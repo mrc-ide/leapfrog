@@ -3,3 +3,4 @@
 ^.github$
 Makefile
 docker
+^.lintr$
