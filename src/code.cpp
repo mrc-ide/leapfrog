@@ -1,6 +1,6 @@
 #include <Rcpp.h>
 
-#include "code.h"
+#include "code.hpp"
 
 //' Add two numbers.
 //'
