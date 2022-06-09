@@ -18,6 +18,7 @@ Suggests:
 Config/testthat/edition: 3
 LinkingTo: 
     Rcpp,
+    RcppEigen,
     testthat
 Imports: 
     Rcpp

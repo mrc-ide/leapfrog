@@ -1,6 +1,6 @@
 #include <Rcpp.h>
 
-#include "code.hpp"
+#include "leapfrog.hpp"
 
 //' Add two numbers.
 //'
