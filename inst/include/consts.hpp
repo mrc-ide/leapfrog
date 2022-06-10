@@ -1,4 +1,4 @@
 #pragma once
 
-#define MALE = 0;
-#define FEMALE = 1;
+const int MALE = 0;
+const int FEMALE = 1;

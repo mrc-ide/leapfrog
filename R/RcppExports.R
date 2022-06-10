@@ -11,3 +11,20 @@ adder <- function(a, b) {
     .Call(`_frogger_adder`, a, b)
 }
 
+#' Simulate base leapfrog model
+#'
+#' @param demp list of demographic input parameters (TODO: document)
+#' @param model_type The type of model, possible options:
+#'   * base - Run the base demographic model
+#'
+#' @details
+#' The first year of `survival`, `asfr`, `srb`, and `netmig` is not used. This
+#' is assumed ' to apply to the base year population (consistent with
+#' Spectrum).
+#'
+#' @export
+#'
+fit_base_model <- function(demp, model_type) {
+    .Call(`_frogger_fit_base_model`, demp, model_type)
+}
+

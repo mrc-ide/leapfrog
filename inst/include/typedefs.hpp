@@ -1,7 +1,15 @@
 #pragma once
 
-typedef Eigen::TensorMap<Eigen::Tensor<const Type, 2>> TensorMapX2cT;
-typedef Eigen::TensorMap<Eigen::Tensor<const Type, 3>> TensorMapX3cT;
+#include <unsupported/Eigen/CXX11/Tensor>
 
-typedef Eigen::TensorMap<Eigen::Tensor<Type, 1>> TensorMapX1T;
-typedef Eigen::TensorMap<Eigen::Tensor<Type, 3>> TensorMapX3T;
+template <typename Type>
+using TensorMapX1cT = Eigen::TensorMap<Eigen::Tensor<const Type, 1>>;
+
+template <typename Type>
+using TensorMapX2cT = Eigen::TensorMap<Eigen::Tensor<const Type, 2>>;
+
+template <typename Type>
+using TensorMapX1T = Eigen::TensorMap<Eigen::Tensor<Type, 1>>;
+
+template <typename Type>
+using TensorMapX2T = Eigen::TensorMap<Eigen::Tensor<Type, 2>>;
