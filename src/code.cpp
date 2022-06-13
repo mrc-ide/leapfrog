@@ -12,7 +12,7 @@ int get_simulation_years(const Rcpp::List demp, SEXP r_sim_years) {
   }
   auto sim_years = INTEGER(r_sim_years)[0];
   if (sim_years > max_sim_years) {
-    Rcpp::stop("Too long");
+    Rcpp::stop(sprintf("No of years > max years %d", max_sim_years));
   }
   return sim_years;
 }
