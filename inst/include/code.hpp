@@ -15,6 +15,9 @@ template <typename real_type>
 using TensorMapX2T = Eigen::TensorMap<Eigen::Tensor<real_type, 2>>;
 
 template <typename real_type>
+using TensorX2T = Eigen::Tensor<real_type, 2>;
+
+template <typename real_type>
 struct Parameters {
   int num_genders;
   int age_groups_pop;             // Default 81 for ages 0 to 80+
@@ -30,7 +33,11 @@ struct Parameters {
 
 template <typename real_type>
 struct State {
-  TensorMapX2T<real_type> total_population;
+  TensorX2T<real_type> total_population;
+  TensorX2T<real_type> natural_deaths;
   real_type births;
-  TensorMapX2T<real_type> natural_deaths;
+
+  State(int age_groups_pop, int num_genders)
+      : total_population(age_groups_pop, num_genders),
+        natural_deaths(age_groups_pop, num_genders) {}
 };

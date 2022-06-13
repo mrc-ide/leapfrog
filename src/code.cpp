@@ -32,33 +32,32 @@ Rcpp::List run_base_model(const Rcpp::List demp) {
                                age_sex_fertility_ratio,
                                births_sex_prop};
 
-  // allocate memory for return object
-  Rcpp::NumericVector total_population(age_groups_pop * num_genders);
-  total_population.attr("dim") =
-      Rcpp::NumericVector::create(age_groups_pop, num_genders);
-  double births;
-
-  Rcpp::NumericVector natural_deaths(age_groups_pop * num_genders);
-  natural_deaths.attr("dim") =
-      Rcpp::NumericVector::create(age_groups_pop, num_genders);
-
-  TensorMapX2T<double> total_population_tensor(REAL(total_population),
-                                               age_groups_pop, num_genders);
-  TensorMapX2T<double> natural_deaths_tensor(REAL(natural_deaths),
-                                             age_groups_pop, num_genders);
-
-  State<double> initial_state = {total_population_tensor, births,
-                                 natural_deaths_tensor};
+  State<double> state(age_groups_pop, num_genders);
 
   // leapfrog_sim<double>(
   //     REAL(demp["basepop"]), REAL(demp["Sx"]), REAL(demp["netmigr_adj"]),
   //     REAL(demp["asfr"]), REAL(demp["births_sex_prop"]), num_genders,
-  //     age_groups_pop, fertility_first_age_group, age_groups_fert, proj_years,
-  //     REAL(total_population), REAL(births), REAL(natural_deaths));
+  //     age_groups_pop, fertility_first_age_group, age_groups_fert,
+  //     proj_years, REAL(total_population), REAL(births),
+  //     REAL(natural_deaths));
 
-  Rcpp::List ret = Rcpp::List::create(
-      Rcpp::_["total_population"] = total_population,
-      Rcpp::_["births"] = births, Rcpp::_["natural_deaths"] = natural_deaths);
+  Rcpp::NumericVector r_total_population(age_groups_pop * num_genders);
+  Rcpp::NumericVector r_births;
+  Rcpp::NumericVector r_natural_deaths(age_groups_pop * num_genders);
+  r_total_population.attr("dim") =
+      Rcpp::NumericVector::create(age_groups_pop, num_genders);
+  r_natural_deaths.attr("dim") =
+      Rcpp::NumericVector::create(age_groups_pop, num_genders);
 
+  std::copy_n(state.total_population.data(), state.total_population.size(),
+              REAL(r_total_population));
+  std::copy_n(state.natural_deaths.data(), state.natural_deaths.size(),
+              REAL(r_natural_deaths));
+  REAL(r_births)[0] = state.births;
+
+  Rcpp::List ret =
+      Rcpp::List::create(Rcpp::_["total_population"] = r_total_population,
+                         Rcpp::_["births"] = r_births,
+                         Rcpp::_["natural_deaths"] = r_natural_deaths);
   return ret;
 }
