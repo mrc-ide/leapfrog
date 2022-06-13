@@ -27,7 +27,7 @@ struct Parameters {
   TensorMapX2T<real_type> base_pop;
   TensorMapX2T<real_type> survival;
   TensorMapX2T<real_type> net_migration;
-  TensorMapX1T<real_type> asfr;
+  TensorMapX1T<real_type> age_sex_fertility_ratio;
   TensorMapX1T<real_type> births_sex_prop;
 };
 

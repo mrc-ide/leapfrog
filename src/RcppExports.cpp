@@ -12,13 +12,14 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // run_base_model
-Rcpp::List run_base_model(const Rcpp::List demp);
-RcppExport SEXP _frogger_run_base_model(SEXP dempSEXP) {
+Rcpp::List run_base_model(const Rcpp::List demp, SEXP sim_years);
+RcppExport SEXP _frogger_run_base_model(SEXP dempSEXP, SEXP sim_yearsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::List >::type demp(dempSEXP);
-    rcpp_result_gen = Rcpp::wrap(run_base_model(demp));
+    Rcpp::traits::input_parameter< SEXP >::type sim_years(sim_yearsSEXP);
+    rcpp_result_gen = Rcpp::wrap(run_base_model(demp, sim_years));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -26,7 +27,7 @@ END_RCPP
 RcppExport SEXP run_testthat_tests(SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_frogger_run_base_model", (DL_FUNC) &_frogger_run_base_model, 1},
+    {"_frogger_run_base_model", (DL_FUNC) &_frogger_run_base_model, 2},
     {"run_testthat_tests", (DL_FUNC) &run_testthat_tests, 1},
     {NULL, NULL, 0}
 };

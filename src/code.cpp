@@ -1,11 +1,25 @@
 #include <Rcpp.h>
 
 #include "code.hpp"
+#include "frogger.hpp"
+
+int get_simulation_years(const Rcpp::List demp, SEXP r_sim_years) {
+  Rcpp::NumericVector Sx = demp["Sx"];
+  Rcpp::Dimension d = Sx.attr("dim");
+  const int max_sim_years = d[2];
+  if (r_sim_years == R_NilValue) {
+    return max_sim_years;
+  }
+  auto sim_years = INTEGER(r_sim_years)[0];
+  if (sim_years > max_sim_years) {
+    Rcpp::stop("Too long");
+  }
+  return sim_years;
+}
 
 // [[Rcpp::export]]
-Rcpp::List run_base_model(const Rcpp::List demp) {
-  const size_t proj_years =
-      2;  // TODO: Fix temporarily for testing should be d[2]
+Rcpp::List run_base_model(const Rcpp::List demp, SEXP sim_years) {
+  const int proj_years = get_simulation_years(demp, sim_years);
   const int num_genders = 2;
   const int age_groups_pop = 81;
   const int fertility_first_age_group = 15;
@@ -32,17 +46,10 @@ Rcpp::List run_base_model(const Rcpp::List demp) {
                                age_sex_fertility_ratio,
                                births_sex_prop};
 
-  State<double> state(age_groups_pop, num_genders);
-
-  // leapfrog_sim<double>(
-  //     REAL(demp["basepop"]), REAL(demp["Sx"]), REAL(demp["netmigr_adj"]),
-  //     REAL(demp["asfr"]), REAL(demp["births_sex_prop"]), num_genders,
-  //     age_groups_pop, fertility_first_age_group, age_groups_fert,
-  //     proj_years, REAL(total_population), REAL(births),
-  //     REAL(natural_deaths));
+  auto state = model_runner(proj_years, params);
 
   Rcpp::NumericVector r_total_population(age_groups_pop * num_genders);
-  Rcpp::NumericVector r_births;
+  Rcpp::NumericVector r_births(1);
   Rcpp::NumericVector r_natural_deaths(age_groups_pop * num_genders);
   r_total_population.attr("dim") =
       Rcpp::NumericVector::create(age_groups_pop, num_genders);
