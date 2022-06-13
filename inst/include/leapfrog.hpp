@@ -1,18 +1,18 @@
 #pragma once
 
 #include <consts.hpp>
+#include <model_runner.hpp>
 #include <unsupported/Eigen/CXX11/Tensor>
 
 template <typename real_type>
-void run_demographic_projection(const parameters& pars,
-                                const state& state_cur,
-                                state& state_next) {
+void run_demographic_projection(const Parameters<real_type>& pars,
+                                const State<real_type>& state_cur,
+                                State<real_type>& state_next) {
   const int num_genders = pars.num_genders;
   const int age_groups_pop = pars.age_groups_pop;
   const int fertility_first_age_group = pars.fertility_first_age_group;
   const int age_groups_fert = pars.age_groups_fert;
-  Eigen::Tensor<real_type, Eigen::Sizes<age_groups_pop, num_genders>>
-      migrate_ag;
+  Eigen::Tensor<real_type, 2> migrate_ag(age_groups_pop, num_genders);
 
   // ageing and non-HIV mortality
   for (int g = 0; g < num_genders; g++) {

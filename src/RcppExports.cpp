@@ -11,27 +11,15 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// adder
-int adder(int a, int b);
-RcppExport SEXP _frogger_adder(SEXP aSEXP, SEXP bSEXP) {
+// run_base_model
+Rcpp::List run_base_model(const Rcpp::List demp, const std::string model_type);
+RcppExport SEXP _frogger_run_base_model(SEXP dempSEXP, SEXP model_typeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type a(aSEXP);
-    Rcpp::traits::input_parameter< int >::type b(bSEXP);
-    rcpp_result_gen = Rcpp::wrap(adder(a, b));
-    return rcpp_result_gen;
-END_RCPP
-}
-// fit_base_model
-Rcpp::List fit_base_model(const Rcpp::List& demp, const std::string model_type);
-RcppExport SEXP _frogger_fit_base_model(SEXP dempSEXP, SEXP model_typeSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Rcpp::List& >::type demp(dempSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List >::type demp(dempSEXP);
     Rcpp::traits::input_parameter< const std::string >::type model_type(model_typeSEXP);
-    rcpp_result_gen = Rcpp::wrap(fit_base_model(demp, model_type));
+    rcpp_result_gen = Rcpp::wrap(run_base_model(demp, model_type));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -39,8 +27,7 @@ END_RCPP
 RcppExport SEXP run_testthat_tests(SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_frogger_adder", (DL_FUNC) &_frogger_adder, 2},
-    {"_frogger_fit_base_model", (DL_FUNC) &_frogger_fit_base_model, 2},
+    {"_frogger_run_base_model", (DL_FUNC) &_frogger_run_base_model, 2},
     {"run_testthat_tests", (DL_FUNC) &run_testthat_tests, 1},
     {NULL, NULL, 0}
 };
