@@ -6,13 +6,15 @@
 int get_simulation_years(const Rcpp::List demp, SEXP r_sim_years) {
   Rcpp::NumericVector Sx = demp["Sx"];
   Rcpp::Dimension d = Sx.attr("dim");
-  const int max_sim_years = d[2];
+  // Simulation builds this year output from last year output and this years
+  // data so -1 off dim for max number of sim years
+  const int max_sim_years = d[2] - 1;
   if (r_sim_years == R_NilValue) {
     return max_sim_years;
   }
   auto sim_years = INTEGER(r_sim_years)[0];
   if (sim_years > max_sim_years) {
-    Rcpp::stop(sprintf("No of years > max years %d", max_sim_years));
+    Rcpp::stop("No of years > max years of " + std::to_string(max_sim_years));
   }
   return sim_years;
 }
@@ -25,16 +27,19 @@ Rcpp::List run_base_model(const Rcpp::List demp, SEXP sim_years) {
   const int fertility_first_age_group = 15;
   const int age_groups_fert = 35;
 
-  TensorMapX2T<double> base_pop(REAL(demp["basepop"]), age_groups_pop,
-                                num_genders);
-  TensorMapX2T<double> survival(REAL(demp["Sx"]), age_groups_pop + 1,
-                                num_genders);
-  TensorMapX2T<double> net_migration(REAL(demp["netmigr_adj"]), age_groups_pop,
-                                     num_genders);
-  TensorMapX1T<double> age_sex_fertility_ratio(REAL(demp["asfr"]),
-                                               age_groups_fert);
-  TensorMapX1T<double> births_sex_prop(REAL(demp["births_sex_prop"]),
-                                       num_genders);
+  TensorMap2<double> base_pop(REAL(demp["basepop"]), age_groups_pop,
+                              num_genders);
+  // Survival has size age_groups_pop + 1 as this is the probability of
+  // surviving between ages, so from 0 to 1, 1 to 2, ..., 79 to 80+ and
+  // 80+ to 80+
+  TensorMap3<double> survival(REAL(demp["Sx"]), age_groups_pop + 1, num_genders,
+                              proj_years);
+  TensorMap3<double> net_migration(REAL(demp["netmigr_adj"]), age_groups_pop,
+                                   num_genders, proj_years);
+  TensorMap2<double> age_sex_fertility_ratio(REAL(demp["asfr"]),
+                                             age_groups_fert, proj_years);
+  TensorMap2<double> births_sex_prop(REAL(demp["births_sex_prop"]), num_genders,
+                                     proj_years);
 
   Parameters<double> params = {num_genders,
                                age_groups_pop,

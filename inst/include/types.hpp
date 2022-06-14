@@ -3,19 +3,13 @@
 #include <unsupported/Eigen/CXX11/Tensor>
 
 template <typename real_type>
-using TensorMapX1cT = Eigen::TensorMap<Eigen::Tensor<const real_type, 1>>;
+using TensorMap2 = Eigen::TensorMap<Eigen::Tensor<real_type, 2>>;
 
 template <typename real_type>
-using TensorMapX2cT = Eigen::TensorMap<Eigen::Tensor<const real_type, 2>>;
+using TensorMap3 = Eigen::TensorMap<Eigen::Tensor<real_type, 3>>;
 
 template <typename real_type>
-using TensorMapX1T = Eigen::TensorMap<Eigen::Tensor<real_type, 1>>;
-
-template <typename real_type>
-using TensorMapX2T = Eigen::TensorMap<Eigen::Tensor<real_type, 2>>;
-
-template <typename real_type>
-using TensorX2T = Eigen::Tensor<real_type, 2>;
+using Tensor2 = Eigen::Tensor<real_type, 2>;
 
 template <typename real_type>
 struct Parameters {
@@ -24,17 +18,17 @@ struct Parameters {
   int fertility_first_age_group;  // First index eligible for fertility
   int age_groups_fert;            // Number of ages eligible for fertility
 
-  TensorMapX2T<real_type> base_pop;
-  TensorMapX2T<real_type> survival;
-  TensorMapX2T<real_type> net_migration;
-  TensorMapX1T<real_type> age_sex_fertility_ratio;
-  TensorMapX1T<real_type> births_sex_prop;
+  TensorMap2<real_type> base_pop;
+  TensorMap3<real_type> survival;
+  TensorMap3<real_type> net_migration;
+  TensorMap2<real_type> age_sex_fertility_ratio;
+  TensorMap2<real_type> births_sex_prop;
 };
 
 template <typename real_type>
 struct State {
-  TensorX2T<real_type> total_population;
-  TensorX2T<real_type> natural_deaths;
+  Tensor2<real_type> total_population;
+  Tensor2<real_type> natural_deaths;
   real_type births;
 
   State(int age_groups_pop, int num_genders)
