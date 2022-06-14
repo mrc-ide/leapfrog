@@ -1,7 +1,7 @@
 #include <Rcpp.h>
 
-#include "code.hpp"
 #include "frogger.hpp"
+#include "types.hpp"
 
 int get_simulation_years(const Rcpp::List demp, SEXP r_sim_years) {
   Rcpp::NumericVector Sx = demp["Sx"];

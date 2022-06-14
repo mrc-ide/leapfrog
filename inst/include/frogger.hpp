@@ -1,6 +1,6 @@
 #pragma once
 
-#include "code.hpp"
+#include "types.hpp"
 
 const int MALE = 0;
 const int FEMALE = 1;
