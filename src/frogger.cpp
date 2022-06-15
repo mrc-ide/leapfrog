@@ -6,8 +6,10 @@
 int get_simulation_years(const Rcpp::List demp, SEXP r_sim_years) {
   Rcpp::NumericVector Sx = demp["Sx"];
   Rcpp::Dimension d = Sx.attr("dim");
-  // Simulation builds this year output from last year output and this years
-  // data so -1 off dim for max number of sim years
+  // Simulation initialises state from first years input data (index 0)
+  // then runs for each year simulating this years (i) data using previous years
+  // state (i - 1) and this years input data (i). So -1 off index for max years
+  // to simulate as index 0 used for initial state
   const int max_sim_years = d[2] - 1;
   if (r_sim_years == R_NilValue) {
     return max_sim_years;
