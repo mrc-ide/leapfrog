@@ -53,7 +53,7 @@ Rcpp::List run_base_model(const Rcpp::List demp, SEXP sim_years) {
                                age_sex_fertility_ratio,
                                births_sex_prop};
 
-  auto state = model_runner(proj_years, params);
+  auto state = run_model(proj_years, params);
 
   Rcpp::NumericVector r_total_population(age_groups_pop * num_genders);
   Rcpp::NumericVector r_births(1);

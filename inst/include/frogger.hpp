@@ -1,14 +1,12 @@
 #pragma once
 
-#include <iostream>
 #include "types.hpp"
 
 const int MALE = 0;
 const int FEMALE = 1;
 
 template <typename real_type>
-State<real_type> model_runner(int time_steps,
-                              const Parameters<real_type>& pars) {
+State<real_type> run_model(int time_steps, const Parameters<real_type>& pars) {
   State<double> state(pars.age_groups_pop, pars.num_genders);
   initialise_model_state(pars, state);
   auto state_next = state;
