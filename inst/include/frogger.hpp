@@ -40,7 +40,7 @@ void run_demographic_projection(int time_step,
   const int age_groups_pop = pars.age_groups_pop;
   const int fertility_first_age_group = pars.fertility_first_age_group;
   const int age_groups_fert = pars.age_groups_fert;
-  Tensor2<real_type> migrate_ag(age_groups_pop, num_genders);
+  Tensor2<real_type> migration_rate(age_groups_pop, num_genders);
 
   // ageing and non-HIV mortality
   for (int g = 0; g < num_genders; ++g) {
@@ -68,10 +68,10 @@ void run_demographic_projection(int time_step,
       // Get migration rate, as number of net migrants adjusted for survivorship
       // to end of period. Divide by 2 as (on average) half of deaths will
       // happen before they migrate. Then divide by total pop to get rate.
-      migrate_ag(a, g) = pars.net_migration(a, g, time_step) *
-                         (1.0 + pars.survival(a, g, time_step)) * 0.5 /
-                         state_next.total_population(a, g);
-      state_next.total_population(a, g) *= 1.0 + migrate_ag(a, g);
+      migration_rate(a, g) = pars.net_migration(a, g, time_step) *
+                             (1.0 + pars.survival(a, g, time_step)) * 0.5 /
+                             state_next.total_population(a, g);
+      state_next.total_population(a, g) *= 1.0 + migration_rate(a, g);
     }
 
     // For open age group (age 80+), net migrant survivor adjustment based on
@@ -86,9 +86,10 @@ void run_demographic_projection(int time_step,
         (state_next.total_population(a, g) +
          0.5 * state_next.natural_deaths(a, g)) /
         (state_next.total_population(a, g) + state_next.natural_deaths(a, g));
-    migrate_ag(a, g) = survival_netmig * pars.net_migration(a, g, time_step) /
-                       state_next.total_population(a, g);
-    state_next.total_population(a, g) *= 1.0 + migrate_ag(a, g);
+    migration_rate(a, g) = survival_netmig *
+                           pars.net_migration(a, g, time_step) /
+                           state_next.total_population(a, g);
+    state_next.total_population(a, g) *= 1.0 + migration_rate(a, g);
   }
 
   // fertility
@@ -112,9 +113,9 @@ void run_demographic_projection(int time_step,
 
     // Assume 2/3 survival rate since mortality in first six months higher
     // than second 6 months (Spectrum manual, section 6.2.7.4)
-    real_type migrate_a0 = pars.net_migration(0, g, time_step) *
-                           (1.0 + 2.0 * pars.survival(0, g, time_step)) / 3.0 /
-                           state_next.total_population(0, g);
-    state_next.total_population(0, g) *= 1.0 + migrate_a0;
+    real_type migration_rate_a0 = pars.net_migration(0, g, time_step) *
+                                  (1.0 + 2.0 * pars.survival(0, g, time_step)) /
+                                  3.0 / state_next.total_population(0, g);
+    state_next.total_population(0, g) *= 1.0 + migration_rate_a0;
   }
 }
