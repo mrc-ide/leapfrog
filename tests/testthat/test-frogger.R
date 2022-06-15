@@ -39,11 +39,3 @@ test_that("error thrown if trying to run model for more than max years", {
 
   expect_error(run_base_model(demp, 100L), "No of years > max years of 60")
 })
-
-test_that("when running with no fertility, there are no births", {
-  demp <- readRDS(test_path("testdata/demographic_projection_object.rds"))
-
-  demp$asfr[, ] <- 0
-  out <- run_base_model(demp, NULL)
-  expect_equal(out$births, 0)
-})
