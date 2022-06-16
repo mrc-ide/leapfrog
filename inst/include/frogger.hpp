@@ -10,8 +10,9 @@ State<real_type> run_model(int time_steps, const Parameters<real_type>& pars) {
   State<double> state(pars.age_groups_pop, pars.num_genders);
   initialise_model_state(pars, state);
   auto state_next = state;
-  for (int time = 1; time <= time_steps; ++time) {
-    run_demographic_projection(time, pars, state, state_next);
+  // Each time step is mid-point of the year
+  for (int step = 1; step <= time_steps; ++step) {
+    run_demographic_projection(step, pars, state, state_next);
     std::swap(state, state_next);
   }
   return state;
