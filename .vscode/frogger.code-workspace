@@ -68,7 +68,16 @@
 			"typeindex": "cpp",
 			"typeinfo": "cpp",
 			"variant": "cpp",
-			"bit": "cpp"
+			"bit": "cpp",
+			"csetjmp": "cpp",
+			"csignal": "cpp",
+			"any": "cpp",
+			"codecvt": "cpp",
+			"unordered_set": "cpp",
+			"filesystem": "cpp",
+			"future": "cpp",
+			"shared_mutex": "cpp",
+			"valarray": "cpp"
 		},
 		"name": "R"
 	}
