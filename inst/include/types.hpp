@@ -2,6 +2,9 @@
 
 #include <unsupported/Eigen/CXX11/Tensor>
 
+const int MALE = 0;
+const int FEMALE = 1;
+
 template <typename real_type>
 using TensorMap1 = Eigen::TensorMap<Eigen::Tensor<real_type, 1>>;
 template <typename real_type>
@@ -65,4 +68,14 @@ struct State {
                         disease_stages,
                         age_groups_hiv,
                         num_genders) {}
+};
+
+template <typename real_type>
+struct WorkingData {
+  Tensor2<real_type> migration_rate;
+
+  WorkingData(int age_groups_pop, int num_genders)
+      : migration_rate(age_groups_pop, num_genders) {}
+
+  void reset() { migration_rate.setZero(); }
 };
