@@ -61,7 +61,7 @@ Rcpp::List run_base_model(const Rcpp::List data,
                              1;  // 0-based indexing vs R 1-based
   auto age_groups_hiv_span =
       get_age_groups_hiv_span(projection_parameters, hiv_age_stratification);
-  auto age_groups_hiv = age_groups_hiv_span.size();
+  int age_groups_hiv = age_groups_hiv_span.size();
 
   TensorMap2<double> base_pop(REAL(data["basepop"]), age_groups_pop,
                               num_genders);
