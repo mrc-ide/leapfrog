@@ -33,7 +33,7 @@ TensorMap1<int> get_age_groups_hiv_span(const Rcpp::List projection_parameters,
     data = projection_parameters["hAG_SPAN_coarse"];
   } else {
     Rcpp::stop(
-        "Invalid hiv age stratification must be 'full' or 'coarse' got " +
+        "Invalid HIV age stratification must be 'full' or 'coarse' got '%s'.",
         hiv_age_stratification);
   }
   if (LENGTH(data) != age_groups_hiv) {
@@ -48,7 +48,7 @@ TensorMap1<int> get_age_groups_hiv_span(const Rcpp::List projection_parameters,
 Rcpp::List run_base_model(const Rcpp::List data,
                           const Rcpp::List projection_parameters,
                           SEXP sim_years,
-                          std::string hiv_age_stratification) {
+                          std::string hiv_age_stratification = "full") {
   const int proj_years = get_simulation_years(data, sim_years);
   const int num_genders = 2;
   const int age_groups_pop = 81;
@@ -136,7 +136,7 @@ Rcpp::List run_base_model(const Rcpp::List data,
                          Rcpp::_["births"] = r_births,
                          Rcpp::_["natural_deaths"] = r_natural_deaths,
                          Rcpp::_["hiv_population"] = r_hiv_population,
-                         Rcpp::_["natural_deaths"] = r_hiv_natural_deaths,
+                         Rcpp::_["hiv_natural_deaths"] = r_hiv_natural_deaths,
                          Rcpp::_["hiv_strat_adult"] = r_hiv_strat_adult,
                          Rcpp::_["art_strat_adult"] = r_art_strat_adult);
   return ret;
