@@ -10,7 +10,7 @@ void run_hiv_pop_demographic_projection(int time_step,
                                         State<real_type>& state_next,
                                         WorkingData<real_type>& working) {
   run_hiv_ageing_and_mortality(time_step, pars, state_curr, state_next);
-  run_hiv_and_art_stratified_aging(time_step, pars, state_curr, state_next);
+  run_hiv_and_art_stratified_ageing(time_step, pars, state_curr, state_next);
   run_hiv_deaths_and_migration(time_step, pars, state_next, working);
   run_hiv_and_art_stratified_deaths_and_migration(time_step, pars, state_curr,
                                                   state_next, working);
@@ -40,10 +40,10 @@ void run_hiv_ageing_and_mortality(int time_step,
 }
 
 template <typename real_type>
-void run_hiv_and_art_stratified_aging(int time_step,
-                                      const Parameters<real_type>& pars,
-                                      const State<real_type>& state_curr,
-                                      State<real_type>& state_next) {
+void run_hiv_and_art_stratified_ageing(int time_step,
+                                       const Parameters<real_type>& pars,
+                                       const State<real_type>& state_curr,
+                                       State<real_type>& state_next) {
   // TODO: better name for hiv_ag_prob - what is this? Prob of chance of someone
   // getting HIV as a function of the size of the HIV population
   Tensor2<real_type> hiv_ag_prob(pars.age_groups_hiv, pars.num_genders);
