@@ -73,9 +73,14 @@ struct State {
 template <typename real_type>
 struct WorkingData {
   Tensor2<real_type> migration_rate;
+  Tensor2<real_type> hiv_net_migration;
 
   WorkingData(int age_groups_pop, int num_genders)
-      : migration_rate(age_groups_pop, num_genders) {}
+      : migration_rate(age_groups_pop, num_genders),
+        hiv_net_migration(age_groups_pop, num_genders) {}
 
-  void reset() { migration_rate.setZero(); }
+  void reset() {
+    migration_rate.setZero();
+    hiv_net_migration.setZero();
+  }
 };
