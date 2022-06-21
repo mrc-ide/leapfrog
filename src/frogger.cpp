@@ -57,8 +57,9 @@ Rcpp::List run_base_model(const Rcpp::List data,
   const int disease_stages = 7;
   const int treatment_stages = 3;
   const int hiv_adult_first_age_group = 15;
-  const int time_art_start = *INTEGER(projection_parameters["t_ART_start"]) -
-                             1;  // 0-based indexing vs R 1-based
+  // 0-based indexing vs R 1-based
+  const int time_art_start =
+      Rcpp::as<int>(projection_parameters["t_ART_start"]) - 1;
   auto age_groups_hiv_span =
       get_age_groups_hiv_span(projection_parameters, hiv_age_stratification);
   int age_groups_hiv = static_cast<int>(age_groups_hiv_span.size());

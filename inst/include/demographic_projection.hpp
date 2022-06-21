@@ -8,16 +8,18 @@ void run_demographic_projection(int time_step,
                                 const State<real_type>& state_curr,
                                 State<real_type>& state_next,
                                 WorkingData<real_type>& working) {
-  run_ageing_and_mortality(time_step, pars, state_curr, state_next);
+  run_ageing_and_mortality(time_step, pars, state_curr, state_next, working);
   run_migration(time_step, pars, state_curr, state_next, working);
-  run_fertility_and_infant_migration(time_step, pars, state_curr, state_next);
+  run_fertility_and_infant_migration(time_step, pars, state_curr, state_next,
+                                     working);
 }
 
 template <typename real_type>
 void run_ageing_and_mortality(int time_step,
                               const Parameters<real_type>& pars,
                               const State<real_type>& state_curr,
-                              State<real_type>& state_next) {
+                              State<real_type>& state_next,
+                              WorkingData<real_type>& working) {
   for (int g = 0; g < pars.num_genders; ++g) {
     // Start at index 1 as we will add infant (age 0) births and deaths later
     for (int a = 1; a < pars.age_groups_pop; ++a) {
@@ -81,7 +83,8 @@ template <typename real_type>
 void run_fertility_and_infant_migration(int time_step,
                                         const Parameters<real_type>& pars,
                                         const State<real_type>& state_curr,
-                                        State<real_type>& state_next) {
+                                        State<real_type>& state_next,
+                                        WorkingData<real_type>& working) {
   state_next.births = 0.0;
   for (int af = 0; af < pars.age_groups_fert; ++af) {
     state_next.births += (state_curr.total_population(
