@@ -3,11 +3,11 @@
 #include "types.hpp"
 
 template <typename real_type>
-void run_demographic_projection(int time_step,
-                                const Parameters<real_type>& pars,
-                                const State<real_type>& state_curr,
-                                State<real_type>& state_next,
-                                WorkingData<real_type>& working) {
+void run_general_demographic_projection(int time_step,
+                                        const Parameters<real_type>& pars,
+                                        const State<real_type>& state_curr,
+                                        State<real_type>& state_next,
+                                        WorkingData<real_type>& working) {
   run_ageing_and_mortality(time_step, pars, state_curr, state_next, working);
   run_migration(time_step, pars, state_curr, state_next, working);
   run_fertility_and_infant_migration(time_step, pars, state_curr, state_next,
