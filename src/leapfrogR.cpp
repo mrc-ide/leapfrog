@@ -67,8 +67,8 @@ leapfrogR(const Rcpp::List& demp,
   NumericVector artstrat_adult(hTS * hDS * hAG * NG * proj_years);
   artstrat_adult.attr("dim") = NumericVector::create(hTS, hDS, hAG, NG, proj_years);
   
- // NumericVector hivstrat_paeds(hDS * pIDX_HIVADULT * NG * proj_years);
- // hivstrat_paeds.attr("dim") = NumericVector::create(hDS, pIDX_HIVADULT, NG, proj_years);
+  NumericVector hivstrat_paeds(hDS * pIDX_HIVADULT * NG * proj_years);
+  hivstrat_paeds.attr("dim") = NumericVector::create(hDS, pIDX_HIVADULT, NG, proj_years);
   
   NumericVector coarse_totpop1(hAG * NG * proj_years);
   coarse_totpop1.attr("dim") = NumericVector::create(hAG, NG, proj_years);
@@ -133,7 +133,7 @@ leapfrogR(const Rcpp::List& demp,
        REAL(infections),
        REAL(hivstrat_adult),
        REAL(artstrat_adult),
-      // REAL(hivstrat_paeds),
+       REAL(hivstrat_paeds),
        REAL(births),
        REAL(hiv_births),
        REAL(natdeaths),
@@ -180,7 +180,7 @@ leapfrogR(const Rcpp::List& demp,
        REAL(infections),
        REAL(hivstrat_adult),
        REAL(artstrat_adult),
-      // REAL(hivstrat_paeds),
+       REAL(hivstrat_paeds),
        REAL(births),
        REAL(hiv_births),
        REAL(natdeaths),
@@ -199,7 +199,7 @@ leapfrogR(const Rcpp::List& demp,
 			  _("hivnpop1") = hivnpop1,
 			  _("hivstrat_adult") = hivstrat_adult,
 			  _("artstrat_adult") = artstrat_adult,
-			 // _("hivstrat_paeds") = hivstrat_paeds,
+			  _("hivstrat_paeds") = hivstrat_paeds,
 			  _("infections") = infections,
 			  _("births") = births,	
 			  _("hiv_births") = hiv_births,			  

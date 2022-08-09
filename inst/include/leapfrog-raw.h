@@ -80,7 +80,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                     Type *p_infections,
                     Type *p_hivstrat_adult,
                     Type *p_artstrat_adult,
-                    //Type *p_hivstrat_paeds,
+                    Type *p_hivstrat_paeds,
 		                Type *p_births,
 		                Type *p_hiv_births,
                     Type *p_natdeaths,
@@ -154,7 +154,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   
   // paed
   const TensorMapX1cT paed_incid_input(p_paed_incid_input, sim_years);
-  const TensorMapX1cT paed_cd4_dist(p_paed_cd4_dist, sim_years);
+  const TensorMapX1cT paed_cd4_dist(p_paed_cd4_dist, hDS);
 
   // outputs
   TensorMapX3T totpop1(p_totpop1, pAG, NG, sim_years);
@@ -173,7 +173,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   TensorMapX4T hivstrat_adult(p_hivstrat_adult, hDS, hAG, NG, sim_years);
   TensorMapX5T artstrat_adult(p_artstrat_adult, hTS, hDS, hAG, NG, sim_years);
   
-  //TensorMapX4T hivstrat_paeds(p_hivstrat_paeds, hDS, hAG, NG, sim_years);
+  TensorMapX4T hivstrat_paeds(p_hivstrat_paeds, hDS, pIDX_HIVADULT, NG, sim_years);
   
   TensorMapX3T coarse_totpop1(p_coarse_totpop1, hAG, NG, sim_years);
   
@@ -189,7 +189,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   hivpop1.setZero();
   hivstrat_adult.setZero();
   artstrat_adult.setZero();
- // hivstrat_paeds.setZero();
+  hivstrat_paeds.setZero();
 
   int everARTelig_idx = hDS;
 
@@ -708,12 +708,15 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       //hiv_births(t) += (hivpop1(pIDX_FERT + af, FEMALE, t + hivpop1(pIDX_FERT + af, FEMALE, t-1) * 0.5) * asfr(af, t) * fert_rat(pIDX_FERT + af, t));
     }
     
-    
+    TensorFixedSize<Type, Sizes<hDS>> infections_strat;
     //distribute across eligible ages, right now just going to hardcode
     for(int g = 0; g < NG; g++){
       for(int af = 0; af < 5; af++){
         infections(af, g, t) = paed_incid_input(t) / 10;
-        hivpop1(af, g, t) += infections(af, g, t) ;
+        hivpop1(af, g, t) += infections(af, g, t);
+        for(int hm = 0; hm < hDS; hm++){
+          hivstrat_paeds(hm, af, g, t) = infections(af, g, t) * paed_cd4_dist(hm);
+        }
         //natdeaths(af, g, t) = hivpop1(af, g, t) * (1 - sx(af, g, t));
         //hivpop1(af, g, t) -= natdeaths(af, g, t);
       }
