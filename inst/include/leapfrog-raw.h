@@ -172,7 +172,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 
   TensorMapX4T hivstrat_adult(p_hivstrat_adult, hDS, hAG, NG, sim_years);
   TensorMapX5T artstrat_adult(p_artstrat_adult, hTS, hDS, hAG, NG, sim_years);
-  
   TensorMapX4T hivstrat_paeds(p_hivstrat_paeds, hDS, pIDX_HIVADULT, NG, sim_years);
   
   TensorMapX3T coarse_totpop1(p_coarse_totpop1, hAG, NG, sim_years);
@@ -253,6 +252,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     hiv_ag_prob.setZero();
     TensorFixedSize<Type, Sizes<hAG, NG>> tot_ag_prob;
     tot_ag_prob.setZero();
+    TensorFixedSize<Type, Sizes<pIDX_FERT, NG>> hivpaeds_ag_prob;
+    hivpaeds_ag_prob.setZero();
 
     for(int g = 0; g < NG; g++){
       int a = pIDX_HIVADULT;
@@ -269,7 +270,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
       // Note: loop stops at hAG-1; no one ages out of the open-ended age group
     }
-
+    
     for(int g = 0; g < NG; g++) {
       for(int ha = 1; ha < hAG; ha++) {
         coarse_totpop1(ha, g, t) = (1.0 - tot_ag_prob(ha, g)) * coarse_totpop1(ha, g, t-1);  // age-out
@@ -285,14 +286,38 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         }
       }
     }
+    
+   for(int g = 0; g < NG; g++){
+      int a = 0;
+      for(int ha = 1; ha < pIDX_FERT; ha++){
+          hivpaeds_ag_prob(ha, g) += hivpop1(a, g, t-1);
+          hivpaeds_ag_prob(ha, g) = (hivpaeds_ag_prob(ha, g) > 0) ? hivpop1(a-1, g, t-1) / hivpaeds_ag_prob(ha, g) : 0.0;
+          a++;
+      }
+      // Note: loop stops at hAG-1; no one ages out of the open-ended age group
+      //MKW: need to change this to entrants go into the adult population
+    }
+    
+    for(int g = 0; g < NG; g++) {
+      for(int ha = 1; ha < pIDX_FERT; ha++) {
+        for(int hm = 0; hm < hDS; hm++) {
+          hivstrat_paeds(hm, ha, g, t) = (1.0 - hivpaeds_ag_prob(ha, g)) * hivstrat_paeds(hm, ha, g, t-1);  // age-out
+          hivstrat_paeds(hm, ha, g, t) += hivpaeds_ag_prob(ha-1, g) * hivstrat_paeds(hm, ha-1, g, t-1);   // age-in
+          //if(t > t_ART_start)
+          //  for(int hu = 0; hu < hTS; hu++) {
+          //    artstrat_adult(hu, hm, ha, g, t) = (1.0 - hiv_ag_prob(ha, g)) * artstrat_adult(hu, hm, ha, g, t-1);
+          //   artstrat_adult(hu, hm, ha, g, t) += hiv_ag_prob(ha-1, g) * artstrat_adult(hu, hm, ha-1, g, t-1);
+          //  }
+       }
+      }
+    }
+
+
 
     // !!!TODO: add HIV+ 15 year old entrants
-    //mkw: through both sexes
     for (int g = 0; g < NG; g++) {
-      //mkw: through CD4 categories 
       for (int hm = 0; hm < hDS; hm++) {
         hivstrat_adult(hm, 0, g, t) = (1.0 - hiv_ag_prob(0, g)) * hivstrat_adult(hm, 0, g, t-1);
-       //mkw TODO: not including any on art here
         hivstrat_adult(hm, 0, g, t) = hivstrat_adult(hm, 0, g, t) + age15hivpop(1, hm, g, t);
         // ADD HIV+ entrants here
         if(t > t_ART_start) {

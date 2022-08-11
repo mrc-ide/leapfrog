@@ -37,7 +37,7 @@ test_that("Leapfrog matches direct incidence option at coarse and single year ag
 test_that("Input childhood infections and test alignment betwen leapfrog and spectrum", {
   ## Check that prevalence, deaths and incidence  matches between
   ## the two models
-  pjnz1 <- "../testdata/spectrum/v6.13/bwa_aim-adult-no-art-child-input-distribute-infections_spectrum-v6.13_2022-02-12.PJNZ"
+  pjnz1 <- "../testdata/spectrum/v6.13/bwa_aim-adult-no-art-child-input_spectrum-v6.13_2022-02-12.PJNZ"
   demog_matches_birthsdeaths(pjnz1, threshold_deaths = 1e-3, threshold_births = 0.01)
   demog_matches_totpop(pjnz1)
   transmission_matches(pjnz1, threshold_absolute_pid = c(0.2, 1e-3, 1e-3))
