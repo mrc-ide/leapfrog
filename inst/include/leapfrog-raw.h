@@ -739,11 +739,12 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       for(int af = 0; af < 5; af++){
         infections(af, g, t) = paed_incid_input(t) / 10;
         hivpop1(af, g, t) += infections(af, g, t);
+ 
         for(int hm = 0; hm < hDS; hm++){
-          hivstrat_paeds(hm, af, g, t) = infections(af, g, t) * paed_cd4_dist(hm);
+          hivstrat_paeds(hm, af, g, t) = (infections(af, g, t) )* paed_cd4_dist(hm);
         }
-        //natdeaths(af, g, t) = hivpop1(af, g, t) * (1 - sx(af, g, t));
-        //hivpop1(af, g, t) -= natdeaths(af, g, t);
+    //    natdeaths(af, g, t) = hivpop1(af, g, t) * (1 - sx(af, g, t));
+      //  hivpop1(af, g, t) -= natdeaths(af, g, t);
       }
     }
    

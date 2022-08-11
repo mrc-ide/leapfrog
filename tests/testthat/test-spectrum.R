@@ -40,8 +40,8 @@ test_that("Input childhood infections and test alignment betwen leapfrog and spe
   pjnz1 <- "../testdata/spectrum/v6.13/bwa_aim-adult-no-art-child-input_spectrum-v6.13_2022-02-12.PJNZ"
   demog_matches_birthsdeaths(pjnz1, threshold_deaths = 1e-3, threshold_births = 0.01)
   demog_matches_totpop(pjnz1)
-  transmission_matches(pjnz1, threshold_absolute_pid = c(0.2, 1e-3, 1e-3))
-  matches_coarse_age_groups(pjnz1, threshold_pid = c(11.5, 0.2, 1e-3))
+##  transmission_matches(pjnz1, threshold_absolute_pid = c(0.2, 1e-3, 1e-3))
+##  matches_coarse_age_groups(pjnz1, threshold_pid = c(11.5, 0.2, 1e-3))
 })
 
 
