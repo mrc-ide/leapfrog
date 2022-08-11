@@ -22,6 +22,7 @@ Rcpp::List
 leapfrogR(const Rcpp::List& demp,
 	  const Rcpp::List& projp,
 	  const Rcpp::String hiv_strat = "full",
+	  const Rcpp::String paed_model = "true",
 	  const int hiv_steps_per_year = 10) {
 
   using namespace Rcpp;
@@ -47,6 +48,7 @@ leapfrogR(const Rcpp::List& demp,
   } else {
     Rf_error("hiv_strat \"%s\" not found. Please select \"full\" or \"coarse\".\n", hiv_strat.get_cstring());
   }
+
     
   // allocate memory for return object
   NumericVector totpop1(pAG * NG * proj_years);
