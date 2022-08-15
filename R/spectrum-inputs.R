@@ -141,7 +141,7 @@ prepare_leapfrog_demp <- function(pjnz) {
 prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
  
   ## projp <- eppasm::read_hivproj_param(pjnz)
-  source('C:/Users/mwalters/leapfrog/R/read-spectrum-files.R')
+ ## source('C:/Users/mwalters/leapfrog/R/read-spectrum-files.R')
   projp <- read_hivproj_param(pjnz)
     
   ## Hard coded to expand age groups 15-24, 25-34, 35-44, 45+ to
