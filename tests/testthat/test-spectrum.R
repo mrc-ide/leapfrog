@@ -37,6 +37,8 @@ test_that("Leapfrog matches direct incidence option at coarse and single year ag
 test_that("Input childhood infections and test alignment betwen leapfrog and spectrum", {
   ## Check that prevalence, deaths and incidence  matches between
   ## the two models
+  
+  ##100 children under 5 getting infected in 1980
   pjnz1 <- "../testdata/spectrum/v6.13/bwa_aim-adult-no-art-child-input_spectrum-v6.13_2022-02-12.PJNZ"
   demog_matches_birthsdeaths(pjnz1, threshold_deaths = 1e-3, threshold_births = 0.01)
   demog_matches_totpop(pjnz1)
@@ -45,11 +47,29 @@ test_that("Input childhood infections and test alignment betwen leapfrog and spe
 })
 
 
+test_that('Paediatric aging and natural deaths working appropriately', {
+  pjnz <- "../testdata/spectrum/v6.13/bwa_aim-adult-no-art-child-input_spectrum-v6.13_2022-02-12.PJNZ"
+  pjnz1 <- test_path(pjnz)
+  
+  demp <- prepare_leapfrog_demp(pjnz1)
+  hivp <- prepare_leapfrog_projp(pjnz1)
+  
+  ## Replace netmigr with unadjusted age 0-4 netmigr, which are not
+  ## in EPP-ASM preparation
+  demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
+  demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
+  
+  lmod <- leapfrogR(demp, hivp)
 
-
-
-
-
+  stratified_pop <- apply(lmod$hivstrat_paeds, MARGIN = c(2,4), FUN = sum)
+  pop <- apply(lmod$hivpop1[1:15,,], MARGIN = c(1,3), FUN = sum)
+  
+  
+  expect_equal(object = stratified_pop, expected = pop, label = 'Stratified population and unstrat pop match for paeds')
+  
+  
+  
+  })
 
 
 

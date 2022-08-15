@@ -298,17 +298,28 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       //MKW: need to change this to entrants go into the adult population
     }
     
-    for(int g = 0; g < NG; g++) {
-      for(int ha = 1; ha < pIDX_FERT; ha++) {
-        for(int hm = 0; hm < hDS; hm++) {
-          hivstrat_paeds(hm, ha, g, t) = (1.0 - hivpaeds_ag_prob(ha, g)) * hivstrat_paeds(hm, ha, g, t-1);  // age-out
-          hivstrat_paeds(hm, ha, g, t) += hivpaeds_ag_prob(ha-1, g) * hivstrat_paeds(hm, ha-1, g, t-1);   // age-in
+ //   for(int g = 0; g < NG; g++) {
+   //   for(int ha = 1; ha < pIDX_FERT; ha++) {
+    //    for(int hm = 0; hm < hDS; hm++) {
+         // hivstrat_paeds(hm, ha, g, t) -=  hivstrat_paeds(hm, ha, g, t-1);  // age-out
+        // hivstrat_paeds(hm, ha, g, t) +=  hivstrat_paeds(hm, ha-1, g, t-1);   // age-in
+        //  hivstrat_paeds(hm, ha, g, t) = (1.0 - hivpaeds_ag_prob(ha, g)) * hivstrat_paeds(hm, ha, g, t-1);  // age-out
+         // hivstrat_paeds(hm, ha, g, t) += hivpaeds_ag_prob(ha-1, g) * hivstrat_paeds(hm, ha-1, g, t-1);   // age-in
           //if(t > t_ART_start)
           //  for(int hu = 0; hu < hTS; hu++) {
           //    artstrat_adult(hu, hm, ha, g, t) = (1.0 - hiv_ag_prob(ha, g)) * artstrat_adult(hu, hm, ha, g, t-1);
           //   artstrat_adult(hu, hm, ha, g, t) += hiv_ag_prob(ha-1, g) * artstrat_adult(hu, hm, ha-1, g, t-1);
           //  }
-       }
+    //   }
+    //  }
+  //  }
+    
+    for(int g = 0; g < NG; g++){
+      for(int ha = 1; ha < pIDX_FERT; ha++) {
+        for(int hm = 0; hm < hDS; hm++){
+          hivstrat_paeds(hm, ha, g, t) += hivstrat_paeds(hm, ha-1, g, t-1);
+          hivstrat_paeds(hm, ha, g, t) -= hivstrat_paeds(hm, ha-1, g, t-1) * (1.0 - sx(ha, g, t));
+        }
       }
     }
 
@@ -741,7 +752,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         hivpop1(af, g, t) += infections(af, g, t);
  
         for(int hm = 0; hm < hDS; hm++){
-          hivstrat_paeds(hm, af, g, t) = (infections(af, g, t) )* paed_cd4_dist(hm);
+          hivstrat_paeds(hm, af, g, t) += (infections(af, g, t) ) * paed_cd4_dist(hm);
         }
     //    natdeaths(af, g, t) = hivpop1(af, g, t) * (1 - sx(af, g, t));
       //  hivpop1(af, g, t) -= natdeaths(af, g, t);
