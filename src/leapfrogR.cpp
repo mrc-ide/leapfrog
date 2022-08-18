@@ -22,7 +22,6 @@ Rcpp::List
 leapfrogR(const Rcpp::List& demp,
 	  const Rcpp::List& projp,
 	  const Rcpp::String hiv_strat = "full",
-	  const Rcpp::String paed_model = "true",
 	  const int hiv_steps_per_year = 10) {
 
   using namespace Rcpp;
