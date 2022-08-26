@@ -66,6 +66,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                     //paed inputs
                     const Type *p_paed_incid_input,
                     const Type *p_paed_cd4_dist, 
+                    const Type *p_paed_cd4_prog,
+                    const Type *p_adol_cd4_prog,
                     //
                     //settings
                     const int sim_years,
@@ -155,6 +157,9 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   // paed
   const TensorMapX1cT paed_incid_input(p_paed_incid_input, sim_years);
   const TensorMapX1cT paed_cd4_dist(p_paed_cd4_dist, hDS);
+  const TensorMapX3cT paed_cd4_prog(p_paed_cd4_prog, 6, 5, NG);
+  const TensorMapX3cT adol_cd4_prog(p_adol_cd4_prog, hDS - 1, 10, NG);
+  
 
   // outputs
   TensorMapX3T totpop1(p_totpop1, pAG, NG, sim_years);
@@ -287,38 +292,38 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
     }
     
-   for(int g = 0; g < NG; g++){
-      int a = 0;
-      for(int ha = 1; ha < pIDX_FERT; ha++){
-          hivpaeds_ag_prob(ha, g) += hivpop1(a, g, t-1);
-          hivpaeds_ag_prob(ha, g) = (hivpaeds_ag_prob(ha, g) > 0) ? hivpop1(a-1, g, t-1) / hivpaeds_ag_prob(ha, g) : 0.0;
-          a++;
-      }
+ //  for(int g = 0; g < NG; g++){
+   //   int a = 0;
+     // for(int ha = 1; ha < pIDX_FERT; ha++){
+       //   hivpaeds_ag_prob(ha, g) += hivpop1(a, g, t-1);
+        //  hivpaeds_ag_prob(ha, g) = (hivpaeds_ag_prob(ha, g) > 0) ? hivpop1(a-1, g, t-1) / hivpaeds_ag_prob(ha, g) : 0.0;
+        //  a++;
+     // }
       // Note: loop stops at hAG-1; no one ages out of the open-ended age group
       //MKW: need to change this to entrants go into the adult population
-    }
+   // }
     
- //   for(int g = 0; g < NG; g++) {
+ // for(int g = 0; g < NG; g++) {
    //   for(int ha = 1; ha < pIDX_FERT; ha++) {
-    //    for(int hm = 0; hm < hDS; hm++) {
-         // hivstrat_paeds(hm, ha, g, t) -=  hivstrat_paeds(hm, ha, g, t-1);  // age-out
-        // hivstrat_paeds(hm, ha, g, t) +=  hivstrat_paeds(hm, ha-1, g, t-1);   // age-in
+     //   for(int hm = 0; hm < hDS; hm++) {
+       //   hivstrat_paeds(hm, ha, g, t) -=  hivstrat_paeds(hm, ha, g, t-1);  // age-out
+         // hivstrat_paeds(hm, ha, g, t) +=  hivstrat_paeds(hm, ha-1, g, t-1);   // age-in
         //  hivstrat_paeds(hm, ha, g, t) = (1.0 - hivpaeds_ag_prob(ha, g)) * hivstrat_paeds(hm, ha, g, t-1);  // age-out
-         // hivstrat_paeds(hm, ha, g, t) += hivpaeds_ag_prob(ha-1, g) * hivstrat_paeds(hm, ha-1, g, t-1);   // age-in
+          //hivstrat_paeds(hm, ha, g, t) += hivpaeds_ag_prob(ha-1, g) * hivstrat_paeds(hm, ha-1, g, t-1);   // age-in
           //if(t > t_ART_start)
           //  for(int hu = 0; hu < hTS; hu++) {
           //    artstrat_adult(hu, hm, ha, g, t) = (1.0 - hiv_ag_prob(ha, g)) * artstrat_adult(hu, hm, ha, g, t-1);
           //   artstrat_adult(hu, hm, ha, g, t) += hiv_ag_prob(ha-1, g) * artstrat_adult(hu, hm, ha-1, g, t-1);
           //  }
-    //   }
-    //  }
-  //  }
+  //    }
+    //}
+ // }
     
     for(int g = 0; g < NG; g++){
       for(int ha = 1; ha < pIDX_FERT; ha++) {
         for(int hm = 0; hm < hDS; hm++){
-          hivstrat_paeds(hm, ha, g, t) += hivstrat_paeds(hm, ha-1, g, t-1);
-          hivstrat_paeds(hm, ha, g, t) -= hivstrat_paeds(hm, ha-1, g, t-1) * (1.0 - sx(ha, g, t));
+       //   hivstrat_paeds(hm, ha, g, t) -= hivstrat_paeds(hm, ha, g, t) * (1.0 - sx(ha, g, t));
+          hivstrat_paeds(hm, ha, g, t) += hivstrat_paeds(hm, ha-1, g, t-1) * sx(ha, g, t);
         }
       }
     }
@@ -352,6 +357,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         }
       }
     }
+    
 
     // remove non-HIV deaths and net migration from hivpop1
     TensorFixedSize<Type, Sizes<pAG, NG>> netmig_ag;
@@ -362,6 +368,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         hivpop1(a, g, t) += netmig_ag(a, g);
       }
     }
+    
 
     // remove non-HIV deaths and net migration from adult stratified population
     for(int g = 0; g < NG; g++){
@@ -374,6 +381,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
           a++;
         }
 
+        //implement this for children
         Type deathmigrate_ha = hivpop_ha(ha, g) > 0 ? deathsmig_ha / hivpop_ha(ha, g) : 0.0;
         for(int hm = 0; hm < hDS; hm++){
           hivstrat_adult(hm, ha, g, t) *= 1.0 + deathmigrate_ha;
@@ -385,7 +393,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         } // loop over hm
       } // loop over ha
     } // loop over g
-
+    
+    
 
     // fertility
 
@@ -744,10 +753,24 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       //hiv_births(t) += (hivpop1(pIDX_FERT + af, FEMALE, t + hivpop1(pIDX_FERT + af, FEMALE, t-1) * 0.5) * asfr(af, t) * fert_rat(pIDX_FERT + af, t));
     }
     
+    //progress through CD4 categories
+    for(int g = 0; g < NG; g++){
+      //the nosocomial infections aren't distributed so can't just move everything forward. So going to limit hm to just go to the n+1 basically
+      for(int hm = 1; hm < 6; hm++){
+         for(int af = 1; af < 5; af++){
+           hivstrat_paeds(hm, af, g, t) += (hivstrat_paeds(hm-1, af, g, t-1) > 0) ? hivstrat_paeds(hm - 1, af, g, t) * paed_cd4_prog(hm - 1, af, g) : 0.0; //moving into this cd4 category
+           hivstrat_paeds(hm - 1, af, g, t) -= (hivstrat_paeds(hm-1, af, g, t-1) > 0) ? hivstrat_paeds(hm - 1, af, g, t) * paed_cd4_prog(hm - 1, af, g): 0.0; //moving to next cd4 category
+          // hivstrat_paeds(hm, af, g, t) += hivstrat_paeds(hm - 1, af, g, t) * paed_cd4_prog(hm - 1, af, g); //moving to next cd4 category
+           
+        }
+      }
+    }
+    
     TensorFixedSize<Type, Sizes<hDS>> infections_strat;
     //distribute across eligible ages, right now just going to hardcode
     for(int g = 0; g < NG; g++){
       for(int af = 0; af < 5; af++){
+        infections(af, g, t) = 0 ;
         infections(af, g, t) = paed_incid_input(t) / 10;
         hivpop1(af, g, t) += infections(af, g, t);
  
@@ -756,6 +779,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         }
       }
     }
+    
    
 
     
