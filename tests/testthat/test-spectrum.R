@@ -124,7 +124,8 @@ test_that('Paediatric transition through CD4 working appropriately', {
   dt <- right_join(df, strat_pop)
   dt <- dt %>% filter(age < 5 & !is.na(pop))
   
-  ##aligned for 1980-1981, but something happening in 1982. Works in excel.
+  dt <- dt %>% mutate(diff = lfrog - pop)
+  expect_true(all(select(dt, diff) < 1e-3), label = 'Prevalence in leapfrog and spectrum match')
   
 })
 
