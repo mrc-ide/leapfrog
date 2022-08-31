@@ -753,18 +753,31 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       //hiv_births(t) += (hivpop1(pIDX_FERT + af, FEMALE, t + hivpop1(pIDX_FERT + af, FEMALE, t-1) * 0.5) * asfr(af, t) * fert_rat(pIDX_FERT + af, t));
     }
     
+    
+    TensorFixedSize<Type, Sizes<6, 15, NG>> grad_paeds;
+    grad_paeds.setZero();
     //progress through CD4 categories
     for(int g = 0; g < NG; g++){
       //the nosocomial infections aren't distributed so can't just move everything forward. So going to limit hm to just go to the n+1 basically
       for(int hm = 1; hm < 6; hm++){
-         for(int af = 1; af < 5; af++){
-           hivstrat_paeds(hm, af, g, t) += (hivstrat_paeds(hm-1, af, g, t-1) > 0) ? hivstrat_paeds(hm - 1, af, g, t) * paed_cd4_prog(hm - 1, af, g) : 0.0; //moving into this cd4 category
-           hivstrat_paeds(hm - 1, af, g, t) -= (hivstrat_paeds(hm-1, af, g, t-1) > 0) ? hivstrat_paeds(hm - 1, af, g, t) * paed_cd4_prog(hm - 1, af, g): 0.0; //moving to next cd4 category
-          // hivstrat_paeds(hm, af, g, t) += hivstrat_paeds(hm - 1, af, g, t) * paed_cd4_prog(hm - 1, af, g); //moving to next cd4 category
-           
+        for(int af = 1; af < 5; af++){
+           grad_paeds(hm - 1, af, g) -= (hivstrat_paeds(hm-1, af, g, t-1) > 0) ? hivstrat_paeds(hm - 1, af, g, t) * paed_cd4_prog(hm - 1, af, g): 0.0; //moving to next cd4 category
+           grad_paeds(hm, af, g) += (hivstrat_paeds(hm-1, af, g, t-1) > 0) ? hivstrat_paeds(hm - 1, af, g, t) * paed_cd4_prog(hm - 1, af, g) : 0.0; //moving into this cd4 category
+        
+         //  hivstrat_paeds(hm, af, g, t) += hivstrat_paeds(hm - 1, af, g, t) * paed_cd4_prog(hm - 1, af, g); //moving to next cd4 category
         }
       }
     }
+    
+    for(int g = 0; g < NG; g++){
+      //the nosocomial infections aren't distributed so can't just move everything forward. So going to limit hm to just go to the n+1 basically
+      for(int hm = 0; hm < 6; hm++){
+        for(int af = 1; af < 5; af++){
+         hivstrat_paeds(hm , af, g, t) += grad_paeds(hm, af, g) ; 
+        }
+      }
+    }
+    
     
     TensorFixedSize<Type, Sizes<hDS>> infections_strat;
     //distribute across eligible ages, right now just going to hardcode
