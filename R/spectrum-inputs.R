@@ -174,6 +174,36 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   v$paed_cd4_prog <- paed_cd4_prog
   v$adol_cd4_prog <- adol_cd4_prog
   
+  paed_cd4_mort <- array(data = 0, dim = c(7, 4, 5, 2), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'),
+                                                                        transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'),
+                                                                        age = c(0:4), sex = c('male', 'female')))
+  ## 0-2
+  paed_cd4_mort[,1,1:3,] <- c(0.25801, 0.31513, 0.38490, 0.47011, 0.57418, 0.79129, 0.85655)
+  paed_cd4_mort[,2,1:3,] <- c(0.15385, 0.18791, 0.22951, 0.28031, 0.34237, 0.41817, 0.51074)
+  paed_cd4_mort[,3,1:3,] <- rep(0.08743, times = 7)
+  paed_cd4_mort[,4,1:3,] <- rep(0.02450, times = 7)
+  
+  ## 3-4
+  paed_cd4_mort[,1,4:5,] <- c(0.06470, 0.07902, 0.09652, 0.11789, 0.14398, 0.14586, 0.21479)
+  paed_cd4_mort[,2,4:5,] <- rep(0.04622, times = 7)
+  paed_cd4_mort[,3,4:5,] <- c(0.03383, 0.03485, 0.03609, 0.03761, 0.03946, 0.04172, 0.04449)
+  paed_cd4_mort[,4,4:5,] <- c(0.02144, 0.02347, 0.02596, 0.02899, 0.03270, 0.03723, 0.04276)
+  
+  
+  adol_cd4_mort <- array(data = 0, dim = c(6, 4, 10, 2), dimnames = list(cd4 = c('>1000', '750-999', '500-749', '350-499', '200-349', '<200'),
+                                                                        transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'),
+                                                                        age =5:14, sex = c('male', 'female')))
+  ## 5 - 14
+  adol_cd4_mort[,1,,] <- c(0.02617, 0.03197, 0.03905, 0.04769, 0.05825, 0.07114)
+  adol_cd4_mort[,2,,] <- c(0.02572, 0.03142, 0.03837, 0.04687, 0.05724, 0.06991)
+  adol_cd4_mort[,3,,] <- c(0.02409, 0.02942, 0.03593, 0.04388, 0.05360, 0.06547)
+  adol_cd4_mort[,4,,] <- c(0.02245, 0.02742, 0.03349, 0.04090, 0.04996, 0.06102)
+  
+  
+  v$paed_cd4_mort <- paed_cd4_mort
+  v$adol_cd4_mort <- adol_cd4_mort
+
+  
   
   ## HIV positive entrants, right now just doing those without ART
   v$age15hivpop <- projp$age15hivpop

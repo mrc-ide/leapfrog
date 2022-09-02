@@ -68,8 +68,8 @@ leapfrogR(const Rcpp::List& demp,
   NumericVector artstrat_adult(hTS * hDS * hAG * NG * proj_years);
   artstrat_adult.attr("dim") = NumericVector::create(hTS, hDS, hAG, NG, proj_years);
   
-  NumericVector hivstrat_paeds(hDS * pIDX_HIVADULT * NG * proj_years);
-  hivstrat_paeds.attr("dim") = NumericVector::create(hDS, pIDX_HIVADULT, NG, proj_years);
+  NumericVector hivstrat_paeds(4 * hDS * pIDX_HIVADULT * NG * proj_years);
+  hivstrat_paeds.attr("dim") = NumericVector::create(hDS, 4, pIDX_HIVADULT, NG, proj_years);
   
   NumericVector coarse_totpop1(hAG * NG * proj_years);
   coarse_totpop1.attr("dim") = NumericVector::create(hAG, NG, proj_years);
@@ -126,6 +126,8 @@ leapfrogR(const Rcpp::List& demp,
        REAL(projp["paed_cd4_dist"]),
        REAL(projp["paed_cd4_prog"]),
        REAL(projp["adol_cd4_prog"]),
+       REAL(projp["paed_cd4_mort"]),
+       REAL(projp["adol_cd4_mort"]),
        proj_years,
        hiv_steps_per_year,
        *INTEGER(projp["t_ART_start"]) - 1, // 0-based indexing vs. R 1-based
@@ -175,6 +177,8 @@ leapfrogR(const Rcpp::List& demp,
        REAL(projp["paed_cd4_dist"]),
        REAL(projp["paed_cd4_prog"]),
        REAL(projp["adol_cd4_prog"]),
+       REAL(projp["paed_cd4_mort"]),
+       REAL(projp["adol_cd4_mort"]),
        proj_years,
        hiv_steps_per_year,
        *INTEGER(projp["t_ART_start"]) - 1,  // 0-based indexing vs. R 1-based

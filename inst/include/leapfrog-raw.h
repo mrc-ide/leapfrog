@@ -68,6 +68,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                     const Type *p_paed_cd4_dist, 
                     const Type *p_paed_cd4_prog,
                     const Type *p_adol_cd4_prog,
+                    const Type *p_paed_cd4_mort,
+                    const Type *p_adol_cd4_mort,
                     //
                     //settings
                     const int sim_years,
@@ -159,6 +161,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   const TensorMapX1cT paed_cd4_dist(p_paed_cd4_dist, hDS);
   const TensorMapX3cT paed_cd4_prog(p_paed_cd4_prog, 6, 5, NG);
   const TensorMapX3cT adol_cd4_prog(p_adol_cd4_prog, hDS - 1, 10, NG);
+  const TensorMapX4cT paed_cd4_mort(p_paed_cd4_mort, 6, 4, 5, NG);
+  const TensorMapX4cT adol_cd4_mort(p_adol_cd4_mort, hDS - 1, 4, 10, NG);
   
 
   // outputs
@@ -177,7 +181,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 
   TensorMapX4T hivstrat_adult(p_hivstrat_adult, hDS, hAG, NG, sim_years);
   TensorMapX5T artstrat_adult(p_artstrat_adult, hTS, hDS, hAG, NG, sim_years);
-  TensorMapX4T hivstrat_paeds(p_hivstrat_paeds, hDS, pIDX_HIVADULT, NG, sim_years);
+  //adding in transmission category
+  TensorMapX5T hivstrat_paeds(p_hivstrat_paeds, hDS, 4, pIDX_HIVADULT, NG, sim_years);
   
   TensorMapX3T coarse_totpop1(p_coarse_totpop1, hAG, NG, sim_years);
   
@@ -322,8 +327,10 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     for(int g = 0; g < NG; g++){
       for(int ha = 1; ha < pIDX_FERT; ha++) {
         for(int hm = 0; hm < hDS; hm++){
-       //   hivstrat_paeds(hm, ha, g, t) -= hivstrat_paeds(hm, ha, g, t) * (1.0 - sx(ha, g, t));
-          hivstrat_paeds(hm, ha, g, t) += hivstrat_paeds(hm, ha-1, g, t-1) * sx(ha, g, t);
+          for(int cat = 0 ; cat < 4; cat++){
+            //   hivstrat_paeds(hm, ha, g, t) -= hivstrat_paeds(hm, ha, g, t) * (1.0 - sx(ha, g, t));
+            hivstrat_paeds(hm, cat, ha, g, t) += hivstrat_paeds(hm, cat, ha-1, g, t-1) * sx(ha, g, t);
+          }
         }
       }
     }
@@ -754,17 +761,17 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     }
     
     
-    TensorFixedSize<Type, Sizes<6, 15, NG>> grad_paeds;
+    TensorFixedSize<Type, Sizes<6, 4, 15, NG>> grad_paeds;
     grad_paeds.setZero();
     //progress through CD4 categories
     for(int g = 0; g < NG; g++){
       //the nosocomial infections aren't distributed so can't just move everything forward. So going to limit hm to just go to the n+1 basically
       for(int hm = 1; hm < 6; hm++){
         for(int af = 1; af < 5; af++){
-           grad_paeds(hm - 1, af, g) -= (hivstrat_paeds(hm-1, af, g, t-1) > 0) ? hivstrat_paeds(hm - 1, af, g, t) * paed_cd4_prog(hm - 1, af, g): 0.0; //moving to next cd4 category
-           grad_paeds(hm, af, g) += (hivstrat_paeds(hm-1, af, g, t-1) > 0) ? hivstrat_paeds(hm - 1, af, g, t) * paed_cd4_prog(hm - 1, af, g) : 0.0; //moving into this cd4 category
-        
-         //  hivstrat_paeds(hm, af, g, t) += hivstrat_paeds(hm - 1, af, g, t) * paed_cd4_prog(hm - 1, af, g); //moving to next cd4 category
+          for(int cat = 0; cat < 4; cat++){
+            grad_paeds(hm - 1, cat, af, g) -= (hivstrat_paeds(hm-1, cat, af, g, t-1) > 0) ? hivstrat_paeds(hm - 1, cat, af, g, t) * paed_cd4_prog(hm - 1, af, g): 0.0; //moving to next cd4 category
+            grad_paeds(hm, cat, af, g) += (hivstrat_paeds(hm-1, cat, af, g, t-1) > 0) ? hivstrat_paeds(hm - 1, cat, af, g, t) * paed_cd4_prog(hm - 1, af, g) : 0.0; //moving into this cd4 category
+          }
         }
       }
     }
@@ -773,7 +780,9 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       //the nosocomial infections aren't distributed so can't just move everything forward. So going to limit hm to just go to the n+1 basically
       for(int hm = 0; hm < 6; hm++){
         for(int af = 1; af < 5; af++){
-         hivstrat_paeds(hm , af, g, t) += grad_paeds(hm, af, g) ; 
+          for(int cat = 0; cat < 4; cat++){
+            hivstrat_paeds(hm, cat, af, g, t) += grad_paeds(hm, cat, af, g) ; 
+          }
         }
       }
     }
@@ -788,7 +797,10 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         hivpop1(af, g, t) += infections(af, g, t);
  
         for(int hm = 0; hm < hDS; hm++){
-          hivstrat_paeds(hm, af, g, t) += (infections(af, g, t)) * paed_cd4_dist(hm);
+          for(int cat = 0; cat < 4; cat++){
+            //also splitting equally across transmission category? this might be wrong
+            hivstrat_paeds(hm, cat, af, g, t) += (infections(af, g, t) / 4) * paed_cd4_dist(hm);
+          }
         }
       }
     }
