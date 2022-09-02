@@ -65,14 +65,16 @@ test_that('Paediatric aging and natural deaths working appropriately', {
   
   lmod <- leapfrogR(demp, hivp)
   source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
-  df <- read_pop1("C:/Users/mwalters/leapfrog/tests/testdata/spectrum/v6.13/bwa_aim-adult-no-art-child-input_spectrum-v6.13_2022-02-12_pop1.xlsx", "Botswana", years = 1970:2022)
+  df <- "../testdata/spectrum/v6.13/bwa_aim-adult-no-art-child-input_spectrum-v6.13_2022-02-12_pop1.xlsx"
+  df <- test_path(df)
+  df <- read_pop1(df, "Botswana", years = 1970:2022)
   df <- df %>% filter(age < 5) %>%
     right_join(y = data.frame(cd4 = 1:7, cd4_cat = c('neg', 'gte30', '26-30', '21-25', '16-20', '11-5', '5-10'))) %>%
     filter(cd4_cat != 'neg') 
   
   strat_pop <- lmod$hivstrat_paeds
   dimnames(strat_pop) <- list(cd4_cat =  c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'x'), age = 0:14, sex = c('Male', 'Female'), year = 1970:2030)
-  strat_pop <- strat_pop %>% as.data.frame.table(, responseName = "lfrog")
+  strat_pop <- strat_pop %>% as.data.frame.table(responseName = "lfrog")
   strat_pop$cd4_cat <- as.character(strat_pop$cd4_cat) ; strat_pop$age = as.integer(as.character(strat_pop$age)) ; strat_pop$sex <- as.character(strat_pop$sex) ; strat_pop$year <- as.numeric(as.character(strat_pop$year))
   
   dt <- right_join(df, strat_pop)
@@ -108,7 +110,9 @@ test_that('Paediatric transition through CD4 working appropriately', {
   
   ##pull out stratified population from the .xlsx file, This function doesn't take out the paediatric output, so going to just compare to the Spectrum software itself 
   source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
-  df <- read_pop1("C:/Users/mwalters/leapfrog/tests/testdata/spectrum/v6.13/bwa_aim-adult-no-art-child-input-transition_spectrum-v6.13_2022-02-12_pop1.xlsx", "Botswana", years = 1970:2022)
+  df <- "../testdata/spectrum/v6.13/bwa_aim-adult-no-art-child-input-transition_spectrum-v6.13_2022-02-12_pop1.xlsx"
+  df <- test_path(df)
+  df <- read_pop1(df, "Botswana", years = 1970:2022)
   df <- df %>% filter(age < 5) %>%
     right_join(y = data.frame(cd4 = 1:7, cd4_cat = c('neg', 'gte30', '26-30', '21-25', '16-20', '11-5', '5-10'))) %>%
     filter(cd4_cat != 'neg') 
@@ -117,7 +121,7 @@ test_that('Paediatric transition through CD4 working appropriately', {
   
   strat_pop <- lmod$hivstrat_paeds
   dimnames(strat_pop) <- list(cd4_cat =  c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'x'), age = 0:14, sex = c('Male', 'Female'), year = 1970:2030)
-  strat_pop <- strat_pop %>% as.data.frame.table(, responseName = "lfrog")
+  strat_pop <- strat_pop %>% as.data.frame.table(responseName = "lfrog")
   strat_pop$cd4_cat <- as.character(strat_pop$cd4_cat) ; strat_pop$age = as.integer(as.character(strat_pop$age)) ; strat_pop$sex <- as.character(strat_pop$sex) ; strat_pop$year <- as.numeric(as.character(strat_pop$year))
   
   

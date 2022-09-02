@@ -12,23 +12,22 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // leapfrogR
-Rcpp::List leapfrogR(const Rcpp::List& demp, const Rcpp::List& projp, const Rcpp::String hiv_strat, const Rcpp::String paed_model, const int hiv_steps_per_year);
-RcppExport SEXP _leapfrog_leapfrogR(SEXP dempSEXP, SEXP projpSEXP, SEXP hiv_stratSEXP, SEXP paed_modelSEXP, SEXP hiv_steps_per_yearSEXP) {
+Rcpp::List leapfrogR(const Rcpp::List& demp, const Rcpp::List& projp, const Rcpp::String hiv_strat, const int hiv_steps_per_year);
+RcppExport SEXP _leapfrog_leapfrogR(SEXP dempSEXP, SEXP projpSEXP, SEXP hiv_stratSEXP, SEXP hiv_steps_per_yearSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::List& >::type demp(dempSEXP);
     Rcpp::traits::input_parameter< const Rcpp::List& >::type projp(projpSEXP);
     Rcpp::traits::input_parameter< const Rcpp::String >::type hiv_strat(hiv_stratSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::String >::type paed_model(paed_modelSEXP);
     Rcpp::traits::input_parameter< const int >::type hiv_steps_per_year(hiv_steps_per_yearSEXP);
-    rcpp_result_gen = Rcpp::wrap(leapfrogR(demp, projp, hiv_strat, paed_model, hiv_steps_per_year));
+    rcpp_result_gen = Rcpp::wrap(leapfrogR(demp, projp, hiv_strat, hiv_steps_per_year));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_leapfrog_leapfrogR", (DL_FUNC) &_leapfrog_leapfrogR, 5},
+    {"_leapfrog_leapfrogR", (DL_FUNC) &_leapfrog_leapfrogR, 4},
     {NULL, NULL, 0}
 };
 

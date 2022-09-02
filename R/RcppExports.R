@@ -16,7 +16,7 @@
 #'
 #' @export
 #' 
-leapfrogR <- function(demp, projp, hiv_strat = "full", paed_model = "true", hiv_steps_per_year = 10L) {
-    .Call(`_leapfrog_leapfrogR`, demp, projp, hiv_strat, paed_model, hiv_steps_per_year)
+leapfrogR <- function(demp, projp, hiv_strat = "full", hiv_steps_per_year = 10L) {
+    .Call(`_leapfrog_leapfrogR`, demp, projp, hiv_strat, hiv_steps_per_year)
 }
 
