@@ -88,7 +88,7 @@ test_that('Paediatric aging and natural deaths working appropriately', {
   pop <- apply(lmod$hivpop1[1:15,,], MARGIN = c(1,3), FUN = sum)
   
   
-  expect_equal(object = stratified_pop, expected = pop, label = 'Stratified population and unstrat pop match for paeds')
+  expect_true(all(stratified_pop - pop < 1e-3), label = 'Stratified population and unstrat pop match for paeds')
   
   ##check that the populations between specrum and lfrog match
   expect_true(all(select(dt, diff) < 1e-3), label = 'Prevalence in leapfrog and spectrum match')
@@ -157,17 +157,19 @@ test_that('Paediatric HIV mortality working as expected', {
   
   ##pull out stratified population from the .xlsx file, This function doesn't take out the paediatric output, so going to just compare to the Spectrum software itself 
   source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
-  df <- "../testdata/spectrum/v6.13/bwa_aim-adult-no-art-child-input-transition_spectrum-v6.13_2022-02-12_pop1.xlsx"
+  df <- "../testdata/spectrum/v6.13/bwa_aim-adult-no-art-child-input-hivmort_spectrum-v6.13_2022-02-12_pop1.xlsx"
   df <- test_path(df)
   df <- read_pop1(df, "Botswana", years = 1970:2022)
   df <- df %>% filter(age < 5) %>%
     right_join(y = data.frame(cd4 = 1:7, cd4_cat = c('neg', 'gte30', '26-30', '21-25', '16-20', '11-5', '5-10'))) %>%
+    right_join(y = data.frame(artdur = 2:5, transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'))) %>%
     filter(cd4_cat != 'neg') 
-  df <- df %>% select(sex, age, cd4_cat, year, pop)
+  df <- df %>% select(sex, age, cd4_cat, year, pop, transmission)
   
   
   strat_pop <- lmod$hivstrat_paeds
-  dimnames(strat_pop) <- list(cd4_cat =  c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'x'), age = 0:14, sex = c('Male', 'Female'), year = 1970:2030)
+  dimnames(strat_pop) <- list(cd4_cat =  c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'x'), transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'),
+                              age = 0:14, sex = c('Male', 'Female'), year = 1970:2030)
   strat_pop <- strat_pop %>% as.data.frame.table(responseName = "lfrog")
   strat_pop$cd4_cat <- as.character(strat_pop$cd4_cat) ; strat_pop$age = as.integer(as.character(strat_pop$age)) ; strat_pop$sex <- as.character(strat_pop$sex) ; strat_pop$year <- as.numeric(as.character(strat_pop$year))
   

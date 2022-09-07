@@ -96,6 +96,13 @@ leapfrogR(const Rcpp::List& demp,
 
   NumericVector artinit(hDS * hAG * NG * proj_years);
   artinit.attr("dim") = NumericVector::create(hDS, hAG, NG, proj_years);
+  
+  NumericVector deaths_paeds(6 * 4 * 15 * proj_years * NG);
+  deaths_paeds.attr("dim") = NumericVector::create(6, 4, 15, NG, proj_years);
+  
+  NumericVector grad_paeds(6 * 4 * 15 * proj_years * NG);
+  grad_paeds.attr("dim") = NumericVector::create(6, 4, 15, NG, proj_years);
+  
  
   if (hAG == hAG_FULL) {
     leapfrog_sim<double, NG, pAG, pIDX_FERT, pAG_FERT,
@@ -147,7 +154,9 @@ leapfrogR(const Rcpp::List& demp,
        REAL(aidsdeaths_noart),
        REAL(aidsdeaths_art),
        REAL(artinit),
-       REAL(coarse_totpop1));
+       REAL(coarse_totpop1),
+       REAL(deaths_paeds),
+       REAL(grad_paeds));
   } else if (hAG == hAG_COARSE) {
     leapfrog_sim<double, NG, pAG, pIDX_FERT, pAG_FERT,
 		 pIDX_HIVADULT, hAG_COARSE, hDS, hTS>
@@ -198,7 +207,9 @@ leapfrogR(const Rcpp::List& demp,
        REAL(aidsdeaths_noart),
        REAL(aidsdeaths_art),
        REAL(artinit),
-       REAL(coarse_totpop1));
+       REAL(coarse_totpop1),
+       REAL(deaths_paeds),
+       REAL(grad_paeds));
   } else {
     Rf_error("Invalid HIV stratification age groups (hAG)");
   }
@@ -218,7 +229,9 @@ leapfrogR(const Rcpp::List& demp,
 			  _("aidsdeaths_noart") = aidsdeaths_noart,
 			  _("aidsdeaths_art") = aidsdeaths_art,
 			  _("artinit") = artinit,
-			  _("coarse_totpop1") = coarse_totpop1);
+			  _("coarse_totpop1") = coarse_totpop1,
+			  _("deaths_paeds") = deaths_paeds,
+			  _("grad_paeds") = grad_paeds);
 				      
   return ret;
 }

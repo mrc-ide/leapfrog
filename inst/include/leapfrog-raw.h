@@ -93,7 +93,10 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                     Type *p_aidsdeaths_noart,
                     Type *p_aidsdeaths_art,
                     Type *p_artinit,
-                    Type *p_coarse_totpop1) {
+                    Type *p_coarse_totpop1,
+                    Type *p_deaths_paeds,
+                    Type *p_grad_paeds
+                      ) {
 
   // macros
   // TODO: unsure if these should be defined here or elsewhere. Maybe in a future class.
@@ -161,7 +164,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   const TensorMapX1cT paed_cd4_dist(p_paed_cd4_dist, hDS);
   const TensorMapX3cT paed_cd4_prog(p_paed_cd4_prog, 6, 5, NG);
   const TensorMapX3cT adol_cd4_prog(p_adol_cd4_prog, hDS - 1, 10, NG);
-  const TensorMapX4cT paed_cd4_mort(p_paed_cd4_mort, 6, 4, 5, NG);
+  const TensorMapX4cT paed_cd4_mort(p_paed_cd4_mort, 7, 4, 5, NG);
   const TensorMapX4cT adol_cd4_mort(p_adol_cd4_mort, hDS - 1, 4, 10, NG);
   
 
@@ -186,6 +189,11 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   
   TensorMapX3T coarse_totpop1(p_coarse_totpop1, hAG, NG, sim_years);
   
+  TensorMapX5T deaths_paeds(p_deaths_paeds, 6, 4, 15, NG, sim_years);
+  TensorMapX5T grad_paeds(p_grad_paeds, 6, 4, 15, NG, sim_years);
+  
+  
+  
 
   // initialise population
 
@@ -199,6 +207,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   hivstrat_adult.setZero();
   artstrat_adult.setZero();
   hivstrat_paeds.setZero();
+  deaths_paeds.setZero();
+  grad_paeds.setZero();
 
   int everARTelig_idx = hDS;
 
@@ -760,28 +770,41 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       //hiv_births(t) += (hivpop1(pIDX_FERT + af, FEMALE, t + hivpop1(pIDX_FERT + af, FEMALE, t-1) * 0.5) * asfr(af, t) * fert_rat(pIDX_FERT + af, t));
     }
     
-    
-    TensorFixedSize<Type, Sizes<6, 4, 15, NG>> grad_paeds;
-    grad_paeds.setZero();
+    //progress through CD4 categories
+    for(int g = 0; g < NG; g++){
+      //the nosocomial infections aren't distributed so can't just move everything forward. So going to limit hm to just go to the n+1 basically
+      for(int hm = 0; hm < 6; hm++){
+        for(int af = 1; af < 5; af++){
+          for(int cat = 0; cat < 4; cat++){
+            deaths_paeds(hm, cat, af, g, t) = hivstrat_paeds(hm, cat, af, g, t) * (1 - paed_cd4_mort(hm, cat, af, g)); 
+            aidsdeaths_noart(hm, af, g, t) +=  hivstrat_paeds(hm, cat, af, g, t) * paed_cd4_mort(hm, cat, af, g); // output hiv deaths, aggregated across transmission category
+          }
+        }
+      }
+    }
+
     //progress through CD4 categories
     for(int g = 0; g < NG; g++){
       //the nosocomial infections aren't distributed so can't just move everything forward. So going to limit hm to just go to the n+1 basically
       for(int hm = 1; hm < 6; hm++){
         for(int af = 1; af < 5; af++){
           for(int cat = 0; cat < 4; cat++){
-            grad_paeds(hm - 1, cat, af, g) -= (hivstrat_paeds(hm-1, cat, af, g, t-1) > 0) ? hivstrat_paeds(hm - 1, cat, af, g, t) * paed_cd4_prog(hm - 1, af, g): 0.0; //moving to next cd4 category
-            grad_paeds(hm, cat, af, g) += (hivstrat_paeds(hm-1, cat, af, g, t-1) > 0) ? hivstrat_paeds(hm - 1, cat, af, g, t) * paed_cd4_prog(hm - 1, af, g) : 0.0; //moving into this cd4 category
+            grad_paeds(hm - 1, cat, af, g, t) -= (hivstrat_paeds(hm-1, cat, af, g, t-1) > 0) ? (deaths_paeds(hm - 1, cat, af, g, t) * paed_cd4_prog(hm - 1, af, g) + hivstrat_paeds(hm - 1, cat, af, g, t) * paed_cd4_prog(hm - 1, af, g)) / 2: 0.0; //moving to next cd4 category
+            grad_paeds(hm, cat, af, g, t) += (hivstrat_paeds(hm-1, cat, af, g, t-1) > 0) ? (deaths_paeds(hm - 1, cat, af, g, t) * paed_cd4_prog(hm - 1, af, g) + hivstrat_paeds(hm - 1, cat, af, g, t) * paed_cd4_prog(hm - 1, af, g)) / 2 : 0.0; //moving into this cd4 category
           }
         }
       }
     }
+    
+
     
     for(int g = 0; g < NG; g++){
       //the nosocomial infections aren't distributed so can't just move everything forward. So going to limit hm to just go to the n+1 basically
       for(int hm = 0; hm < 6; hm++){
         for(int af = 1; af < 5; af++){
           for(int cat = 0; cat < 4; cat++){
-            hivstrat_paeds(hm, cat, af, g, t) += grad_paeds(hm, cat, af, g) ; 
+            grad_paeds(hm, cat, af, g, t) -= hivstrat_paeds(hm, cat, af, g, t) * paed_cd4_mort(hm, cat, af, g);
+            hivstrat_paeds(hm, cat, af, g, t) += grad_paeds(hm, cat, af, g, t) ; 
           }
         }
       }
@@ -797,9 +820,9 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         hivpop1(af, g, t) += infections(af, g, t);
  
         for(int hm = 0; hm < hDS; hm++){
-          for(int cat = 0; cat < 4; cat++){
-            //also splitting equally across transmission category? this might be wrong
-            hivstrat_paeds(hm, cat, af, g, t) += (infections(af, g, t) / 4) * paed_cd4_dist(hm);
+          for(int cat = 0; cat < 1; cat++){
+            //putting them all in perinatal trans to match spec nosocomial
+            hivstrat_paeds(hm, cat, af, g, t) += (infections(af, g, t)) * paed_cd4_dist(hm);
           }
         }
       }
