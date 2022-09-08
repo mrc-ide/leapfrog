@@ -70,6 +70,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                     const Type *p_adol_cd4_prog,
                     const Type *p_paed_cd4_mort,
                     const Type *p_adol_cd4_mort,
+                    const Type *p_ctx_val,
+                    const Type ctx_effect,
                     //
                     //settings
                     const int sim_years,
@@ -166,7 +168,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   const TensorMapX3cT adol_cd4_prog(p_adol_cd4_prog, hDS - 1, 10, NG);
   const TensorMapX4cT paed_cd4_mort(p_paed_cd4_mort, 7, 4, 5, NG);
   const TensorMapX4cT adol_cd4_mort(p_adol_cd4_mort, hDS - 1, 4, 10, NG);
-  
+  const TensorMapX1cT ctx_val(p_ctx_val, sim_years);
+
 
   // outputs
   TensorMapX3T totpop1(p_totpop1, pAG, NG, sim_years);
@@ -776,8 +779,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       for(int hm = 0; hm < 6; hm++){
         for(int af = 1; af < 5; af++){
           for(int cat = 0; cat < 4; cat++){
-            deaths_paeds(hm, cat, af, g, t) = hivstrat_paeds(hm, cat, af, g, t) * (1 - paed_cd4_mort(hm, cat, af, g)); 
-            aidsdeaths_noart(hm, af, g, t) +=  hivstrat_paeds(hm, cat, af, g, t) * paed_cd4_mort(hm, cat, af, g); // output hiv deaths, aggregated across transmission category
+            deaths_paeds(hm, cat, af, g, t) = hivstrat_paeds(hm, cat, af, g, t) * (1 - paed_cd4_mort(hm, cat, af, g) * ctx_val(t) * (1 - ctx_effect)) + hivstrat_paeds(hm, cat, af, g, t) * (1 - paed_cd4_mort(hm, cat, af, g) * (1 - ctx_val(t))); 
+            aidsdeaths_noart(hm, af, g, t) +=  hivstrat_paeds(hm, cat, af, g, t) * paed_cd4_mort(hm, cat, af, g) * ctx_val(t) * (1 - ctx_effect) + hivstrat_paeds(hm, cat, af, g, t) * paed_cd4_mort(hm, cat, af, g * (1 - ctx_val(t))); // output hiv deaths, aggregated across transmission category
           }
         }
       }
@@ -803,7 +806,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       for(int hm = 0; hm < 6; hm++){
         for(int af = 1; af < 5; af++){
           for(int cat = 0; cat < 4; cat++){
-            grad_paeds(hm, cat, af, g, t) -= hivstrat_paeds(hm, cat, af, g, t) * paed_cd4_mort(hm, cat, af, g);
+            grad_paeds(hm, cat, af, g, t) -= hivstrat_paeds(hm, cat, af, g, t) * paed_cd4_mort(hm, cat, af, g) * ctx_val(t) * (1 - ctx_effect) + hivstrat_paeds(hm, cat, af, g, t) * paed_cd4_mort(hm, cat, af, g * (1 - ctx_val(t)));
             hivstrat_paeds(hm, cat, af, g, t) += grad_paeds(hm, cat, af, g, t) ; 
           }
         }

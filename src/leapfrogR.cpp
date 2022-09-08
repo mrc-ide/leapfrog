@@ -38,6 +38,7 @@ leapfrogR(const Rcpp::List& demp,
   const int hAG_FULL = 66;
   const int hDS = 7;
   const int hTS = 3;
+  const int ctx_effect = 0.33;
 
   int hAG;
   if (hiv_strat == "full") {
@@ -135,6 +136,8 @@ leapfrogR(const Rcpp::List& demp,
        REAL(projp["adol_cd4_prog"]),
        REAL(projp["paed_cd4_mort"]),
        REAL(projp["adol_cd4_mort"]),
+       REAL(projp["ctx_val"]),
+       ctx_effect,
        proj_years,
        hiv_steps_per_year,
        *INTEGER(projp["t_ART_start"]) - 1, // 0-based indexing vs. R 1-based
@@ -188,6 +191,8 @@ leapfrogR(const Rcpp::List& demp,
        REAL(projp["adol_cd4_prog"]),
        REAL(projp["paed_cd4_mort"]),
        REAL(projp["adol_cd4_mort"]),
+       REAL(projp["ctx_val"]),
+       ctx_effect,
        proj_years,
        hiv_steps_per_year,
        *INTEGER(projp["t_ART_start"]) - 1,  // 0-based indexing vs. R 1-based

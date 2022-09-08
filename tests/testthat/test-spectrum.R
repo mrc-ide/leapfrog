@@ -147,6 +147,8 @@ test_that('Paediatric HIV mortality working as expected', {
   
   demp <- prepare_leapfrog_demp(pjnz1)
   hivp <- prepare_leapfrog_projp(pjnz1)
+  hivp$ctx_effect <- 0
+  hivp$ctx_val[] <- 0
   
   ## Replace netmigr with unadjusted age 0-4 netmigr, which are not
   ## in EPP-ASM preparation
@@ -180,6 +182,49 @@ test_that('Paediatric HIV mortality working as expected', {
   dt <- dt %>% mutate(diff = lfrog - pop)
   expect_true(all(select(dt, diff) < 1e-3), label = 'Prevalence in leapfrog and spectrum match')
   
+})
+
+
+
+test_that('Cotrim reduction of mortality implemented', {
+  pjnz <- "../testdata/spectrum/v6.13/bwa_aim-adult-no-art-child-input-cotrim_spectrum-v6.13_2022-02-12.PJNZ"
+  pjnz1 <- test_path(pjnz)
+  
+  demp <- prepare_leapfrog_demp(pjnz1)
+  hivp <- prepare_leapfrog_projp(pjnz1)
+  
+  ## Replace netmigr with unadjusted age 0-4 netmigr, which are not
+  ## in EPP-ASM preparation
+  demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
+  demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
+  
+  lmod <- leapfrogR(demp, hivp)
+  
+  ##pull out stratified population from the .xlsx file, This function doesn't take out the paediatric output, so going to just compare to the Spectrum software itself 
+  source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
+  df <- "../testdata/spectrum/v6.13/bwa_aim-adult-no-art-child-input-cotrim_spectrum-v6.13_2022-02-12_pop1.xlsx"
+  df <- test_path(df)
+  df <- read_pop1(df, "Botswana", years = 1970:2022)
+  df <- df %>% filter(age < 5) %>%
+  right_join(y = data.frame(cd4 = 1:7, cd4_cat = c('neg', 'gte30', '26-30', '21-25', '16-20', '11-5', '5-10'))) %>%
+  right_join(y = data.frame(artdur = 2:5, transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'))) %>%
+  filter(cd4_cat != 'neg') 
+  df <- df %>% select(sex, age, cd4_cat, year, pop, transmission)
+
+
+strat_pop <- lmod$hivstrat_paeds
+dimnames(strat_pop) <- list(cd4_cat =  c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'x'), transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'),
+                            age = 0:14, sex = c('Male', 'Female'), year = 1970:2030)
+strat_pop <- strat_pop %>% as.data.frame.table(responseName = "lfrog")
+strat_pop$cd4_cat <- as.character(strat_pop$cd4_cat) ; strat_pop$age = as.integer(as.character(strat_pop$age)) ; strat_pop$sex <- as.character(strat_pop$sex) ; strat_pop$year <- as.numeric(as.character(strat_pop$year))
+
+
+dt <- right_join(df, strat_pop)
+dt <- dt %>% filter(age < 5 & !is.na(pop))
+
+dt <- dt %>% mutate(diff = lfrog - pop)
+expect_true(all(select(dt, diff) < 1e-3), label = 'Prevalence in leapfrog and spectrum match')
+
 })
 
 

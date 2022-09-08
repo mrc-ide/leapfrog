@@ -202,7 +202,22 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   
   v$paed_cd4_mort <- paed_cd4_mort
   v$adol_cd4_mort <- adol_cd4_mort
-
+  
+  ## pull in cotrim coverage numbers
+  ctx_val <- c(rep(0, 25), rep(0, 5), 
+               rep(50, 3),
+               52.222220,	54.444440,	56.666670,	58.888890,	61.111110,	65.000000,	68.888890,	72.777780,	76.666670,
+               80.555550,	84.444440,	88.333330,	92.222220,	96.111110,	86.690000,	100.000000,	100.000000,	100.000000,
+               100.000000,	100.000000,	100.000000,	100.000000,	100.000000,	100.000000,	100.000000,	100.000000,	100.000000,	100.000000)
+  ctx_pct <- T
+  if(ctx_pct){
+    ctx_val <- ctx_val / 100
+  }
+ ## ctx_effect_notrt <- c(rep(0.33, 5), rep(0,5))
+  ctx_effect <- 0.33
+  v$ctx_val <- ctx_val
+  v$ctx_effect <- ctx_effect
+  
   
   
   ## HIV positive entrants, right now just doing those without ART
