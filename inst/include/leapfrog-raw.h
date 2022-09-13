@@ -779,8 +779,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       for(int hm = 0; hm < 6; hm++){
         for(int af = 1; af < 5; af++){
           for(int cat = 0; cat < 4; cat++){
-            deaths_paeds(hm, cat, af, g, t) = hivstrat_paeds(hm, cat, af, g, t) * (1 - paed_cd4_mort(hm, cat, af, g) * ctx_val(t) * (1 - ctx_effect)) + hivstrat_paeds(hm, cat, af, g, t) * (1 - paed_cd4_mort(hm, cat, af, g) * (1 - ctx_val(t))); 
-            aidsdeaths_noart(hm, af, g, t) +=  hivstrat_paeds(hm, cat, af, g, t) * paed_cd4_mort(hm, cat, af, g) * ctx_val(t) * (1 - ctx_effect) + hivstrat_paeds(hm, cat, af, g, t) * paed_cd4_mort(hm, cat, af, g * (1 - ctx_val(t))); // output hiv deaths, aggregated across transmission category
+            deaths_paeds(hm, cat, af, g, t) = hivstrat_paeds(hm, cat, af, g, t) - (1 - ctx_effect * ctx_val(t)) * hivstrat_paeds(hm, cat, af, g, t) * paed_cd4_mort(hm, cat, af, g); 
+            aidsdeaths_noart(hm, af, g, t) +=  (1 - ctx_effect * ctx_val(t)) * hivstrat_paeds(hm, cat, af, g, t) * paed_cd4_mort(hm, cat, af, g); // output hiv deaths, aggregated across transmission category
           }
         }
       }
