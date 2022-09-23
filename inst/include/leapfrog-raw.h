@@ -72,6 +72,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                     const Type *p_adol_cd4_mort,
                     const Type *p_ctx_val,
                     const Type ctx_effect,
+                    const Type *p_paed_art_val,
                     //
                     //settings
                     const int sim_years,
@@ -87,6 +88,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                     Type *p_hivstrat_adult,
                     Type *p_artstrat_adult,
                     Type *p_hivstrat_paeds,
+                    Type *p_artstrat_paeds,
 		                Type *p_births,
 		                Type *p_hiv_births,
                     Type *p_natdeaths,
@@ -169,6 +171,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   const TensorMapX4cT paed_cd4_mort(p_paed_cd4_mort, 7, 4, 5, NG);
   const TensorMapX4cT adol_cd4_mort(p_adol_cd4_mort, hDS - 1, 4, 10, NG);
   const TensorMapX1cT ctx_val(p_ctx_val, sim_years);
+  const TensorMapX1cT paed_art_val(p_paed_art_val, sim_years);
+  
 
 
   // outputs
@@ -189,6 +193,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   TensorMapX5T artstrat_adult(p_artstrat_adult, hTS, hDS, hAG, NG, sim_years);
   //adding in transmission category
   TensorMapX5T hivstrat_paeds(p_hivstrat_paeds, hDS, 4, pIDX_HIVADULT, NG, sim_years);
+  TensorMapX5T artstrat_paeds(p_artstrat_paeds, hTS, hDS, pIDX_HIVADULT, NG, sim_years);
   
   TensorMapX3T coarse_totpop1(p_coarse_totpop1, hAG, NG, sim_years);
   
@@ -210,6 +215,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   hivstrat_adult.setZero();
   artstrat_adult.setZero();
   hivstrat_paeds.setZero();
+  artstrat_paeds.setZero();
   deaths_paeds.setZero();
   grad_paeds.setZero();
 
@@ -760,6 +766,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
     }
     
+    //going to put ART here for right now, it might be the wrong place eventually
+    
     
    for(int g = 0; g < NG; g++){
       for(int a = 0; a < pAG; a++){
@@ -771,6 +779,30 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     hiv_births(t) = 0.0;
     for(int af = 0; af < pAG; af++) {
       //hiv_births(t) += (hivpop1(pIDX_FERT + af, FEMALE, t + hivpop1(pIDX_FERT + af, FEMALE, t-1) * 0.5) * asfr(af, t) * fert_rat(pIDX_FERT + af, t));
+    }
+    
+    //move some people from hiv strat to art strat
+    TensorFixedSize<Type, Sizes<hDS, 3, pIDX_adult, NG>> artelig_paeds;
+    for(int g = 0; g < NG; g++){
+      //the nosocomial infections aren't distributed so can't just move everything forward. So going to limit hm to just go to the n+1 basically
+      for(int hm = 0; hm < 6; hm++){
+        for(int af = 1; af < 5; af++){
+          for(int cat = 0; cat < 4; cat++){
+            artelig_paeds(hm, cat, af, g) = hivstrat_paeds(hm, cat, af, g, t);
+            //this is assuming that coverage is in percents
+            artstrat_paeds(0, hm, af, g, t) += artelig_paeds(hm, cat, af, g) * paed_art_val(t); 
+            // take out those who are now on treatment 
+            hivstrat_paeds(hm, cat, af, g, t) -= artelig_paeds(hm, cat, af, g) * paed_art_val(t); 
+            
+          }
+        }
+      }
+    }
+    //split art pop amongst art treatment categories
+    for(int dur = 1; dur < hTS; dur++){
+      move = artstrat_paeds(dur - 1, hm, af, g, t) * 0.5;
+      artstrat_paeds(dur, hm, af, g, t) += move;
+      artstrat_paeds(dur - 1, hm, af, g, t) -= move;
     }
     
     //progress through CD4 categories
