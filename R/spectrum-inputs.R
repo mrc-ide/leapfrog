@@ -237,6 +237,16 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   v$cd4_prog_coarse <- (1-exp(-projp$cd4_prog[ , idx_expand_coarse, ] / hiv_steps_per_year)) * hiv_steps_per_year
   v$cd4_mort_coarse <- projp$cd4_mort[ ,idx_expand_coarse, ]
   v$art_mort_coarse <- projp$art_mort[c(1, 2, rep(3, hTS - 2)), , idx_expand_coarse, ]
+  
+  paed_cd4_transition <- array(0, dim = c(6,7), dimnames = list(cd4_count = c('gte1000', '750-1000', '500-749', '350-499', '200-349', 'lte200'), cd4_pct = c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5')))
+  paed_cd4_transition[1:2,1] <- c(0.71, 0.29)
+  paed_cd4_transition[2:3,2] <- c(0.6, 0.4)
+  paed_cd4_transition[3:4,3] <- c(0.83, 0.17)
+  paed_cd4_transition[4:5,4] <- c(0.77, 0.23)
+  paed_cd4_transition[5:6,5] <- c(0.89, 0.11)
+  paed_cd4_transition[6,6:7] <- c(0.01, 0.01)
+  v$paed_cd4_transition <- paed_cd4_transition
+
 
   v$artmx_timerr <- projp$artmx_timerr[c(1, 2, rep(3, hTS - 2)), ]
 

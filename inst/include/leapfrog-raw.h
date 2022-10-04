@@ -71,6 +71,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                     const Type *p_paed_cd4_mort,
                     const Type *p_adol_cd4_mort,
                     const Type *p_ctx_val,
+                    const Type *p_paed_cd4_transition,
                     const Type ctx_effect,
                     //
                     //settings
@@ -169,6 +170,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   const TensorMapX4cT paed_cd4_mort(p_paed_cd4_mort, 7, 4, 5, NG);
   const TensorMapX4cT adol_cd4_mort(p_adol_cd4_mort, hDS - 1, 4, 10, NG);
   const TensorMapX1cT ctx_val(p_ctx_val, sim_years);
+  //count by pct
+  const TensorMapX2cT paed_cd4_transition(p_paed_cd4_transition, 6, 7);
 
 
   // outputs
@@ -338,18 +341,37 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
  // }
     
     for(int g = 0; g < NG; g++){
-      for(int ha = 1; ha < pIDX_FERT; ha++) {
+      for(int ha = 1; ha < 5; ha++) {
         for(int hm = 0; hm < hDS; hm++){
           for(int cat = 0 ; cat < 4; cat++){
             //   hivstrat_paeds(hm, ha, g, t) -= hivstrat_paeds(hm, ha, g, t) * (1.0 - sx(ha, g, t));
-            hivstrat_paeds(hm, cat, ha, g, t) += hivstrat_paeds(hm, cat, ha-1, g, t-1) * sx(ha, g, t);
+            hivstrat_paeds(hm, cat, ha, g, t) += ha != 5 ? hivstrat_paeds(hm, cat, ha-1, g, t-1) * sx(ha, g, t) : 0.0;
           }
         }
       }
     }
 
+    for(int g = 0; g < NG; g++){
+        for(int hm = 0; hm < hDS; hm++){
+          for(int cat = 0 ; cat < 4; cat++){
+            hivstrat_paeds(hm, cat, 5, g, t) +=  hivstrat_paeds(hm, cat, 4, g, t-1) * sx(4, g, t) * paed_cd4_transition(hm, hm);
+            hivstrat_paeds(hm, cat, 5, g, t) +=  hivstrat_paeds(hm, cat, 4, g, t-1) * sx(4, g, t) * paed_cd4_transition(hm-1, hm);
+        }
+      }
+    }
 
-
+    
+    for(int g = 0; g < NG; g++){
+      for(int ha = 6; ha < pIDX_FERT; ha++) {
+        for(int hm = 0; hm < hDS; hm++){
+          for(int cat = 0 ; cat < 4; cat++){
+            //   hivstrat_paeds(hm, ha, g, t) -= hivstrat_paeds(hm, ha, g, t) * (1.0 - sx(ha, g, t));
+            hivstrat_paeds(hm, cat, ha, g, t) += ha != 5 ? hivstrat_paeds(hm, cat, ha-1, g, t-1) * sx(ha, g, t) : 0.0;
+          }
+        }
+      }
+    }
+    
     // !!!TODO: add HIV+ 15 year old entrants
     for (int g = 0; g < NG; g++) {
       for (int hm = 0; hm < hDS; hm++) {
