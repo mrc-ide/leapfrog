@@ -75,6 +75,9 @@ leapfrogR(const Rcpp::List& demp,
   NumericVector artstrat_paeds(hTS * hDS * pIDX_HIVADULT * NG * proj_years);
   artstrat_paeds.attr("dim") = NumericVector::create(hTS, hDS, pIDX_HIVADULT, NG, proj_years);
   
+  NumericVector artelig_paeds(hDS * pIDX_HIVADULT * NG * proj_years);
+  artelig_paeds.attr("dim") = NumericVector::create(hDS, pIDX_HIVADULT, NG, proj_years);
+  
   NumericVector coarse_totpop1(hAG * NG * proj_years);
   coarse_totpop1.attr("dim") = NumericVector::create(hAG, NG, proj_years);
 
@@ -142,6 +145,9 @@ leapfrogR(const Rcpp::List& demp,
        REAL(projp["ctx_val"]),
        ctx_effect,
        REAL(projp["paed_art_val"]),
+       REAL(projp["paed_art_elig_age"]),
+       REAL(projp["paed_art_elig_cd4"]),
+       REAL(projp["adol_art_elig_cd4"]),
        proj_years,
        hiv_steps_per_year,
        *INTEGER(projp["t_ART_start"]) - 1, // 0-based indexing vs. R 1-based
@@ -154,6 +160,7 @@ leapfrogR(const Rcpp::List& demp,
        REAL(artstrat_adult),
        REAL(hivstrat_paeds),
        REAL(artstrat_paeds),
+       REAL(artelig_paeds),
        REAL(births),
        REAL(hiv_births),
        REAL(natdeaths),
@@ -199,6 +206,9 @@ leapfrogR(const Rcpp::List& demp,
        REAL(projp["ctx_val"]),
        ctx_effect,
        REAL(projp["paed_art_val"]),
+       REAL(projp["paed_art_elig_age"]),
+       REAL(projp["paed_art_elig_cd4"]),
+       REAL(projp["adol_art_elig_cd4"]),
        proj_years,
        hiv_steps_per_year,
        *INTEGER(projp["t_ART_start"]) - 1,  // 0-based indexing vs. R 1-based
@@ -211,6 +221,7 @@ leapfrogR(const Rcpp::List& demp,
        REAL(artstrat_adult),
        REAL(hivstrat_paeds),
        REAL(artstrat_paeds),
+       REAL(artelig_paeds),
        REAL(births),
        REAL(hiv_births),
        REAL(natdeaths),
@@ -233,6 +244,7 @@ leapfrogR(const Rcpp::List& demp,
 			  _("artstrat_adult") = artstrat_adult,
 			  _("hivstrat_paeds") = hivstrat_paeds,
 			  _("artstrat_paeds") = artstrat_paeds,
+			  _("artelig_paeds") = artelig_paeds,
 			  _("infections") = infections,
 			  _("births") = births,	
 			  _("hiv_births") = hiv_births,			  

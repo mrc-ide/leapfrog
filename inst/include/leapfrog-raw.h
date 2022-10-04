@@ -73,6 +73,9 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                     const Type *p_ctx_val,
                     const Type ctx_effect,
                     const Type *p_paed_art_val,
+                    const Type *p_paed_art_elig_age,
+                    const Type *p_paed_art_elig_cd4,
+                    const Type *p_adol_art_elig_cd4,
                     //
                     //settings
                     const int sim_years,
@@ -89,6 +92,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                     Type *p_artstrat_adult,
                     Type *p_hivstrat_paeds,
                     Type *p_artstrat_paeds,
+                    Type *p_artelig_paeds,
 		                Type *p_births,
 		                Type *p_hiv_births,
                     Type *p_natdeaths,
@@ -172,6 +176,10 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   const TensorMapX4cT adol_cd4_mort(p_adol_cd4_mort, hDS - 1, 4, 10, NG);
   const TensorMapX1cT ctx_val(p_ctx_val, sim_years);
   const TensorMapX1cT paed_art_val(p_paed_art_val, sim_years);
+  const TensorMapX1cT paed_art_elig_age(p_paed_art_elig_age, sim_years);
+  //5 age categories
+  const TensorMapX2cT paed_art_elig_cd4(p_paed_art_elig_cd4, 5, sim_years);
+  const TensorMapX1cT adol_art_elig_cd4(p_adol_art_elig_cd4, sim_years); 
   
 
 
@@ -782,27 +790,56 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     }
     
     //move some people from hiv strat to art strat
-    TensorFixedSize<Type, Sizes<hDS, 3, pIDX_adult, NG>> artelig_paeds;
+    TensorFixedSize<Type, Sizes<hDS, 3, pIDX_FERT, NG>> artelig_paeds;
+    
+    //all children under a certain age eligible for ART
     for(int g = 0; g < NG; g++){
-      //the nosocomial infections aren't distributed so can't just move everything forward. So going to limit hm to just go to the n+1 basically
-      for(int hm = 0; hm < 6; hm++){
-        for(int af = 1; af < 5; af++){
-          for(int cat = 0; cat < 4; cat++){
-            artelig_paeds(hm, cat, af, g) = hivstrat_paeds(hm, cat, af, g, t);
+      for(int cat = 0; cat < 4; cat++){
+        for(int af = 0; af < 5; af++){
+          for(int hm = 0; hm < 6; hm++){
+            artelig_paeds(hm, cat, af, g) += af < paed_art_elig_age(t) ? hivstrat_paeds(hm, cat, af, g, t) : 0.0;
+          }
+        } 
+      }
+    }
+    
+    //all children under a certain CD4 are eligible for ART, regardless of age
+    for(int g = 0; g < NG; g++){
+      for(int cat = 0; cat < 4; cat++){
+        for(int af = paed_art_elig_age(t); af < 5; af++){
+          for(int hm = 0; hm < 6; hm++){
+            artelig_paeds(hm, cat, af, g) += hm > paed_art_elig_cd4(af, t) - 1 ? hivstrat_paeds(hm, cat, af, g, t) : 0.0;
+          }
+        } 
+      }
+    }
+    
+    //the nosocomial infections aren't distributed so can't just move everything forward. So going to limit hm to just go to the n+1 basically
+    for(int g = 0; g < NG; g++){
+      for(int cat = 0; cat < 4; cat++){
+        //don't want to double add in those that are already there for age
+        for(int af = 0; af < 5; af++){
+          for(int hm = 0; hm < 6; hm++){
             //this is assuming that coverage is in percents
             artstrat_paeds(0, hm, af, g, t) += artelig_paeds(hm, cat, af, g) * paed_art_val(t); 
             // take out those who are now on treatment 
             hivstrat_paeds(hm, cat, af, g, t) -= artelig_paeds(hm, cat, af, g) * paed_art_val(t); 
-            
           }
         }
       }
     }
+    int move;
     //split art pop amongst art treatment categories
     for(int dur = 1; dur < hTS; dur++){
-      move = artstrat_paeds(dur - 1, hm, af, g, t) * 0.5;
-      artstrat_paeds(dur, hm, af, g, t) += move;
-      artstrat_paeds(dur - 1, hm, af, g, t) -= move;
+      for(int hm = 0; hm < 6; hm++){
+        for(int af = 0; af < 5; af++){
+          for(int g = 0; g < NG; g++){
+            move = artstrat_paeds(dur - 1, hm, af, g, t) * 0.5;
+            artstrat_paeds(dur, hm, af, g, t) += move;
+            artstrat_paeds(dur - 1, hm, af, g, t) -= move;
+          }
+        }
+      }
     }
     
     //progress through CD4 categories

@@ -261,6 +261,13 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   
   v$paed_art_val <- paed_art_val
   
+  ## ART eligibility age, doing this in years rather than months
+  v$paed_art_elig_age <- c(rep(0, 37), rep(1, 3), rep(2, 20))
+  v$paed_art_elig_cd4 <- array(data = 25, dim = c(5, length(1970:2029)), dimnames = list(age = c(0:4), year = c(1970:2029)))
+  adol_art_elig_cd4 <- array(data = NA, dim = c(1, length(1970:2029)), dimnames = list(age = c('>5'), year = c(1970:2029)))
+  ## correspond with 200 then 300 
+  adol_art_elig_cd4 <- c(rep(6, 40), rep(5, 20))
+  v$adol_art_elig_cd4 <- adol_art_elig_cd4
   
   ## HIV positive entrants, right now just doing those without ART
   v$age15hivpop <- projp$age15hivpop
