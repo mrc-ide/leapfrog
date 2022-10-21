@@ -205,22 +205,35 @@ test_that('Cotrim reduction of mortality implemented', {
   df <- "../testdata/spectrum/v6.13/bwa_aim-adult-no-art-child-input-cotrim_spectrum-v6.13_2022-02-12_pop1.xlsx"
   df <- test_path(df)
   df <- read_pop1(df, "Botswana", years = 1970:2022)
-  df <- df %>% filter(age < 5) %>%
+  df <- df %>%
+  ##df <- df %>% filter(age < 5) %>%
   right_join(y = data.frame(cd4 = 1:7, cd4_cat = c('neg', 'gte30', '26-30', '21-25', '16-20', '11-5', '5-10'))) %>%
   right_join(y = data.frame(artdur = 2:5, transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'))) %>%
   filter(cd4_cat != 'neg') 
   df <- df %>% select(sex, age, cd4_cat, year, pop, transmission)
-
+  ##correct cd4 cateogries for above 5
+  age_cats <- data.frame(cd4_cat = c('26-30', '21-25', '16-20', '11-5', '5-10'), cd4_cat_count = c('>1000', '750-999', '500-749', '350-499', '200-349'))
+  df_5plus <- df %>% filter(age > 4) %>% right_join( age_cats)
+  df_5plus <- df_5plus %>% mutate(cd4_cat = cd4_cat_count) %>% select(sex, age, cd4_cat, year, pop, transmission)
+  df <- df %>% filter(age < 5) 
+  df <- rbind(df,df_5plus)
+  df <- df %>% filter(!is.na(year))
+  df <- df %>% filter(age < 15)
 
 strat_pop <- lmod$hivstrat_paeds
 dimnames(strat_pop) <- list(cd4_cat =  c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'x'), transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'),
                             age = 0:14, sex = c('Male', 'Female'), year = 1970:2030)
 strat_pop <- strat_pop %>% as.data.frame.table(responseName = "lfrog")
 strat_pop$cd4_cat <- as.character(strat_pop$cd4_cat) ; strat_pop$age = as.integer(as.character(strat_pop$age)) ; strat_pop$sex <- as.character(strat_pop$sex) ; strat_pop$year <- as.numeric(as.character(strat_pop$year))
-
+strat_pop_5plus <- strat_pop %>% filter(age > 4) %>% right_join(age_cats)
+strat_pop_5plus <- strat_pop_5plus %>% mutate(cd4_cat =  cd4_cat_count) %>% select(sex, age, cd4_cat, year, lfrog, transmission)
+strat_pop <- strat_pop %>% filter(age < 5)
+strat_pop <- rbind(strat_pop, strat_pop_5plus)
 
 dt <- right_join(df, strat_pop)
-dt <- dt %>% filter(age < 5 & !is.na(pop))
+##dt <- dt %>% filter(age < 5 & !is.na(pop))
+dt <- dt %>% filter(!is.na(pop))
+
 
 dt <- dt %>% mutate(diff = lfrog - pop)
 expect_true(all(select(dt, diff) < 1e-3), label = 'Prevalence in leapfrog and spectrum match')

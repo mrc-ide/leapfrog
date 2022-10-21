@@ -263,11 +263,13 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   
   ## ART eligibility age, doing this in years rather than months
   v$paed_art_elig_age <- c(rep(0, 37), rep(1, 3), rep(2, 20))
-  v$paed_art_elig_cd4 <- array(data = 25, dim = c(5, length(1970:2029)), dimnames = list(age = c(0:4), year = c(1970:2029)))
-  adol_art_elig_cd4 <- array(data = NA, dim = c(1, length(1970:2029)), dimnames = list(age = c('>5'), year = c(1970:2029)))
+  paed_art_elig_cd4 <- array(data = NA, dim = c(length(0:14), length(1970:2029)), dimnames = list(age = c(0:14), year = c(1970:2029)))
+  ## corresponds with less than 25
+  paed_art_elig_cd4[1:5,] <- 3
   ## correspond with 200 then 300 
-  adol_art_elig_cd4 <- c(rep(6, 40), rep(5, 20))
-  v$adol_art_elig_cd4 <- adol_art_elig_cd4
+  paed_art_elig_cd4[6:15,1:40] <- 6
+  paed_art_elig_cd4[6:15,41:60] <- 5
+  v$paed_art_elig_cd4 <- paed_art_elig_cd4
   
   ## HIV positive entrants, right now just doing those without ART
   v$age15hivpop <- projp$age15hivpop
@@ -286,6 +288,16 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   v$cd4_prog_coarse <- (1-exp(-projp$cd4_prog[ , idx_expand_coarse, ] / hiv_steps_per_year)) * hiv_steps_per_year
   v$cd4_mort_coarse <- projp$cd4_mort[ ,idx_expand_coarse, ]
   v$art_mort_coarse <- projp$art_mort[c(1, 2, rep(3, hTS - 2)), , idx_expand_coarse, ]
+  
+  paed_cd4_transition <- array(0, dim = c(6,7), dimnames = list(cd4_count = c('gte1000', '750-1000', '500-749', '350-499', '200-349', 'lte200'), cd4_pct = c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5')))
+  paed_cd4_transition[1:2,1] <- c(0.71, 0.29)
+  paed_cd4_transition[2:3,2] <- c(0.6, 0.4)
+  paed_cd4_transition[3:4,3] <- c(0.83, 0.17)
+  paed_cd4_transition[4:5,4] <- c(0.77, 0.23)
+  paed_cd4_transition[5:6,5] <- c(0.89, 0.11)
+  paed_cd4_transition[6,6:7] <- c(0.01, 0.01)
+  v$paed_cd4_transition <- paed_cd4_transition
+
 
   v$artmx_timerr <- projp$artmx_timerr[c(1, 2, rep(3, hTS - 2)), ]
 

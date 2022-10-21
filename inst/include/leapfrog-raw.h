@@ -71,6 +71,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                     const Type *p_paed_cd4_mort,
                     const Type *p_adol_cd4_mort,
                     const Type *p_ctx_val,
+                    const Type *p_paed_cd4_transition,
                     const Type ctx_effect,
                     const Type *p_paed_art_val,
                     const Type *p_paed_art_elig_age,
@@ -180,7 +181,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   //5 age categories
   const TensorMapX2cT paed_art_elig_cd4(p_paed_art_elig_cd4, 5, sim_years);
   const TensorMapX1cT adol_art_elig_cd4(p_adol_art_elig_cd4, sim_years); 
-  
+  //count by pct
+  const TensorMapX2cT paed_cd4_transition(p_paed_cd4_transition, 6, 7);
 
 
   // outputs
@@ -352,7 +354,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
  // }
     
     for(int g = 0; g < NG; g++){
-      for(int ha = 1; ha < pIDX_FERT; ha++) {
+      for(int ha = 1; ha < 5; ha++) {
         for(int hm = 0; hm < hDS; hm++){
           for(int cat = 0 ; cat < 4; cat++){
             //   hivstrat_paeds(hm, ha, g, t) -= hivstrat_paeds(hm, ha, g, t) * (1.0 - sx(ha, g, t));
@@ -362,8 +364,28 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
     }
 
+    for(int g = 0; g < NG; g++){
+        for(int hm = 1; hm < hDS; hm++){
+          for(int cat = 0 ; cat < 4; cat++){
+            hivstrat_paeds(hm-1, cat, 4, g, t) +=  hivstrat_paeds(hm-1, cat, 3, g, t-1) * sx(3, g, t) * paed_cd4_transition(hm-1, hm-1);
+            hivstrat_paeds(hm, cat, 4, g, t) +=  hivstrat_paeds(hm-1, cat, 3, g, t-1) * sx(3, g, t) * paed_cd4_transition(hm, hm-1);
 
+        }
+      }
+    }
 
+    
+    for(int g = 0; g < NG; g++){
+      for(int ha = 6; ha < pIDX_FERT; ha++) {
+        for(int hm = 0; hm < hDS; hm++){
+          for(int cat = 0 ; cat < 4; cat++){
+            //   hivstrat_paeds(hm, ha, g, t) -= hivstrat_paeds(hm, ha, g, t) * (1.0 - sx(ha, g, t));
+            hivstrat_paeds(hm, cat, ha, g, t) += hivstrat_paeds(hm, cat, ha-1, g, t-1) * sx(ha, g, t);
+          }
+        }
+      }
+    }
+    
     // !!!TODO: add HIV+ 15 year old entrants
     for (int g = 0; g < NG; g++) {
       for (int hm = 0; hm < hDS; hm++) {
@@ -803,21 +825,30 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
     }
     
-    //all children under a certain CD4 are eligible for ART, regardless of age
+    //I think have to do this separately bc of the difference in cd4 categories (hm)
     for(int g = 0; g < NG; g++){
       for(int cat = 0; cat < 4; cat++){
-        for(int af = paed_art_elig_age(t); af < 5; af++){
-          for(int hm = 0; hm < 6; hm++){
-            artelig_paeds(hm, cat, af, g) += hm > paed_art_elig_cd4(af, t) - 1 ? hivstrat_paeds(hm, cat, af, g, t) : 0.0;
+        for(int af = 5; af < pIDX_FERT; af++){
+          for(int hm = 0; hm < 5; hm++){
+            artelig_paeds(hm, cat, af, g) += af < paed_art_elig_age(t) ? hivstrat_paeds(hm, cat, af, g, t) : 0.0;
           }
         } 
       }
     }
     
+    //all children under a certain CD4 are eligible for ART, regardless of age
+    for(int g = 0; g < NG; g++){
+      for(int cat = 0; cat < 4; cat++){
+        for(int af = paed_art_elig_age(t); af < pIDX_FERT; af++){
+          for(int hm = 0; hm < 5; hm++){
+            artelig_paeds(hm, cat, af, g) += hm > paed_art_elig_cd4(af, t) - 1 ? hivstrat_paeds(hm, cat, af, g, t) : 0.0;
+          }
+        } 
+      }
+    }
     //the nosocomial infections aren't distributed so can't just move everything forward. So going to limit hm to just go to the n+1 basically
     for(int g = 0; g < NG; g++){
       for(int cat = 0; cat < 4; cat++){
-        //don't want to double add in those that are already there for age
         for(int af = 0; af < 5; af++){
           for(int hm = 0; hm < 6; hm++){
             //this is assuming that coverage is in percents
@@ -828,11 +859,36 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         }
       }
     }
+    for(int g = 0; g < NG; g++){
+      for(int cat = 0; cat < 4; cat++){
+        for(int af = 5; af < pIDX_FERT; af++){
+          for(int hm = 0; hm < 4; hm++){
+            //this is assuming that coverage is in percents
+            artstrat_paeds(0, hm, af, g, t) += artelig_paeds(hm, cat, af, g) * paed_art_val(t); 
+            // take out those who are now on treatment 
+            hivstrat_paeds(hm, cat, af, g, t) -= artelig_paeds(hm, cat, af, g) * paed_art_val(t); 
+          }
+        }
+      }
+    }
+    
     int move;
     //split art pop amongst art treatment categories
     for(int dur = 1; dur < hTS; dur++){
       for(int hm = 0; hm < 6; hm++){
         for(int af = 0; af < 5; af++){
+          for(int g = 0; g < NG; g++){
+            move = artstrat_paeds(dur - 1, hm, af, g, t) * 0.5;
+            artstrat_paeds(dur, hm, af, g, t) += move;
+            artstrat_paeds(dur - 1, hm, af, g, t) -= move;
+          }
+        }
+      }
+    }
+    
+    for(int dur = 1; dur < hTS; dur++){
+      for(int hm = 0; hm < 5; hm++){
+        for(int af = 5; af < pIDX_FERT; af++){
           for(int g = 0; g < NG; g++){
             move = artstrat_paeds(dur - 1, hm, af, g, t) * 0.5;
             artstrat_paeds(dur, hm, af, g, t) += move;
@@ -854,6 +910,18 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         }
       }
     }
+    //progress through CD4 categories
+    for(int g = 0; g < NG; g++){
+      for(int hm = 0; hm < 5; hm++){
+        for(int af = 5; af < pIDX_FERT; af++){
+          for(int cat = 0; cat < 4; cat++){
+            //deaths_paeds kinda a misnomer, those alive after hiv mortality
+            deaths_paeds(hm, cat, af, g, t) = hivstrat_paeds(hm, cat, af, g, t) - (1 - ctx_effect * ctx_val(t)) * hivstrat_paeds(hm, cat, af, g, t) * paed_cd4_mort(hm, cat, af, g); 
+            aidsdeaths_noart(hm, af, g, t) +=  (1 - ctx_effect * ctx_val(t)) * hivstrat_paeds(hm, cat, af, g, t) * paed_cd4_mort(hm, cat, af, g); // output hiv deaths, aggregated across transmission category
+          }
+        }
+      }
+    }
 
     //progress through CD4 categories
     for(int g = 0; g < NG; g++){
@@ -868,6 +936,18 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
     }
     
+    //progress through CD4 categories
+    //for 5-14, can just move everyone forward one, don't need to go to hm - 1
+    for(int g = 0; g < NG; g++){
+      for(int hm = 1; hm < 5; hm++){
+        for(int af = 5; af < pIDX_FERT; af++){
+          for(int cat = 0; cat < 4; cat++){
+            grad_paeds(hm - 1, cat, af, g, t) -= (deaths_paeds(hm - 1, cat, af, g, t) * paed_cd4_prog(hm - 1, af, g) + hivstrat_paeds(hm - 1, cat, af, g, t) * paed_cd4_prog(hm - 1, af, g)) / 2; //moving to next cd4 category
+            grad_paeds(hm, cat, af, g, t) += (deaths_paeds(hm - 1, cat, af, g, t) * paed_cd4_prog(hm - 1, af, g) + hivstrat_paeds(hm - 1, cat, af, g, t) * paed_cd4_prog(hm - 1, af, g)) / 2; //moving into this cd4 category
+          }
+        }
+      }
+    }
 
     
     for(int g = 0; g < NG; g++){
@@ -882,6 +962,17 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
     }
     
+    //not accounting for ctx 5 year 
+    for(int g = 0; g < NG; g++){
+      for(int hm = 0; hm < 5; hm++){
+        for(int af = 5; af < pIDX_FERT; af++){
+          for(int cat = 0; cat < 4; cat++){
+            grad_paeds(hm, cat, af, g, t) -= hivstrat_paeds(hm, cat, af, g, t) * paed_cd4_mort(hm, cat, af, g) * ctx_val(t) * (1 - ctx_effect) + hivstrat_paeds(hm, cat, af, g, t) * paed_cd4_mort(hm, cat, af, g * (1 - ctx_val(t)));
+            hivstrat_paeds(hm, cat, af, g, t) += grad_paeds(hm, cat, af, g, t) ; 
+          }
+        }
+      }
+    }
     
     TensorFixedSize<Type, Sizes<hDS>> infections_strat;
     //distribute across eligible ages, right now just going to hardcode
