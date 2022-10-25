@@ -290,12 +290,26 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   v$art_mort_coarse <- projp$art_mort[c(1, 2, rep(3, hTS - 2)), , idx_expand_coarse, ]
   
   paed_cd4_transition <- array(0, dim = c(6,7), dimnames = list(cd4_count = c('gte1000', '750-1000', '500-749', '350-499', '200-349', 'lte200'), cd4_pct = c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5')))
-  paed_cd4_transition[1:2,1] <- c(0.71, 0.29)
-  paed_cd4_transition[2:3,2] <- c(0.6, 0.4)
-  paed_cd4_transition[3:4,3] <- c(0.83, 0.17)
-  paed_cd4_transition[4:5,4] <- c(0.77, 0.23)
-  paed_cd4_transition[5:6,5] <- c(0.89, 0.11)
-  paed_cd4_transition[6,6:7] <- c(0.01, 0.01)
+  # paed_cd4_transition[1:2,1] <- c(0.71, 0.29)
+  # paed_cd4_transition[2:3,2] <- c(0.6, 0.4)
+  # paed_cd4_transition[3:4,3] <- c(0.83, 0.17)
+  # paed_cd4_transition[4:5,4] <- c(0.77, 0.23)
+  # paed_cd4_transition[5:6,5] <- c(0.89, 0.11)
+  # paed_cd4_transition[6,6:7] <- c(0.01, 0.01)
+  
+  paed_cd4_transition[1:6,1] <- c(0.608439, 0.185181, 0.105789, 0.055594, 0.018498, 0.026497)
+  paed_cd4_transition[1:6,2] <- c(0.338733873, 0.222622262, 0.293529353, 0.093509351, 0.03550355, 0.01610161)
+  paed_cd4_transition[1:6,3] <- c(0.2004, 0.2562, 0.3636, 0.1074, 0.0579, 0.0145)
+  paed_cd4_transition[1:6,4] <- c(0.095, 0.1693, 0.3082, 0.2497, 0.1449, 0.0329)
+  paed_cd4_transition[1:6,5] <- c(0.03880388, 0.090309031, 0.275927593, 0.259925993, 0.255725573, 0.079307931)
+  paed_cd4_transition[1:6,6] <- c(0.018615705, 0.018615705, 0.099217744, 0.165065848, 0.363501337, 0.334983662)
+  paed_cd4_transition[1:6,7] <- c(0, 0.0014, 0.00990099, 0.00710071, 0.04960496, 0.931993199)
+  
+  
+  
+  
+  
+  
   v$paed_cd4_transition <- paed_cd4_transition
 
 

@@ -104,11 +104,11 @@ leapfrogR(const Rcpp::List& demp,
   NumericVector artinit(hDS * hAG * NG * proj_years);
   artinit.attr("dim") = NumericVector::create(hDS, hAG, NG, proj_years);
   
-  NumericVector deaths_paeds(6 * 4 * 15 * proj_years * NG);
-  deaths_paeds.attr("dim") = NumericVector::create(6, 4, 15, NG, proj_years);
+  NumericVector deaths_paeds(hDS * 4 * 15 * proj_years * NG);
+  deaths_paeds.attr("dim") = NumericVector::create(hDS, 4, 15, NG, proj_years);
   
-  NumericVector grad_paeds(6 * 4 * 15 * proj_years * NG);
-  grad_paeds.attr("dim") = NumericVector::create(6, 4, 15, NG, proj_years);
+  NumericVector grad_paeds(hDS * 4 * 15 * proj_years * NG);
+  grad_paeds.attr("dim") = NumericVector::create(hDS, 4, 15, NG, proj_years);
   
  
   if (hAG == hAG_FULL) {
@@ -148,7 +148,6 @@ leapfrogR(const Rcpp::List& demp,
        REAL(projp["paed_art_val"]),
        REAL(projp["paed_art_elig_age"]),
        REAL(projp["paed_art_elig_cd4"]),
-       REAL(projp["adol_art_elig_cd4"]),
        proj_years,
        hiv_steps_per_year,
        *INTEGER(projp["t_ART_start"]) - 1, // 0-based indexing vs. R 1-based
@@ -210,7 +209,6 @@ leapfrogR(const Rcpp::List& demp,
        REAL(projp["paed_art_val"]),
        REAL(projp["paed_art_elig_age"]),
        REAL(projp["paed_art_elig_cd4"]),
-       REAL(projp["adol_art_elig_cd4"]),
        proj_years,
        hiv_steps_per_year,
        *INTEGER(projp["t_ART_start"]) - 1,  // 0-based indexing vs. R 1-based

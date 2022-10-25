@@ -53,42 +53,60 @@ test_that('Paediatric aging and natural deaths working appropriately', {
   
   demp <- prepare_leapfrog_demp(pjnz1)
   hivp <- prepare_leapfrog_projp(pjnz1)
+  hivp$ctx_effect <- 0
+  hivp$ctx_val[] <- 0
+  hivp$paed_art_val[] <- 0
+  hivp$paed_cd4_mort[] <- 0
+  hivp$adol_cd4_mort[] <- 0
+  hivp$adol_cd4_prog[] <- 0
+  hivp$paed_cd4_prog[] <- 0
   
   ## Replace netmigr with unadjusted age 0-4 netmigr, which are not
   ## in EPP-ASM preparation
   demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
   demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
   
-  ##right now paed progress is hardcoded, corrected for this test case here
-  hivp$paed_cd4_prog[] <- 0
-  hivp$paed_cd4_mort[] <- 0
-  
-  
-  
   lmod <- leapfrogR(demp, hivp)
+  
   source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
   df <- "../testdata/spectrum/v6.13/bwa_aim-adult-no-art-child-input_spectrum-v6.13_2022-02-12_pop1.xlsx"
   df <- test_path(df)
   df <- read_pop1(df, "Botswana", years = 1970:2022)
-  df <- df %>% filter(age < 5) %>%
-    right_join(y = data.frame(cd4 = 1:7, cd4_cat = c('neg', 'gte30', '26-30', '21-25', '16-20', '11-5', '5-10'))) %>%
+  df_paed <- df %>% filter(age < 5) %>%
+    right_join(y = data.frame(cd4 = 1:8, cd4_cat = c('neg', 'gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5'))) %>%
+    right_join(y = data.frame(artdur = 2:5, transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'))) %>%
     filter(cd4_cat != 'neg') 
   
+  df_adol <- df %>% filter(age > 4) %>%
+    right_join(y = data.frame(cd4 = 3:8, cd4_cat = c('gte1000', '750-999', '500-749', '350-499', '200-349','lte200'))) %>%
+    right_join(y = data.frame(artdur = 2:5, transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'))) %>%
+    filter(cd4_cat != 'neg') 
+  
+  df <- rbind(df_paed, df_adol)
+  df <- df %>% select(sex, age, cd4_cat, year, pop, transmission)
+  
+  
+  ##5-15 can move more than one cd4 category in a year... feels wrong?
+  
   strat_pop <- lmod$hivstrat_paeds
-  dimnames(strat_pop) <- list(cd4_cat =  c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'x'),transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+') , age = 0:14, sex = c('Male', 'Female'), year = 1970:2030)
-  strat_pop <- apply(strat_pop, MARGIN = c(1,3:5), FUN = sum)
+  dimnames(strat_pop) <- list(cd4_cat =  c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5'), transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'),
+                              age = 0:14, sex = c('Male', 'Female'), year = 1970:2030)
   strat_pop <- strat_pop %>% as.data.frame.table(responseName = "lfrog")
   strat_pop$cd4_cat <- as.character(strat_pop$cd4_cat) ; strat_pop$age = as.integer(as.character(strat_pop$age)) ; strat_pop$sex <- as.character(strat_pop$sex) ; strat_pop$year <- as.numeric(as.character(strat_pop$year))
+  strat_pop_paed <- strat_pop %>% filter(age < 5)
+  
+  strat_pop_adol <- strat_pop %>% filter(age > 4)
+  strat_pop_adol <- strat_pop_adol %>% right_join(y = data.frame(cd4_cat = c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5'), cd4_cat_new =  c('gte1000', '750-999', '500-749', '350-499', '200-349','lte200', 'lte200')))
+  strat_pop_adol <-  strat_pop_adol %>% select(sex, age, cd4_cat = cd4_cat_new, year, lfrog, transmission)
+  strat_pop_adol <- strat_pop_adol %>% group_by(sex, age, cd4_cat, year, transmission) %>% mutate(lfrog = sum(lfrog)) %>% unique
+  strat_pop <- rbind(strat_pop_paed, strat_pop_adol)
   
   dt <- right_join(df, strat_pop)
-  dt <- dt %>% filter(age < 5 & !is.na(pop))
+  dt <- dt %>% filter(!is.na(pop))
+  
+  ## dt <- dt %>% filter(age < 5 & !is.na(pop))
+  
   dt <- dt %>% mutate(diff = lfrog - pop)
-  
-  stratified_pop <- apply(lmod$hivstrat_paeds, MARGIN = c(3,5), FUN = sum)
-  pop <- apply(lmod$hivpop1[1:15,,], MARGIN = c(1,3), FUN = sum)
-  
-  
-  expect_true(all(stratified_pop - pop < 1e-3), label = 'Stratified population and unstrat pop match for paeds')
   
   ##check that the populations between specrum and lfrog match
   expect_true(all(select(dt, diff) < 1e-3), label = 'Prevalence in leapfrog and spectrum match')
@@ -103,14 +121,17 @@ test_that('Paediatric transition through CD4 working appropriately', {
   
   demp <- prepare_leapfrog_demp(pjnz1)
   hivp <- prepare_leapfrog_projp(pjnz1)
+  hivp$ctx_effect <- 0
+  hivp$ctx_val[] <- 0
+  hivp$paed_art_val[] <- 0
+  hivp$paed_cd4_mort[] <- 0
+  hivp$adol_cd4_mort[] <- 0
+  
   
   ## Replace netmigr with unadjusted age 0-4 netmigr, which are not
   ## in EPP-ASM preparation
   demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
   demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
-  
-  hivp$paed_cd4_mort[] <- 0
-  
   
   lmod <- leapfrogR(demp, hivp)
   
@@ -119,21 +140,39 @@ test_that('Paediatric transition through CD4 working appropriately', {
   df <- "../testdata/spectrum/v6.13/bwa_aim-adult-no-art-child-input-transition_spectrum-v6.13_2022-02-12_pop1.xlsx"
   df <- test_path(df)
   df <- read_pop1(df, "Botswana", years = 1970:2022)
-  df <- df %>% filter(age < 5) %>%
-    right_join(y = data.frame(cd4 = 1:7, cd4_cat = c('neg', 'gte30', '26-30', '21-25', '16-20', '11-5', '5-10'))) %>%
+  df_paed <- df %>% filter(age < 5) %>%
+    right_join(y = data.frame(cd4 = 1:8, cd4_cat = c('neg', 'gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5'))) %>%
+    right_join(y = data.frame(artdur = 2:5, transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'))) %>%
     filter(cd4_cat != 'neg') 
-  df <- df %>% select(sex, age, cd4_cat, year, pop)
   
+  df_adol <- df %>% filter(age > 4) %>%
+    right_join(y = data.frame(cd4 = 3:8, cd4_cat = c('gte1000', '750-999', '500-749', '350-499', '200-349','lte200'))) %>%
+    right_join(y = data.frame(artdur = 2:5, transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'))) %>%
+    filter(cd4_cat != 'neg') 
+  
+  df <- rbind(df_paed, df_adol)
+  df <- df %>% select(sex, age, cd4_cat, year, pop, transmission)
+  
+  
+  ##5-15 can move more than one cd4 category in a year... feels wrong?
   
   strat_pop <- lmod$hivstrat_paeds
-  dimnames(strat_pop) <- list(cd4_cat =  c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'x'),transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+') , age = 0:14, sex = c('Male', 'Female'), year = 1970:2030)
-  strat_pop <- apply(strat_pop, MARGIN = c(1,3:5), FUN = sum)
+  dimnames(strat_pop) <- list(cd4_cat =  c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5'), transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'),
+                              age = 0:14, sex = c('Male', 'Female'), year = 1970:2030)
   strat_pop <- strat_pop %>% as.data.frame.table(responseName = "lfrog")
   strat_pop$cd4_cat <- as.character(strat_pop$cd4_cat) ; strat_pop$age = as.integer(as.character(strat_pop$age)) ; strat_pop$sex <- as.character(strat_pop$sex) ; strat_pop$year <- as.numeric(as.character(strat_pop$year))
+  strat_pop_paed <- strat_pop %>% filter(age < 5)
   
+  strat_pop_adol <- strat_pop %>% filter(age > 4)
+  strat_pop_adol <- strat_pop_adol %>% right_join(y = data.frame(cd4_cat = c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5'), cd4_cat_new =  c('gte1000', '750-999', '500-749', '350-499', '200-349','lte200', 'lte200')))
+  strat_pop_adol <-  strat_pop_adol %>% select(sex, age, cd4_cat = cd4_cat_new, year, lfrog, transmission)
+  strat_pop_adol <- strat_pop_adol %>% group_by(sex, age, cd4_cat, year, transmission) %>% mutate(lfrog = sum(lfrog)) %>% unique
+  strat_pop <- rbind(strat_pop_paed, strat_pop_adol)
   
   dt <- right_join(df, strat_pop)
-  dt <- dt %>% filter(age < 5 & !is.na(pop))
+  dt <- dt %>% filter(!is.na(pop))
+  
+  ## dt <- dt %>% filter(age < 5 & !is.na(pop))
   
   dt <- dt %>% mutate(diff = lfrog - pop)
   expect_true(all(select(dt, diff) < 1e-3), label = 'Prevalence in leapfrog and spectrum match')
@@ -141,6 +180,7 @@ test_that('Paediatric transition through CD4 working appropriately', {
 })
 
 
+##expand aidsdeaths_art to 80 ages
 test_that('Paediatric HIV mortality working as expected', {
   pjnz <- "../testdata/spectrum/v6.13/bwa_aim-adult-no-art-child-input-hivmort_spectrum-v6.13_2022-02-12.PJNZ"
   pjnz1 <- test_path(pjnz)
@@ -149,6 +189,7 @@ test_that('Paediatric HIV mortality working as expected', {
   hivp <- prepare_leapfrog_projp(pjnz1)
   hivp$ctx_effect <- 0
   hivp$ctx_val[] <- 0
+  hivp$paed_art_val[] <- 0
   
   ## Replace netmigr with unadjusted age 0-4 netmigr, which are not
   ## in EPP-ASM preparation
@@ -162,22 +203,39 @@ test_that('Paediatric HIV mortality working as expected', {
   df <- "../testdata/spectrum/v6.13/bwa_aim-adult-no-art-child-input-hivmort_spectrum-v6.13_2022-02-12_pop1.xlsx"
   df <- test_path(df)
   df <- read_pop1(df, "Botswana", years = 1970:2022)
-  df <- df %>% filter(age < 5) %>%
-    right_join(y = data.frame(cd4 = 1:7, cd4_cat = c('neg', 'gte30', '26-30', '21-25', '16-20', '11-5', '5-10'))) %>%
+  df_paed <- df %>% filter(age < 5) %>%
+    right_join(y = data.frame(cd4 = 1:8, cd4_cat = c('neg', 'gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5'))) %>%
     right_join(y = data.frame(artdur = 2:5, transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'))) %>%
     filter(cd4_cat != 'neg') 
+  
+  df_adol <- df %>% filter(age > 4) %>%
+    right_join(y = data.frame(cd4 = 3:8, cd4_cat = c('gte1000', '750-999', '500-749', '350-499', '200-349','lte200'))) %>%
+    right_join(y = data.frame(artdur = 2:5, transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'))) %>%
+    filter(cd4_cat != 'neg') 
+  
+  df <- rbind(df_paed, df_adol)
   df <- df %>% select(sex, age, cd4_cat, year, pop, transmission)
   
   
+  ##5-15 can move more than one cd4 category in a year... feels wrong?
+  
   strat_pop <- lmod$hivstrat_paeds
-  dimnames(strat_pop) <- list(cd4_cat =  c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'x'), transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'),
+  dimnames(strat_pop) <- list(cd4_cat =  c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5'), transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'),
                               age = 0:14, sex = c('Male', 'Female'), year = 1970:2030)
   strat_pop <- strat_pop %>% as.data.frame.table(responseName = "lfrog")
   strat_pop$cd4_cat <- as.character(strat_pop$cd4_cat) ; strat_pop$age = as.integer(as.character(strat_pop$age)) ; strat_pop$sex <- as.character(strat_pop$sex) ; strat_pop$year <- as.numeric(as.character(strat_pop$year))
+  strat_pop_paed <- strat_pop %>% filter(age < 5)
   
+  strat_pop_adol <- strat_pop %>% filter(age > 4)
+  strat_pop_adol <- strat_pop_adol %>% right_join(y = data.frame(cd4_cat = c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5'), cd4_cat_new =  c('gte1000', '750-999', '500-749', '350-499', '200-349','lte200', 'lte200')))
+  strat_pop_adol <-  strat_pop_adol %>% select(sex, age, cd4_cat = cd4_cat_new, year, lfrog, transmission)
+  strat_pop_adol <- strat_pop_adol %>% group_by(sex, age, cd4_cat, year, transmission) %>% mutate(lfrog = sum(lfrog)) %>% unique
+  strat_pop <- rbind(strat_pop_paed, strat_pop_adol)
   
   dt <- right_join(df, strat_pop)
-  dt <- dt %>% filter(age < 5 & !is.na(pop))
+  dt <- dt %>% filter(!is.na(pop))
+  
+ ## dt <- dt %>% filter(age < 5 & !is.na(pop))
   
   dt <- dt %>% mutate(diff = lfrog - pop)
   expect_true(all(select(dt, diff) < 1e-3), label = 'Prevalence in leapfrog and spectrum match')
@@ -240,6 +298,8 @@ expect_true(all(select(dt, diff) < 1e-3), label = 'Prevalence in leapfrog and sp
 
 })
 
+
+##art elig looks like its indexed wrong
 test_that('ART counts implemented, no mortality reduction all children eligible for treatment', {
   pjnz <- "../testdata/spectrum/v6.13/bwa_aim-adult-no-art-child-input-cotrim_spectrum-v6.13_2022-02-12.PJNZ"
   pjnz1 <- test_path(pjnz)
@@ -301,7 +361,7 @@ test_that('ART counts implemented, no mortality reduction', {
   df <- "../testdata/spectrum/v6.13/bwa_aim-adult-child-input-art-elig_spectrum-v6.13_2022-02-12_pop1.xlsx"
   df <- test_path(df)
   df <- read_pop1(df, "Botswana", years = 1970:2022)
-  df <- df %>% filter(age < 5) %>%
+  df <- df %>% filter(age < 15) %>%
     right_join(y = data.frame(cd4 = 0:8, cd4_cat = c('all_cd4','neg', 'gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5'))) %>%
     right_join(y = data.frame(artdur = 0:8, transmission = c('all_dur', 'hiv_neg','perinatal', 'bf0-6', 'bf7-12', 'bf12+','lte6mo', '6to12', 'gte12'))) %>%
     filter(cd4_cat != 'neg') 
@@ -323,7 +383,9 @@ test_that('ART counts implemented, no mortality reduction', {
   
   
   dt <- right_join(df, strat_pop)
-  dt <- dt %>% filter(age < 5 & !is.na(pop))
+  dt <- dt %>% filter(!is.na(pop))
+  
+  ##dt <- dt %>% filter(age < 5 & !is.na(pop))
   
   ##
   dt <- dt %>% mutate(diff = lfrog - pop)
