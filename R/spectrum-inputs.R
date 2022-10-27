@@ -165,11 +165,11 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   ## Hardcoded, this is putting all individuals in the highest cd4 category bc i think thats how the nosocomial infections work
  ## v$paed_cd4_dist <- c(0.6, 0.12, 0.1, 0.09, 0.05, 0.03, 0.01)
   v$paed_cd4_dist <- c(1, 0, 0, 0, 0, 0, 0)
-  paed_cd4_prog <- array(data = 0, dim = c(6, 5, 2), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10'), age = 0:4, sex = c('male', 'female')) )
-  paed_cd4_prog[,1:5,1:2] <- c(0.14, 0.37, 0.3, 0.35, 0.4, 0.4)
+  paed_cd4_prog <- array(data = 0, dim = c(7), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', 'lte5')) )
+  paed_cd4_prog[] <- c(0.14, 0.37, 0.3, 0.35, 0.4, 0.4, 0)
   
-  adol_cd4_prog <- array(data = 0, dim = c(6, 10, 2), dimnames = list(cd4 = c('>1000', '750-999', '500-749', '350-499', '200-349', 'lte200'), age = 5:14 , sex = c('male', 'female')) )
-  adol_cd4_prog[,1:10,1:2] <- c(0.3028, 0.3028, 0.2575, 0.2122, 0.1669, 0)
+  adol_cd4_prog <- array(data = 0, dim = c(6), dimnames = list(cd4 = c('>1000', '750-999', '500-749', '350-499', '200-349', 'lte200')) )
+  adol_cd4_prog[] <- c(0.3028, 0.3028, 0.2575, 0.2122, 0.1669, 0)
   
   v$paed_cd4_prog <- paed_cd4_prog
   v$adol_cd4_prog <- adol_cd4_prog

@@ -37,6 +37,9 @@ leapfrogR(const Rcpp::List& demp,
   const int hAG_COARSE = 9;
   const int hAG_FULL = 66;
   const int hDS = 7;
+  const int hDS_adol = 6;
+  const int trans = 4;
+  const int tx_time = 3;
   const int hTS = 3;
   const int ctx_effect = 0.33;
 
@@ -113,7 +116,7 @@ leapfrogR(const Rcpp::List& demp,
  
   if (hAG == hAG_FULL) {
     leapfrog_sim<double, NG, pAG, pIDX_FERT, pAG_FERT,
-		 pIDX_HIVADULT, hAG_FULL, hDS, hTS>
+		 pIDX_HIVADULT, hAG_FULL, hDS, hDS_adol, trans, tx_time, hTS>
       (REAL(demp["basepop"]),
        REAL(demp["Sx"]),
        REAL(demp["netmigr_adj"]),
@@ -174,7 +177,7 @@ leapfrogR(const Rcpp::List& demp,
        REAL(grad_paeds));
   } else if (hAG == hAG_COARSE) {
     leapfrog_sim<double, NG, pAG, pIDX_FERT, pAG_FERT,
-		 pIDX_HIVADULT, hAG_COARSE, hDS, hTS>
+		 pIDX_HIVADULT, hAG_COARSE, hDS, hDS_adol, trans, tx_time,  hTS>
       (REAL(demp["basepop"]),
        REAL(demp["Sx"]),
        REAL(demp["netmigr_adj"]),
