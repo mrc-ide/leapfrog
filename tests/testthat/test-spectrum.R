@@ -216,9 +216,7 @@ test_that('Paediatric HIV mortality working as expected', {
   df <- rbind(df_paed, df_adol)
   df <- df %>% select(sex, age, cd4_cat, year, pop, transmission)
   
-  
-  ##5-15 can move more than one cd4 category in a year... feels wrong?
-  
+
   strat_pop <- lmod$hivstrat_paeds
   dimnames(strat_pop) <- list(cd4_cat =  c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5'), transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'),
                               age = 0:14, sex = c('Male', 'Female'), year = 1970:2030)
@@ -235,8 +233,7 @@ test_that('Paediatric HIV mortality working as expected', {
   dt <- right_join(df, strat_pop)
   dt <- dt %>% filter(!is.na(pop))
   
- ## dt <- dt %>% filter(age < 5 & !is.na(pop))
-  
+  ## 13 and 14 year old females are causing NANs are 
   dt <- dt %>% mutate(diff = lfrog - pop)
   expect_true(all(select(dt, diff) < 1e-3), label = 'Prevalence in leapfrog and spectrum match')
   

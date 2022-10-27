@@ -170,7 +170,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   const TensorMapX1cT paed_incid_input(p_paed_incid_input, sim_years);
   const TensorMapX1cT paed_cd4_dist(p_paed_cd4_dist, hDS);
   const TensorMapX3cT paed_cd4_prog(p_paed_cd4_prog, 6, 5, NG);
-  const TensorMapX3cT adol_cd4_prog(p_adol_cd4_prog, hDS - 1, 10, NG);
+  const TensorMapX3cT adol_cd4_prog(p_adol_cd4_prog, 6, 10, NG);
   const TensorMapX4cT paed_cd4_mort(p_paed_cd4_mort, 7, 4, 5, NG);
   const TensorMapX4cT adol_cd4_mort(p_adol_cd4_mort, hDS - 1, 4, 10, NG);
   const TensorMapX1cT ctx_val(p_ctx_val, sim_years);
@@ -929,8 +929,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
           for(int cat = 0; cat < 4; cat++){
             //deaths_paeds kinda a misnomer, those alive after hiv mortality
              deaths_paeds(hm, cat, af, g, t) += hivstrat_paeds(hm, cat, af, g, t) ;
-           // deaths_paeds(hm, cat, af, g, t) -= (1 - ctx_effect * ctx_val(t)) * hivstrat_paeds(hm, cat, af, g, t) * adol_cd4_mort(hm, cat, af, g); 
-           // aidsdeaths_noart_paed(hm, af, g) +=  (1 - ctx_effect * ctx_val(t)) * hivstrat_paeds(hm, cat, af, g, t) * adol_cd4_mort(hm, cat, af, g); // output hiv deaths, aggregated across transmission category
+             deaths_paeds(hm, cat, af, g, t) -= (1 - ctx_effect * ctx_val(t)) * hivstrat_paeds(hm, cat, af, g, t) * adol_cd4_mort(hm, cat, af, g); 
+             aidsdeaths_noart_paed(hm, af, g) +=  (1 - ctx_effect * ctx_val(t)) * hivstrat_paeds(hm, cat, af, g, t) * adol_cd4_mort(hm, cat, af, g); // output hiv deaths, aggregated across transmission category
           }
         }
       }
@@ -960,7 +960,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
           for(int cat = 0; cat < 4; cat++){
             //deaths_paeds causing NANs
             grad_paeds(hm - 1, cat, af, g, t) -= (deaths_paeds(hm - 1, cat, af, g, t) * adol_cd4_prog(hm - 1, af - 5, g) + hivstrat_paeds(hm - 1, cat, af, g, t) * adol_cd4_prog(hm - 1, af - 5, g)) / 2; //moving to next cd4 category
-           // grad_paeds(hm, cat, af, g, t) += (deaths_paeds(hm - 1, cat, af, g, t) * adol_cd4_prog(hm - 1, af - 5, g) + hivstrat_paeds(hm - 1, cat, af, g, t) * adol_cd4_prog(hm - 1, af - 5, g)) / 2; //moving into this cd4 category
+            grad_paeds(hm, cat, af, g, t) += (deaths_paeds(hm - 1, cat, af, g, t) * adol_cd4_prog(hm - 1, af - 5, g) + hivstrat_paeds(hm - 1, cat, af, g, t) * adol_cd4_prog(hm - 1, af - 5, g)) / 2; //moving into this cd4 category
           }
         }
       }

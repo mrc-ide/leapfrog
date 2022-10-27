@@ -168,8 +168,8 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   paed_cd4_prog <- array(data = 0, dim = c(6, 5, 2), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10'), age = 0:4, sex = c('male', 'female')) )
   paed_cd4_prog[,1:5,1:2] <- c(0.14, 0.37, 0.3, 0.35, 0.4, 0.4)
   
-  adol_cd4_prog <- array(data = 0, dim = c(5, 10, 2), dimnames = list(cd4 = c('>1000', '750-999', '500-749', '350-499', '200-349'), age = 5:14 , sex = c('male', 'female')) )
-  adol_cd4_prog[,1:10,1:2] <- c(0.3028, 0.3028, 0.2575, 0.2122, 0.1669)
+  adol_cd4_prog <- array(data = 0, dim = c(6, 10, 2), dimnames = list(cd4 = c('>1000', '750-999', '500-749', '350-499', '200-349', 'lte200'), age = 5:14 , sex = c('male', 'female')) )
+  adol_cd4_prog[,1:10,1:2] <- c(0.3028, 0.3028, 0.2575, 0.2122, 0.1669, 0)
   
   v$paed_cd4_prog <- paed_cd4_prog
   v$adol_cd4_prog <- adol_cd4_prog
