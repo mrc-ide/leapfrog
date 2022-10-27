@@ -929,8 +929,9 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
           for(int cat = 0; cat < trans; cat++){
             //deaths_paeds kinda a misnomer, those alive after hiv mortality
              deaths_paeds(hm, cat, af, g, t) += hivstrat_paeds(hm, cat, af, g, t) ;
-             deaths_paeds(hm, cat, af, g, t) -= (1 - ctx_effect * ctx_val(t)) * hivstrat_paeds(hm, cat, af, g, t) * adol_cd4_mort(hm, cat, af); 
-             aidsdeaths_noart_paed(hm, af, g) +=  (1 - ctx_effect * ctx_val(t)) * hivstrat_paeds(hm, cat, af, g, t) * adol_cd4_mort(hm, cat, af); // output hiv deaths, aggregated across transmission category
+             deaths_paeds(hm, cat, af, g, t) -= (1 - ctx_effect * ctx_val(t)) * hivstrat_paeds(hm, cat, af, g, t) * adol_cd4_mort(hm, cat, af - 5); 
+             aidsdeaths_noart_paed(hm, af, g) +=  (1 - ctx_effect * ctx_val(t)) * hivstrat_paeds(hm, cat, af, g, t) * adol_cd4_mort(hm, cat, af - 5); // output hiv deaths, aggregated across transmission category
+
           }
         }
       }
