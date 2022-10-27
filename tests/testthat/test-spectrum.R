@@ -141,7 +141,7 @@ test_that('Paediatric transition through CD4 working appropriately', {
   df <- test_path(df)
   df <- read_pop1(df, "Botswana", years = 1970:2022)
   df_paed <- df %>% filter(age < 5) %>%
-    right_join(y = data.frame(cd4 = 1:8, cd4_cat = c('neg', 'gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5'))) %>%
+    right_join(y = data.frame(cd4 = 1:8, cd4_cat = c('neg', 'gte30', '26-30', '21-25', '16-20', '11-14', '5-10', 'lte5'))) %>%
     right_join(y = data.frame(artdur = 2:5, transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'))) %>%
     filter(cd4_cat != 'neg') 
   
@@ -157,14 +157,14 @@ test_that('Paediatric transition through CD4 working appropriately', {
   ##5-15 can move more than one cd4 category in a year... feels wrong?
   
   strat_pop <- lmod$hivstrat_paeds
-  dimnames(strat_pop) <- list(cd4_cat =  c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5'), transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'),
+  dimnames(strat_pop) <- list(cd4_cat =  c('gte30', '26-30', '21-25', '16-20', '11-14', '5-10', 'lte5'), transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'),
                               age = 0:14, sex = c('Male', 'Female'), year = 1970:2030)
   strat_pop <- strat_pop %>% as.data.frame.table(responseName = "lfrog")
   strat_pop$cd4_cat <- as.character(strat_pop$cd4_cat) ; strat_pop$age = as.integer(as.character(strat_pop$age)) ; strat_pop$sex <- as.character(strat_pop$sex) ; strat_pop$year <- as.numeric(as.character(strat_pop$year))
   strat_pop_paed <- strat_pop %>% filter(age < 5)
   
   strat_pop_adol <- strat_pop %>% filter(age > 4)
-  strat_pop_adol <- strat_pop_adol %>% right_join(y = data.frame(cd4_cat = c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5'), cd4_cat_new =  c('gte1000', '750-999', '500-749', '350-499', '200-349','lte200', 'lte200')))
+  strat_pop_adol <- strat_pop_adol %>% right_join(y = data.frame(cd4_cat = c('gte30', '26-30', '21-25', '16-20', '11-14', '5-10', 'lte5'), cd4_cat_new =  c('gte1000', '750-999', '500-749', '350-499', '200-349','lte200', 'lte200')))
   strat_pop_adol <-  strat_pop_adol %>% select(sex, age, cd4_cat = cd4_cat_new, year, lfrog, transmission)
   strat_pop_adol <- strat_pop_adol %>% group_by(sex, age, cd4_cat, year, transmission) %>% mutate(lfrog = sum(lfrog)) %>% unique
   strat_pop <- rbind(strat_pop_paed, strat_pop_adol)
@@ -175,7 +175,7 @@ test_that('Paediatric transition through CD4 working appropriately', {
   ## dt <- dt %>% filter(age < 5 & !is.na(pop))
   
   dt <- dt %>% mutate(diff = lfrog - pop)
-  expect_true(all(select(dt, diff) < 1e-3), label = 'Prevalence in leapfrog and spectrum match')
+  expect_true(all(abs(select(dt, diff)) < 1e-3), label = 'Prevalence in leapfrog and spectrum match')
   
 })
 
