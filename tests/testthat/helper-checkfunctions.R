@@ -104,3 +104,75 @@ transmission_matches <- function(pjnz, threshold_absolute_pid = c(250, 25, 3)){
               label = paste0("HIV deaths in leapfrog differ by less than ", threshold_absolute_pid[3], " from Spectrum for 15+, both sexes, and all years."))
 
 }
+
+spectrum_output <- function(file = "../testdata/spectrum/v6.13/bwa_aim-adult-child-input-art-elig_spectrum-v6.13_2022-02-12_pop1.xlsx", ages = 0:14, country = 'Botswana'){
+  ##pull out stratified population from the .xlsx file, This function doesn't take out the paediatric output, so going to just compare to the Spectrum software itself
+  df <- file
+  df <- test_path(df)
+  df <- read_pop1(df, country, years = 1970:2022)
+  if(any(0:5 %in% ages)){
+    df_paed <- df %>% filter(age < 5) %>%
+      right_join(y = data.frame(cd4 = 1:8, cd4_cat = c('neg', 'gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5'))) %>%
+      right_join(y = data.frame(artdur = 2:8, transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+', 'ARTlte5mo', 'ART6to12mo', 'ARTgte12mo'))) %>%
+      filter(cd4_cat != 'neg') 
+    
+    df_adol <- df %>% filter(age > 4) %>%
+      right_join(y = data.frame(cd4 = 3:8, cd4_cat = c('gte1000', '750-999', '500-749', '350-499', '200-349','lte200'))) %>%
+      right_join(y = data.frame(artdur = 2:8, transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+', 'ARTlte5mo', 'ART6to12mo', 'ARTgte12mo'))) %>%
+      filter(cd4_cat != 'neg') 
+    
+    df <- rbind(df_paed, df_adol)
+    df <- df %>% filter(age %in% ages)
+  }else{
+    df <- df %>% filter(age > 4) %>%
+      right_join(y = data.frame(cd4 = 3:8, cd4_cat = c('gte1000', '750-999', '500-749', '350-499', '200-349','lte200'))) %>%
+      right_join(y = data.frame(artdur = 2:8, transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+', 'ARTlte5mo', 'ART6to12mo', 'ARTgte12mo'))) %>%
+      filter(cd4_cat != 'neg') 
+  }
+
+  df <- df %>% select(sex, age, cd4_cat, year, pop, transmission)
+  
+  df_on_treatment <- df[grepl('ART', df$transmission),] %>% select(sex, age, cd4_cat, year, pop) %>% group_by(sex, age, cd4_cat, year) %>% mutate(pop = sum(pop)) %>% unique() %>% filter(age %in% ages)
+  df_off_treatment <- df[!grepl('ART', df$transmission),]%>% filter(age %in% ages)
+  df_total <- df %>% select(sex, age, cd4_cat, year, pop) %>% group_by(sex, age, cd4_cat, year) %>% mutate(pop = sum(pop)) %>% unique()%>% filter(age %in% ages)
+  
+  return(list(on_treatment = df_on_treatment, off_treatment = df_off_treatment, total = df_total))
+  
+}
+
+lmod_output_paed <- function(lmod){
+  source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
+  
+  
+  strat_pop <- lmod$hivstrat_paeds
+  dimnames(strat_pop) <- list(cd4_cat =  c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5'), transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'),
+                              age = 0:14, sex = c('Male', 'Female'), year = 1970:2030)
+  strat_pop <- strat_pop %>% as.data.frame.table(responseName = "lfrog")
+  strat_pop$cd4_cat <- as.character(strat_pop$cd4_cat) ; strat_pop$age = as.integer(as.character(strat_pop$age)) ; strat_pop$sex <- as.character(strat_pop$sex) ; strat_pop$year <- as.numeric(as.character(strat_pop$year))
+  strat_pop_paed <- strat_pop %>% filter(age < 5)
+  
+  strat_pop_adol <- strat_pop %>% filter(age > 4)
+  strat_pop_adol <- strat_pop_adol %>% right_join(y = data.frame(cd4_cat = c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5'), cd4_cat_new =  c('gte1000', '750-999', '500-749', '350-499', '200-349','lte200', 'lte200')))
+  strat_pop_adol <-  strat_pop_adol %>% select(sex, age, cd4_cat = cd4_cat_new, year, lfrog, transmission)
+  strat_pop_adol <- strat_pop_adol %>% group_by(sex, age, cd4_cat, year, transmission) %>% mutate(lfrog = sum(lfrog)) %>% unique
+  strat_pop <- rbind(strat_pop_paed, strat_pop_adol)
+  
+  strat_pop_total <- strat_pop %>% select(sex, age, cd4_cat, year, lfrog) %>% group_by(sex, age, cd4_cat, year) %>% mutate(lfrog = sum(lfrog))%>% filter(age < 15)
+  
+  strat_art <- lmod$artstrat_paeds
+  dimnames(strat_art) <- list(transmission = c('ARTlte5mo', 'ART6to12mo', 'ARTgte12mo'), cd4_cat =  c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5'), 
+                              age = 0:14, sex = c('Male', 'Female'), year = 1970:2030)
+  strat_art <- strat_art %>% as.data.frame.table(responseName = "lfrog")
+  strat_art$cd4_cat <- as.character(strat_art$cd4_cat) ; strat_art$age = as.integer(as.character(strat_art$age)) ; strat_art$sex <- as.character(strat_art$sex) ; strat_art$year <- as.numeric(as.character(strat_art$year))
+  strat_art_paed <- strat_art %>% filter(age < 5)
+  
+  strat_art_adol <- strat_art %>% filter(age > 4)
+  strat_art_adol <- strat_art_adol %>% right_join(y = data.frame(cd4_cat = c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5'), cd4_cat_new =  c('gte1000', '750-999', '500-749', '350-499', '200-349','lte200', 'lte200')))
+  strat_art_adol <-  strat_art_adol %>% select(sex, age, cd4_cat = cd4_cat_new, year, lfrog, transmission)
+  strat_art_adol <- strat_art_adol %>% group_by(sex, age, cd4_cat, year, transmission) %>% mutate(lfrog = sum(lfrog)) %>% unique
+  strat_art <- rbind(strat_art_paed, strat_art_adol)
+  strat_art <- strat_art %>% select(sex, age, cd4_cat, year, lfrog) %>% group_by(sex, age, cd4_cat, year) %>% mutate(lfrog = sum(lfrog)) %>% unique() %>% filter(age < 15)
+  
+  
+  return(list(prev_strat = strat_pop, prev = strat_pop_total, art = strat_art))
+}
