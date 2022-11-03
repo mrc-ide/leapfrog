@@ -387,7 +387,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
               
         }
             for(int dur = 0 ; dur < hTS; dur++){
-              artstrat_paeds(dur, hm, 5, g, t) += artstrat_paeds(dur, hm, 4, g, t-1) * sx(5, g, t);
+              artstrat_paeds(dur, hm_alt, 5, g, t) += artstrat_paeds(dur, hm, 4, g, t-1) * sx(5, g, t) * paed_cd4_transition(hm_alt, hm);
             }
       }
     }
