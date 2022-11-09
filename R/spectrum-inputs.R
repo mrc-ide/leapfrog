@@ -237,6 +237,17 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   v$paed_art_mort <- paed_art_mort
   v$adol_art_mort <- adol_art_mort
   
+  art_dist_paed <- read.csv('tests/testdata/spectrum/v6.13/paed_art_dist.csv')
+  expand <- NULL
+  for(yr in 2023:2030){
+    x = art_dist_paed %>% filter(year == 2022)
+    x = x %>% mutate(year = yr)
+    expand <- rbind(expand, x)
+  }
+  art_dist_paed <- rbind(art_dist_paed, expand)
+  art_dist_paed <- array(data = art_dist_paed$value, dim = c(15, length(unique(art_dist_paed$year))), dimnames = list( age= 0:14, year = sort(unique(art_dist_paed$year))))
+  v$art_dist_paed <- art_dist_paed
+  
   ## pull in cotrim coverage numbers
   ctx_val <- c(rep(0, 25), rep(0, 5), 
                rep(50, 3),

@@ -337,32 +337,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
     }
     
- //  for(int g = 0; g < NG; g++){
-   //   int a = 0;
-     // for(int ha = 1; ha < pIDX_FERT; ha++){
-       //   hivpaeds_ag_prob(ha, g) += hivpop1(a, g, t-1);
-        //  hivpaeds_ag_prob(ha, g) = (hivpaeds_ag_prob(ha, g) > 0) ? hivpop1(a-1, g, t-1) / hivpaeds_ag_prob(ha, g) : 0.0;
-        //  a++;
-     // }
-      // Note: loop stops at hAG-1; no one ages out of the open-ended age group
-      //MKW: need to change this to entrants go into the adult population
-   // }
     
- // for(int g = 0; g < NG; g++) {
-   //   for(int ha = 1; ha < pIDX_FERT; ha++) {
-     //   for(int hm = 0; hm < hDS; hm++) {
-       //   hivstrat_paeds(hm, ha, g, t) -=  hivstrat_paeds(hm, ha, g, t-1);  // age-out
-         // hivstrat_paeds(hm, ha, g, t) +=  hivstrat_paeds(hm, ha-1, g, t-1);   // age-in
-        //  hivstrat_paeds(hm, ha, g, t) = (1.0 - hivpaeds_ag_prob(ha, g)) * hivstrat_paeds(hm, ha, g, t-1);  // age-out
-          //hivstrat_paeds(hm, ha, g, t) += hivpaeds_ag_prob(ha-1, g) * hivstrat_paeds(hm, ha-1, g, t-1);   // age-in
-          //if(t > t_ART_start)
-          //  for(int hu = 0; hu < hTS; hu++) {
-          //    artstrat_adult(hu, hm, ha, g, t) = (1.0 - hiv_ag_prob(ha, g)) * artstrat_adult(hu, hm, ha, g, t-1);
-          //   artstrat_adult(hu, hm, ha, g, t) += hiv_ag_prob(ha-1, g) * artstrat_adult(hu, hm, ha-1, g, t-1);
-          //  }
-  //    }
-    //}
- // }
+
     
     for(int g = 0; g < NG; g++){
       for(int ha = 1; ha < 5; ha++) {
@@ -370,10 +346,9 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
           for(int cat = 0 ; cat < 4; cat++){
             hivstrat_paeds(hm, cat, ha, g, t) += hivstrat_paeds(hm, cat, ha-1, g, t-1) * sx(ha, g, t);
           }
-          
-          for(int dur = 0 ; dur < hTS; dur++){
-            artstrat_paeds(dur, hm, ha, g, t) += artstrat_paeds(dur, hm, ha-1, g, t-1) * sx(ha, g, t);
-          }
+            for(int dur = 0; dur < hTS; dur++){
+              artstrat_paeds(dur, hm, ha, g, t) += artstrat_paeds(dur, hm, ha-1, g, t-1) * sx(ha, g, t);
+            }
           
         }
       }
@@ -386,9 +361,9 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
              hivstrat_paeds(hm_alt, cat, 5, g, t) +=  hivstrat_paeds(hm, cat, 4, g, t-1) * sx(5, g, t) * paed_cd4_transition(hm_alt, hm);
               
         }
-            for(int dur = 0 ; dur < hTS; dur++){
-              artstrat_paeds(dur, hm_alt, 5, g, t) += artstrat_paeds(dur, hm, 4, g, t-1) * sx(5, g, t) * paed_cd4_transition(hm_alt, hm);
-            }
+          for(int dur = 0; dur < hTS; dur++){
+            artstrat_paeds(dur, hm_alt, 5, g, t) += artstrat_paeds(dur, hm, 4, g, t-1) * sx(5, g, t) * paed_cd4_transition(hm_alt, hm);
+          }
       }
     }
   }
@@ -403,13 +378,23 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
            hivstrat_paeds(hm, cat, ha, g, t) += hivstrat_paeds(hm, cat, ha-1, g, t-1) * sx(ha, g, t);
             
           }
-          for(int dur = 0 ; dur < hTS; dur++){
+          for(int dur = 0; dur < hTS; dur++){
             artstrat_paeds(dur, hm, ha, g, t) += artstrat_paeds(dur, hm, ha-1, g, t-1) * sx(ha, g, t);
-          }          
+          }
+            
         }
       }
     }
     
+    //Progress ART to the correct time on ART
+    for(int hm = 0; hm < hDS; hm++){
+      for(int af = 0; af < pIDX_FERT; af++){
+        for(int g = 0; g < NG; g++){
+          artstrat_paeds(2, hm, af, g, t) += artstrat_paeds(0, hm, af, g, t) > 0 ? artstrat_paeds(0, hm, af, g, t) : 0;
+          artstrat_paeds(0, hm, af, g, t) -= artstrat_paeds(0, hm, af, g, t) > 0 ? artstrat_paeds(0, hm, af, g, t) : 0;
+        }
+      }
+    }
     
     // !!!TODO: add HIV+ 15 year old entrants
     for (int g = 0; g < NG; g++) {
@@ -969,14 +954,14 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
               artnum_paed += need_art_paed(hm, cat, af, g);
             }
             for(int dur = 0; dur < hTS; dur++){
-           // artnum_paed += artstrat_paeds(dur, hm, af, g, t);
+              artnum_paed += artstrat_paeds(dur, hm, af, g, t);
           }
         } 
       }
     }
     
     //this is assuming that coverage is in percents
-   // artnum_paed = artnum_paed * paed_art_val(t);
+     artnum_paed = paed_art_val(t-1) ? artnum_paed * (paed_art_val(t) + paed_art_val(t-1)) / 2 : 0.0;
     
     //how many should initialize ART
     for(int g = 0; g < NG; g++){
@@ -1015,26 +1000,13 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
             artstrat_paeds(0, hm, af, g, t) += init_art_paed_total > 0 ? artnum_paed * (init_art_paed(hm, cat, af, g) / init_art_paed_total) : 0.0; 
             // take out those who are now on treatment 
             //this is causing issues
-          ///  hivstrat_paeds(hm, cat, af, g, t) -= artnum_paed;// * init_art_paed(hm, cat, af, g) / init_art_paed_total; 
+            hivstrat_paeds(hm, cat, af, g, t) -= init_art_paed_total > 0 ? artnum_paed * (init_art_paed(hm, cat, af, g) / init_art_paed_total) : 0.0; 
           }
         }
       }
     }
     
-    int move;
-    move = 0;
-    //split art pop amongst art treatment categories
-    for(int dur = 1; dur < hTS; dur++){
-      for(int hm = 0; hm < hDS; hm++){
-        for(int af = 0; af < pIDX_FERT; af++){
-          for(int g = 0; g < NG; g++){
-            move = artstrat_paeds(dur - 1, hm, af, g, t) * 0.5;
-            artstrat_paeds(dur, hm, af, g, t) += move;
-            artstrat_paeds(dur - 1, hm, af, g, t) -= move;
-          }
-        }
-      }
-    }
+
     for(int g = 0; g < NG; g++){
       for(int hm = 0; hm < hDS_adol; hm++){
         for(int af = 0; af < pIDX_HIVADULT; af++){

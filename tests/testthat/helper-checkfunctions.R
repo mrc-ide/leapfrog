@@ -132,7 +132,7 @@ spectrum_output <- function(file = "../testdata/spectrum/v6.13/bwa_aim-adult-chi
 
   df <- df %>% select(sex, age, cd4_cat, year, pop, transmission)
   
-  df_on_treatment <- df[grepl('ART', df$transmission),] %>% select(sex, age, cd4_cat, year, pop) %>% group_by(sex, age, cd4_cat, year) %>% mutate(pop = sum(pop)) %>% unique() %>% filter(age %in% ages)
+  df_on_treatment <- df[grepl('ART', df$transmission),] %>% select(sex, age, cd4_cat, year, pop, transmission) %>% group_by(sex, age, cd4_cat, transmission, year) %>% mutate(pop = sum(pop)) %>% unique() %>% filter(age %in% ages)
   df_off_treatment <- df[!grepl('ART', df$transmission),]%>% filter(age %in% ages)
   df_total <- df %>% select(sex, age, cd4_cat, year, pop) %>% group_by(sex, age, cd4_cat, year) %>% mutate(pop = sum(pop)) %>% unique()%>% filter(age %in% ages)
   
@@ -141,8 +141,6 @@ spectrum_output <- function(file = "../testdata/spectrum/v6.13/bwa_aim-adult-chi
 }
 
 lmod_output_paed <- function(lmod){
-  source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
-  
   
   strat_pop <- lmod$hivstrat_paeds
   dimnames(strat_pop) <- list(cd4_cat =  c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5'), transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'),
@@ -163,7 +161,7 @@ lmod_output_paed <- function(lmod){
   dimnames(strat_art) <- list(transmission = c('ARTlte5mo', 'ART6to12mo', 'ARTgte12mo'), cd4_cat =  c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5'), 
                               age = 0:14, sex = c('Male', 'Female'), year = 1970:2030)
   strat_art <- strat_art %>% as.data.frame.table(responseName = "lfrog")
-  strat_art$cd4_cat <- as.character(strat_art$cd4_cat) ; strat_art$age = as.integer(as.character(strat_art$age)) ; strat_art$sex <- as.character(strat_art$sex) ; strat_art$year <- as.numeric(as.character(strat_art$year))
+  strat_art$transmission <- as.character(strat_art$transmission) ; strat_art$cd4_cat <- as.character(strat_art$cd4_cat) ; strat_art$age = as.integer(as.character(strat_art$age)) ; strat_art$sex <- as.character(strat_art$sex) ; strat_art$year <- as.numeric(as.character(strat_art$year))
   strat_art_paed <- strat_art %>% filter(age < 5)
   
   strat_art_adol <- strat_art %>% filter(age > 4)
@@ -171,7 +169,7 @@ lmod_output_paed <- function(lmod){
   strat_art_adol <-  strat_art_adol %>% select(sex, age, cd4_cat = cd4_cat_new, year, lfrog, transmission)
   strat_art_adol <- strat_art_adol %>% group_by(sex, age, cd4_cat, year, transmission) %>% mutate(lfrog = sum(lfrog)) %>% unique
   strat_art <- rbind(strat_art_paed, strat_art_adol)
-  strat_art <- strat_art %>% select(sex, age, cd4_cat, year, lfrog) %>% group_by(sex, age, cd4_cat, year) %>% mutate(lfrog = sum(lfrog)) %>% unique() %>% filter(age < 15)
+  strat_art <- strat_art %>% select(sex, age, cd4_cat, year, transmission, lfrog) %>% group_by(sex, age, cd4_cat, transmission, year) %>% mutate(lfrog = sum(lfrog)) %>% unique() %>% filter(age < 15)
   
   
   return(list(prev_strat = strat_pop, prev = strat_pop_total, art = strat_art))
