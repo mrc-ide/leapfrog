@@ -961,7 +961,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     }
     
     //this is assuming that coverage is in percents
-     artnum_paed = paed_art_val(t-1) > 0 ? artnum_paed * (paed_art_val(t) + paed_art_val(t-1)) / 2 : 0.0;
+     artnum_paed =  artnum_paed * (paed_art_val(t) + paed_art_val(t-1)) / 2 ;
     
     //how many should initialize ART
     for(int g = 0; g < NG; g++){
