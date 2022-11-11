@@ -961,7 +961,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     }
     
     //this is assuming that coverage is in percents
-     artnum_paed = paed_art_val(t-1) ? artnum_paed * (paed_art_val(t) + paed_art_val(t-1)) / 2 : 0.0;
+     artnum_paed = paed_art_val(t-1) > 0 ? artnum_paed * (paed_art_val(t) + paed_art_val(t-1)) / 2 : 0.0;
     
     //how many should initialize ART
     for(int g = 0; g < NG; g++){
@@ -998,15 +998,34 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
             //this is assuming that coverage is in percents
             //also need to figure out how to take people off of treatment if ART coverage decreases in count space
             artstrat_paeds(0, hm, af, g, t) += init_art_paed_total > 0 ? artnum_paed * (init_art_paed(hm, cat, af, g) / init_art_paed_total) : 0.0; 
-            // take out those who are now on treatment 
-            //this is causing issues
-            hivstrat_paeds(hm, cat, af, g, t) -= init_art_paed_total > 0 ? artnum_paed * (init_art_paed(hm, cat, af, g) / init_art_paed_total) : 0.0; 
           }
         }
       }
     }
     
-
+    for(int g = 0; g < NG; g++){
+      for(int hm = 0; hm < hDS_adol; hm++){
+        artstrat_paeds(0, hm, 1, g, t) = artstrat_paeds(0, hm, 1, g, t) * 0.6236951;
+      }
+    }
+    
+    for(int g = 0; g < NG; g++){
+      for(int hm = 0; hm < hDS_adol; hm++){
+        artstrat_paeds(0, hm, 3, g, t) = artstrat_paeds(0, hm, 3, g, t) *  0.6015512;
+      }
+    }
+    
+    
+    for(int g = 0; g < NG; g++){
+      for(int hm = 0; hm < hDS_adol; hm++){
+        for(int af = 0; af < pIDX_HIVADULT; af++){
+          artstrat_paeds(1, hm, af, g, t) += artstrat_paeds(0, hm, af, g, t) * 0.5;
+          artstrat_paeds(0, hm, af, g, t) -= artstrat_paeds(0, hm, af, g, t) * 0.5;
+        }
+      }
+    }
+    
+    
     for(int g = 0; g < NG; g++){
       for(int hm = 0; hm < hDS_adol; hm++){
         for(int af = 0; af < pIDX_HIVADULT; af++){
@@ -1019,6 +1038,29 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
           }
         }
       }
+    }
+    
+    for(int g = 0; g < NG; g++){
+      for(int hm = 0; hm < hDS_adol; hm++){
+        for(int af = 0; af < pIDX_HIVADULT; af++){
+          artstrat_paeds(0, hm, af, g, t) += artstrat_paeds(1, hm, af, g, t);
+          artstrat_paeds(1, hm, af, g, t) -= artstrat_paeds(1, hm, af, g, t);
+        }
+      }
+    }
+    
+
+    
+    
+    //the nosocomial infections aren't distributed so can't just move everything forward. So going to limit hm to just go to the n+1 basically
+    for(int g = 0; g < NG; g++){
+  //    for(int cat = 0; cat < trans; cat++){
+        for(int af = 0; af < pIDX_HIVADULT; af++){
+          for(int hm = 0; hm < hDS; hm++){
+            hivstrat_paeds(hm, 0, af, g, t) -= af < 5 ? 0.5 * artstrat_paeds(0, hm, af, g, t) / (1 - paed_art_mort(hm, 0, af)) + 0.5 *  artstrat_paeds(0, hm, af, g, t) / (1 - paed_art_mort(hm, 1, af)): 0.5 * artstrat_paeds(0, hm, af, g, t) / (1 - adol_art_mort(hm, 0, af)) + 0.5 * artstrat_paeds(0, hm, af, g, t) / (1 - adol_art_mort(hm, 1, af)); 
+          }
+        }
+    //  }
     }
     
     
