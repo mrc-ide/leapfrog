@@ -113,6 +113,10 @@ leapfrogR(const Rcpp::List& demp,
   NumericVector artinit(hDS * hAG * NG * proj_years);
   artinit.attr("dim") = NumericVector::create(hDS, hAG, NG, proj_years);
   
+  NumericVector artnum_paed(proj_years);
+  artnum_paed.attr("dim") = NumericVector::create(proj_years);
+  
+  
   
  
   if (hAG == hAG_FULL) {
@@ -176,6 +180,7 @@ leapfrogR(const Rcpp::List& demp,
        REAL(aidsdeaths_art),
        REAL(aidsdeaths_noart_paed),
        REAL(aidsdeaths_art_paed),
+      // REAL(artnum_paed),
        REAL(artinit),
        REAL(coarse_totpop1));
   } else if (hAG == hAG_COARSE) {
@@ -239,6 +244,7 @@ leapfrogR(const Rcpp::List& demp,
        REAL(aidsdeaths_art),
        REAL(aidsdeaths_noart_paed),
        REAL(aidsdeaths_art_paed),
+      // REAL(artnum_paed),
        REAL(artinit),
        REAL(coarse_totpop1));
   } else {
@@ -263,6 +269,7 @@ leapfrogR(const Rcpp::List& demp,
 			  _("aidsdeaths_art") = aidsdeaths_art,
 			  _("aidsdeaths_noart_paed") = aidsdeaths_noart_paed,
 			  _("aidsdeaths_art_paed") = aidsdeaths_art_paed,
+//  _("artnum_paed") = artnum_paed,
 			  _("artinit") = artinit,
 			  _("coarse_totpop1") = coarse_totpop1);
 

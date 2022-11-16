@@ -106,6 +106,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                     Type *p_aidsdeaths_art,
                     Type *p_aidsdeaths_noart_paed,
                     Type *p_aidsdeaths_art_paed,
+                   // Type *p_artnum_paed,
                     Type *p_artinit,
                     Type *p_coarse_totpop1
                       ) {
@@ -214,7 +215,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   TensorMapX5T artelig_paeds(p_artelig_paeds, hDS, trans, pIDX_HIVADULT, NG, sim_years);
   TensorMapX4T aidsdeaths_noart_paed(p_aidsdeaths_noart_paed, hDS, pIDX_HIVADULT, NG, sim_years);
   TensorMapX5T aidsdeaths_art_paed(p_aidsdeaths_art_paed, hTS, hDS, pIDX_HIVADULT, NG, sim_years);
-  
+ // TensorMapX1T artnum_paed(p_artnum_paed, sim_years);
 
   TensorMapX3T coarse_totpop1(p_coarse_totpop1, hAG, NG, sim_years);
   
@@ -238,6 +239,9 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   artelig_paeds.setZero();
   aidsdeaths_noart_paed.setZero();
   aidsdeaths_art_paed.setZero();
+ // TensorFixedSize<Type, Sizes<sim_years>> artnum_paed
+  //artnum_paed.setZero();
+    
   
   
   int everARTelig_idx = hDS;
@@ -867,8 +871,10 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       for(int hm = 1; hm < hDS; hm++){
         for(int af = 1; af < 5; af++){
           for(int cat = 0; cat < trans; cat++){
-            grad_paeds(hm - 1, cat, af, g) -= (hivstrat_paeds(hm-1, cat, af, g, t-1) > 0) ? (deaths_paeds(hm - 1, cat, af, g) * paed_cd4_prog(hm - 1) + hivstrat_paeds(hm - 1, cat, af, g, t) * paed_cd4_prog(hm - 1)) / 2: 0.0; //moving to next cd4 category
-            grad_paeds(hm, cat, af, g) += (hivstrat_paeds(hm-1, cat, af, g, t-1) > 0) ? (deaths_paeds(hm - 1, cat, af, g) * paed_cd4_prog(hm - 1) + hivstrat_paeds(hm - 1, cat, af, g, t) * paed_cd4_prog(hm - 1)) / 2 : 0.0; //moving into this cd4 category
+            grad_paeds(hm - 1, cat, af, g) -= ((hivstrat_paeds(hm-1, cat, af, g, t-1) +  artstrat_paeds(hm-1, cat, af, g, t-1)) > 0 )   ? (deaths_paeds(hm - 1, cat, af, g) * paed_cd4_prog(hm - 1) + hivstrat_paeds(hm - 1, cat, af, g, t) * paed_cd4_prog(hm - 1)) / 2: 0.0; //moving to next cd4 category
+            grad_paeds(hm, cat, af, g) += ((hivstrat_paeds(hm-1, cat, af, g, t-1) +  artstrat_paeds(hm-1, cat, af, g, t-1)) > 0 ) ? (deaths_paeds(hm - 1, cat, af, g) * paed_cd4_prog(hm - 1) + hivstrat_paeds(hm - 1, cat, af, g, t) * paed_cd4_prog(hm - 1)) / 2 : 0.0; //moving into this cd4 category
+            
+              
           }
         }
       }
@@ -944,13 +950,12 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
     }
     
-    int artnum_paed;
-    artnum_paed = 0.0;
+   int artnum_paed;
+   artnum_paed = 0.0;
     for(int g = 0; g < NG; g++){
         for(int af = 0; af < pIDX_HIVADULT; af++){
           for(int hm = 0; hm < hDS; hm++){
             for(int cat = 0; cat < trans; cat++){
-              //artnum_paed += need_art_paed(hm, cat, af, g);
               artnum_paed += need_art_paed(hm, cat, af, g);
             }
             for(int dur = 0; dur < hTS; dur++){
@@ -970,8 +975,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
             for(int cat = 0; cat < trans; cat++){
               init_art_paed(hm, cat, af, g) += need_art_paed(hm, cat, af, g);
               for(int dur = 0; dur < hTS; dur++){
-                init_art_paed(hm, cat, af, g) -= (artstrat_paeds(dur, hm, af, g, t) + artstrat_paeds(dur, hm, af, g, t - 1) / 2) ;
-                init_art_paed(hm, cat, af, g) = init_art_paed(hm, cat, af, g) < 0 ? 0.0 : init_art_paed(hm, cat, af, g);
+               // init_art_paed(hm, cat, af, g) -= (artstrat_paeds(dur, hm, af, g, t) + artstrat_paeds(dur, hm, af, g, t - 1) / 2) ;
+                init_art_paed(hm, cat, af, g) -= (artstrat_paeds(dur, hm, af, g, t)) ;
               }
             }
         } 
@@ -990,15 +995,24 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     }
     }
     
-    //the nosocomial infections aren't distributed so can't just move everything forward. So going to limit hm to just go to the n+1 basically
+    //the nosocomial infections aren't distributed so can't just move everything forward. So going to limit hm to just go to the n+1 basically#
+    int val;
+    val = 0.0;
     for(int g = 0; g < NG; g++){
       for(int cat = 0; cat < trans; cat++){
         for(int af = 0; af < pIDX_HIVADULT; af++){
           for(int hm = 0; hm < hDS; hm++){
             //this is assuming that coverage is in percents
             //also need to figure out how to take people off of treatment if ART coverage decreases in count space
-            artstrat_paeds(0, hm, af, g, t) += init_art_paed_total > 0 ? artnum_paed * (init_art_paed(hm, cat, af, g) / init_art_paed_total) : 0.0; 
+            val = init_art_paed_total > 0 ? artnum_paed * (init_art_paed(hm, cat, af, g) / init_art_paed_total) : 0.0;
+            artstrat_paeds(0, hm, af, g, t) +=  init_art_paed_total > 0 ? artnum_paed * (init_art_paed(hm, cat, af, g) / init_art_paed_total) : 0.0;
+           // hivstrat_paeds(hm, 0, af, g, t) -= val; 
+            
+            
+           // artstrat_paeds(0, hm, af, g, t) += init_art_paed_total > 0 ? artnum_paed * (init_art_paed(hm, cat, af, g) / init_art_paed_total) : 0.0; 
+           // hivstrat_paeds(hm, 0, af, g, t) -= init_art_paed_total > 0 ? artnum_paed * (init_art_paed(hm, cat, af, g) / init_art_paed_total) : 0.0; 
           }
+          
         }
       }
     }
@@ -1052,12 +1066,11 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 
     
     
-    //the nosocomial infections aren't distributed so can't just move everything forward. So going to limit hm to just go to the n+1 basically
     for(int g = 0; g < NG; g++){
   //    for(int cat = 0; cat < trans; cat++){
         for(int af = 0; af < pIDX_HIVADULT; af++){
           for(int hm = 0; hm < hDS; hm++){
-            hivstrat_paeds(hm, 0, af, g, t) -= af < 5 ? 0.5 * artstrat_paeds(0, hm, af, g, t) / (1 - paed_art_mort(hm, 0, af)) + 0.5 *  artstrat_paeds(0, hm, af, g, t) / (1 - paed_art_mort(hm, 1, af)): 0.5 * artstrat_paeds(0, hm, af, g, t) / (1 - adol_art_mort(hm, 0, af)) + 0.5 * artstrat_paeds(0, hm, af, g, t) / (1 - adol_art_mort(hm, 1, af)); 
+           hivstrat_paeds(hm, 0, af, g, t) -= af < 5 ? 0.5 * artstrat_paeds(0, hm, af, g, t) / (1 - paed_art_mort(hm, 0, af)) + 0.5 *  artstrat_paeds(0, hm, af, g, t) / (1 - paed_art_mort(hm, 1, af)): 0.5 * artstrat_paeds(0, hm, af, g, t) / (1 - adol_art_mort(hm, 0, af)) + 0.5 * artstrat_paeds(0, hm, af, g, t) / (1 - adol_art_mort(hm, 1, af)); 
           }
         }
     //  }
