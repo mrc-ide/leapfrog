@@ -114,7 +114,7 @@ leapfrogR(const Rcpp::List& demp,
   artinit.attr("dim") = NumericVector::create(hDS, hAG, NG, proj_years);
   
   NumericVector artnum_paed(proj_years);
-  artnum_paed.attr("dim") = NumericVector::create(proj_years);
+//  artnum_paed.attr("dim") = NumericVector::create(proj_years);
   
   
   
@@ -162,6 +162,7 @@ leapfrogR(const Rcpp::List& demp,
        hiv_steps_per_year,
        *INTEGER(projp["t_ART_start"]) - 1, // 0-based indexing vs. R 1-based
        INTEGER(projp["hAG_SPAN_full"]),
+       REAL(artnum_paed),
        REAL(totpop1),
        REAL(hivpop1),
        REAL(hivnpop1),
@@ -180,7 +181,6 @@ leapfrogR(const Rcpp::List& demp,
        REAL(aidsdeaths_art),
        REAL(aidsdeaths_noart_paed),
        REAL(aidsdeaths_art_paed),
-      // REAL(artnum_paed),
        REAL(artinit),
        REAL(coarse_totpop1));
   } else if (hAG == hAG_COARSE) {
@@ -226,6 +226,7 @@ leapfrogR(const Rcpp::List& demp,
        hiv_steps_per_year,
        *INTEGER(projp["t_ART_start"]) - 1,  // 0-based indexing vs. R 1-based
        INTEGER(projp["hAG_SPAN_coarse"]),
+       REAL(artnum_paed),
        REAL(totpop1),
        REAL(hivpop1),
        REAL(hivnpop1),
@@ -244,14 +245,14 @@ leapfrogR(const Rcpp::List& demp,
        REAL(aidsdeaths_art),
        REAL(aidsdeaths_noart_paed),
        REAL(aidsdeaths_art_paed),
-      // REAL(artnum_paed),
        REAL(artinit),
        REAL(coarse_totpop1));
   } else {
     Rf_error("Invalid HIV stratification age groups (hAG)");
   }
 
-  List ret = List::create(_("totpop1") = totpop1,
+  List ret = List::create(_("artnum_paed") = artnum_paed,
+    _("totpop1") = totpop1,
 			  _("hivpop1") = hivpop1,
 			  _("hivnpop1") = hivnpop1,
 			  _("hivstrat_adult") = hivstrat_adult,
@@ -269,7 +270,6 @@ leapfrogR(const Rcpp::List& demp,
 			  _("aidsdeaths_art") = aidsdeaths_art,
 			  _("aidsdeaths_noart_paed") = aidsdeaths_noart_paed,
 			  _("aidsdeaths_art_paed") = aidsdeaths_art_paed,
-//  _("artnum_paed") = artnum_paed,
 			  _("artinit") = artinit,
 			  _("coarse_totpop1") = coarse_totpop1);
 

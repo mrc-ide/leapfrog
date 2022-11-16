@@ -88,6 +88,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                     const int *hAG_SPAN,
                     //
                     //outputs
+                    Type *p_artnum_paed,
                     Type *p_totpop1,
                     Type *p_hivpop1,
                     Type *p_hivnpop1,
@@ -106,7 +107,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                     Type *p_aidsdeaths_art,
                     Type *p_aidsdeaths_noart_paed,
                     Type *p_aidsdeaths_art_paed,
-                   // Type *p_artnum_paed,
                     Type *p_artinit,
                     Type *p_coarse_totpop1
                       ) {
@@ -215,8 +215,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   TensorMapX5T artelig_paeds(p_artelig_paeds, hDS, trans, pIDX_HIVADULT, NG, sim_years);
   TensorMapX4T aidsdeaths_noart_paed(p_aidsdeaths_noart_paed, hDS, pIDX_HIVADULT, NG, sim_years);
   TensorMapX5T aidsdeaths_art_paed(p_aidsdeaths_art_paed, hTS, hDS, pIDX_HIVADULT, NG, sim_years);
- // TensorMapX1T artnum_paed(p_artnum_paed, sim_years);
-
+  TensorMapX1T artnum_paed(p_artnum_paed, sim_years); 
+  
   TensorMapX3T coarse_totpop1(p_coarse_totpop1, hAG, NG, sim_years);
   
   
@@ -240,7 +240,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   aidsdeaths_noart_paed.setZero();
   aidsdeaths_art_paed.setZero();
  // TensorFixedSize<Type, Sizes<sim_years>> artnum_paed
-  //artnum_paed.setZero();
+  artnum_paed.setZero();
     
   
   
@@ -950,23 +950,23 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
     }
     
-   int artnum_paed;
-   artnum_paed = 0.0;
+   //int artnum_paed;
+   //artnum_paed(t) = 0.0;
     for(int g = 0; g < NG; g++){
         for(int af = 0; af < pIDX_HIVADULT; af++){
           for(int hm = 0; hm < hDS; hm++){
             for(int cat = 0; cat < trans; cat++){
-              artnum_paed += need_art_paed(hm, cat, af, g);
+              artnum_paed(t) += need_art_paed(hm, cat, af, g);
             }
             for(int dur = 0; dur < hTS; dur++){
-              artnum_paed += artstrat_paeds(dur, hm, af, g, t);
+              artnum_paed(t) += artstrat_paeds(dur, hm, af, g, t);
           }
         } 
       }
     }
     
     //this is assuming that coverage is in percents
-     artnum_paed =  artnum_paed * (paed_art_val(t) + paed_art_val(t-1)) / 2 ;
+     artnum_paed(t) =  artnum_paed(t) * (paed_art_val(t) + paed_art_val(t-1)) / 2 ;
     
     //how many should initialize ART
     for(int g = 0; g < NG; g++){
@@ -1004,13 +1004,13 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
           for(int hm = 0; hm < hDS; hm++){
             //this is assuming that coverage is in percents
             //also need to figure out how to take people off of treatment if ART coverage decreases in count space
-            val = init_art_paed_total > 0 ? artnum_paed * (init_art_paed(hm, cat, af, g) / init_art_paed_total) : 0.0;
-            artstrat_paeds(0, hm, af, g, t) +=  init_art_paed_total > 0 ? artnum_paed * (init_art_paed(hm, cat, af, g) / init_art_paed_total) : 0.0;
+            val = init_art_paed_total > 0 ? artnum_paed(t) * (init_art_paed(hm, cat, af, g) / init_art_paed_total) : 0.0;
+            artstrat_paeds(0, hm, af, g, t) +=  init_art_paed_total > 0 ? artnum_paed(t) * (init_art_paed(hm, cat, af, g) / init_art_paed_total) : 0.0;
            // hivstrat_paeds(hm, 0, af, g, t) -= val; 
             
             
-           // artstrat_paeds(0, hm, af, g, t) += init_art_paed_total > 0 ? artnum_paed * (init_art_paed(hm, cat, af, g) / init_art_paed_total) : 0.0; 
-           // hivstrat_paeds(hm, 0, af, g, t) -= init_art_paed_total > 0 ? artnum_paed * (init_art_paed(hm, cat, af, g) / init_art_paed_total) : 0.0; 
+           // artstrat_paeds(0, hm, af, g, t) += init_art_paed_total > 0 ? artnum_paed(t) * (init_art_paed(hm, cat, af, g) / init_art_paed_total) : 0.0; 
+           // hivstrat_paeds(hm, 0, af, g, t) -= init_art_paed_total > 0 ? artnum_paed(t) * (init_art_paed(hm, cat, af, g) / init_art_paed_total) : 0.0; 
           }
           
         }
