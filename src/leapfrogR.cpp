@@ -1,6 +1,7 @@
 #include <Rcpp.h>
 
 #include "leapfrog-raw.h"
+#include "ListBuilder.h" // alternative for construct lists longer than 20 elements
 
 //' Simulate leapfrog model
 //'
@@ -250,27 +251,28 @@ leapfrogR(const Rcpp::List& demp,
     Rf_error("Invalid HIV stratification age groups (hAG)");
   }
 
-  List ret = List::create( _("totpop1") = totpop1,
-			  _("hivpop1") = hivpop1,
-			  _("hivnpop1") = hivnpop1,
-			  _("hivstrat_adult") = hivstrat_adult,
-			  _("artstrat_adult") = artstrat_adult,
-			  _("hivstrat_paeds") = hivstrat_paeds,
-			  _("artstrat_paeds") = artstrat_paeds,
-			  _("artelig_paeds") = artelig_paeds,
-			  _("infections") = infections,
-			  _("births") = births,	
-			  _("hiv_births") = hiv_births,			  
-			  _("natdeaths") = natdeaths,
-			  _("natdeaths_hivpop") = natdeaths_hivpop,
-			  _("hivdeaths") = hivdeaths,
-			  _("aidsdeaths_noart") = aidsdeaths_noart,
-			  _("aidsdeaths_art") = aidsdeaths_art,
-			  _("aidsdeaths_noart_paed") = aidsdeaths_noart_paed,
-			  _("aidsdeaths_art_paed") = aidsdeaths_art_paed,
-			  _("artnum_paed") = artnum_paed,
-			  _("artinit") = artinit,
-			  _("coarse_totpop1") = coarse_totpop1);
+  List ret = ListBuilder()
+    .add("totpop1", totpop1)
+    .add("hivpop1", hivpop1)
+    .add("hivnpop1", hivnpop1)
+    .add("hivstrat_adult", hivstrat_adult)
+    .add("artstrat_adult", artstrat_adult)
+    .add("hivstrat_paeds", hivstrat_paeds)
+    .add("artstrat_paeds", artstrat_paeds)
+    .add("artelig_paeds", artelig_paeds)
+    .add("infections", infections)
+    .add("births", births)
+    .add("hiv_births", hiv_births)
+    .add("natdeaths", natdeaths)
+    .add("natdeaths_hivpop", natdeaths_hivpop)
+    .add("hivdeaths", hivdeaths)
+    .add("aidsdeaths_noart", aidsdeaths_noart)
+    .add("aidsdeaths_art", aidsdeaths_art)
+    .add("aidsdeaths_noart_paed", aidsdeaths_noart_paed)
+    .add("aidsdeaths_art_paed", aidsdeaths_art_paed)
+    .add("artnum_paed", artnum_paed)
+    .add("artinit", artinit)
+    .add("coarse_totpop1", coarse_totpop1);
 
   return ret;
 }
