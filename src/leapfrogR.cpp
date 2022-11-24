@@ -41,7 +41,7 @@ leapfrogR(const Rcpp::List& demp,
   const int trans = 4;
   const int tx_time = 3;
   const int hTS = 3;
-  const int ctx_effect = 0.33;
+  const double ctx_effect = 0.33;
 
   int hAG;
   if (hiv_strat == "full") {
