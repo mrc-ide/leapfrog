@@ -303,14 +303,14 @@ test_that('ART counts implemented, mortality reduction & all eligible', {
   
   lmod_out <- lmod_output_paed(lmod = lmod)
   ##source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
- ## df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_pop1.xlsx", ages =0:14, country = 'Botswana')
+ ##df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_pop1.xlsx", ages =0:14, country = 'Botswana')
   
   
   
   dt <- left_join(lmod_out$prev, df_out$off_treatment)
   dt <- dt %>% filter(!is.na(pop)) %>% unique()
   dt <- dt %>% mutate(diff = lfrog - pop) %>% unique()
-  diff = dt$diff
+  ##diff = dt$diff
 ##  expect_true(all(abs(diff) < 1e-3), label = 'Off treatment paediatric population in leapfrog and spectrum match')
   
   
@@ -319,6 +319,7 @@ test_that('ART counts implemented, mortality reduction & all eligible', {
   diff_art <- abs(select(dt_onart, diff))
 ##  expect_true(all(diff_art < 1e-3), label = 'On treatment paediatric population in leapfrog and spectrum match')
   
+  ##Not transmitting into 21-25
   x = data.table(dt)
   y = data.table(dt_onart)
   

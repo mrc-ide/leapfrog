@@ -116,6 +116,23 @@ leapfrogR(const Rcpp::List& demp,
   artinit.attr("dim") = NumericVector::create(hDS, hAG, NG, proj_years);
   
   
+  NumericVector artnum_paed(proj_years);
+  
+  NumericVector deaths_paeds(trans * hDS * pIDX_HIVADULT * NG * proj_years);
+  deaths_paeds.attr("dim") = NumericVector::create(hDS, trans,  pIDX_HIVADULT, NG, proj_years);
+  
+  NumericVector deaths_paeds_art(trans * hDS * pIDX_HIVADULT * NG * proj_years);
+  deaths_paeds_art.attr("dim") = NumericVector::create(hDS, trans,  pIDX_HIVADULT, NG, proj_years);
+  
+  NumericVector grad_paeds(trans * hDS * pIDX_HIVADULT * NG * proj_years);
+  grad_paeds.attr("dim") = NumericVector::create(hDS, trans,  pIDX_HIVADULT, NG, proj_years);
+  
+  NumericVector grad_paeds_art(hTS * hDS * pIDX_HIVADULT * NG * proj_years);
+  grad_paeds_art.attr("dim") = NumericVector::create(hTS, hDS,  pIDX_HIVADULT, NG, proj_years);
+  
+  
+  NumericVector init_art_paed(trans * hDS * pIDX_HIVADULT * NG * proj_years);
+  init_art_paed.attr("dim") = NumericVector::create(hDS, trans,  pIDX_HIVADULT, NG, proj_years);
  
   if (hAG == hAG_FULL) {
     leapfrog_sim<double, NG, pAG, pIDX_FERT, pAG_FERT,
@@ -135,6 +152,7 @@ leapfrogR(const Rcpp::List& demp,
        REAL(projp["art_mort_full"]),
        REAL(projp["artmx_timerr"]),
        REAL(projp["art15plus_num"]),
+       REAL(projp["scalar_art"]),
        LOGICAL(projp["art15plus_isperc"]),
        INTEGER(projp["artcd4elig_idx"]),
        *INTEGER(projp["art_alloc_method"]),
@@ -178,7 +196,13 @@ leapfrogR(const Rcpp::List& demp,
        REAL(aidsdeaths_art),
        REAL(aidsdeaths_noart_paed),
        REAL(aidsdeaths_art_paed),
+       REAL(artnum_paed),
        REAL(artinit),
+       REAL(deaths_paeds),
+       REAL(deaths_paeds_art),
+       REAL(grad_paeds),
+       REAL(grad_paeds_art),
+       REAL(init_art_paed),
        REAL(coarse_totpop1));
   } else if (hAG == hAG_COARSE) {
     leapfrog_sim<double, NG, pAG, pIDX_FERT, pAG_FERT,
@@ -198,6 +222,7 @@ leapfrogR(const Rcpp::List& demp,
        REAL(projp["art_mort_coarse"]),
        REAL(projp["artmx_timerr"]),
        REAL(projp["art15plus_num"]),
+       REAL(projp["scalar_art"]),
        LOGICAL(projp["art15plus_isperc"]),
        INTEGER(projp["artcd4elig_idx"]),
        *INTEGER(projp["art_alloc_method"]),
@@ -241,7 +266,13 @@ leapfrogR(const Rcpp::List& demp,
        REAL(aidsdeaths_art),
        REAL(aidsdeaths_noart_paed),
        REAL(aidsdeaths_art_paed),
+       REAL(artnum_paed),
        REAL(artinit),
+       REAL(deaths_paeds),
+       REAL(deaths_paeds_art),
+       REAL(grad_paeds),
+       REAL(grad_paeds_art),
+       REAL(init_art_paed),
        REAL(coarse_totpop1));
   } else {
     Rf_error("Invalid HIV stratification age groups (hAG)");
@@ -267,13 +298,13 @@ leapfrogR(const Rcpp::List& demp,
     .add("aidsdeaths_art", aidsdeaths_art)
     .add("aidsdeaths_noart_paed", aidsdeaths_noart_paed)
     .add("aidsdeaths_art_paed", aidsdeaths_art_paed)
-  //  .add("artnum_paed", artnum_paed)
+    .add("artnum_paed", artnum_paed)
     .add("artinit", artinit)
- //   .add("deaths_paeds", deaths_paeds)
-  //  .add("deaths_paeds_art", deaths_paeds_art)
-  //  .add("grad_paeds", grad_paeds)
-  //  .add("grad_paeds_art", grad_paeds_art)
-  //  .add("init_art_paed", init_art_paed)
+    .add("deaths_paeds", deaths_paeds)
+    .add("deaths_paeds_art", deaths_paeds_art)
+    .add("grad_paeds", grad_paeds)
+    .add("grad_paeds_art", grad_paeds_art)
+    .add("init_art_paed", init_art_paed)
     .add("coarse_totpop1", coarse_totpop1);
 
   return ret;

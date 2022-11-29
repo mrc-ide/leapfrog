@@ -272,6 +272,11 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   
   v$paed_art_val <- paed_art_val
   
+  scalar <- rep(1, 14)
+  v$scalar_art <- scalar
+  v$scalar_art[2] <- 0.6236951
+  v$scalar_art[4] <- 0.6015512
+  
   ## ART eligibility age, doing this in years rather than months
   v$paed_art_elig_age <- c(rep(0, 37), rep(1, 3), rep(2, 20))
   paed_art_elig_cd4 <- array(data = NA, dim = c(length(0:14), length(1970:2029)), dimnames = list(age = c(0:14), year = c(1970:2029)))
