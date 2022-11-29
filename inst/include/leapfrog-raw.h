@@ -413,8 +413,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     for(int hm = 0; hm < hDS; hm++){
       for(int af = 0; af < pIDX_FERT; af++){
         for(int g = 0; g < NG; g++){
-          artstrat_paeds(1, hm, af, g, t) += artstrat_paeds(0, hm, af, g, t) > 0 ? artstrat_paeds(0, hm, af, g, t) * 0.5 : 0;
-          artstrat_paeds(0, hm, af, g, t) -= artstrat_paeds(0, hm, af, g, t) > 0 ? artstrat_paeds(0, hm, af, g, t) * 0.5 : 0;
+          artstrat_paeds(2, hm, af, g, t) += artstrat_paeds(0, hm, af, g, t) > 0 ? artstrat_paeds(0, hm, af, g, t)  : 0;
+          artstrat_paeds(0, hm, af, g, t) -= artstrat_paeds(0, hm, af, g, t) > 0 ? artstrat_paeds(0, hm, af, g, t) : 0;
         }
       }
     }
