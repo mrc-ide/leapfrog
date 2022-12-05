@@ -181,7 +181,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   const TensorMapX4cT age15hivpop(p_age15hivpop, 4, hDS, NG, sim_years);
   
   // paed
-  const TensorMapX1cT scalar_art(p_scalar_art,  pIDX_HIVADULT);
+  const TensorMapX2cT scalar_art(p_scalar_art,  pIDX_HIVADULT, sim_years);
   const TensorMapX1cT paed_incid_input(p_paed_incid_input, sim_years);
   const TensorMapX1cT paed_cd4_dist(p_paed_cd4_dist, hDS);
   const TensorMapX1cT paed_cd4_prog(p_paed_cd4_prog, hDS);
@@ -1003,13 +1003,11 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     }
     
     for(int g = 0; g < NG; g++){
-      for(int hm = 0; hm < hDS_adol; hm++){
+      for(int hm = 0; hm < hDS; hm++){
         for(int af = 0; af < pIDX_HIVADULT; af++){
-       //     deaths_paeds_art(0, hm, af, g, t) += artstrat_paeds(0, hm, af, g, t) ;
-        //    deaths_paeds_art(0, hm, af, g, t) -=  af < 5 ? artstrat_paeds(0, hm, af, g, t) * paed_art_mort(hm, 0, af) : artstrat_paeds(0, hm, af, g, t) * adol_art_mort(hm, 0, af - 5); 
-            aidsdeaths_art_paed(0,hm, af, g, t) +=  af < 5 ? artstrat_paeds(0, hm, af, g, t) * paed_art_mort(hm, 0, af)  * 0.5 + artstrat_paeds(0, hm, af, g, t) * paed_art_mort(hm, 1, af)  * 0.5  : artstrat_paeds(0, hm, af, g, t) * adol_art_mort(hm, 0, af - 5) * 0.5 + artstrat_paeds(0, hm, af, g, t) * adol_art_mort(hm, 1, af - 5) * 0.5; // output hiv deaths, aggregated across transmission category
+           aidsdeaths_art_paed(0,hm, af, g, t) +=  af < 5 ? artstrat_paeds(0, hm, af, g, t) * paed_art_mort(hm, 0, af)  * 0.5 + artstrat_paeds(0, hm, af, g, t) * paed_art_mort(hm, 1, af)  * 0.5  : artstrat_paeds(0, hm, af, g, t) * adol_art_mort(hm, 0, af - 5) * 0.5 + artstrat_paeds(0, hm, af, g, t) * adol_art_mort(hm, 1, af - 5) * 0.5; // output hiv deaths, aggregated across transmission category
             grad_paeds_art(0,hm, af, g, t) -= aidsdeaths_art_paed(0,hm, af, g, t) ;
-            artstrat_paeds(0, hm,  af, g, t) += grad_paeds_art(0, hm, af, g, t) ; 
+          artstrat_paeds(0, hm,  af, g, t) += grad_paeds_art(0, hm, af, g, t) ; 
             grad_paeds_art(0, hm, af, g, t) = 0.0;
         }
       }
@@ -1033,8 +1031,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
           for(int hm = 0; hm < hDS; hm++){
             //this is assuming that coverage is in percents
             //also need to figure out how to take people off of treatment if ART coverage decreases in count space
-            artstrat_paeds(0, hm, af, g, t) += init_art_paed_total > 0 ? scalar_art(af) * artnum_paed(t) * (init_art_paed(hm, cat, af, g, t) / init_art_paed_total) : 0.0; 
-            hivstrat_paeds(hm, cat, af, g, t) -= init_art_paed_total > 0 ? scalar_art(af) * artnum_paed(t) * (init_art_paed(hm, cat, af, g, t) / init_art_paed_total) : 0.0; 
+            artstrat_paeds(0, hm, af, g, t) += init_art_paed_total > 0 ? scalar_art(af, t) * artnum_paed(t) * (init_art_paed(hm, cat, af, g, t) / init_art_paed_total) : 0.0; 
+            hivstrat_paeds(hm, cat, af, g, t) -= init_art_paed_total > 0 ? scalar_art(af, t) * artnum_paed(t) * (init_art_paed(hm, cat, af, g, t) / init_art_paed_total) : 0.0; 
           }
           }
         }
