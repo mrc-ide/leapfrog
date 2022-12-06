@@ -303,7 +303,7 @@ test_that('ART % implemented, mortality reduction & all eligible', {
   
   lmod_out <- lmod_output_paed(lmod = lmod)
   ##source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
- ##df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_pop1.xlsx", ages =0:14, country = 'Botswana')
+ df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_pop1.xlsx", ages =0:14, country = 'Botswana')
   
   
   
@@ -334,7 +334,7 @@ test_that('ART counts implemented, mortality reduction & all eligible', {
   hivp$ctx_effect <- 0
   hivp$ctx_val[] <- 0
   hivp$paed_art_val[which(1970:2030 %in% 1995:2014)] <- 100
-  hivp$paed_art_pct <- F
+  hivp$artpaeds_isperc[] <- FALSE
   hivp$paed_art_elig_age[] <- 15
   
   ## Replace netmigr with unadjusted age 0-4 netmigr, which are not
@@ -346,7 +346,7 @@ test_that('ART counts implemented, mortality reduction & all eligible', {
   
   lmod_out <- lmod_output_paed(lmod = lmod)
   ##source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
-  ##df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_pop1.xlsx", ages =0:14, country = 'Botswana')
+  ##df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_art_COUNTS_pop1.xlsx", ages =0:14, country = 'Botswana')
   
   
   

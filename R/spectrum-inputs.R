@@ -269,7 +269,7 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   if(paed_art_pct){
     paed_art_val <- paed_art_val / 100
   }
-  v$paed_art_pct <- paed_art_pct
+  v$artpaeds_isperc <- rep(paed_art_pct,  length(1970:2029))
   v$paed_art_val <- paed_art_val
   
   scalar <- rep(1, 14)

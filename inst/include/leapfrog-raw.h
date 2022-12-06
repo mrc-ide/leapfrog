@@ -77,6 +77,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                     const Type *p_paed_cd4_transition,
                     const double ctx_effect,
                     const Type *p_paed_art_val,
+                    const int *p_artpaeds_isperc,
                     const Type *p_paed_art_elig_age,
                     const Type *p_paed_art_elig_cd4,
                 
@@ -121,6 +122,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 
   // macros
   // TODO: unsure if these should be defined here or elsewhere. Maybe in a future class.
+  typedef Eigen::TensorMap<Eigen::Tensor<const int, 1>> TensorMapX1cI;
   typedef Eigen::TensorMap<Eigen::Tensor<const int, 2>> TensorMapX2cI;
 
   typedef Eigen::TensorMap<Eigen::Tensor<const Type, 1>> TensorMapX1cT;
@@ -199,6 +201,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 
   const TensorMapX3cT paed_art_mort(p_paed_art_mort, hDS, hTS, 5);
   const TensorMapX3cT adol_art_mort(p_adol_art_mort, hDS_adol, hTS, 10);
+  const TensorMapX1cI artpaeds_isperc(p_artpaeds_isperc, sim_years);
   
 
 
@@ -971,9 +974,36 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
     }
     
-    //this is assuming that coverage is in percents
-     artnum_paed(t) = paed_art_val(t-1) > 0 ? artnum_paed(t) * (paed_art_val(t) + paed_art_val(t-1)) / 2 : 0.0;
-    
+   // if ( (!art15plus_isperc(g, t-2)) & (!art15plus_isperc(g, t-1)) ){ // both numbers
+  //    artnum_hts = (0.5-dt*(hts+1))*art15plus_num(g, t-2) + (dt*(hts+1)+0.5)*art15plus_num(g, t-1);
+  //  } else if (art15plus_isperc(g, t-2) & art15plus_isperc(g, t-1)){ // both percentages
+   //   Type artcov_hts = (0.5-dt*(hts+1))*art15plus_num(g, t-2) + (dt*(hts+1)+0.5)*art15plus_num(g, t-1);
+   //   artnum_hts = artcov_hts * (Xart_15plus + Xartelig_15plus);
+   // } else if ( (!art15plus_isperc(g, t-2)) & art15plus_isperc(g, t-1)) { // transition from number to percentage
+  //    Type curr_coverage = Xart_15plus / (Xart_15plus + Xartelig_15plus);
+ //     Type artcov_hts = curr_coverage + (art15plus_num(g, t-1) - curr_coverage) * dt / (0.5-dt*hts);
+ //     artnum_hts = artcov_hts * (Xart_15plus + Xartelig_15plus);
+//    }
+
+
+if ( (!artpaeds_isperc(t)) & (!artpaeds_isperc(t-1)) ){ // both numbers
+  artnum_paed(t) = paed_art_val(t-1) > 0 ?  (paed_art_val(t) + paed_art_val(t-1)) / 2 : 0.0;
+  
+  //Remove how many that are already on ART
+  for(int g = 0; g < NG; g++){
+    for(int af = 0; af < pIDX_HIVADULT; af++){
+      for(int hm = 0; hm < hDS; hm++){
+          for(int dur = 0; dur < hTS; dur++){
+            artnum_paed(t)-= artstrat_paeds(dur, hm, af, g, t) ;
+          }
+        }
+     }
+  }
+
+} else if (artpaeds_isperc(t) & artpaeds_isperc(t-1)){ // both percentages
+  artnum_paed(t) = paed_art_val(t-1) > 0 ? artnum_paed(t) * (paed_art_val(t) + paed_art_val(t-1)) / 2 : 0.0;
+} 
+
     
     //how many should initialize ART
     for(int g = 0; g < NG; g++){
@@ -999,8 +1029,10 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
             init_art_paed_total += init_art_paed(hm, cat, af, g, t);
           }
         } 
+      }
     }
-    }
+    
+    artnum_paed(t) = init_art_paed_total < artnum_paed(t) ? init_art_paed_total : artnum_paed(t) ;
     
     for(int g = 0; g < NG; g++){
       for(int hm = 0; hm < hDS; hm++){
@@ -1029,7 +1061,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       for(int cat = 0; cat < trans; cat++){
         for(int af = 0; af < pIDX_HIVADULT; af++){
           for(int hm = 0; hm < hDS; hm++){
-            //this is assuming that coverage is in percents
             //also need to figure out how to take people off of treatment if ART coverage decreases in count space
             artstrat_paeds(0, hm, af, g, t) += init_art_paed_total > 0 ? scalar_art(af, t) * artnum_paed(t) * (init_art_paed(hm, cat, af, g, t) / init_art_paed_total) : 0.0; 
             hivstrat_paeds(hm, cat, af, g, t) -= init_art_paed_total > 0 ? scalar_art(af, t) * artnum_paed(t) * (init_art_paed(hm, cat, af, g, t) / init_art_paed_total) : 0.0; 
