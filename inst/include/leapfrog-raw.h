@@ -1039,6 +1039,17 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
     }
     
+    for(int g = 0; g < NG; g++){
+      for(int hm = 0; hm < hDS; hm++){
+        for(int af = 0; af < pIDX_HIVADULT; af++){
+          aidsdeaths_art_paed(2,hm, af, g, t) =  af < 5 ? artstrat_paeds(2, hm, af, g, t) * paed_art_mort(hm, 2, af)  : artstrat_paeds(2, hm, af, g, t) * adol_art_mort(hm, 2, af - 5); // output hiv deaths, aggregated across transmission category
+          grad_paeds_art(2,hm, af, g, t) -= aidsdeaths_art_paed(2,hm, af, g, t) ;
+          artstrat_paeds(2, hm,  af, g, t) += grad_paeds_art(2, hm, af, g, t) ; 
+          
+        }
+      }
+    }
+    
     if ( (!artpaeds_isperc(t)) & (!artpaeds_isperc(t-1)) ){ // both numbers
       artnum_paed(t) = paed_art_val(t-1) > 0 ?  (paed_art_val(t) + paed_art_val(t-1)) / 2 : 0.0;
       //Remove how many that are already on ART
@@ -1046,8 +1057,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         for(int af = 0; af < pIDX_HIVADULT; af++){
           for(int hm = 0; hm < hDS; hm++){
             for(int dur = 0; dur < hTS; dur++){
-             // artnum_paed(t) -= (artstrat_paeds(dur, hm, af, g, t) + artstrat_paeds(dur, hm, af, g, t-1)) / 2 ;
-              artnum_paed(t) -= (artstrat_paeds(dur, hm, af, g, t) )  ;
+             artnum_paed(t) -= (artstrat_paeds(dur, hm, af, g, t) )  ;
               
             }
           }
@@ -1086,18 +1096,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         }
       }
     }
-    
-    for(int g = 0; g < NG; g++){
-      for(int hm = 0; hm < hDS; hm++){
-        for(int af = 0; af < pIDX_HIVADULT; af++){
-            aidsdeaths_art_paed(2,hm, af, g, t) =  af < 5 ? artstrat_paeds(2, hm, af, g, t) * paed_art_mort(hm, 2, af)  : artstrat_paeds(2, hm, af, g, t) * adol_art_mort(hm, 2, af - 5); // output hiv deaths, aggregated across transmission category
-            grad_paeds_art(2,hm, af, g, t) -= aidsdeaths_art_paed(2,hm, af, g, t) ;
-            artstrat_paeds(2, hm,  af, g, t) += grad_paeds_art(2, hm, af, g, t) ; 
-        
-        }
-      }
-    }
-    
+
 
     //Progress ART to the correct time on ART
     for(int hm = 0; hm < hDS; hm++){
