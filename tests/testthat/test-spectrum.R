@@ -293,6 +293,8 @@ test_that('ART % implemented, mortality reduction & all eligible', {
   hivp$ctx_val[] <- 0
   hivp$paed_art_val[which(1970:2030 %in% 1995:2030)] <- 1
   hivp$paed_art_elig_age[] <- 15
+  hivp$scalar_art[] <- 1
+  
   
   ## Replace netmigr with unadjusted age 0-4 netmigr, which are not
   ## in EPP-ASM preparation
@@ -302,8 +304,8 @@ test_that('ART % implemented, mortality reduction & all eligible', {
   lmod <- leapfrogR(demp, hivp)
   
   lmod_out <- lmod_output_paed(lmod = lmod)
-  ##source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
- df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_pop1.xlsx", ages =0:14, country = 'Botswana')
+  source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
+  df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_pop1.xlsx", ages =0:14, country = 'Botswana')
   
   
   
@@ -319,7 +321,6 @@ test_that('ART % implemented, mortality reduction & all eligible', {
   diff_art <- abs(select(dt_onart, diff))
 ##  expect_true(all(diff_art < 1e-3), label = 'On treatment paediatric population in leapfrog and spectrum match')
   
-  ##Not transmitting into 21-25
   x = data.table(dt)
   y = data.table(dt_onart)
   
@@ -336,6 +337,8 @@ test_that('ART counts implemented, mortality reduction & all eligible', {
   hivp$paed_art_val[which(1970:2030 %in% 1995:2014)] <- 100
   hivp$artpaeds_isperc[] <- FALSE
   hivp$paed_art_elig_age[] <- 15
+  hivp$scalar_art[] <- 1
+  
   
   ## Replace netmigr with unadjusted age 0-4 netmigr, which are not
   ## in EPP-ASM preparation
@@ -346,7 +349,65 @@ test_that('ART counts implemented, mortality reduction & all eligible', {
   
   lmod_out <- lmod_output_paed(lmod = lmod)
   ##source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
-  ##df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_art_COUNTS_pop1.xlsx", ages =0:14, country = 'Botswana')
+  df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_art_COUNTS_pop1.xlsx", ages =0:14, country = 'Botswana')
+  
+  
+  
+  dt <- left_join(lmod_out$prev, df_out$off_treatment)
+  dt <- dt %>% filter(!is.na(pop)) %>% unique()
+  dt <- dt %>% mutate(diff = lfrog - pop) %>% unique()
+  ##diff = dt$diff
+  ##  expect_true(all(abs(diff) < 1e-3), label = 'Off treatment paediatric population in leapfrog and spectrum match')
+  
+  
+  dt_onart <- left_join(lmod_out$art, df_out$on_treatment)
+  dt_onart <- dt_onart%>% filter(!is.na(pop)) %>% mutate(diff = lfrog - pop) %>%  ungroup()
+  diff_art <- abs(select(dt_onart, diff))
+  ##  expect_true(all(diff_art < 1e-3), label = 'On treatment paediatric population in leapfrog and spectrum match')
+  
+  x = data.table(dt)
+  y = data.table(dt_onart)
+  
+})
+
+
+test_that('ART counts, number covered is less than total prevalent cases', {
+  pjnz <- "../testdata/spectrum/v6.13/TEST_art_COUNTS_insufficient.PJNZ"
+  pjnz1 <- test_path(pjnz)
+  
+  demp <- prepare_leapfrog_demp(pjnz1)
+  hivp <- prepare_leapfrog_projp(pjnz1)
+  hivp$ctx_effect <- 0
+  hivp$ctx_val[] <- 0
+  hivp$paed_art_val[which(1970:2030 %in% 1995:2014)] <- 50
+  hivp$artpaeds_isperc[] <- FALSE
+  hivp$paed_art_elig_age[] <- 15
+  ##I have no idea what these are
+  hivp$scalar_art[] <- 1
+  # hivp$scalar_art[3,which(1970:2022 == 1996)] <- 1.118222
+  # hivp$scalar_art[5,which(1970:2022 == 1996)] <- 1.380245
+  # hivp$scalar_art[6,which(1970:2022 == 1996)] <- 1.214174
+  # hivp$scalar_art[3,which(1970:2022 == 1997)] <- 1.959734
+  # hivp$scalar_art[4,which(1970:2022 == 1997)] <- 0.9183396
+  # hivp$scalar_art[5,which(1970:2022 == 1997)] <- 2.107027
+  # hivp$scalar_art[6,which(1970:2022 == 1997)] <- 1.853228
+  # hivp$scalar_art[7,which(1970:2022 == 1997)] <- 1.261841
+  # hivp$scalar_art[4:8,which(1970:2022 == 1998)] <- c(6.4288, 14.55768, 12.82277, 8.73683, 12.78607)
+  # hivp$scalar_art[5:9,which(1970:2022 == 1999)] <- c(-36.71856, -31.90538, -21.72475, -31.81774, -25.99843)
+
+  
+  
+    
+  ## Replace netmigr with unadjusted age 0-4 netmigr, which are not
+  ## in EPP-ASM preparation
+  demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
+  demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
+  
+  lmod <- leapfrogR(demp, hivp)
+  
+  lmod_out <- lmod_output_paed(lmod = lmod)
+  ##source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
+ ## df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_art_COUNTS_insufficient_pop1.xlsx", ages =0:14, country = 'Botswana')
   
   
   
@@ -367,4 +428,5 @@ test_that('ART counts implemented, mortality reduction & all eligible', {
   y = data.table(dt_onart)
   
 })
+
 

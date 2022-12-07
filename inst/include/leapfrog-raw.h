@@ -986,23 +986,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 //    }
 
 
-if ( (!artpaeds_isperc(t)) & (!artpaeds_isperc(t-1)) ){ // both numbers
-  artnum_paed(t) = paed_art_val(t-1) > 0 ?  (paed_art_val(t) + paed_art_val(t-1)) / 2 : 0.0;
-  
-  //Remove how many that are already on ART
-  for(int g = 0; g < NG; g++){
-    for(int af = 0; af < pIDX_HIVADULT; af++){
-      for(int hm = 0; hm < hDS; hm++){
-          for(int dur = 0; dur < hTS; dur++){
-            artnum_paed(t)-= artstrat_paeds(dur, hm, af, g, t) ;
-          }
-        }
-     }
-  }
-
-} else if (artpaeds_isperc(t) & artpaeds_isperc(t-1)){ // both percentages
-  artnum_paed(t) = paed_art_val(t-1) > 0 ? artnum_paed(t) * (paed_art_val(t) + paed_art_val(t-1)) / 2 : 0.0;
-} 
 
     
     //how many should initialize ART
@@ -1032,7 +1015,7 @@ if ( (!artpaeds_isperc(t)) & (!artpaeds_isperc(t-1)) ){ // both numbers
       }
     }
     
-    artnum_paed(t) = init_art_paed_total < artnum_paed(t) ? init_art_paed_total : artnum_paed(t) ;
+  //  artnum_paed(t) = init_art_paed_total < artnum_paed(t) ? init_art_paed_total : artnum_paed(t) ;
     
     for(int g = 0; g < NG; g++){
       for(int hm = 0; hm < hDS; hm++){
@@ -1055,6 +1038,29 @@ if ( (!artpaeds_isperc(t)) & (!artpaeds_isperc(t-1)) ){ // both numbers
         }
       }
     }
+    
+    if ( (!artpaeds_isperc(t)) & (!artpaeds_isperc(t-1)) ){ // both numbers
+      artnum_paed(t) = paed_art_val(t-1) > 0 ?  (paed_art_val(t) + paed_art_val(t-1)) / 2 : 0.0;
+      //Remove how many that are already on ART
+      for(int g = 0; g < NG; g++){
+        for(int af = 0; af < pIDX_HIVADULT; af++){
+          for(int hm = 0; hm < hDS; hm++){
+            for(int dur = 0; dur < hTS; dur++){
+             // artnum_paed(t) -= (artstrat_paeds(dur, hm, af, g, t) + artstrat_paeds(dur, hm, af, g, t-1)) / 2 ;
+              artnum_paed(t) -= (artstrat_paeds(dur, hm, af, g, t) )  ;
+              
+            }
+          }
+        }
+      }
+      
+      ////Add on those that would die in the first year
+      
+      
+    } else if (artpaeds_isperc(t) & artpaeds_isperc(t-1)){ // both percentages
+      artnum_paed(t) = paed_art_val(t-1) > 0 ? artnum_paed(t) * (paed_art_val(t) + paed_art_val(t-1)) / 2 : 0.0;
+    } 
+    
     
     //the nosocomial infections aren't distributed so can't just move everything forward. So going to limit hm to just go to the n+1 basically
     for(int g = 0; g < NG; g++){
