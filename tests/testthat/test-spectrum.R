@@ -423,7 +423,7 @@ test_that('ART counts, number covered is less than total prevalent cases', {
   diff_art <- abs(select(dt_onart, diff))
   ##  expect_true(all(diff_art < 1e-3), label = 'On treatment paediatric population in leapfrog and spectrum match')
   
-  ##Not transmitting into 21-25
+  ##
   x = data.table(dt)
   y = data.table(dt_onart)
   

@@ -1015,7 +1015,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
     }
     
-  //  artnum_paed(t) = init_art_paed_total < artnum_paed(t) ? init_art_paed_total : artnum_paed(t) ;
     
     for(int g = 0; g < NG; g++){
       for(int hm = 0; hm < hDS; hm++){
@@ -1064,7 +1063,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         }
       }
       
-      ////Add on those that would die in the first year
+      artnum_paed(t) = init_art_paed_total < artnum_paed(t) ? init_art_paed_total : artnum_paed(t) ;
       
       
     } else if (artpaeds_isperc(t) & artpaeds_isperc(t-1)){ // both percentages
