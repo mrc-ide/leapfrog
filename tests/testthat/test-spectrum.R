@@ -429,4 +429,54 @@ test_that('ART counts, number covered is less than total prevalent cases', {
   
 })
 
+#ART in year t < t+1
+#ART in year t > t+1
+test_that('ART counts, number covered is less than total prevalent cases', {
+  pjnz <- "../testdata/spectrum/v6.13/TEST_art_COUNTS_insufficient.PJNZ"
+  pjnz1 <- test_path(pjnz)
+  
+  demp <- prepare_leapfrog_demp(pjnz1)
+  hivp <- prepare_leapfrog_projp(pjnz1)
+  hivp$ctx_effect <- 0
+  hivp$ctx_val[] <- 0
+  hivp$paed_art_val[which(1970:2030 %in% 1995:2014)] <- 50
+  hivp$paed_art_val[which(1970:2030 %in% 1998:2000)] <- 10
+  
+  hivp$artpaeds_isperc[] <- FALSE
+  hivp$paed_art_elig_age[] <- 15
+  ##I have no idea what these are
+  hivp$scalar_art[] <- 1
+  
+  
+  ## Replace netmigr with unadjusted age 0-4 netmigr, which are not
+  ## in EPP-ASM preparation
+  demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
+  demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
+  
+  lmod <- leapfrogR(demp, hivp)
+  
+  lmod_out <- lmod_output_paed(lmod = lmod)
+  ##source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
+  ## df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_art_COUNTS_insufficient_pop1.xlsx", ages =0:14, country = 'Botswana')
+  
+  
+  
+  dt <- left_join(lmod_out$prev, df_out$off_treatment)
+  dt <- dt %>% filter(!is.na(pop)) %>% unique()
+  dt <- dt %>% mutate(diff = lfrog - pop) %>% unique()
+  ##diff = dt$diff
+  ##  expect_true(all(abs(diff) < 1e-3), label = 'Off treatment paediatric population in leapfrog and spectrum match')
+  
+  
+  dt_onart <- left_join(lmod_out$art, df_out$on_treatment)
+  dt_onart <- dt_onart%>% filter(!is.na(pop)) %>% mutate(diff = lfrog - pop) %>%  ungroup()
+  diff_art <- abs(select(dt_onart, diff))
+  ##  expect_true(all(diff_art < 1e-3), label = 'On treatment paediatric population in leapfrog and spectrum match')
+  
+  ##
+  x = data.table(dt)
+  y = data.table(dt_onart)
+  
+})
+#Switch between number and percents
 
