@@ -1064,6 +1064,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
       
       artnum_paed(t) = init_art_paed_total < artnum_paed(t) ? init_art_paed_total : artnum_paed(t) ;
+      artnum_paed(t) = artnum_paed(t) < 0 ? 0 : artnum_paed(t); 
       
       
     } else if (artpaeds_isperc(t) & artpaeds_isperc(t-1)){ // both percentages
