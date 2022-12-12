@@ -1101,6 +1101,25 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       artnum_paed(t) = artnum_paed(t) < 0 ? 0 : artnum_paed(t); 
       
        
+    } else if (artpaeds_isperc(t-1) & !artpaeds_isperc(t)){ //percentage to num 
+      artnum_paed(t) = init_art_paed_total < paed_art_val(t) ? init_art_paed_total : paed_art_val(t) ;
+      artnum_paed(t) = (artnum_paed(t-1) + artnum_paed(t)) / 2 ;
+      
+      //Remove how many that are already on ART
+      for(int g = 0; g < NG; g++){
+        for(int af = 0; af < pIDX_HIVADULT; af++){
+          for(int hm = 0; hm < hDS; hm++){
+            for(int dur = 0; dur < hTS; dur++){
+              artnum_paed(t) -= (artstrat_paeds(dur, hm, af, g, t) )  ;
+              
+            }
+          }
+        }
+      }
+      
+      artnum_paed(t) = artnum_paed(t) < 0 ? 0 : artnum_paed(t); 
+      
+      
     }
     
     
