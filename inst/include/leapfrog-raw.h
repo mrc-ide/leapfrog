@@ -1069,7 +1069,39 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       
     } else if (artpaeds_isperc(t) & artpaeds_isperc(t-1)){ // both percentages
       artnum_paed(t) = paed_art_val(t-1) > 0 ? artnum_paed(t) * (paed_art_val(t) + paed_art_val(t-1)) / 2 : 0.0;
-    } 
+      //Remove how many that are already on ART
+      for(int g = 0; g < NG; g++){
+        for(int af = 0; af < pIDX_HIVADULT; af++){
+          for(int hm = 0; hm < hDS; hm++){
+            for(int dur = 0; dur < hTS; dur++){
+              artnum_paed(t) -= (artstrat_paeds(dur, hm, af, g, t) )  ;
+              
+            }
+          }
+        }
+      }
+      
+      artnum_paed(t) = artnum_paed(t) < 0 ? 0 : artnum_paed(t); 
+      
+    } else if (artpaeds_isperc(t) & !artpaeds_isperc(t-1)){ // num to percentage
+       artnum_paed(t) = (artnum_paed(t-1) + artnum_paed(t) * paed_art_val(t)) / 2 ;
+      
+      //Remove how many that are already on ART
+      for(int g = 0; g < NG; g++){
+        for(int af = 0; af < pIDX_HIVADULT; af++){
+          for(int hm = 0; hm < hDS; hm++){
+            for(int dur = 0; dur < hTS; dur++){
+              artnum_paed(t) -= (artstrat_paeds(dur, hm, af, g, t) )  ;
+              
+            }
+          }
+        }
+      }
+      
+      artnum_paed(t) = artnum_paed(t) < 0 ? 0 : artnum_paed(t); 
+      
+       
+    }
     
     
     //the nosocomial infections aren't distributed so can't just move everything forward. So going to limit hm to just go to the n+1 basically

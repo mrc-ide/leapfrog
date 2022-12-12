@@ -490,7 +490,7 @@ test_that('ART counts, number covered is less than total prevalent cases', {
   hivp$ctx_effect <- 0
   hivp$ctx_val[] <- 0
   hivp$paed_art_val[which(1970:2030 %in% 1995:2014)] <- 50
-  hivp$paed_art_val[which(1970:2030 %in% 1998:2000)] <- 60
+  hivp$paed_art_val[which(1970:2030 %in% 1998:2000)] <- 60/100
   
   hivp$artpaeds_isperc[] <- FALSE
   hivp$artpaeds_isperc[which(1970:2030 %in% 1998:2000)] <- TRUE
