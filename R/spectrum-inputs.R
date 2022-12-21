@@ -279,6 +279,25 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   v$scalar_art[4,which(1970:2022 == 1996)] <- 0.6015512
   v$scalar_art[3,which(1970:2022 == 1997)] <- 0.8710667
   
+  mort_rr_art <- read.csv('tests/testdata/spectrum/v6.13/mort_RR.csv', header = F)
+  mort_rr_art_target <- array(NA, dim = c(3, 15, 61), dimnames = list(transmission = c('0to6mo', '7to12mo', '12+mo'), age = 0:14, year = 1970:2030))
+  mort_rr_art_target[1:2, 1:5,] <- unlist(mort_rr_art[1,])
+  mort_rr_art_target[3, 1:5,] <- unlist(mort_rr_art[2,])
+  mort_rr_art_target[1:2, 6:15,] <- unlist(mort_rr_art[3,])
+  mort_rr_art_target[3, 6:15,] <- unlist(mort_rr_art[4,])
+  v$mort_rr_art <- mort_rr_art_target
+  
+  art_dist_paed <- read.csv('tests/testdata/spectrum/v6.13/paed_art_dist.csv')
+  expand <- NULL
+  for(yr in 2023:2030){
+    x = art_dist_paed %>% filter(year == 2022)
+    x = x %>% mutate(year = yr)
+    expand <- rbind(expand, x)
+  }
+  art_dist_paed <- rbind(art_dist_paed, expand)
+  art_dist_paed <- array(data = art_dist_paed$value, dim = c(15, length(unique(art_dist_paed$year))), dimnames = list( age= 0:14, year = sort(unique(art_dist_paed$year))))
+  v$init_art_dist <- art_dist_paed
+  
   
   ## ART eligibility age, doing this in years rather than months
   v$paed_art_elig_age <- c(rep(0, 37), rep(1, 3), rep(2, 20))
