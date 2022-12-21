@@ -1039,7 +1039,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       for(int af = 0; af < pIDX_FERT; af++){
         for(int g = 0; g < NG; g++){
           artstrat_paeds(1, hm, af, g, t) += artstrat_paeds(0, hm, af, g, t) > 0 ? artstrat_paeds(0, hm, af, g, t) : 0;
-         // artstrat_paeds(2, hm, af, g, t) += artstrat_paeds(0, hm, af, g, t) > 0 ? artstrat_paeds(0, hm, af, g, t) : 0;
           artstrat_paeds(0, hm, af, g, t) -= artstrat_paeds(0, hm, af, g, t) > 0 ? artstrat_paeds(0, hm, af, g, t) : 0;
         }
       }
@@ -1089,7 +1088,9 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         }
       }
       artnum_paed(t) = init_art_paed_total < artnum_paed(t) ? init_art_paed_total : artnum_paed(t) ;
-      artnum_paed(t) = artnum_paed(t) < 0 ? 0 : artnum_paed(t); 
+      //if ART coverage in percentages isn't changing we don't continue to add more people on art (idrk get this)
+      artnum_paed(t) = paed_art_val(t-1) >= paed_art_val(t-1) ? 0 : artnum_paed(t); 
+
 
     } else if (artpaeds_isperc(t) & !artpaeds_isperc(t-1)){ // num to percentage
        artnum_paed(t) = (artnum_paed(t-1) + artnum_paed(t) * paed_art_val(t)) / 2 ;
@@ -1107,8 +1108,9 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
       
       artnum_paed(t) = artnum_paed(t) < 0 ? 0 : artnum_paed(t); 
-      
-       
+      artnum_paed(t) = init_art_paed_total < artnum_paed(t) ? init_art_paed_total : artnum_paed(t) ;
+      std::cout << artnum_paed(t);
+
     } else if (artpaeds_isperc(t-1) & !artpaeds_isperc(t)){ //percentage to num 
       artnum_paed(t) = init_art_paed_total < paed_art_val(t) ? init_art_paed_total : paed_art_val(t) ;
       

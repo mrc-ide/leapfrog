@@ -466,7 +466,7 @@ test_that('ART counts, number covered is less than total prevalent cases', {
   
 })
 
-##WORKs until 2000
+##WORKING
 test_that('ART counts, number covered is less than total prevalent cases', {
   pjnz <- "../testdata/spectrum/v6.13/TEST_art_COUNTS_num_to_pct.PJNZ"
   pjnz1 <- test_path(pjnz)
@@ -476,10 +476,10 @@ test_that('ART counts, number covered is less than total prevalent cases', {
   hivp$ctx_effect <- 0
   hivp$ctx_val[] <- 0
   hivp$paed_art_val[which(1970:2030 %in% 1995:2014)] <- 50
-  hivp$paed_art_val[which(1970:2030 %in% 1997:2003)] <- 60/100
+  hivp$paed_art_val[which(1970:2030 %in% 1998:2000)] <- 60/100
   
   hivp$artpaeds_isperc[] <- FALSE
-  hivp$artpaeds_isperc[which(1970:2030 %in% 1997:2003)] <- TRUE
+  hivp$artpaeds_isperc[which(1970:2030 %in% 1998:2000)] <- TRUE
   
   hivp$paed_art_elig_age[] <- 15
   ##I have no idea what these are
