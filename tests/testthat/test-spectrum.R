@@ -239,7 +239,7 @@ test_that('Paediatric HIV mortality working as expected', {
 })
 
 
-
+##WORKING
 test_that('ART % implemented, no mortality reduction & all eligible', {
   pjnz <- "../testdata/spectrum/v6.13/bwa_aim-adult-child-input-art-elig_spectrum-v6.13_2022-02-12.PJNZ"
   pjnz1 <- test_path(pjnz)
@@ -263,7 +263,7 @@ test_that('ART % implemented, no mortality reduction & all eligible', {
   lmod_out <- lmod_output_paed(lmod = lmod)
   x=data.table(lmod_out$prev_strat)
 ##  source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
-## df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/bwa_aim-adult-child-input-art-elig_spectrum-v6.13_2022-02-12_pop1.xlsx", ages =0:14, country = 'Botswana')
+ df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/bwa_aim-adult-child-input-art-elig_spectrum-v6.13_2022-02-12_pop1.xlsx", ages =0:14, country = 'Botswana')
 
   
 
@@ -283,6 +283,7 @@ test_that('ART % implemented, no mortality reduction & all eligible', {
   
 })
 
+##WORKING
 test_that('ART % implemented, mortality reduction & all eligible', {
   pjnz <- "../testdata/spectrum/v6.13/TEST.PJNZ"
   pjnz1 <- test_path(pjnz)
@@ -326,6 +327,7 @@ test_that('ART % implemented, mortality reduction & all eligible', {
   
 })
 
+##WORKING
 test_that('ART counts implemented, mortality reduction & all eligible', {
   pjnz <- "../testdata/spectrum/v6.13/TEST_art_COUNTS.PJNZ"
   pjnz1 <- test_path(pjnz)
@@ -370,7 +372,7 @@ test_that('ART counts implemented, mortality reduction & all eligible', {
   
 })
 
-
+##WORKING
 test_that('ART counts, number covered is less than total prevalent cases', {
   pjnz <- "../testdata/spectrum/v6.13/TEST_art_COUNTS_insufficient.PJNZ"
   pjnz1 <- test_path(pjnz)
@@ -384,20 +386,7 @@ test_that('ART counts, number covered is less than total prevalent cases', {
   hivp$paed_art_elig_age[] <- 15
   ##I have no idea what these are
   hivp$scalar_art[] <- 1
-  # hivp$scalar_art[3,which(1970:2022 == 1996)] <- 1.118222
-  # hivp$scalar_art[5,which(1970:2022 == 1996)] <- 1.380245
-  # hivp$scalar_art[6,which(1970:2022 == 1996)] <- 1.214174
-  # hivp$scalar_art[3,which(1970:2022 == 1997)] <- 1.959734
-  # hivp$scalar_art[4,which(1970:2022 == 1997)] <- 0.9183396
-  # hivp$scalar_art[5,which(1970:2022 == 1997)] <- 2.107027
-  # hivp$scalar_art[6,which(1970:2022 == 1997)] <- 1.853228
-  # hivp$scalar_art[7,which(1970:2022 == 1997)] <- 1.261841
-  # hivp$scalar_art[4:8,which(1970:2022 == 1998)] <- c(6.4288, 14.55768, 12.82277, 8.73683, 12.78607)
-  # hivp$scalar_art[5:9,which(1970:2022 == 1999)] <- c(-36.71856, -31.90538, -21.72475, -31.81774, -25.99843)
 
-  
-  
-    
   ## Replace netmigr with unadjusted age 0-4 netmigr, which are not
   ## in EPP-ASM preparation
   demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
@@ -407,7 +396,7 @@ test_that('ART counts, number covered is less than total prevalent cases', {
   
   lmod_out <- lmod_output_paed(lmod = lmod)
   ##source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
- ## df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_art_COUNTS_insufficient_pop1.xlsx", ages =0:14, country = 'Botswana')
+  df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_art_COUNTS_insufficient_pop1.xlsx", ages =0:14, country = 'Botswana')
   
   
   
@@ -429,8 +418,7 @@ test_that('ART counts, number covered is less than total prevalent cases', {
   
 })
 
-#ART in year t < t+1
-#ART in year t > t+1
+##WORKING
 test_that('ART counts, number covered is less than total prevalent cases', {
   pjnz <- "../testdata/spectrum/v6.13/TEST_art_COUNTS_decreasing_ART.PJNZ"
   pjnz1 <- test_path(pjnz)
@@ -457,7 +445,7 @@ test_that('ART counts, number covered is less than total prevalent cases', {
   
   lmod_out <- lmod_output_paed(lmod = lmod)
   ##source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
-  ## df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_art_COUNTS_decreasing_ART_pop1.xlsx", ages =0:14, country = 'Botswana')
+  df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_art_COUNTS_decreasing_ART_pop1.xlsx", ages =0:14, country = 'Botswana')
   
   
   
@@ -478,9 +466,7 @@ test_that('ART counts, number covered is less than total prevalent cases', {
   
 })
 
-
-
-#Switch between number and percents
+##WORKING
 test_that('ART counts, number covered is less than total prevalent cases', {
   pjnz <- "../testdata/spectrum/v6.13/TEST_art_COUNTS_num_to_pct.PJNZ"
   pjnz1 <- test_path(pjnz)
@@ -509,7 +495,7 @@ test_that('ART counts, number covered is less than total prevalent cases', {
   
   lmod_out <- lmod_output_paed(lmod = lmod)
   ##source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
-    ## df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_art_COUNTS_num_to_pct_pop1.xlsx", ages =0:14, country = 'Botswana')
+  df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_art_COUNTS_num_to_pct_pop1.xlsx", ages =0:14, country = 'Botswana')
   
   
   
