@@ -305,8 +305,8 @@ test_that('ART % implemented, mortality reduction & all eligible', {
   lmod <- leapfrogR(demp, hivp)
   
   lmod_out <- lmod_output_paed(lmod = lmod)
-  source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
-  ##df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_pop1.xlsx", ages =0:14, country = 'Botswana')
+ ## source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
+ ## df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_pop1.xlsx", ages =0:14, country = 'Botswana')
   
   
   

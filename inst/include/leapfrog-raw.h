@@ -1027,7 +1027,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         for(int af = 0; af < pIDX_HIVADULT; af++){
             double death_rate ;
             death_rate = af < 5 ? mort_art_rr(0, af, t) * 0.5 * (paed_art_mort(hm, 0, af) + paed_art_mort(hm, 1, af)) : mort_art_rr(0, af, t) * 0.5 * (adol_art_mort(hm, 0, af-5) + adol_art_mort(hm, 1, af-5));
-            aidsdeaths_art_paed(0,hm, af, g, t) +=  death_rate * artstrat_paeds(0, hm, af, g, t)  ;
+            aidsdeaths_art_paed(0,hm, af, g, t) =  death_rate * artstrat_paeds(0, hm, af, g, t)  ;
             grad_paeds_art(0,hm, af, g, t) -= aidsdeaths_art_paed(0,hm, af, g, t) ;
             artstrat_paeds(0, hm,  af, g, t) += grad_paeds_art(0, hm, af, g, t) ; 
             grad_paeds_art(0, hm, af, g, t) = 0.0;
@@ -1051,7 +1051,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       for(int hm = 0; hm < hDS; hm++){
         for(int af = 0; af < pIDX_HIVADULT; af++){
           double death_rate;
-          death_rate =  af < 5 ? mort_art_rr(2, af, t) * paed_art_mort(hm, 2, af) : mort_art_rr(2, af, t) * adol_art_mort(hm, 2, af);
+          death_rate =  af < 5 ? mort_art_rr(2, af, t) * paed_art_mort(hm, 2, af) : mort_art_rr(2, af, t) * adol_art_mort(hm, 2, af-5);
           aidsdeaths_art_paed(2,hm, af, g, t) =  artstrat_paeds(2, hm, af, g, t) * death_rate;
           grad_paeds_art(2,hm, af, g, t) -= aidsdeaths_art_paed(2,hm, af, g, t) ;
           artstrat_paeds(2, hm,  af, g, t) += grad_paeds_art(2, hm, af, g, t) ; 
@@ -1188,8 +1188,10 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
             scalar = (adj * init_art_dist(af, t)) > 1 ? 1 : adj * init_art_dist(af, t);
             scalar = artnum_paed(t) > 0 ? scalar : 0.0;
             //not really sure why this needs to be here, but without it it scales down certain age groups when there is enough ART
-            scalar = (paed_art_val(t) == 1 & artpaeds_isperc(t)) ?  1 : scalar;
+            scalar = (paed_art_mort(hm, cat, af) == 0) ?  1 : scalar;
+          
             artstrat_paeds(0, hm, af, g, t) +=  scalar * init_art_paed(hm, cat, af, g, t) ;
+         
             hivstrat_paeds(hm, cat, af, g, t) -=  scalar* init_art_paed(hm, cat, af, g, t) ;
             
           }
@@ -1198,13 +1200,14 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     }
     
     
+    
     for(int g = 0; g < NG; g++){
       for(int hm = 0; hm < hDS; hm++){
         for(int af = 0; af < pIDX_HIVADULT; af++){
           //SOMETHING HAPPENING HERE
           double death_rate ;
             death_rate = af < 5 ? mort_art_rr(0, af, t) * 0.5 * (paed_art_mort(hm, 0, af) + paed_art_mort(hm, 1, af)) : mort_art_rr(0, af, t) * 0.5 * (adol_art_mort(hm, 0, af-5) + adol_art_mort(hm, 1, af-5));
-            aidsdeaths_art_paed(0,hm, af, g, t) +=  death_rate * artstrat_paeds(0, hm, af, g, t)  ;
+            aidsdeaths_art_paed(0,hm, af, g, t) =  death_rate * artstrat_paeds(0, hm, af, g, t)  ;
             grad_paeds_art(0,hm, af, g, t) -= aidsdeaths_art_paed(0,hm, af, g, t) ;
             artstrat_paeds(0, hm,  af, g, t) += grad_paeds_art(0, hm, af, g, t) ; 
           
