@@ -484,8 +484,7 @@ test_that('ART counts, number covered is less than total prevalent cases', {
   hivp$paed_art_elig_age[] <- 15
   ##I have no idea what these are
   hivp$scalar_art[] <- 1
-  hivp$mort_art_rr[] <- 1
-  
+
   
   ## Replace netmigr with unadjusted age 0-4 netmigr, which are not
   ## in EPP-ASM preparation
