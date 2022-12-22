@@ -239,7 +239,7 @@ test_that('Paediatric HIV mortality working as expected', {
 })
 
 
-##testing eligibility, stops working in 1998
+##testing eligibility
 test_that('ART % implemented, no mortality reduction & all eligible', {
   pjnz <- "../testdata/spectrum/v6.13/bwa_aim-adult-child-input-art-elig_spectrum-v6.13_2022-02-12.PJNZ"
   pjnz1 <- test_path(pjnz)
@@ -484,6 +484,7 @@ test_that('ART counts, number covered is less than total prevalent cases', {
   hivp$paed_art_elig_age[] <- 15
   ##I have no idea what these are
   hivp$scalar_art[] <- 1
+  hivp$mort_art_rr[] <- 1
   
   
   ## Replace netmigr with unadjusted age 0-4 netmigr, which are not

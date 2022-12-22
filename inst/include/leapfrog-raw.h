@@ -1100,26 +1100,30 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     } else if (artpaeds_isperc(t) & !artpaeds_isperc(t-1)){ // num to percentage
       
       //Remove how many that are already on ART
+      std::cout << artnum_paed(t) ;
+      
       double temp ;
       temp = 0.0;
       for(int g = 0; g < NG; g++){
         for(int af = 0; af < pIDX_HIVADULT; af++){
           for(int hm = 0; hm < hDS; hm++){
             for(int dur = 0; dur < hTS; dur++){
-              artnum_paed(t) += artstrat_paeds(dur, hm, af, g, t)   ;
+              artnum_paed(t) += artstrat_paeds(dur, hm, af, g, t) +  aidsdeaths_art_paed(dur,hm, af, g, t)  ;
               
             }
           }
         }
       }
-
-      artnum_paed(t) = (paed_art_val(t-1) + (artnum_paed(t)) * paed_art_val(t)) / 2 ;
+      //80.13030
+      artnum_paed(t) = (paed_art_val(t-1) + (artnum_paed(t) * paed_art_val(t))) / 2 ;
 
       for(int g = 0; g < NG; g++){
         for(int af = 0; af < pIDX_HIVADULT; af++){
           for(int hm = 0; hm < hDS; hm++){
             for(int dur = 0; dur < hTS; dur++){
               artnum_paed(t) -= (artstrat_paeds(dur, hm, af, g, t) )  ;
+             // artnum_paed(t) += aidsdeaths_art_paed(dur,hm, af, g, t)  ;
+              
 
             }
           }
