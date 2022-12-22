@@ -281,11 +281,11 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   
   mort_rr_art <- read.csv('tests/testdata/spectrum/v6.13/mort_RR.csv', header = F)
   mort_rr_art_target <- array(NA, dim = c(3, 15, 61), dimnames = list(transmission = c('0to6mo', '7to12mo', '12+mo'), age = 0:14, year = 1970:2030))
-  mort_rr_art_target[1:2, 1:5,] <- unlist(mort_rr_art[1,])
-  mort_rr_art_target[3, 1:5,] <- unlist(mort_rr_art[2,])
-  mort_rr_art_target[1:2, 6:15,] <- unlist(mort_rr_art[3,])
-  mort_rr_art_target[3, 6:15,] <- unlist(mort_rr_art[4,])
-  v$mort_rr_art <- mort_rr_art_target
+  mort_rr_art_target[1:2, 1:5,] <- rep(unlist(mort_rr_art[1,]), each = 10)
+  mort_rr_art_target[3, 1:5,] <- rep(unlist(mort_rr_art[2,]), each = 5)
+  mort_rr_art_target[1:2, 6:15,] <- rep(unlist(mort_rr_art[3,]), each = 20)
+  mort_rr_art_target[3, 6:15,] <- rep(unlist(mort_rr_art[4,]), each = 10)
+  v$mort_art_rr <- mort_rr_art_target
   
   art_dist_paed <- read.csv('tests/testdata/spectrum/v6.13/paed_art_dist.csv')
   expand <- NULL

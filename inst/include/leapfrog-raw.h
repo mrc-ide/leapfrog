@@ -960,7 +960,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       for(int cat = 0; cat < trans; cat++){
         for(int af = paed_art_elig_age(t); af < pIDX_HIVADULT; af++){
           for(int hm = 0; hm < hDS; hm++){
-            need_art_paed(hm, cat, af, g) += hm > paed_art_elig_cd4(af, t) - 1 ? hivstrat_paeds(hm, cat, af, g, t) : 0.0;
+            need_art_paed(hm, cat, af, g) += (hm > (paed_art_elig_cd4(af, t) - 2)) ? hivstrat_paeds(hm, cat, af, g, t) : 0.0;
           }
         } 
       }
@@ -1025,7 +1025,9 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     for(int g = 0; g < NG; g++){
       for(int hm = 0; hm < hDS; hm++){
         for(int af = 0; af < pIDX_HIVADULT; af++){
-            aidsdeaths_art_paed(0,hm, af, g, t) +=  af < 5 ? artstrat_paeds(0, hm, af, g, t) * paed_art_mort(hm, 0, af)  * 0.5 + artstrat_paeds(0, hm, af, g, t) * paed_art_mort(hm, 1, af)  * 0.5  : artstrat_paeds(0, hm, af, g, t) * adol_art_mort(hm, 0, af - 5) * 0.5 + artstrat_paeds(0, hm, af, g, t) * adol_art_mort(hm, 1, af - 5) * 0.5; // output hiv deaths, aggregated across transmission category
+            double death_rate ;
+            death_rate = af < 5 ? mort_art_rr(0, af, t) * 0.5 * (paed_art_mort(hm, 0, af) + paed_art_mort(hm, 1, af)) : mort_art_rr(0, af, t) * 0.5 * (adol_art_mort(hm, 0, af-5) + adol_art_mort(hm, 1, af-5));
+            aidsdeaths_art_paed(0,hm, af, g, t) +=  death_rate * artstrat_paeds(0, hm, af, g, t)  ;
             grad_paeds_art(0,hm, af, g, t) -= aidsdeaths_art_paed(0,hm, af, g, t) ;
             artstrat_paeds(0, hm,  af, g, t) += grad_paeds_art(0, hm, af, g, t) ; 
             grad_paeds_art(0, hm, af, g, t) = 0.0;
@@ -1048,7 +1050,9 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     for(int g = 0; g < NG; g++){
       for(int hm = 0; hm < hDS; hm++){
         for(int af = 0; af < pIDX_HIVADULT; af++){
-          aidsdeaths_art_paed(2,hm, af, g, t) =  af < 5 ? artstrat_paeds(2, hm, af, g, t) * paed_art_mort(hm, 2, af)  : artstrat_paeds(2, hm, af, g, t) * adol_art_mort(hm, 2, af - 5); // output hiv deaths, aggregated across transmission category
+          double death_rate;
+          death_rate =  af < 5 ? mort_art_rr(2, af, t) * paed_art_mort(hm, 2, af) : mort_art_rr(2, af, t) * adol_art_mort(hm, 2, af);
+          aidsdeaths_art_paed(2,hm, af, g, t) =  artstrat_paeds(2, hm, af, g, t) * death_rate;
           grad_paeds_art(2,hm, af, g, t) -= aidsdeaths_art_paed(2,hm, af, g, t) ;
           artstrat_paeds(2, hm,  af, g, t) += grad_paeds_art(2, hm, af, g, t) ; 
           
@@ -1089,19 +1093,34 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
       artnum_paed(t) = init_art_paed_total < artnum_paed(t) ? init_art_paed_total : artnum_paed(t) ;
       //if ART coverage in percentages isn't changing we don't continue to add more people on art (idrk get this)
-      artnum_paed(t) = paed_art_val(t-1) >= paed_art_val(t-1) ? 0 : artnum_paed(t); 
+      artnum_paed(t) = (paed_art_val(t-1) >= paed_art_val(t)) & paed_art_val(t) != 1 ? 0 : artnum_paed(t); 
+      
 
 
     } else if (artpaeds_isperc(t) & !artpaeds_isperc(t-1)){ // num to percentage
-       artnum_paed(t) = (artnum_paed(t-1) + artnum_paed(t) * paed_art_val(t)) / 2 ;
       
       //Remove how many that are already on ART
+      double temp ;
+      temp = 0.0;
+      for(int g = 0; g < NG; g++){
+        for(int af = 0; af < pIDX_HIVADULT; af++){
+          for(int hm = 0; hm < hDS; hm++){
+            for(int dur = 0; dur < hTS; dur++){
+              artnum_paed(t) += artstrat_paeds(dur, hm, af, g, t)   ;
+              
+            }
+          }
+        }
+      }
+
+      artnum_paed(t) = (paed_art_val(t-1) + (artnum_paed(t)) * paed_art_val(t)) / 2 ;
+
       for(int g = 0; g < NG; g++){
         for(int af = 0; af < pIDX_HIVADULT; af++){
           for(int hm = 0; hm < hDS; hm++){
             for(int dur = 0; dur < hTS; dur++){
               artnum_paed(t) -= (artstrat_paeds(dur, hm, af, g, t) )  ;
-              
+
             }
           }
         }
@@ -1109,7 +1128,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       
       artnum_paed(t) = artnum_paed(t) < 0 ? 0 : artnum_paed(t); 
       artnum_paed(t) = init_art_paed_total < artnum_paed(t) ? init_art_paed_total : artnum_paed(t) ;
-      std::cout << artnum_paed(t);
 
     } else if (artpaeds_isperc(t-1) & !artpaeds_isperc(t)){ //percentage to num 
       artnum_paed(t) = init_art_paed_total < paed_art_val(t) ? init_art_paed_total : paed_art_val(t) ;
@@ -1127,8 +1145,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         }
       }
    
-      
-      
       artnum_paed(t) = (last_year_art + artnum_paed(t)) / 2 ;
       
       //Remove how many that are already on ART
@@ -1143,6 +1159,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         }
       }
       
+
       artnum_paed(t) = artnum_paed(t) < 0 ? 0 : artnum_paed(t); 
       
       
@@ -1162,8 +1179,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     double adj ;
     adj = initByAge == 0 ? 1 : artnum_paed(t) / initByAge ;
     
-    
-    
     //the nosocomial infections aren't distributed so can't just move everything forward. So going to limit hm to just go to the n+1 basically
     for(int g = 0; g < NG; g++){
       for(int cat = 0; cat < trans; cat++){
@@ -1172,6 +1187,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
             double scalar ;
             scalar = (adj * init_art_dist(af, t)) > 1 ? 1 : adj * init_art_dist(af, t);
             scalar = artnum_paed(t) > 0 ? scalar : 0.0;
+            //not really sure why this needs to be here, but without it it scales down certain age groups when there is enough ART
+            scalar = (paed_art_val(t) == 1 & artpaeds_isperc(t)) ?  1 : scalar;
             artstrat_paeds(0, hm, af, g, t) +=  scalar * init_art_paed(hm, cat, af, g, t) ;
             hivstrat_paeds(hm, cat, af, g, t) -=  scalar* init_art_paed(hm, cat, af, g, t) ;
             
@@ -1184,7 +1201,10 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     for(int g = 0; g < NG; g++){
       for(int hm = 0; hm < hDS; hm++){
         for(int af = 0; af < pIDX_HIVADULT; af++){
-            aidsdeaths_art_paed(0,hm, af, g, t) =  af < 5 ? artstrat_paeds(0, hm, af, g, t) * paed_art_mort(hm, 0, af)  * 0.5 + artstrat_paeds(0, hm, af, g, t) * paed_art_mort(hm, 1, af)  * 0.5  : artstrat_paeds(0, hm, af, g, t) * adol_art_mort(hm, 0, af - 5) * 0.5 + artstrat_paeds(0, hm, af, g, t) * adol_art_mort(hm, 1, af - 5) * 0.5; // output hiv deaths, aggregated across transmission category
+          //SOMETHING HAPPENING HERE
+          double death_rate ;
+            death_rate = af < 5 ? mort_art_rr(0, af, t) * 0.5 * (paed_art_mort(hm, 0, af) + paed_art_mort(hm, 1, af)) : mort_art_rr(0, af, t) * 0.5 * (adol_art_mort(hm, 0, af-5) + adol_art_mort(hm, 1, af-5));
+            aidsdeaths_art_paed(0,hm, af, g, t) +=  death_rate * artstrat_paeds(0, hm, af, g, t)  ;
             grad_paeds_art(0,hm, af, g, t) -= aidsdeaths_art_paed(0,hm, af, g, t) ;
             artstrat_paeds(0, hm,  af, g, t) += grad_paeds_art(0, hm, af, g, t) ; 
           

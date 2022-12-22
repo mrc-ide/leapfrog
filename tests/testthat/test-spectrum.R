@@ -239,7 +239,7 @@ test_that('Paediatric HIV mortality working as expected', {
 })
 
 
-##WORKING
+##testing eligibility, stops working in 1998
 test_that('ART % implemented, no mortality reduction & all eligible', {
   pjnz <- "../testdata/spectrum/v6.13/bwa_aim-adult-child-input-art-elig_spectrum-v6.13_2022-02-12.PJNZ"
   pjnz1 <- test_path(pjnz)
@@ -251,7 +251,7 @@ test_that('ART % implemented, no mortality reduction & all eligible', {
   hivp$paed_art_mort[] <- 0
   hivp$adol_art_mort[] <- 0
   hivp$paed_art_val[which(1970:2030 %in% 1995:2030)] <- 1
-  hivp$paed_art_elig_age[] <- 15
+ ## hivp$paed_art_elig_age[] <- 15
   hivp$scalar_art[] <- 1
   ## Replace netmigr with unadjusted age 0-4 netmigr, which are not
   ## in EPP-ASM preparation
@@ -263,7 +263,7 @@ test_that('ART % implemented, no mortality reduction & all eligible', {
   lmod_out <- lmod_output_paed(lmod = lmod)
   x=data.table(lmod_out$prev_strat)
 ##  source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
- df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/bwa_aim-adult-child-input-art-elig_spectrum-v6.13_2022-02-12_pop1.xlsx", ages =0:14, country = 'Botswana')
+ ##df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/bwa_aim-adult-child-input-art-elig_spectrum-v6.13_2022-02-12_pop1.xlsx", ages =0:14, country = 'Botswana')
 
   
 
@@ -306,7 +306,7 @@ test_that('ART % implemented, mortality reduction & all eligible', {
   
   lmod_out <- lmod_output_paed(lmod = lmod)
   source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
-  df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_pop1.xlsx", ages =0:14, country = 'Botswana')
+  ##df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_pop1.xlsx", ages =0:14, country = 'Botswana')
   
   
   
@@ -466,7 +466,7 @@ test_that('ART counts, number covered is less than total prevalent cases', {
   
 })
 
-##WORKING
+##Not working for this current one, I think is a matter of not adding in the deaths in this year to get a slightly higher number of ART doses
 test_that('ART counts, number covered is less than total prevalent cases', {
   pjnz <- "../testdata/spectrum/v6.13/TEST_art_COUNTS_num_to_pct.PJNZ"
   pjnz1 <- test_path(pjnz)
@@ -476,10 +476,10 @@ test_that('ART counts, number covered is less than total prevalent cases', {
   hivp$ctx_effect <- 0
   hivp$ctx_val[] <- 0
   hivp$paed_art_val[which(1970:2030 %in% 1995:2014)] <- 50
-  hivp$paed_art_val[which(1970:2030 %in% 1998:2000)] <- 60/100
+  hivp$paed_art_val[which(1970:2030 %in% 1997:2002)] <- 60/100
   
   hivp$artpaeds_isperc[] <- FALSE
-  hivp$artpaeds_isperc[which(1970:2030 %in% 1998:2000)] <- TRUE
+  hivp$artpaeds_isperc[which(1970:2030 %in% 1997:2002)] <- TRUE
   
   hivp$paed_art_elig_age[] <- 15
   ##I have no idea what these are
