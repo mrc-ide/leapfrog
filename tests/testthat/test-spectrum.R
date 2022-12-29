@@ -239,7 +239,7 @@ test_that('Paediatric HIV mortality working as expected', {
 })
 
 
-##testing eligibility
+##NOT all the way working
 test_that('ART % implemented, no mortality reduction & all eligible', {
   pjnz <- "../testdata/spectrum/v6.13/bwa_aim-adult-child-input-art-elig_spectrum-v6.13_2022-02-12.PJNZ"
   pjnz1 <- test_path(pjnz)
@@ -263,7 +263,7 @@ test_that('ART % implemented, no mortality reduction & all eligible', {
   lmod_out <- lmod_output_paed(lmod = lmod)
   x=data.table(lmod_out$prev_strat)
 ##  source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
- ##df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/bwa_aim-adult-child-input-art-elig_spectrum-v6.13_2022-02-12_pop1.xlsx", ages =0:14, country = 'Botswana')
+ df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/bwa_aim-adult-child-input-art-elig_spectrum-v6.13_2022-02-12_pop1.xlsx", ages =0:14, country = 'Botswana')
 
   
 
@@ -293,7 +293,6 @@ test_that('ART % implemented, mortality reduction & all eligible', {
   hivp$ctx_effect <- 0
   hivp$ctx_val[] <- 0
   hivp$paed_art_val[which(1970:2030 %in% 1995:2030)] <- 1
-  hivp$paed_art_elig_age[] <- 15
   hivp$scalar_art[] <- 1
   
   
@@ -306,21 +305,21 @@ test_that('ART % implemented, mortality reduction & all eligible', {
   
   lmod_out <- lmod_output_paed(lmod = lmod)
  ## source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
- ## df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_pop1.xlsx", ages =0:14, country = 'Botswana')
+ df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_pop1.xlsx", ages =0:14, country = 'Botswana')
   
   
   
   dt <- left_join(lmod_out$prev, df_out$off_treatment)
   dt <- dt %>% filter(!is.na(pop)) %>% unique()
   dt <- dt %>% mutate(diff = lfrog - pop) %>% unique()
-  ##diff = dt$diff
-##  expect_true(all(abs(diff) < 1e-3), label = 'Off treatment paediatric population in leapfrog and spectrum match')
+  diff = dt$diff
+  expect_true(all(abs(diff) < 1e-3), label = 'Off treatment paediatric population in leapfrog and spectrum match')
   
   
   dt_onart <- left_join(lmod_out$art, df_out$on_treatment)
   dt_onart <- dt_onart%>% filter(!is.na(pop)) %>% mutate(diff = lfrog - pop) %>%  ungroup()
   diff_art <- abs(select(dt_onart, diff))
-##  expect_true(all(diff_art < 1e-3), label = 'On treatment paediatric population in leapfrog and spectrum match')
+  expect_true(all(diff_art < 1e-3), label = 'On treatment paediatric population in leapfrog and spectrum match')
   
   x = data.table(dt)
   y = data.table(dt_onart)
@@ -338,7 +337,6 @@ test_that('ART counts implemented, mortality reduction & all eligible', {
   hivp$ctx_val[] <- 0
   hivp$paed_art_val[which(1970:2030 %in% 1995:2014)] <- 100
   hivp$artpaeds_isperc[] <- FALSE
-  hivp$paed_art_elig_age[] <- 15
   hivp$scalar_art[] <- 1
   
   
@@ -358,14 +356,14 @@ test_that('ART counts implemented, mortality reduction & all eligible', {
   dt <- left_join(lmod_out$prev, df_out$off_treatment)
   dt <- dt %>% filter(!is.na(pop)) %>% unique()
   dt <- dt %>% mutate(diff = lfrog - pop) %>% unique()
-  ##diff = dt$diff
-  ##  expect_true(all(abs(diff) < 1e-3), label = 'Off treatment paediatric population in leapfrog and spectrum match')
+  diff = dt$diff
+  expect_true(all(abs(diff) < 1e-3), label = 'Off treatment paediatric population in leapfrog and spectrum match')
   
   
   dt_onart <- left_join(lmod_out$art, df_out$on_treatment)
   dt_onart <- dt_onart%>% filter(!is.na(pop)) %>% mutate(diff = lfrog - pop) %>%  ungroup()
   diff_art <- abs(select(dt_onart, diff))
-  ##  expect_true(all(diff_art < 1e-3), label = 'On treatment paediatric population in leapfrog and spectrum match')
+  expect_true(all(diff_art < 1e-3), label = 'On treatment paediatric population in leapfrog and spectrum match')
   
   x = data.table(dt)
   y = data.table(dt_onart)
@@ -383,7 +381,6 @@ test_that('ART counts, number covered is less than total prevalent cases', {
   hivp$ctx_val[] <- 0
   hivp$paed_art_val[which(1970:2030 %in% 1995:2014)] <- 50
   hivp$artpaeds_isperc[] <- FALSE
-  hivp$paed_art_elig_age[] <- 15
   ##I have no idea what these are
   hivp$scalar_art[] <- 1
 
@@ -403,14 +400,14 @@ test_that('ART counts, number covered is less than total prevalent cases', {
   dt <- left_join(lmod_out$prev, df_out$off_treatment)
   dt <- dt %>% filter(!is.na(pop)) %>% unique()
   dt <- dt %>% mutate(diff = lfrog - pop) %>% unique()
-  ##diff = dt$diff
-  ##  expect_true(all(abs(diff) < 1e-3), label = 'Off treatment paediatric population in leapfrog and spectrum match')
+  diff = dt$diff
+  expect_true(all(abs(diff) < 1e-3), label = 'Off treatment paediatric population in leapfrog and spectrum match')
   
   
   dt_onart <- left_join(lmod_out$art, df_out$on_treatment)
   dt_onart <- dt_onart%>% filter(!is.na(pop)) %>% mutate(diff = lfrog - pop) %>%  ungroup()
   diff_art <- abs(select(dt_onart, diff))
-  ##  expect_true(all(diff_art < 1e-3), label = 'On treatment paediatric population in leapfrog and spectrum match')
+  expect_true(all(diff_art < 1e-3), label = 'On treatment paediatric population in leapfrog and spectrum match')
   
   ##
   x = data.table(dt)
@@ -431,7 +428,6 @@ test_that('ART counts, number covered is less than total prevalent cases', {
   hivp$paed_art_val[which(1970:2030 %in% 1998:2000)] <- 10
   
   hivp$artpaeds_isperc[] <- FALSE
-  hivp$paed_art_elig_age[] <- 15
   ##I have no idea what these are
   hivp$scalar_art[] <- 1
   
@@ -452,21 +448,21 @@ test_that('ART counts, number covered is less than total prevalent cases', {
   dt <- left_join(lmod_out$prev, df_out$off_treatment)
   dt <- dt %>% filter(!is.na(pop)) %>% unique()
   dt <- dt %>% mutate(diff = lfrog - pop) %>% unique()
-  ##diff = dt$diff
-  ##  expect_true(all(abs(diff) < 1e-3), label = 'Off treatment paediatric population in leapfrog and spectrum match')
+  diff = dt$diff
+  expect_true(all(abs(diff) < 1e-3), label = 'Off treatment paediatric population in leapfrog and spectrum match')
   
   
   dt_onart <- left_join(lmod_out$art, df_out$on_treatment)
   dt_onart <- dt_onart%>% filter(!is.na(pop)) %>% mutate(diff = lfrog - pop) %>%  ungroup()
   diff_art <- abs(select(dt_onart, diff))
-  ##  expect_true(all(diff_art < 1e-3), label = 'On treatment paediatric population in leapfrog and spectrum match')
+  expect_true(all(diff_art < 1e-3), label = 'On treatment paediatric population in leapfrog and spectrum match')
   
   x = data.table(dt)
   y = data.table(dt_onart)
   
 })
 
-##Not working for this current one, I think is a matter of not adding in the deaths in this year to get a slightly higher number of ART doses
+##WORKING
 test_that('ART counts, number covered is less than total prevalent cases', {
   pjnz <- "../testdata/spectrum/v6.13/TEST_art_COUNTS_num_to_pct.PJNZ"
   pjnz1 <- test_path(pjnz)
@@ -481,7 +477,6 @@ test_that('ART counts, number covered is less than total prevalent cases', {
   hivp$artpaeds_isperc[] <- FALSE
   hivp$artpaeds_isperc[which(1970:2030 %in% 1997:2002)] <- TRUE
   
-  hivp$paed_art_elig_age[] <- 15
   ##I have no idea what these are
   hivp$scalar_art[] <- 1
 
@@ -495,21 +490,67 @@ test_that('ART counts, number covered is less than total prevalent cases', {
   
   lmod_out <- lmod_output_paed(lmod = lmod)
   ##source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
-  ##df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_art_COUNTS_num_to_pct_pop1.xlsx", ages =0:14, country = 'Botswana')
+  df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_art_COUNTS_num_to_pct_pop1.xlsx", ages =0:14, country = 'Botswana')
   
   
   
   dt <- left_join(lmod_out$prev, df_out$off_treatment)
   dt <- dt %>% filter(!is.na(pop)) %>% unique()
   dt <- dt %>% mutate(diff = lfrog - pop) %>% unique()
-  ##diff = dt$diff
-  ##  expect_true(all(abs(diff) < 1e-3), label = 'Off treatment paediatric population in leapfrog and spectrum match')
+  diff = dt$diff
+  expect_true(all(abs(diff) < 1e-3), label = 'Off treatment paediatric population in leapfrog and spectrum match')
   
   
   dt_onart <- left_join(lmod_out$art, df_out$on_treatment)
   dt_onart <- dt_onart%>% filter(!is.na(pop)) %>% mutate(diff = lfrog - pop) %>%  ungroup()
   diff_art <- abs(select(dt_onart, diff))
-  ##  expect_true(all(diff_art < 1e-3), label = 'On treatment paediatric population in leapfrog and spectrum match')
+  expect_true(all(diff_art < 1e-3), label = 'On treatment paediatric population in leapfrog and spectrum match')
+  
+  x = data.table(dt)
+  y = data.table(dt_onart)
+  
+})
+
+##WORKING
+test_that('BWA normal treatment', {
+  pjnz <- "../testdata/spectrum/v6.13/TEST_art_BWA.PJNZ"
+  pjnz1 <- test_path(pjnz)
+  
+  demp <- prepare_leapfrog_demp(pjnz1)
+  hivp <- prepare_leapfrog_projp(pjnz1)
+  hivp$ctx_effect <- 0
+  hivp$ctx_val[] <- 0
+  
+  hivp$artpaeds_isperc[] <- TRUE
+
+  ##I have no idea what these are
+  hivp$scalar_art[] <- 1
+  
+  
+  ## Replace netmigr with unadjusted age 0-4 netmigr, which are not
+  ## in EPP-ASM preparation
+  demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
+  demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
+  
+  lmod <- leapfrogR(demp, hivp)
+  
+  lmod_out <- lmod_output_paed(lmod = lmod)
+  ##source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
+  df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_art_BWA_pop1.xlsx", ages =0:14, country = 'Botswana')
+  
+  
+  
+  dt <- left_join(lmod_out$prev, df_out$off_treatment)
+  dt <- dt %>% filter(!is.na(pop)) %>% unique()
+  dt <- dt %>% mutate(diff = lfrog - pop) %>% unique()
+  diff = dt$diff
+  expect_true(all(abs(diff) < 1e-3), label = 'Off treatment paediatric population in leapfrog and spectrum match')
+  
+  
+  dt_onart <- left_join(lmod_out$art, df_out$on_treatment)
+  dt_onart <- dt_onart%>% filter(!is.na(pop)) %>% mutate(diff = lfrog - pop) %>%  ungroup()
+  diff_art <- abs(select(dt_onart, diff))
+  expect_true(all(diff_art < 1e-3), label = 'On treatment paediatric population in leapfrog and spectrum match')
   
   x = data.table(dt)
   y = data.table(dt_onart)
