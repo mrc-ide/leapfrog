@@ -40,8 +40,7 @@ leapfrogR(const Rcpp::List& demp,
   const int hAG_FULL = 66;
   const int hDS = 7;
   const int hDS_adol = 6;
-  const int trans = 4;
-  const int tx_time = 3;
+  const int hTM = 4;
   const int hTS = 3;
   const int ctx_effect = 0.33;
 
@@ -74,14 +73,14 @@ leapfrogR(const Rcpp::List& demp,
   NumericVector artstrat_adult(hTS * hDS * hAG * NG * proj_years);
   artstrat_adult.attr("dim") = NumericVector::create(hTS, hDS, hAG, NG, proj_years);
   
-  NumericVector hivstrat_paeds(trans * hDS * pIDX_HIVADULT * NG * proj_years);
-  hivstrat_paeds.attr("dim") = NumericVector::create(hDS, trans, pIDX_HIVADULT, NG, proj_years);
+  NumericVector hivstrat_paeds(hTM * hDS * pIDX_HIVADULT * NG * proj_years);
+  hivstrat_paeds.attr("dim") = NumericVector::create(hDS, hTM, pIDX_HIVADULT, NG, proj_years);
   
   NumericVector artstrat_paeds(hTS * hDS * pIDX_HIVADULT * NG * proj_years);
   artstrat_paeds.attr("dim") = NumericVector::create(hTS, hDS, pIDX_HIVADULT, NG, proj_years);
   
-  NumericVector artelig_paeds(hDS * trans * pIDX_HIVADULT * NG * proj_years);
-  artelig_paeds.attr("dim") = NumericVector::create(hDS, trans, pIDX_HIVADULT, NG, proj_years);
+  NumericVector artelig_paeds(hDS * hTM * pIDX_HIVADULT * NG * proj_years);
+  artelig_paeds.attr("dim") = NumericVector::create(hDS, hTM, pIDX_HIVADULT, NG, proj_years);
   
   NumericVector coarse_totpop1(hAG * NG * proj_years);
   coarse_totpop1.attr("dim") = NumericVector::create(hAG, NG, proj_years);
@@ -118,25 +117,25 @@ leapfrogR(const Rcpp::List& demp,
   
   NumericVector artnum_paed(proj_years);
   
-  NumericVector deaths_paeds(trans * hDS * pIDX_HIVADULT * NG * proj_years);
-  deaths_paeds.attr("dim") = NumericVector::create(hDS, trans,  pIDX_HIVADULT, NG, proj_years);
+  NumericVector deaths_paeds(hTM * hDS * pIDX_HIVADULT * NG * proj_years);
+  deaths_paeds.attr("dim") = NumericVector::create(hDS, hTM,  pIDX_HIVADULT, NG, proj_years);
   
-  NumericVector deaths_paeds_art(trans * hDS * pIDX_HIVADULT * NG * proj_years);
-  deaths_paeds_art.attr("dim") = NumericVector::create(hDS, trans,  pIDX_HIVADULT, NG, proj_years);
+  NumericVector deaths_paeds_art(hTM * hDS * pIDX_HIVADULT * NG * proj_years);
+  deaths_paeds_art.attr("dim") = NumericVector::create(hDS, hTM,  pIDX_HIVADULT, NG, proj_years);
   
-  NumericVector grad_paeds(trans * hDS * pIDX_HIVADULT * NG * proj_years);
-  grad_paeds.attr("dim") = NumericVector::create(hDS, trans,  pIDX_HIVADULT, NG, proj_years);
+  NumericVector grad_paeds(hTM * hDS * pIDX_HIVADULT * NG * proj_years);
+  grad_paeds.attr("dim") = NumericVector::create(hDS, hTM,  pIDX_HIVADULT, NG, proj_years);
   
   NumericVector grad_paeds_art(hTS * hDS * pIDX_HIVADULT * NG * proj_years);
   grad_paeds_art.attr("dim") = NumericVector::create(hTS, hDS,  pIDX_HIVADULT, NG, proj_years);
   
   
-  NumericVector init_art_paed(trans * hDS * pIDX_HIVADULT * NG * proj_years);
-  init_art_paed.attr("dim") = NumericVector::create(hDS, trans,  pIDX_HIVADULT, NG, proj_years);
+  NumericVector init_art_paed(hTM * hDS * pIDX_HIVADULT * NG * proj_years);
+  init_art_paed.attr("dim") = NumericVector::create(hDS, hTM,  pIDX_HIVADULT, NG, proj_years);
  
   if (hAG == hAG_FULL) {
     leapfrog_sim<double, NG, pAG, pIDX_FERT, pAG_FERT,
-		 pIDX_HIVADULT, hAG_FULL, hDS, hDS_adol, trans, tx_time, hTS>
+		 pIDX_HIVADULT, hAG_FULL, hDS, hDS_adol, hTM, hTS>
       (REAL(demp["basepop"]),
        REAL(demp["Sx"]),
        REAL(demp["netmigr_adj"]),
@@ -152,7 +151,6 @@ leapfrogR(const Rcpp::List& demp,
        REAL(projp["art_mort_full"]),
        REAL(projp["artmx_timerr"]),
        REAL(projp["art15plus_num"]),
-       REAL(projp["scalar_art"]),
        LOGICAL(projp["art15plus_isperc"]),
        INTEGER(projp["artcd4elig_idx"]),
        *INTEGER(projp["art_alloc_method"]),
@@ -209,7 +207,7 @@ leapfrogR(const Rcpp::List& demp,
        REAL(coarse_totpop1));
   } else if (hAG == hAG_COARSE) {
     leapfrog_sim<double, NG, pAG, pIDX_FERT, pAG_FERT,
-		 pIDX_HIVADULT, hAG_COARSE, hDS, hDS_adol, trans, tx_time,  hTS>
+		 pIDX_HIVADULT, hAG_COARSE, hDS, hDS_adol, hTM, hTS>
       (REAL(demp["basepop"]),
        REAL(demp["Sx"]),
        REAL(demp["netmigr_adj"]),
@@ -225,7 +223,6 @@ leapfrogR(const Rcpp::List& demp,
        REAL(projp["art_mort_coarse"]),
        REAL(projp["artmx_timerr"]),
        REAL(projp["art15plus_num"]),
-       REAL(projp["scalar_art"]),
        LOGICAL(projp["art15plus_isperc"]),
        INTEGER(projp["artcd4elig_idx"]),
        *INTEGER(projp["art_alloc_method"]),

@@ -272,12 +272,6 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   v$artpaeds_isperc <- rep(paed_art_pct,  length(1970:2029))
   v$paed_art_val <- paed_art_val
   
-  scalar <- rep(1, 14)
-  scalar <- array(data = 1, dim = c(length(0:14), length(1970:2029)), list(age = c(0:14), year = c(1970:2029)))
-  v$scalar_art <- scalar
-  v$scalar_art[2,which(1970:2022 == 1996)] <- 0.6236951
-  v$scalar_art[4,which(1970:2022 == 1996)] <- 0.6015512
-  v$scalar_art[3,which(1970:2022 == 1997)] <- 0.8710667
   
   mort_rr_art <- read.csv('tests/testdata/spectrum/v6.13/mort_RR.csv', header = F)
   mort_rr_art_target <- array(NA, dim = c(3, 15, 61), dimnames = list(transmission = c('0to6mo', '7to12mo', '12+mo'), age = 0:14, year = 1970:2030))

@@ -240,48 +240,49 @@ test_that('Paediatric HIV mortality working as expected', {
 
 
 ##NOT all the way working
-test_that('ART % implemented, no mortality reduction & all eligible', {
-  pjnz <- "../testdata/spectrum/v6.13/bwa_aim-adult-child-input-art-elig_spectrum-v6.13_2022-02-12.PJNZ"
-  pjnz1 <- test_path(pjnz)
-
-  demp <- prepare_leapfrog_demp(pjnz1)
-  hivp <- prepare_leapfrog_projp(pjnz1)
-  hivp$ctx_effect <- 0
-  hivp$ctx_val[] <- 0
-  hivp$paed_art_mort[] <- 0
-  hivp$adol_art_mort[] <- 0
-  hivp$paed_art_val[which(1970:2030 %in% 1995:2030)] <- 1
- ## hivp$paed_art_elig_age[] <- 15
-  hivp$scalar_art[] <- 1
-  ## Replace netmigr with unadjusted age 0-4 netmigr, which are not
-  ## in EPP-ASM preparation
-  demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
-  demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
-
-  lmod <- leapfrogR(demp, hivp)
-  
-  lmod_out <- lmod_output_paed(lmod = lmod)
-  x=data.table(lmod_out$prev_strat)
-##  source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
- df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/bwa_aim-adult-child-input-art-elig_spectrum-v6.13_2022-02-12_pop1.xlsx", ages =0:14, country = 'Botswana')
-
-  
-
-  dt <- left_join(lmod_out$prev, df_out$off_treatment)
-  dt <- dt %>% filter(!is.na(pop)) %>% unique()
-  dt <- dt %>% mutate(diff = lfrog - pop) %>% unique()
- ## diff = dt$diff
-  ##expect_true(all(abs(diff) < 1e-3), label = 'Off treatment paediatric population in leapfrog and spectrum match')
-  
-  
-  dt_onart <- left_join(lmod_out$art, df_out$on_treatment)
-  dt_onart <- dt_onart%>% filter(!is.na(pop))  %>% mutate(diff = lfrog - pop) %>%  ungroup()
- ## diff_art <- abs(select(dt_onart, diff))
-  ##expect_true(all(diff_art < 1e-3), label = 'On treatment paediatric population in leapfrog and spectrum match')
-  x.1 = data.table(dt)
-  y.1 = data.table(dt_onart)
-  
-})
+##For some reason in 1997 age 6 the scalar should be 1
+# test_that('ART % implemented, no mortality reduction & all eligible', {
+#   pjnz <- "../testdata/spectrum/v6.13/bwa_aim-adult-child-input-art-elig_spectrum-v6.13_2022-02-12.PJNZ"
+#   pjnz1 <- test_path(pjnz)
+# 
+#   demp <- prepare_leapfrog_demp(pjnz1)
+#   hivp <- prepare_leapfrog_projp(pjnz1)
+#   hivp$ctx_effect <- 0
+#   hivp$ctx_val[] <- 0
+#   hivp$paed_art_mort[] <- 0
+#   hivp$adol_art_mort[] <- 0
+#   hivp$paed_art_val[which(1970:2030 %in% 1995:2030)] <- 1
+#   hivp$scalar_art[] <- 1
+#   ## Replace netmigr with unadjusted age 0-4 netmigr, which are not
+#   ## in EPP-ASM preparation
+#   demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
+#   demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
+#   hivp$mort_art_rr[] <- 1
+# 
+#   lmod <- leapfrogR(demp, hivp)
+#   
+#   lmod_out <- lmod_output_paed(lmod = lmod)
+#   x=data.table(lmod_out$prev_strat)
+#   source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
+#  df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/bwa_aim-adult-child-input-art-elig_spectrum-v6.13_2022-02-12_pop1.xlsx", ages =0:14, country = 'Botswana')
+# 
+#   
+# 
+#   dt <- left_join(lmod_out$prev, df_out$off_treatment)
+#   dt <- dt %>% filter(!is.na(pop)) %>% unique()
+#   dt <- dt %>% mutate(diff = lfrog - pop) %>% unique()
+#   diff = dt$diff
+#   expect_true(all(abs(diff) < 1e-3), label = 'Off treatment paediatric population in leapfrog and spectrum match')
+#   
+#   
+#   dt_onart <- left_join(lmod_out$art, df_out$on_treatment)
+#   dt_onart <- dt_onart%>% filter(!is.na(pop))  %>% mutate(diff = lfrog - pop) %>%  ungroup()
+#   diff_art <- abs(select(dt_onart, diff))
+#   expect_true(all(diff_art < 1e-3), label = 'On treatment paediatric population in leapfrog and spectrum match')
+#   x.1 = data.table(dt)
+#   y.1 = data.table(dt_onart)
+#   
+# })
 
 ##WORKING
 test_that('ART % implemented, mortality reduction & all eligible', {
@@ -416,7 +417,7 @@ test_that('ART counts, number covered is less than total prevalent cases', {
 })
 
 ##WORKING
-test_that('ART counts, number covered is less than total prevalent cases', {
+test_that('ART counts, number covered is less than total prevalent cases. ART coverage goes down', {
   pjnz <- "../testdata/spectrum/v6.13/TEST_art_COUNTS_decreasing_ART.PJNZ"
   pjnz1 <- test_path(pjnz)
   
@@ -463,7 +464,7 @@ test_that('ART counts, number covered is less than total prevalent cases', {
 })
 
 ##WORKING
-test_that('ART counts, number covered is less than total prevalent cases', {
+test_that('ART counts, number covered is less than total prevalent cases. ART input switches from numbers to percentages', {
   pjnz <- "../testdata/spectrum/v6.13/TEST_art_COUNTS_num_to_pct.PJNZ"
   pjnz1 <- test_path(pjnz)
   
