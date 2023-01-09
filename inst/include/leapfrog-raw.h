@@ -1096,9 +1096,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
       
       
-     // artnum_paed(t) = paed_art_val(t-1) > 0 ? artnum_paed(t) * (paed_art_val(t) + paed_art_val(t-1)) / 2 : 0.0;
       artnum_paed(t) =  artnum_paed(t) * (paed_art_val(t) + paed_art_val(t-1)) / 2 ;
-      
       //Remove how many that are already on ART
       for(int g = 0; g < NG; g++){
         for(int af = 0; af < pIDX_HIVADULT; af++){
@@ -1111,13 +1109,9 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         }
       }
       artnum_paed(t) = init_art_paed_total < artnum_paed(t) ? init_art_paed_total : artnum_paed(t) ;
-      //if ART coverage in percentages isn't changing we don't continue to add more people on art (idrk get this)
-     // artnum_paed(t) = (paed_art_val(t-1) >= paed_art_val(t)) & paed_art_val(t) != 1 ? 0 : artnum_paed(t); 
-      
 
 
     } else if (artpaeds_isperc(t) & !artpaeds_isperc(t-1)){ // num to percentage
-      
       //Remove how many that are already on ART
       double temp ;
       temp = 0.0;
@@ -1131,7 +1125,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
           }
         }
       }
-      //80.13030
       artnum_paed(t) = (paed_art_val(t-1) + (artnum_paed(t) * paed_art_val(t))) / 2 ;
 
       for(int g = 0; g < NG; g++){
@@ -1164,7 +1157,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
       
    
-      //artnum_paed(t) = (artnum_paed(t) * paed_art_val(t-1) + paed_art_val(t)) / 2 ;
       artnum_paed(t) = (artnum_paed(t-1) + paed_art_val(t)) / 2 ;
       
       
@@ -1174,8 +1166,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
           for(int hm = 0; hm < hDS; hm++){
             for(int dur = 0; dur < hTS; dur++){
               artnum_paed(t) -= (artstrat_paeds(dur, hm, af, g, t))  ;
-              //artnum_paed(t) +=  aidsdeaths_art_paed(dur,hm, af, g, t);
-              
+
             }
           }
         }
@@ -1210,7 +1201,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
             double scalar ;
             scalar = (adj * init_art_dist(af, t)) > 1 ? 1 : adj * init_art_dist(af, t);
             scalar = artnum_paed(t) > 0 ? scalar : 0.0;
-            //not really sure why this needs to be here, but without it it scales down certain age groups when there is enough ART
             scalar = (paed_art_mort(hm, cat, af) == 0) ?  1 : scalar;
           
             artstrat_paeds(0, hm, af, g, t) +=  scalar * init_art_paed(hm, cat, af, g, t) ;
@@ -1227,7 +1217,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     for(int g = 0; g < NG; g++){
       for(int hm = 0; hm < hDS; hm++){
         for(int af = 0; af < pIDX_HIVADULT; af++){
-          //SOMETHING HAPPENING HERE
           double death_rate ;
             death_rate = af < 5 ? mort_art_rr(0, af, t) * 0.5 * (paed_art_mort(hm, 0, af) + paed_art_mort(hm, 1, af)) : mort_art_rr(0, af, t) * 0.5 * (adol_art_mort(hm, 0, af-5) + adol_art_mort(hm, 1, af-5));
             aidsdeaths_art_paed(0,hm, af, g, t) =  death_rate * artstrat_paeds(0, hm, af, g, t)  ;
