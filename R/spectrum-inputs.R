@@ -240,8 +240,8 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   art_dist_paed <- read.csv('tests/testdata/spectrum/v6.13/paed_art_dist.csv')
   expand <- NULL
   for(yr in 2023:2030){
-    x = art_dist_paed %>% filter(year == 2022)
-    x = x %>% mutate(year = yr)
+    x = art_dist_paed %>% dplyr::filter(year == 2022)
+    x = x %>% dplyr::mutate(year = yr)
     expand <- rbind(expand, x)
   }
   art_dist_paed <- rbind(art_dist_paed, expand)
@@ -284,8 +284,8 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   art_dist_paed <- read.csv('tests/testdata/spectrum/v6.13/paed_art_dist.csv')
   expand <- NULL
   for(yr in 2023:2030){
-    x = art_dist_paed %>% filter(year == 2022)
-    x = x %>% mutate(year = yr)
+    x = art_dist_paed %>% dplyr::filter(year == 2022)
+    x = x %>% dplyr::mutate(year = yr)
     expand <- rbind(expand, x)
   }
   art_dist_paed <- rbind(art_dist_paed, expand)

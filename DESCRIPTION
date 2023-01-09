@@ -17,7 +17,7 @@ LinkingTo:
     RcppEigen
 Imports:
     beers,
-    eppasm (>= 0.5.12),
+    eppasm (>= 0.7.2),
     methods,
     Matrix,
     Rcpp,
