@@ -86,7 +86,12 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                     const int *p_artpaeds_isperc,
                     const Type *p_paed_art_elig_age,
                     const Type *p_paed_art_elig_cd4,
-                
+                    
+                    //mtct trans
+                    const Type *p_mtct_trans,
+                    const Type *p_fert_mult_by_age,
+                    const Type *p_fert_mult_offart,
+                    const Type *p_fert_mult_onart,
                     
                     //
                     //settings
@@ -202,6 +207,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   const TensorMapX2cT init_art_dist(p_init_art_dist, pIDX_HIVADULT, sim_years);
   const TensorMapX3cT mort_art_rr(p_mort_art_rr, hTS, pIDX_HIVADULT, sim_years);
   
+  
 
   //5 age categories
   const TensorMapX2cT paed_art_elig_cd4(p_paed_art_elig_cd4, pIDX_FERT, sim_years);
@@ -211,6 +217,12 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   const TensorMapX3cT paed_art_mort(p_paed_art_mort, hDS, hTS, 5);
   const TensorMapX3cT adol_art_mort(p_adol_art_mort, hDS_adol, hTS, 10);
   const TensorMapX1cI artpaeds_isperc(p_artpaeds_isperc, sim_years);
+  
+  //MTCT
+  const TensorMapX1cT mtct_trans(p_mtct_trans, hDS);
+  const TensorMapX1cT fert_mult_by_age(p_fert_mult_by_age, 35);
+  const TensorMapX1cT fert_mult_offart(p_fert_mult_offart, hDS);
+  const TensorMapX1cT fert_mult_onart(p_fert_mult_onart, 35);
   
 
 
@@ -851,15 +863,48 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         
       }
     }
+   
+   
+   
+  // TensorFixedSize<Type, Sizes<hDS, hAG, NG>> hivstrat_preg;
+   //hivstrat_preg.setZero();
+   
+  // TensorFixedSize<Type, Sizes<hDS, hAG, NG>> artstrat_preg;
+   //artstrat_preg.setZero();
+   
+   for(int g = 0; g < NG; g++){
+     for(int hm = 0; hm < hDS; hm++){
+       for(int af = 1; af < 5; af++){
+     //      hivstrat_preg(hm, af, g) += hivstrat_adult(hm, af, g, t);
+       //    artstrat_preg(hm, af, g) += artstrat_adult(hm, af, g, t);
+       }
+     }
+   }
+   
+ //  double needPMTCT;
+ //  needPMTCT = 0.0;
+   for(int g = 0; g < NG; g++){
+     for(int hm = 0; hm < hDS; hm++){
+       for(int af = 1; af < 5; af++){
+   //      needPMTCT += hivstrat_adult(hm, af, g, t) + artstrat_adult(hm, af, g, t);
+       }
+     }
+   }
+   
+   
+   
+   
+   
     hiv_births(t) = 0.0;
-    for(int af = 0; af < pAG; af++) {
-      //hiv_births(t) += (hivpop1(pIDX_FERT + af, FEMALE, t + hivpop1(pIDX_FERT + af, FEMALE, t-1) * 0.5) * asfr(af, t) * fert_rat(pIDX_FERT + af, t));
+    for(int af = 0; af < 35; af++) {
+      for(int hm = 0; hm < hDS; hm++){
+        hiv_births(t) += (hivstrat_adult(hm, af, 1, t) + hivstrat_adult(hm, af, 1, t-1)) * 0.5 * asfr(af, t) * fert_mult_by_age(af) * fert_mult_offart(hm);
+      }
     }
 
 
 
     for(int g = 0; g < NG; g++){
-      //WAS 6
       for(int hm = 0; hm < hDS; hm++){
         for(int af = 1; af < 5; af++){
           for(int cat = 0; cat < hTM; cat++){
@@ -1243,19 +1288,39 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     //distribute across eligible ages, right now just going to hardcode
     for(int g = 0; g < NG; g++){
       for(int af = 0; af < 5; af++){
-        infections(af, g, t) = 0 ;
-        infections(af, g, t) = paed_incid_input(t) / 10;
-        hivpop1(af, g, t) += infections(af, g, t);
- 
-        for(int hm = 0; hm < hDS; hm++){
-          for(int cat = 0; cat < 1; cat++){
-            //putting them all in perinatal hTM to match spec nosocomial
-            hivstrat_paeds(hm, cat, af, g, t) += paed_cd4_dist(hm) > 0 ? infections(af, g, t) * paed_cd4_dist(hm) : 0.0;
-          }
+        if(paed_incid_input(t) > 0){
+       //   infections(af, g, t) = 0 ;
+        //  infections(af, g, t) = paed_incid_input(t) / 10;
+        //  hivpop1(af, g, t) += infections(af, g, t);
+          
+          
+          for(int hm = 0; hm < hDS; hm++){
+            for(int cat = 0; cat < 1; cat++){
+              //putting them all in perinatal hTM to match spec nosocomial
+          //    hivstrat_paeds(hm, cat, af, g, t) += paed_cd4_dist(hm) > 0 ? infections(af, g, t) * paed_cd4_dist(hm) : 0.0;
+            }
+          } 
+        }
+        }
+         
+      
+  
+      
+      for(int hm = 0; hm < hDS; hm++){
+        for(int cat = 0; cat < 1; cat++){
+        //   hivstrat_paeds(hm, cat, 0, g, t) += paed_cd4_dist(hm) > 0 ? infections(0, g, t) * paed_cd4_dist(hm) : 0.0;
+          
         }
       }
     }
     
+    
+    for(int hm = 0; hm < hDS; hm++){
+      for(int g = 0; g < NG; g++){
+        infections(0, g, t) += mtct_trans(hm) * hiv_births(t) * births_sex_prop(g, t);
+         hivstrat_paeds(hm, 0, 0, g, t) += paed_cd4_dist(hm) > 0 ? infections(0, g, t) * paed_cd4_dist(hm) : 0.0;
+     }
+    }
     
   }
 

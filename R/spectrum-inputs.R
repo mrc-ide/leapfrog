@@ -163,8 +163,8 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   ## paed input
   v$paed_incid_input <- projp$nosocom_infections_04
   ## Hardcoded, this is putting all individuals in the highest cd4 category bc i think thats how the nosocomial infections work
- ## v$paed_cd4_dist <- c(0.6, 0.12, 0.1, 0.09, 0.05, 0.03, 0.01)
-  v$paed_cd4_dist <- c(1, 0, 0, 0, 0, 0, 0)
+  v$paed_cd4_dist <- c(0.6, 0.12, 0.1, 0.09, 0.05, 0.03, 0.01)
+ ## v$paed_cd4_dist <- c(1, 0, 0, 0, 0, 0, 0)
   paed_cd4_prog <- array(data = 0, dim = c(7), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', 'lte5')) )
   paed_cd4_prog[] <- c(0.14, 0.37, 0.3, 0.35, 0.4, 0.4, 0)
   
@@ -343,6 +343,14 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   
   
   v$paed_cd4_transition <- paed_cd4_transition
+  
+  v$mtct_trans <- c(0.15, 0.15, 0.27, 0.27, 0.37, 0.37, 0.37)
+  
+  v$fert_mult_by_age <- rep(c(1.153260, 1.001870, 0.909590,0.912760, 0.883990, 0.883990, 0.883990), each = 5)
+  
+  v$fert_mult_offart <- c(1, 0.96, 0.88, 0.78, 0.61, 0.38, 0.30)
+  
+  v$fert_mult_onart <- rep(c(1.094460, 1.006870, 0.916170, 0.810910, 0.637220, 0.637220, 0.637220), each = 5)
 
 
   v$artmx_timerr <- projp$artmx_timerr[c(1, 2, rep(3, hTS - 2)), ]

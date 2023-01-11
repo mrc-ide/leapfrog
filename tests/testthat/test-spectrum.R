@@ -539,3 +539,52 @@ test_that('BWA normal treatment', {
 
   
 })
+
+##Currently have the right number of births to HIV+ women (checking that with output from spectrum variable hivpregwomen)
+##close ish on getting the first year to align
+test_that('Perinatal transmission of HIV', {
+  pjnz <- "../testdata/spectrum/v6.13/TEST_MTCT_perinatal.PJNZ"
+  pjnz1 <- test_path(pjnz)
+  
+  demp <- prepare_leapfrog_demp(pjnz1)
+  hivp <- prepare_leapfrog_projp(pjnz1)
+  hivp$ctx_effect <- 0
+  hivp$ctx_val[] <- 0
+  
+  hivp$artpaeds_isperc[] <- TRUE
+  
+  ##I have no idea what these are
+  hivp$scalar_art[] <- 1
+  hivp$fert_rat[] <- 1
+
+  
+  
+  ## Replace netmigr with unadjusted age 0-4 netmigr, which are not
+  ## in EPP-ASM preparation
+  demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
+  demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
+  
+  lmod <- leapfrogR(demp, hivp)
+  
+  lmod_out <- lmod_output_paed(lmod = lmod)
+  ##df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_MTCT_perinatal_pop1.xlsx", ages =0:14, country = 'Botswana')
+ ## df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_MTCT_perinatal_pop1.xlsx", ages =15:49, country = 'Botswana')
+  
+  
+  
+  dt <- dplyr::left_join(lmod_out$prev, df_out$off_treatment)
+  dt <- dt %>% dplyr::filter(!is.na(pop)) %>% unique()
+  dt <- dt %>% dplyr::mutate(diff = lfrog - pop) %>% unique()
+  diff = dt$diff
+  expect_true(all(abs(diff) < 1e-3), label = 'Off treatment paediatric population in leapfrog and spectrum match')
+  
+  
+  dt_onart <- dplyr::left_join(lmod_out$art, df_out$on_treatment)
+  dt_onart <- dt_onart%>% dplyr::filter(!is.na(pop)) %>% dplyr::mutate(diff = lfrog - pop) %>%  dplyr::ungroup()
+  diff_art <- abs(dplyr::select(dt_onart, diff))
+  expect_true(all(diff_art < 1e-3), label = 'On treatment paediatric population in leapfrog and spectrum match')
+  
+  
+  
+})
+
