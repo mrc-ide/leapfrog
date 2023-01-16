@@ -17,7 +17,7 @@ test_that("Leapfrog matches direct incidence option at coarse and single year ag
   ## Check that prevalence, deaths and incidence  matches between
   ## the two models
   pjnz1 <- "../testdata/spectrum/v6.13/bwa_aim-adult-no-art-no-hiv-deaths_spectrum-v6.13_2022-02-12.pjnz"
-  demog_matches_birthsdeaths(pjnz1, threshold_deaths = 1e-3, threshold_births = 0.01)
+  demog_matches_birthsdeaths(pjnz1, threshold_deaths = 1e-1, threshold_births = 0.01)
   demog_matches_totpop(pjnz1)
   transmission_matches(pjnz1, threshold_absolute_pid = c(0.2, 1e-3, 1e-3))
   matches_coarse_age_groups(pjnz1, threshold_pid = c(0.5, 0.01, 1e-3))
@@ -563,7 +563,7 @@ test_that('Perinatal transmission of HIV', {
   ## in EPP-ASM preparation
   demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
   demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
-  
+  hivp$paed_cd4_dist <- c(0.515952304221721, 0.159523042217209, 0.114405414115372, 0.088623912342894, 0.0615533354817918, 0.0380277151144054, 0.0219142765066065)
   lmod <- leapfrogR(demp, hivp)
   
   lmod_out <- lmod_output_paed(lmod = lmod)

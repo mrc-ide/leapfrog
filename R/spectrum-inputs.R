@@ -344,7 +344,7 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   
   v$paed_cd4_transition <- paed_cd4_transition
   
-  v$mtct_trans <- c(0.15, 0.15, 0.27, 0.27, 0.37, 0.37, 0.37)
+  v$mtct_trans <- (c(0.15, 0.15, 0.27, 0.27, 0.37, 0.37, 0.37))
   
   v$fert_mult_by_age <- rep(c(1.153260, 1.001870, 0.909590,0.912760, 0.883990, 0.883990, 0.883990), each = 5)
   

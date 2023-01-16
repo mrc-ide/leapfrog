@@ -142,6 +142,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   typedef Eigen::TensorMap<Eigen::Tensor<const Type, 4>> TensorMapX4cT;
 
   typedef Eigen::TensorMap<Eigen::Tensor<Type, 1>> TensorMapX1T;
+  typedef Eigen::TensorMap<Eigen::Tensor<Type, 2>> TensorMapX2T;
   typedef Eigen::TensorMap<Eigen::Tensor<Type, 3>> TensorMapX3T;
   typedef Eigen::TensorMap<Eigen::Tensor<Type, 4>> TensorMapX4T;
   typedef Eigen::TensorMap<Eigen::Tensor<Type, 5>> TensorMapX5T;
@@ -232,7 +233,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   TensorMapX3T hivnpop1(p_hivnpop1, pAG, NG, sim_years);
   TensorMapX3T infections(p_infections, pAG, NG, sim_years);
   TensorMapX1T births(p_births, sim_years); 
-  TensorMapX1T hiv_births(p_hiv_births, sim_years); 
+  TensorMapX2T hiv_births(p_hiv_births, hDS, sim_years); 
   TensorMapX3T natdeaths(p_natdeaths, pAG, NG, sim_years);
   TensorMapX3T natdeaths_hivpop(p_natdeaths_hivpop, pAG, NG, sim_years);
   TensorMapX3T hivdeaths(p_hivdeaths, pAG, NG, sim_years);
@@ -284,7 +285,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   grad_paeds.setZero();
   grad_paeds_art.setZero();
   init_art_paed.setZero();
-  
+  hiv_births.setZero();
   
   
   int everARTelig_idx = hDS;
@@ -842,8 +843,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         // maybe need to change this for coarse age groups
         // hivpopadjprob(ha, g) = popadjprob(ha, g) ;
         
-        totpop1(ha, g, t) = basepop(ha, g, t);
-        hivpop1(ha, g, t) =  hivpop1(ha, g, t) * basepop(ha, g, t) / totpop1(ha, g, t);
+       totpop1(ha, g, t) = basepop(ha, g, t);
+       hivpop1(ha, g, t) =  hivpop1(ha, g, t) * basepop(ha, g, t) / totpop1(ha, g, t);
         
         //hivpop1(ha, g, t) = hivpopadjprob(ha, g) * hivpop1(ha, g, t);
         //if (t >= t_ART_start) {
@@ -895,10 +896,14 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    
    
    
-    hiv_births(t) = 0.0;
     for(int af = 0; af < 35; af++) {
       for(int hm = 0; hm < hDS; hm++){
-        hiv_births(t) += (hivstrat_adult(hm, af, 1, t) + hivstrat_adult(hm, af, 1, t-1)) * 0.5 * asfr(af, t) * fert_mult_by_age(af) * fert_mult_offart(hm);
+        hiv_births(hm, t) += (hivstrat_adult(hm, af, 1, t) + hivstrat_adult(hm, af, 1, t-1)) * 0.5 * asfr(af, t) * fert_mult_by_age(af) * fert_mult_offart(hm);
+        for(int hu = 0; hu < hTS; hu++){
+          hiv_births(hm, t) += (artstrat_adult(hu, hm, af, 1, t) + artstrat_adult(hu, hm, af, 1, t-1)) * 0.5 * asfr(af, t) * fert_mult_by_age(af) * fert_mult_onart(af);
+          
+        }
+        
       }
     }
 
@@ -1317,9 +1322,15 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     
     for(int hm = 0; hm < hDS; hm++){
       for(int g = 0; g < NG; g++){
-        infections(0, g, t) += mtct_trans(hm) * hiv_births(t) * births_sex_prop(g, t);
-         hivstrat_paeds(hm, 0, 0, g, t) += paed_cd4_dist(hm) > 0 ? infections(0, g, t) * paed_cd4_dist(hm) : 0.0;
+        //not sure if hiv free surv is needed here
+        infections(0, g, t) += mtct_trans(hm) * hiv_births(hm, t) * births_sex_prop(g, t);
      }
+    }
+    
+    for(int hm = 0; hm < hDS; hm++){
+      for(int g = 0; g < NG; g++){
+        hivstrat_paeds(hm, 0, 0, g, t) +=  infections(0, g, t) * paed_cd4_dist(hm) ;
+      }
     }
     
   }

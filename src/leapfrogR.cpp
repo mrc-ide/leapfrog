@@ -87,7 +87,8 @@ leapfrogR(const Rcpp::List& demp,
 
   NumericVector births(proj_years);
   
-  NumericVector hiv_births(proj_years);
+  NumericVector hiv_births(hDS * proj_years);
+  hiv_births.attr("dim") = NumericVector::create(hDS, proj_years);
   
 
   NumericVector natdeaths(pAG * NG * proj_years);
