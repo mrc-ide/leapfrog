@@ -565,6 +565,13 @@ test_that('Perinatal transmission of HIV', {
   demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
   hivp$paed_cd4_dist <- c(0.515952304221721, 0.159523042217209, 0.114405414115372, 0.088623912342894, 0.0615533354817918, 0.0380277151144054, 0.0219142765066065)
   lmod <- leapfrogR(demp, hivp)
+  plot(specres$hivpregwomen)
+  lines(lmod$hiv_births)
+  
+  x <- data.table(lmod = as.vector(lmod$hiv_births), spec = specres$hivpregwomen)
+  x[,diff := spec - lmod]
+  x[,ratio := spec/  lmod]
+  x[,year := 1970:2030]
   
   lmod_out <- lmod_output_paed(lmod = lmod)
   ##df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_MTCT_perinatal_pop1.xlsx", ages =0:14, country = 'Botswana')

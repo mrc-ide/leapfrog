@@ -154,12 +154,8 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   v$incrr_sex <- projp$incrr_sex
   
   ## HIV effects on fertilty
-  ## mkw: should this be normalized as well?
-  x <- apply(projp$fert_rat, 2, rep, each = 5)
-  x <- rbind(array(data = 0, dim = c(15,61)), x, array(data = 0, dim = c(31,61)))
-  rownames(x) <- 0:80
-  v$fert_rat <- x
-  
+  x <- c(6.663660,	6.627490,	6.587540,	6.550000,	6.515790,	6.480510,	6.442340,	6.399450,	6.350000,	6.292810,	6.226410,	6.148620,	6.057220,	5.950000,	5.795050,	5.582180,	5.341780,	5.104260,	4.900000,	4.728830,	4.568750,	4.417400,	4.272430,	4.131500,	3.988570,	3.844730,	3.708350,	3.587750,	3.491300,	3.414530,	3.346940,	3.287800,	3.236360,	3.191900,	3.150350,	3.110410,	3.075540,	3.049190,	3.034800,	3.029150,	3.025720,	3.023080,	3.019750,	3.014300,	3.002190,	2.981570,	2.955020,	2.925100,	2.894400,	2.859560,	2.817970,	2.773350,	2.729390,	2.689800,	2.654560,	2.621020,	2.588890,	2.557880,	2.527700,	2.498230,	2.469570)
+  v$tfr = x
   ## paed input
   v$paed_incid_input <- projp$nosocom_infections_04
   ## Hardcoded, this is putting all individuals in the highest cd4 category bc i think thats how the nosocomial infections work
@@ -271,6 +267,53 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   }
   v$artpaeds_isperc <- rep(paed_art_pct,  length(1970:2029))
   v$paed_art_val <- paed_art_val
+  
+  ##PMTCT
+  pmtct <- read.csv('tests/testdata/spectrum/v6.13/pmtct.csv')
+  pmtct <- unique(pmtct)
+  colnames(pmtct) <- c('type', 'metric', 1970:2030)
+  pmtct <- pmtct %>% filter(type != '')
+  regimens <- pmtct %>% filter(metric == 'number') %>% select(type) %>% unique()
+  pmtct_num <- pmtct %>% filter(metric == 'number') %>% select(-type) %>% select(-metric)
+  pmtct_pct <- pmtct %>% filter(metric == 'percent')  %>% select(-type) %>% select(-metric)
+  pmtct_list <- list(pmtct_num, pmtct_pct)
+  pmtct_list <- array(as.numeric(unlist(pmtct_list)), dim = c(7,length(1970:2030), 2), dimnames = list(type = unlist(regimens), year = 1970:2030, metric = c('number', 'pct')))
+  pmtct_list[,,2] <- pmtct_list[,,2] / 100
+  v$pmtct <- pmtct_list
+  
+  if(sum(pmtct_list[,,1]) == 0){
+    v$pmtct_input_num = F
+  }else{
+    v$pmtct_input_pct = T
+  }
+  
+  ##rates of MTCT
+  noart <- read.csv('tests/testdata/spectrum/v6.13/mtct_notrt.csv')
+  noart$cd4 <- factor(x = noart$cd4, levels = rev(unique(noart$cd4)))
+  noart <- noart %>% arrange(cd4)
+  noart <- noart %>% spread(key = pmtct, value = perinatal)
+  noart_per <- noart %>% filter(type == 'perinatal') %>% select(-type)
+  rownames(noart_per) <- unique(noart_per$cd4)
+  noart_per <- noart_per %>% select(-cd4)
+  noart_bf <- noart %>% filter(type != 'perinatal') %>% select(-type)
+  rownames(noart_bf) <- unique(noart_bf$cd4)
+  noart_bf <- noart_bf %>% select(-cd4)
+  noart <- list(noart_per, noart_bf)
+  v$pmtct_mtct <- array(unlist(noart), dim = c(7,5,2), dimnames = list(cd4 = rownames(noart[[1]]), time = colnames(noart[[1]]), trans_type = c('perinatal', 'bf')))
+  
+  
+  art <- read.csv('tests/testdata/spectrum/v6.13/mtct_trt.csv')
+  art$cd4 <- factor(x = art$cd4, levels = rev(unique(art$cd4)))
+  art <- art %>% arrange(cd4)
+  art <- art %>% spread(key = pmtct, value = perinatal)
+  art_per <- art %>% filter(type == 'perinatal') %>% select(-type)
+  rownames(art_per) <- unique(art_per$cd4)
+  art_per <- art_per %>% select(-cd4)
+  art_bf <- art %>% filter(type != 'perinatal') %>% select(-type)
+  rownames(art_bf) <- unique(art_bf$cd4)
+  art_bf <- art_bf %>% select(-cd4)
+  art <- list(art_per, art_bf)
+  v$art_mtct <- array(unlist(art), dim = c(7,3,2), dimnames = list(cd4 = rownames(art[[1]]), time = colnames(art[[1]]), trans_type = c('perinatal', 'bf')))
   
   
   mort_rr_art <- read.csv('tests/testdata/spectrum/v6.13/mort_RR.csv', header = F)
@@ -396,8 +439,6 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   v$hAG_SPAN_coarse <- c(2L, 3L, 5L, 5L, 5L, 5L, 5L, 5L, 31L)
   
   ## Add in pediatric components
-  v$fert_rat <- apply(projp$fert_rat, 2, rep, each = 5)
-  rownames(v$fert_rat) <- 15:49
   v$cd4fert_rat <- projp$cd4fert_rat
   v$frr_art6mos <- projp$frr_art6mos
   v$frr_scalar <- projp$frr_scalar
