@@ -564,6 +564,13 @@ test_that('Perinatal transmission of HIV', {
   demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
   demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
   hivp$paed_cd4_dist <- c(0.515952304221721, 0.159523042217209, 0.114405414115372, 0.088623912342894, 0.0615533354817918, 0.0380277151144054, 0.0219142765066065)
+  
+  ##look to make sure understanding about HIV incident infections 
+  ##fertility discounting differences, change all of the FRR to one and see if it lines up
+  ##should then just reflect prevalence by age 
+  ##then account for age, then CD4
+  ##check that asfr is divided by 5 in the spectrum inputs file
+
   lmod <- leapfrogR(demp, hivp)
   plot(specres$hivpregwomen)
   lines(lmod$hiv_births)

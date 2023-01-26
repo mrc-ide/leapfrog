@@ -930,7 +930,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
        }
      }
      
-   totpop = basepop(af,1,t);
+   totpop = nHIVcurr + hivnpop1(af + 15,1,t);
      
 
    double prev;
@@ -958,7 +958,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    }
    
 
-    birthsCurrAge = ((nHIVcurr + nHIVlast) / 2) * tfr(t) * df / (df * prev + 1 - prev) *  asfr(af, t) / asfr_sum ;
+    birthsCurrAge = (nHIVcurr + nHIVlast) / 2 * tfr(t) * df / (df * prev + 1 - prev) *  asfr(af, t) / asfr_sum ;
      birthsHE += birthsCurrAge;
      if(af < 9){
        birthsHE_15_24 += birthsCurrAge;
