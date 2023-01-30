@@ -42,7 +42,8 @@ leapfrogR(const Rcpp::List& demp,
   const int hDS_adol = 6;
   const int hTM = 4;
   const int hTS = 3;
-  const int ctx_effect = 0.33;
+  const int hPS = 7;
+  const double ctx_effect = 0.33;
 
   int hAG;
   if (hiv_strat == "full") {
@@ -142,7 +143,7 @@ leapfrogR(const Rcpp::List& demp,
  
   if (hAG == hAG_FULL) {
     leapfrog_sim<double, NG, pAG, pIDX_FERT, pAG_FERT,
-		 pIDX_HIVADULT, hAG_FULL, hDS, hDS_adol, hTM, hTS>
+		 pIDX_HIVADULT, hAG_FULL, hDS, hDS_adol, hTM, hTS, hPS>
       (REAL(demp["basepop"]),
        REAL(demp["Sx"]),
        REAL(demp["netmigr_adj"]),
@@ -188,6 +189,7 @@ leapfrogR(const Rcpp::List& demp,
        REAL(projp["fert_mult_onart"]),
        REAL(projp["art_mtct"]),
        REAL(projp["pmtct_mtct"]),
+       REAL(projp["pmtct"]),
        proj_years,
        hiv_steps_per_year,
        *INTEGER(projp["t_ART_start"]) - 1, // 0-based indexing vs. R 1-based
@@ -221,7 +223,7 @@ leapfrogR(const Rcpp::List& demp,
        REAL(tracking));
   } else if (hAG == hAG_COARSE) {
     leapfrog_sim<double, NG, pAG, pIDX_FERT, pAG_FERT,
-		 pIDX_HIVADULT, hAG_COARSE, hDS, hDS_adol, hTM, hTS>
+		 pIDX_HIVADULT, hAG_COARSE, hDS, hDS_adol, hTM, hTS, hPS>
       (REAL(demp["basepop"]),
        REAL(demp["Sx"]),
        REAL(demp["netmigr_adj"]),
@@ -267,6 +269,7 @@ leapfrogR(const Rcpp::List& demp,
        REAL(projp["fert_mult_onart"]),
        REAL(projp["art_mtct"]),
        REAL(projp["pmtct_mtct"]),
+       REAL(projp["pmtct"]),
        proj_years,
        hiv_steps_per_year,
        *INTEGER(projp["t_ART_start"]) - 1,  // 0-based indexing vs. R 1-based

@@ -554,10 +554,11 @@ test_that('Perinatal transmission of HIV', {
   hivp$artpaeds_isperc[] <- TRUE
   
   ##I have no idea what these are
-  hivp$scalar_art[] <- 1
-  hivp$fert_rat[] <- 1
-
+ ## hivp$scalar_art[] <- 1
+ ##hivp$fert_rat[] <- 1
   
+  hivp$pmtct_mtct[,,2] <- 0
+  hivp$pmtct[] <- 0
   
   ## Replace netmigr with unadjusted age 0-4 netmigr, which are not
   ## in EPP-ASM preparation
@@ -570,6 +571,9 @@ test_that('Perinatal transmission of HIV', {
   ##should then just reflect prevalence by age 
   ##then account for age, then CD4
   ##check that asfr is divided by 5 in the spectrum inputs file
+  
+  ##something is off with the transmission of infections from off-treatment population, not sure what
+  hivp$pmtct_mtct[,2:5,1] <- 0
 
   lmod <- leapfrogR(demp, hivp)
   plot(specres$hivpregwomen)

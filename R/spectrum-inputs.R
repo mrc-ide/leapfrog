@@ -289,7 +289,7 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   
   ##rates of MTCT
   noart <- read.csv('tests/testdata/spectrum/v6.13/mtct_notrt.csv')
-  noart$cd4 <- factor(x = noart$cd4, levels = rev(unique(noart$cd4)))
+  noart$cd4 <- factor(x = noart$cd4, levels = c('>500', '350-500', '250-349', '200-249', '100-199', '50-99', '<50'))
   noart <- noart %>% arrange(cd4)
   noart <- noart %>% spread(key = pmtct, value = perinatal)
   noart_per <- noart %>% filter(type == 'perinatal') %>% select(-type)
@@ -303,7 +303,7 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   
   
   art <- read.csv('tests/testdata/spectrum/v6.13/mtct_trt.csv')
-  art$cd4 <- factor(x = art$cd4, levels = rev(unique(art$cd4)))
+  art$cd4 <- factor(x = art$cd4, levels = c('>500', '350-500', '250-349', '200-249', '100-199', '50-99', '<50'))
   art <- art %>% arrange(cd4)
   art <- art %>% spread(key = pmtct, value = perinatal)
   art_per <- art %>% filter(type == 'perinatal') %>% select(-type)

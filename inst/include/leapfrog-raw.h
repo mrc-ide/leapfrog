@@ -23,6 +23,7 @@ using Eigen::Sizes;
 //' @param hDS number of CD4 categories
 //' @param hTS length on ART (less than 6 months, 6-12 months, 12+ months)
 //' @param hTM transmission category
+//' @param hPS number of PMTCT types (7)
 
 //'
 //' @details
@@ -38,7 +39,7 @@ using Eigen::Sizes;
 
 template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   int pIDX_HIVADULT,
-  int hAG, int hDS, int hDS_adol,int hTM, int hTS>
+  int hAG, int hDS, int hDS_adol,int hTM, int hTS, int hPS>
   void leapfrog_sim(const Type *p_basepop,
                     const Type *p_sx,
                     const Type *p_netmigr,
@@ -94,6 +95,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                     const Type *p_fert_mult_onart,
                     const Type *p_art_mtct,
                     const Type *p_pmtct_mtct,
+                    const Type *p_pmtct,
                     
                     //
                     //settings
@@ -230,7 +232,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   const TensorMapX3cT art_mtct(p_art_mtct, hDS, 3, 2);
   //2 is the same as above, but 5 is no trt, A, B, nev, WHO 2006
   const TensorMapX3cT pmtct_mtct(p_pmtct_mtct, hDS, 5, 2);
-    
+  //hPS is number of pmtct types (7) and two is whether it is a number or percent
+  const TensorMapX3cT pmtct(p_pmtct, hPS, sim_years, 2);
 
 
   // outputs
@@ -299,6 +302,16 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   
   int everARTelig_idx = hDS;
 
+  
+  /////ISSUE: doesn't like this sim_years call for some reason?
+  //TensorFixedSize<Type, Sizes<sim_years>> needPMTCT;
+  TensorFixedSize<Type, Sizes<61>> needPMTCT;
+  TensorFixedSize<Type, Sizes<61>> HIVPregwomen;
+  TensorFixedSize<Type, Sizes<61>> OnPMTCT;
+  
+  
+  
+  
   ////////////////////////////////////
   ////  do population projection  ////
   ////////////////////////////////////
@@ -876,39 +889,16 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    
    
    
-  // TensorFixedSize<Type, Sizes<hDS, hAG, NG>> hivstrat_preg;
-   //hivstrat_preg.setZero();
-   
-  // TensorFixedSize<Type, Sizes<hDS, hAG, NG>> artstrat_preg;
-   //artstrat_preg.setZero();
-   
-   for(int g = 0; g < NG; g++){
-     for(int hm = 0; hm < hDS; hm++){
-       for(int af = 1; af < 5; af++){
-     //      hivstrat_preg(hm, af, g) += hivstrat_adult(hm, af, g, t);
-       //    artstrat_preg(hm, af, g) += artstrat_adult(hm, af, g, t);
-       }
-     }
-   }
-   
- //  double needPMTCT;
- //  needPMTCT = 0.0;
-   for(int g = 0; g < NG; g++){
-     for(int hm = 0; hm < hDS; hm++){
-       for(int af = 1; af < 5; af++){
-   //      needPMTCT += hivstrat_adult(hm, af, g, t) + artstrat_adult(hm, af, g, t);
-       }
-     }
-   }
-   
-   
-   
    
    double asfr_sum;
    asfr_sum = 0.0 ;
    for(int af = 0; af < 35; af++) {
      asfr_sum += asfr(af, t);
    }
+   
+   double births_sum;
+   births_sum = births(t);
+   
    double birthsCurrAge;
    double birthsHE;
    birthsHE = 0.0;
@@ -978,36 +968,158 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   
   
 //TODO ABORTION
- //  needPMTCT(t) = birthsHE;
-  // HIVPregwomen(t) = birthsHE_15_24;
+   needPMTCT(t) = birthsHE;
+   HIVPregwomen(t) = birthsHE_15_24;
    
    
    
-  // double sumARV;
- //  sumARV = 0.0;
+   double sumARV;
+   sumARV = 0.0;
    //just doing this for percentages rn
-//   for(int hp = 0; hp < hPS; hp++){
-//     sumARV += pmtct(hp,t,1);
- //  }
+   for(int hp = 0; hp < hPS; hp++){
+    sumARV += pmtct(hp,t,1);
+   }
    
-  // double numPMTCT;
- //  numPMTCT = 0.0;
+   double numPMTCT;
+   numPMTCT = sumARV ;// + PATIENTS REALLOCATED
+   
    //need to make this more dependent on the input and now just one input
    //need to add in reallocated patients as well
- //  if(pmtct_input_num = 1){ //input is percent
- //    numPMTCT = (needPMTCT(t) * sumARV) > 0 ? needPMTCT(t) * sumARV : 0.0;
- //    onPMTCT(t) = numPMTCT;
- //    if(sumARV = 0){
- //      PMTCTEffReg(t) = 0;
- //    }else{
-       //pmtct(0,t,1) is the % on NVP in a given year
-   //    PMTCTEffReg(t) = numPMTCT * (1 - pmtct(0,t,1) / sumARV)
-  //   }
-//   }else{//input is number
+  // if(pmtct_input_num = 1){ //input is percent
+     OnPMTCT(t) = (needPMTCT(t) * sumARV) > 0 ? needPMTCT(t) * sumARV : 0.0;
+  // }else{//input is number
 
      
-  // }
-
+  //  }
+   double need;
+   need = needPMTCT(t) > numPMTCT ? needPMTCT(t) : numPMTCT;
+   
+   
+   double PMTCT_NONE;
+   PMTCT_NONE = (1 - sumARV) > 0 ? 1 - sumARV : 0;
+   tracking(0,0,t) = PMTCT_NONE;
+   
+   //TOOO: ART dropout and then recalculate how many women aren't on any PMTCT
+   
+   
+   //Proportion of pregnant women by CD4 count
+   double sum1;
+   double sum2;
+   double sum3;
+   sum1 = 0.0;
+   sum2 = 0.0;
+   sum3 = 0.0;
+   
+   for(int af = 0; af < 35; af++) {
+    
+    // for(int hm = 0; hm < hDS; hm++){
+        sum3 += hivstrat_adult(4,af,1,t) + hivstrat_adult(5,af,1,t) + hivstrat_adult(6,af,1,t) ;
+        sum1 += hivstrat_adult(3,af,1,t) + hivstrat_adult(2,af,1,t) ;
+        sum2 += hivstrat_adult(0,af,1,t) + hivstrat_adult(1,af,1,t) ;
+    // }
+     
+   }
+   
+   double total;
+   total = sum1 + sum2 + sum3;
+   
+   double proplt200;
+   double prop200to350;
+   double propgte350;
+   
+   if(total >0){
+     proplt200 = sum3/ total;
+     prop200to350 = sum1 / total;
+     propgte350 = sum2 / total;
+   }else{
+     proplt200 = 0;
+     prop200to350 = 1;
+     propgte350 = 0;
+   }
+   
+   double proplte350 ;
+   proplte350 = proplt200 + prop200to350;
+   
+   //adjust option A and option B
+   //Option A and B were only authorized for women with greater than 350 CD4, so if the percentage of women
+   //on option A/B > the proportion of women in this cd4 category, we assume that some must have a cd4 less than 350
+   //option AB will be less effective for these women so we adjust for that
+   double excessratio;
+   double optA_tr;
+   double optB_tr;
+   //pmtct(2,t, 1) = Option A and pmtct(3, 4, 1) = option B
+   if((pmtct(2,t,1) + pmtct(3,t,1)) > propgte350){
+     excessratio = 0.0;
+     optA_tr = pmtct_mtct(0,1,0) * (1 + excessratio);
+     optB_tr = pmtct_mtct(0,2,0) * (1 + excessratio);
+   }else{
+     excessratio = ((pmtct(3,t,1) + pmtct(4,t,1)) / propgte350) - 1;
+     //pmtct_mtct(0,1,0) option A, pmtct_mtct(0,2,0) is option b
+     optA_tr = pmtct_mtct(0,1,0) * (1 + excessratio);
+     optB_tr = pmtct_mtct(0,2,0) * (1 + excessratio);
+   }
+   
+   
+   //Calculate transmission rate
+   //this should be aligned or have some more strategic indexing later on
+   double ptr1;
+   ptr1 = pmtct(0,t,1) * pmtct_mtct(0,3,0) +  pmtct(1,t,1) * pmtct_mtct(0,4,0) + pmtct(2,t,1) * pmtct_mtct(0,1,0) + 
+     pmtct(3,t,1) * pmtct_mtct(0,2,0) + pmtct(4,t,1) * art_mtct(0,2,0) + pmtct(5,t,1) * art_mtct(4,1,0) + pmtct(6,t,1) * art_mtct(4,0,0) ;
+   
+   double percent_in_program;
+   percent_in_program = pmtct(0,t,1) + pmtct(1,t,1) + pmtct(2,t,1) + pmtct(3,t,1) + pmtct(4,t,1) + pmtct(5,t,1) + pmtct(6,t,1);
+   
+   double ptr2;
+   if(percent_in_program > 0){
+     ptr2 = ptr1 / percent_in_program;
+   }else{
+     ptr2 = 0;
+   }
+   
+   //Add in women not receiving any form of prophylaxis
+   tracking(1,0,t) = proplt200;
+   tracking(2,0,t) = prop200to350;
+   tracking(3,0,t) = propgte350;
+   ptr1 = ptr1 + PMTCT_NONE * (proplt200 * pmtct_mtct(4,0,0) + prop200to350 * pmtct_mtct(2,0,0) + propgte350 * pmtct_mtct(0,0,0));
+   tracking(4,0,t) = ptr1;
+   double ptr3;
+   ptr3 = ptr1;
+   
+   
+   //Add in transmission due to incident infections
+   sum2 = 0.0; //HIV negative 15-49 women weighted for ASFR
+   sum3 = 0.0; //newly infected 15-49 women, weighted for ASFR
+   
+   for(int af = 0; af < 35; af++) {
+     sum2 += asfr(af, t) / asfr_sum  * hivnpop1(af + 15,1,t) ;
+     sum3 +=  asfr(af, t) / asfr_sum  * infections(af + 15,1,t) ;
+   }
+   
+   double IncRate ;
+   if(sum2 > need){
+     IncRate = sum3 / sum2;
+   }else{
+     IncRate = 0;
+   }
+   
+   double v3;
+   //need to pull incidence infection mtct into the input object
+   v3 = IncRate * (9/12) * (births_sum - need) *  0.181;
+   v3 = 0.0;
+   if(need > 0){
+     ptr1 = ptr1 + v3 / need;
+   }
+   
+   double hivpos_births;
+   hivpos_births = birthsHE * ptr1;
+   tracking(5,0,t) = hivpos_births;
+   
+   double existinghivbirths;
+   existinghivbirths = birthsHE * ptr3;
+   
+   //INSERT BF block here
+   
+   
     for(int g = 0; g < NG; g++){
       for(int hm = 0; hm < hDS; hm++){
         for(int af = 1; af < 5; af++){
@@ -1419,16 +1531,15 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     }
     
     
-    for(int hm = 0; hm < hDS; hm++){
       for(int g = 0; g < NG; g++){
         //not sure if hiv free surv is needed here
-     //   infections(0, g, t) += mtct_trans(hm) * hiv_births(hm, t) * births_sex_prop(g, t);
+        tracking(5,0,t) = hivpos_births;
+        infections(0, g, t) += hivpos_births * births_sex_prop(g, t);
      }
-    }
     
     for(int hm = 0; hm < hDS; hm++){
       for(int g = 0; g < NG; g++){
-     //   hivstrat_paeds(hm, 0, 0, g, t) +=  infections(0, g, t) * paed_cd4_dist(hm) ;
+        hivstrat_paeds(hm, 0, 0, g, t) +=  infections(0, g, t) * paed_cd4_dist(hm) ;
       }
     }
     
