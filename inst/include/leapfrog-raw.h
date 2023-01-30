@@ -367,6 +367,24 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       hivpop1(pAG-1, g, t) += hivpop1(pAG-1, g, t-1);
     }
 
+    
+    TensorFixedSize<Type, Sizes<hTS, hDS, NG>> age15_hivpop;
+    age15_hivpop.setZero();
+    for(int g = 0; g < NG; g++){
+      for(int hm = 0; hm < hDS; hm++){
+        for(int cat = 0; cat < 4; cat++){
+            age15_hivpop(0, hm, g) += hivstrat_paeds(hm, cat, 14, g, t-1);
+        }
+      }
+    }
+    
+    for(int g = 0; g < NG; g++){
+      for(int hm = 0; hm < hDS; hm++){
+          hivpop1(pIDX_HIVADULT, g, t) += age15_hivpop(0, hm, g);
+      }
+    }
+    
+    
     // age coarse stratified HIV population
     TensorFixedSize<Type, Sizes<hAG, NG>> hiv_ag_prob;
     hiv_ag_prob.setZero();
@@ -375,6 +393,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     TensorFixedSize<Type, Sizes<pIDX_FERT, NG>> hivpaeds_ag_prob;
     hivpaeds_ag_prob.setZero();
 
+    
+    //I think can add in age 15 here
     for(int g = 0; g < NG; g++){
       int a = pIDX_HIVADULT;
       for(int ha = 0; ha < (hAG-1); ha++){
@@ -406,8 +426,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         }
       }
     }
-    
-    
+
 
     
     for(int g = 0; g < NG; g++){
@@ -466,11 +485,14 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
     }
     
+
+    
+    
     // !!!TODO: add HIV+ 15 year old entrants
     for (int g = 0; g < NG; g++) {
       for (int hm = 0; hm < hDS; hm++) {
-        hivstrat_adult(hm, 0, g, t) = (1.0 - hiv_ag_prob(0, g)) * hivstrat_adult(hm, 0, g, t-1);
-        hivstrat_adult(hm, 0, g, t) = hivstrat_adult(hm, 0, g, t) + age15hivpop(1, hm, g, t);
+    //    hivstrat_adult(hm, 0, g, t) = (1.0 - hiv_ag_prob(0, g)) * hivstrat_adult(hm, 0, g, t-1);
+    //    hivstrat_adult(hm, 0, g, t) = hivstrat_adult(hm, 0, g, t) + age15hivpop(0, hm, g, t);
         // ADD HIV+ entrants here
         if(t > t_ART_start) {
           for(int hu = 0; hu < hTS; hu++) {
@@ -1540,6 +1562,16 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     for(int hm = 0; hm < hDS; hm++){
       for(int g = 0; g < NG; g++){
         hivstrat_paeds(hm, 0, 0, g, t) +=  infections(0, g, t) * paed_cd4_dist(hm) ;
+      }
+    }
+    
+    for(int g = 0; g < NG; g++){
+      for(int af =0; af < pIDX_FERT; af++){
+        for(int hm = 0; hm < hDS; hm++){
+          for(int cat = 0; cat < 4; cat++){
+          //  hivpop1(af,g,t) += hivstrat_paeds(hm, cat, af, g, t);
+          }
+        }
       }
     }
     

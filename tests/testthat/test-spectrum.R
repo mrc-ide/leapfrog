@@ -572,8 +572,13 @@ test_that('Perinatal transmission of HIV', {
   ##then account for age, then CD4
   ##check that asfr is divided by 5 in the spectrum inputs file
   
-  ##something is off with the transmission of infections from off-treatment population, not sure what
   hivp$pmtct_mtct[,2:5,1] <- 0
+  ## turn off hiv mort
+  hivp$paed_cd4_mort[] <- 0
+  ## turn off ART
+  hivp$paed_art_val[] <- 0
+  hivp$adol_cd4_mort[] <- 0
+  
 
   lmod <- leapfrogR(demp, hivp)
   plot(specres$hivpregwomen)
