@@ -387,6 +387,17 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   
   v$paed_cd4_transition <- paed_cd4_transition
   
+  
+  
+  adult_cd4_dist <- read.csv('tests/testdata/spectrum/v6.13/adult_cd4_dist.csv')
+  adult_cd4_dist[is.na(adult_cd4_dist)] <- 0
+  adult_cd4_dist <- adult_cd4_dist[,2:7]
+  adult_cd4_dist_array <- array(unlist(adult_cd4_dist), dim = c(7,6), dimnames = list(cd4_adult = c('>500', '350-500', '250-349', '200-249', '100-199', '50-99', '<50'),
+                                                                              cd4_adol = c('gte1000', '750-1000', '500-749', '350-499', '200-349', 'lte200')))
+  
+  v$adult_cd4_dist <- adult_cd4_dist_array
+  
+  
   v$mtct_trans <- (c(0.15, 0.15, 0.27, 0.27, 0.37, 0.37, 0.37))
   
   v$fert_mult_by_age <- rep(c(1.153260, 1.001870, 0.909590,0.912760, 0.883990, 0.883990, 0.883990), each = 5)

@@ -82,6 +82,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                     const Type *p_init_art_dist,
                     const Type *p_mort_art_rr,
                     const Type *p_paed_cd4_transition,
+                    const Type *p_adult_cd4_dist,
                     const double ctx_effect,
                     const Type *p_paed_art_val,
                     const int *p_artpaeds_isperc,
@@ -217,6 +218,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   const TensorMapX2cT paed_art_elig_cd4(p_paed_art_elig_cd4, pIDX_FERT, sim_years);
   //count by pct
   const TensorMapX2cT paed_cd4_transition(p_paed_cd4_transition, hDS_adol, hDS);
+  const TensorMapX2cT adult_cd4_dist(p_adult_cd4_dist, hDS, hDS_adol);
 
   const TensorMapX3cT paed_art_mort(p_paed_art_mort, hDS, hTS, 5);
   const TensorMapX3cT adol_art_mort(p_adol_art_mort, hDS_adol, hTS, 10);
@@ -495,6 +497,11 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       for (int hm = 0; hm < hDS; hm++) {
     //    hivstrat_adult(hm, 0, g, t) = (1.0 - hiv_ag_prob(0, g)) * hivstrat_adult(hm, 0, g, t-1);
     //    hivstrat_adult(hm, 0, g, t) = hivstrat_adult(hm, 0, g, t) + age15hivpop(0, hm, g, t);
+    
+     //   hivstrat_adult(hm, 0, g, t) = (1.0 - hiv_ag_prob(0, g)) * hivstrat_adult(hm, 0, g, t-1);
+        for(int hm_adol = 0; hm_adol < hDS_adol; hm_adol++){
+          hivstrat_adult(hm, 0, g, t) += hivstrat_adult(hm, 0, g, t) + age15_hivpop(0, hm, g) * adult_cd4_dist(hm, hm_adol);
+        }
         // ADD HIV+ entrants here
         if(t > t_ART_start) {
           for(int hu = 0; hu < hTS; hu++) {
