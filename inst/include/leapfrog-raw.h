@@ -382,9 +382,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     
     for(int g = 0; g < NG; g++){
       for(int hm = 0; hm < hDS; hm++){
-        hivpop1(pIDX_HIVADULT, g, t) += age15_hivpop(0, hm, g);
-        natdeaths_hivpop(pIDX_FERT, g, t) = age15_hivpop(0, hm, g) * (1.0 - sx(pIDX_FERT, g, t));
-        
+          hivpop1(pIDX_HIVADULT, g, t) += age15_hivpop(0, hm, g);
       }
     }
     
