@@ -500,7 +500,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     
      //   hivstrat_adult(hm, 0, g, t) = (1.0 - hiv_ag_prob(0, g)) * hivstrat_adult(hm, 0, g, t-1);
         for(int hm_adol = 0; hm_adol < hDS_adol; hm_adol++){
-          hivstrat_adult(hm, 0, g, t) += hivstrat_adult(hm, 0, g, t) + age15_hivpop(0, hm, g) * adult_cd4_dist(hm, hm_adol);
+          hivstrat_adult(hm, 0, g, t) += hivstrat_adult(hm, 0, g, t) + age15_hivpop(0, hm, g) * adult_cd4_dist(hm, hm_adol) ;
         }
         // ADD HIV+ entrants here
         if(t > t_ART_start) {
