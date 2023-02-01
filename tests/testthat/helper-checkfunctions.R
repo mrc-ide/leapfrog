@@ -110,13 +110,13 @@ spectrum_output <- function(file = "../testdata/spectrum/v6.13/bwa_aim-adult-chi
   df <- file
   df <- test_path(df)
   df <- eppasm::read_pop1(df, country, years = 1970:2022)
-  if(any(0:5 %in% ages)){
+  if(any(0:14 %in% ages)){
     df_paed <- df %>% dplyr::filter(age < 5) %>%
       dplyr::right_join(y = data.frame(cd4 = 1:8, cd4_cat = c('neg', 'gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5'))) %>%
       dplyr::right_join(y = data.frame(artdur = 2:8, transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+', 'ARTlte5mo', 'ART6to12mo', 'ARTgte12mo'))) %>%
       dplyr::filter(cd4_cat != 'neg') 
      
-    df_adol <- df %>% dplyr::filter(age > 4) %>%
+    df_adol <- df %>% dplyr::filter(age > 4 & age < 15) %>%
       dplyr::right_join(y = data.frame(cd4 = 3:8, cd4_cat = c('gte1000', '750-999', '500-749', '350-499', '200-349','lte200'))) %>%
       dplyr::right_join(y = data.frame(artdur = 2:8, transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+', 'ARTlte5mo', 'ART6to12mo', 'ARTgte12mo'))) %>%
       dplyr::filter(cd4_cat != 'neg') 
@@ -124,7 +124,7 @@ spectrum_output <- function(file = "../testdata/spectrum/v6.13/bwa_aim-adult-chi
     df <- rbind(df_paed, df_adol)
     df <- df %>% dplyr::filter(age %in% ages)
   }else{
-    df <- df %>% dplyr::filter(age %in% ages) %>%
+    df <- df %>% dplyr::filter(age %in%  c(15:max(ages))) %>%
       dplyr::right_join(y = data.frame(cd4 = 2:8, cd4_cat = c('gte500', '350-500', '250-349', '200-249', '100-199','50-99', 'lte50'))) %>%
       dplyr::right_join(y = data.frame(artdur = 2:8, transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+', 'ARTlte5mo', 'ART6to12mo', 'ARTgte12mo'))) %>%
       dplyr::filter(cd4_cat != 'neg') 

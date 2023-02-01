@@ -495,7 +495,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       for (int hm = 0; hm < hDS; hm++) {
     //    hivstrat_adult(hm, 0, g, t) = (1.0 - hiv_ag_prob(0, g)) * hivstrat_adult(hm, 0, g, t-1);
     //    hivstrat_adult(hm, 0, g, t) = hivstrat_adult(hm, 0, g, t) + age15hivpop(0, hm, g, t);
-    
+      
      //   hivstrat_adult(hm, 0, g, t) = (1.0 - hiv_ag_prob(0, g)) * hivstrat_adult(hm, 0, g, t-1);
         for(int hm_adol = 0; hm_adol < hDS_adol; hm_adol++){
           hivstrat_adult(hm, 0, g, t) += hivstrat_adult(hm, 0, g, t) + age15_hivpop(0, hm, g) * adult_cd4_dist(hm, hm_adol) ;
@@ -844,6 +844,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         for(int ha = 0; ha < hAG; ha++) {
           for(int hm = 0; hm < hDS; hm++) {
             hivstrat_adult(hm, ha, g, t) += dt * grad(hm, ha, g);
+
           }
         }
       }
@@ -968,8 +969,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
        }
      }
    
-   tracking(5,af,t) = df;
-       
+
    if(nHIVcurr > 0){
      df = df / ((nHIVcurr + nHIVlast) / 2);
    }else{
@@ -983,14 +983,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
        birthsHE_15_24 += birthsCurrAge;
      }
    
-   tracking(0,af,t) = asfr_sum;
-   tracking(1, af,t) = nHIVcurr;
-   tracking(2, af,t) = nHIVlast;
-   tracking(3,af,t) = totpop;
-   tracking(4,af,t) = prev;
-   tracking(6,af,t) = df;
-   tracking(7, af, t) = birthsCurrAge;
-     
+
+
    }
    
    hiv_births(t) = birthsHE;
@@ -1026,8 +1020,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    
    double PMTCT_NONE;
    PMTCT_NONE = (1 - sumARV) > 0 ? 1 - sumARV : 0;
-   tracking(0,0,t) = PMTCT_NONE;
-   
+
    //TOOO: ART dropout and then recalculate how many women aren't on any PMTCT
    
    
@@ -1092,9 +1085,13 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    //Calculate transmission rate
    //this should be aligned or have some more strategic indexing later on
    double ptr1;
-   ptr1 = pmtct(0,t,1) * pmtct_mtct(0,3,0) +  pmtct(1,t,1) * pmtct_mtct(0,4,0) + pmtct(2,t,1) * pmtct_mtct(0,1,0) + 
-     pmtct(3,t,1) * pmtct_mtct(0,2,0) + pmtct(4,t,1) * art_mtct(0,2,0) + pmtct(5,t,1) * art_mtct(4,1,0) + pmtct(6,t,1) * art_mtct(4,0,0) ;
-   
+   ptr1 = 0;
+   ptr1 = pmtct(0,t,1) * pmtct_mtct(0,3,0)  +  pmtct(1,t,1) * pmtct_mtct(0,4,0)  + pmtct(2,t,1) * pmtct_mtct(0,1,0) + pmtct(3,t,1) * pmtct_mtct(0,2,0)  ;//+ pmtct(4,t,1) * art_mtct(0,2,0) + pmtct(5,t,1) * art_mtct(4,1,0) + pmtct(6,t,1) * art_mtct(4,0,0) ;
+
+   tracking(0,0,t) = pmtct(0,t,1) * pmtct_mtct(0,3,0) ;
+   tracking(1,0,t) = pmtct(1,t,1) * pmtct_mtct(0,4,0) ;
+   tracking(2,0,t) =  pmtct(2,t,1) * pmtct_mtct(0,1,0);
+   tracking(3,0,t) = pmtct(3,t,1) * pmtct_mtct(0,2,0);
    double percent_in_program;
    percent_in_program = pmtct(0,t,1) + pmtct(1,t,1) + pmtct(2,t,1) + pmtct(3,t,1) + pmtct(4,t,1) + pmtct(5,t,1) + pmtct(6,t,1);
    
@@ -1104,17 +1101,20 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    }else{
      ptr2 = 0;
    }
+   tracking(5,0,t) = ptr1;
+   
    
    //Add in women not receiving any form of prophylaxis
-   tracking(1,0,t) = proplt200;
-   tracking(2,0,t) = prop200to350;
-   tracking(3,0,t) = propgte350;
-   ptr1 = ptr1 + PMTCT_NONE * (proplt200 * pmtct_mtct(4,0,0) + prop200to350 * pmtct_mtct(2,0,0) + propgte350 * pmtct_mtct(0,0,0));
-   tracking(4,0,t) = ptr1;
+   if(total > 0){
+     ptr1 = ptr1 + PMTCT_NONE * (proplt200 * pmtct_mtct(4,0,0) + prop200to350 * pmtct_mtct(2,0,0) + propgte350 * pmtct_mtct(0,0,0));
+   }else{
+     ptr1 = ptr1 ;
+   }
    double ptr3;
    ptr3 = ptr1;
+   tracking(4,0,t) = PMTCT_NONE;
    
-   
+
    //Add in transmission due to incident infections
    sum2 = 0.0; //HIV negative 15-49 women weighted for ASFR
    sum3 = 0.0; //newly infected 15-49 women, weighted for ASFR
@@ -1141,8 +1141,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    
    double hivpos_births;
    hivpos_births = birthsHE * ptr1;
-   tracking(5,0,t) = hivpos_births;
-   
+
    double existinghivbirths;
    existinghivbirths = birthsHE * ptr3;
    
@@ -1562,7 +1561,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     
       for(int g = 0; g < NG; g++){
         //not sure if hiv free surv is needed here
-        tracking(5,0,t) = hivpos_births;
         infections(0, g, t) += hivpos_births * births_sex_prop(g, t);
      }
     

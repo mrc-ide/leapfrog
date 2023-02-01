@@ -578,7 +578,8 @@ test_that('Perinatal transmission of HIV', {
   ## turn off ART
   hivp$paed_art_val[] <- 0
   hivp$adol_cd4_mort[] <- 0
-  
+  hivp$cd4_mort_full[] <- 0
+  hivp$cd4_mort_coarse[] <- 0
 
   lmod <- leapfrogR(demp, hivp)
   plot(specres$hivpregwomen)
@@ -610,4 +611,76 @@ test_that('Perinatal transmission of HIV', {
   
   
 })
+
+
+test_that('Perinatal transmission of HIV, some pmtct', {
+  pjnz <- "../testdata/spectrum/v6.13/TEST_MTCT_perinatal_options.PJNZ"
+  pjnz1 <- test_path(pjnz)
+  
+  demp <- prepare_leapfrog_demp(pjnz1)
+  hivp <- prepare_leapfrog_projp(pjnz1)
+  hivp$ctx_effect <- 0
+  hivp$ctx_val[] <- 0
+  
+  hivp$artpaeds_isperc[] <- TRUE
+  
+  ##I have no idea what these are
+  ## hivp$scalar_art[] <- 1
+  ##hivp$fert_rat[] <- 1
+  
+  hivp$pmtct_mtct[,,2] <- 0
+  hivp$pmtct[] <- 0
+  hivp$pmtct[1:5,which(1970:2030 %in% c(1980:1991)),2] <- 0.1
+  
+  ## Replace netmigr with unadjusted age 0-4 netmigr, which are not
+  ## in EPP-ASM preparation
+  demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
+  demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
+  hivp$paed_cd4_dist <- c(0.515952304221721, 0.159523042217209, 0.114405414115372, 0.088623912342894, 0.0615533354817918, 0.0380277151144054, 0.0219142765066065)
+  
+  ##look to make sure understanding about HIV incident infections 
+  ##fertility discounting differences, change all of the FRR to one and see if it lines up
+  ##should then just reflect prevalence by age 
+  ##then account for age, then CD4
+  ##check that asfr is divided by 5 in the spectrum inputs file
+  
+  ## turn off hiv mort
+  hivp$paed_cd4_mort[] <- 0
+  ## turn off ART
+  hivp$paed_art_val[] <- 0
+  hivp$adol_cd4_mort[] <- 0
+  hivp$cd4_mort_full[] <- 0
+  hivp$cd4_mort_coarse[] <- 0
+  
+  lmod <- leapfrogR(demp, hivp)
+  plot(specres$hivpregwomen)
+  lines(lmod$hiv_births)
+  
+  x <- data.table(lmod = as.vector(lmod$hiv_births), spec = specres$hivpregwomen)
+  x[,diff := spec - lmod]
+  x[,ratio := spec/  lmod]
+  x[,year := 1970:2030]
+  
+  lmod_out <- lmod_output_paed(lmod = lmod)
+  ##df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_MTCT_perinatal_pop1.xlsx", ages =0:14, country = 'Botswana')
+  ## df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_MTCT_perinatal_pop1.xlsx", ages =15:49, country = 'Botswana')
+  
+  
+  
+  dt <- dplyr::left_join(lmod_out$prev, df_out$off_treatment)
+  dt <- dt %>% dplyr::filter(!is.na(pop)) %>% unique()
+  dt <- dt %>% dplyr::mutate(diff = lfrog - pop) %>% unique()
+  diff = dt$diff
+  expect_true(all(abs(diff) < 1e-3), label = 'Off treatment paediatric population in leapfrog and spectrum match')
+  
+  
+  dt_onart <- dplyr::left_join(lmod_out$art, df_out$on_treatment)
+  dt_onart <- dt_onart%>% dplyr::filter(!is.na(pop)) %>% dplyr::mutate(diff = lfrog - pop) %>%  dplyr::ungroup()
+  diff_art <- abs(dplyr::select(dt_onart, diff))
+  expect_true(all(diff_art < 1e-3), label = 'On treatment paediatric population in leapfrog and spectrum match')
+  
+  
+  
+})
+
 
