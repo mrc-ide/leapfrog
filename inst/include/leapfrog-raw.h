@@ -1172,20 +1172,20 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    NoPMTCT_bf = 1;
    for(int bf = 0; bf < 3; bf++){
      //ignoring dropout for rn
-       if(bf > 0){
+      
+      //could also just go from 0:1 here
          for(int hp = 0; hp < hPS; hp++){
            //NVP has different transmission rates based on CD4 but not sure how to implement that...
-           
            bftr_1 += pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(hp+1,2,1);
            NoPMTCT_bf -= pmtct(hp,t,1);
          }
          if(NoPMTCT_bf < 1){
            NoPMTCT_bf = 0;
          }
-         bftr_1 +=  NoPMTCT_bf * (1 - bf_duration(bf, t, 0)) * (2*proplt200 * pmtct_mtct(4,0,1) +2* prop200to350 * pmtct_mtct(1,0,1) +2* propgte350 * pmtct_mtct(0,0,1));
+         bftr_1 +=  NoPMTCT_bf * (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * propgte350 * pmtct_mtct(0,0,1));
       
          
-       }else{
+      if(bf > 0){
          bftr_1 = bftr_1/ 4;
        }
 
@@ -1209,7 +1209,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
          NoPMTCT_bf = 0;
        }
        
-       bftr_2 += NoPMTCT_bf * (1 - bf_duration(bf, t, 0)) * (2*proplt200 * pmtct_mtct(4,0,1) + 2*prop200to350 * pmtct_mtct(1,0,1) +2* propgte350 * pmtct_mtct(0,0,1));
+       bftr_2 += NoPMTCT_bf * (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * propgte350 * pmtct_mtct(0,0,1));
    }
 
    double NewInfBFgte6;
@@ -1230,7 +1230,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
        NoPMTCT_bf = 0;
      }
      
-     bftr_3 += NoPMTCT_bf * (1 - bf_duration(bf, t, 0)) * (2 * proplt200 * pmtct_mtct(4,0,1) + 2 *prop200to350 * pmtct_mtct(1,0,1) +2*  propgte350 * pmtct_mtct(0,0,1));
+     bftr_3 += NoPMTCT_bf * (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * propgte350 * pmtct_mtct(0,0,1));
    }
 
    double NewInfBFgte12;

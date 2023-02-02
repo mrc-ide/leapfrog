@@ -694,7 +694,7 @@ test_that('BF transmission of HIV', {
   ##hivp$fert_rat[] <- 1
   
   hivp$pmtct[] <- 0
-  hivp$pmtct_mtct[,2:5,1] <- 0
+  hivp$pmtct_mtct[,,1] <- 0
   hivp$pmtct_mtct[,2:5,2] <- 0
   
   ## Replace netmigr with unadjusted age 0-4 netmigr, which are not
