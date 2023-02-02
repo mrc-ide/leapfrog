@@ -9,8 +9,8 @@ no treatment,>500,perinatal,0.15
 no treatment,<50,bf,0.0089
 no treatment,50-99,bf,0.0089
 no treatment,100-199,bf,0.0089
-no treatment,250-349,bf,0.0081
-no treatment,200-249,bf,0.0081
+no treatment,250-349,bf,0.0089
+no treatment,200-249,bf,0.0089
 no treatment,350-500,bf,0.0051
 no treatment,>500,bf,0.0051
 single dose nevirapine,<50,perinatal,0.075

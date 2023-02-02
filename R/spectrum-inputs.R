@@ -335,6 +335,20 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   art_dist_paed <- array(data = art_dist_paed$value, dim = c(15, length(unique(art_dist_paed$year))), dimnames = list( age= 0:14, year = sort(unique(art_dist_paed$year))))
   v$init_art_dist <- art_dist_paed
   
+  ##BF duration
+  bf_noart <- read.csv('tests/testdata/spectrum/v6.13/bf_duration_no_art.csv', header = F)
+  bf_art <- read.csv('tests/testdata/spectrum/v6.13/bf_duration_art.csv', header = F)
+  
+  labels <- c()
+  for(i in 1:18){
+    labels[i] <- paste0(seq(0,36, by = 2)[i], '-', (seq(0,36, by = 2)[i])+1)
+  }
+  
+  bf_array <- array(0, dim = c(18, 61, 2), dimnames = list(child_age_months = labels, year = 1970:2030, trt = c('no_art', 'art')))
+  bf_array[,,1] <- unlist(bf_noart) / 100
+  bf_array[,,2] <- unlist(bf_art) / 100
+  
+  v$bf_duration <- bf_array
   
   ## ART eligibility age, doing this in years rather than months
   v$paed_art_elig_age <- c(rep(0, 37), rep(1, 3), rep(2, 20))
