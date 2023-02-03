@@ -1164,53 +1164,49 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    
    //bftr from birth to <6 months
    double bftr_1;
-   bftr_1 = 0.0;
    double NoPMTCT_bf;
-   NoPMTCT_bf = 1;
    double NewInfBFLt6;
    NewInfBFLt6 = 0.0;
    for(int bf = 0; bf < 3; bf++){
      //ignoring dropout for rn
-      
+     bftr_1 = 0.0;
+     NoPMTCT_bf = 1;
       //could also just go from 0:1 here
          for(int hp = 0; hp < hPS; hp++){
            //NVP has different transmission rates based on CD4 but not sure how to implement that...
-           bftr_1 = pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(hp+1,2,1);
+           bftr_1 += pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1);
            NoPMTCT_bf -= pmtct(hp,t,1);
          }
-         if(NoPMTCT_bf < 1){
+         if(NoPMTCT_bf < 0){
            NoPMTCT_bf = 0;
          }
          
-
          bftr_1 +=  NoPMTCT_bf * (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * propgte350 * pmtct_mtct(0,0,1));
-
+         
       if(bf < 1){
          bftr_1 = bftr_1/ 4;
        }
       
       NewInfBFLt6 += (birthsHE_bf - NewInfBFLt6) * bftr_1;
-      
 
    }
-   tracking(0,0,t) = proplte350;
-   tracking(1,0,t) = propgte350;
 
 
    //bftr from 6-12 months
    double bftr_2;
    double NewInfBFgte6;
-   bftr_2 = 0.0;
-   NoPMTCT_bf = 1;
    NewInfBFgte6 = 0.0;
    for(int bf = 3; bf < 6; bf++){
      //ignoring dropout for rn
+     bftr_2 = 0.0;
+     NoPMTCT_bf = 1;
+     
        for(int hp = 0; hp < hPS; hp++){
          //NVP has different transmission rates based on CD4 but not sure how to implement that...
-         bftr_2 = pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(hp+1,2,1);
+         bftr_2 += pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1);
          NoPMTCT_bf -= pmtct(hp,t,1);
        }
-       if(NoPMTCT_bf < 1){
+       if(NoPMTCT_bf < 0){
          NoPMTCT_bf = 0;
        }
        
@@ -1224,23 +1220,30 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    //bftr from 12+months
    double NewInfBFgte12;
    double bftr_3;
-   bftr_3 = 0.0;
-   NoPMTCT_bf = 1;
    NewInfBFgte12 = 0.0;
    for(int bf = 6; bf < 12; bf++){
      //ignoring dropout for rn
+     bftr_3 = 0.0;
+     NoPMTCT_bf = 1;
+     
      for(int hp = 0; hp < hPS; hp++){
        //NVP has different transmission rates based on CD4 but not sure how to implement that...
-       bftr_3= pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(hp+1,2,1);
+       bftr_3 += pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * propgte350;
        NoPMTCT_bf -= pmtct(hp,t,1);
      }
-     if(NoPMTCT_bf < 1){
+     tracking(0,bf,t) = bftr_3;
+     tracking(1,bf,t) = NoPMTCT_bf;
+     if(NoPMTCT_bf < 0){
        NoPMTCT_bf = 0;
      }
      
      bftr_3 += NoPMTCT_bf * (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * propgte350 * pmtct_mtct(0,0,1));
+     tracking(2,bf,t) = bftr_3;
+     tracking(3,bf,t) = (birthsHE_bf  - NewInfBFgte12) ;
+     
      NewInfBFgte12 += (birthsHE_bf  - NewInfBFgte12) * bftr_3;
      
+    
    }
 
    
@@ -1248,17 +1251,18 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    //bftr from 24-36
    double NewInfBFgte24;
    double bftr_4;
-   bftr_4 = 0.0;
-   NoPMTCT_bf = 1;
    NewInfBFgte24 = 0.0;
    for(int bf = 12; bf < hBF; bf++){
      //ignoring dropout for rn
+     bftr_4 = 0.0;
+     NoPMTCT_bf = 1;
+     
      for(int hp = 0; hp < hPS; hp++){
        //NVP has different Ftransmission rates based on CD4 but not sure how to implement that...
-       bftr_4 = pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(hp+1,2,1);
+       bftr_4 += pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) *pmtct_mtct(4,hp+1,1);
        NoPMTCT_bf -= pmtct(hp,t,1);
      }
-     if(NoPMTCT_bf < 1){
+     if(NoPMTCT_bf < 0){
        NoPMTCT_bf = 0;
      }
      
@@ -1699,11 +1703,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         infections(2,g,t) += NewInfBFgte24 * births_sex_prop(g,t);
         
      }
-      tracking(0,0,t) = temp_inf(0,0) + temp_inf(0,1);
-      tracking(1,0,t) = temp_inf(1,0) + temp_inf(1,1);
-      tracking(2,0,t) = temp_inf(2,0) + temp_inf(2,1);
-      tracking(3,0,t) = temp_inf(3,0) + temp_inf(3,1);
-      
+
       
       
     
