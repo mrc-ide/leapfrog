@@ -1212,8 +1212,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
        
        bftr_2 += NoPMTCT_bf * (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * propgte350 * pmtct_mtct(0,0,1));
      //  NewInfBFgte6 += (birthsHE_bf - NewInfBFLt6 - NewInfBFgte6) * bftr_2;
-       NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6) * bftr_2;
-       
+NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6) * bftr_2;
+     
    }
 
    
