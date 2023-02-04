@@ -1174,14 +1174,14 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       //could also just go from 0:1 here
          for(int hp = 0; hp < hPS; hp++){
            //NVP has different transmission rates based on CD4 but not sure how to implement that...
-           bftr_1 += pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1);
-           NoPMTCT_bf -= pmtct(hp,t,1);
+           bftr_1 += propgte350 * pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1);
+           NoPMTCT_bf -=propgte350 *  pmtct(hp,t,1);
          }
          if(NoPMTCT_bf < 0){
            NoPMTCT_bf = 0;
          }
          
-         bftr_1 +=  NoPMTCT_bf * (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * propgte350 * pmtct_mtct(0,0,1));
+         bftr_1 +=   (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * NoPMTCT_bf * pmtct_mtct(0,0,1));
          
       if(bf < 1){
          bftr_1 = bftr_1/ 4;
@@ -1203,16 +1203,16 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
      
        for(int hp = 0; hp < hPS; hp++){
          //NVP has different transmission rates based on CD4 but not sure how to implement that...
-         bftr_2 += pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1);
-         NoPMTCT_bf -= pmtct(hp,t,1);
+         bftr_2 += propgte350 * pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1);
+         NoPMTCT_bf -= propgte350 * pmtct(hp,t,1);
        }
        if(NoPMTCT_bf < 0){
          NoPMTCT_bf = 0;
        }
        
-       bftr_2 += NoPMTCT_bf * (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * propgte350 * pmtct_mtct(0,0,1));
+       bftr_2 +=  (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * NoPMTCT_bf * pmtct_mtct(0,0,1));
      //  NewInfBFgte6 += (birthsHE_bf - NewInfBFLt6 - NewInfBFgte6) * bftr_2;
-NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6) * bftr_2;
+NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6- NewInfBFLt6) * bftr_2;
      
    }
 
@@ -1221,15 +1221,16 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6) * bftr_2;
    double NewInfBFgte12;
    double bftr_3;
    NewInfBFgte12 = 0.0;
+   
    for(int bf = 6; bf < 12; bf++){
      //ignoring dropout for rn
-     bftr_3 = 0.0;
      NoPMTCT_bf = 1;
+     bftr_3 = 0.0;
      
      for(int hp = 0; hp < hPS; hp++){
        //NVP has different transmission rates based on CD4 but not sure how to implement that...
-       bftr_3 += pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * propgte350;
-       NoPMTCT_bf -= pmtct(hp,t,1);
+       bftr_3 += propgte350 * pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * propgte350;
+       NoPMTCT_bf -=propgte350 *  pmtct(hp,t,1);
      }
      tracking(0,bf,t) = bftr_3;
      tracking(1,bf,t) = NoPMTCT_bf;
@@ -1237,15 +1238,15 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6) * bftr_2;
        NoPMTCT_bf = 0;
      }
      
-     bftr_3 += NoPMTCT_bf * (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * propgte350 * pmtct_mtct(0,0,1));
+     bftr_3 += (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * NoPMTCT_bf * pmtct_mtct(0,0,1));
      tracking(2,bf,t) = bftr_3;
      tracking(3,bf,t) = (birthsHE_bf  - NewInfBFgte12) ;
      
      NewInfBFgte12 += (birthsHE_bf  - NewInfBFgte12) * bftr_3;
      
-    
    }
 
+  // NewInfBFgte12 += (birthsHE_bf  ) * bftr_3;
    
    
    //bftr from 24-36
@@ -1259,14 +1260,14 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6) * bftr_2;
      
      for(int hp = 0; hp < hPS; hp++){
        //NVP has different Ftransmission rates based on CD4 but not sure how to implement that...
-       bftr_4 += pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) *pmtct_mtct(4,hp+1,1);
-       NoPMTCT_bf -= pmtct(hp,t,1);
+       bftr_4 += propgte350 * pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) *pmtct_mtct(4,hp+1,1);
+       NoPMTCT_bf -= propgte350 * pmtct(hp,t,1);
      }
      if(NoPMTCT_bf < 0){
        NoPMTCT_bf = 0;
      }
      
-     bftr_4 += NoPMTCT_bf * (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * propgte350 * pmtct_mtct(0,0,1));
+     bftr_4 +=  (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * NoPMTCT_bf * pmtct_mtct(0,0,1));
      NewInfBFgte24 += (birthsHE_bf - NewInfBFgte24) * bftr_4;
      
    }
