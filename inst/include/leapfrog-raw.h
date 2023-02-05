@@ -378,20 +378,28 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       hivpop1(pAG-1, g, t) += hivpop1(pAG-1, g, t-1);
     }
 
-    
     TensorFixedSize<Type, Sizes<hTS, hDS, NG>> age15_hivpop;
     age15_hivpop.setZero();
     for(int g = 0; g < NG; g++){
       for(int hm = 0; hm < hDS; hm++){
         for(int cat = 0; cat < 4; cat++){
-            age15_hivpop(0, hm, g) += hivstrat_paeds(hm, cat, 14, g, t-1);
+          age15_hivpop(0, hm, g) += hivstrat_paeds(hm, cat, 14, g, t);
         }
+      }
+    }
+
+    
+    for(int g = 0; g < NG; g++){
+      for(int hm = 0; hm < hDS; hm++){
+       //   hivpop1(pIDX_HIVADULT, g, t) += age15_hivpop(0, hm, g);
       }
     }
     
     for(int g = 0; g < NG; g++){
       for(int hm = 0; hm < hDS; hm++){
-          hivpop1(pIDX_HIVADULT, g, t) += age15_hivpop(0, hm, g);
+        for(int hm_adol = 0; hm_adol < hDS_adol; hm_adol++){
+          hivstrat_adult(hm, 0, g, t) +=  age15_hivpop(0, hm, g) * adult_cd4_dist(hm, hm_adol) ;
+        }
       }
     }
     
@@ -405,9 +413,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     hivpaeds_ag_prob.setZero();
 
     
-    //I think can add in age 15 here
     for(int g = 0; g < NG; g++){
-      int a = pIDX_HIVADULT;
+      int a = pIDX_HIVADULT + 1;
       for(int ha = 0; ha < (hAG-1); ha++){
         for(int i = 0; i < hAG_SPAN[ha]; i++){
           hiv_ag_prob(ha, g) += hivpop1(a, g, t-1);
@@ -486,29 +493,12 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
     }
     
-    //Progress ART to the correct time on ART
-    for(int hm = 0; hm < hDS; hm++){
-      for(int af = 0; af < pIDX_FERT; af++){
-        for(int g = 0; g < NG; g++){
-       //   artstrat_paeds(2, hm, af, g, t) += artstrat_paeds(0, hm, af, g, t) > 0 ? artstrat_paeds(0, hm, af, g, t)  : 0;
-      //    artstrat_paeds(0, hm, af, g, t) -= artstrat_paeds(0, hm, af, g, t) > 0 ? artstrat_paeds(0, hm, af, g, t) : 0;
-        }
-      }
-    }
-    
 
-    
-    
     // !!!TODO: add HIV+ 15 year old entrants
     for (int g = 0; g < NG; g++) {
       for (int hm = 0; hm < hDS; hm++) {
-    //    hivstrat_adult(hm, 0, g, t) = (1.0 - hiv_ag_prob(0, g)) * hivstrat_adult(hm, 0, g, t-1);
-    //    hivstrat_adult(hm, 0, g, t) = hivstrat_adult(hm, 0, g, t) + age15hivpop(0, hm, g, t);
-      
-     //   hivstrat_adult(hm, 0, g, t) = (1.0 - hiv_ag_prob(0, g)) * hivstrat_adult(hm, 0, g, t-1);
-        for(int hm_adol = 0; hm_adol < hDS_adol; hm_adol++){
-          hivstrat_adult(hm, 0, g, t) += hivstrat_adult(hm, 0, g, t) + age15_hivpop(0, hm, g) * adult_cd4_dist(hm, hm_adol) ;
-        }
+        hivstrat_adult(hm, 0, g, t) = (1.0 - hiv_ag_prob(0, g)) * hivstrat_adult(hm, 0, g, t-1);
+
         // ADD HIV+ entrants here
         if(t > t_ART_start) {
           for(int hu = 0; hu < hTS; hu++) {
@@ -1778,13 +1768,23 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6- NewInfBFLt6) * bftr_2;
 
     for(int g = 0; g < NG; g++){
       for(int af =0; af < pIDX_FERT; af++){
+        hivpop1(af,g,t) = 0.0;
         for(int hm = 0; hm < hDS; hm++){
           for(int cat = 0; cat < 4; cat++){
-          //  hivpop1(af,g,t) += hivstrat_paeds(hm, cat, af, g, t);
+            hivpop1(af,g,t) +=  hivstrat_paeds(hm, cat, af, g, t);
+          }    
+          for(int time = 0; time < 2; time++){
+            hivpop1(af,g,t) += artstrat_paeds(time, hm, af, g, t);
           }
         }
       }
     }
+    
+
+
+
+ 
+
     
   }
 
