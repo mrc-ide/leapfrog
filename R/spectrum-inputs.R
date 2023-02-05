@@ -287,6 +287,12 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
     v$pmtct_input_pct = T
   }
   
+  ##PMTCT dropout
+  pmtct_drop <- read.csv('tests/testdata/spectrum/v6.13/pmtct_dropout.csv', header = F)
+  types = pmtct_drop$V1
+  pmtct_drop <- pmtct_drop %>% select(-V1)
+  pmtct_drop_array <- array(unlist(pmtct_drop), dim = c(6,61), dimnames = list(type = types, year = 1970:2030))
+  v$pmtct_dropout <- pmtct_drop_array
   ##rates of MTCT
   noart <- read.csv('tests/testdata/spectrum/v6.13/mtct_notrt.csv')
   noart$cd4 <- factor(x = noart$cd4, levels = c('>500', '350-500', '250-349', '200-249', '100-199', '50-99', '<50'))
@@ -306,6 +312,7 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   art$cd4 <- factor(x = art$cd4, levels = c('>500', '350-500', '250-349', '200-249', '100-199', '50-99', '<50'))
   art <- art %>% arrange(cd4)
   art <- art %>% spread(key = pmtct, value = perinatal)
+  art <- art %>% select(cd4, type, `ART before pregnancy`, `ART >4 weeks before delivery`, `ART <4 weeks before delivery`)
   art_per <- art %>% filter(type == 'perinatal') %>% select(-type)
   rownames(art_per) <- unique(art_per$cd4)
   art_per <- art_per %>% select(-cd4)

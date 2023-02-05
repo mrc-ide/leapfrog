@@ -98,7 +98,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                     const Type *p_pmtct_mtct,
                     const Type *p_pmtct,
                     const Type *p_bf_duration,
-                    
+                    const Type *p_pmtct_dropout,
                     //
                     //settings
                     const int sim_years,
@@ -239,7 +239,13 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   const TensorMapX3cT pmtct(p_pmtct, hPS, sim_years, 2);
   //18 is the number of 2 month age groups up to 3 years
   const TensorMapX3cT bf_duration(p_bf_duration, 18, sim_years, 2);
-
+  //6 is for percent already on ART retained at delivery
+  //percent starting ART retained at delivery
+  //postnatal option A monthly dropout
+  //postnatal option B monthly dropout
+  //art 0-12 months breastfeeding
+  //art 12+months bf
+  const TensorMapX2cT pmtct_dropout(p_pmtct_dropout, 6, sim_years);
 
   // outputs
   TensorMapX3T totpop1(p_totpop1, pAG, NG, sim_years);
@@ -1088,10 +1094,10 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    //this should be aligned or have some more strategic indexing later on
    double ptr1;
    ptr1 = 0;
-   ptr1 = pmtct(3-1,t,1) * pmtct_mtct(0,3,0) +  pmtct(4-1,t,1) * pmtct_mtct(0,4,0)  + pmtct(1-1,t,1) * pmtct_mtct(0,1,0) + pmtct(2-1,t,1) * pmtct_mtct(0,2,0)  ;//+ pmtct(4,t,1) * art_mtct(0,2,0) + pmtct(5,t,1) * art_mtct(4,1,0) + pmtct(6,t,1) * art_mtct(4,0,0) ;
+   //add in dropout here
+   ptr1 = pmtct(3-1,t,1) * pmtct_mtct(0,3,0) +  pmtct(4-1,t,1) * pmtct_mtct(0,4,0)  + pmtct(1-1,t,1) * pmtct_mtct(0,1,0) + pmtct(2-1,t,1) * pmtct_mtct(0,2,0)  + pmtct(4,t,1) * art_mtct(0,2,0) *( pmtct_dropout(0,t) / 100) + pmtct(5,t,1) * art_mtct(4,1,0) * (pmtct_dropout(1,t) / 100) + pmtct(6,t,1) * art_mtct(4,2,0) * (pmtct_dropout(1,t) / 100) ;
    double percent_in_program;
-   percent_in_program = pmtct(0,t,1) + pmtct(1,t,1) + pmtct(2,t,1) + pmtct(3,t,1) + pmtct(4,t,1) + pmtct(5,t,1) + pmtct(6,t,1);
-   
+   percent_in_program = pmtct(0,t,1) + pmtct(1,t,1) + pmtct(2,t,1) + pmtct(3,t,1) + pmtct(4,t,1) * (pmtct_dropout(0,t) / 100)+ pmtct(5,t,1)* (pmtct_dropout(1,t) / 100) + pmtct(6,t,1)*( pmtct_dropout(1,t) / 100);
    double ptr2;
    if(percent_in_program > 0){
      ptr2 = ptr1 / percent_in_program;
@@ -1172,16 +1178,28 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
      bftr_1 = 0.0;
      NoPMTCT_bf = 1;
       //could also just go from 0:1 here
-         for(int hp = 0; hp < hPS; hp++){
-           //NVP has different transmission rates based on CD4 but not sure how to implement that...
-           bftr_1 += propgte350 * pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1);
-           NoPMTCT_bf -=propgte350 *  pmtct(hp,t,1);
-         }
+      
+      for(int hp = 0; hp < hPS; hp++){
+        //NVP has different transmission rates based on CD4 but not sure how to implement that...
+        if(hp == 0){
+          bftr_1 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * (1 - pmtct_dropout(2,t) / 100);
+          NoPMTCT_bf -=  pmtct(hp ,t,1) * (1 - pmtct_dropout(2,t) / 100);
+        }
+        if(hp == 1){
+          bftr_1 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * (1 - pmtct_dropout(3,t) / 100);
+          NoPMTCT_bf -=  pmtct(hp ,t,1)* (1 - pmtct_dropout(3,t) / 100);
+        }
+        if(hp > 1){
+          bftr_1 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1);
+          NoPMTCT_bf -=  pmtct(hp ,t,1);
+        }      
+      }
+    
          if(NoPMTCT_bf < 0){
            NoPMTCT_bf = 0;
          }
          
-         bftr_1 +=   (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * NoPMTCT_bf * pmtct_mtct(0,0,1));
+         bftr_1 +=  NoPMTCT_bf * (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * propgte350 * pmtct_mtct(0,0,1));
          
       if(bf < 1){
          bftr_1 = bftr_1/ 4;
@@ -1201,17 +1219,28 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
      bftr_2 = 0.0;
      NoPMTCT_bf = 1;
      
-       for(int hp = 0; hp < hPS; hp++){
-         //NVP has different transmission rates based on CD4 but not sure how to implement that...
-         bftr_2 += propgte350 * pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1);
-         NoPMTCT_bf -= propgte350 * pmtct(hp,t,1);
+
+     for(int hp = 0; hp < hPS; hp++){
+       //NVP has different transmission rates based on CD4 but not sure how to implement that...
+       if(hp == 0){
+         bftr_2 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * (1 - pmtct_dropout(2,t) / 100);
+         NoPMTCT_bf -=  pmtct(hp ,t,1) * (1 - pmtct_dropout(2,t) / 100);
        }
+       if(hp == 1){
+         bftr_2 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * (1 - pmtct_dropout(3,t) / 100);
+         NoPMTCT_bf -=  pmtct(hp ,t,1)* (1 - pmtct_dropout(3,t) / 100);
+       }
+       if(hp > 1){
+         bftr_2 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1);
+         NoPMTCT_bf -=  pmtct(hp ,t,1);
+       }      
+     }
        if(NoPMTCT_bf < 0){
          NoPMTCT_bf = 0;
        }
        
-       bftr_2 +=  (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * NoPMTCT_bf * pmtct_mtct(0,0,1));
-     //  NewInfBFgte6 += (birthsHE_bf - NewInfBFLt6 - NewInfBFgte6) * bftr_2;
+       bftr_2 +=  NoPMTCT_bf * (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * propgte350 * pmtct_mtct(0,0,1));
+       //  NewInfBFgte6 += (birthsHE_bf - NewInfBFLt6 - NewInfBFgte6) * bftr_2;
 NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6- NewInfBFLt6) * bftr_2;
      
    }
@@ -1227,18 +1256,30 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6- NewInfBFLt6) * bftr_2;
      NoPMTCT_bf = 1;
      bftr_3 = 0.0;
      
+     
      for(int hp = 0; hp < hPS; hp++){
        //NVP has different transmission rates based on CD4 but not sure how to implement that...
-       bftr_3 += propgte350 * pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * propgte350;
-       NoPMTCT_bf -=propgte350 *  pmtct(hp,t,1);
+       if(hp == 0){
+         bftr_3 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * (1 - pmtct_dropout(2,t) / 100);
+         NoPMTCT_bf -=  pmtct(hp ,t,1) * (1 - pmtct_dropout(2,t) / 100);
+       }
+       if(hp == 1){
+         bftr_3 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * (1 - pmtct_dropout(3,t) / 100);
+         NoPMTCT_bf -=  pmtct(hp ,t,1)* (1 - pmtct_dropout(3,t) / 100);
+       }
+       if(hp > 1){
+         bftr_3 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1);
+         NoPMTCT_bf -=  pmtct(hp ,t,1);
+       }      
      }
+
      tracking(0,bf,t) = bftr_3;
      tracking(1,bf,t) = NoPMTCT_bf;
      if(NoPMTCT_bf < 0){
        NoPMTCT_bf = 0;
      }
      
-     bftr_3 += (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * NoPMTCT_bf * pmtct_mtct(0,0,1));
+     bftr_3 +=  NoPMTCT_bf * (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * propgte350 * pmtct_mtct(0,0,1));
      tracking(2,bf,t) = bftr_3;
      tracking(3,bf,t) = (birthsHE_bf  - NewInfBFgte12) ;
      
@@ -1258,16 +1299,32 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6- NewInfBFLt6) * bftr_2;
      bftr_4 = 0.0;
      NoPMTCT_bf = 1;
      
+     
      for(int hp = 0; hp < hPS; hp++){
-       //NVP has different Ftransmission rates based on CD4 but not sure how to implement that...
-       bftr_4 += propgte350 * pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) *pmtct_mtct(4,hp+1,1);
-       NoPMTCT_bf -= propgte350 * pmtct(hp,t,1);
+       //NVP has different transmission rates based on CD4 but not sure how to implement that...
+       if(hp == 0){
+         bftr_4 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * (1 - pmtct_dropout(2,t) / 100);
+         NoPMTCT_bf -=  pmtct(hp ,t,1) * (1 - pmtct_dropout(2,t) / 100);
+       }
+       if(hp == 1){
+         bftr_4 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * (1 - pmtct_dropout(3,t) / 100);
+         NoPMTCT_bf -=  pmtct(hp ,t,1)* (1 - pmtct_dropout(3,t) / 100);
+       }
+       if(hp > 1){
+         bftr_4 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1);
+         NoPMTCT_bf -=  pmtct(hp ,t,1);
+       }      
+     }
+     for(int hp = 3; hp < hPS; hp++){
+       //NVP has different transmission rates based on CD4 but not sure how to implement that...
+       bftr_4 +=   pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * art_mtct(4,hp - 3,1);
+       NoPMTCT_bf -=  pmtct(hp ,t,1);
      }
      if(NoPMTCT_bf < 0){
        NoPMTCT_bf = 0;
      }
      
-     bftr_4 +=  (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * NoPMTCT_bf * pmtct_mtct(0,0,1));
+     bftr_4 +=  NoPMTCT_bf * (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * propgte350 * pmtct_mtct(0,0,1));
      NewInfBFgte24 += (birthsHE_bf - NewInfBFgte24) * bftr_4;
      
    }
