@@ -233,7 +233,7 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   v$paed_art_mort <- paed_art_mort
   v$adol_art_mort <- adol_art_mort
   
-  art_dist_paed <- read.csv('tests/testdata/spectrum/v6.13/paed_art_dist.csv')
+  art_dist_paed <- read.csv('tests/testdata/spectrum/inputs/paed_art_dist.csv')
   expand <- NULL
   for(yr in 2023:2030){
     x = art_dist_paed %>% dplyr::filter(year == 2022)
@@ -269,7 +269,7 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   v$paed_art_val <- paed_art_val
   
   ##PMTCT
-  pmtct <- read.csv('tests/testdata/spectrum/v6.13/pmtct.csv')
+  pmtct <- read.csv('tests/testdata/spectrum/inputs/pmtct.csv')
   pmtct <- unique(pmtct)
   colnames(pmtct) <- c('type', 'metric', 1970:2030)
   pmtct <- pmtct %>% filter(type != '')
@@ -288,13 +288,13 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   }
   
   ##PMTCT dropout
-  pmtct_drop <- read.csv('tests/testdata/spectrum/v6.13/pmtct_dropout.csv', header = F)
+  pmtct_drop <- read.csv('tests/testdata/spectrum/inputs/pmtct_dropout.csv', header = F)
   types = pmtct_drop$V1
   pmtct_drop <- pmtct_drop %>% select(-V1)
   pmtct_drop_array <- array(unlist(pmtct_drop), dim = c(6,61), dimnames = list(type = types, year = 1970:2030))
   v$pmtct_dropout <- pmtct_drop_array
   ##rates of MTCT
-  noart <- read.csv('tests/testdata/spectrum/v6.13/mtct_notrt.csv')
+  noart <- read.csv('tests/testdata/spectrum/inputs/mtct_notrt.csv')
   noart$cd4 <- factor(x = noart$cd4, levels = c('>500', '350-500', '250-349', '200-249', '100-199', '50-99', '<50'))
   noart <- noart %>% arrange(cd4)
   noart <- noart %>% spread(key = pmtct, value = perinatal)
@@ -308,7 +308,7 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   v$pmtct_mtct <- array(unlist(noart), dim = c(7,5,2), dimnames = list(cd4 = rownames(noart[[1]]), time = colnames(noart[[1]]), trans_type = c('perinatal', 'bf')))
   
   
-  art <- read.csv('tests/testdata/spectrum/v6.13/mtct_trt.csv')
+  art <- read.csv('tests/testdata/spectrum/inputs/mtct_trt.csv')
   art$cd4 <- factor(x = art$cd4, levels = c('>500', '350-500', '250-349', '200-249', '100-199', '50-99', '<50'))
   art <- art %>% arrange(cd4)
   art <- art %>% spread(key = pmtct, value = perinatal)
@@ -323,7 +323,7 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   v$art_mtct <- array(unlist(art), dim = c(7,3,2), dimnames = list(cd4 = rownames(art[[1]]), time = colnames(art[[1]]), trans_type = c('perinatal', 'bf')))
   
   
-  mort_rr_art <- read.csv('tests/testdata/spectrum/v6.13/mort_RR.csv', header = F)
+  mort_rr_art <- read.csv('tests/testdata/spectrum/inputs/mort_RR.csv', header = F)
   mort_rr_art_target <- array(NA, dim = c(3, 15, 61), dimnames = list(transmission = c('0to6mo', '7to12mo', '12+mo'), age = 0:14, year = 1970:2030))
   mort_rr_art_target[1:2, 1:5,] <- rep(unlist(mort_rr_art[1,]), each = 10)
   mort_rr_art_target[3, 1:5,] <- rep(unlist(mort_rr_art[2,]), each = 5)
@@ -331,7 +331,7 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   mort_rr_art_target[3, 6:15,] <- rep(unlist(mort_rr_art[4,]), each = 10)
   v$mort_art_rr <- mort_rr_art_target
   
-  art_dist_paed <- read.csv('tests/testdata/spectrum/v6.13/paed_art_dist.csv')
+  art_dist_paed <- read.csv('tests/testdata/spectrum/inputs/paed_art_dist.csv')
   expand <- NULL
   for(yr in 2023:2030){
     x = art_dist_paed %>% dplyr::filter(year == 2022)
@@ -343,8 +343,8 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   v$init_art_dist <- art_dist_paed
   
   ##BF duration
-  bf_noart <- read.csv('tests/testdata/spectrum/v6.13/bf_duration_no_art.csv', header = F)
-  bf_art <- read.csv('tests/testdata/spectrum/v6.13/bf_duration_art.csv', header = F)
+  bf_noart <- read.csv('tests/testdata/spectrum/inputs/bf_duration_no_art.csv', header = F)
+  bf_art <- read.csv('tests/testdata/spectrum/inputs/bf_duration_art.csv', header = F)
   
   labels <- c()
   for(i in 1:18){
@@ -410,7 +410,7 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   
   
   
-  adult_cd4_dist <- read.csv('tests/testdata/spectrum/v6.13/adult_cd4_dist.csv')
+  adult_cd4_dist <- read.csv('tests/testdata/spectrum/inputs/adult_cd4_dist.csv')
   adult_cd4_dist[is.na(adult_cd4_dist)] <- 0
   adult_cd4_dist <- adult_cd4_dist[,2:7]
   adult_cd4_dist_array <- array(unlist(adult_cd4_dist), dim = c(7,6), dimnames = list(cd4_adult = c('>500', '350-500', '250-349', '200-249', '100-199', '50-99', '<50'),

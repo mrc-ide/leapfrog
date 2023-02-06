@@ -16,7 +16,7 @@ test_that("Leapfrog matches single year age group and coarse age group projectio
 test_that("Leapfrog matches direct incidence option at coarse and single year age structure, no ART and no hiv mort", {
   ## Check that prevalence, deaths and incidence  matches between
   ## the two models
-  pjnz1 <- "../testdata/spectrum/v6.13/bwa_aim-adult-no-art-no-hiv-deaths_spectrum-v6.13_2022-02-12.pjnz"
+  pjnz1 <- "../testdata/spectrum/v6.19/bwa_aim-adult-no-art-no-hiv-deaths_spectrum-v6.19_2022-02-12.pjnz"
   demog_matches_birthsdeaths(pjnz1, threshold_deaths = 1e-1, threshold_births = 0.01)
   demog_matches_totpop(pjnz1)
   transmission_matches(pjnz1, threshold_absolute_pid = c(0.2, 1e-3, 1e-3))
@@ -26,7 +26,7 @@ test_that("Leapfrog matches direct incidence option at coarse and single year ag
 test_that("Leapfrog matches direct incidence option at coarse and single year age structure, no ART + hiv mort", {
   ## Check that prevalence, deaths and incidence  matches between
   ## the two models
-  pjnz1 <- "../testdata/spectrum/v6.13/bwa_aim-adult-no-art_spectrum-v6.13_2022-02-12.PJNZ"
+  pjnz1 <- "../testdata/spectrum/v6.19/bwa_aim-adult-no-art_spectrum-v6.19_2022-02-12.PJNZ"
   demog_matches_birthsdeaths(pjnz1, threshold_deaths = 1e-3, threshold_births = 0.01)
   demog_matches_totpop(pjnz1)
   transmission_matches(pjnz1, threshold_absolute_pid = c(0.5, 1e-3, 0.1))
@@ -39,7 +39,7 @@ test_that("Input childhood infections and test alignment betwen leapfrog and spe
   ## the two models
   
   ##100 children under 5 getting infected in 1980
-  pjnz1 <- "../testdata/spectrum/v6.13/bwa_aim-adult-no-art-child-input_spectrum-v6.13_2022-02-12.PJNZ"
+  pjnz1 <- "../testdata/spectrum/v6.19/bwa_aim-adult-no-art-child-input_spectrum-v6.19_2022-02-12.PJNZ"
   demog_matches_birthsdeaths(pjnz1, threshold_deaths = 1e-3, threshold_births = 0.01)
   demog_matches_totpop(pjnz1)
 ##  transmission_matches(pjnz1, threshold_absolute_pid = c(0.2, 1e-3, 1e-3))
@@ -48,7 +48,7 @@ test_that("Input childhood infections and test alignment betwen leapfrog and spe
 
 
 test_that('Paediatric aging and natural deaths working appropriately', {
-  pjnz <- "../testdata/spectrum/v6.13/bwa_aim-adult-no-art-child-input_spectrum-v6.13_2022-02-12.PJNZ"
+  pjnz <- "../testdata/spectrum/v6.19/bwa_aim-adult-no-art-child-input_spectrum-v6.19_2022-02-12.PJNZ"
   pjnz1 <- test_path(pjnz)
   
   demp <- prepare_leapfrog_demp(pjnz1)
@@ -69,7 +69,7 @@ test_that('Paediatric aging and natural deaths working appropriately', {
   lmod <- leapfrogR(demp, hivp)
   
   source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
-  df <- "../testdata/spectrum/v6.13/bwa_aim-adult-no-art-child-input_spectrum-v6.13_2022-02-12_pop1.xlsx"
+  df <- "../testdata/spectrum/v6.19/bwa_aim-adult-no-art-child-input_spectrum-v6.19_2022-02-12_pop1.xlsx"
   df <- test_path(df)
   df <- read_pop1(df, "Botswana", years = 1970:2022)
   df_paed <- df %>% dplyr::filter(age < 5) %>%
@@ -116,7 +116,7 @@ test_that('Paediatric aging and natural deaths working appropriately', {
 
 
 test_that('Paediatric transition through CD4 working appropriately', {
-  pjnz <- "../testdata/spectrum/v6.13/bwa_aim-adult-no-art-child-input-transition_spectrum-v6.13_2022-02-12.PJNZ"
+  pjnz <- "../testdata/spectrum/v6.19/bwa_aim-adult-no-art-child-input-transition_spectrum-v6.19_2022-02-12.PJNZ"
   pjnz1 <- test_path(pjnz)
   
   demp <- prepare_leapfrog_demp(pjnz1)
@@ -137,7 +137,7 @@ test_that('Paediatric transition through CD4 working appropriately', {
   
   ##pull out stratified population from the .xlsx file, This function doesn't take out the paediatric output, so going to just compare to the Spectrum software itself 
   source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
-  df <- "../testdata/spectrum/v6.13/bwa_aim-adult-no-art-child-input-transition_spectrum-v6.13_2022-02-12_pop1.xlsx"
+  df <- "../testdata/spectrum/v6.19/bwa_aim-adult-no-art-child-input-transition_spectrum-v6.19_2022-02-12_pop1.xlsx"
   df <- test_path(df)
   df <- read_pop1(df, "Botswana", years = 1970:2022)
   df_paed <- df %>% dplyr::filter(age < 5) %>%
@@ -181,7 +181,7 @@ test_that('Paediatric transition through CD4 working appropriately', {
 
 
 test_that('Paediatric HIV mortality working as expected', {
-  pjnz <- "../testdata/spectrum/v6.13/bwa_aim-adult-no-art-child-input-hivmort_spectrum-v6.13_2022-02-12.PJNZ"
+  pjnz <- "../testdata/spectrum/v6.19/bwa_aim-adult-no-art-child-input-hivmort_spectrum-v6.19_2022-02-12.PJNZ"
   pjnz1 <- test_path(pjnz)
   
   demp <- prepare_leapfrog_demp(pjnz1)
@@ -199,7 +199,7 @@ test_that('Paediatric HIV mortality working as expected', {
   
   ##pull out stratified population from the .xlsx file, This function doesn't take out the paediatric output, so going to just compare to the Spectrum software itself 
   source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
-  df <- "../testdata/spectrum/v6.13/bwa_aim-adult-no-art-child-input-hivmort_spectrum-v6.13_2022-02-12_pop1.xlsx"
+  df <- "../testdata/spectrum/v6.19/bwa_aim-adult-no-art-child-input-hivmort_spectrum-v6.19_2022-02-12_pop1.xlsx"
   df <- test_path(df)
   df <- read_pop1(df, "Botswana", years = 1970:2022)
   df_paed <- df %>% dplyr::filter(age < 5) %>%
@@ -242,7 +242,7 @@ test_that('Paediatric HIV mortality working as expected', {
 ##NOT all the way working
 ##For some reason in 1997 age 6 the scalar should be 1
 # test_that('ART % implemented, no mortality reduction & all eligible', {
-#   pjnz <- "../testdata/spectrum/v6.13/bwa_aim-adult-child-input-art-elig_spectrum-v6.13_2022-02-12.PJNZ"
+#   pjnz <- "../testdata/spectrum/v6.19/bwa_aim-adult-child-input-art-elig_spectrum-v6.19_2022-02-12.PJNZ"
 #   pjnz1 <- test_path(pjnz)
 # 
 #   demp <- prepare_leapfrog_demp(pjnz1)
@@ -264,7 +264,7 @@ test_that('Paediatric HIV mortality working as expected', {
 #   lmod_out <- lmod_output_paed(lmod = lmod)
 #   x=data.table(lmod_out$prev_strat)
 #   source("https://raw.githubusercontent.com/mrc-ide/eppasm/new-master/R/read-spectrum-pop1.R")
-#  df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/bwa_aim-adult-child-input-art-elig_spectrum-v6.13_2022-02-12_pop1.xlsx", ages =0:14, country = 'Botswana')
+#  df_out <- spectrum_output(file = "../testdata/spectrum/v6.19/bwa_aim-adult-child-input-art-elig_spectrum-v6.19_2022-02-12_pop1.xlsx", ages =0:14, country = 'Botswana')
 # 
 #   
 # 
@@ -286,7 +286,7 @@ test_that('Paediatric HIV mortality working as expected', {
 
 ##WORKING
 test_that('ART % implemented, mortality reduction & all eligible', {
-  pjnz <- "../testdata/spectrum/v6.13/TEST.PJNZ"
+  pjnz <- "../testdata/spectrum/v6.19/TEST.PJNZ"
   pjnz1 <- test_path(pjnz)
   
   demp <- prepare_leapfrog_demp(pjnz1)
@@ -305,7 +305,7 @@ test_that('ART % implemented, mortality reduction & all eligible', {
   lmod <- leapfrogR(demp, hivp)
   
   lmod_out <- lmod_output_paed(lmod = lmod)
- df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_pop1.xlsx", ages =0:14, country = 'Botswana')
+ df_out <- spectrum_output(file = "../testdata/spectrum/v6.19/TEST_pop1.xlsx", ages =0:14, country = 'Botswana')
   
   
   
@@ -326,7 +326,7 @@ test_that('ART % implemented, mortality reduction & all eligible', {
 
 ##WORKING
 test_that('ART counts implemented, mortality reduction & all eligible', {
-  pjnz <- "../testdata/spectrum/v6.13/TEST_art_COUNTS.PJNZ"
+  pjnz <- "../testdata/spectrum/v6.19/TEST_art_COUNTS.PJNZ"
   pjnz1 <- test_path(pjnz)
   
   demp <- prepare_leapfrog_demp(pjnz1)
@@ -346,7 +346,7 @@ test_that('ART counts implemented, mortality reduction & all eligible', {
   lmod <- leapfrogR(demp, hivp)
   
   lmod_out <- lmod_output_paed(lmod = lmod)
-  df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_art_COUNTS_pop1.xlsx", ages =0:14, country = 'Botswana')
+  df_out <- spectrum_output(file = "../testdata/spectrum/v6.19/TEST_art_COUNTS_pop1.xlsx", ages =0:14, country = 'Botswana')
   
   
   
@@ -367,7 +367,7 @@ test_that('ART counts implemented, mortality reduction & all eligible', {
 
 ##WORKING
 test_that('ART counts, number covered is less than total prevalent cases', {
-  pjnz <- "../testdata/spectrum/v6.13/TEST_art_COUNTS_insufficient.PJNZ"
+  pjnz <- "../testdata/spectrum/v6.19/TEST_art_COUNTS_insufficient.PJNZ"
   pjnz1 <- test_path(pjnz)
   
   demp <- prepare_leapfrog_demp(pjnz1)
@@ -387,7 +387,7 @@ test_that('ART counts, number covered is less than total prevalent cases', {
   lmod <- leapfrogR(demp, hivp)
   
   lmod_out <- lmod_output_paed(lmod = lmod)
-  df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_art_COUNTS_insufficient_pop1.xlsx", ages =0:14, country = 'Botswana')
+  df_out <- spectrum_output(file = "../testdata/spectrum/v6.19/TEST_art_COUNTS_insufficient_pop1.xlsx", ages =0:14, country = 'Botswana')
   
   
   
@@ -408,7 +408,7 @@ test_that('ART counts, number covered is less than total prevalent cases', {
 
 ##WORKING
 test_that('ART counts, number covered is less than total prevalent cases. ART coverage goes down', {
-  pjnz <- "../testdata/spectrum/v6.13/TEST_art_COUNTS_decreasing_ART.PJNZ"
+  pjnz <- "../testdata/spectrum/v6.19/TEST_art_COUNTS_decreasing_ART.PJNZ"
   pjnz1 <- test_path(pjnz)
   
   demp <- prepare_leapfrog_demp(pjnz1)
@@ -431,7 +431,7 @@ test_that('ART counts, number covered is less than total prevalent cases. ART co
   lmod <- leapfrogR(demp, hivp)
   
   lmod_out <- lmod_output_paed(lmod = lmod)
-  df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_art_COUNTS_decreasing_ART_pop1.xlsx", ages =0:14, country = 'Botswana')
+  df_out <- spectrum_output(file = "../testdata/spectrum/v6.19/TEST_art_COUNTS_decreasing_ART_pop1.xlsx", ages =0:14, country = 'Botswana')
   
   
   
@@ -452,7 +452,7 @@ test_that('ART counts, number covered is less than total prevalent cases. ART co
 
 ##WORKING
 test_that('ART counts, number covered is less than total prevalent cases. ART input switches from numbers to percentages', {
-  pjnz <- "../testdata/spectrum/v6.13/TEST_art_COUNTS_num_to_pct.PJNZ"
+  pjnz <- "../testdata/spectrum/v6.19/TEST_art_COUNTS_num_to_pct.PJNZ"
   pjnz1 <- test_path(pjnz)
   
   demp <- prepare_leapfrog_demp(pjnz1)
@@ -477,7 +477,7 @@ test_that('ART counts, number covered is less than total prevalent cases. ART in
   lmod <- leapfrogR(demp, hivp)
   
   lmod_out <- lmod_output_paed(lmod = lmod)
-  df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_art_COUNTS_num_to_pct_pop1.xlsx", ages =0:14, country = 'Botswana')
+  df_out <- spectrum_output(file = "../testdata/spectrum/v6.19/TEST_art_COUNTS_num_to_pct_pop1.xlsx", ages =0:14, country = 'Botswana')
   
   
   
@@ -498,7 +498,7 @@ test_that('ART counts, number covered is less than total prevalent cases. ART in
 
 ##WORKING
 test_that('BWA normal treatment', {
-  pjnz <- "../testdata/spectrum/v6.13/TEST_art_BWA.PJNZ"
+  pjnz <- "../testdata/spectrum/v6.19/TEST_art_BWA.PJNZ"
   pjnz1 <- test_path(pjnz)
   
   demp <- prepare_leapfrog_demp(pjnz1)
@@ -520,7 +520,7 @@ test_that('BWA normal treatment', {
   lmod <- leapfrogR(demp, hivp)
   
   lmod_out <- lmod_output_paed(lmod = lmod)
-  df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_art_BWA_pop1.xlsx", ages =0:14, country = 'Botswana')
+  df_out <- spectrum_output(file = "../testdata/spectrum/v6.19/TEST_art_BWA_pop1.xlsx", ages =0:14, country = 'Botswana')
   
   
   
@@ -543,7 +543,7 @@ test_that('BWA normal treatment', {
 ##Currently have the right number of births to HIV+ women (checking that with output from spectrum variable hivpregwomen)
 ##close ish on getting the first year to align
 test_that('Perinatal transmission of HIV', {
-  pjnz <- "../testdata/spectrum/v6.13/TEST_MTCT_perinatal.PJNZ"
+  pjnz <- "../testdata/spectrum/v6.19/TEST_MTCT_perinatal.PJNZ"
   pjnz1 <- test_path(pjnz)
   
   demp <- prepare_leapfrog_demp(pjnz1)
@@ -591,8 +591,8 @@ test_that('Perinatal transmission of HIV', {
   x[,year := 1970:2030]
   
   lmod_out <- lmod_output_paed(lmod = lmod)
-  ##df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_MTCT_perinatal_pop1.xlsx", ages =0:14, country = 'Botswana')
- ## df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_MTCT_perinatal_pop1.xlsx", ages =15:49, country = 'Botswana')
+  ##df_out <- spectrum_output(file = "../testdata/spectrum/v6.19/TEST_MTCT_perinatal_pop1.xlsx", ages =0:14, country = 'Botswana')
+ ## df_out <- spectrum_output(file = "../testdata/spectrum/v6.19/TEST_MTCT_perinatal_pop1.xlsx", ages =15:49, country = 'Botswana')
   
   
   
@@ -614,7 +614,7 @@ test_that('Perinatal transmission of HIV', {
 
 
 test_that('Perinatal transmission of HIV, some pmtct', {
-  pjnz <- "../testdata/spectrum/v6.13/TEST_MTCT_perinatal_options.PJNZ"
+  pjnz <- "../testdata/spectrum/v6.19/TEST_MTCT_perinatal_options.PJNZ"
   pjnz1 <- test_path(pjnz)
   
   demp <- prepare_leapfrog_demp(pjnz1)
@@ -655,8 +655,8 @@ test_that('Perinatal transmission of HIV, some pmtct', {
   lmod <- leapfrogR(demp, hivp)
 
   lmod_out <- lmod_output_paed(lmod = lmod)
-  df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_MTCT_perinatal_options_pop1.xlsx", ages =0:14, country = 'Botswana')
-  ## df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_MTCT_perinatal_pop1.xlsx", ages =15:49, country = 'Botswana')
+  df_out <- spectrum_output(file = "../testdata/spectrum/v6.19/TEST_MTCT_perinatal_options_pop1.xlsx", ages =0:14, country = 'Botswana')
+  ## df_out <- spectrum_output(file = "../testdata/spectrum/v6.19/TEST_MTCT_perinatal_pop1.xlsx", ages =15:49, country = 'Botswana')
   
   
   
@@ -679,7 +679,7 @@ test_that('Perinatal transmission of HIV, some pmtct', {
 
 
 test_that('BF transmission of HIV', {
-  pjnz <- "../testdata/spectrum/v6.13/TEST_MTCT_bf.PJNZ"
+  pjnz <- "../testdata/spectrum/v6.19/TEST_MTCT_bf.PJNZ"
   pjnz1 <- test_path(pjnz)
   
   demp <- prepare_leapfrog_demp(pjnz1)
@@ -720,8 +720,8 @@ test_that('BF transmission of HIV', {
   lmod <- leapfrogR(demp, hivp)
   
   lmod_out <- lmod_output_paed(lmod = lmod)
-  df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_MTCT_perinatal_options_pop1.xlsx", ages =0:14, country = 'Botswana')
-  ## df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_MTCT_perinatal_pop1.xlsx", ages =15:49, country = 'Botswana')
+  df_out <- spectrum_output(file = "../testdata/spectrum/v6.19/TEST_MTCT_perinatal_options_pop1.xlsx", ages =0:14, country = 'Botswana')
+  ## df_out <- spectrum_output(file = "../testdata/spectrum/v6.19/TEST_MTCT_perinatal_pop1.xlsx", ages =15:49, country = 'Botswana')
   
   
   
