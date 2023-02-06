@@ -24,6 +24,7 @@ using Eigen::Sizes;
 //' @param hTS length on ART (less than 6 months, 6-12 months, 12+ months)
 //' @param hTM transmission category
 //' @param hPS number of PMTCT types (7)
+//' @param hBF number of breastfeeding durations
 
 //'
 //' @details
@@ -995,34 +996,41 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    
    
    
-   double sumARV;
-   sumARV = 0.0;
-   //just doing this for percentages rn
-   for(int hp = 0; hp < hPS; hp++){
-    sumARV += pmtct(hp,t,1);
-   }
-   
-   double numPMTCT;
-   numPMTCT = sumARV ;// + PATIENTS REALLOCATED
-   
    //need to make this more dependent on the input and now just one input
    //need to add in reallocated patients as well
-  // if(pmtct_input_num = 1){ //input is percent
+ //  if(pmtct_input_num == 1){ //input is percent
+     double sumARV;
+     sumARV = 0.0;
+     for(int hp = 0; hp < hPS; hp++){
+       sumARV += pmtct(hp,t,1);
+     }
+     
+     double numPMTCT;
+     numPMTCT = sumARV ;// + PATIENTS REALLOCATED
      OnPMTCT(t) = (needPMTCT(t) * sumARV) > 0 ? needPMTCT(t) * sumARV : 0.0;
   // }else{//input is number
-
+  //   double sumARV;
+  //   sumARV = 0.0;
+  //   for(int hp = 0; hp < hPS; hp++){
+  //     sumARV += pmtct(hp,t,0);
+  //   }
      
+  //   double numPMTCT;
+  //   numPMTCT = sumARV ;// + PATIENTS REALLOCATED
+     
+    double need;
+     need = needPMTCT(t) > numPMTCT ? needPMTCT(t) : numPMTCT;
+  //   for(int hp = 0; hp < hPS; hp++){
+  //     OnPMTCT(t) = (pmtct(hp,t,0) / sumARV) * (numPMTCT / need);
+  //   }
   //  }
-   double need;
-   need = needPMTCT(t) > numPMTCT ? needPMTCT(t) : numPMTCT;
+ 
    
    
    double PMTCT_NONE;
    PMTCT_NONE = (1 - sumARV) > 0 ? 1 - sumARV : 0;
 
-   //TOOO: ART dropout and then recalculate how many women aren't on any PMTCT
-   
-   
+
    //Proportion of pregnant women by CD4 count
    double sum1;
    double sum2;
@@ -1033,12 +1041,10 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    
    for(int af = 0; af < 35; af++) {
     
-    // for(int hm = 0; hm < hDS; hm++){
         sum3 += hivstrat_adult(4,af,1,t) + hivstrat_adult(5,af,1,t) + hivstrat_adult(6,af,1,t) ;
         sum1 += hivstrat_adult(3,af,1,t) + hivstrat_adult(2,af,1,t) ;
         sum2 += hivstrat_adult(0,af,1,t) + hivstrat_adult(1,af,1,t) ;
-    // }
-     
+
    }
    
    double total;
@@ -1169,7 +1175,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
      NoPMTCT_bf = 1;
       //could also just go from 0:1 here
       
-      for(int hp = 0; hp < hPS; hp++){
+      for(int hp = 0; hp < 3; hp++){
         //NVP has different transmission rates based on CD4 but not sure how to implement that...
         if(hp == 0){
           bftr_1 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * (1 - pmtct_dropout(2,t) / 100);
@@ -1188,6 +1194,10 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
          if(NoPMTCT_bf < 0){
            NoPMTCT_bf = 0;
          }
+         tracking(0,0,t) = proplte350;
+         tracking(1,0,t) = propgte350;
+         tracking(2,0,t) = birthsHE_bf;
+         tracking(3,0,t) = NoPMTCT_bf;
          
          bftr_1 +=  NoPMTCT_bf * (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * propgte350 * pmtct_mtct(0,0,1));
          
@@ -1210,7 +1220,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
      NoPMTCT_bf = 1;
      
 
-     for(int hp = 0; hp < hPS; hp++){
+     for(int hp = 0; hp < 3; hp++){
        //NVP has different transmission rates based on CD4 but not sure how to implement that...
        if(hp == 0){
          bftr_2 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * (1 - pmtct_dropout(2,t) / 100);
@@ -1247,7 +1257,7 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6- NewInfBFLt6) * bftr_2;
      bftr_3 = 0.0;
      
      
-     for(int hp = 0; hp < hPS; hp++){
+     for(int hp = 0; hp < 3; hp++){
        //NVP has different transmission rates based on CD4 but not sure how to implement that...
        if(hp == 0){
          bftr_3 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * (1 - pmtct_dropout(2,t) / 100);
@@ -1263,16 +1273,12 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6- NewInfBFLt6) * bftr_2;
        }      
      }
 
-     tracking(0,bf,t) = bftr_3;
-     tracking(1,bf,t) = NoPMTCT_bf;
      if(NoPMTCT_bf < 0){
        NoPMTCT_bf = 0;
      }
      
      bftr_3 +=  NoPMTCT_bf * (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * propgte350 * pmtct_mtct(0,0,1));
-     tracking(2,bf,t) = bftr_3;
-     tracking(3,bf,t) = (birthsHE_bf  - NewInfBFgte12) ;
-     
+  
      NewInfBFgte12 += (birthsHE_bf  - NewInfBFgte12) * bftr_3;
      
    }
@@ -1290,7 +1296,7 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6- NewInfBFLt6) * bftr_2;
      NoPMTCT_bf = 1;
      
      
-     for(int hp = 0; hp < hPS; hp++){
+     for(int hp = 0; hp < 3; hp++){
        //NVP has different transmission rates based on CD4 but not sure how to implement that...
        if(hp == 0){
          bftr_4 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * (1 - pmtct_dropout(2,t) / 100);
