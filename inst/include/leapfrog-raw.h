@@ -906,8 +906,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
     }
     
-    //going to put ART here for right now, it might be the wrong place eventually
-    
+
     
    for(int g = 0; g < NG; g++){
       for(int a = 0; a < pAG; a++){
@@ -1090,7 +1089,10 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    //this should be aligned or have some more strategic indexing later on
    double ptr1;
    ptr1 = 0;
-   //add in dropout here
+   for(int hp = 1; hp < hPS; hp++){
+     //move ptr into this type of loop once pmtct values are extracted and I can see what the real structures are
+    // ptr1 += pmtct(hp,t,1) * pmtct_mtct(hp-1,1,0)
+  }
    ptr1 = pmtct(3-1,t,1) * pmtct_mtct(0,3,0) +  pmtct(4-1,t,1) * pmtct_mtct(0,4,0)  + pmtct(1-1,t,1) * pmtct_mtct(0,1,0) + pmtct(2-1,t,1) * pmtct_mtct(0,2,0)  + pmtct(4,t,1) * art_mtct(0,2,0) *( pmtct_dropout(0,t) / 100) + pmtct(5,t,1) * art_mtct(4,1,0) * (pmtct_dropout(1,t) / 100) + pmtct(6,t,1) * art_mtct(4,2,0) * (pmtct_dropout(1,t) / 100) ;
    double percent_in_program;
    percent_in_program = pmtct(0,t,1) + pmtct(1,t,1) + pmtct(2,t,1) + pmtct(3,t,1) + pmtct(4,t,1) * (pmtct_dropout(0,t) / 100)+ pmtct(5,t,1)* (pmtct_dropout(1,t) / 100) + pmtct(6,t,1)*( pmtct_dropout(1,t) / 100);
@@ -1116,9 +1118,9 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    sum2 = 0.0; //HIV negative 15-49 women weighted for ASFR
    sum3 = 0.0; //newly infected 15-49 women, weighted for ASFR
    
-   for(int af = 0; af < 35; af++) {
-     sum2 += asfr(af, t) / asfr_sum  * hivnpop1(af + 15,1,t) ;
-     sum3 +=  asfr(af, t) / asfr_sum  * infections(af + 15,1,t) ;
+   for(int af = 0; af < pAG_FERT; af++) {
+     sum2 += asfr(af, t) / asfr_sum  * hivnpop1(af + pIDX_FERT,1,t) ;
+     sum3 +=  asfr(af, t) / asfr_sum  * infections(af + pIDX_FERT,1,t) ;
    }
    
    double IncRate ;
@@ -1170,11 +1172,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    double NewInfBFLt6;
    NewInfBFLt6 = 0.0;
    for(int bf = 0; bf < 3; bf++){
-     //ignoring dropout for rn
      bftr_1 = 0.0;
      NoPMTCT_bf = 1;
-      //could also just go from 0:1 here
-      
       for(int hp = 0; hp < 3; hp++){
         //NVP has different transmission rates based on CD4 but not sure how to implement that...
         if(hp == 0){
@@ -1194,10 +1193,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
          if(NoPMTCT_bf < 0){
            NoPMTCT_bf = 0;
          }
-         tracking(0,0,t) = proplte350;
-         tracking(1,0,t) = propgte350;
-         tracking(2,0,t) = birthsHE_bf;
-         tracking(3,0,t) = NoPMTCT_bf;
          
          bftr_1 +=  NoPMTCT_bf * (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * propgte350 * pmtct_mtct(0,0,1));
          
@@ -1215,7 +1210,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    double NewInfBFgte6;
    NewInfBFgte6 = 0.0;
    for(int bf = 3; bf < 6; bf++){
-     //ignoring dropout for rn
      bftr_2 = 0.0;
      NoPMTCT_bf = 1;
      
@@ -1252,10 +1246,8 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6- NewInfBFLt6) * bftr_2;
    NewInfBFgte12 = 0.0;
    
    for(int bf = 6; bf < 12; bf++){
-     //ignoring dropout for rn
      NoPMTCT_bf = 1;
      bftr_3 = 0.0;
-     
      
      for(int hp = 0; hp < 3; hp++){
        //NVP has different transmission rates based on CD4 but not sure how to implement that...
@@ -1291,10 +1283,8 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6- NewInfBFLt6) * bftr_2;
    double bftr_4;
    NewInfBFgte24 = 0.0;
    for(int bf = 12; bf < hBF; bf++){
-     //ignoring dropout for rn
      bftr_4 = 0.0;
      NoPMTCT_bf = 1;
-     
      
      for(int hp = 0; hp < 3; hp++){
        //NVP has different transmission rates based on CD4 but not sure how to implement that...
@@ -1360,8 +1350,6 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6- NewInfBFLt6) * bftr_2;
 
     //progress through CD4 categories
     for(int g = 0; g < NG; g++){
-      //the nosocomial infections aren't distributed so can't just move everything forward. So going to limit hm to just go to the n+1 basically
-      //WAS 6
       for(int hm = 1; hm < hDS; hm++){
         for(int af = 1; af < 5; af++){
           for(int cat = 0; cat < hTM; cat++){
@@ -1373,12 +1361,10 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6- NewInfBFLt6) * bftr_2;
     }
     
     //progress through CD4 categories
-    //changed here
     for(int g = 0; g < NG; g++){
       for(int hm = 1; hm < hDS_adol; hm++){
         for(int af = 5; af < pIDX_FERT; af++){
           for(int cat = 0; cat < hTM; cat++){
-            //deaths_paeds causing NANs
             grad_paeds(hm - 1, cat, af, g, t) -= (deaths_paeds(hm - 1, cat, af, g, t) * adol_cd4_prog(hm - 1) + hivstrat_paeds(hm - 1, cat, af, g, t) * adol_cd4_prog(hm - 1)) / 2; //moving to next cd4 category
             grad_paeds(hm, cat, af, g, t) += (deaths_paeds(hm - 1, cat, af, g, t) * adol_cd4_prog(hm - 1) + hivstrat_paeds(hm - 1, cat, af, g, t) * adol_cd4_prog(hm - 1)) / 2; //moving into this cd4 category
           }
@@ -1388,7 +1374,6 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6- NewInfBFLt6) * bftr_2;
 
     
     for(int g = 0; g < NG; g++){
-      //WAS 6
       for(int hm = 0; hm < hDS; hm++){
         for(int af = 1; af < 5; af++){
           for(int cat = 0; cat < hTM; cat++){
@@ -1428,8 +1413,7 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6- NewInfBFLt6) * bftr_2;
         } 
       }
     }
-    
-    
+
     //all children under a certain CD4 are eligible for ART, regardless of age
     for(int g = 0; g < NG; g++){
       for(int cat = 0; cat < hTM; cat++){
@@ -1455,19 +1439,6 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6- NewInfBFLt6) * bftr_2;
       }
     }
     
-   // if ( (!art15plus_isperc(g, t-2)) & (!art15plus_isperc(g, t-1)) ){ // both numbers
-  //    artnum_hts = (0.5-dt*(hts+1))*art15plus_num(g, t-2) + (dt*(hts+1)+0.5)*art15plus_num(g, t-1);
-  //  } else if (art15plus_isperc(g, t-2) & art15plus_isperc(g, t-1)){ // both percentages
-   //   Type artcov_hts = (0.5-dt*(hts+1))*art15plus_num(g, t-2) + (dt*(hts+1)+0.5)*art15plus_num(g, t-1);
-   //   artnum_hts = artcov_hts * (Xart_15plus + Xartelig_15plus);
-   // } else if ( (!art15plus_isperc(g, t-2)) & art15plus_isperc(g, t-1)) { // transition from number to percentage
-  //    Type curr_coverage = Xart_15plus / (Xart_15plus + Xartelig_15plus);
- //     Type artcov_hts = curr_coverage + (art15plus_num(g, t-1) - curr_coverage) * dt / (0.5-dt*hts);
- //     artnum_hts = artcov_hts * (Xart_15plus + Xartelig_15plus);
-//    }
-
-
-
     
     //how many should initialize ART
     for(int g = 0; g < NG; g++){
@@ -1476,7 +1447,6 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6- NewInfBFLt6) * bftr_2;
             for(int cat = 0; cat < hTM; cat++){
               init_art_paed(hm, cat, af, g, t) += need_art_paed(hm, cat, af, g);
               for(int dur = 0; dur < hTS; dur++){
-            //    init_art_paed(hm, cat, af, g, t) -= artstrat_paeds(dur, hm, af, g, t) / 4;
                 init_art_paed(hm, cat, af, g, t) = init_art_paed(hm, cat, af, g, t) < 0 ? 0.0 : init_art_paed(hm, cat, af, g, t);
               }
             }
@@ -1537,7 +1507,7 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6- NewInfBFLt6) * bftr_2;
     
     if ( (!artpaeds_isperc(t)) & (!artpaeds_isperc(t-1)) ){ // both numbers
       artnum_paed(t) = paed_art_val(t-1) > 0 ?  (paed_art_val(t) + paed_art_val(t-1)) / 2 : 0.0;
-      //Remove how many that are already on ART
+      //Remove those already on ART
       for(int g = 0; g < NG; g++){
         for(int af = 0; af < pIDX_HIVADULT; af++){
           for(int hm = 0; hm < hDS; hm++){
@@ -1569,7 +1539,7 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6- NewInfBFLt6) * bftr_2;
       
       
       artnum_paed(t) =  artnum_paed(t) * (paed_art_val(t) + paed_art_val(t-1)) / 2 ;
-      //Remove how many that are already on ART
+      //Remove those already on ART
       for(int g = 0; g < NG; g++){
         for(int af = 0; af < pIDX_HIVADULT; af++){
           for(int hm = 0; hm < hDS; hm++){
@@ -1584,7 +1554,7 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6- NewInfBFLt6) * bftr_2;
 
 
     } else if (artpaeds_isperc(t) & !artpaeds_isperc(t-1)){ // num to percentage
-      //Remove how many that are already on ART
+      //Remove those already on ART
       double temp ;
       temp = 0.0;
       for(int g = 0; g < NG; g++){
@@ -1632,7 +1602,7 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6- NewInfBFLt6) * bftr_2;
       artnum_paed(t) = (artnum_paed(t-1) + paed_art_val(t)) / 2 ;
       
       
-      //Remove how many that are already on ART
+      //Remove those already on ART
       for(int g = 0; g < NG; g++){
         for(int af = 0; af < pIDX_HIVADULT; af++){
           for(int hm = 0; hm < hDS; hm++){
@@ -1712,11 +1682,12 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6- NewInfBFLt6) * bftr_2;
 
   
     
-    //distribute across eligible ages, right now just going to hardcode
+    //distribute across eligible ages
     for(int g = 0; g < NG; g++){
       for(int af = 0; af < 5; af++){
         if(paed_incid_input(t) > 0){
           infections(af, g, t) = 0 ;
+          //nosocomial infections are evenly distributed
           infections(af, g, t) = paed_incid_input(t) / 10;
           hivpop1(af, g, t) += infections(af, g, t);
           
@@ -1728,25 +1699,17 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6- NewInfBFLt6) * bftr_2;
             }
           } 
         }
-        }
-         
-      
-  
-      
-      for(int hm = 0; hm < hDS; hm++){
-        for(int cat = 0; cat < 1; cat++){
-        //   hivstrat_paeds(hm, cat, 0, g, t) += paed_cd4_dist(hm) > 0 ? infections(0, g, t) * paed_cd4_dist(hm) : 0.0;
-          
-        }
       }
+         
+          if(paed_incid_input(t) > 0){
+              hivstrat_paeds(0, 0, 0, g, t) +=  infections(0, g, t) ;
+           }
     }
 
-    //will need to add in nosocomial
     TensorFixedSize<Type, Sizes<4, NG>> temp_inf;
     temp_inf.setZero();
     
       for(int g = 0; g < NG; g++){
-        //not sure if hiv free surv is needed here
         temp_inf(0, g) += hivpos_births * births_sex_prop(g, t);
         temp_inf(1, g) = (NewInfBFLt6 + IncidentInfectionsBF) * births_sex_prop(g, t);
         temp_inf(2, g) = (NewInfBFgte6) * births_sex_prop(g, t);
@@ -1758,8 +1721,6 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6- NewInfBFLt6) * bftr_2;
         
      }
 
-      
-      
     
     for(int hm = 0; hm < hDS; hm++){
       for(int g = 0; g < NG; g++){
@@ -1786,10 +1747,6 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6- NewInfBFLt6) * bftr_2;
       }
     }
     
-
-
-
- 
 
     
   }
