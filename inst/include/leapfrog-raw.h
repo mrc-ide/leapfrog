@@ -89,6 +89,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                     const int *p_artpaeds_isperc,
                     const Type *p_paed_art_elig_age,
                     const Type *p_paed_art_elig_cd4,
+                    const Type *p_abortion,
                     
                     //mtct trans
                     const Type *p_mtct_trans,
@@ -208,12 +209,12 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   const TensorMapX3cT paed_cd4_mort(p_paed_cd4_mort, hDS, hTM, 5);
   const TensorMapX3cT adol_cd4_mort(p_adol_cd4_mort, hDS_adol, hTM, 10);
   const TensorMapX1cT ctx_val(p_ctx_val, sim_years);
+  //need to ad an option for if it is for the 5 year age groups 
   const TensorMapX1cT paed_art_val(p_paed_art_val, sim_years);
   const TensorMapX1cT paed_art_elig_age(p_paed_art_elig_age, sim_years);
-  
   const TensorMapX2cT init_art_dist(p_init_art_dist, pIDX_HIVADULT, sim_years);
   const TensorMapX3cT mort_art_rr(p_mort_art_rr, hTS, pIDX_HIVADULT, sim_years);
-  
+  const TensorMapx1cT abortion(p_abortion, sim_years);
   
 
   //5 age categories
@@ -236,11 +237,12 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   const TensorMapX3cT art_mtct(p_art_mtct, hDS, 3, 2);
   //2 is the same as above, but 5 is no trt, A, B, nev, WHO 2006
   const TensorMapX3cT pmtct_mtct(p_pmtct_mtct, hDS, 5, 2);
-  //hPS is number of pmtct types (7) and two is whether it is a number or percent
-  const TensorMapX3cT pmtct(p_pmtct, hPS, sim_years, 2);
+  //hPS is number of pmtct types (7) 
+  const TensorMapX2cT pmtct(p_pmtct, hPS, sim_years);
   //18 is the number of 2 month age groups up to 3 years
   const TensorMapX3cT bf_duration(p_bf_duration, 18, sim_years, 2);
-  //6 is for percent already on ART retained at delivery
+  //6 is for 
+  //percent already on ART retained at delivery
   //percent starting ART retained at delivery
   //postnatal option A monthly dropout
   //postnatal option B monthly dropout
@@ -991,6 +993,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   
 //TODO ABORTION
    needPMTCT(t) = birthsHE;
+   needPMTCT(t) -= (birthshe * abortion(t))
    HIVPregwomen(t) = birthsHE_15_24;
    
    
@@ -1093,6 +1096,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
      //move ptr into this type of loop once pmtct values are extracted and I can see what the real structures are
     // ptr1 += pmtct(hp,t,1) * pmtct_mtct(hp-1,1,0)
   }
+   //TODO: need to change these so that they align
    ptr1 = pmtct(3-1,t,1) * pmtct_mtct(0,3,0) +  pmtct(4-1,t,1) * pmtct_mtct(0,4,0)  + pmtct(1-1,t,1) * pmtct_mtct(0,1,0) + pmtct(2-1,t,1) * pmtct_mtct(0,2,0)  + pmtct(4,t,1) * art_mtct(0,2,0) *( pmtct_dropout(0,t) / 100) + pmtct(5,t,1) * art_mtct(4,1,0) * (pmtct_dropout(1,t) / 100) + pmtct(6,t,1) * art_mtct(4,2,0) * (pmtct_dropout(1,t) / 100) ;
    double percent_in_program;
    percent_in_program = pmtct(0,t,1) + pmtct(1,t,1) + pmtct(2,t,1) + pmtct(3,t,1) + pmtct(4,t,1) * (pmtct_dropout(0,t) / 100)+ pmtct(5,t,1)* (pmtct_dropout(1,t) / 100) + pmtct(6,t,1)*( pmtct_dropout(1,t) / 100);

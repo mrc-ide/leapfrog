@@ -245,54 +245,29 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   v$art_dist_paed <- art_dist_paed
   
   ## pull in cotrim coverage numbers
-  ctx_val <- c(rep(0, 25), rep(0, 5), 
-               rep(50, 3),
-               52.222220,	54.444440,	56.666670,	58.888890,	61.111110,	65.000000,	68.888890,	72.777780,	76.666670,
-               80.555550,	84.444440,	88.333330,	92.222220,	96.111110,	86.690000,	100.000000,	100.000000,	100.000000,
-               100.000000,	100.000000,	100.000000,	100.000000,	100.000000,	100.000000,	100.000000,	100.000000,	100.000000,	100.000000)
-  ctx_pct <- T
-  if(ctx_pct){
-    ctx_val <- ctx_val / 100
-  }
- ## ctx_effect_notrt <- c(rep(0.33, 5), rep(0,5))
+  ctx_val <- input_childart(pjnz)$ctx
   ctx_effect <- 0.33
   v$ctx_val <- ctx_val
   v$ctx_effect <- ctx_effect
   
   ## pull in ART coverage numbers
-  paed_art_val <- c(rep(0, length(1970:1994)), 0.000000,	0.000000,	0.000000,	0.000000,	0.000000,	0.000000,	0.000000,	0.000000,	13.407190,	27.990470,	44.005150,	58.008330,	69.103150,	79.204180,	75.471110,	72.889590,	80.878660,	89.824530,	94.705560,	86.893400,	88.066360,	72.887590,	59.954710,	59.831570,	50.672620,	62.719990,	62.719990,	62.719990,	62.719990,	62.719990,	62.719990,	62.719990,	62.719990,	62.719990,	62.719990,	62.719990)
-  paed_art_pct <- T
-  if(paed_art_pct){
-    paed_art_val <- paed_art_val / 100
-  }
-  v$artpaeds_isperc <- rep(paed_art_pct,  length(1970:2029))
-  v$paed_art_val <- paed_art_val
+  ##TO DO: pull out whether this is in % or number
+  ##TO DO: pull out whether this is age specific 
+  ##TO DO: Incorporate ART dropout for kids
+  v$artpaeds_isperc <- rep(F,  length(1970:2029))
+  v$paed_art_val <- input_childart(pjnz)$child_art
+  v$paed_art_ltfu <- input_childart_ltfu(pjnz)
   
   ##PMTCT
-  pmtct <- read.csv('tests/testdata/spectrum/inputs/pmtct.csv')
-  pmtct <- unique(pmtct)
-  colnames(pmtct) <- c('type', 'metric', 1970:2030)
-  pmtct <- pmtct %>% filter(type != '')
-  regimens <- pmtct %>% filter(metric == 'number') %>% select(type) %>% unique()
-  pmtct_num <- pmtct %>% filter(metric == 'number') %>% select(-type) %>% select(-metric)
-  pmtct_pct <- pmtct %>% filter(metric == 'percent')  %>% select(-type) %>% select(-metric)
-  pmtct_list <- list(pmtct_num, pmtct_pct)
-  pmtct_list <- array(as.numeric(unlist(pmtct_list)), dim = c(7,length(1970:2030), 2), dimnames = list(type = unlist(regimens), year = 1970:2030, metric = c('number', 'pct')))
-  pmtct_list[,,2] <- pmtct_list[,,2] / 100
-  v$pmtct <- pmtct_list
+  ##Need to reorder pmtct types in the leapfrog code and switch from having both % and # in the pmtct object
+  v$pmtct <- input_pmtct(pjnz)
+  v$pmtct_input_num <- format_pmtct(pjnz)$pmtct_number
+
   
-  if(sum(pmtct_list[,,1]) == 0){
-    v$pmtct_input_num = F
-  }else{
-    v$pmtct_input_pct = T
-  }
   
   ##PMTCT dropout
-  pmtct_drop <- read.csv('tests/testdata/spectrum/inputs/pmtct_dropout.csv', header = F)
-  types = pmtct_drop$V1
-  pmtct_drop <- pmtct_drop %>% select(-V1)
-  pmtct_drop_array <- array(unlist(pmtct_drop), dim = c(6,61), dimnames = list(type = types, year = 1970:2030))
-  v$pmtct_dropout <- pmtct_drop_array
+  pmtct_drop <- input_pmtct_retained(pjnz)
+  v$pmtct_dropout <- pmtct_drop
   ##rates of MTCT
   noart <- read.csv('tests/testdata/spectrum/inputs/mtct_notrt.csv')
   noart$cd4 <- factor(x = noart$cd4, levels = c('>500', '350-500', '250-349', '200-249', '100-199', '50-99', '<50'))
@@ -343,19 +318,7 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   v$init_art_dist <- art_dist_paed
   
   ##BF duration
-  bf_noart <- read.csv('tests/testdata/spectrum/inputs/bf_duration_no_art.csv', header = F)
-  bf_art <- read.csv('tests/testdata/spectrum/inputs/bf_duration_art.csv', header = F)
-  
-  labels <- c()
-  for(i in 1:18){
-    labels[i] <- paste0(seq(0,36, by = 2)[i], '-', (seq(0,36, by = 2)[i])+1)
-  }
-  
-  bf_array <- array(0, dim = c(18, 61, 2), dimnames = list(child_age_months = labels, year = 1970:2030, trt = c('no_art', 'art')))
-  bf_array[,,1] <- unlist(bf_noart) / 100
-  bf_array[,,2] <- unlist(bf_art) / 100
-  
-  v$bf_duration <- bf_array
+  v$bf_duration <- input_breastfeeding_dur(pjnz)
   
   ## ART eligibility age, doing this in years rather than months
   v$paed_art_elig_age <- c(rep(0, 37), rep(1, 3), rep(2, 20))
@@ -366,6 +329,8 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   paed_art_elig_cd4[6:15,1:40] <- 6
   paed_art_elig_cd4[6:15,41:60] <- 5
   v$paed_art_elig_cd4 <- paed_art_elig_cd4
+  
+  v$abortion <- input_abortion(pjnz)[,,1]
   
   ## HIV positive entrants, right now just doing those without ART
   v$age15hivpop <- projp$age15hivpop
@@ -402,10 +367,7 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   paed_cd4_transition[1:6,7] <- c(0, 0.0014, 0.00990099, 0.00710071, 0.04960496, 0.931993199)
   
   
-  
-  
-  
-  
+
   v$paed_cd4_transition <- paed_cd4_transition
   
   
