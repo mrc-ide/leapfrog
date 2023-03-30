@@ -40,7 +40,7 @@ format_pmtct <- function(pjnz){
 
 input_pmtct <- function(pjnz){
   pmtct <- format_pmtct(pjnz)$pmtct_value
-  out <- array(data = NA, dim = c(nrow(pmtct), ncol(pmtct)), dimnames = list(type = rownames(pmtct), year = 1970:2030))
+  out <- array(data = NA, dim = c(nrow(pmtct), ncol(pmtct)), dimnames = list(type = rownames(pmtct), year = 1970:(1969 + ncol(pmtct))))
   out[] <- unlist(pmtct)
   out[is.na(out)] <- 0
   
