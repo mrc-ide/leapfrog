@@ -329,8 +329,36 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 
   for(int t = 1; t < sim_years; t++){
 
+    TensorFixedSize<Type, Sizes< hDS, NG>> age15_hivpop;
+    age15_hivpop.setZero();
+    for(int g = 0; g < NG; g++){
+      for(int hm = 0; hm < hDS; hm++){
+        for(int cat = 0; cat < 4; cat++){
+          age15_hivpop(hm, g) += hivstrat_paeds(hm, cat, 14, g, t-1);
+        }
+      }
+    }
+    
+    // !!!TODO: add HIV+ 15 year old entrants
+    for (int g = 0; g < NG; g++) {
+      for (int hm = 0; hm < hDS; hm++) {
+        // hivstrat_adult(hm, 0, g, t) = (1.0 - hiv_ag_prob(0, g)) * hivstrat_adult(hm, 0, g, t-1);
+        for(int hm_adol = 0; hm_adol < hDS_adol; hm_adol++){
+          hivstrat_adult(hm, 0, g, t) += age15_hivpop(hm_adol, g) * adult_cd4_dist(hm, hm_adol)  ;//* sx(pIDX_HIVADULT,g,t) ;
+        }
+        
+        // ADD HIV+ entrants here
+        if(t > t_ART_start) {
+          for(int hu = 0; hu < hTS; hu++) {
+          //  artstrat_adult(hu, hm, 0, g, t) = (1.0 - hiv_ag_prob(0, g)) * artstrat_adult(hu, hm, 0, g, t-1);
+            // ADD HIV+ entrants here
+            //       artpop_t(hu, hm, 0, g, t) += paedsurv_g * paedsurv_artcd4dist(hu, hm, g, t) * entrantartcov(g, t);
+          }
+        }
+      }
+    }
+    
     TensorFixedSize<Type, Sizes<pAG, NG>> migrate_ag;
-
     // ageing and non-HIV mortality
     for(int g = 0; g < NG; g++){
 
@@ -378,31 +406,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       hivpop1(pAG-1, g, t) += hivpop1(pAG-1, g, t-1);
     }
 
-    TensorFixedSize<Type, Sizes<hTS, hDS, NG>> age15_hivpop;
-    age15_hivpop.setZero();
-    for(int g = 0; g < NG; g++){
-      for(int hm = 0; hm < hDS; hm++){
-        for(int cat = 0; cat < 4; cat++){
-          age15_hivpop(0, hm, g) += hivstrat_paeds(hm, cat, 14, g, t);
-        }
-      }
-    }
 
-    
-    for(int g = 0; g < NG; g++){
-      for(int hm = 0; hm < hDS; hm++){
-       //   hivpop1(pIDX_HIVADULT, g, t) += age15_hivpop(0, hm, g);
-      }
-    }
-    
-    for(int g = 0; g < NG; g++){
-      for(int hm = 0; hm < hDS; hm++){
-        for(int hm_adol = 0; hm_adol < hDS_adol; hm_adol++){
-          hivstrat_adult(hm, 0, g, t) +=  age15_hivpop(0, hm, g) * adult_cd4_dist(hm, hm_adol) ;
-        }
-      }
-    }
-    
+
     
     // age coarse stratified HIV population
     TensorFixedSize<Type, Sizes<hAG, NG>> hiv_ag_prob;
@@ -414,7 +419,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 
     
     for(int g = 0; g < NG; g++){
-      int a = pIDX_HIVADULT + 1;
+      int a = pIDX_HIVADULT ;
       for(int ha = 0; ha < (hAG-1); ha++){
         for(int i = 0; i < hAG_SPAN[ha]; i++){
           hiv_ag_prob(ha, g) += hivpop1(a, g, t-1);
@@ -444,8 +449,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         }
       }
     }
-
-
+    
     
     for(int g = 0; g < NG; g++){
       for(int ha = 1; ha < 5; ha++) {
@@ -494,21 +498,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     }
     
 
-    // !!!TODO: add HIV+ 15 year old entrants
-    for (int g = 0; g < NG; g++) {
-      for (int hm = 0; hm < hDS; hm++) {
-        hivstrat_adult(hm, 0, g, t) = (1.0 - hiv_ag_prob(0, g)) * hivstrat_adult(hm, 0, g, t-1);
 
-        // ADD HIV+ entrants here
-        if(t > t_ART_start) {
-          for(int hu = 0; hu < hTS; hu++) {
-            artstrat_adult(hu, hm, 0, g, t) = (1.0 - hiv_ag_prob(0, g)) * artstrat_adult(hu, hm, 0, g, t-1);
-            // ADD HIV+ entrants here
-            //       artpop_t(hu, hm, 0, g, t) += paedsurv_g * paedsurv_artcd4dist(hu, hm, g, t) * entrantartcov(g, t);
-          }
-        }
-      }
-    }
 
     TensorFixedSize<Type, Sizes<hAG, NG>> hivpop_ha;
     hivpop_ha.setZero();
@@ -1321,7 +1311,8 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6- NewInfBFLt6) * bftr_2;
    
    
    double bf_infections;
-   bf_infections = NewInfBFgte6 + NewInfBFLt6 + IncidentInfectionsBF + NewInfBFgte12 + NewInfBFgte24;
+   //bf_infections = NewInfBFgte6 + NewInfBFLt6 + IncidentInfectionsBF + NewInfBFgte12 + NewInfBFgte24;
+   bf_infections = NewInfBFgte6 + NewInfBFLt6 + NewInfBFgte12 + NewInfBFgte24;
    
    
    
@@ -1341,8 +1332,7 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6- NewInfBFLt6) * bftr_2;
         for(int af = 5; af < pIDX_HIVADULT; af++){
           for(int cat = 0; cat < hTM; cat++){
             //deaths_paeds kinda a misnomer, those alive after hiv mortality
-             deaths_paeds(hm, cat, af, g, t) += hivstrat_paeds(hm, cat, af, g, t) ;
-             deaths_paeds(hm, cat, af, g, t) -= (1 - ctx_effect * ctx_val(t)) * hivstrat_paeds(hm, cat, af, g, t) * adol_cd4_mort(hm, cat, af - 5); 
+             deaths_paeds(hm, cat, af, g, t) += hivstrat_paeds(hm, cat, af, g, t) - (1 - ctx_effect * ctx_val(t)) * hivstrat_paeds(hm, cat, af, g, t) * adol_cd4_mort(hm, cat, af - 5); 
              aidsdeaths_noart_paed(hm, af, g, t) +=  (1 - ctx_effect * ctx_val(t)) * hivstrat_paeds(hm, cat, af, g, t) * adol_cd4_mort(hm, cat, af - 5); // output hiv deaths, aggregated across transmission category
              
           }
@@ -1742,7 +1732,8 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6- NewInfBFLt6) * bftr_2;
       for(int g = 0; g < NG; g++){
         //not sure if hiv free surv is needed here
         temp_inf(0, g) += hivpos_births * births_sex_prop(g, t);
-        temp_inf(1, g) = (NewInfBFLt6 + IncidentInfectionsBF) * births_sex_prop(g, t);
+        temp_inf(1, g) = (NewInfBFLt6 ) * births_sex_prop(g, t);
+        //temp_inf(1, g) = (NewInfBFLt6 + IncidentInfectionsBF) * births_sex_prop(g, t);
         temp_inf(2, g) = (NewInfBFgte6) * births_sex_prop(g, t);
         temp_inf(3, g) = (NewInfBFgte12) * births_sex_prop(g, t);
         
@@ -1781,11 +1772,6 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6- NewInfBFLt6) * bftr_2;
     }
     
 
-
-
- 
-
-    
   }
 
   return;
