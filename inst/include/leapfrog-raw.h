@@ -89,7 +89,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                     const int *p_artpaeds_isperc,
                     const Type *p_paed_art_elig_age,
                     const Type *p_paed_art_elig_cd4,
-                   // const Type *p_abortion,
+                    const Type *p_abortion,
                     
                     //mtct trans
                     const Type *p_mtct_trans,
@@ -214,7 +214,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   const TensorMapX1cT paed_art_elig_age(p_paed_art_elig_age, sim_years);
   const TensorMapX2cT init_art_dist(p_init_art_dist, pIDX_HIVADULT, sim_years);
   const TensorMapX3cT mort_art_rr(p_mort_art_rr, hTS, pIDX_HIVADULT, sim_years);
- // const TensorMapx1cT abortion(p_abortion, sim_years);
+  const TensorMapx1cT abortion(p_abortion, sim_years);
   
 
   //5 age categories
@@ -993,7 +993,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   
 //TODO ABORTION
    needPMTCT(t) = birthsHE;
-//   needPMTCT(t) -= (birthshe * abortion(t))
+   needPMTCT(t) -= (birthshe * abortion(t))
    HIVPregwomen(t) = birthsHE_15_24;
    
    
