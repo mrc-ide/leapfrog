@@ -344,7 +344,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       for (int hm = 0; hm < hDS; hm++) {
         // hivstrat_adult(hm, 0, g, t) = (1.0 - hiv_ag_prob(0, g)) * hivstrat_adult(hm, 0, g, t-1);
         for(int hm_adol = 0; hm_adol < hDS_adol; hm_adol++){
-          hivstrat_adult(hm, 0, g, t) += age15_hivpop(hm_adol, g) * adult_cd4_dist(hm, hm_adol)  ;//* sx(pIDX_HIVADULT,g,t) ;
+          hivstrat_adult(hm, 0, g, t) += age15_hivpop(hm_adol, g) * adult_cd4_dist(hm, hm_adol)  ;
         }
         
         // ADD HIV+ entrants here
@@ -884,8 +884,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         // maybe need to change this for coarse age groups
         // hivpopadjprob(ha, g) = popadjprob(ha, g) ;
         
-       totpop1(ha, g, t) = basepop(ha, g, t);
-       hivpop1(ha, g, t) =  hivpop1(ha, g, t) * basepop(ha, g, t) / totpop1(ha, g, t);
+     //  totpop1(ha, g, t) = basepop(ha, g, t);
+     // hivpop1(ha, g, t) =  hivpop1(ha, g, t) * basepop(ha, g, t) / totpop1(ha, g, t);
         
         //hivpop1(ha, g, t) = hivpopadjprob(ha, g) * hivpop1(ha, g, t);
         //if (t >= t_ART_start) {
@@ -1138,11 +1138,13 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
      v2 += IncRate / 12 * 2 * (1 - bf_duration(bf, t, 0));
    }
    double v4;
- //  v4 = v2 * pmtct_mtct(0,0,1);
+   v4 = v2 * 0.269;
+   //HERE
+   v4 = 0.0;
    
    //Incident infections are hiv+mothers minus hiv births * v4 (which has already been adjusted for prevalence)
    double IncidentInfectionsBF;
-  // IncidentInfectionsBF = (births_sum - needPMTCT(t)) * v4;
+   IncidentInfectionsBF = (births_sum - needPMTCT(t)) * v4;
 
    //baseline bftr = 0
    double bftr;
@@ -1311,8 +1313,8 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6- NewInfBFLt6) * bftr_2;
    
    
    double bf_infections;
-   //bf_infections = NewInfBFgte6 + NewInfBFLt6 + IncidentInfectionsBF + NewInfBFgte12 + NewInfBFgte24;
-   bf_infections = NewInfBFgte6 + NewInfBFLt6 + NewInfBFgte12 + NewInfBFgte24;
+   bf_infections = NewInfBFgte6 + NewInfBFLt6 + IncidentInfectionsBF + NewInfBFgte12 + NewInfBFgte24;
+  // bf_infections = NewInfBFgte6 + NewInfBFLt6 + NewInfBFgte12 + NewInfBFgte24;
    
    
    
@@ -1359,6 +1361,7 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6- NewInfBFLt6) * bftr_2;
     //progress through CD4 categories
     //changed here
     for(int g = 0; g < NG; g++){
+      //HERE
       for(int hm = 1; hm < hDS_adol; hm++){
         for(int af = 5; af < pIDX_FERT; af++){
           for(int cat = 0; cat < hTM; cat++){
@@ -1732,8 +1735,8 @@ NewInfBFgte6 += (birthsHE_bf -  NewInfBFgte6- NewInfBFLt6) * bftr_2;
       for(int g = 0; g < NG; g++){
         //not sure if hiv free surv is needed here
         temp_inf(0, g) += hivpos_births * births_sex_prop(g, t);
-        temp_inf(1, g) = (NewInfBFLt6 ) * births_sex_prop(g, t);
-        //temp_inf(1, g) = (NewInfBFLt6 + IncidentInfectionsBF) * births_sex_prop(g, t);
+       // temp_inf(1, g) = (NewInfBFLt6 ) * births_sex_prop(g, t);
+        temp_inf(1, g) = (NewInfBFLt6 + IncidentInfectionsBF) * births_sex_prop(g, t);
         temp_inf(2, g) = (NewInfBFgte6) * births_sex_prop(g, t);
         temp_inf(3, g) = (NewInfBFgte12) * births_sex_prop(g, t);
         
