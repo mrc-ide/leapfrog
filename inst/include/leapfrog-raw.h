@@ -1058,13 +1058,13 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    double optA_tr;
    double optB_tr;
    //pmtct(2,t, 1) = Option A and pmtct(3, 4, 1) = option B
-   if((pmtct(2,t,1) + pmtct(3,t,1)) > propgte350){
-     excessratio = 0.0;
+   if((pmtct(0,t,1) + pmtct(1,t,1)) > propgte350){
+     excessratio = ((pmtct(0,t,1) + pmtct(1,t,1)) / propgte350) - 1;
+     //pmtct_mtct(0,1,0) option A, pmtct_mtct(0,2,0) is option b
      optA_tr = pmtct_mtct(0,1,0) * (1 + excessratio);
      optB_tr = pmtct_mtct(0,2,0) * (1 + excessratio);
    }else{
-     excessratio = ((pmtct(3,t,1) + pmtct(4,t,1)) / propgte350) - 1;
-     //pmtct_mtct(0,1,0) option A, pmtct_mtct(0,2,0) is option b
+     excessratio = 0.0;
      optA_tr = pmtct_mtct(0,1,0) * (1 + excessratio);
      optB_tr = pmtct_mtct(0,2,0) * (1 + excessratio);
    }
@@ -1074,10 +1074,11 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    //this should be aligned or have some more strategic indexing later on
    double ptr1;
    ptr1 = 0;
-   //add in dropout here
-   ptr1 = pmtct(3-1,t,1) * pmtct_mtct(0,3,0) +  pmtct(4-1,t,1) * pmtct_mtct(0,4,0)  + pmtct(1-1,t,1) * pmtct_mtct(0,1,0) + pmtct(2-1,t,1) * pmtct_mtct(0,2,0)  + pmtct(4,t,1) * art_mtct(0,2,0) *( pmtct_dropout(0,t) / 100) + pmtct(5,t,1) * art_mtct(4,1,0) * (pmtct_dropout(1,t) / 100) + pmtct(6,t,1) * art_mtct(4,2,0) * (pmtct_dropout(1,t) / 100) ;
+   //add in dropout here: MKW 20/04 took out dropout
+   ptr1 = pmtct(3-1,t,1) * pmtct_mtct(0,3,0) +  pmtct(4-1,t,1) * pmtct_mtct(0,4,0)  + pmtct(1-1,t,1) * optA_tr + pmtct(2-1,t,1) *  optB_tr  + pmtct(4,t,1) * art_mtct(0,0,0)  + pmtct(5,t,1) * art_mtct(0,1,0)+ pmtct(6,t,1) * art_mtct(0,2,0);
+
    double percent_in_program;
-   percent_in_program = pmtct(0,t,1) + pmtct(1,t,1) + pmtct(2,t,1) + pmtct(3,t,1) + pmtct(4,t,1) * (pmtct_dropout(0,t) / 100)+ pmtct(5,t,1)* (pmtct_dropout(1,t) / 100) + pmtct(6,t,1)*( pmtct_dropout(1,t) / 100);
+   percent_in_program = pmtct(0,t,1) + pmtct(1,t,1) + pmtct(2,t,1) + pmtct(3,t,1) + pmtct(4,t,1) + pmtct(5,t,1)+ pmtct(6,t,1);
    double ptr2;
    if(percent_in_program > 0){
      ptr2 = ptr1 / percent_in_program;
@@ -1088,7 +1089,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    
    //Add in women not receiving any form of prophylaxis
    if(total > 0){
-     ptr1 = ptr1 + PMTCT_NONE * (proplt200 * pmtct_mtct(4,0,0) + prop200to350 * pmtct_mtct(2,0,0) + propgte350 * pmtct_mtct(0,0,0));
+     ptr1 = ptr1  + PMTCT_NONE * (proplt200 * pmtct_mtct(4,0,0) + prop200to350 * pmtct_mtct(2,0,0) + propgte350 * pmtct_mtct(0,0,0));
    }else{
      ptr1 = ptr1 ;
    }
