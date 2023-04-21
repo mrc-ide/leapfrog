@@ -1059,11 +1059,17 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    double optB_tr;
    //pmtct(2,t, 1) = Option A and pmtct(3, 4, 1) = option B
    if((pmtct(0,t,1) + pmtct(1,t,1)) > propgte350){
-     excessratio = ((pmtct(0,t,1) + pmtct(1,t,1)) / propgte350) - 1;
+     if(propgte350 = 0){
+       excessratio = 0;
+     }else{
+       excessratio = ((pmtct(0,t,1) + pmtct(1,t,1)) / propgte350) - 1;
+     }
      //pmtct_mtct(0,1,0) option A, pmtct_mtct(0,2,0) is option b
      optA_tr = pmtct_mtct(0,1,0) * (1 + excessratio);
      optB_tr = pmtct_mtct(0,2,0) * (1 + excessratio);
-   }else{
+   }
+   
+   else{
      excessratio = 0.0;
      optA_tr = pmtct_mtct(0,1,0) * (1 + excessratio);
      optB_tr = pmtct_mtct(0,2,0) * (1 + excessratio);
