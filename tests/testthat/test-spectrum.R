@@ -720,7 +720,7 @@ test_that('BF transmission of HIV', {
   lmod <- leapfrogR(demp, hivp)
   
   lmod_out <- lmod_output_paed(lmod = lmod)
-  df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_MTCT_perinatal_options_pop1.xlsx", ages =0:14, country = 'Botswana')
+  df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_MTCT_bf_pop1.xlsx", ages =0:14, country = 'Botswana')
   ## df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_MTCT_perinatal_pop1.xlsx", ages =15:49, country = 'Botswana')
   
   

@@ -139,8 +139,8 @@ leapfrogR(const Rcpp::List& demp,
   NumericVector init_art_paed(hTM * hDS * pIDX_HIVADULT * NG * proj_years);
   init_art_paed.attr("dim") = NumericVector::create(hDS, hTM,  pIDX_HIVADULT, NG, proj_years);
   
-  NumericVector tracking(8 *35 * proj_years);
-  tracking.attr("dim") = NumericVector::create(8,35, proj_years);
+  NumericVector tracking(18 *35 * proj_years);
+  tracking.attr("dim") = NumericVector::create(18,35, proj_years);
  
   if (hAG == hAG_FULL) {
     leapfrog_sim<double, NG, pAG, pIDX_FERT, pAG_FERT,

@@ -280,7 +280,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   
 
   TensorMapX3T coarse_totpop1(p_coarse_totpop1, hAG, NG, sim_years);
-  TensorMapX3T tracking(p_tracking, 8, 35, sim_years);
+  TensorMapX3T tracking(p_tracking, 18, 35, sim_years);
   
   
   
@@ -1126,10 +1126,9 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    if(need > 0){
      ptr1 = ptr1 + v3 / need;
    }
-   
+   //CHANGED SOMETHING HERE
    double hivpos_births;
    hivpos_births = birthsHE * ptr1;
-
 
    double existinghivbirths;
    existinghivbirths = birthsHE * ptr3;
@@ -1239,38 +1238,43 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    double NewInfBFgte12;
    double bftr_3;
    NewInfBFgte12 = 0.0;
+   tracking(0,0,t) = proplte350;
+   tracking(1,0,t) = propgte350;
+   tracking(2,0,t) = ptr3;
+   bftr_3 = 0.0;
    
    for(int bf = 6; bf < 12; bf++){
-     NoPMTCT_bf = 1;
-     bftr_3 = 0.0;
-     
-     
+     NoPMTCT_bf = 1 - ptr3 - bftr_3;
+
      for(int hp = 0; hp < hPS; hp++){
        if(hp == 0){
-         bftr_3 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * (1 - pmtct_dropout(3,t) / 100);
-         NoPMTCT_bf -=  pmtct(hp ,t,1) * (1 - pmtct_dropout(3,t) / 100);
+       //  bftr_3 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * (1 - pmtct_dropout(3,t) / 100);
+       //  NoPMTCT_bf -=  pmtct(hp ,t,1) * (1 - pmtct_dropout(3,t) / 100);
        }
        if(hp == 1){
-         bftr_3 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * (1 - pmtct_dropout(4,t) / 100);
-         NoPMTCT_bf -=  pmtct(hp ,t,1)* (1 - pmtct_dropout(4,t) / 100);
+       //  bftr_3 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * (1 - pmtct_dropout(4,t) / 100);
+        // NoPMTCT_bf -=  pmtct(hp ,t,1)* (1 - pmtct_dropout(4,t) / 100);
        }
        if(hp > 1){
-         bftr_3 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1);
-         NoPMTCT_bf -=  pmtct(hp ,t,1);
+       //  bftr_3 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1);
+       //  NoPMTCT_bf -=  pmtct(hp ,t,1);
        }      
      }
-
-     tracking(0,bf,t) = bftr_3;
-     tracking(1,bf,t) = NoPMTCT_bf;
+   
      if(NoPMTCT_bf < 0){
        NoPMTCT_bf = 0;
      }
+     tracking(bf, 2, t) = bftr_3;
+     tracking(bf, 3, t) = NoPMTCT_bf;
      //No treatment
-     bftr_3 +=  NoPMTCT_bf * (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * propgte350 * pmtct_mtct(0,0,1));
-     NewInfBFgte12 += (birthsHE_bf  - NewInfBFgte12) * bftr_3;
-     
+     if(bf_duration(bf, t, 0) < 1){
+       bftr_3 +=  NoPMTCT_bf * (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * propgte350 * pmtct_mtct(0,0,1));
+       NewInfBFgte12 += (birthsHE_bf -  NewInfBFgte12) * bftr_3  ;
+     }
+  
    }
-
+   
+   
 
    
    //bftr from 24-36
@@ -1312,9 +1316,10 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    
    
    double bf_infections;
-   bf_infections = NewInfBFgte6 + NewInfBFLt6 + IncidentInfectionsBF + NewInfBFgte12 + NewInfBFgte24;
+  // bf_infections = NewInfBFgte6 + NewInfBFLt6 + IncidentInfectionsBF + NewInfBFgte12 + NewInfBFgte24;
 
-   
+  bf_infections = NewInfBFgte12;
+  
    
     for(int g = 0; g < NG; g++){
       for(int hm = 0; hm < hDS; hm++){
@@ -1727,7 +1732,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     }
 
     //will need to add in nosocomial
-    TensorFixedSize<Type, Sizes<4, NG>> temp_inf;
+    TensorFixedSize<Type, Sizes<5, NG>> temp_inf;
     temp_inf.setZero();
     
       for(int g = 0; g < NG; g++){
