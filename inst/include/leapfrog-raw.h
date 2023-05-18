@@ -976,6 +976,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 
    }
    
+   birthsHE = std::round(birthsHE * 100000.0) / 100000.0;
    hiv_births(t) = birthsHE;
   
   
@@ -1165,9 +1166,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    for(int bf = 0; bf < 3; bf++){
      //ptr3 is the transmission that has already occurred due to perinatal transmission
      //NoPMTCT_bf is the percentage of women who are still vulnerable to HIV transmission to their babies
-     NoPMTCT_bf = 1 - ptr3 - bftr_1;
- 
-     
+    NoPMTCT_bf = 1 - ptr3 - bftr_1;
+
       for(int hp = 0; hp < hPS; hp++){
         //hp = 0 is option A
         if(hp == 1){
@@ -1187,14 +1187,17 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
          if(NoPMTCT_bf < 0){
            NoPMTCT_bf = 0;
          }
-         
+         tracking(5,bf,t) = bftr_1;
          //No treatment 
          if(bf_duration(bf, t, 0) < 1){
            if(total > 0){
-             bftr_1 +=  NoPMTCT_bf * (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * propgte350 * pmtct_mtct(0,0,1));
+             tracking(6,bf,t) =  NoPMTCT_bf * (1 - bf_duration(bf, t, 0)) * (2 * (1 - propgte350) * pmtct_mtct(2,0,1)  + 2 * propgte350 * pmtct_mtct(0,0,1));
+             bftr_1 +=  NoPMTCT_bf * (1 - bf_duration(bf, t, 0)) * (2 * (1 - propgte350) * pmtct_mtct(2,0,1) + 2 * propgte350 * pmtct_mtct(0,0,1));
+
            }
          }
-
+        bftr_1 = std::round(bftr_1 * 100000.0) / 100000.0;
+         
          
       if(bf < 1){
          bftr_1 = bftr_1/ 4;
@@ -1206,7 +1209,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       tracking(4,bf,t) = propgte350;
 
    }
-   NewInfBFLt6 = birthsHE_bf  * bftr_1;
+   NewInfBFLt6 = birthsHE  * bftr_1;
    NewInfBFLt6 = std::round(NewInfBFLt6 * 100000.0) / 100000.0;
    
 
@@ -1217,7 +1220,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    bftr_2 = 0.0;
    
    for(int bf = 3; bf < 6; bf++){
-     NoPMTCT_bf = 1 - ptr3  - bftr_2;
+     NoPMTCT_bf = 1 - ptr3  - bftr_2 ;
      
      for(int hp = 0; hp < hPS; hp++){
        if(hp == 0){
@@ -1237,12 +1240,12 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
          NoPMTCT_bf = 0;
        }
        
-       
        //No treatment 
        bftr_2 +=  NoPMTCT_bf * (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * propgte350 * pmtct_mtct(0,0,1));
      
    }
-   NewInfBFgte6 = (birthsHE) * bftr_2;
+   NewInfBFgte6 = birthsHE * bftr_2;
+   NewInfBFgte6 = std::round(NewInfBFgte6 * 100000.0) / 100000.0;
    
 
    
@@ -1258,16 +1261,16 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 
      for(int hp = 0; hp < hPS; hp++){
        if(hp == 0){
-       //  bftr_3 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * (1 - pmtct_dropout(3,t) / 100);
-       //  NoPMTCT_bf -=  pmtct(hp ,t,1) * (1 - pmtct_dropout(3,t) / 100);
+        bftr_3 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * (1 - pmtct_dropout(3,t) / 100);
+        NoPMTCT_bf -=  pmtct(hp ,t,1) * (1 - pmtct_dropout(3,t) / 100);
        }
        if(hp == 1){
-       //  bftr_3 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * (1 - pmtct_dropout(4,t) / 100);
-        // NoPMTCT_bf -=  pmtct(hp ,t,1)* (1 - pmtct_dropout(4,t) / 100);
+        bftr_3 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * (1 - pmtct_dropout(4,t) / 100);
+       NoPMTCT_bf -=  pmtct(hp ,t,1)* (1 - pmtct_dropout(4,t) / 100);
        }
        if(hp > 1){
-       //  bftr_3 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1);
-       //  NoPMTCT_bf -=  pmtct(hp ,t,1);
+        bftr_3 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1);
+        NoPMTCT_bf -=  pmtct(hp ,t,1);
        }      
      }
    
@@ -1276,52 +1279,46 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
      }
 
      //No treatment
-     if(bf_duration(bf, t, 0) < 1){
        bftr_3 +=  NoPMTCT_bf * (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * propgte350 * pmtct_mtct(0,0,1));
-       NewInfBFgte12 += (birthsHE_bf -  NewInfBFgte12) * bftr_3  ;
-     }
   
    }
+   NewInfBFgte12 = birthsHE * bftr_3  ;
+   NewInfBFgte12 = std::round(NewInfBFgte12 * 100000.0) / 100000.0;
    
-   
-
    
    //bftr from 24-36
    double NewInfBFgte24;
    double bftr_4;
+   bftr_4 = 0.0;
    NewInfBFgte24 = 0.0;
    for(int bf = 12; bf < hBF; bf++){
-     //ignoring dropout for rn
-     bftr_4 = 0.0;
-     NoPMTCT_bf = 1;
-     
+     NoPMTCT_bf = 1 - ptr3 - bftr_4;
      
      for(int hp = 0; hp < hPS; hp++){
        if(hp == 0){
          bftr_4 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * (1 - pmtct_dropout(3,t) / 100);
-         NoPMTCT_bf -=  pmtct(hp ,t,1) * (1 - pmtct_dropout(2,t) / 100);
+         NoPMTCT_bf -=  pmtct(hp ,t,1) * (1 - pmtct_dropout(3,t) / 100);
        }
        if(hp == 1){
          bftr_4 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * (1 - pmtct_dropout(4,t) / 100);
-         NoPMTCT_bf -=  pmtct(hp ,t,1)* (1 - pmtct_dropout(3,t) / 100);
+         NoPMTCT_bf -=  pmtct(hp ,t,1)* (1 - pmtct_dropout(4,t) / 100);
        }
        if(hp > 1){
          bftr_4 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1);
          NoPMTCT_bf -=  pmtct(hp ,t,1);
        }      
      }
-     for(int hp = 3; hp < hPS; hp++){
-       bftr_4 +=   pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * art_mtct(4,hp - 3,1);
-       NoPMTCT_bf -=  pmtct(hp ,t,1);
-     }
+     
      if(NoPMTCT_bf < 0){
        NoPMTCT_bf = 0;
      }
      
      bftr_4 +=  NoPMTCT_bf * (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * propgte350 * pmtct_mtct(0,0,1));
-     NewInfBFgte24 += (birthsHE_bf - NewInfBFgte24) * bftr_4;
      
    }
+   NewInfBFgte24 = birthsHE * bftr_4  ;
+   NewInfBFgte24 = std::round(NewInfBFgte24 * 100000.0) / 100000.0;
+   
    
    
    double bf_infections;
