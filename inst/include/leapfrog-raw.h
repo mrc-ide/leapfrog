@@ -1317,8 +1317,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    }
    
 
-   
-   
    //double bf_infections;
 
    //bf_infections = NewInfBFgte6 + NewInfBFLt6 + IncidentInfectionsBF + NewInfBFgte12 + NewInfBFgte24;
@@ -1756,7 +1754,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
             NewInfBFgte12 = birthsHE * bftr_3 * (hivnpop1(1,g,t) / nNeg);
           }
         //Remove those who were infected
-      //  hivnpop1(1,g,t) -= NewInfBFgte12;
+         hivnpop1(1,g,t) -= NewInfBFgte12;
       //  NewInfBFgte12 = std::round(NewInfBFgte12 * 100000.0) / 100000.0;
         temp_inf(3, g) = NewInfBFgte12 ;
         
@@ -1768,7 +1766,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
             NewInfBFgte24 = birthsHE * bftr_4 * (hivnpop1(2,g,t) / nNeg);
           }
         //Remove those who were infected
-      //  hivnpop1(3,g,t) -= NewInfBFgte24;
+        hivnpop1(3,g,t) -= NewInfBFgte24;
       //  NewInfBFgte24 = std::round(NewInfBFgte24 * 100000.0) / 100000.0;
         temp_inf(4, g) = NewInfBFgte24;
         infections(2,g,t) += temp_inf(4, g);
