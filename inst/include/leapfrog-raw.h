@@ -1282,8 +1282,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
        bftr_3 +=  NoPMTCT_bf * (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * propgte350 * pmtct_mtct(0,0,1));
   
    }
-   NewInfBFgte12 = birthsHE * bftr_3  ;
-   NewInfBFgte12 = std::round(NewInfBFgte12 * 100000.0) / 100000.0;
+
    
    
    //bftr from 24-36
@@ -1316,15 +1315,14 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
      bftr_4 +=  NoPMTCT_bf * (1 - bf_duration(bf, t, 0)) * (2 * proplte350 * pmtct_mtct(2,0,1)  + 2 * propgte350 * pmtct_mtct(0,0,1));
      
    }
-   NewInfBFgte24 = birthsHE * bftr_4  ;
-   NewInfBFgte24 = std::round(NewInfBFgte24 * 100000.0) / 100000.0;
+   
+
    
    
-   
-   double bf_infections;
+   //double bf_infections;
 
    //bf_infections = NewInfBFgte6 + NewInfBFLt6 + IncidentInfectionsBF + NewInfBFgte12 + NewInfBFgte24;
-   bf_infections = NewInfBFgte6 + NewInfBFLt6 + NewInfBFgte12 + NewInfBFgte24;
+   //bf_infections = NewInfBFgte6 + NewInfBFLt6 + NewInfBFgte12 + NewInfBFgte24;
    
 
     for(int g = 0; g < NG; g++){
@@ -1741,18 +1739,28 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         temp_inf(1, g) = (NewInfBFLt6 ) * births_sex_prop(g, t);
         //temp_inf(1, g) = (NewInfBFLt6 + IncidentInfectionsBF) * births_sex_prop(g, t);
         temp_inf(2, g) = (NewInfBFgte6) * births_sex_prop(g, t);
-        temp_inf(3, g) = (NewInfBFgte12) * births_sex_prop(g, t);
-        
-      //  temp_inf(0, g) = std::round(temp_inf(0, g) * 100000.0) / 100000.0;
-      //  temp_inf(1, g) = std::round(temp_inf(1, g) * 100000.0) / 100000.0;
-      //  temp_inf(2, g) = std::round(temp_inf(2, g) * 100000.0) / 100000.0;
-      //  temp_inf(3, g) = std::round(temp_inf(3, g) * 100000.0) / 100000.0;
-        
+        double nNeg;
+        nNeg = hivnpop1(1,0,t) + hivnpop1(1,1,t) ;
+        NewInfBFgte12 = 0.0;
+          if(nNeg > 0 ){
+            NewInfBFgte12 = birthsHE * bftr_3 * hivnpop1(1,g,t) / nNeg;
+          }
+        //Remove those who were infected
+        hivnpop1(1,g,t) -= NewInfBFgte12;
+        NewInfBFgte12 = std::round(NewInfBFgte12 * 100000.0) / 100000.0;
+        temp_inf(3, g) = NewInfBFgte12 ;
         
         infections(0,g,t) += temp_inf(0,g) + temp_inf(1,g) + temp_inf(2,g);
         infections(1,g,t) += temp_inf(3,g);
-        temp_inf(4, g) = NewInfBFgte24 * births_sex_prop(g,t);
-     //   temp_inf(4, g) = std::round(temp_inf(4, g) * 100000.0) / 100000.0;
+        NewInfBFgte24 = 0.0;
+        nNeg = hivnpop1(2,0,t) + hivnpop1(2,1,t) ;
+          if(nNeg > 0 ){
+            NewInfBFgte24 = birthsHE * bftr_4 * hivnpop1(2,g,t) / nNeg;
+          }
+        //Remove those who were infected
+        hivnpop1(3,g,t) -= NewInfBFgte24;
+        NewInfBFgte24 = std::round(NewInfBFgte24 * 100000.0) / 100000.0;
+        temp_inf(4, g) = NewInfBFgte24;
         infections(2,g,t) += temp_inf(4, g);
         
      }
@@ -1763,7 +1771,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
           hivstrat_paeds(hm, 1, 0, g, t) +=  temp_inf(1,g) * paed_cd4_dist(hm) ;
           hivstrat_paeds(hm, 2, 0, g, t) +=  temp_inf(2,g) * paed_cd4_dist(hm) ;
           hivstrat_paeds(hm, 3, 1, g, t) +=  temp_inf(3,g) * paed_cd4_dist(hm) ;
-          hivstrat_paeds(hm, 3, 2, g, t) += NewInfBFgte24 * births_sex_prop(g,t) * paed_cd4_dist(hm) ;
+          hivstrat_paeds(hm, 3, 2, g, t) +=  temp_inf(4, g) * paed_cd4_dist(hm) ;
       }
     }
     
