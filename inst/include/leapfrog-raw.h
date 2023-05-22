@@ -497,9 +497,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
     }
     
-    for(int hm = 0; hm < 7; hm++){
-      tracking(5,0,t) += hivstrat_paeds(hm, 3, 4, 0, t);
-    }
 
 
 
@@ -1116,16 +1113,15 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    }
    
    double IncRate ;
-   if(sum2 > need){
+  // if(sum2 > need){
      IncRate = sum3 / sum2;
-   }else{
-     IncRate = 0;
-   }
+ //  }else{
+  //   IncRate = 0;
+  // }
    
    double v3;
    //need to pull incidence infection mtct into the input object
    v3 = IncRate * (9/12) * (births_sum - need) *  0.181;
-   v3 = 0.0;
    if(need > 0){
      ptr1 = ptr1 + v3 / need;
    }
@@ -1150,17 +1146,24 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
      v2 += IncRate / 12 * 2 * (1 - bf_duration(bf, t, 0));
    }
    double v4;
- //  v4 = v2 * pmtct_mtct(0,0,1);
+   v4 = v2 * 0.269;
    
    //Incident infections are hiv+mothers minus hiv births * v4 (which has already been adjusted for prevalence)
    double IncidentInfectionsBF;
-  // IncidentInfectionsBF = (births_sum - needPMTCT(t)) * v4;
+   IncidentInfectionsBF = (births_sum - needPMTCT(t)) * v4;
+   tracking(0,0,t) = needPMTCT(t);
+   tracking(0,1,t) = births_sum;
+   tracking(0,2,t) = v2;
+   tracking(0,3,t) = IncidentInfectionsBF;
+  
 
    //baseline bftr = 0
    double bftr;
    bftr = 0.0;
    
    //bftr from birth to <6 months
+   double trt_pct;
+   
    double bftr_1;
    double NoPMTCT_bf;
    double NewInfBFLt6;
@@ -1174,18 +1177,21 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       for(int hp = 0; hp < 7; hp++){
         //hp = 0 is option A
         if(hp == 0){
-          bftr_1 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * (1 - pmtct_dropout(2,t) / 100);
-          NoPMTCT_bf -=  pmtct(hp,t,1) * (1 - pmtct_dropout(2,t) / 100);
+          trt_pct = pmtct(hp,t,1)   ;//* (1 - (pmtct_dropout(2,t) / 100) * 2);
+          bftr_1 += trt_pct * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) ;
+          NoPMTCT_bf -=  trt_pct;
         }
         //hp = 1 is option B
         if(hp == 1){
-          bftr_1 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * (1 - pmtct_dropout(3,t) / 100);
-          NoPMTCT_bf -=  pmtct(hp ,t,1)* (1 - pmtct_dropout(3,t) / 100);
+          trt_pct = pmtct(hp,t,1)   ;//* (1 - (pmtct_dropout(3,t) / 100) * 2);
+          bftr_1 +=  trt_pct * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1);
+          NoPMTCT_bf -= trt_pct;
         }
         if(hp > 3){
-          bftr_1 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * art_mtct(4,hp-4,1);
-          NoPMTCT_bf -=  pmtct(hp ,t,1);
-        }      
+          trt_pct = pmtct(hp,t,1) ;// * (1 - (pmtct_dropout(4,t) / 100) * 2);
+          bftr_1 += trt_pct * 2 * (1 - bf_duration(bf, t, 1)) * art_mtct(4,hp-4,1);
+          NoPMTCT_bf -=  trt_pct;
+        }  
       }
          if(NoPMTCT_bf < 0){
            NoPMTCT_bf = 0;
@@ -1201,11 +1207,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       if(bf < 1){
          bftr_1 = bftr_1/ 4;
        }
-      tracking(0,bf,t) =  NoPMTCT_bf;
-      tracking(1,bf,t) = ptr3;
-      tracking(2,bf,t) = bftr_1;
-      tracking(3,bf,t) = total;
-      tracking(4,bf,t) = propgte350;
 
 
    }
@@ -1224,17 +1225,20 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
      for(int hp = 0; hp < 7; hp++){
        //hp = 0 is option A
        if(hp == 0){
-         bftr_2 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * (1 - pmtct_dropout(2,t) / 100);
-         NoPMTCT_bf -=  pmtct(hp,t,1) * (1 - pmtct_dropout(2,t) / 100);
+         trt_pct = pmtct(hp,t,1)  ;//* (1 - (pmtct_dropout(2,t) / 100) * 2);
+         bftr_2 +=  trt_pct * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) ;
+         NoPMTCT_bf -=  trt_pct;
        }
        //hp = 1 is option B
        if(hp == 1){
-         bftr_2 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * (1 - pmtct_dropout(3,t) / 100);
-         NoPMTCT_bf -=  pmtct(hp ,t,1)* (1 - pmtct_dropout(3,t) / 100);
+         trt_pct = pmtct(hp,t,1)  ;//* (1 - (pmtct_dropout(3,t) / 100) * 2);
+         bftr_2 +=  trt_pct * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) ;
+         NoPMTCT_bf -=  trt_pct;
        }
        if(hp > 3){
-         bftr_2 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * art_mtct(4,hp-4,1);
-         NoPMTCT_bf -=  pmtct(hp ,t,1);
+         trt_pct = pmtct(hp,t,1) ;//* (1 - (pmtct_dropout(4,t) / 100) * 2 );
+         bftr_2 +=  trt_pct * 2 * (1 - bf_duration(bf, t, 1)) * art_mtct(4,hp-4,1);
+         NoPMTCT_bf -=  trt_pct;
        }      
      }
      
@@ -1262,17 +1266,20 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
      for(int hp = 0; hp < 7; hp++){
        //hp = 0 is option A
        if(hp == 0){
-         bftr_3 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * (1 - pmtct_dropout(2,t) / 100);
-         NoPMTCT_bf -=  pmtct(hp,t,1) * (1 - pmtct_dropout(2,t) / 100);
+         trt_pct = pmtct(hp,t,1)  ;//* (1 - (pmtct_dropout(2,t) / 100) * 2);
+         bftr_3 +=  trt_pct * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) ;
+         NoPMTCT_bf -=  trt_pct;
        }
        //hp = 1 is option B
        if(hp == 1){
-         bftr_3 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * (1 - pmtct_dropout(3,t) / 100);
-         NoPMTCT_bf -=  pmtct(hp ,t,1)* (1 - pmtct_dropout(3,t) / 100);
+         trt_pct = pmtct(hp,t,1) ;// * (1 - (pmtct_dropout(3,t) / 100) * 2 );
+         bftr_3 +=  trt_pct * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1);
+         NoPMTCT_bf -=  trt_pct;
        }
        if(hp > 3){
-         bftr_3 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * art_mtct(4,hp-4,1);
-         NoPMTCT_bf -=  pmtct(hp ,t,1);
+         trt_pct = pmtct(hp,t,1) ;// * (1 - (pmtct_dropout(5,t) / 100) * 2 );
+         bftr_3 +=  trt_pct * 2 * (1 - bf_duration(bf, t, 1)) * art_mtct(4,hp-4,1) ;
+         NoPMTCT_bf -=  trt_pct;
        }      
      }
      if(NoPMTCT_bf < 0){
@@ -1294,17 +1301,20 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
      for(int hp = 0; hp < 7; hp++){
        //hp = 0 is option A
        if(hp == 0){
-         bftr_4 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * (1 - pmtct_dropout(2,t) / 100);
-         NoPMTCT_bf -=  pmtct(hp,t,1) * (1 - pmtct_dropout(2,t) / 100);
+         trt_pct = pmtct(hp,t,1)  ;//* (1 - (pmtct_dropout(2,t) / 100) * 2);
+         bftr_4 +=  trt_pct * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) ;
+         NoPMTCT_bf -=  trt_pct;
        }
        //hp = 1 is option B
        if(hp == 1){
-         bftr_4 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) * (1 - pmtct_dropout(3,t) / 100);
-         NoPMTCT_bf -=  pmtct(hp ,t,1)* (1 - pmtct_dropout(3,t) / 100);
+         trt_pct = pmtct(hp,t,1) ;// * (1 - (pmtct_dropout(3,t) / 100) * 2);
+         bftr_4 +=  trt_pct * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1);
+         NoPMTCT_bf -=  trt_pct;
        }
        if(hp > 3){
-         bftr_4 +=  pmtct(hp,t,1) * 2 * (1 - bf_duration(bf, t, 1)) * art_mtct(4,hp-4,1);
-         NoPMTCT_bf -=  pmtct(hp ,t,1);
+         trt_pct = pmtct(hp,t,1) ;// * (1 - (pmtct_dropout(5,t) / 100) * 2 );
+         bftr_4 +=  trt_pct * 2 * (1 - bf_duration(bf, t, 1)) * art_mtct(4,hp-4,1) ;
+         NoPMTCT_bf -=  trt_pct;
        }      
      }
      if(NoPMTCT_bf < 0){
@@ -1403,9 +1413,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     
     TensorFixedSize<Type, Sizes<hDS, hTM, pIDX_HIVADULT, NG>> need_art_paed;
     need_art_paed.setZero();
-    for(int hm = 0; hm < 7; hm++){
-      tracking(5,1,t) += hivstrat_paeds(hm, 3, 4, 0, t);
-    }
+
  
     
     //all children under a certain age eligible for ART
@@ -1677,10 +1685,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         }
       }
     }
-    for(int hm = 0; hm < 7; hm++){
-      tracking(5,2,t) += hivstrat_paeds(hm, 3, 4, 0, t);
-    }
-    
+
     for(int g = 0; g < NG; g++){
       for(int hm = 0; hm < hDS; hm++){
         for(int af = 0; af < pIDX_HIVADULT; af++){
@@ -1723,10 +1728,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         }
      }
          
-      
-      for(int hm = 0; hm < 7; hm++){
-        tracking(5,3,t) += hivstrat_paeds(hm, 3, 4, 0, t);
-      }
+
       
       for(int hm = 0; hm < hDS; hm++){
         for(int cat = 0; cat < 1; cat++){
@@ -1743,8 +1745,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     for(int g = 0; g < NG; g++){
         //not sure if hiv free surv is needed here
         temp_inf(0, g) += hivpos_births * births_sex_prop(g, t);
-        temp_inf(1, g) = (NewInfBFLt6) * births_sex_prop(g, t);
-        //temp_inf(1, g) = (NewInfBFLt6 + IncidentInfectionsBF) * births_sex_prop(g, t);
+       // temp_inf(1, g) = (NewInfBFLt6) * births_sex_prop(g, t);
+        temp_inf(1, g) = (NewInfBFLt6 + IncidentInfectionsBF) * births_sex_prop(g, t);
         temp_inf(2, g) = (NewInfBFgte6) * births_sex_prop(g, t);
         double nNeg;
         nNeg = hivnpop1(1,0,t) + hivnpop1(1,1,t) ;
