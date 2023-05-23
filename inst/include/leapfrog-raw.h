@@ -1164,11 +1164,16 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    optB_trbf = 0;
    excess = 0;
    if(propgte350 > 0){
-     if((pmtct(0,t,1) + pmtct(1,t,1) - pmtct(4,t,1) - pmtct(5,t,1) - pmtct(6,t,1)) > propgte350){
-       excess = pmtct(0,t,1) + pmtct(1,t,1) - pmtct(4,t,1) - pmtct(5,t,1) - pmtct(6,t,1) - propgte350;
+     if((pmtct(0,t,1) + pmtct(1,t,1)) > propgte350){
+    //if((pmtct(0,t,1) + pmtct(1,t,1) - pmtct(4,t,1) - pmtct(5,t,1) - pmtct(6,t,1)) > propgte350){
+      // excess = pmtct(0,t,1) + pmtct(1,t,1) - pmtct(4,t,1) - pmtct(5,t,1) - pmtct(6,t,1) - propgte350;
+       excess = pmtct(0,t,1) + pmtct(1,t,1) - propgte350;
        optA_trbf = (propgte350 * pmtct_mtct(4,1,1)) + excess * (1.45 / 0.46) * pmtct_mtct(4,1,1) / (propgte350 + excess);
        optB_trbf = (propgte350 * pmtct_mtct(4,2,1)) + excess * (1.45 / 0.46) * pmtct_mtct(4,2,1) / (propgte350 + excess);
        
+     }else{
+       optA_trbf = pmtct_mtct(4,1,1);
+       optB_trbf = pmtct_mtct(4,2,1);
      }
    }else{
      optA_trbf = pmtct_mtct(4,1,1);
@@ -1176,6 +1181,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    }
    tracking(8, 0, t) = optA_trbf;
    tracking(9, 0, t) = optB_trbf;
+   tracking(10, 0, t) = excess;
    
    
    //bftr from birth to <6 months
@@ -1194,13 +1200,13 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       for(int hp = 0; hp < 7; hp++){
         //hp = 0 is option A
         if(hp == 0){
-          trt_pct = optA_trbf ;//* (1 - (pmtct_dropout(2,t) / 100) * 2);
+          trt_pct = optA_trbf * pmtct(0,t,1);//* (1 - (pmtct_dropout(2,t) / 100) * 2);
           bftr_1 += trt_pct * 2 * (1 - bf_duration(bf, t, 1)) ;
           NoPMTCT_bf -=  pmtct(0,t,1);
         }
         //hp = 1 is option B
         if(hp == 1){
-          trt_pct = optB_trbf   ;//* (1 - (pmtct_dropout(3,t) / 100) * 2);
+          trt_pct = optB_trbf * pmtct(1,t,1)  ;//* (1 - (pmtct_dropout(3,t) / 100) * 2);
           bftr_1 +=  trt_pct * 2 * (1 - bf_duration(bf, t, 1)) ;
           NoPMTCT_bf -= pmtct(1,t,1);
         }
@@ -1251,13 +1257,13 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
      for(int hp = 0; hp < 7; hp++){
        //hp = 0 is option A
        if(hp == 0){
-         trt_pct = optA_trbf ;//* (1 - (pmtct_dropout(2,t) / 100) * 2);
+         trt_pct = optA_trbf * pmtct(0,t,1) ;//* (1 - (pmtct_dropout(2,t) / 100) * 2);
          bftr_2 +=  trt_pct * 2 * (1 - bf_duration(bf, t, 1))  ;
          NoPMTCT_bf -=  pmtct(0,t,1);
        }
        //hp = 1 is option B
        if(hp == 1){
-         trt_pct = optB_trbf   ;//* (1 - (pmtct_dropout(3,t) / 100) * 2);
+         trt_pct =  optB_trbf * pmtct(1,t,1)   ;//* (1 - (pmtct_dropout(3,t) / 100) * 2);
          bftr_2 +=  trt_pct * 2 * (1 - bf_duration(bf, t, 1)) ;
          NoPMTCT_bf -= pmtct(1,t,1);
        }
@@ -1294,13 +1300,13 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
      for(int hp = 0; hp < 7; hp++){
        //hp = 0 is option A
        if(hp == 0){
-         trt_pct = optA_trbf  ;//* (1 - (pmtct_dropout(2,t) / 100) * 2);
+         trt_pct = optA_trbf * pmtct(0,t,1)  ;//* (1 - (pmtct_dropout(2,t) / 100) * 2);
          bftr_3 +=  trt_pct * 2 * (1 - bf_duration(bf, t, 1))  ;
          NoPMTCT_bf -=  pmtct(0,t,1);
        }
        //hp = 1 is option B
        if(hp == 1){
-         trt_pct = optB_trbf  ;// * (1 - (pmtct_dropout(3,t) / 100) * 2 );
+         trt_pct =  optB_trbf * pmtct(1,t,1) ;// * (1 - (pmtct_dropout(3,t) / 100) * 2 );
          bftr_3 +=  trt_pct * 2 * (1 - bf_duration(bf, t, 1));
          NoPMTCT_bf -= pmtct(1,t,1);
        }
@@ -1330,13 +1336,13 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
      for(int hp = 0; hp < 7; hp++){
        //hp = 0 is option A
        if(hp == 0){
-         trt_pct = optA_trbf ;//* (1 - (pmtct_dropout(2,t) / 100) * 2);
+         trt_pct = optA_trbf * pmtct(0,t,1) ;//* (1 - (pmtct_dropout(2,t) / 100) * 2);
          bftr_4 +=  trt_pct * 2 * (1 - bf_duration(bf, t, 1)) ;
          NoPMTCT_bf -=  pmtct(0,t,1);
        }
        //hp = 1 is option B
        if(hp == 1){
-         trt_pct = optB_trbf  ;// * (1 - (pmtct_dropout(3,t) / 100) * 2);
+         trt_pct = optB_trbf * pmtct(1,t,1)  ;// * (1 - (pmtct_dropout(3,t) / 100) * 2);
          bftr_4 +=  trt_pct * 2 * (1 - bf_duration(bf, t, 1)) ;
          NoPMTCT_bf -= pmtct(1,t,1);
        }
