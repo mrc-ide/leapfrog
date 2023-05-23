@@ -1008,8 +1008,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    
    double PMTCT_NONE;
    PMTCT_NONE = (1 - sumARV) > 0 ? 1 - sumARV : 0;
-
-
    //TOOO: ART dropout and then recalculate how many women aren't on any PMTCT
    
    
@@ -1101,7 +1099,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
      ptr1 = ptr1 ;
    }
    double ptr3;
-   ptr3 = ptr1;
+  // ptr3 = ptr1;
+  ptr3 = PMTCT_NONE * (proplt200 * pmtct_mtct(4,0,0) + prop200to350 * pmtct_mtct(2,0,0) + propgte350 * pmtct_mtct(0,0,0));
 
    //Add in transmission due to incident infections
    sum2 = 0.0; //HIV negative 15-49 women weighted for ASFR
@@ -1151,10 +1150,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    //Incident infections are hiv+mothers minus hiv births * v4 (which has already been adjusted for prevalence)
    double IncidentInfectionsBF;
    IncidentInfectionsBF = (births_sum - needPMTCT(t)) * v4;
-   tracking(0,0,t) = needPMTCT(t);
-   tracking(0,1,t) = births_sum;
-   tracking(0,2,t) = v2;
-   tracking(0,3,t) = IncidentInfectionsBF;
+
   
 
    //baseline bftr = 0
@@ -1172,7 +1168,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    for(int bf = 0; bf < 3; bf++){
      //ptr3 is the transmission that has already occurred due to perinatal transmission
      //NoPMTCT_bf is the percentage of women who are still vulnerable to HIV transmission to their babies
-    NoPMTCT_bf = 1 - ptr3 - bftr_1;
+      NoPMTCT_bf = 1 - ptr3 - bftr_1;
 
       for(int hp = 0; hp < 7; hp++){
         //hp = 0 is option A
@@ -1207,6 +1203,11 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       if(bf < 1){
          bftr_1 = bftr_1/ 4;
        }
+ tracking(0,bf,t) =  NoPMTCT_bf;
+ tracking(1,bf,t) = ptr3;
+ tracking(2,bf,t) = bftr_1;
+ tracking(3,bf,t) = total;
+ tracking(4,bf,t) = propgte350;
 
 
    }
@@ -1220,7 +1221,9 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    NewInfBFgte6 = 0.0;
    bftr_2 = 0.0;
    for(int bf = 3; bf < 6; bf++){
-     NoPMTCT_bf = 1 - ptr3  - bftr_2 ;
+  
+       NoPMTCT_bf = 1 - ptr3 - bftr_2;
+     
      
      for(int hp = 0; hp < 7; hp++){
        //hp = 0 is option A
@@ -1262,7 +1265,9 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    bftr_3 = 0.0;
    
    for(int bf = 6; bf < 12; bf++){
-     NoPMTCT_bf = 1 - ptr3 - bftr_3;
+   
+       NoPMTCT_bf = 1 - ptr3 - bftr_3;
+   
      for(int hp = 0; hp < 7; hp++){
        //hp = 0 is option A
        if(hp == 0){
@@ -1297,7 +1302,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    bftr_4 = 0.0;
    NewInfBFgte24 = 0.0;
    for(int bf = 12; bf < hBF; bf++){
-     NoPMTCT_bf = 1 - ptr3 - bftr_4;
+    NoPMTCT_bf = 1 - ptr3 - bftr_4;
+   
      for(int hp = 0; hp < 7; hp++){
        //hp = 0 is option A
        if(hp == 0){
