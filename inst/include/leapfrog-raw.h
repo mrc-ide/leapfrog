@@ -1080,7 +1080,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    ptr1 = 0;
    //add in dropout here: MKW 20/04 took out dropout
    ptr1 = pmtct(3-1,t,1) * pmtct_mtct(0,3,0) +  pmtct(4-1,t,1) * pmtct_mtct(0,4,0)  + pmtct(1-1,t,1) * optA_tr + pmtct(2-1,t,1) *  optB_tr  + pmtct(4,t,1) * art_mtct(0,0,0)  + pmtct(5,t,1) * art_mtct(0,1,0)+ pmtct(6,t,1) * art_mtct(0,2,0);
-
+   tracking(5,0,t) = ptr1;
+   
 
    double percent_in_program;
    percent_in_program = pmtct(0,t,1) + pmtct(1,t,1) + pmtct(2,t,1) + pmtct(3,t,1) + pmtct(4,t,1) + pmtct(5,t,1)+ pmtct(6,t,1);
@@ -1090,7 +1091,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    }else{
      ptr2 = 0;
    }
-
    
    //Add in women not receiving any form of prophylaxis
    if(total > 0){
@@ -1099,8 +1099,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
      ptr1 = ptr1 ;
    }
    double ptr3;
-  // ptr3 = ptr1;
-  ptr3 = PMTCT_NONE * (proplt200 * pmtct_mtct(4,0,0) + prop200to350 * pmtct_mtct(2,0,0) + propgte350 * pmtct_mtct(0,0,0));
+   ptr3 = ptr1;
+  // ptr3 = PMTCT_NONE * (proplt200 * pmtct_mtct(4,0,0) + prop200to350 * pmtct_mtct(2,0,0) + propgte350 * pmtct_mtct(0,0,0));
 
    //Add in transmission due to incident infections
    sum2 = 0.0; //HIV negative 15-49 women weighted for ASFR
@@ -1157,6 +1157,27 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    double bftr;
    bftr = 0.0;
    
+   double optA_trbf;
+   double optB_trbf;
+   double excess;
+   optA_trbf = 0;
+   optB_trbf = 0;
+   excess = 0;
+   if(propgte350 > 0){
+     if((pmtct(0,t,1) + pmtct(1,t,1) - pmtct(4,t,1) - pmtct(5,t,1) - pmtct(6,t,1)) > propgte350){
+       excess = pmtct(0,t,1) + pmtct(1,t,1) - pmtct(4,t,1) - pmtct(5,t,1) - pmtct(6,t,1) - propgte350;
+       optA_trbf = (propgte350 * pmtct_mtct(4,1,1)) + excess * (1.45 / 0.46) * pmtct_mtct(4,1,1) / (propgte350 + excess);
+       optB_trbf = (propgte350 * pmtct_mtct(4,2,1)) + excess * (1.45 / 0.46) * pmtct_mtct(4,2,1) / (propgte350 + excess);
+       
+     }
+   }else{
+     optA_trbf = pmtct_mtct(4,1,1);
+     optB_trbf = pmtct_mtct(4,2,1);
+   }
+   tracking(8, 0, t) = optA_trbf;
+   tracking(9, 0, t) = optB_trbf;
+   
+   
    //bftr from birth to <6 months
    double trt_pct;
    
@@ -1173,15 +1194,15 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       for(int hp = 0; hp < 7; hp++){
         //hp = 0 is option A
         if(hp == 0){
-          trt_pct = pmtct(hp,t,1)   ;//* (1 - (pmtct_dropout(2,t) / 100) * 2);
-          bftr_1 += trt_pct * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) ;
-          NoPMTCT_bf -=  trt_pct;
+          trt_pct = optA_trbf ;//* (1 - (pmtct_dropout(2,t) / 100) * 2);
+          bftr_1 += trt_pct * 2 * (1 - bf_duration(bf, t, 1)) ;
+          NoPMTCT_bf -=  pmtct(0,t,1);
         }
         //hp = 1 is option B
         if(hp == 1){
-          trt_pct = pmtct(hp,t,1)   ;//* (1 - (pmtct_dropout(3,t) / 100) * 2);
-          bftr_1 +=  trt_pct * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1);
-          NoPMTCT_bf -= trt_pct;
+          trt_pct = optB_trbf   ;//* (1 - (pmtct_dropout(3,t) / 100) * 2);
+          bftr_1 +=  trt_pct * 2 * (1 - bf_duration(bf, t, 1)) ;
+          NoPMTCT_bf -= pmtct(1,t,1);
         }
         if(hp > 3){
           trt_pct = pmtct(hp,t,1) ;// * (1 - (pmtct_dropout(4,t) / 100) * 2);
@@ -1192,6 +1213,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
          if(NoPMTCT_bf < 0){
            NoPMTCT_bf = 0;
          }
+         tracking(7,bf,t) = bftr_1;
          //No treatment 
          if(bf_duration(bf, t, 0) < 1){
            if(total > 0){
@@ -1212,6 +1234,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 
    }
    NewInfBFLt6 = birthsHE  * bftr_1;
+   tracking(6,0,t) = NewInfBFLt6;
   // NewInfBFLt6 = std::round(NewInfBFLt6 * 100000.0) / 100000.0;
    
 
@@ -1228,15 +1251,15 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
      for(int hp = 0; hp < 7; hp++){
        //hp = 0 is option A
        if(hp == 0){
-         trt_pct = pmtct(hp,t,1)  ;//* (1 - (pmtct_dropout(2,t) / 100) * 2);
-         bftr_2 +=  trt_pct * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) ;
-         NoPMTCT_bf -=  trt_pct;
+         trt_pct = optA_trbf ;//* (1 - (pmtct_dropout(2,t) / 100) * 2);
+         bftr_2 +=  trt_pct * 2 * (1 - bf_duration(bf, t, 1))  ;
+         NoPMTCT_bf -=  pmtct(0,t,1);
        }
        //hp = 1 is option B
        if(hp == 1){
-         trt_pct = pmtct(hp,t,1)  ;//* (1 - (pmtct_dropout(3,t) / 100) * 2);
-         bftr_2 +=  trt_pct * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) ;
-         NoPMTCT_bf -=  trt_pct;
+         trt_pct = optB_trbf   ;//* (1 - (pmtct_dropout(3,t) / 100) * 2);
+         bftr_2 +=  trt_pct * 2 * (1 - bf_duration(bf, t, 1)) ;
+         NoPMTCT_bf -= pmtct(1,t,1);
        }
        if(hp > 3){
          trt_pct = pmtct(hp,t,1) ;//* (1 - (pmtct_dropout(4,t) / 100) * 2 );
@@ -1271,15 +1294,15 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
      for(int hp = 0; hp < 7; hp++){
        //hp = 0 is option A
        if(hp == 0){
-         trt_pct = pmtct(hp,t,1)  ;//* (1 - (pmtct_dropout(2,t) / 100) * 2);
-         bftr_3 +=  trt_pct * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) ;
-         NoPMTCT_bf -=  trt_pct;
+         trt_pct = optA_trbf  ;//* (1 - (pmtct_dropout(2,t) / 100) * 2);
+         bftr_3 +=  trt_pct * 2 * (1 - bf_duration(bf, t, 1))  ;
+         NoPMTCT_bf -=  pmtct(0,t,1);
        }
        //hp = 1 is option B
        if(hp == 1){
-         trt_pct = pmtct(hp,t,1) ;// * (1 - (pmtct_dropout(3,t) / 100) * 2 );
-         bftr_3 +=  trt_pct * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1);
-         NoPMTCT_bf -=  trt_pct;
+         trt_pct = optB_trbf  ;// * (1 - (pmtct_dropout(3,t) / 100) * 2 );
+         bftr_3 +=  trt_pct * 2 * (1 - bf_duration(bf, t, 1));
+         NoPMTCT_bf -= pmtct(1,t,1);
        }
        if(hp > 3){
          trt_pct = pmtct(hp,t,1) ;// * (1 - (pmtct_dropout(5,t) / 100) * 2 );
@@ -1307,15 +1330,15 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
      for(int hp = 0; hp < 7; hp++){
        //hp = 0 is option A
        if(hp == 0){
-         trt_pct = pmtct(hp,t,1)  ;//* (1 - (pmtct_dropout(2,t) / 100) * 2);
-         bftr_4 +=  trt_pct * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1) ;
-         NoPMTCT_bf -=  trt_pct;
+         trt_pct = optA_trbf ;//* (1 - (pmtct_dropout(2,t) / 100) * 2);
+         bftr_4 +=  trt_pct * 2 * (1 - bf_duration(bf, t, 1)) ;
+         NoPMTCT_bf -=  pmtct(0,t,1);
        }
        //hp = 1 is option B
        if(hp == 1){
-         trt_pct = pmtct(hp,t,1) ;// * (1 - (pmtct_dropout(3,t) / 100) * 2);
-         bftr_4 +=  trt_pct * 2 * (1 - bf_duration(bf, t, 1)) * pmtct_mtct(4,hp+1,1);
-         NoPMTCT_bf -=  trt_pct;
+         trt_pct = optB_trbf  ;// * (1 - (pmtct_dropout(3,t) / 100) * 2);
+         bftr_4 +=  trt_pct * 2 * (1 - bf_duration(bf, t, 1)) ;
+         NoPMTCT_bf -= pmtct(1,t,1);
        }
        if(hp > 3){
          trt_pct = pmtct(hp,t,1) ;// * (1 - (pmtct_dropout(5,t) / 100) * 2 );
@@ -1751,8 +1774,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     for(int g = 0; g < NG; g++){
         //not sure if hiv free surv is needed here
         temp_inf(0, g) += hivpos_births * births_sex_prop(g, t);
-       // temp_inf(1, g) = (NewInfBFLt6) * births_sex_prop(g, t);
-        temp_inf(1, g) = (NewInfBFLt6 + IncidentInfectionsBF) * births_sex_prop(g, t);
+       temp_inf(1, g) = (NewInfBFLt6) * births_sex_prop(g, t);
+    //    temp_inf(1, g) = (NewInfBFLt6 + IncidentInfectionsBF) * births_sex_prop(g, t);
         temp_inf(2, g) = (NewInfBFgte6) * births_sex_prop(g, t);
         double nNeg;
         nNeg = hivnpop1(1,0,t) + hivnpop1(1,1,t) ;
