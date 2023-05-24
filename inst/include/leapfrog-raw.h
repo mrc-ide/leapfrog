@@ -1366,6 +1366,52 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    //bf_infections = NewInfBFgte6 + NewInfBFLt6 + IncidentInfectionsBF + NewInfBFgte12 + NewInfBFgte24;
    //bf_infections = NewInfBFgte6 + NewInfBFLt6 + NewInfBFgte12 + NewInfBFgte24;
    
+   //will need to add in nosocomial
+   TensorFixedSize<Type, Sizes<5, NG>> temp_inf;
+   temp_inf.setZero();
+   
+   for(int g = 0; g < NG; g++){
+     //not sure if hiv free surv is needed here
+     temp_inf(0, g) += hivpos_births * births_sex_prop(g, t);
+     //temp_inf(1, g) = (NewInfBFLt6) * births_sex_prop(g, t);
+     temp_inf(1, g) = (NewInfBFLt6 + IncidentInfectionsBF) * births_sex_prop(g, t);
+     temp_inf(2, g) = (NewInfBFgte6) * births_sex_prop(g, t);
+     double nNeg;
+     nNeg = hivnpop1(1,0,t) + hivnpop1(1,1,t) ;
+     NewInfBFgte12 = 0.0;
+     if(nNeg > 0 ){
+       NewInfBFgte12 = birthsHE * bftr_3 * (hivnpop1(1,g,t) / nNeg);
+     }
+     //Remove those who were infected
+     hivnpop1(1,g,t) -= NewInfBFgte12;
+     //  NewInfBFgte12 = std::round(NewInfBFgte12 * 100000.0) / 100000.0;
+     temp_inf(3, g) = NewInfBFgte12 ;
+     
+     infections(0,g,t) += temp_inf(0,g) + temp_inf(1,g) + temp_inf(2,g);
+     infections(1,g,t) += temp_inf(3,g);
+     NewInfBFgte24 = 0.0;
+     nNeg = hivnpop1(2,0,t) + hivnpop1(2,1,t) ;
+     if(nNeg > 0 ){
+       NewInfBFgte24 = birthsHE * bftr_4 * (hivnpop1(2,g,t) / nNeg);
+     }
+     //Remove those who were infected
+     hivnpop1(2,g,t) -= NewInfBFgte24;
+     //  NewInfBFgte24 = std::round(NewInfBFgte24 * 100000.0) / 100000.0;
+     temp_inf(4, g) = NewInfBFgte24;
+     infections(2,g,t) += temp_inf(4, g);
+     
+   }
+   
+   for(int hm = 0; hm < hDS; hm++){
+     for(int g = 0; g < NG; g++){
+       hivstrat_paeds(hm, 0, 0, g, t) +=  temp_inf(0,g)  * paed_cd4_dist(hm) ;
+       hivstrat_paeds(hm, 1, 0, g, t) +=  temp_inf(1,g) * paed_cd4_dist(hm) ;
+       hivstrat_paeds(hm, 2, 0, g, t) +=  temp_inf(2,g) * paed_cd4_dist(hm) ;
+       hivstrat_paeds(hm, 3, 1, g, t) +=  temp_inf(3,g) * paed_cd4_dist(hm) ;
+       hivstrat_paeds(hm, 3, 2, g, t) +=  temp_inf(4, g) * paed_cd4_dist(hm) ;
+     }
+   }
+   
 
     for(int g = 0; g < NG; g++){
       for(int hm = 0; hm < hDS; hm++){
@@ -1423,7 +1469,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     for(int g = 0; g < NG; g++){
       //WAS 6
       for(int hm = 0; hm < hDS; hm++){
-        for(int af = 1; af < 5; af++){
+        for(int af = 0; af < 5; af++){
           for(int cat = 0; cat < hTM; cat++){
             grad_paeds(hm, cat, af, g, t) -= hivstrat_paeds(hm, cat, af, g, t) * paed_cd4_mort(hm, cat, af) * ctx_val(t) * (1 - ctx_effect) + hivstrat_paeds(hm, cat, af, g, t) * paed_cd4_mort(hm, cat, af) * (1 - ctx_val(t));
             hivstrat_paeds(hm, cat, af, g, t) += grad_paeds(hm, cat, af, g, t) ; 
@@ -1773,51 +1819,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
     }
 
-    //will need to add in nosocomial
-    TensorFixedSize<Type, Sizes<5, NG>> temp_inf;
-    temp_inf.setZero();
-    
-    for(int g = 0; g < NG; g++){
-        //not sure if hiv free surv is needed here
-        temp_inf(0, g) += hivpos_births * births_sex_prop(g, t);
-       temp_inf(1, g) = (NewInfBFLt6) * births_sex_prop(g, t);
-    //    temp_inf(1, g) = (NewInfBFLt6 + IncidentInfectionsBF) * births_sex_prop(g, t);
-        temp_inf(2, g) = (NewInfBFgte6) * births_sex_prop(g, t);
-        double nNeg;
-        nNeg = hivnpop1(1,0,t) + hivnpop1(1,1,t) ;
-        NewInfBFgte12 = 0.0;
-          if(nNeg > 0 ){
-            NewInfBFgte12 = birthsHE * bftr_3 * (hivnpop1(1,g,t) / nNeg);
-          }
-        //Remove those who were infected
-         hivnpop1(1,g,t) -= NewInfBFgte12;
-      //  NewInfBFgte12 = std::round(NewInfBFgte12 * 100000.0) / 100000.0;
-        temp_inf(3, g) = NewInfBFgte12 ;
-        
-        infections(0,g,t) += temp_inf(0,g) + temp_inf(1,g) + temp_inf(2,g);
-        infections(1,g,t) += temp_inf(3,g);
-        NewInfBFgte24 = 0.0;
-        nNeg = hivnpop1(2,0,t) + hivnpop1(2,1,t) ;
-          if(nNeg > 0 ){
-            NewInfBFgte24 = birthsHE * bftr_4 * (hivnpop1(2,g,t) / nNeg);
-          }
-        //Remove those who were infected
-        hivnpop1(2,g,t) -= NewInfBFgte24;
-      //  NewInfBFgte24 = std::round(NewInfBFgte24 * 100000.0) / 100000.0;
-        temp_inf(4, g) = NewInfBFgte24;
-        infections(2,g,t) += temp_inf(4, g);
-        
-     }
 
-    for(int hm = 0; hm < hDS; hm++){
-      for(int g = 0; g < NG; g++){
-          hivstrat_paeds(hm, 0, 0, g, t) +=  temp_inf(0,g)  * paed_cd4_dist(hm) ;
-          hivstrat_paeds(hm, 1, 0, g, t) +=  temp_inf(1,g) * paed_cd4_dist(hm) ;
-          hivstrat_paeds(hm, 2, 0, g, t) +=  temp_inf(2,g) * paed_cd4_dist(hm) ;
-          hivstrat_paeds(hm, 3, 1, g, t) +=  temp_inf(3,g) * paed_cd4_dist(hm) ;
-          hivstrat_paeds(hm, 3, 2, g, t) +=  temp_inf(4, g) * paed_cd4_dist(hm) ;
-      }
-    }
     
 
     for(int g = 0; g < NG; g++){
