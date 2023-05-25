@@ -24,7 +24,7 @@ int get_simulation_years(const Rcpp::List demp, SEXP r_sim_years) {
 TensorMap1<int> get_age_groups_hiv_span(const Rcpp::List projection_parameters,
                                         std::string hiv_age_stratification) {
   int age_groups_hiv;
-  SEXP data;
+  Rcpp::sexp data;
   if (hiv_age_stratification == "full") {
     age_groups_hiv = 66;
     data = projection_parameters["hAG_SPAN_full"];
