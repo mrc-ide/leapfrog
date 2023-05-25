@@ -23,6 +23,7 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 * Rename `WorkingData` to something more obvious, `IntermediateData`?
 * Add a test which proves that C++ code can be compiled standalone, one exists in dust that can be used as inspriration
 * Tidy data copying a tensor2 to matrix and a tensor n to array utility functions which should be used in C++ R interface "src/frogger.cpp"
+* Ensure input data is not copied, we can read from the data that R owns (as long as don't write to it)
 
 ## License
 
