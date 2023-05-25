@@ -15,6 +15,16 @@ To install `frogger`:
 remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 ```
 
+## TODO
+* Restructuring the model code to identify more common code
+   * There are examples like general demographic projection and hiv population demographic projection which are running similar processes like ageing, non HIV mortality, migration. We should be able to write a function for e.g. ageing which we can run on each of our population matrices. Even for the HIV and ART stratified we can add overloaded function to work with higher dimension data
+* Add a test that checks that no `double`s are used in `inst/include` dir. We should be using templated `real_type` for TMB
+* Add a broad level overview of the algorithm - is there a diagram available?
+* Rename `WorkingData` to something more obvious, `IntermediateData`?
+* Add a test which proves that C++ code can be compiled standalone, one exists in dust that can be used as inspriration
+* Tidy data copying a tensor2 to matrix and a tensor n to array utility functions which should be used in C++ R interface "src/frogger.cpp"
+* Ensure input data is not copied, we can read from the data that R owns (as long as don't write to it)
+
 ## License
 
 MIT © Imperial College of Science, Technology and Medicine
