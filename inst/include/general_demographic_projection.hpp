@@ -7,11 +7,11 @@ void run_general_pop_demographic_projection(int time_step,
                                         const Parameters<real_type>& pars,
                                         const State<real_type>& state_curr,
                                         State<real_type>& state_next,
-                                        WorkingData<real_type>& working) {
-  run_ageing_and_mortality(time_step, pars, state_curr, state_next, working);
-  run_migration(time_step, pars, state_curr, state_next, working);
+                                        IntermediateData<real_type>& intermediate) {
+  run_ageing_and_mortality(time_step, pars, state_curr, state_next, intermediate);
+  run_migration(time_step, pars, state_curr, state_next, intermediate);
   run_fertility_and_infant_migration(time_step, pars, state_curr, state_next,
-                                     working);
+                                     intermediate);
 }
 
 template <typename real_type>
@@ -19,7 +19,7 @@ void run_ageing_and_mortality(int time_step,
                               const Parameters<real_type>& pars,
                               const State<real_type>& state_curr,
                               State<real_type>& state_next,
-                              WorkingData<real_type>& working) {
+                              IntermediateData<real_type>& intermediate) {
   for (int g = 0; g < pars.num_genders; ++g) {
     // Start at index 1 as we will add infant (age 0) births and deaths later
     for (int a = 1; a < pars.age_groups_pop; ++a) {
@@ -47,17 +47,17 @@ void run_migration(int time_step,
                    const Parameters<real_type>& pars,
                    const State<real_type>& state_curr,
                    State<real_type>& state_next,
-                   WorkingData<real_type>& working) {
+                   IntermediateData<real_type>& intermediate) {
   for (int g = 0; g < pars.num_genders; ++g) {
     // Migration for ages 1, 2, ... 79
     for (int a = 1; a < pars.age_groups_pop - 1; ++a) {
       // Get migration rate, as number of net migrants adjusted for survivorship
       // to end of period. Divide by 2 as (on average) half of deaths will
       // happen before they migrate. Then divide by total pop to get rate.
-      working.migration_rate(a, g) = pars.net_migration(a, g, time_step) *
+      intermediate.migration_rate(a, g) = pars.net_migration(a, g, time_step) *
                                      (1.0 + pars.survival(a, g, time_step)) *
                                      0.5 / state_next.total_population(a, g);
-      state_next.total_population(a, g) *= 1.0 + working.migration_rate(a, g);
+      state_next.total_population(a, g) *= 1.0 + intermediate.migration_rate(a, g);
     }
 
     // For open age group (age 80+), net migrant survivor adjustment based on
@@ -72,10 +72,10 @@ void run_migration(int time_step,
         (state_next.total_population(a, g) +
          0.5 * state_next.natural_deaths(a, g)) /
         (state_next.total_population(a, g) + state_next.natural_deaths(a, g));
-    working.migration_rate(a, g) = survival_netmig *
+    intermediate.migration_rate(a, g) = survival_netmig *
                                    pars.net_migration(a, g, time_step) /
                                    state_next.total_population(a, g);
-    state_next.total_population(a, g) *= 1.0 + working.migration_rate(a, g);
+    state_next.total_population(a, g) *= 1.0 + intermediate.migration_rate(a, g);
   }
 }
 
@@ -84,7 +84,7 @@ void run_fertility_and_infant_migration(int time_step,
                                         const Parameters<real_type>& pars,
                                         const State<real_type>& state_curr,
                                         State<real_type>& state_next,
-                                        WorkingData<real_type>& working) {
+                                        IntermediateData<real_type>& intermediate) {
   state_next.births = 0.0;
   for (int af = 0; af < pars.age_groups_fert; ++af) {
     state_next.births += (state_curr.total_population(

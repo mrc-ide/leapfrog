@@ -71,13 +71,13 @@ struct State {
 };
 
 template <typename real_type>
-struct WorkingData {
+struct IntermediateData {
   Tensor2<real_type> migration_rate;
   Tensor2<real_type> hiv_net_migration;
   Tensor2<real_type> hiv_population_coarse_ages;
   Tensor2<real_type> hiv_age_up_prob;
 
-  WorkingData(int age_groups_pop, int age_groups_hiv, int num_genders)
+  IntermediateData(int age_groups_pop, int age_groups_hiv, int num_genders)
       : migration_rate(age_groups_pop, num_genders),
         hiv_net_migration(age_groups_pop, num_genders),
         hiv_population_coarse_ages(age_groups_hiv, num_genders),

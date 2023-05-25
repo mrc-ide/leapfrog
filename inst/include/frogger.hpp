@@ -11,13 +11,13 @@ State<real_type> run_model(int time_steps, const Parameters<real_type>& pars) {
 
   initialise_model_state(pars, state);
   auto state_next = state;
-  WorkingData<real_type> working(pars.age_groups_pop, pars.age_groups_hiv, pars.num_genders);
+  IntermediateData<real_type> intermediate(pars.age_groups_pop, pars.age_groups_hiv, pars.num_genders);
   // Each time step is mid-point of the year
   for (int step = 1; step <= time_steps; ++step) {
-    run_general_pop_demographic_projection(step, pars, state, state_next, working);
-    run_hiv_pop_demographic_projection(step, pars, state, state_next, working);
+    run_general_pop_demographic_projection(step, pars, state, state_next, intermediate);
+    run_hiv_pop_demographic_projection(step, pars, state, state_next, intermediate);
     std::swap(state, state_next);
-    working.reset();
+    intermediate.reset();
   }
   return state;
 }
