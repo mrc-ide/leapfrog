@@ -48,10 +48,6 @@ void run_hiv_and_art_stratified_ageing(int time_step,
                                        const State<real_type>& state_curr,
                                        State<real_type>& state_next,
                                        WorkingData<real_type>& working) {
-  // TODO: better name for hiv_age_up_prob - what is this? Prob of chance of someone
-  // getting HIV as a function of the size of the HIV population
-  Tensor2<real_type> hiv_age_up_prob(pars.age_groups_hiv, pars.num_genders);
-  hiv_age_up_prob.setZero();
   // age coarse stratified HIV population
   for (int g = 0; g < pars.num_genders; ++g) {
     int a = pars.hiv_adult_first_age_group;
@@ -59,26 +55,27 @@ void run_hiv_and_art_stratified_ageing(int time_step,
     // age group
     for (int ha = 0; ha < (pars.age_groups_hiv - 1); ++ha) {
       for (int i = 0; i < pars.age_groups_hiv_span(ha); ++i, ++a) {
-        hiv_age_up_prob(ha, g) += state_curr.hiv_population(a, g);
-
+        // TODO: Is this just multiplying hiv_population by the size of the span? Should we just multiply this instead?
+        // We don't need i
+        working.hiv_age_up_prob(ha, g) += state_curr.hiv_population(a, g);
       }
-      if (hiv_age_up_prob(ha, g) > 0) {
-        hiv_age_up_prob(ha, g) = state_curr.hiv_population(a - 1, g) / hiv_age_up_prob(ha, g);
+      if (working.hiv_age_up_prob(ha, g) > 0) {
+        working.hiv_age_up_prob(ha, g) = state_curr.hiv_population(a - 1, g) / working.hiv_age_up_prob(ha, g);
       } else {
-        hiv_age_up_prob(ha, g) = 0.0;
+        working.hiv_age_up_prob(ha, g) = 0.0;
       }
     }
 
     for (int ha = 1; ha < pars.age_groups_hiv; ++ha) {
       for (int hm = 0; hm < pars.disease_stages; ++hm) {
         state_next.hiv_strat_adult(hm, ha, g) =
-            ((1.0 - hiv_age_up_prob(ha, g)) * state_curr.hiv_strat_adult(hm, ha, g)) +
-            (hiv_age_up_prob(ha - 1, g) * state_curr.hiv_strat_adult(hm, ha - 1, g));
+            ((1.0 - working.hiv_age_up_prob(ha, g)) * state_curr.hiv_strat_adult(hm, ha, g)) +
+            (working.hiv_age_up_prob(ha - 1, g) * state_curr.hiv_strat_adult(hm, ha - 1, g));
         if (time_step > pars.time_art_start)
           for (int hu = 0; hu < pars.treatment_stages; ++hu) {
             state_next.art_strat_adult(hu, hm, ha, g) =
-                ((1.0 - hiv_age_up_prob(ha, g)) * state_curr.art_strat_adult(hu, hm, ha, g)) +
-                (hiv_age_up_prob(ha - 1, g) * state_curr.art_strat_adult(hu, hm, ha - 1, g));
+                ((1.0 - working.hiv_age_up_prob(ha, g)) * state_curr.art_strat_adult(hu, hm, ha, g)) +
+                (working.hiv_age_up_prob(ha - 1, g) * state_curr.art_strat_adult(hu, hm, ha - 1, g));
           }
       }
     }
@@ -86,12 +83,12 @@ void run_hiv_and_art_stratified_ageing(int time_step,
     // TODO: add HIV+ 15 year old entrants
     for (int hm = 0; hm < pars.disease_stages; ++hm) {
       state_next.hiv_strat_adult(hm, 0, g) =
-          (1.0 - hiv_age_up_prob(0, g)) * state_curr.hiv_strat_adult(hm, 0, g);
+          (1.0 - working.hiv_age_up_prob(0, g)) * state_curr.hiv_strat_adult(hm, 0, g);
       // ADD HIV+ entrants here
       if (time_step > pars.time_art_start) {
         for (int hu = 0; hu < pars.treatment_stages; ++hu) {
           state_next.art_strat_adult(hu, hm, 0, g) =
-              (1.0 - hiv_age_up_prob(0, g)) *
+              (1.0 - working.hiv_age_up_prob(0, g)) *
               state_curr.art_strat_adult(hu, hm, 0, g);
           // ADD HIV+ entrants here
           //       artpop_t(hu, hm, 0, g, t) += paedsurv_g *
@@ -125,13 +122,11 @@ void run_hiv_and_art_stratified_deaths_and_migration(
     const State<real_type>& state_curr,
     State<real_type>& state_next,
     WorkingData<real_type>& working) {
-  Tensor2<real_type> hiv_population_coarse_ages(pars.age_groups_hiv, pars.num_genders);
-  hiv_population_coarse_ages.setZero();
   for (int g = 0; g < pars.num_genders; ++g) {
     int a = pars.hiv_adult_first_age_group;
     for (int ha = 0; ha < pars.age_groups_hiv; ++ha) {
       for (int i = 0; i < pars.age_groups_hiv_span(ha); ++i, ++a) {
-        hiv_population_coarse_ages(ha, g) += state_next.hiv_population(a, g);
+        working.hiv_population_coarse_ages(ha, g) += state_next.hiv_population(a, g);
       }
     }
   }
@@ -145,9 +140,9 @@ void run_hiv_and_art_stratified_deaths_and_migration(
         deaths_migrate += (working.hiv_net_migration(a, g) - state_next.hiv_natural_deaths(a, g));
       }
 
-      real_type deaths_migrate_rate = 0.0
-      if (hiv_population_coarse_ages(ha, g) > 0) {
-        deaths_migrate_rate = deaths_migrate / hiv_population_coarse_ages(ha, g)
+      real_type deaths_migrate_rate = 0.0;
+      if (working.hiv_population_coarse_ages(ha, g) > 0) {
+        deaths_migrate_rate = deaths_migrate / working.hiv_population_coarse_ages(ha, g);
       }
 
       for (int hm = 0; hm < pars.disease_stages; ++hm) {

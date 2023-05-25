@@ -74,13 +74,19 @@ template <typename real_type>
 struct WorkingData {
   Tensor2<real_type> migration_rate;
   Tensor2<real_type> hiv_net_migration;
+  Tensor2<real_type> hiv_population_coarse_ages;
+  Tensor2<real_type> hiv_age_up_prob;
 
-  WorkingData(int age_groups_pop, int num_genders)
+  WorkingData(int age_groups_pop, int age_groups_hiv, int num_genders)
       : migration_rate(age_groups_pop, num_genders),
-        hiv_net_migration(age_groups_pop, num_genders) {}
+        hiv_net_migration(age_groups_pop, num_genders),
+        hiv_population_coarse_ages(age_groups_hiv, num_genders),
+        hiv_age_up_prob(age_groups_hiv, num_genders) {}
 
   void reset() {
     migration_rate.setZero();
     hiv_net_migration.setZero();
+    hiv_population_coarse_ages.setZero();
+    hiv_age_up_prob.setZero();
   }
 };
