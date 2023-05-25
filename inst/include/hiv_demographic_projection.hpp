@@ -62,28 +62,23 @@ void run_hiv_and_art_stratified_ageing(int time_step,
         hiv_age_up_prob(ha, g) += state_curr.hiv_population(a, g);
 
       }
-      hiv_age_up_prob(ha, g) =
-          (hiv_age_up_prob(ha, g) > 0)
-              ? state_curr.hiv_population(a - 1, g) / hiv_age_up_prob(ha, g)
-              : 0.0;
+      if (hiv_age_up_prob(ha, g) > 0) {
+        hiv_age_up_prob(ha, g) = state_curr.hiv_population(a - 1, g) / hiv_age_up_prob(ha, g);
+      } else {
+        hiv_age_up_prob(ha, g) = 0.0;
+      }
     }
 
     for (int ha = 1; ha < pars.age_groups_hiv; ++ha) {
       for (int hm = 0; hm < pars.disease_stages; ++hm) {
         state_next.hiv_strat_adult(hm, ha, g) =
-            (1.0 - hiv_age_up_prob(ha, g)) *
-            state_curr.hiv_strat_adult(hm, ha, g);  // age-out
-        state_next.hiv_strat_adult(hm, ha, g) +=
-            hiv_age_up_prob(ha - 1, g) *
-            state_curr.hiv_strat_adult(hm, ha - 1, g);  // age-in
+            ((1.0 - hiv_age_up_prob(ha, g)) * state_curr.hiv_strat_adult(hm, ha, g)) +
+            (hiv_age_up_prob(ha - 1, g) * state_curr.hiv_strat_adult(hm, ha - 1, g));
         if (time_step > pars.time_art_start)
           for (int hu = 0; hu < pars.treatment_stages; ++hu) {
             state_next.art_strat_adult(hu, hm, ha, g) =
-                (1.0 - hiv_age_up_prob(ha, g)) *
-                state_curr.art_strat_adult(hu, hm, ha, g);
-            state_next.art_strat_adult(hu, hm, ha, g) +=
-                hiv_age_up_prob(ha - 1, g) *
-                state_curr.art_strat_adult(hu, hm, ha - 1, g);
+                ((1.0 - hiv_age_up_prob(ha, g)) * state_curr.art_strat_adult(hu, hm, ha, g)) +
+                (hiv_age_up_prob(ha - 1, g) * state_curr.art_strat_adult(hu, hm, ha - 1, g));
           }
       }
     }
@@ -147,14 +142,14 @@ void run_hiv_and_art_stratified_deaths_and_migration(
     for (int ha = 0; ha < pars.age_groups_hiv; ++ha) {
       real_type deaths_migrate = 0;
       for (int i = 0; i < pars.age_groups_hiv_span(ha); ++i, ++a) {
-        deaths_migrate -= state_next.hiv_natural_deaths(a, g);
-        deaths_migrate += working.hiv_net_migration(a, g);
+        deaths_migrate += (working.hiv_net_migration(a, g) - state_next.hiv_natural_deaths(a, g));
       }
 
-      real_type deaths_migrate_rate =
-          hiv_population_coarse_ages(ha, g) > 0
-              ? deaths_migrate / hiv_population_coarse_ages(ha, g)
-              : 0.0;
+      real_type deaths_migrate_rate = 0.0
+      if (hiv_population_coarse_ages(ha, g) > 0) {
+        deaths_migrate_rate = deaths_migrate / hiv_population_coarse_ages(ha, g)
+      }
+
       for (int hm = 0; hm < pars.disease_stages; ++hm) {
         state_next.hiv_strat_adult(hm, ha, g) *= 1.0 + deaths_migrate_rate;
         if (time_step > pars.time_art_start) {
