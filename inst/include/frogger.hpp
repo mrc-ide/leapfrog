@@ -5,7 +5,7 @@
 
 template <typename real_type>
 State<real_type> run_model(int time_steps, const Parameters<real_type>& pars) {
-  State<double> state(pars.age_groups_pop, pars.num_genders,
+  State<real_type> state(pars.age_groups_pop, pars.num_genders,
                       pars.disease_stages, pars.age_groups_hiv,
                       pars.treatment_stages);
 
