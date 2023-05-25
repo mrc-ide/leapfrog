@@ -14,7 +14,7 @@ State<real_type> run_model(int time_steps, const Parameters<real_type>& pars) {
   WorkingData<real_type> working(pars.age_groups_pop, pars.num_genders);
   // Each time step is mid-point of the year
   for (int step = 1; step <= time_steps; ++step) {
-    run_general_demographic_projection(step, pars, state, state_next, working);
+    run_general_pop_demographic_projection(step, pars, state, state_next, working);
     run_hiv_pop_demographic_projection(step, pars, state, state_next, working);
     std::swap(state, state_next);
     working.reset();

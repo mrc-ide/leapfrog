@@ -3,7 +3,7 @@
 #include "types.hpp"
 
 template <typename real_type>
-void run_general_demographic_projection(int time_step,
+void run_general_pop_demographic_projection(int time_step,
                                         const Parameters<real_type>& pars,
                                         const State<real_type>& state_curr,
                                         State<real_type>& state_next,
