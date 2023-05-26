@@ -12,7 +12,7 @@ using TensorMap2 = Eigen::TensorMap <Eigen::Tensor<real_type, 2>>;
 
 template<typename real_type>
 using TensorMap3 = Eigen::TensorMap <Eigen::Tensor<real_type, 3>>;
- 
+
 template<typename real_type>
 using Tensor2 = Eigen::Tensor<real_type, 2>;
 
@@ -71,6 +71,7 @@ struct State {
 };
 
 namespace internal {
+
 const int MALE = 0;
 const int FEMALE = 1;
 
@@ -94,5 +95,6 @@ struct IntermediateData {
     hiv_age_up_prob.setZero();
   }
 };
+
 }
 }

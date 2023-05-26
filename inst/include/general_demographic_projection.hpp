@@ -115,5 +115,6 @@ void run_fertility_and_infant_migration(int time_step,
     state_next.total_population(0, g) *= 1.0 + migration_rate_a0;
   }
 }
+
 }
 }

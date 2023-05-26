@@ -22,6 +22,7 @@ void initialise_model_state(const Parameters<real_type> &pars,
   state.art_strat_adult.setZero();
   state.births = 0;
 }
+
 }
 
 template<typename real_type>
@@ -42,4 +43,5 @@ State<real_type> run_model(int time_steps, const Parameters<real_type> &pars) {
   }
   return state;
 }
+
 }
