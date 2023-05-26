@@ -66,12 +66,30 @@
 <div class="page-header"><h1 id="frogger">frogger<a class="anchor" aria-label="anchor" href="#frogger"></a>
 </h1></div>
 <!-- badges: start -->
+
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p>To install <code>frogger</code>:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"mrc-ide/frogger"</span>, upgrade <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"mrc-ide/frogger"</span>, upgrade <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="todo">TODO<a class="anchor" aria-label="anchor" href="#todo"></a>
+</h2>
+<ul>
+<li>Restructuring the model code to identify more common code
+<ul>
+<li>There are examples like general demographic projection and hiv population demographic projection which are running similar processes like ageing, non HIV mortality, migration. We should be able to write a function for e.g. ageing which we can run on each of our population matrices. Even for the HIV and ART stratified we can add overloaded function to work with higher dimension data</li>
+</ul>
+</li>
+<li>Add a test that checks that no <code>double</code>s are used in <code>inst/include</code> dir. We should be using templated <code>real_type</code> for TMB</li>
+<li>Add a broad level overview of the algorithm - is there a diagram available?</li>
+<li>Add a test which proves that C++ code can be compiled standalone, one exists in dust that can be used as inspriration</li>
+<li>Tidy data copying a tensor2 to matrix and a tensor n to array utility functions which should be used in C++ R interface “src/frogger.cpp”</li>
+<li>Ensure input data is not copied, we can read from the data that R owns (as long as don’t write to it)</li>
+<li>Convert string flags to the model to enums if we need to switch on them in several places. This should make it easier to reason about in C++ world and isolate the string checking to a single place</li>
+</ul>
 </div>
 <div class="section level2">
 <h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
@@ -136,7 +154,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>
