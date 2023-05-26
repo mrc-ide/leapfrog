@@ -37,16 +37,16 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 
 ### Stratifications
 
-| Leapfrog      | Frogger                   | Details                                             |
-|---------------|---------------------------|-----------------------------------------------------|
-| NG            | num_genders               | Number of genders                                   |
-| pAG           | age_groups_pop            | Number of age groups in population, 81 for 0 to 80+ |
-| pIDX_FERT     | fertility_first_age_group | First age group index eligible for fertility        |
-| pAG_FERT      | age_groups_fertiity       | Number of ages eligible for fertility               |
-| pIDX_HIVADULT | hiv_adult_first_age_group |                                                     |
-| hAG           | age_groups_hiv            | Number of age groups in HIV population              |
-| hDS           | disease_stages            | Number of disease stages                            |
-| hTS           | treatment_stages          | Number of treatment stages                          |
+| Leapfrog      | Frogger                   | Details                                                |
+|---------------|---------------------------|--------------------------------------------------------|
+| NG            | num_genders               | Number of genders                                      |
+| pAG           | age_groups_pop            | Number of age groups in population, 81 for 0 to 80+    |
+| pIDX_FERT     | fertility_first_age_group | First age group index eligible for fertility           |
+| pAG_FERT      | age_groups_fertiity       | Number of ages eligible for fertility                  |
+| pIDX_HIVADULT | hiv_adult_first_age_group | Index of the first age group to be considered an adult |
+| hAG           | age_groups_hiv            | Number of age groups in HIV population                 |
+| hDS           | disease_stages            | Number of disease stages                               |
+| hTS           | treatment_stages          | Number of treatment stages                             |
 
 ### Model settings
 
@@ -67,9 +67,9 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 | asfr               | age_sex_fertility_ratio | Ratio of number of live births in a year and the whole female population of childbearing age |
 | births_sex_prop    | births_sex_prop         |                                                                                              |
 | incidinput         | ?                       |                                                                                              |
-| incrr_sex          | ?                       |                                                                                              |
-| incrr_age          | ?                       |                                                                                              |
-| cd4_initdist       | ?                       |                                                                                              |
+| incrr_sex          | ?                       | Relative risk of incidence by sex                                                            |
+| incrr_age          | ?                       | Relative risk of incidence by age                                                            |
+| cd4_initdist       | ?                       | Distribution of infections by cd4 category upon infection                                    |
 | cd4_prog           | ?                       |                                                                                              |
 | cd4_mort           | ?                       |                                                                                              |
 | art_mort           | ?                       |                                                                                              |
@@ -101,48 +101,52 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 
 ### Internal
 
-| Leapfrog                  | Frogger                    | Details                                            |
-|---------------------------|----------------------------|----------------------------------------------------|
-| ART0MOS                   | ?                          |                                                    |
-| pIDX_INCIDPOP             | ?                          |                                                    |
-| pAG_INCIDPOP              | ?                          |                                                    |
-| hAG_15PLUS                | ?                          |                                                    |
-| hIDX_15PLUS               | ?                          |                                                    |
-| h_art_stage_dur           | ?                          |                                                    |
-| everARTelig_idx           | ?                          |                                                    |
-| migrate_ag                | migration_rate             | Rate people migrate into population by age and sex |
-| sx_netmig                 | survival_netmig            |                                                    |
-| births_sex                | births_sex                 |                                                    |
-| migrate_a0                | migration_rate_a0          |                                                    |
-| hiv_ag_prob               | hiv_age_up_prob            |                                                    |
-| hivpop_ha                 | hiv_population_coarse_ages |                                                    |
-| netmig_ag                 | hiv_net_migration          |                                                    |
-| deathsmig_ha              | deaths_migrate             |                                                    |
-| deathmigrate_ha           | deaths_migrate_rate        |                                                    |
-| cd4elig_idx               | ?                          |                                                    |
-| everARTelig_idx           |                            |                                                    |
-| infections_ts             |                            |                                                    |
-| Xhivn                     |                            |                                                    |
-| Xhivn_incagerr            |                            |                                                    |
-| incrate_i                 |                            |                                                    |
-| incrate_g                 |                            |                                                    |
-| hivdeaths_ha              |                            |                                                    |
-| grad                      |                            |                                                    |
-| infections_a              |                            |                                                    |
-| infections_ha             |                            |                                                    |
-| gradART                   |                            |                                                    |
-| artelig_hahm              |                            |                                                    |
-| Xart_15plus               |                            |                                                    |
-| Xartelig_15plus           |                            |                                                    |
-| expect_mort_artelig15plus |                            |                                                    |
-| artnum_hts                |                            |                                                    |
-| artcov_hts                |                            |                                                    |
-| curr_coverage             |                            |                                                    |
-| artinit_hts               |                            |                                                    |
-| artinit_hahm              |                            |                                                    |
-| hivpop_ha                 |                            |                                                    |
-| hivqx_ha                  |                            |                                                    |
-| hivdeaths_a               |                            |                                                    |
+| Leapfrog                  | Frogger                    | Details                                                                   |
+|---------------------------|----------------------------|---------------------------------------------------------------------------|
+| ART0MOS                   | ?                          |                                                                           |
+| pIDX_INCIDPOP             | ?                          | Index of youngest age that is reflected in the adult incidence input      |
+| pAG_INCIDPOP              | ?                          |                                                                           |
+| hAG_15PLUS                | ?                          |                                                                           |
+| hIDX_15PLUS               | ?                          |                                                                           |
+| h_art_stage_dur           | ?                          |                                                                           |
+| everARTelig_idx           | ?                          |                                                                           |
+| migrate_ag                | migration_rate             | Rate people migrate into population by age and sex                        |
+| sx_netmig                 | survival_netmig            |                                                                           |
+| births_sex                | births_sex                 |                                                                           |
+| migrate_a0                | migration_rate_a0          |                                                                           |
+| hiv_ag_prob               | hiv_age_up_prob            | Probability of aging from one group to the next in HIV age stratification |
+| hivpop_ha                 | hiv_population_coarse_ages |                                                                           |
+| netmig_ag                 | hiv_net_migration          |                                                                           |
+| deathsmig_ha              | deaths_migrate             |                                                                           |
+| deathmigrate_ha           | deaths_migrate_rate        |                                                                           |
+| cd4elig_idx               | ?                          | Index of the maximum CD4 count category eligible for ART                  |
+| everARTelig_idx           |                            |                                                                           |
+| anyelig_idx               |                            |                                                                           |
+| infections_ts             |                            | Infections occurring at a specific time step                              |
+| hivn_ag                   |                            | HIV negative population for a given age and sex                           |
+| Xhivn                     |                            |                                                                           |
+| Xhivn_incagerr            |                            |                                                                           |
+| incrate_i                 |                            | Incidence rate input                                                      |
+| incrate_g                 |                            | Incidence rate by sex                                                     |
+| hivdeaths_ha              |                            |                                                                           |
+| grad                      |                            | Movement between cd4 categories at a given time step                      |
+| artpop_hahm               |                            |                                                                           |
+| cd4mx_scale               |                            |                                                                           |
+| infections_a              |                            |                                                                           |
+| infections_ha             |                            |                                                                           |
+| gradART                   |                            |                                                                           |
+| artelig_hahm              |                            |                                                                           |
+| Xart_15plus               |                            |                                                                           |
+| Xartelig_15plus           |                            |                                                                           |
+| expect_mort_artelig15plus |                            |                                                                           |
+| artnum_hts                |                            |                                                                           |
+| artcov_hts                |                            |                                                                           |
+| curr_coverage             |                            |                                                                           |
+| artinit_hts               |                            |                                                                           |
+| artinit_hahm              |                            |                                                                           |
+| hivpop_ha                 |                            | HIV population by coarse HIV age group stratification                     |
+| hivqx_ha                  |                            |                                                                           |
+| hivdeaths_a               |                            |                                                                           |
 
 ## License
 
