@@ -57,6 +57,9 @@ Rcpp::List run_base_model(const Rcpp::List data,
   const int disease_stages = 7;
   const int treatment_stages = 3;
   const int hiv_adult_first_age_group = 15;
+  const int adult_incidence_first_age_group = hiv_adult_first_age_group;
+  // Hardcoded 15-49 for now
+  const int pAG_INCIDPOP = 35;
   // 0-based indexing vs R 1-based
   const int time_art_start =
       Rcpp::as<int>(projection_parameters["t_ART_start"]) - 1;
@@ -78,6 +81,12 @@ Rcpp::List run_base_model(const Rcpp::List data,
   leapfrog::TensorMap2<double> births_sex_prop(REAL(data["births_sex_prop"]), num_genders,
                                                proj_years);
 
+  leapfrog::TensorMap1<double> incidence_rate(REAL(data["incidinput"]), proj_years);
+  leapfrog::TensorMap2<double> incidence_relative_risk_age(REAL(data["incrr_age"]),
+                                                           age_groups_pop - hiv_adult_first_age_group,
+                                                           num_genders);
+  leapfrog::TensorMap1<double> incidence_relative_risk_sex(REAL(data["incrr_sex"]), num_genders);
+
   leapfrog::Parameters<double> params = {num_genders,
                                          age_groups_pop,
                                          fertility_first_age_group,
@@ -87,12 +96,17 @@ Rcpp::List run_base_model(const Rcpp::List data,
                                          hiv_adult_first_age_group,
                                          treatment_stages,
                                          time_art_start,
+                                         adult_incidence_first_age_group,
+                                         pAG_INCIDPOP,
                                          age_groups_hiv_span,
+                                         incidence_rate,
                                          base_pop,
                                          survival,
                                          net_migration,
                                          age_sex_fertility_ratio,
-                                         births_sex_prop};
+                                         births_sex_prop,
+                                         incidence_relative_risk_age,
+                                         incidence_relative_risk_sex};
 
   auto state = leapfrog::run_model(proj_years, params);
 

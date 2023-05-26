@@ -41,14 +41,24 @@ struct Parameters {
   int treatment_stages;
   // Time step to start ART treatment
   int time_art_start;
+  // Index of the youngest age that is reflected in the adult incidence input
+  int adult_incidence_first_age_group;
+
+  int pAG_INCIDPOP;
+
   // Number of years in each HIV age group
   TensorMap1<int> age_groups_hiv_span;
+
+  // Incidence rate at each time step
+  TensorMap1<real_type> incidence_rate;
 
   TensorMap2<real_type> base_pop;
   TensorMap3<real_type> survival;
   TensorMap3<real_type> net_migration;
   TensorMap2<real_type> age_sex_fertility_ratio;
   TensorMap2<real_type> births_sex_prop;
+  TensorMap2<real_type> incidence_relative_risk_age;
+  TensorMap1<real_type> incidence_relative_risk_sex;
 };
 
 template<typename real_type>
@@ -60,6 +70,7 @@ struct State {
   Tensor3<real_type> hiv_strat_adult;
   Tensor4<real_type> art_strat_adult;
   real_type births;
+  real_type incidence_rate;
 
   State(int age_groups_pop,
         int num_genders,

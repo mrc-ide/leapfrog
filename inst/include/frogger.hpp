@@ -2,6 +2,7 @@
 
 #include "general_demographic_projection.hpp"
 #include "hiv_demographic_projection.hpp"
+#include "model_simulation.hpp"
 
 namespace leapfrog {
 
@@ -38,6 +39,7 @@ State<real_type> run_model(int time_steps, const Parameters<real_type> &pars) {
   for (int step = 1; step <= time_steps; ++step) {
     internal::run_general_pop_demographic_projection(step, pars, state, state_next, intermediate);
     internal::run_hiv_pop_demographic_projection(step, pars, state, state_next, intermediate);
+    internal::run_hiv_model_simulation(step, pars, state, state_next, intermediate);
     std::swap(state, state_next);
     intermediate.reset();
   }
