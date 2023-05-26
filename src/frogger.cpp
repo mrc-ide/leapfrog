@@ -65,34 +65,34 @@ Rcpp::List run_base_model(const Rcpp::List data,
   int age_groups_hiv = static_cast<int>(age_groups_hiv_span.size());
 
   leapfrog::TensorMap2<double> base_pop(REAL(data["basepop"]), age_groups_pop,
-                              num_genders);
+                                        num_genders);
   // Survival has size age_groups_pop + 1 as this is the probability of
   // surviving between ages, so from 0 to 1, 1 to 2, ..., 79 to 80+ and
   // 80+ to 80+
   leapfrog::TensorMap3<double> survival(REAL(data["Sx"]), age_groups_pop + 1, num_genders,
-                                       proj_years);
+                                        proj_years);
   leapfrog::TensorMap3<double> net_migration(REAL(data["netmigr_adj"]), age_groups_pop,
-                                            num_genders, proj_years);
+                                             num_genders, proj_years);
   leapfrog::TensorMap2<double> age_sex_fertility_ratio(REAL(data["asfr"]),
-                                                      age_groups_fert, proj_years);
+                                                       age_groups_fert, proj_years);
   leapfrog::TensorMap2<double> births_sex_prop(REAL(data["births_sex_prop"]), num_genders,
-                                              proj_years);
+                                               proj_years);
 
   leapfrog::Parameters<double> params = {num_genders,
-                                        age_groups_pop,
-                                        fertility_first_age_group,
-                                        age_groups_fert,
-                                        age_groups_hiv,
-                                        disease_stages,
-                                        hiv_adult_first_age_group,
-                                        treatment_stages,
-                                        time_art_start,
-                                        age_groups_hiv_span,
-                                        base_pop,
-                                        survival,
-                                        net_migration,
-                                        age_sex_fertility_ratio,
-                                        births_sex_prop};
+                                         age_groups_pop,
+                                         fertility_first_age_group,
+                                         age_groups_fert,
+                                         age_groups_hiv,
+                                         disease_stages,
+                                         hiv_adult_first_age_group,
+                                         treatment_stages,
+                                         time_art_start,
+                                         age_groups_hiv_span,
+                                         base_pop,
+                                         survival,
+                                         net_migration,
+                                         age_sex_fertility_ratio,
+                                         births_sex_prop};
 
   auto state = leapfrog::run_model(proj_years, params);
 
