@@ -21,8 +21,8 @@ int get_simulation_years(const Rcpp::List demp, SEXP r_sim_years) {
   return sim_years;
 }
 
-TensorMap1<int> get_age_groups_hiv_span(const Rcpp::List projection_parameters,
-                                        std::string hiv_age_stratification) {
+leapfrog::TensorMap1<int> get_age_groups_hiv_span(const Rcpp::List projection_parameters,
+                                                  std::string hiv_age_stratification) {
   int age_groups_hiv;
   SEXP data;
   if (hiv_age_stratification == "full") {
@@ -40,7 +40,7 @@ TensorMap1<int> get_age_groups_hiv_span(const Rcpp::List projection_parameters,
     Rcpp::stop("Invalid size of data, expected %d got %d", age_groups_hiv,
                LENGTH(data));
   }
-  TensorMap1<int> age_groups_hiv_span(INTEGER(data), age_groups_hiv);
+  leapfrog::TensorMap1<int> age_groups_hiv_span(INTEGER(data), age_groups_hiv);
   return age_groups_hiv_span;
 }
 
@@ -64,37 +64,37 @@ Rcpp::List run_base_model(const Rcpp::List data,
       get_age_groups_hiv_span(projection_parameters, hiv_age_stratification);
   int age_groups_hiv = static_cast<int>(age_groups_hiv_span.size());
 
-  TensorMap2<double> base_pop(REAL(data["basepop"]), age_groups_pop,
-                              num_genders);
+  leapfrog::TensorMap2<double> base_pop(REAL(data["basepop"]), age_groups_pop,
+                                        num_genders);
   // Survival has size age_groups_pop + 1 as this is the probability of
   // surviving between ages, so from 0 to 1, 1 to 2, ..., 79 to 80+ and
   // 80+ to 80+
-  TensorMap3<double> survival(REAL(data["Sx"]), age_groups_pop + 1, num_genders,
-                              proj_years);
-  TensorMap3<double> net_migration(REAL(data["netmigr_adj"]), age_groups_pop,
-                                   num_genders, proj_years);
-  TensorMap2<double> age_sex_fertility_ratio(REAL(data["asfr"]),
-                                             age_groups_fert, proj_years);
-  TensorMap2<double> births_sex_prop(REAL(data["births_sex_prop"]), num_genders,
-                                     proj_years);
+  leapfrog::TensorMap3<double> survival(REAL(data["Sx"]), age_groups_pop + 1, num_genders,
+                                        proj_years);
+  leapfrog::TensorMap3<double> net_migration(REAL(data["netmigr_adj"]), age_groups_pop,
+                                             num_genders, proj_years);
+  leapfrog::TensorMap2<double> age_sex_fertility_ratio(REAL(data["asfr"]),
+                                                       age_groups_fert, proj_years);
+  leapfrog::TensorMap2<double> births_sex_prop(REAL(data["births_sex_prop"]), num_genders,
+                                               proj_years);
 
-  Parameters<double> params = {num_genders,
-                               age_groups_pop,
-                               fertility_first_age_group,
-                               age_groups_fert,
-                               age_groups_hiv,
-                               disease_stages,
-                               hiv_adult_first_age_group,
-                               treatment_stages,
-                               time_art_start,
-                               age_groups_hiv_span,
-                               base_pop,
-                               survival,
-                               net_migration,
-                               age_sex_fertility_ratio,
-                               births_sex_prop};
+  leapfrog::Parameters<double> params = {num_genders,
+                                         age_groups_pop,
+                                         fertility_first_age_group,
+                                         age_groups_fert,
+                                         age_groups_hiv,
+                                         disease_stages,
+                                         hiv_adult_first_age_group,
+                                         treatment_stages,
+                                         time_art_start,
+                                         age_groups_hiv_span,
+                                         base_pop,
+                                         survival,
+                                         net_migration,
+                                         age_sex_fertility_ratio,
+                                         births_sex_prop};
 
-  auto state = run_model(proj_years, params);
+  auto state = leapfrog::run_model(proj_years, params);
 
   Rcpp::NumericVector r_total_population(age_groups_pop * num_genders);
   Rcpp::NumericVector r_births(1);

@@ -2,40 +2,47 @@
 
 #include <unsupported/Eigen/CXX11/Tensor>
 
-const int MALE = 0;
-const int FEMALE = 1;
+namespace leapfrog {
 
-template <typename real_type>
-using TensorMap1 = Eigen::TensorMap<Eigen::Tensor<real_type, 1>>;
-template <typename real_type>
-using TensorMap2 = Eigen::TensorMap<Eigen::Tensor<real_type, 2>>;
+template<typename real_type>
+using TensorMap1 = Eigen::TensorMap <Eigen::Tensor<real_type, 1>>;
 
-template <typename real_type>
-using TensorMap3 = Eigen::TensorMap<Eigen::Tensor<real_type, 3>>;
+template<typename real_type>
+using TensorMap2 = Eigen::TensorMap <Eigen::Tensor<real_type, 2>>;
 
-template <typename real_type>
+template<typename real_type>
+using TensorMap3 = Eigen::TensorMap <Eigen::Tensor<real_type, 3>>;
+
+template<typename real_type>
 using Tensor2 = Eigen::Tensor<real_type, 2>;
 
-template <typename real_type>
+template<typename real_type>
 using Tensor3 = Eigen::Tensor<real_type, 3>;
 
-template <typename real_type>
+template<typename real_type>
 using Tensor4 = Eigen::Tensor<real_type, 4>;
 
-template <typename real_type>
+template<typename real_type>
 struct Parameters {
   int num_genders;
-  int age_groups_pop;             // Default 81 for ages 0 to 80+
-  int fertility_first_age_group;  // First index of population eligible for
-                                  // fertility
-  int age_groups_fert;            // Number of ages eligible for fertility
-  int age_groups_hiv;             // Numer of age groups in HIV population
-  int disease_stages;             // Number of HIV disease stages
-  int hiv_adult_first_age_group;  // First index of HIV population to model as
-                                  // adult
-  int treatment_stages;           // Number of HIV ART treatment stages
-  int time_art_start;             // Time step to start ART treatment
-  TensorMap1<int> age_groups_hiv_span;  // Number of years in each HIV age group
+  // Default 81 for ages 0 to 80+
+  int age_groups_pop;
+  // First index of population eligible for fertility
+  int fertility_first_age_group;
+  // Number of ages eligible for fertility
+  int age_groups_fert;
+  // Numer of age groups in HIV population
+  int age_groups_hiv;
+  // Number of HIV disease stages
+  int disease_stages;
+  // First index of HIV population to model as adult
+  int hiv_adult_first_age_group;
+  // Number of HIV ART treatment stages
+  int treatment_stages;
+  // Time step to start ART treatment
+  int time_art_start;
+  // Number of years in each HIV age group
+  TensorMap1<int> age_groups_hiv_span;
 
   TensorMap2<real_type> base_pop;
   TensorMap3<real_type> survival;
@@ -44,7 +51,7 @@ struct Parameters {
   TensorMap2<real_type> births_sex_prop;
 };
 
-template <typename real_type>
+template<typename real_type>
 struct State {
   Tensor2<real_type> total_population;
   Tensor2<real_type> natural_deaths;
@@ -70,7 +77,12 @@ struct State {
                         num_genders) {}
 };
 
-template <typename real_type>
+namespace internal {
+
+const int MALE = 0;
+const int FEMALE = 1;
+
+template<typename real_type>
 struct IntermediateData {
   Tensor2<real_type> migration_rate;
   Tensor2<real_type> hiv_net_migration;
@@ -90,3 +102,6 @@ struct IntermediateData {
     hiv_age_up_prob.setZero();
   }
 };
+
+}
+}

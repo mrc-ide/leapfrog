@@ -3,12 +3,16 @@
 #include <iostream>
 #include "types.hpp"
 
-template <typename real_type>
+namespace leapfrog {
+
+namespace internal {
+
+template<typename real_type>
 void run_hiv_pop_demographic_projection(int time_step,
-                                        const Parameters<real_type>& pars,
-                                        const State<real_type>& state_curr,
-                                        State<real_type>& state_next,
-                                        IntermediateData<real_type>& intermediate) {
+                                        const Parameters<real_type> &pars,
+                                        const State<real_type> &state_curr,
+                                        State<real_type> &state_next,
+                                        IntermediateData<real_type> &intermediate) {
   run_hiv_ageing_and_mortality(time_step, pars, state_curr, state_next,
                                intermediate);
   run_hiv_and_art_stratified_ageing(time_step, pars, state_curr, state_next,
@@ -18,12 +22,12 @@ void run_hiv_pop_demographic_projection(int time_step,
                                                   state_next, intermediate);
 }
 
-template <typename real_type>
+template<typename real_type>
 void run_hiv_ageing_and_mortality(int time_step,
-                                  const Parameters<real_type>& pars,
-                                  const State<real_type>& state_curr,
-                                  State<real_type>& state_next,
-                                  IntermediateData<real_type>& intermediate) {
+                                  const Parameters<real_type> &pars,
+                                  const State<real_type> &state_curr,
+                                  State<real_type> &state_next,
+                                  IntermediateData<real_type> &intermediate) {
   // Non-hiv deaths
   for (int g = 0; g < pars.num_genders; ++g) {
     for (int a = 1; a < pars.age_groups_pop; ++a) {
@@ -42,12 +46,12 @@ void run_hiv_ageing_and_mortality(int time_step,
   }
 }
 
-template <typename real_type>
+template<typename real_type>
 void run_hiv_and_art_stratified_ageing(int time_step,
-                                       const Parameters<real_type>& pars,
-                                       const State<real_type>& state_curr,
-                                       State<real_type>& state_next,
-                                       IntermediateData<real_type>& intermediate) {
+                                       const Parameters<real_type> &pars,
+                                       const State<real_type> &state_curr,
+                                       State<real_type> &state_next,
+                                       IntermediateData<real_type> &intermediate) {
   // age coarse stratified HIV population
   for (int g = 0; g < pars.num_genders; ++g) {
     int a = pars.hiv_adult_first_age_group;
@@ -60,7 +64,8 @@ void run_hiv_and_art_stratified_ageing(int time_step,
         intermediate.hiv_age_up_prob(ha, g) += state_curr.hiv_population(a, g);
       }
       if (intermediate.hiv_age_up_prob(ha, g) > 0) {
-        intermediate.hiv_age_up_prob(ha, g) = state_curr.hiv_population(a - 1, g) / intermediate.hiv_age_up_prob(ha, g);
+        intermediate.hiv_age_up_prob(ha, g) =
+            state_curr.hiv_population(a - 1, g) / intermediate.hiv_age_up_prob(ha, g);
       } else {
         intermediate.hiv_age_up_prob(ha, g) = 0.0;
       }
@@ -74,8 +79,10 @@ void run_hiv_and_art_stratified_ageing(int time_step,
         if (time_step > pars.time_art_start)
           for (int hu = 0; hu < pars.treatment_stages; ++hu) {
             state_next.art_strat_adult(hu, hm, ha, g) =
-                ((1.0 - intermediate.hiv_age_up_prob(ha, g)) * state_curr.art_strat_adult(hu, hm, ha, g)) +
-                (intermediate.hiv_age_up_prob(ha - 1, g) * state_curr.art_strat_adult(hu, hm, ha - 1, g));
+                ((1.0 - intermediate.hiv_age_up_prob(ha, g)) *
+                 state_curr.art_strat_adult(hu, hm, ha, g)) +
+                (intermediate.hiv_age_up_prob(ha - 1, g) *
+                 state_curr.art_strat_adult(hu, hm, ha - 1, g));
           }
       }
     }
@@ -99,11 +106,11 @@ void run_hiv_and_art_stratified_ageing(int time_step,
   }
 }
 
-template <typename real_type>
+template<typename real_type>
 void run_hiv_deaths_and_migration(int time_step,
-                                  const Parameters<real_type>& pars,
-                                  State<real_type>& state_next,
-                                  IntermediateData<real_type>& intermediate) {
+                                  const Parameters<real_type> &pars,
+                                  State<real_type> &state_next,
+                                  IntermediateData<real_type> &intermediate) {
   // remove non-HIV deaths and net migration from hiv_population
   for (int g = 0; g < pars.num_genders; ++g) {
     for (int a = 1; a < pars.age_groups_pop; ++a) {
@@ -115,13 +122,13 @@ void run_hiv_deaths_and_migration(int time_step,
   }
 }
 
-template <typename real_type>
+template<typename real_type>
 void run_hiv_and_art_stratified_deaths_and_migration(
     int time_step,
-    const Parameters<real_type>& pars,
-    const State<real_type>& state_curr,
-    State<real_type>& state_next,
-    IntermediateData<real_type>& intermediate) {
+    const Parameters<real_type> &pars,
+    const State<real_type> &state_curr,
+    State<real_type> &state_next,
+    IntermediateData<real_type> &intermediate) {
   for (int g = 0; g < pars.num_genders; ++g) {
     int a = pars.hiv_adult_first_age_group;
     for (int ha = 0; ha < pars.age_groups_hiv; ++ha) {
@@ -156,4 +163,7 @@ void run_hiv_and_art_stratified_deaths_and_migration(
       }
     }
   }
+}
+
+}
 }
