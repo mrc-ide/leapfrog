@@ -81,11 +81,11 @@ Rcpp::List run_base_model(const Rcpp::List data,
   leapfrog::TensorMap2<double> births_sex_prop(REAL(data["births_sex_prop"]), num_genders,
                                                proj_years);
 
-  leapfrog::TensorMap1<double> incidence_rate(REAL(data["incidinput"]), proj_years);
-  leapfrog::TensorMap2<double> incidence_relative_risk_age(REAL(data["incrr_age"]),
+  leapfrog::TensorMap1<double> incidence_rate(REAL(projection_parameters["incidinput"]), proj_years);
+  leapfrog::TensorMap3<double> incidence_relative_risk_age(REAL(projection_parameters["incrr_age"]),
                                                            age_groups_pop - hiv_adult_first_age_group,
-                                                           num_genders);
-  leapfrog::TensorMap1<double> incidence_relative_risk_sex(REAL(data["incrr_sex"]), num_genders);
+                                                           num_genders, proj_years);
+  leapfrog::TensorMap1<double> incidence_relative_risk_sex(REAL(projection_parameters["incrr_sex"]), proj_years);
 
   leapfrog::Parameters<double> params = {num_genders,
                                          age_groups_pop,

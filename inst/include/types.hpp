@@ -14,6 +14,9 @@ template<typename real_type>
 using TensorMap3 = Eigen::TensorMap <Eigen::Tensor<real_type, 3>>;
 
 template<typename real_type>
+using Tensor1 = Eigen::Tensor<real_type, 1>;
+
+template<typename real_type>
 using Tensor2 = Eigen::Tensor<real_type, 2>;
 
 template<typename real_type>
@@ -57,7 +60,7 @@ struct Parameters {
   TensorMap3<real_type> net_migration;
   TensorMap2<real_type> age_sex_fertility_ratio;
   TensorMap2<real_type> births_sex_prop;
-  TensorMap2<real_type> incidence_relative_risk_age;
+  TensorMap3<real_type> incidence_relative_risk_age;
   TensorMap1<real_type> incidence_relative_risk_sex;
 };
 
@@ -70,7 +73,6 @@ struct State {
   Tensor3<real_type> hiv_strat_adult;
   Tensor4<real_type> art_strat_adult;
   real_type births;
-  real_type incidence_rate;
 
   State(int age_groups_pop,
         int num_genders,
@@ -99,18 +101,34 @@ struct IntermediateData {
   Tensor2<real_type> hiv_net_migration;
   Tensor2<real_type> hiv_population_coarse_ages;
   Tensor2<real_type> hiv_age_up_prob;
+  Tensor2<real_type> hiv_negative_pop;
+  Tensor2<real_type> infections_ts;
+  Tensor1<real_type> incidence_rate_sex;
+  Tensor1<real_type> hiv_neg_aggregate;
+  Tensor1<real_type> Xhivn_incagerr;
+
 
   IntermediateData(int age_groups_pop, int age_groups_hiv, int num_genders)
       : migration_rate(age_groups_pop, num_genders),
         hiv_net_migration(age_groups_pop, num_genders),
         hiv_population_coarse_ages(age_groups_hiv, num_genders),
-        hiv_age_up_prob(age_groups_hiv, num_genders) {}
+        hiv_age_up_prob(age_groups_hiv, num_genders),
+        hiv_negative_pop(age_groups_pop, num_genders),
+        infections_ts(age_groups_pop, num_genders),
+        hiv_neg_aggregate(num_genders),
+        Xhivn_incagerr(num_genders),
+        incidence_rate_sex(num_genders) {}
 
   void reset() {
     migration_rate.setZero();
     hiv_net_migration.setZero();
     hiv_population_coarse_ages.setZero();
     hiv_age_up_prob.setZero();
+    hiv_negative_pop.setZero();
+    infections_ts.setZero();
+    hiv_neg_aggregate.setZero();
+    Xhivn_incagerr.setZero();
+    incidence_rate_sex.setZero();
   }
 };
 
