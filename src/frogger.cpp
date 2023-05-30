@@ -21,6 +21,16 @@ int get_simulation_years(const Rcpp::List demp, SEXP r_sim_years) {
   return sim_years;
 }
 
+int get_hiv_steps_per_year(SEXP r_hiv_steps_per_year) {
+  int hiv_steps_per_year;
+  if (r_hiv_steps_per_year == R_NilValue) {
+    hiv_steps_per_year = 10;
+  } else {
+    hiv_steps_per_year = INTEGER(r_hiv_steps_per_year)[0];
+  }
+  return hiv_steps_per_year;
+}
+
 leapfrog::TensorMap1<int> get_age_groups_hiv_span(const Rcpp::List projection_parameters,
                                                   std::string hiv_age_stratification) {
   int age_groups_hiv;
@@ -48,8 +58,10 @@ leapfrog::TensorMap1<int> get_age_groups_hiv_span(const Rcpp::List projection_pa
 Rcpp::List run_base_model(const Rcpp::List data,
                           const Rcpp::List projection_parameters,
                           SEXP sim_years,
+                          SEXP hiv_steps_per_year = 10,
                           std::string hiv_age_stratification = "full") {
   const int proj_years = get_simulation_years(data, sim_years);
+  const int hiv_steps = get_hiv_steps_per_year(hiv_steps_per_year);
   const int num_genders = 2;
   const int age_groups_pop = 81;
   const int fertility_first_age_group = 15;
@@ -66,6 +78,8 @@ Rcpp::List run_base_model(const Rcpp::List data,
   auto age_groups_hiv_span =
       get_age_groups_hiv_span(projection_parameters, hiv_age_stratification);
   int age_groups_hiv = static_cast<int>(age_groups_hiv_span.size());
+  const int scale_cd4_mort =
+      Rcpp::as<int>(projection_parameters["scale_cd4_mort"]);
 
   leapfrog::TensorMap2<double> base_pop(REAL(data["basepop"]), age_groups_pop,
                                         num_genders);
@@ -80,12 +94,16 @@ Rcpp::List run_base_model(const Rcpp::List data,
                                                        age_groups_fert, proj_years);
   leapfrog::TensorMap2<double> births_sex_prop(REAL(data["births_sex_prop"]), num_genders,
                                                proj_years);
-
   leapfrog::TensorMap1<double> incidence_rate(REAL(projection_parameters["incidinput"]), proj_years);
   leapfrog::TensorMap3<double> incidence_relative_risk_age(REAL(projection_parameters["incrr_age"]),
                                                            age_groups_pop - hiv_adult_first_age_group,
                                                            num_genders, proj_years);
   leapfrog::TensorMap1<double> incidence_relative_risk_sex(REAL(projection_parameters["incrr_sex"]), proj_years);
+  leapfrog::TensorMap3<double> cd4_mortality(REAL(projection_parameters["cd4_mort_full"]),
+                                             disease_stages, age_groups_hiv, num_genders);
+  leapfrog::TensorMap3<double> cd4_progression(REAL(projection_parameters["cd4_prog_full"]),
+                                               disease_stages - 1, age_groups_hiv, num_genders);
+  leapfrog::TensorMap1<double> artcd4elig_idx(REAL(projection_parameters["artcd4elig_idx"]), proj_years);
 
   leapfrog::Parameters<double> params = {num_genders,
                                          age_groups_pop,
@@ -98,6 +116,9 @@ Rcpp::List run_base_model(const Rcpp::List data,
                                          time_art_start,
                                          adult_incidence_first_age_group,
                                          pAG_INCIDPOP,
+                                         hiv_steps,
+                                         (1.0 / hiv_steps),
+                                         scale_cd4_mort,
                                          age_groups_hiv_span,
                                          incidence_rate,
                                          base_pop,
@@ -106,7 +127,10 @@ Rcpp::List run_base_model(const Rcpp::List data,
                                          age_sex_fertility_ratio,
                                          births_sex_prop,
                                          incidence_relative_risk_age,
-                                         incidence_relative_risk_sex};
+                                         incidence_relative_risk_sex,
+                                         cd4_mortality,
+                                         cd4_progression,
+                                         artcd4elig_idx};
 
   auto state = leapfrog::run_model(proj_years, params);
 
@@ -119,6 +143,7 @@ Rcpp::List run_base_model(const Rcpp::List data,
                                         num_genders);
   Rcpp::NumericVector r_art_strat_adult(treatment_stages * disease_stages *
                                         age_groups_hiv * num_genders);
+  Rcpp::NumericVector r_aids_deaths_no_art(disease_stages * age_groups_hiv * num_genders);
   r_total_population.attr("dim") =
       Rcpp::NumericVector::create(age_groups_pop, num_genders);
   r_natural_deaths.attr("dim") =
@@ -131,6 +156,8 @@ Rcpp::List run_base_model(const Rcpp::List data,
       Rcpp::NumericVector::create(disease_stages, age_groups_hiv, num_genders);
   r_art_strat_adult.attr("dim") = Rcpp::NumericVector::create(
       treatment_stages, disease_stages, age_groups_hiv, num_genders);
+  r_aids_deaths_no_art.attr("dim") = Rcpp::NumericVector::create(
+      disease_stages, age_groups_hiv, num_genders);
 
   std::copy_n(state.total_population.data(), state.total_population.size(),
               REAL(r_total_population));
@@ -144,6 +171,8 @@ Rcpp::List run_base_model(const Rcpp::List data,
               REAL(r_hiv_strat_adult));
   std::copy_n(state.art_strat_adult.data(), state.art_strat_adult.size(),
               REAL(r_art_strat_adult));
+  std::copy_n(state.aids_deaths_no_art.data(), state.aids_deaths_no_art.size(),
+              REAL(r_aids_deaths_no_art));
   REAL(r_births)[0] = state.births;
 
   Rcpp::List ret =
@@ -153,6 +182,7 @@ Rcpp::List run_base_model(const Rcpp::List data,
                          Rcpp::_["hiv_population"] = r_hiv_population,
                          Rcpp::_["hiv_natural_deaths"] = r_hiv_natural_deaths,
                          Rcpp::_["hiv_strat_adult"] = r_hiv_strat_adult,
-                         Rcpp::_["art_strat_adult"] = r_art_strat_adult);
+                         Rcpp::_["art_strat_adult"] = r_art_strat_adult,
+                         Rcpp::_["aids_deaths_no_art"] = r_aids_deaths_no_art);
   return ret;
 }

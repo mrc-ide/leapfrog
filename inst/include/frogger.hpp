@@ -22,6 +22,7 @@ void initialise_model_state(const Parameters<real_type> &pars,
   state.hiv_strat_adult.setZero();
   state.art_strat_adult.setZero();
   state.births = 0;
+  state.aids_deaths_no_art.setZero();
 }
 
 }
@@ -34,7 +35,8 @@ State<real_type> run_model(int time_steps, const Parameters<real_type> &pars) {
 
   internal::initialise_model_state(pars, state);
   auto state_next = state;
-  internal::IntermediateData<real_type> intermediate(pars.age_groups_pop, pars.age_groups_hiv, pars.num_genders);
+  internal::IntermediateData<real_type> intermediate(pars.age_groups_pop, pars.age_groups_hiv, pars.num_genders,
+                                                     pars.disease_stages);
   // Each time step is mid-point of the year
   for (int step = 1; step <= time_steps; ++step) {
     internal::run_general_pop_demographic_projection(step, pars, state, state_next, intermediate);
