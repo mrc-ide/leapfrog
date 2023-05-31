@@ -2,13 +2,14 @@ test_that("initial state set up works as expected", {
   demp <- readRDS(test_path("testdata/demographic_projection_object.rds"))
   parameters <- readRDS(test_path("testdata/projection_parameters.rds"))
 
-  out <- run_base_model(demp, parameters, 0L)
+  out <- run_base_model(demp, parameters, 0L, 0L)
 
   expect_setequal(
     names(out),
     c(
       "total_population", "births", "natural_deaths", "hiv_population",
-      "hiv_natural_deaths", "hiv_strat_adult", "art_strat_adult"
+      "hiv_natural_deaths", "hiv_strat_adult", "art_strat_adult",
+      "aids_deaths_no_art"
     )
   )
   expect_equal(dim(out$total_population), c(81, 2))
@@ -32,13 +33,14 @@ test_that("initial state set up with coarse stratified HIV works as expected", {
   demp <- readRDS(test_path("testdata/demographic_projection_object.rds"))
   parameters <- readRDS(test_path("testdata/projection_parameters.rds"))
 
-  out <- run_base_model(demp, parameters, 0L, "coarse")
+  out <- run_base_model(demp, parameters, 0L, 0L, hiv_age_stratification = "coarse")
 
   expect_setequal(
     names(out),
     c(
       "total_population", "births", "natural_deaths", "hiv_population",
-      "hiv_natural_deaths", "hiv_strat_adult", "art_strat_adult"
+      "hiv_natural_deaths", "hiv_strat_adult", "art_strat_adult",
+      "aids_deaths_no_art"
     )
   )
   expect_equal(dim(out$total_population), c(81, 2))
@@ -62,13 +64,14 @@ test_that("model for 1 time step has looped", {
   demp <- readRDS(test_path("testdata/demographic_projection_object.rds"))
   parameters <- readRDS(test_path("testdata/projection_parameters.rds"))
 
-  out <- run_base_model(demp, parameters, 1L)
+  out <- run_base_model(demp, parameters, 1L, 10L)
 
   expect_setequal(
     names(out),
     c(
       "total_population", "births", "natural_deaths", "hiv_population",
-      "hiv_natural_deaths", "hiv_strat_adult", "art_strat_adult"
+      "hiv_natural_deaths", "hiv_strat_adult", "art_strat_adult",
+      "aids_deaths_no_art"
     )
   )
   expect_equal(dim(out$total_population), c(81, 2))
@@ -87,7 +90,7 @@ test_that("model can be run for all years", {
   demp <- readRDS(test_path("testdata/demographic_projection_object.rds"))
   parameters <- readRDS(test_path("testdata/projection_parameters.rds"))
 
-  expect_error(run_base_model(demp, parameters, NULL), NA)
+  expect_error(run_base_model(demp, parameters, NULL, NULL), NA)
 })
 
 test_that("model can be run with ART initiation", {
@@ -96,7 +99,7 @@ test_that("model can be run with ART initiation", {
   ## Set time ART start to some value lower than no of years in projection
   parameters[["t_ART_start"]] <- 20L
 
-  expect_error(run_base_model(demp, parameters, NULL), NA)
+  expect_error(run_base_model(demp, parameters, NULL, NULL), NA)
 })
 
 test_that("error thrown if trying to run model for more than max years", {
@@ -104,7 +107,7 @@ test_that("error thrown if trying to run model for more than max years", {
   parameters <- readRDS(test_path("testdata/projection_parameters.rds"))
 
   expect_error(
-    run_base_model(demp, parameters, 100L),
+    run_base_model(demp, parameters, 100L, 10L),
     "No of years > max years of 60"
   )
 })
@@ -114,7 +117,7 @@ test_that("error thrown if model run with invalid HIV stratification", {
   parameters <- readRDS(test_path("testdata/projection_parameters.rds"))
 
   expect_error(
-    run_base_model(demp, parameters, NULL, hiv_age_stratification = "fine"),
+    run_base_model(demp, parameters, NULL, NULL, hiv_age_stratification = "fine"),
     "Invalid HIV age stratification must be 'full' or 'coarse' got 'fine'."
   )
 })
@@ -125,7 +128,7 @@ test_that("error thrown if size of stratified data does not match expected", {
   parameters[["hAG_SPAN_full"]] <- rep(1, 3)
 
   expect_error(
-    run_base_model(demp, parameters, NULL, hiv_age_stratification = "full"),
+    run_base_model(demp, parameters, NULL, NULL, hiv_age_stratification = "full"),
     "Invalid size of data, expected 66 got 3"
   )
 })

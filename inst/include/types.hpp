@@ -51,9 +51,9 @@ struct Parameters {
   // Number of time steps per year in the HIV projection
   int hiv_steps_per_year;
   // Difference in time for each hiv time step in HIV projection
-  int dt;
+  double dt;
 
-  int scale_cd4_mort;
+  int scale_cd4_mortality;
 
   // Number of years in each HIV age group
   TensorMap1<int> age_groups_hiv_span;

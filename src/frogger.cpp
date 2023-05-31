@@ -58,7 +58,7 @@ leapfrog::TensorMap1<int> get_age_groups_hiv_span(const Rcpp::List projection_pa
 Rcpp::List run_base_model(const Rcpp::List data,
                           const Rcpp::List projection_parameters,
                           SEXP sim_years,
-                          SEXP hiv_steps_per_year = 10,
+                          SEXP hiv_steps_per_year,
                           std::string hiv_age_stratification = "full") {
   const int proj_years = get_simulation_years(data, sim_years);
   const int hiv_steps = get_hiv_steps_per_year(hiv_steps_per_year);
@@ -78,7 +78,7 @@ Rcpp::List run_base_model(const Rcpp::List data,
   auto age_groups_hiv_span =
       get_age_groups_hiv_span(projection_parameters, hiv_age_stratification);
   int age_groups_hiv = static_cast<int>(age_groups_hiv_span.size());
-  const int scale_cd4_mort =
+  const int scale_cd4_mortality =
       Rcpp::as<int>(projection_parameters["scale_cd4_mort"]);
 
   leapfrog::TensorMap2<double> base_pop(REAL(data["basepop"]), age_groups_pop,
@@ -103,7 +103,7 @@ Rcpp::List run_base_model(const Rcpp::List data,
                                              disease_stages, age_groups_hiv, num_genders);
   leapfrog::TensorMap3<double> cd4_progression(REAL(projection_parameters["cd4_prog_full"]),
                                                disease_stages - 1, age_groups_hiv, num_genders);
-  leapfrog::TensorMap1<double> artcd4elig_idx(REAL(projection_parameters["artcd4elig_idx"]), proj_years);
+  leapfrog::TensorMap1<int> artcd4elig_idx(INTEGER(projection_parameters["artcd4elig_idx"]), proj_years);
 
   leapfrog::Parameters<double> params = {num_genders,
                                          age_groups_pop,
@@ -118,7 +118,7 @@ Rcpp::List run_base_model(const Rcpp::List data,
                                          pAG_INCIDPOP,
                                          hiv_steps,
                                          (1.0 / hiv_steps),
-                                         scale_cd4_mort,
+                                         scale_cd4_mortality,
                                          age_groups_hiv_span,
                                          incidence_rate,
                                          base_pop,

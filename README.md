@@ -32,7 +32,8 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 * Convert string flags to the model to enums if we need to switch on them in several places. This should make it easier
   to reason about in C++ world and isolate the string checking to a single place
 * Update `gender` terminology to sex
-* Previously `hiv_negative_pop` was fixed size by having dimensions specified by template, how much does this speed up the code? Is there a better way to do this?
+* Previously `hiv_negative_pop` was fixed size by having dimensions specified by template, how much does this speed up
+  the code? Is there a better way to do this?
 
 ## Leapfrog to Frogger glossary
 
@@ -51,37 +52,37 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 
 ### Model settings
 
-| Leapfrog           | Frogger           | Details                           |
-|--------------------|-------------------|-----------------------------------|
-| sim_years          | sim_years         | Number of simulation years to run |
-| hiv_steps_per_year | hiv_steps_per_year                  |                                   |
-| t_ART_start        | time_art_start                  | Time step to start modelling ART  |
+| Leapfrog           | Frogger             | Details                           |
+|--------------------|---------------------|-----------------------------------|
+| sim_years          | sim_years           | Number of simulation years to run |
+| hiv_steps_per_year | hiv_steps_per_year  |                                   |
+| t_ART_start        | time_art_start      | Time step to start modelling ART  |
 | hAG_SPAN           | hiv_age_groups_span | Array of HIV age group sizes      |
 
 ### Input data
 
-| Leapfrog           | Frogger                   | Details                                                                                      |
-|--------------------|---------------------------|----------------------------------------------------------------------------------------------|
-| basepop            | base_pop                  | Population data by age group and sex                                                         |
-| sx                 | Survival                  | Probability of surviving between ages, from 0 to 1, 1 to 2, ..., 79 to 80+ and 80+ to 80+    |
-| netmigr            | net_migration             | Net migration by age group, sex and year                                                     |
-| asfr               | age_sex_fertility_ratio   | Ratio of number of live births in a year and the whole female population of childbearing age |
-| births_sex_prop    | births_sex_prop           |                                                                                              |
-| incidinput         | incidence_rate            |                                                                                              |
+| Leapfrog           | Frogger                     | Details                                                                                      |
+|--------------------|-----------------------------|----------------------------------------------------------------------------------------------|
+| basepop            | base_pop                    | Population data by age group and sex                                                         |
+| sx                 | Survival                    | Probability of surviving between ages, from 0 to 1, 1 to 2, ..., 79 to 80+ and 80+ to 80+    |
+| netmigr            | net_migration               | Net migration by age group, sex and year                                                     |
+| asfr               | age_sex_fertility_ratio     | Ratio of number of live births in a year and the whole female population of childbearing age |
+| births_sex_prop    | births_sex_prop             |                                                                                              |
+| incidinput         | incidence_rate              |                                                                                              |
 | incrr_sex          | incidence_relative_risk_sex | Relative risk of incidence by sex                                                            |
 | incrr_age          | incidence_relative_risk_age | Relative risk of incidence by age                                                            |
-| cd4_initdist       | ?                         | Distribution of infections by cd4 category upon infection                                    |
-| cd4_prog           | cd4_progression           |                                                                                              |
-| cd4_mort           | cd4_mortality             |                                                                                              |
-| art_mort           | ?                         |                                                                                              |
-| artmx_timerr       | ?                         |                                                                                              |
-| art15plus_num      | ?                         |                                                                                              |
-| art15plus_isperc   | ?                         |                                                                                              |
-| artcd4elig_idx     | ?                         |                                                                                              |
-| art_alloc_method   | ?                         |                                                                                              |
-| art_alloc_mxweight | ?                         |                                                                                              |
-| scale_cd4_mort     | scale_cd4_mort                          |                                                                                              |
-| art_dropout        | ?                         |                                                                                              |
+| cd4_initdist       | ?                           | Distribution of infections by cd4 category upon infection                                    |
+| cd4_prog           | cd4_progression             |                                                                                              |
+| cd4_mort           | cd4_mortality               |                                                                                              |
+| art_mort           | ?                           |                                                                                              |
+| artmx_timerr       | ?                           |                                                                                              |
+| art15plus_num      | ?                           |                                                                                              |
+| art15plus_isperc   | ?                           |                                                                                              |
+| artcd4elig_idx     | ?                           |                                                                                              |
+| art_alloc_method   | ?                           |                                                                                              |
+| art_alloc_mxweight | ?                           |                                                                                              |
+| scale_cd4_mort     | scale_cd4_mortality         |                                                                                              |
+| art_dropout        | ?                           |                                                                                              |
 
 ### Outputs
 
@@ -129,7 +130,7 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 | Xhivn_incagerr            |                                 |                                                                           |
 | incrate_i                 |                                 | Incidence rate input                                                      |
 | incrate_g                 | incidence_rate_sex              | Incidence rate by sex                                                     |
-| hivdeaths_ha              | hiv_deaths_age_sex                                |                                                                           |
+| hivdeaths_ha              | hiv_deaths_age_sex              |                                                                           |
 | grad                      | grad                            | Movement between cd4 categories at a given time step                      |
 | artpop_hahm               |                                 |                                                                           |
 | cd4mx_scale               |                                 |                                                                           |

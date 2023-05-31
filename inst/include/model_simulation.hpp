@@ -15,9 +15,10 @@ void run_hiv_model_simulation(int time_step,
   run_add_new_hiv_infections(time_step, pars, state_curr, state_next, intermediate);
 
   intermediate.cd4elig_idx = pars.artcd4elig_idx(time_step) - 1; // -1 for 0-based indexing vs. 1-based in R
-  intermediate.everARTelig_idx = intermediate.cd4elig_idx < pars.disease_stages ? intermediate.cd4elig_idx : pars.disease_stages;
+  intermediate.everARTelig_idx =
+      intermediate.cd4elig_idx < pars.disease_stages ? intermediate.cd4elig_idx : pars.disease_stages;
   for (int hiv_step = 0; hiv_step < pars.hiv_steps_per_year; ++hiv_step) {
-    run_disease_progression(time_step, pars, state_curr, state_next, intermediate, hiv_step);
+    run_disease_progression_and_mortality(time_step, pars, state_curr, state_next, intermediate, hiv_step);
   }
 //  run_mortality(time_step, pars, state_curr, state_next, intermediate);
 //  run_art_dropout(time_step, pars, state_curr, state_next, intermediate);
@@ -47,25 +48,28 @@ void run_add_new_hiv_infections(int time_step,
          a < pars.adult_incidence_first_age_group + pars.pAG_INCIDPOP; a++) {
       intermediate.hiv_neg_aggregate(g) += intermediate.hiv_negative_pop(a, g);
       intermediate.Xhivn_incagerr(g) +=
-          pars.incidence_relative_risk_age(a - pars.adult_incidence_first_age_group, g, time_step) * intermediate.hiv_negative_pop(a, g);
+          pars.incidence_relative_risk_age(a - pars.adult_incidence_first_age_group, g, time_step) *
+          intermediate.hiv_negative_pop(a, g);
     }
   }
 
-  intermediate.incidence_rate_sex(MALE) = pars.incidence_rate(time_step) * (intermediate.hiv_neg_aggregate(MALE) + intermediate.hiv_neg_aggregate(FEMALE)) /
-                             (intermediate.hiv_neg_aggregate(MALE) +
-                              pars.incidence_relative_risk_sex(time_step) * intermediate.hiv_neg_aggregate(FEMALE));
+  intermediate.incidence_rate_sex(MALE) =
+      pars.incidence_rate(time_step) * (intermediate.hiv_neg_aggregate(MALE) + intermediate.hiv_neg_aggregate(FEMALE)) /
+      (intermediate.hiv_neg_aggregate(MALE) +
+       pars.incidence_relative_risk_sex(time_step) * intermediate.hiv_neg_aggregate(FEMALE));
   intermediate.incidence_rate_sex(FEMALE) =
       pars.incidence_rate(time_step) * pars.incidence_relative_risk_sex(time_step) *
       (intermediate.hiv_neg_aggregate(MALE) + intermediate.hiv_neg_aggregate(FEMALE)) /
-      (intermediate.hiv_neg_aggregate(MALE) + pars.incidence_relative_risk_sex(time_step) * intermediate.hiv_neg_aggregate(FEMALE));
+      (intermediate.hiv_neg_aggregate(MALE) +
+       pars.incidence_relative_risk_sex(time_step) * intermediate.hiv_neg_aggregate(FEMALE));
 
   for (int g = 0; g < pars.num_genders; g++) {
     for (int a = pars.hiv_adult_first_age_group; a < pars.age_groups_pop; a++) {
       intermediate.infections_ts(a, g) =
           intermediate.hiv_negative_pop(a, g) * intermediate.incidence_rate_sex(g) *
           pars.incidence_relative_risk_age(a - pars.adult_incidence_first_age_group, g, time_step) *
-              intermediate.hiv_neg_aggregate(g) /
-              intermediate.Xhivn_incagerr(g);
+          intermediate.hiv_neg_aggregate(g) /
+          intermediate.Xhivn_incagerr(g);
     }
   }
 }
@@ -78,31 +82,32 @@ void run_disease_progression_and_mortality(int time_step,
                                            IntermediateData<real_type> &intermediate,
                                            int hiv_step) {
 
-  for(int g = 0; g < pars.num_genders; g++) {
-    for(int ha = 0; ha < pars.age_groups_hiv; ha++) {
-      for(int hm = 0; hm < pars.disease_stages; hm++) {
-
-        real_type cd4mx_scale = 1.0;
+  for (int g = 0; g < pars.num_genders; g++) {
+    for (int ha = 0; ha < pars.age_groups_hiv; ha++) {
+      for (int hm = 0; hm < pars.disease_stages; hm++) {
         // TODO: Mortality scaling not yet implemented
-        if (pars.scale_cd4_mort &
+        if (pars.scale_cd4_mortality &
             (time_step >= pars.time_art_start) &
             (hm >= intermediate.everARTelig_idx) &
             (state_next.hiv_strat_adult(hm, ha, g) > 0.0)) {
           for (int hu = 0; hu < pars.treatment_stages; hu++) {
             intermediate.artpop_hahm += state_next.art_strat_adult(hu, hm, ha, g);
           }
-          cd4mx_scale = state_next.hiv_strat_adult(hm, ha, g) / (state_next.hiv_strat_adult(hm, ha, g) + intermediate.artpop_hahm);
+          intermediate.cd4mx_scale = state_next.hiv_strat_adult(hm, ha, g) /
+                                     (state_next.hiv_strat_adult(hm, ha, g) + intermediate.artpop_hahm);
         }
 
-        intermediate.deaths = cd4mx_scale * pars.cd4_mort(hm, ha, g) * state_next.hiv_strat_adult(hm, ha, g);
+        intermediate.deaths =
+            intermediate.cd4mx_scale * pars.cd4_mortality(hm, ha, g) * state_next.hiv_strat_adult(hm, ha, g);
         intermediate.hiv_deaths_age_sex(ha, g) += pars.dt * intermediate.deaths;
         state_next.aids_deaths_no_art(hm, ha, g) += pars.dt * intermediate.deaths;
         intermediate.grad(hm, ha, g) = -intermediate.deaths;
       }
 
-      for(int hm = 1; hm < pars.disease_stages; hm++) {
-        intermediate.grad(hm-1, ha, g) -= pars.cd4_prog(hm-1, ha, g) * state_next.hiv_strat_adult(hm-1, ha, g);
-        intermediate.grad(hm, ha, g) += pars.cd4_prog(hm-1, ha, g) * state_next.hiv_strat_adult(hm-1, ha, g);
+      for (int hm = 1; hm < pars.disease_stages; hm++) {
+        intermediate.grad(hm - 1, ha, g) -=
+            pars.cd4_progression(hm - 1, ha, g) * state_next.hiv_strat_adult(hm - 1, ha, g);
+        intermediate.grad(hm, ha, g) += pars.cd4_progression(hm - 1, ha, g) * state_next.hiv_strat_adult(hm - 1, ha, g);
       }
     }
   }
