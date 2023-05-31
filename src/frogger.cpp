@@ -104,6 +104,9 @@ Rcpp::List run_base_model(const Rcpp::List data,
   leapfrog::TensorMap3<double> cd4_progression(REAL(projection_parameters["cd4_prog_full"]),
                                                disease_stages - 1, age_groups_hiv, num_genders);
   leapfrog::TensorMap1<int> artcd4elig_idx(INTEGER(projection_parameters["artcd4elig_idx"]), proj_years);
+  leapfrog::TensorMap3<double> cd4_initdist(REAL(projection_parameters["cd4_initdist_full"]), disease_stages,
+                                            age_groups_hiv, num_genders);
+  leapfrog::TensorMap1<int> hiv_age_groups_span(INTEGER(projection_parameters["hAG_SPAN_full"]), age_groups_hiv);
 
   leapfrog::Parameters<double> params = {num_genders,
                                          age_groups_pop,
@@ -130,7 +133,9 @@ Rcpp::List run_base_model(const Rcpp::List data,
                                          incidence_relative_risk_sex,
                                          cd4_mortality,
                                          cd4_progression,
-                                         artcd4elig_idx};
+                                         artcd4elig_idx,
+                                         cd4_initdist,
+                                         hiv_age_groups_span};
 
   auto state = leapfrog::run_model(proj_years, params);
 
@@ -144,6 +149,8 @@ Rcpp::List run_base_model(const Rcpp::List data,
   Rcpp::NumericVector r_art_strat_adult(treatment_stages * disease_stages *
                                         age_groups_hiv * num_genders);
   Rcpp::NumericVector r_aids_deaths_no_art(disease_stages * age_groups_hiv * num_genders);
+  Rcpp::NumericVector r_infections(age_groups_pop * num_genders);
+
   r_total_population.attr("dim") =
       Rcpp::NumericVector::create(age_groups_pop, num_genders);
   r_natural_deaths.attr("dim") =
@@ -158,6 +165,7 @@ Rcpp::List run_base_model(const Rcpp::List data,
       treatment_stages, disease_stages, age_groups_hiv, num_genders);
   r_aids_deaths_no_art.attr("dim") = Rcpp::NumericVector::create(
       disease_stages, age_groups_hiv, num_genders);
+  r_infections.attr("dim") = Rcpp::NumericVector::create(age_groups_pop, num_genders);
 
   std::copy_n(state.total_population.data(), state.total_population.size(),
               REAL(r_total_population));
@@ -173,6 +181,8 @@ Rcpp::List run_base_model(const Rcpp::List data,
               REAL(r_art_strat_adult));
   std::copy_n(state.aids_deaths_no_art.data(), state.aids_deaths_no_art.size(),
               REAL(r_aids_deaths_no_art));
+  std::copy_n(state.infections.data(), state.infections.size(),
+              REAL(r_infections));
   REAL(r_births)[0] = state.births;
 
   Rcpp::List ret =
@@ -183,6 +193,7 @@ Rcpp::List run_base_model(const Rcpp::List data,
                          Rcpp::_["hiv_natural_deaths"] = r_hiv_natural_deaths,
                          Rcpp::_["hiv_strat_adult"] = r_hiv_strat_adult,
                          Rcpp::_["art_strat_adult"] = r_art_strat_adult,
-                         Rcpp::_["aids_deaths_no_art"] = r_aids_deaths_no_art);
+                         Rcpp::_["aids_deaths_no_art"] = r_aids_deaths_no_art,
+                         Rcpp::_["infections"] = r_infections);
   return ret;
 }

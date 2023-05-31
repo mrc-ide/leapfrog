@@ -90,7 +90,7 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 |------------------|--------------------|----------------------------------------------------------|
 | totpop1          | total_population   | Projected total population                               |
 | hivpop1          | hiv_population     | Projected HIV population                                 |
-| infections       | ?                  |                                                          |
+| infections       | infections         |                                                          |
 | hivstrat_adult   | hiv_strat_adult    |                                                          |
 | artstrat_adult   | art_strat_adult    |                                                          |
 | births           | births             | Projected number of births                               |
@@ -124,7 +124,7 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 | cd4elig_idx               | ?                               | Index of the maximum CD4 count category eligible for ART                  |
 | everARTelig_idx           |                                 |                                                                           |
 | anyelig_idx               |                                 |                                                                           |
-| infections_ts             |                                 | Infections occurring at a specific time step                              |
+| infections_ts             | infections_ts                   | Infections occurring at a specific time step                              |
 | hivn_ag                   | hiv_negative_pop                | HIV negative population for a given age and sex                           |
 | Xhivn                     | hiv_neg_aggregate               |                                                                           |
 | Xhivn_incagerr            |                                 |                                                                           |
@@ -134,8 +134,8 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 | grad                      | grad                            | Movement between cd4 categories at a given time step                      |
 | artpop_hahm               |                                 |                                                                           |
 | cd4mx_scale               |                                 |                                                                           |
-| infections_a              |                                 |                                                                           |
-| infections_ha             |                                 |                                                                           |
+| infections_a              | infections_a                    |                                                                           |
+| infections_ha             | infections_ha                   |                                                                           |
 | gradART                   |                                 |                                                                           |
 | artelig_hahm              |                                 |                                                                           |
 | Xart_15plus               |                                 |                                                                           |

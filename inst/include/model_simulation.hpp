@@ -19,12 +19,8 @@ void run_hiv_model_simulation(int time_step,
       intermediate.cd4elig_idx < pars.disease_stages ? intermediate.cd4elig_idx : pars.disease_stages;
   for (int hiv_step = 0; hiv_step < pars.hiv_steps_per_year; ++hiv_step) {
     run_disease_progression_and_mortality(time_step, pars, state_curr, state_next, intermediate, hiv_step);
+    run_new_infections(time_step, pars, state_curr, state_next, intermediate, hiv_step);
   }
-//  run_mortality(time_step, pars, state_curr, state_next, intermediate);
-//  run_art_dropout(time_step, pars, state_curr, state_next, intermediate);
-//  run_art_initiation(time_step, pars, state_curr, state_next, intermediate);
-//  run_update_hiv_pop(time_step, pars, state_curr, state_next, intermediate);
-//  run_hiv_deaths(time_step, pars, state_curr, state_next, intermediate);
 }
 
 template<typename real_type>
@@ -113,44 +109,29 @@ void run_disease_progression_and_mortality(int time_step,
   }
 }
 
-
 template<typename real_type>
-void run_art_dropout(int time_step,
-                     const Parameters<real_type> &pars,
-                     const State<real_type> &state_curr,
-                     State<real_type> &state_next,
-                     IntermediateData<real_type> &intermediate) {
-
-}
-
-template<typename real_type>
-void run_art_initiation(int time_step,
+void run_new_infections(int time_step,
                         const Parameters<real_type> &pars,
                         const State<real_type> &state_curr,
                         State<real_type> &state_next,
-                        IntermediateData<real_type> &intermediate) {
+                        IntermediateData<real_type> &intermediate,
+                        int hiv_step) {
+  for (int g = 0; g < pars.num_genders; g++) {
+    int a = pars.hiv_adult_first_age_group;
+    for (int ha = 0; ha < pars.age_groups_hiv; ha++) {
+      for (int i = 0; i < pars.hiv_age_groups_span(ha); i++, a++) {
+        intermediate.infections_ha += intermediate.infections_a = intermediate.infections_ts(a, g);
+        state_next.infections(a, g) += pars.dt * intermediate.infections_a;
+        state_next.hiv_population(a, g) += pars.dt * intermediate.infections_a;
+      }
 
+      // add infections to grad hivpop
+      for (int hm = 0; hm < pars.disease_stages; hm++) {
+        intermediate.grad(hm, ha, g) += intermediate.infections_ha * pars.cd4_initdist(hm, ha, g);
+      }
+    }
+  }
 }
-
-template<typename real_type>
-void run_update_hiv_pop(int time_step,
-                        const Parameters<real_type> &pars,
-                        const State<real_type> &state_curr,
-                        State<real_type> &state_next,
-                        IntermediateData<real_type> &intermediate) {
-
-}
-
-template<typename real_type>
-void run_hiv_deaths(int time_step,
-                    const Parameters<real_type> &pars,
-                    const State<real_type> &state_curr,
-                    State<real_type> &state_next,
-                    IntermediateData<real_type> &intermediate) {
-
-
-}
-
 
 }
 }

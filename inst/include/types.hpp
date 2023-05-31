@@ -71,6 +71,8 @@ struct Parameters {
   TensorMap3<real_type> cd4_mortality;
   TensorMap3<real_type> cd4_progression;
   TensorMap1<int> artcd4elig_idx;
+  TensorMap3<real_type> cd4_initdist;
+  TensorMap1<int> hiv_age_groups_span;
 };
 
 template<typename real_type>
@@ -83,6 +85,7 @@ struct State {
   Tensor4<real_type> art_strat_adult;
   real_type births;
   Tensor3<real_type> aids_deaths_no_art;
+  Tensor2<real_type> infections;
 
   State(int age_groups_pop,
         int num_genders,
@@ -98,7 +101,8 @@ struct State {
                         disease_stages,
                         age_groups_hiv,
                         num_genders),
-        aids_deaths_no_art(disease_stages, age_groups_hiv, num_genders) {}
+        aids_deaths_no_art(disease_stages, age_groups_hiv, num_genders),
+        infections(age_groups_pop, num_genders) {}
 };
 
 namespace internal {
@@ -124,6 +128,8 @@ struct IntermediateData {
   real_type deaths;
   int everARTelig_idx;
   int cd4elig_idx;
+  real_type infections_a;
+  real_type infections_ha;
 
   IntermediateData(int age_groups_pop, int age_groups_hiv, int num_genders, int disease_stages)
       : migration_rate(age_groups_pop, num_genders),
@@ -141,7 +147,9 @@ struct IntermediateData {
         artpop_hahm(0.0),
         deaths(0.0),
         everARTelig_idx(0),
-        cd4elig_idx(0) {}
+        cd4elig_idx(0),
+        infections_a(0.0),
+        infections_ha(0.0) {}
 
   void reset() {
     migration_rate.setZero();
@@ -159,6 +167,8 @@ struct IntermediateData {
     deaths = 0.0;
     everARTelig_idx = 0;
     cd4elig_idx = 0;
+    infections_a = 0.0;
+    infections_ha = 0.0;
   }
 };
 
