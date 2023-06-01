@@ -118,7 +118,8 @@ void run_new_infections(int time_step,
     int a = pars.hiv_adult_first_age_group;
     for (int ha = 0; ha < pars.age_groups_hiv; ha++) {
       for (int i = 0; i < pars.hiv_age_groups_span(ha); i++, a++) {
-        intermediate.infections_ha += intermediate.infections_a = intermediate.infections_ts(a, g);
+        intermediate.infections_a = intermediate.infections_ts(a, g);
+        intermediate.infections_ha += intermediate.infections_a;
         state_next.infections(a, g) += pars.dt * intermediate.infections_a;
         state_next.hiv_population(a, g) += pars.dt * intermediate.infections_a;
       }
