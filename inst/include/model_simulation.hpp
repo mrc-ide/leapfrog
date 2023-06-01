@@ -76,7 +76,6 @@ void run_disease_progression_and_mortality(int time_step,
                                            State<real_type> &state_next,
                                            IntermediateData<real_type> &intermediate,
                                            int hiv_step) {
-
   for (int g = 0; g < pars.num_genders; g++) {
     for (int ha = 0; ha < pars.age_groups_hiv; ha++) {
       for (int hm = 0; hm < pars.disease_stages; hm++) {

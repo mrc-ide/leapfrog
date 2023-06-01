@@ -64,10 +64,10 @@ test_that("initial state set up with coarse stratified HIV works as expected", {
     array(rep(0, 3 * 7 * 9 * 2), dim = c(3, 7, 9, 2))
   )
   expect_equal(
-        out$aids_deaths_no_art,
-        array(rep(0, 7 * 9 * 2), dim = c(7, 9, 2))
-    )
-    expect_equal(out$infections, matrix(0, nrow = 81, ncol = 2))
+    out$aids_deaths_no_art,
+    array(rep(0, 7 * 9 * 2), dim = c(7, 9, 2))
+  )
+  expect_equal(out$infections, matrix(0, nrow = 81, ncol = 2))
 })
 
 test_that("model for 1 time step has looped", {
@@ -89,18 +89,41 @@ test_that("model for 1 time step has looped", {
   expect_true(out$births > 0) ## a simulation has been run this is not still 0
   expect_equal(dim(out$natural_deaths), c(81, 2))
   expect_true(all(out$natural_deaths > 0))
-  ## These are going to stay 0 until we add infections into the simulation
+  ## These are going to stay 0 as no infections after just 1 year has been run
   expect_true(all(out$hiv_population == 0))
   expect_true(all(out$hiv_natural_deaths == 0))
   expect_true(all(out$hiv_strat_adult == 0))
   expect_true(all(out$art_strat_adult == 0))
+  expect_true(all(out$aids_deaths_no_art == 0))
+  expect_true(all(out$infections == 0))
 })
 
 test_that("model can be run for all years", {
   demp <- readRDS(test_path("testdata/demographic_projection_object.rds"))
   parameters <- readRDS(test_path("testdata/projection_parameters.rds"))
 
-  expect_error(run_base_model(demp, parameters, NULL, NULL), NA)
+  expect_error(out <- run_base_model(demp, parameters, NULL, NULL), NA)
+
+  ## No HIV population < age 15
+  expect_true(all(out$hiv_population[1:15, ] == 0))
+  expect_true(all(out$hiv_natural_deaths[1:16, ] == 0))
+  expect_true(all(out$infections[1:15, ] == 0))
+
+  ## There is HIV population after age 15
+  expect_true(all(out$hiv_population[16:nrow(out$hiv_population), ] > 0))
+  ## Natural deaths start at index 17 as no deaths in first HIV population projection as they are calculated from
+  ## the no of HIV +ve in previous year - is this right?
+  expect_true(all(out$hiv_natural_deaths[17:nrow(out$hiv_population), ] != 0))
+  ## Some of older ages can be 0 infections, so check the middle chunk
+  expect_true(all(out$infections[16:70, ] != 0))
+
+  ## HIV and ART strat still 0, we are not adding to these yet
+  expect_true(all(out$hiv_strat_adult == 0))
+  expect_true(all(out$art_strat_adult == 0))
+  expect_equal(
+    out$aids_deaths_no_art,
+    array(rep(0, 7 * 66 * 2), dim = c(7, 66, 2))
+  )
 })
 
 test_that("model can be run with ART initiation", {
