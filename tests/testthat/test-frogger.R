@@ -27,6 +27,11 @@ test_that("initial state set up works as expected", {
     out$art_strat_adult,
     array(rep(0, 3 * 7 * 66 * 2), dim = c(3, 7, 66, 2))
   )
+  expect_equal(
+      out$aids_deaths_no_art,
+      array(rep(0, 7 * 66 * 2), dim = c(7, 66, 2))
+  )
+  expect_equal(out$infections, matrix(0, nrow = 81, ncol = 2))
 })
 
 test_that("initial state set up with coarse stratified HIV works as expected", {
@@ -58,6 +63,11 @@ test_that("initial state set up with coarse stratified HIV works as expected", {
     out$art_strat_adult,
     array(rep(0, 3 * 7 * 9 * 2), dim = c(3, 7, 9, 2))
   )
+  expect_equal(
+        out$aids_deaths_no_art,
+        array(rep(0, 7 * 9 * 2), dim = c(7, 9, 2))
+    )
+    expect_equal(out$infections, matrix(0, nrow = 81, ncol = 2))
 })
 
 test_that("model for 1 time step has looped", {

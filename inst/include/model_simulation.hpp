@@ -38,7 +38,6 @@ void run_add_new_hiv_infections(int time_step,
     }
   }
 
-
   for (int g = 0; g < pars.num_genders; g++) {
     for (int a = pars.adult_incidence_first_age_group;
          a < pars.adult_incidence_first_age_group + pars.pAG_INCIDPOP; a++) {

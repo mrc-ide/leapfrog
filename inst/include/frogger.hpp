@@ -23,6 +23,7 @@ void initialise_model_state(const Parameters<real_type> &pars,
   state.art_strat_adult.setZero();
   state.births = 0;
   state.aids_deaths_no_art.setZero();
+  state.infections.setZero();
 }
 
 }
