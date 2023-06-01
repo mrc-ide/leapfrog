@@ -70,7 +70,7 @@ struct Parameters {
   TensorMap1<real_type> incidence_relative_risk_sex;
   TensorMap3<real_type> cd4_mortality;
   TensorMap3<real_type> cd4_progression;
-  TensorMap1<int> artcd4elig_idx;
+  Tensor1<int> artcd4elig_idx;
   TensorMap3<real_type> cd4_initdist;
   TensorMap1<int> hiv_age_groups_span;
 };

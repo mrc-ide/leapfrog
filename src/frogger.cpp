@@ -103,7 +103,12 @@ Rcpp::List run_base_model(const Rcpp::List data,
                                              disease_stages, age_groups_hiv, num_genders);
   leapfrog::TensorMap3<double> cd4_progression(REAL(projection_parameters["cd4_prog_full"]),
                                                disease_stages - 1, age_groups_hiv, num_genders);
-  leapfrog::TensorMap1<int> artcd4elig_idx(INTEGER(projection_parameters["artcd4elig_idx"]), proj_years);
+  Rcpp::IntegerVector v(projection_parameters["artcd4elig_idx"]);
+  leapfrog::Tensor1<int> artcd4elig_idx(proj_years);
+  for (int i = 0; i < proj_years; ++i) {
+    // 0-based indexing in C++ vs 1-based indexing in R
+    artcd4elig_idx(i) = v[i] - 1;
+  }
   leapfrog::TensorMap3<double> cd4_initdist(REAL(projection_parameters["cd4_initdist_full"]), disease_stages,
                                             age_groups_hiv, num_genders);
   leapfrog::TensorMap1<int> hiv_age_groups_span(INTEGER(projection_parameters["hAG_SPAN_full"]), age_groups_hiv);

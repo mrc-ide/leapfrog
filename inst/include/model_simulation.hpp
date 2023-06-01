@@ -14,9 +14,8 @@ void run_hiv_model_simulation(int time_step,
                               IntermediateData<real_type> &intermediate) {
   run_add_new_hiv_infections(time_step, pars, state_curr, state_next, intermediate);
 
-  intermediate.cd4elig_idx = pars.artcd4elig_idx(time_step) - 1; // -1 for 0-based indexing vs. 1-based in R
   intermediate.everARTelig_idx =
-      intermediate.cd4elig_idx < pars.disease_stages ? intermediate.cd4elig_idx : pars.disease_stages;
+      pars.artcd4elig_idx(time_step) < pars.disease_stages ? pars.artcd4elig_idx(time_step) : pars.disease_stages;
   for (int hiv_step = 0; hiv_step < pars.hiv_steps_per_year; ++hiv_step) {
     run_disease_progression_and_mortality(time_step, pars, state_curr, state_next, intermediate, hiv_step);
     run_new_infections(time_step, pars, state_curr, state_next, intermediate, hiv_step);
