@@ -39,6 +39,8 @@ struct Parameters {
   int age_groups_fert;
   // Numer of age groups in HIV population
   int age_groups_hiv;
+  // Numer of age groups in HIV 15+ population
+  int age_groups_hiv_15plus;
   // Number of HIV disease stages
   int disease_stages;
   // First index of HIV population to model as adult
@@ -57,6 +59,10 @@ struct Parameters {
   double dt;
 
   int scale_cd4_mortality;
+
+  int hIDX_15PLUS;
+
+  int everARTelig_idx;
 
   // Number of years in each HIV age group
   TensorMap1<int> age_groups_hiv_span;
@@ -80,6 +86,8 @@ struct Parameters {
   TensorMap2<real_type> artmx_timerr;
   Tensor1<real_type> h_art_stage_dur;
   TensorMap1<real_type> art_dropout;
+  TensorMap2<real_type> art15plus_num;
+  TensorMap2<bool> art15plus_isperc;
 };
 
 template<typename real_type>
@@ -133,6 +141,7 @@ struct IntermediateData {
   Tensor2<real_type> hiv_deaths_age_sex;
   Tensor3<real_type> grad;
   Tensor4<real_type> gradART;
+  Tensor2<real_type> artelig_hahm;
   real_type cd4mx_scale;
   real_type artpop_hahm;
   real_type deaths;
@@ -141,8 +150,16 @@ struct IntermediateData {
   real_type infections_a;
   real_type infections_ha;
   real_type deaths_art;
+  real_type Xart_15plus;
+  real_type Xartelig_15plus;
+  real_type expect_mort_artelig15plus;
+  int anyelig_idx;
+  real_type artnum_hts;
+  real_type artcov_hts;
+  real_type curr_coverage;
 
-  IntermediateData(int age_groups_pop, int age_groups_hiv, int num_genders, int disease_stages, int treatment_stages)
+  IntermediateData(int age_groups_pop, int age_groups_hiv, int num_genders, int disease_stages, int treatment_stages,
+                   int age_groups_hiv_15plus)
       : migration_rate(age_groups_pop, num_genders),
         hiv_net_migration(age_groups_pop, num_genders),
         hiv_population_coarse_ages(age_groups_hiv, num_genders),
@@ -155,6 +172,7 @@ struct IntermediateData {
         hiv_deaths_age_sex(age_groups_hiv, num_genders),
         grad(disease_stages, age_groups_hiv, num_genders),
         gradART(treatment_stages, disease_stages, age_groups_hiv, num_genders),
+        artelig_hahm(disease_stages, age_groups_hiv_15plus)
         cd4mx_scale(1.0),
         artpop_hahm(0.0),
         deaths(0.0),
@@ -162,7 +180,14 @@ struct IntermediateData {
         cd4elig_idx(0),
         infections_a(0.0),
         infections_ha(0.0),
-        deaths_art(0.0) {}
+        deaths_art(0.0),
+        Xart_15plus(0.0),
+        Xartelig_15plus(0.0),
+        expect_mort_artelig15plus(0.0),
+        anyelig_idx(0),
+        artnum_hts(0.0),
+        artcov_hts(0.0),
+        curr_coverage(0.0) {}
 
   void reset() {
     migration_rate.setZero();
@@ -177,6 +202,7 @@ struct IntermediateData {
     hiv_deaths_age_sex.setZero();
     grad.setZero();
     gradART.setZero();
+    artelig_hahm.setZero();
     cd4mx_scale = 1.0;
     deaths = 0.0;
     everARTelig_idx = 0;
@@ -184,6 +210,13 @@ struct IntermediateData {
     infections_a = 0.0;
     infections_ha = 0.0;
     deaths_art = 0.0;
+    Xart_15plus = 0.0;
+    Xartelig_15plus = 0.0;
+    expect_mort_artelig15plus = 0.0;
+    anyelig_idx = 0;
+    artnum_hts = 0.0;
+    artcov_hts = 0.0;
+    curr_coverage = 0.0;
   }
 };
 

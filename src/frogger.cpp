@@ -78,8 +78,11 @@ Rcpp::List run_base_model(const Rcpp::List data,
   auto age_groups_hiv_span =
       get_age_groups_hiv_span(projection_parameters, hiv_age_stratification);
   int age_groups_hiv = static_cast<int>(age_groups_hiv_span.size());
+  int age_groups_hiv_15plus = age_groups_hiv;
   const int scale_cd4_mortality =
       Rcpp::as<int>(projection_parameters["scale_cd4_mort"]);
+  int hIDX_15PLUS = 0;
+  int everARTelig_idx = disease_stages;
 
   leapfrog::TensorMap2<double> base_pop(REAL(data["basepop"]), age_groups_pop,
                                         num_genders);
@@ -121,12 +124,16 @@ Rcpp::List run_base_model(const Rcpp::List data,
     h_art_stage_dur(i) = 0.5;
   }
   leapfrog::TensorMap1<double> art_dropout(REAL(projection_parameters["art_dropout"]), proj_years);
+  leapfrog::TensorMap2<double> art15plus_num(REAL(projection_parameters["art15plus_num"]), num_genders, proj_years)
+  leapfrog::TensorMap2<bool> art15plus_isperc(LOGICAL(projection_parameters["art15plus_isperc"]), num_genders, proj_years)
+
 
   leapfrog::Parameters<double> params = {num_genders,
                                          age_groups_pop,
                                          fertility_first_age_group,
                                          age_groups_fert,
                                          age_groups_hiv,
+                                         age_groups_hiv_15plus,
                                          disease_stages,
                                          hiv_adult_first_age_group,
                                          treatment_stages,
@@ -136,6 +143,8 @@ Rcpp::List run_base_model(const Rcpp::List data,
                                          hiv_steps,
                                          (1.0 / hiv_steps),
                                          scale_cd4_mortality,
+                                         hIDX_15PLUS,
+                                         everARTelig_idx,
                                          age_groups_hiv_span,
                                          incidence_rate,
                                          base_pop,
@@ -153,7 +162,9 @@ Rcpp::List run_base_model(const Rcpp::List data,
                                          art_mortality,
                                          artmx_timerr,
                                          h_art_stage_dur,
-                                         art_dropout};
+                                         art_dropout,
+                                         art15plus_num,
+                                         art15plus_isperc};
 
   auto state = leapfrog::run_model(proj_years, params);
 

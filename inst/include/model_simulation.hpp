@@ -16,6 +16,7 @@ void run_hiv_model_simulation(int time_step,
 
   intermediate.everARTelig_idx =
       pars.artcd4elig_idx(time_step) < pars.disease_stages ? pars.artcd4elig_idx(time_step) : pars.disease_stages;
+  intermediate.anyelig_idx = pars.artcd4elig_idx(time_step);
   for (int hiv_step = 0; hiv_step < pars.hiv_steps_per_year; ++hiv_step) {
     run_disease_progression_and_mortality(time_step, pars, state_curr, state_next, intermediate, hiv_step);
     run_new_infections(time_step, pars, state_curr, state_next, intermediate, hiv_step);
@@ -182,7 +183,93 @@ void run_art_initiation(int time_step,
                         State<real_type> &state_next,
                         IntermediateData<real_type> &intermediate,
                         int hiv_step) {
+  for (int g = 0; g < pars.num_genders; g++) {
+    for (int ha = pars.hIDX_15PLUS; ha < pars.age_groups_hiv; ha++) {
+      for (int hm = pars.everARTelig_idx; hm < pars.disease_stages; hm++) {
+        if (hm >= intermediate.anyelig_idx) {
+          // TODO: Implement special population ART eligibility
+          Type prop_elig = 1.0;
+          intermediate.Xartelig_15plus += intermediate.artelig_hahm(hm, ha - pars.hIDX_15PLUS) =
+              prop_elig * state_curr.hiv_strat_adult(hm, ha, g);
+          intermediate.expect_mort_artelig15plus +=
+              pars.cd4_mortality(hm, ha, g) * intermediate.artelig_hahm(hm, ha - pars.hIDX_15PLUS);
+        }
+        for (int hu = 0; hu < pars.treatment_stages; hu++)
+          intermediate.Xart_15plus +=
+              state_curr.art_strat_adult(hu, hm, ha, g) + pars.dt * intermediate.gradART(hu, hm, ha, g);
+      }
+    } // loop over ha
 
+    // calculate number on ART at end of ts, based on number or percent
+    if (pars.dt * (hts + 1) < 0.5) {
+      if ((!pars.art15plus_isperc(g, time_step - 2)) & (!pars.art15plus_isperc(g, time_step - 1))) {
+        // Both values are numbers
+        intermediate.artnum_hts =
+            (0.5 - pars.dt * (hts + 1)) * pars.art15plus_num(g, t - 2) +
+            (pars.dt * (hts + 1) + 0.5) * pars.art15plus_num(g, time_step - 1);
+      } else if (pars.art15plus_isperc(g, time_step - 2) & pars.art15plus_isperc(g, time_step - 1)) {
+        // Both values are percentages
+        intermediate.artcov_hts =
+            (0.5 - pars.dt * (hts + 1)) * pars.art15plus_num(g, time_step - 2) +
+            (pars.dt * (hts + 1) + 0.5) * pars.art15plus_num(g, time_step - 1);
+        intermediate.artnum_hts = intermediate.artcov_hts * (intermediate.Xart_15plus + intermediate.Xartelig_15plus);
+      } else if ((!pars.art15plus_isperc(g, time_step - 2)) & pars.art15plus_isperc(g, time_step - 1)) {
+        // Transition from number to percentage
+        intermediate.curr_coverage =
+            intermediate.Xart_15plus / (intermediate.Xart_15plus + intermediate.Xartelig_15plus);
+        intermediate.artcov_hts = intermediate.curr_coverage +
+                                  (pars.art15plus_num(g, time_step - 1) - intermediate.curr_coverage) * pars.dt /
+                                  (0.5 - pars.dt * hts);
+        intermediate.artnum_hts = intermediate.artcov_hts * (intermediate.Xart_15plus + intermediate.Xartelig_15plus);
+      }
+    } else {
+      if ((!pars.art15plus_isperc(g, time_step - 1)) & (!pars.art15plus_isperc(g, time_step))) {
+        // Both values are numbers
+        intermediate.artnum_hts =
+            (1.5 - pars.dt * (hts + 1)) * pars.art15plus_num(g, time_step - 1) +
+            (pars.dt * (hts + 1) - 0.5) * pars.art15plus_num(g, time_step);
+      } else if (pars.art15plus_isperc(g, time_step - 1) & pars.art15plus_isperc(g, time_step)) {
+        // Both values are percentages
+        Type artcov_hts =
+            (1.5 - pars.dt * (hts + 1)) * pars.art15plus_num(g, time_step - 1) +
+            (pars.dt * (hts + 1) - 0.5) * pars.art15plus_num(g, time_step);
+        intermediate.artnum_hts = artcov_hts * (intermediate.Xart_15plus + intermediate.Xartelig_15plus);
+      } else if ((!pars.art15plus_isperc(g, time_step - 1)) & pars.art15plus_isperc(g, time_step)) {
+        // Transition from number to percentage
+        intermediate.curr_coverage =
+            intermediate.Xart_15plus / (intermediate.Xart_15plus + Xintermediate.artelig_15plus);
+        intermediate.artcov_hts = intermediate.curr_coverage +
+                                  (pars.art15plus_num(g, time_step) - intermediate.curr_coverage) * pars.dt /
+                                  (1.5 - pars.dt * hts);
+        intermediate.artnum_hts = intermediate.artcov_hts * (intermediate.Xart_15plus + intermediate.Xartelig_15plus);
+      }
+    }
+
+    // Desired number to initiate on ART
+    Type artinit_hts =
+        intermediate.artnum_hts > intermediate.Xart_15plus ? intermediate.artnum_hts - intermediate.Xart_15plus : 0.0;
+
+    // Use mixture of eligibility and expected mortality for initiation distribution
+    for (int ha = pars.hIDX_15PLUS; ha < pars.age_groups_hiv; ha++) {
+      for (int hm = intermediate.anyelig_idx; hm < pars.disease_stages; hm++) {
+
+        if (intermediate.Xartelig_15plus > 0.0) {
+          Type artinit_hahm = artinit_hts * intermediate.artelig_hahm(hm, ha - pars.hIDX_15PLUS) *
+                              ((1.0 - art_alloc_mxweight) / intermediate.Xartelig_15plus +
+                               art_alloc_mxweight * pars.cd4_mortality(hm, ha, g) / expect_mort_artelig15plus);
+          if (artinit_hahm > intermediate.artelig_hahm(hm, ha - pars.hIDX_15PLUS)) {
+            artinit_hahm = aintermediate.rtelig_hahm(hm, ha - pars.hIDX_15PLUS);
+          }
+          if (artinit_hahm > hivstrat_adult(hm, ha, g, t) + dt * grad(hm, ha, g)) {
+            artinit_hahm = hivstrat_adult(hm, ha, g, t) + dt * grad(hm, ha, g);
+          }
+          grad(hm, ha, g) -= artinit_hahm / dt;
+          gradART(ART0MOS, hm, ha, g) += artinit_hahm / dt;
+          artinit(hm, ha, g, t) += artinit_hahm;
+        }
+      }
+    }
+  }
 }
 
 }

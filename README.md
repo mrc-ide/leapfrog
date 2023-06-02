@@ -108,10 +108,10 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 | ART0MOS                   | ?                               |                                                                           |
 | pIDX_INCIDPOP             | adult_incidence_first_age_group | Index of youngest age that is reflected in the adult incidence input      |
 | pAG_INCIDPOP              | ?                               |                                                                           |
-| hAG_15PLUS                | ?                               |                                                                           |
-| hIDX_15PLUS               | ?                               |                                                                           |
+| hAG_15PLUS                | age_groups_hiv_15plus           |                                                                           |
+| hIDX_15PLUS               | hIDX_15PLUS                     |                                                                           |
 | h_art_stage_dur           | ?                               |                                                                           |
-| everARTelig_idx           | ?                               |                                                                           |
+| everARTelig_idx           | everARTelig_idx                 |                                                                           |
 | migrate_ag                | migration_rate                  | Rate people migrate into population by age and sex                        |
 | sx_netmig                 | survival_netmig                 |                                                                           |
 | births_sex                | births_sex                      |                                                                           |
@@ -122,8 +122,7 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 | deathsmig_ha              | deaths_migrate                  |                                                                           |
 | deathmigrate_ha           | deaths_migrate_rate             |                                                                           |
 | cd4elig_idx               | ?                               | Index of the maximum CD4 count category eligible for ART                  |
-| everARTelig_idx           |                                 |                                                                           |
-| anyelig_idx               |                                 |                                                                           |
+| anyelig_idx               | anyelig_idx                     |                                                                           |
 | infections_ts             | infections_ts                   | Infections occurring at a specific time step                              |
 | hivn_ag                   | hiv_negative_pop                | HIV negative population for a given age and sex                           |
 | Xhivn                     | hiv_neg_aggregate               |                                                                           |
