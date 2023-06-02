@@ -19,6 +19,10 @@ void run_hiv_model_simulation(int time_step,
   for (int hiv_step = 0; hiv_step < pars.hiv_steps_per_year; ++hiv_step) {
     run_disease_progression_and_mortality(time_step, pars, state_curr, state_next, intermediate, hiv_step);
     run_new_infections(time_step, pars, state_curr, state_next, intermediate, hiv_step);
+    if (time_step > pars.time_art_start) {
+      run_art_progression_and_mortality(time_step, pars, state_curr, state_next, intermediate, hiv_step);
+      run_art_initiation(time_step, pars, state_curr, state_next, intermediate, hiv_step);
+    }
   }
 }
 
@@ -129,6 +133,56 @@ void run_new_infections(int time_step,
       }
     }
   }
+}
+
+template<typename real_type>
+void run_art_progression_and_mortality(int time_step,
+                                       const Parameters<real_type> &pars,
+                                       const State<real_type> &state_curr,
+                                       State<real_type> &state_next,
+                                       IntermediateData<real_type> &intermediate,
+                                       int hiv_step) {
+  for (int g = 0; g < pars.num_genders; g++) {
+    for (int ha = 0; ha < pars.age_groups_hiv; ha++) {
+      for (int hm = intermediate.everARTelig_idx; hm < pars.disease_stages; hm++) {
+
+        for (int hu = 0; hu < pars.treatment_stages; hu++) {
+          intermediate.deaths_art =
+              pars.art_mortality(hu, hm, ha, g) * pars.artmx_timerr(hu, time_step) *
+              state_next.art_strat_adult(hu, hm, ha, g);
+          intermediate.hiv_deaths_age_sex(ha, g) += pars.dt * intermediate.deaths_art;
+          state_next.aids_deaths_art(hu, hm, ha, g) += pars.dt * intermediate.deaths_art;
+          intermediate.gradART(hu, hm, ha, g) = -intermediate.deaths_art;
+        }
+
+        for (int hu = 0; hu < (pars.treatment_stages - 1); hu++) {
+          intermediate.gradART(hu, hm, ha, g) +=
+              -state_next.art_strat_adult(hu, hm, ha, g) / pars.h_art_stage_dur(hu);
+          intermediate.gradART(hu + 1, hm, ha, g) +=
+              state_next.art_strat_adult(hu, hm, ha, g) / pars.h_art_stage_dur(hu);
+        }
+
+        // ART dropout
+        if (pars.art_dropout(time_step) > 0) {
+          for (int hu = 0; hu < pars.treatment_stages; hu++) {
+            intermediate.grad(hm, ha, g) += pars.art_dropout(time_step) * state_next.art_strat_adult(hu, hm, ha, g);
+            intermediate.gradART(hu, hm, ha, g) -=
+                pars.art_dropout(time_step) * state_next.art_strat_adult(hu, hm, ha, g);
+          }
+        }
+      }
+    }
+  }
+}
+
+template<typename real_type>
+void run_art_initiation(int time_step,
+                        const Parameters<real_type> &pars,
+                        const State<real_type> &state_curr,
+                        State<real_type> &state_next,
+                        IntermediateData<real_type> &intermediate,
+                        int hiv_step) {
+
 }
 
 }

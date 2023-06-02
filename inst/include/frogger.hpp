@@ -37,7 +37,7 @@ State<real_type> run_model(int time_steps, const Parameters<real_type> &pars) {
   internal::initialise_model_state(pars, state);
   auto state_next = state;
   internal::IntermediateData<real_type> intermediate(pars.age_groups_pop, pars.age_groups_hiv, pars.num_genders,
-                                                     pars.disease_stages);
+                                                     pars.disease_stages, pars.treatment_stages);
   // Each time step is mid-point of the year
   for (int step = 0; step < time_steps; ++step) {
     internal::run_general_pop_demographic_projection(step, pars, state, state_next, intermediate);

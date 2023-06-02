@@ -74,7 +74,7 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 | cd4_initdist       | ?                           | Distribution of infections by cd4 category upon infection                                    |
 | cd4_prog           | cd4_progression             |                                                                                              |
 | cd4_mort           | cd4_mortality               |                                                                                              |
-| art_mort           | ?                           |                                                                                              |
+| art_mort           | art_mortality               |                                                                                              |
 | artmx_timerr       | ?                           |                                                                                              |
 | art15plus_num      | ?                           |                                                                                              |
 | art15plus_isperc   | ?                           |                                                                                              |
@@ -98,7 +98,7 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 | natdeaths_hivpop | hiv_natural_deaths | Projected number of natural deaths within HIV population |
 | hivdeaths        | ?                  |                                                          |
 | aidsdeaths_noart | aids_deaths_no_art |                                                          |
-| aidsdeaths_art   | ?                  |                                                          |
+| aidsdeaths_art   | aids_deaths_art    |                                                          |
 | artinit          | ?                  |                                                          |
 
 ### Internal
