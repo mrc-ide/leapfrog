@@ -103,7 +103,7 @@ Rcpp::List run_base_model(const Rcpp::List data,
                                              disease_stages, age_groups_hiv, num_genders);
   leapfrog::TensorMap3<double> cd4_progression(REAL(projection_parameters["cd4_prog_full"]),
                                                disease_stages - 1, age_groups_hiv, num_genders);
-  Rcpp::IntegerVector v(projection_parameters["artcd4elig_idx"]);
+  Rcpp::IntegerVector v = Rcpp::as<Rcpp::IntegerVector>(projection_parameters["artcd4elig_idx"]);
   leapfrog::Tensor1<int> artcd4elig_idx(proj_years);
   for (int i = 0; i < proj_years; ++i) {
     // 0-based indexing in C++ vs 1-based indexing in R
