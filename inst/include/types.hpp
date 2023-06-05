@@ -64,6 +64,8 @@ struct Parameters {
 
   int everARTelig_idx;
 
+  real_type art_alloc_mxweight;
+
   // Number of years in each HIV age group
   TensorMap1<int> age_groups_hiv_span;
 
@@ -87,7 +89,7 @@ struct Parameters {
   Tensor1<real_type> h_art_stage_dur;
   TensorMap1<real_type> art_dropout;
   TensorMap2<real_type> art15plus_num;
-  TensorMap2<bool> art15plus_isperc;
+  TensorMap2<int> art15plus_isperc;
 };
 
 template<typename real_type>
@@ -102,6 +104,7 @@ struct State {
   Tensor3<real_type> aids_deaths_no_art;
   Tensor2<real_type> infections;
   Tensor4<real_type> aids_deaths_art;
+  Tensor3<real_type> art_initiation;
 
   State(int age_groups_pop,
         int num_genders,
@@ -119,13 +122,15 @@ struct State {
                         num_genders),
         aids_deaths_no_art(disease_stages, age_groups_hiv, num_genders),
         infections(age_groups_pop, num_genders),
-        aids_deaths_art(treatment_stages, disease_stages, age_groups_hiv, num_genders) {}
+        aids_deaths_art(treatment_stages, disease_stages, age_groups_hiv, num_genders),
+        art_initiation(disease_stages, age_groups_hiv, num_genders) {}
 };
 
 namespace internal {
 
 const int MALE = 0;
 const int FEMALE = 1;
+const int ART0MOS = 0;
 
 template<typename real_type>
 struct IntermediateData {
@@ -157,6 +162,8 @@ struct IntermediateData {
   real_type artnum_hts;
   real_type artcov_hts;
   real_type curr_coverage;
+  real_type artinit_hts;
+  real_type artinit_hahm;
 
   IntermediateData(int age_groups_pop, int age_groups_hiv, int num_genders, int disease_stages, int treatment_stages,
                    int age_groups_hiv_15plus)
@@ -172,7 +179,7 @@ struct IntermediateData {
         hiv_deaths_age_sex(age_groups_hiv, num_genders),
         grad(disease_stages, age_groups_hiv, num_genders),
         gradART(treatment_stages, disease_stages, age_groups_hiv, num_genders),
-        artelig_hahm(disease_stages, age_groups_hiv_15plus)
+        artelig_hahm(disease_stages, age_groups_hiv_15plus),
         cd4mx_scale(1.0),
         artpop_hahm(0.0),
         deaths(0.0),
@@ -187,7 +194,9 @@ struct IntermediateData {
         anyelig_idx(0),
         artnum_hts(0.0),
         artcov_hts(0.0),
-        curr_coverage(0.0) {}
+        curr_coverage(0.0),
+        artinit_hts(0.0),
+        artinit_hahm(0.0) {}
 
   void reset() {
     migration_rate.setZero();
@@ -217,6 +226,8 @@ struct IntermediateData {
     artnum_hts = 0.0;
     artcov_hts = 0.0;
     curr_coverage = 0.0;
+    artinit_hts = 0.0;
+    artinit_hahm = 0.0;
   }
 };
 

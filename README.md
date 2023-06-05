@@ -99,7 +99,7 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 | hivdeaths        | ?                  |                                                          |
 | aidsdeaths_noart | aids_deaths_no_art |                                                          |
 | aidsdeaths_art   | aids_deaths_art    |                                                          |
-| artinit          | ?                  |                                                          |
+| artinit          | art_initiation     |                                                          |
 
 ### Internal
 
