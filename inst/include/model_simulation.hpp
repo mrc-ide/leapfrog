@@ -79,9 +79,9 @@ void run_disease_progression_and_mortality(int hiv_step,
     for (int ha = 0; ha < pars.age_groups_hiv; ++ha) {
       for (int hm = 0; hm < pars.disease_stages; ++hm) {
         // TODO: Mortality scaling not yet implemented
-        if (pars.scale_cd4_mortality &
-            (time_step >= pars.time_art_start) &
-            (hm >= intermediate.everARTelig_idx) &
+        if (pars.scale_cd4_mortality &&
+            (time_step >= pars.time_art_start) &&
+            (hm >= intermediate.everARTelig_idx) &&
             (state_next.hiv_strat_adult(hm, ha, g) > 0.0)) {
           for (int hu = 0; hu < pars.treatment_stages; ++hu) {
             intermediate.artpop_hahm += state_next.art_strat_adult(hu, hm, ha, g);
