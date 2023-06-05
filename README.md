@@ -96,7 +96,7 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 | births           | births             | Projected number of births                               |
 | natdeaths        | natural_deaths     | Projected number of natural deaths                       |
 | natdeaths_hivpop | hiv_natural_deaths | Projected number of natural deaths within HIV population |
-| hivdeaths        | ?                  |                                                          |
+| hivdeaths        | hiv_deaths         |                                                          |
 | aidsdeaths_noart | aids_deaths_no_art |                                                          |
 | aidsdeaths_art   | aids_deaths_art    |                                                          |
 | artinit          | art_initiation     |                                                          |

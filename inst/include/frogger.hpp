@@ -26,6 +26,7 @@ void initialise_model_state(const Parameters<real_type> &pars,
   state.infections.setZero();
   state.aids_deaths_art.setZero();
   state.art_initiation.setZero();
+  state.hiv_deaths.setZero();
 }
 
 }

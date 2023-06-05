@@ -23,7 +23,10 @@ void run_hiv_model_simulation(int time_step,
     if (time_step > pars.time_art_start) {
       run_art_progression_and_mortality(time_step, pars, state_curr, state_next, intermediate, hiv_step);
       run_art_initiation(time_step, pars, state_curr, state_next, intermediate, hiv_step);
+      run_update_art_stratification(time_step, pars, state_curr, state_next, intermediate, hiv_step);
     }
+    run_update_hiv_stratification(time_step, pars, state_curr, state_next, intermediate, hiv_step);
+    run_remove_hiv_deaths(time_step, pars, state_curr, state_next, intermediate, hiv_step);
   }
 }
 
@@ -255,18 +258,89 @@ void run_art_initiation(int time_step,
 
         if (intermediate.Xartelig_15plus > 0.0) {
           intermediate.artinit_hahm = intermediate.artinit_hts * intermediate.artelig_hahm(hm, ha - pars.hIDX_15PLUS) *
-                              ((1.0 - pars.art_alloc_mxweight) / intermediate.Xartelig_15plus +
-                               pars.art_alloc_mxweight * pars.cd4_mortality(hm, ha, g) / intermediate.expect_mort_artelig15plus);
+                                      ((1.0 - pars.art_alloc_mxweight) / intermediate.Xartelig_15plus +
+                                       pars.art_alloc_mxweight * pars.cd4_mortality(hm, ha, g) /
+                                       intermediate.expect_mort_artelig15plus);
           if (intermediate.artinit_hahm > intermediate.artelig_hahm(hm, ha - pars.hIDX_15PLUS)) {
             intermediate.artinit_hahm = intermediate.artelig_hahm(hm, ha - pars.hIDX_15PLUS);
           }
-          if (intermediate.artinit_hahm > state_next.hiv_strat_adult(hm, ha, g) + pars.dt * intermediate.grad(hm, ha, g)) {
+          if (intermediate.artinit_hahm >
+              state_next.hiv_strat_adult(hm, ha, g) + pars.dt * intermediate.grad(hm, ha, g)) {
             intermediate.artinit_hahm = state_next.hiv_strat_adult(hm, ha, g) + pars.dt * intermediate.grad(hm, ha, g);
           }
           intermediate.grad(hm, ha, g) -= intermediate.artinit_hahm / pars.dt;
           intermediate.gradART(ART0MOS, hm, ha, g) += intermediate.artinit_hahm / pars.dt;
           state_next.art_initiation(hm, ha, g) += intermediate.artinit_hahm;
         }
+      }
+    }
+  }
+}
+
+template<typename real_type>
+void run_update_art_stratification(int time_step,
+                                   const Parameters<real_type> &pars,
+                                   const State<real_type> &state_curr,
+                                   State<real_type> &state_next,
+                                   IntermediateData<real_type> &intermediate,
+                                   int hiv_step) {
+  for (int g = 0; g < pars.num_genders; g++) {
+    for (int ha = 0; ha < pars.age_groups_hiv; ha++) {
+      for (int hm = intermediate.everARTelig_idx; hm < pars.disease_stages; hm++) {
+        for (int hu = 0; hu < pars.treatment_stages; hu++) {
+          state_next.art_strat_adult(hu, hm, ha, g) += pars.dt * intermediate.gradART(hu, hm, ha, g);
+        }
+      }
+    }
+  }
+}
+
+template<typename real_type>
+void run_update_hiv_stratification(int time_step,
+                                   const Parameters<real_type> &pars,
+                                   const State<real_type> &state_curr,
+                                   State<real_type> &state_next,
+                                   IntermediateData<real_type> &intermediate,
+                                   int hiv_step) {
+  for (int g = 0; g < pars.num_genders; g++) {
+    for (int ha = 0; ha < pars.age_groups_hiv; ha++) {
+      for (int hm = 0; hm < pars.disease_stages; hm++) {
+        state_next.hiv_strat_adult(hm, ha, g) += pars.dt * intermediate.grad(hm, ha, g);
+      }
+    }
+  }
+}
+
+template<typename real_type>
+void run_remove_hiv_deaths(int time_step,
+                           const Parameters<real_type> &pars,
+                           const State<real_type> &state_curr,
+                           State<real_type> &state_next,
+                           IntermediateData<real_type> &intermediate,
+                           int hiv_step) {
+  for (int g = 0; g < pars.num_genders; g++) {
+
+    // sum HIV+ population size in each hivpop age group
+    int a = pars.hiv_adult_first_age_group;
+    for (int ha = 0; ha < pars.age_groups_hiv; ha++) {
+      for (int i = 0; i < pars.hiv_age_groups_span(ha); i++, a++) {
+        intermediate.hivpop_ha(ha) += state_next.hiv_population(a, g);
+      }
+    }
+
+    // remove hivdeaths proportionally to age-distribution within each age group
+    a = pars.hiv_adult_first_age_group;
+    for (int ha = 0; ha < pars.age_groups_hiv; ha++) {
+      if (intermediate.hivpop_ha(ha) > 0) {
+        intermediate.hivqx_ha = intermediate.hiv_deaths_age_sex(ha, g) / intermediate.hivpop_ha(ha);
+        for (int i = 0; i < pars.hiv_age_groups_span(ha); i++, a++) {
+          intermediate.hivdeaths_a = state_next.hiv_population(a, g) * intermediate.hivqx_ha;
+          state_next.hiv_deaths(a, g) += intermediate.hivdeaths_a;
+          state_next.total_population(a, g) -= intermediate.hivdeaths_a;
+          state_next.hiv_population(a, g) -= intermediate.hivdeaths_a;
+        }
+      } else {
+        a += pars.hiv_age_groups_span(ha);
       }
     }
   }

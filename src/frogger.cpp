@@ -183,6 +183,7 @@ Rcpp::List run_base_model(const Rcpp::List data,
   Rcpp::NumericVector r_infections(age_groups_pop * num_genders);
   Rcpp::NumericVector r_aids_deaths_art(treatment_stages * disease_stages * age_groups_hiv * num_genders);
   Rcpp::NumericVector r_art_initiation(disease_stages * age_groups_hiv * num_genders);
+  Rcpp::NumericVector r_hiv_deaths(age_groups_pop * num_genders);
 
   r_total_population.attr("dim") =
       Rcpp::NumericVector::create(age_groups_pop, num_genders);
@@ -203,6 +204,7 @@ Rcpp::List run_base_model(const Rcpp::List data,
       treatment_stages, disease_stages, age_groups_hiv, num_genders);
   r_art_initiation.attr("dim") = Rcpp::NumericVector::create(
       disease_stages, age_groups_hiv, num_genders);
+  r_hiv_deaths.attr("dim") = Rcpp::NumericVector::create(age_groups_pop, num_genders);
 
   std::copy_n(state.total_population.data(), state.total_population.size(),
               REAL(r_total_population));
@@ -224,6 +226,8 @@ Rcpp::List run_base_model(const Rcpp::List data,
               REAL(r_aids_deaths_art));
   std::copy_n(state.art_initiation.data(), state.art_initiation.size(),
               REAL(r_art_initiation));
+  std::copy_n(state.hiv_deaths.data(), state.hiv_deaths.size(),
+              REAL(r_hiv_deaths));
   REAL(r_births)[0] = state.births;
 
   Rcpp::List ret =
@@ -237,6 +241,7 @@ Rcpp::List run_base_model(const Rcpp::List data,
                          Rcpp::_["aids_deaths_no_art"] = r_aids_deaths_no_art,
                          Rcpp::_["infections"] = r_infections,
                          Rcpp::_["aids_deaths_art"] = r_aids_deaths_art,
-                         Rcpp::_["art_initiation"] = r_art_initiation);
+                         Rcpp::_["art_initiation"] = r_art_initiation,
+                         Rcpp::_["hiv_deaths"] = r_hiv_deaths);
   return ret;
 }

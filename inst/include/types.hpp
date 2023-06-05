@@ -105,6 +105,7 @@ struct State {
   Tensor2<real_type> infections;
   Tensor4<real_type> aids_deaths_art;
   Tensor3<real_type> art_initiation;
+  Tensor2<real_type> hiv_deaths;
 
   State(int age_groups_pop,
         int num_genders,
@@ -123,7 +124,8 @@ struct State {
         aids_deaths_no_art(disease_stages, age_groups_hiv, num_genders),
         infections(age_groups_pop, num_genders),
         aids_deaths_art(treatment_stages, disease_stages, age_groups_hiv, num_genders),
-        art_initiation(disease_stages, age_groups_hiv, num_genders) {}
+        art_initiation(disease_stages, age_groups_hiv, num_genders),
+        hiv_deaths(age_groups_pop, num_genders) {}
 };
 
 namespace internal {
@@ -147,6 +149,7 @@ struct IntermediateData {
   Tensor3<real_type> grad;
   Tensor4<real_type> gradART;
   Tensor2<real_type> artelig_hahm;
+  Tensor1<real_type> hivpop_ha;
   real_type cd4mx_scale;
   real_type artpop_hahm;
   real_type deaths;
@@ -164,8 +167,11 @@ struct IntermediateData {
   real_type curr_coverage;
   real_type artinit_hts;
   real_type artinit_hahm;
+  real_type hivqx_ha;
+  real_type hivdeaths_a;
 
-  IntermediateData(int age_groups_pop, int age_groups_hiv, int num_genders, int disease_stages, int treatment_stages,
+  IntermediateData(int age_groups_pop, int age_groups_hiv, int num_genders, int disease_stages,
+                   int treatment_stages,
                    int age_groups_hiv_15plus)
       : migration_rate(age_groups_pop, num_genders),
         hiv_net_migration(age_groups_pop, num_genders),
@@ -180,6 +186,7 @@ struct IntermediateData {
         grad(disease_stages, age_groups_hiv, num_genders),
         gradART(treatment_stages, disease_stages, age_groups_hiv, num_genders),
         artelig_hahm(disease_stages, age_groups_hiv_15plus),
+        hivpop_ha(age_groups_hiv),
         cd4mx_scale(1.0),
         artpop_hahm(0.0),
         deaths(0.0),
@@ -196,7 +203,11 @@ struct IntermediateData {
         artcov_hts(0.0),
         curr_coverage(0.0),
         artinit_hts(0.0),
-        artinit_hahm(0.0) {}
+        artinit_hahm(0.0),
+        hivqx_ha(0.0),
+        hivdeaths_a(0.0) {
+    reset();
+  }
 
   void reset() {
     migration_rate.setZero();
@@ -212,6 +223,7 @@ struct IntermediateData {
     grad.setZero();
     gradART.setZero();
     artelig_hahm.setZero();
+    hivpop_ha.setZero();
     cd4mx_scale = 1.0;
     deaths = 0.0;
     everARTelig_idx = 0;
@@ -228,6 +240,8 @@ struct IntermediateData {
     curr_coverage = 0.0;
     artinit_hts = 0.0;
     artinit_hahm = 0.0;
+    hivqx_ha = 0.0;
+    hivdeaths_a = 0.0;
   }
 };
 
