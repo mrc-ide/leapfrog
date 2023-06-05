@@ -17,8 +17,8 @@ void run_hiv_model_simulation(int time_step,
   intermediate.everARTelig_idx =
       pars.artcd4elig_idx(time_step) < pars.disease_stages ? pars.artcd4elig_idx(time_step) : pars.disease_stages;
   for (int hiv_step = 0; hiv_step < pars.hiv_steps_per_year; ++hiv_step) {
-    run_disease_progression_and_mortality(time_step, pars, state_curr, state_next, intermediate, hiv_step);
-    run_new_infections(time_step, pars, state_curr, state_next, intermediate, hiv_step);
+    run_disease_progression_and_mortality(hiv_step, time_step, pars, state_curr, state_next, intermediate);
+    run_new_infections(hiv_step, time_step, pars, state_curr, state_next, intermediate);
   }
 }
 
@@ -28,7 +28,7 @@ void run_add_new_hiv_infections(int time_step,
                                 const State<real_type> &state_curr,
                                 State<real_type> &state_next,
                                 IntermediateData<real_type> &intermediate) {
-  // TODO: Add EPP_DIRECTINCID switch
+  // TODO: Add EPP_DIRECTINCID switch (ask Jeff)
 
   // Calculating new infections once per year (like Spectrum)
   for (int g = 0; g < pars.num_genders; ++g) {
@@ -69,21 +69,21 @@ void run_add_new_hiv_infections(int time_step,
 }
 
 template<typename real_type>
-void run_disease_progression_and_mortality(int time_step,
+void run_disease_progression_and_mortality(int hiv_step,
+                                           int time_step,
                                            const Parameters<real_type> &pars,
                                            const State<real_type> &state_curr,
                                            State<real_type> &state_next,
-                                           IntermediateData<real_type> &intermediate,
-                                           int hiv_step) {
+                                           IntermediateData<real_type> &intermediate) {
   for (int g = 0; g < pars.num_genders; g++) {
-    for (int ha = 0; ha < pars.age_groups_hiv; ha++) {
-      for (int hm = 0; hm < pars.disease_stages; hm++) {
+    for (int ha = 0; ha < pars.age_groups_hiv; ++ha) {
+      for (int hm = 0; hm < pars.disease_stages; ++hm) {
         // TODO: Mortality scaling not yet implemented
         if (pars.scale_cd4_mortality &
             (time_step >= pars.time_art_start) &
             (hm >= intermediate.everARTelig_idx) &
             (state_next.hiv_strat_adult(hm, ha, g) > 0.0)) {
-          for (int hu = 0; hu < pars.treatment_stages; hu++) {
+          for (int hu = 0; hu < pars.treatment_stages; ++hu) {
             intermediate.artpop_hahm += state_next.art_strat_adult(hu, hm, ha, g);
           }
           intermediate.cd4mx_scale = state_next.hiv_strat_adult(hm, ha, g) /
@@ -97,7 +97,7 @@ void run_disease_progression_and_mortality(int time_step,
         intermediate.grad(hm, ha, g) = -intermediate.deaths;
       }
 
-      for (int hm = 1; hm < pars.disease_stages; hm++) {
+      for (int hm = 1; hm < pars.disease_stages; ++hm) {
         intermediate.grad(hm - 1, ha, g) -=
             pars.cd4_progression(hm - 1, ha, g) * state_next.hiv_strat_adult(hm - 1, ha, g);
         intermediate.grad(hm, ha, g) += pars.cd4_progression(hm - 1, ha, g) * state_next.hiv_strat_adult(hm - 1, ha, g);
@@ -107,15 +107,15 @@ void run_disease_progression_and_mortality(int time_step,
 }
 
 template<typename real_type>
-void run_new_infections(int time_step,
+void run_new_infections(int hiv_step,
+                        int time_step,
                         const Parameters<real_type> &pars,
                         const State<real_type> &state_curr,
                         State<real_type> &state_next,
-                        IntermediateData<real_type> &intermediate,
-                        int hiv_step) {
+                        IntermediateData<real_type> &intermediate) {
   for (int g = 0; g < pars.num_genders; g++) {
     int a = pars.hiv_adult_first_age_group;
-    for (int ha = 0; ha < pars.age_groups_hiv; ha++) {
+    for (int ha = 0; ha < pars.age_groups_hiv; ++ha) {
       for (int i = 0; i < pars.hiv_age_groups_span(ha); i++, a++) {
         intermediate.infections_a = intermediate.infections_ts(a, g);
         intermediate.infections_ha += intermediate.infections_a;
@@ -124,7 +124,7 @@ void run_new_infections(int time_step,
       }
 
       // add infections to grad hivpop
-      for (int hm = 0; hm < pars.disease_stages; hm++) {
+      for (int hm = 0; hm < pars.disease_stages; ++hm) {
         intermediate.grad(hm, ha, g) += intermediate.infections_ha * pars.cd4_initdist(hm, ha, g);
       }
     }

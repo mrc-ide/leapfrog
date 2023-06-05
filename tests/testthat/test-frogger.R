@@ -102,7 +102,7 @@ test_that("model can be run for all years", {
   demp <- readRDS(test_path("testdata/demographic_projection_object.rds"))
   parameters <- readRDS(test_path("testdata/projection_parameters.rds"))
 
-  expect_error(out <- run_base_model(demp, parameters, NULL, NULL), NA)
+  out <- run_base_model(demp, parameters, NULL, NULL)
 
   ## No HIV population < age 15
   expect_true(all(out$hiv_population[1:15, ] == 0))
@@ -132,7 +132,7 @@ test_that("model can be run with ART initiation", {
   ## Set time ART start to some value lower than no of years in projection
   parameters[["t_ART_start"]] <- 20L
 
-  expect_error(run_base_model(demp, parameters, NULL, NULL), NA)
+  expect_silent(run_base_model(demp, parameters, NULL, NULL))
 })
 
 test_that("error thrown if trying to run model for more than max years", {
