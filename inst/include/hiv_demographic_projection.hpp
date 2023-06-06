@@ -59,8 +59,6 @@ void run_hiv_and_art_stratified_ageing(int time_step,
     // age group
     for (int ha = 0; ha < (pars.age_groups_hiv - 1); ++ha) {
       for (int i = 0; i < pars.age_groups_hiv_span(ha); ++i, ++a) {
-        // TODO: Is this just multiplying hiv_population by the size of the span? Should we just multiply this instead?
-        // We don't need i
         intermediate.hiv_age_up_prob(ha, g) += state_curr.hiv_population(a, g);
       }
       if (intermediate.hiv_age_up_prob(ha, g) > 0) {

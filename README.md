@@ -34,6 +34,14 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 * Update `gender` terminology to sex
 * Previously `hiv_negative_pop` was fixed size by having dimensions specified by template, how much does this speed up
   the code? Is there a better way to do this?
+* Tidy up confusing looping see https://github.com/mrc-ide/frogger/pull/7#discussion_r1217847753
+* Add R casting helpers which return better errors than Rcpp
+  see https://github.com/mrc-ide/frogger/pull/7#discussion_r1217884684
+* Add a helper to do 0 to base 1 conversion and check upper bounds
+  see https://github.com/mrc-ide/frogger/pull/7#discussion_r1217888684
+* Review what we pass as parameters - can some of these be computed in the struct ctor?
+  e.g. https://github.com/mrc-ide/frogger/pull/7#discussion_r1217890466
+* Add function for calculating incidence rate per sex https://github.com/mrc-ide/frogger/pull/7#discussion_r1217848792
 
 ## Leapfrog to Frogger glossary
 

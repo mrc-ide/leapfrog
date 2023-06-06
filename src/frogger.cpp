@@ -70,7 +70,7 @@ Rcpp::List run_base_model(const Rcpp::List data,
   const int treatment_stages = 3;
   const int hiv_adult_first_age_group = 15;
   const int adult_incidence_first_age_group = hiv_adult_first_age_group;
-  // Hardcoded 15-49 for now
+  // Hardcoded 15-49 for now (35 groups within this band)
   const int pAG_INCIDPOP = 35;
   // 0-based indexing vs R 1-based
   const int time_art_start =
