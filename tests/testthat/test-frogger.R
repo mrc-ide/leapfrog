@@ -115,7 +115,7 @@ test_that("model can be run for all years", {
   ## the no of HIV +ve in previous year - is this right?
   expect_true(all(out$hiv_natural_deaths[17:nrow(out$hiv_population), ] != 0))
   ## Some of older ages can be 0 infections, so check the middle chunk
-  expect_true(all(out$infections[16:70, ] != 0))
+  expect_true(all(out$infections[16:70, ] > 0))
 
   ## HIV and ART strat still 0, we are not adding to these yet
   expect_true(all(out$hiv_strat_adult == 0))
@@ -124,6 +124,17 @@ test_that("model can be run for all years", {
     out$aids_deaths_no_art,
     array(rep(0, 7 * 66 * 2), dim = c(7, 66, 2))
   )
+
+  ## Outputs cannot be negative
+  expect_true(all(out$total_population >= 0))
+  expect_true(all(out$births >= 0))
+  expect_true(all(out$natural_deaths >= 0))
+  expect_true(all(out$hiv_population >= 0))
+  expect_true(all(out$hiv_natural_deaths >= 0))
+  expect_true(all(out$hiv_strat_adult >= 0))
+  expect_true(all(out$art_strat_adult >= 0))
+  expect_true(all(out$aids_deaths_no_art >= 0))
+  expect_true(all(out$infections >= 0))
 })
 
 test_that("model can be run with ART initiation", {
