@@ -17,7 +17,12 @@ void run_hiv_model_simulation(int time_step,
   intermediate.everARTelig_idx =
       pars.artcd4elig_idx(time_step) < pars.disease_stages ? pars.artcd4elig_idx(time_step) : pars.disease_stages;
   intermediate.anyelig_idx = pars.artcd4elig_idx(time_step);
+
   for (int hiv_step = 0; hiv_step < pars.hiv_steps_per_year; ++hiv_step) {
+    intermediate.grad.setZero();
+    intermediate.gradART.setZero();
+    intermediate.hiv_deaths_age_sex.setZero();
+
     run_disease_progression_and_mortality(hiv_step, time_step, pars, state_curr, state_next, intermediate);
     run_new_infections(hiv_step, time_step, pars, state_curr, state_next, intermediate);
     if (time_step > pars.time_art_start) {
@@ -87,10 +92,12 @@ void run_disease_progression_and_mortality(int hiv_step,
     for (int ha = 0; ha < pars.age_groups_hiv; ++ha) {
       for (int hm = 0; hm < pars.disease_stages; ++hm) {
         // TODO: Mortality scaling not yet implemented
+        intermediate.cd4mx_scale = 1.0;
         if (pars.scale_cd4_mortality &&
             (time_step >= pars.time_art_start) &&
             (hm >= intermediate.everARTelig_idx) &&
             (state_next.hiv_strat_adult(hm, ha, g) > 0.0)) {
+          intermediate.artpop_hahm = 0.0;
           for (int hu = 0; hu < pars.treatment_stages; ++hu) {
             intermediate.artpop_hahm += state_next.art_strat_adult(hu, hm, ha, g);
           }
@@ -124,6 +131,7 @@ void run_new_infections(int hiv_step,
   for (int g = 0; g < pars.num_genders; g++) {
     int a = pars.hiv_adult_first_age_group;
     for (int ha = 0; ha < pars.age_groups_hiv; ++ha) {
+      intermediate.infections_ha = 0.0;
       for (int i = 0; i < pars.hiv_age_groups_span(ha); i++, a++) {
         intermediate.infections_a = intermediate.infections_ts(a, g);
         intermediate.infections_ha += intermediate.infections_a;
@@ -187,6 +195,9 @@ void run_art_initiation(int hiv_step,
                         State<real_type> &state_next,
                         IntermediateData<real_type> &intermediate) {
   for (int g = 0; g < pars.num_genders; g++) {
+    intermediate.Xart_15plus = 0.0;
+    intermediate.Xartelig_15plus = 0.0;
+    intermediate.expect_mort_artelig15plus = 0.0;
     for (int ha = pars.hIDX_15PLUS; ha < pars.age_groups_hiv; ha++) {
       for (int hm = pars.everARTelig_idx; hm < pars.disease_stages; hm++) {
         if (hm >= intermediate.anyelig_idx) {
@@ -322,6 +333,7 @@ void run_remove_hiv_deaths(int hiv_step,
 
     // sum HIV+ population size in each hivpop age group
     int a = pars.hiv_adult_first_age_group;
+    intermediate.hivpop_ha.setZero();
     for (int ha = 0; ha < pars.age_groups_hiv; ha++) {
       for (int i = 0; i < pars.hiv_age_groups_span(ha); i++, a++) {
         intermediate.hivpop_ha(ha) += state_next.hiv_population(a, g);
