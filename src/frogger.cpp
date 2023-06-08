@@ -82,7 +82,6 @@ Rcpp::List run_base_model(const Rcpp::List data,
   const int scale_cd4_mortality =
       Rcpp::as<int>(projection_parameters["scale_cd4_mort"]);
   int hIDX_15PLUS = 0;
-  int everARTelig_idx = disease_stages;
   const double art_alloc_mxweight = Rcpp::as<double>(projection_parameters["art_alloc_mxweight"]);
 
   leapfrog::TensorMap2<double> base_pop(REAL(data["basepop"]), age_groups_pop,
@@ -145,7 +144,6 @@ Rcpp::List run_base_model(const Rcpp::List data,
                                          (1.0 / hiv_steps),
                                          scale_cd4_mortality,
                                          hIDX_15PLUS,
-                                         everARTelig_idx,
                                          art_alloc_mxweight,
                                          age_groups_hiv_span,
                                          incidence_rate,

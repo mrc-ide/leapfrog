@@ -61,9 +61,7 @@ struct Parameters {
   int scale_cd4_mortality;
 
   int hIDX_15PLUS;
-
-  int everARTelig_idx;
-
+  
   real_type art_alloc_mxweight;
 
   // Number of years in each HIV age group
