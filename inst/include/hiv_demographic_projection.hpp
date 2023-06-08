@@ -17,7 +17,6 @@ void run_hiv_pop_demographic_projection(int time_step,
                                intermediate);
   run_hiv_and_art_stratified_ageing(time_step, pars, state_curr, state_next,
                                     intermediate);
-  run_hiv_deaths_and_migration(time_step, pars, state_next, intermediate);
   run_hiv_and_art_stratified_deaths_and_migration(time_step, pars, state_curr,
                                                   state_next, intermediate);
 }
@@ -68,7 +67,9 @@ void run_hiv_and_art_stratified_ageing(int time_step,
         intermediate.hiv_age_up_prob(ha, g) = 0.0;
       }
     }
+  }
 
+  for (int g = 0; g < pars.num_genders; ++g) {
     for (int ha = 1; ha < pars.age_groups_hiv; ++ha) {
       for (int hm = 0; hm < pars.disease_stages; ++hm) {
         state_next.hiv_strat_adult(hm, ha, g) =
@@ -84,8 +85,10 @@ void run_hiv_and_art_stratified_ageing(int time_step,
           }
       }
     }
+  }
 
     // TODO: add HIV+ 15 year old entrants
+  for (int g = 0; g < pars.num_genders; ++g) {
     for (int hm = 0; hm < pars.disease_stages; ++hm) {
       state_next.hiv_strat_adult(hm, 0, g) =
           (1.0 - intermediate.hiv_age_up_prob(0, g)) * state_curr.hiv_strat_adult(hm, 0, g);
@@ -105,22 +108,6 @@ void run_hiv_and_art_stratified_ageing(int time_step,
 }
 
 template<typename real_type>
-void run_hiv_deaths_and_migration(int time_step,
-                                  const Parameters<real_type> &pars,
-                                  State<real_type> &state_next,
-                                  IntermediateData<real_type> &intermediate) {
-  // remove non-HIV deaths and net migration from hiv_population
-  for (int g = 0; g < pars.num_genders; ++g) {
-    for (int a = 1; a < pars.age_groups_pop; ++a) {
-      state_next.hiv_population(a, g) -= state_next.hiv_natural_deaths(a, g);
-      intermediate.hiv_net_migration(a, g) =
-          state_next.hiv_population(a, g) * intermediate.migration_rate(a, g);
-      state_next.hiv_population(a, g) += intermediate.hiv_net_migration(a, g);
-    }
-  }
-}
-
-template<typename real_type>
 void run_hiv_and_art_stratified_deaths_and_migration(
     int time_step,
     const Parameters<real_type> &pars,
@@ -133,6 +120,16 @@ void run_hiv_and_art_stratified_deaths_and_migration(
       for (int i = 0; i < pars.age_groups_hiv_span(ha); ++i, ++a) {
         intermediate.hiv_population_coarse_ages(ha, g) += state_next.hiv_population(a, g);
       }
+    }
+  }
+
+  // remove non-HIV deaths and net migration from hiv stratified population
+  for (int g = 0; g < pars.num_genders; ++g) {
+    for (int a = 1; a < pars.age_groups_pop; ++a) {
+      state_next.hiv_population(a, g) -= state_next.hiv_natural_deaths(a, g);
+      intermediate.hiv_net_migration(a, g) =
+          state_next.hiv_population(a, g) * intermediate.migration_rate(a, g);
+      state_next.hiv_population(a, g) += intermediate.hiv_net_migration(a, g);
     }
   }
 

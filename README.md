@@ -125,7 +125,7 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 | births_sex                | births_sex                      |                                                                           |
 | migrate_a0                | migration_rate_a0               |                                                                           |
 | hiv_ag_prob               | hiv_age_up_prob                 | Probability of aging from one group to the next in HIV age stratification |
-| hivpop_ha                 | hiv_population_coarse_ages      |                                                                           |
+| hivpop_ha(ha, g)          | hiv_population_coarse_ages      |                                                                           |
 | netmig_ag                 | hiv_net_migration               |                                                                           |
 | deathsmig_ha              | deaths_migrate                  |                                                                           |
 | deathmigrate_ha           | deaths_migrate_rate             |                                                                           |
@@ -153,7 +153,7 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 | curr_coverage             |                                 |                                                                           |
 | artinit_hts               |                                 |                                                                           |
 | artinit_hahm              |                                 |                                                                           |
-| hivpop_ha                 |                                 | HIV population by coarse HIV age group stratification                     |
+| hivpop_ha(ha)             | hivpop_ha                       | HIV population by coarse HIV age group stratification                     |
 | hivqx_ha                  |                                 |                                                                           |
 | hivdeaths_a               |                                 |                                                                           |
 
