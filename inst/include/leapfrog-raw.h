@@ -1421,8 +1421,9 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         for(int af = 0; af < 5; af++){
           for(int cat = 0; cat < hTM; cat++){
             deaths_paeds(hm, cat, af, g, t) += hivstrat_paeds(hm, cat, af, g, t) - (1 - ctx_effect * ctx_val(t)) * hivstrat_paeds(hm, cat, af, g, t) * paed_cd4_mort(hm, cat, af) ; 
-          //  aidsdeaths_noart_paed(hm, af, g, t) +=  deaths_paeds(hm, cat, af, g, t); // output hiv deaths, aggregated across transmission category
-          //  aidsdeaths_noart_paed(hm, af, g, t) += hivstrat_paeds(hm, cat, af, g, t) ;
+            //  aidsdeaths_noart_paed(hm, af, g, t) += (1 - ctx_effect * ctx_val(t)) * hivstrat_paeds(hm, cat, af, g, t) * paed_cd4_mort(hm, cat, af)  ;
+              aidsdeaths_noart_paed(hm, af, g, t) += hivstrat_paeds(hm, cat, af, g, t)  ;
+  
             
           }
         }
@@ -1434,8 +1435,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         for(int af = 5; af < pIDX_HIVADULT; af++){
           for(int cat = 0; cat < hTM; cat++){
              deaths_paeds(hm, cat, af, g, t) += hivstrat_paeds(hm, cat, af, g, t) - (1 - ctx_effect * ctx_val(t)) * hivstrat_paeds(hm, cat, af, g, t) * adol_cd4_mort(hm, cat, af - 5); 
-           //  aidsdeaths_noart_paed(hm, af, g, t) +=  (1 - ctx_effect * ctx_val(t)) * hivstrat_paeds(hm, cat, af, g, t) * adol_cd4_mort(hm, cat, af - 5); // output hiv deaths, aggregated across transmission category
-             
+             aidsdeaths_noart_paed(hm, af, g, t) +=  (1 - ctx_effect * ctx_val(t)) * hivstrat_paeds(hm, cat, af, g, t) * adol_cd4_mort(hm, cat, af - 5); // output hiv deaths, aggregated across transmission category
           }
         }
       }
@@ -1448,10 +1448,10 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
           for(int cat = 0; cat < hTM; cat++){
             // grad_paeds(hm - 1, cat, af, g, t) -= ((hivstrat_paeds(hm-1, cat, af-1, g, t-1) + artstrat_paeds(hm-1, cat, af-1, g, t-1)) > 0) ? (deaths_paeds(hm - 1, cat, af, g, t) * paed_cd4_prog(hm - 1) + hivstrat_paeds(hm - 1, cat, af, g, t) * paed_cd4_prog(hm - 1)) / 2: 0.0; //moving to next cd4 category
             // grad_paeds(hm, cat, af, g, t) += ((hivstrat_paeds(hm-1, cat, af-1, g, t-1) + artstrat_paeds(hm-1, cat, af-1, g, t-1)) > 0) ? (deaths_paeds(hm - 1, cat, af, g, t) * paed_cd4_prog(hm - 1) + hivstrat_paeds(hm - 1, cat, af, g, t) * paed_cd4_prog(hm - 1)) / 2 : 0.0; //moving into this cd4 category
-             grad_paeds(hm - 1, cat, af, g, t) -=  (deaths_paeds(hm - 1, cat, af, g, t) * paed_cd4_prog(hm - 1) + hivstrat_paeds(hm - 1, cat, af, g, t) * paed_cd4_prog(hm - 1)) / 2; //moving to next cd4 category
-             grad_paeds(hm, cat, af, g, t) += (deaths_paeds(hm - 1, cat, af, g, t) * paed_cd4_prog(hm - 1) + hivstrat_paeds(hm - 1, cat, af, g, t) * paed_cd4_prog(hm - 1)) / 2; //moving into this cd4 category
-             aidsdeaths_noart_paed(hm, af, g, t) += grad_paeds(hm, cat, af, g, t);
-            
+           // if(paed_cd4_mort(hm, cat, af) > 0 or paed_cd4_mort(hm-1, cat, af) > 0){
+              grad_paeds(hm - 1, cat, af, g, t) -=  (deaths_paeds(hm - 1, cat, af, g, t) * paed_cd4_prog(hm - 1) + hivstrat_paeds(hm - 1, cat, af, g, t) * paed_cd4_prog(hm - 1)) / 2; //moving to next cd4 category
+              grad_paeds(hm, cat, af, g, t) += (deaths_paeds(hm - 1, cat, af, g, t) * paed_cd4_prog(hm - 1) + hivstrat_paeds(hm - 1, cat, af, g, t) * paed_cd4_prog(hm - 1)) / 2; //moving into this cd4 category
+           // }
           }
         }
       }
@@ -1462,8 +1462,10 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       for(int hm = 1; hm < hDS_adol; hm++){
         for(int af = 5; af < pIDX_FERT; af++){
           for(int cat = 0; cat < hTM; cat++){
-            grad_paeds(hm - 1, cat, af, g, t) -= (deaths_paeds(hm - 1, cat, af, g, t) * adol_cd4_prog(hm - 1) + hivstrat_paeds(hm - 1, cat, af, g, t) * adol_cd4_prog(hm - 1)) / 2; //moving to next cd4 category
-            grad_paeds(hm, cat, af, g, t) += (deaths_paeds(hm - 1, cat, af, g, t) * adol_cd4_prog(hm - 1) + hivstrat_paeds(hm - 1, cat, af, g, t) * adol_cd4_prog(hm - 1)) / 2; //moving into this cd4 category
+         //  if(adol_cd4_mort(hm, cat, af - 5) > 0 or adol_cd4_mort(hm - 1, cat, af - 5) > 0){
+              grad_paeds(hm - 1, cat, af, g, t) -= (deaths_paeds(hm - 1, cat, af, g, t) * adol_cd4_prog(hm - 1) + hivstrat_paeds(hm - 1, cat, af, g, t) * adol_cd4_prog(hm - 1)) / 2; //moving to next cd4 category
+              grad_paeds(hm, cat, af, g, t) += (deaths_paeds(hm - 1, cat, af, g, t) * adol_cd4_prog(hm - 1) + hivstrat_paeds(hm - 1, cat, af, g, t) * adol_cd4_prog(hm - 1)) / 2; //moving into this cd4 category
+          //  }
           }
         }
       }
@@ -1485,7 +1487,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       for(int hm = 0; hm < hDS_adol; hm++){
         for(int af = 5; af < pIDX_FERT; af++){
           for(int cat = 0; cat < hTM; cat++){
-            grad_paeds(hm, cat, af, g, t) -= hivstrat_paeds(hm, cat, af, g, t) * adol_cd4_mort(hm, cat, af - 5) * ctx_val(t) * (1 - ctx_effect) + hivstrat_paeds(hm, cat, af, g, t) * adol_cd4_mort(hm, cat, af - 5) * (1 - ctx_val(t));
+            //TO DO: add in cotrim effects
+            grad_paeds(hm, cat, af, g, t) -= hivstrat_paeds(hm, cat, af, g, t) * adol_cd4_mort(hm, cat, af - 5) ;
           }
         }
       }
@@ -1596,7 +1599,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         for(int af = 0; af < pIDX_HIVADULT; af++){
             double death_rate ;
             death_rate = af < 5 ? mort_art_rr(0, af, t) * 0.5 * (paed_art_mort(hm, 0, af) + paed_art_mort(hm, 1, af)) : mort_art_rr(0, af, t) * 0.5 * (adol_art_mort(hm, 0, af-5) + adol_art_mort(hm, 1, af-5));
-            aidsdeaths_art_paed(0,hm, af, g, t) =  death_rate * artstrat_paeds(0, hm, af, g, t)  ;
+           aidsdeaths_art_paed(0,hm, af, g, t) =  death_rate * artstrat_paeds(0, hm, af, g, t)  ;
             grad_paeds_art(0,hm, af, g, t) -= aidsdeaths_art_paed(0,hm, af, g, t) ;
             artstrat_paeds(0, hm,  af, g, t) += grad_paeds_art(0, hm, af, g, t) ; 
             grad_paeds_art(0, hm, af, g, t) = 0.0;
