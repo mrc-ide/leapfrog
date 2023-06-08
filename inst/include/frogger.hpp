@@ -49,6 +49,8 @@ State<real_type> run_model(int time_steps, const Parameters<real_type> &pars) {
     state_next.aids_deaths_no_art.setZero();
     state_next.infections.setZero();
     state_next.hiv_deaths.setZero();
+    state_next.aids_deaths_art.setZero();
+    state_next.art_initiation.setZero();
     internal::run_general_pop_demographic_projection(step, pars, state, state_next, intermediate);
     internal::run_hiv_pop_demographic_projection(step, pars, state, state_next, intermediate);
     internal::run_hiv_model_simulation(step, pars, state, state_next, intermediate);
