@@ -41,7 +41,7 @@ void run_add_new_hiv_infections(int time_step,
                                 const State<real_type> &state_curr,
                                 State<real_type> &state_next,
                                 IntermediateData<real_type> &intermediate) {
-  // TODO: Add EPP_DIRECTINCID switch (ask Jeff)
+  // TODO: Add different HIV incidence rates see https://github.com/mrc-ide/leapfrog/issues/8
 
   // Calculating new infections once per year (like Spectrum)
   for (int g = 0; g < pars.num_genders; ++g) {
@@ -91,7 +91,6 @@ void run_disease_progression_and_mortality(int hiv_step,
   for (int g = 0; g < pars.num_genders; g++) {
     for (int ha = 0; ha < pars.age_groups_hiv; ++ha) {
       for (int hm = 0; hm < pars.disease_stages; ++hm) {
-        // TODO: Mortality scaling not yet implemented
         intermediate.cd4mx_scale = 1.0;
         if (pars.scale_cd4_mortality &&
             (time_step >= pars.time_art_start) &&

@@ -87,7 +87,7 @@ void run_hiv_and_art_stratified_ageing(int time_step,
     }
   }
 
-    // TODO: add HIV+ 15 year old entrants
+  // TODO: add HIV+ 15 year old entrants see https://github.com/mrc-ide/leapfrog/issues/8
   for (int g = 0; g < pars.num_genders; ++g) {
     for (int hm = 0; hm < pars.disease_stages; ++hm) {
       state_next.hiv_strat_adult(hm, 0, g) =
