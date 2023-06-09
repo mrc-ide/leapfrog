@@ -328,7 +328,6 @@ void run_remove_hiv_deaths(int hiv_step,
                            State<real_type> &state_next,
                            IntermediateData<real_type> &intermediate) {
   for (int g = 0; g < pars.num_genders; ++g) {
-
     // sum HIV+ population size in each hivpop age group
     int a = pars.hiv_adult_first_age_group;
     for (int ha = 0; ha < pars.age_groups_hiv; ++ha) {
