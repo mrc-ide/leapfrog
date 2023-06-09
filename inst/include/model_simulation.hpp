@@ -132,7 +132,6 @@ void run_new_infections(int hiv_step,
     int a = pars.hiv_adult_first_age_group;
     for (int ha = 0; ha < pars.age_groups_hiv; ++ha) {
       intermediate.infections_ha = 0.0;
-      intermediate.infections_a = 0.0;
       for (int i = 0; i < pars.hiv_age_groups_span(ha); i++, a++) {
         intermediate.infections_a = intermediate.infections_ts(a, g);
         intermediate.infections_ha += intermediate.infections_a;
@@ -158,7 +157,6 @@ void run_art_progression_and_mortality(int hiv_step,
   for (int g = 0; g < pars.num_genders; g++) {
     for (int ha = 0; ha < pars.age_groups_hiv; ha++) {
       for (int hm = intermediate.everARTelig_idx; hm < pars.disease_stages; hm++) {
-
         for (int hu = 0; hu < pars.treatment_stages; hu++) {
           intermediate.deaths_art =
               pars.art_mortality(hu, hm, ha, g) * pars.artmx_timerr(hu, time_step) *
@@ -195,12 +193,12 @@ void run_art_initiation(int hiv_step,
                         const State<real_type> &state_curr,
                         State<real_type> &state_next,
                         IntermediateData<real_type> &intermediate) {
-  for (int g = 0; g < pars.num_genders; g++) {
+  for (int g = 0; g < pars.num_genders; ++g) {
     intermediate.Xart_15plus = 0.0;
     intermediate.Xartelig_15plus = 0.0;
     intermediate.expect_mort_artelig15plus = 0.0;
-    for (int ha = pars.hIDX_15PLUS; ha < pars.age_groups_hiv; ha++) {
-      for (int hm = intermediate.everARTelig_idx; hm < pars.disease_stages; hm++) {
+    for (int ha = pars.hIDX_15PLUS; ha < pars.age_groups_hiv; ++ha) {
+      for (int hm = intermediate.everARTelig_idx; hm < pars.disease_stages; ++hm) {
         if (hm >= intermediate.anyelig_idx) {
           // TODO: Implement special population ART eligibility
           real_type prop_elig = 1.0;
@@ -209,11 +207,11 @@ void run_art_initiation(int hiv_step,
           intermediate.expect_mort_artelig15plus +=
               pars.cd4_mortality(hm, ha, g) * intermediate.artelig_hahm(hm, ha - pars.hIDX_15PLUS);
         }
-        for (int hu = 0; hu < pars.treatment_stages; hu++)
+        for (int hu = 0; hu < pars.treatment_stages; ++hu)
           intermediate.Xart_15plus +=
               state_next.art_strat_adult(hu, hm, ha, g) + pars.dt * intermediate.gradART(hu, hm, ha, g);
       }
-    } // loop over ha
+    }
 
     // calculate number on ART at end of ts, based on number or percent
     if (pars.dt * (hiv_step + 1) < 0.5) {
@@ -265,8 +263,8 @@ void run_art_initiation(int hiv_step,
         intermediate.artnum_hts > intermediate.Xart_15plus ? intermediate.artnum_hts - intermediate.Xart_15plus : 0.0;
 
     // Use mixture of eligibility and expected mortality for initiation distribution
-    for (int ha = pars.hIDX_15PLUS; ha < pars.age_groups_hiv; ha++) {
-      for (int hm = intermediate.anyelig_idx; hm < pars.disease_stages; hm++) {
+    for (int ha = pars.hIDX_15PLUS; ha < pars.age_groups_hiv; ++ha) {
+      for (int hm = intermediate.anyelig_idx; hm < pars.disease_stages; ++hm) {
         if (intermediate.Xartelig_15plus > 0.0) {
           intermediate.artinit_hahm = intermediate.artinit_hts * intermediate.artelig_hahm(hm, ha - pars.hIDX_15PLUS) *
                                       ((1.0 - pars.art_alloc_mxweight) / intermediate.Xartelig_15plus +
@@ -295,10 +293,10 @@ void run_update_art_stratification(int hiv_step,
                                    const State<real_type> &state_curr,
                                    State<real_type> &state_next,
                                    IntermediateData<real_type> &intermediate) {
-  for (int g = 0; g < pars.num_genders; g++) {
-    for (int ha = 0; ha < pars.age_groups_hiv; ha++) {
-      for (int hm = intermediate.everARTelig_idx; hm < pars.disease_stages; hm++) {
-        for (int hu = 0; hu < pars.treatment_stages; hu++) {
+  for (int g = 0; g < pars.num_genders; ++g) {
+    for (int ha = 0; ha < pars.age_groups_hiv; ++ha) {
+      for (int hm = intermediate.everARTelig_idx; hm < pars.disease_stages; ++hm) {
+        for (int hu = 0; hu < pars.treatment_stages; ++hu) {
           state_next.art_strat_adult(hu, hm, ha, g) += pars.dt * intermediate.gradART(hu, hm, ha, g);
         }
       }
@@ -313,9 +311,9 @@ void run_update_hiv_stratification(int hiv_step,
                                    const State<real_type> &state_curr,
                                    State<real_type> &state_next,
                                    IntermediateData<real_type> &intermediate) {
-  for (int g = 0; g < pars.num_genders; g++) {
-    for (int ha = 0; ha < pars.age_groups_hiv; ha++) {
-      for (int hm = 0; hm < pars.disease_stages; hm++) {
+  for (int g = 0; g < pars.num_genders; ++g) {
+    for (int ha = 0; ha < pars.age_groups_hiv; ++ha) {
+      for (int hm = 0; hm < pars.disease_stages; ++hm) {
         state_next.hiv_strat_adult(hm, ha, g) += pars.dt * intermediate.grad(hm, ha, g);
       }
     }
@@ -329,23 +327,23 @@ void run_remove_hiv_deaths(int hiv_step,
                            const State<real_type> &state_curr,
                            State<real_type> &state_next,
                            IntermediateData<real_type> &intermediate) {
-  for (int g = 0; g < pars.num_genders; g++) {
+  for (int g = 0; g < pars.num_genders; ++g) {
 
     // sum HIV+ population size in each hivpop age group
     int a = pars.hiv_adult_first_age_group;
-    for (int ha = 0; ha < pars.age_groups_hiv; ha++) {
+    for (int ha = 0; ha < pars.age_groups_hiv; ++ha) {
       intermediate.hivpop_ha(ha) = 0.0;
-      for (int i = 0; i < pars.hiv_age_groups_span(ha); i++, a++) {
+      for (int i = 0; i < pars.hiv_age_groups_span(ha); ++i, ++a) {
         intermediate.hivpop_ha(ha) += state_next.hiv_population(a, g);
       }
     }
 
     // remove hivdeaths proportionally to age-distribution within each age group
     a = pars.hiv_adult_first_age_group;
-    for (int ha = 0; ha < pars.age_groups_hiv; ha++) {
+    for (int ha = 0; ha < pars.age_groups_hiv; ++ha) {
       if (intermediate.hivpop_ha(ha) > 0) {
         intermediate.hivqx_ha = intermediate.hiv_deaths_age_sex(ha, g) / intermediate.hivpop_ha(ha);
-        for (int i = 0; i < pars.hiv_age_groups_span(ha); i++, a++) {
+        for (int i = 0; i < pars.hiv_age_groups_span(ha); ++i, ++a) {
           intermediate.hivdeaths_a = state_next.hiv_population(a, g) * intermediate.hivqx_ha;
           state_next.hiv_deaths(a, g) += intermediate.hivdeaths_a;
           state_next.total_population(a, g) -= intermediate.hivdeaths_a;

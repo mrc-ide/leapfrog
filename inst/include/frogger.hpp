@@ -11,8 +11,8 @@ namespace internal {
 template<typename real_type>
 void initialise_model_state(const Parameters<real_type> &pars,
                             State<real_type> &state) {
-  for (int g = 0; g < pars.num_genders; g++) {
-    for (int a = 0; a < pars.age_groups_pop; a++) {
+  for (int g = 0; g < pars.num_genders; ++g) {
+    for (int a = 0; a < pars.age_groups_pop; ++a) {
       state.total_population(a, g) = pars.base_pop(a, g);
     }
   }
