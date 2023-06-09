@@ -218,9 +218,7 @@ struct IntermediateData {
         artinit_hts(0.0),
         artinit_hahm(0.0),
         hivqx_ha(0.0),
-        hivdeaths_a(0.0) {
-    reset();
-  }
+        hivdeaths_a(0.0) {}
 
   void reset() {
     migration_rate.setZero();
