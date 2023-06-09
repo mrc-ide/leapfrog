@@ -143,15 +143,8 @@ test_that("model can be run for all years", {
   expect_true(all(out$infections[16:70, ] > 0))
 
   expect_true(all(out$hiv_strat_adult != 0))
-  expect_true(all(out$art_strat_adult == 0))
-  expect_equal(
-    out$aids_deaths_no_art,
-    array(rep(0, 7 * 66 * 2), dim = c(7, 66, 2))
-  )
-  expect_equal(
-    out$art_initiation,
-    array(rep(0, 7 * 66 * 2), dim = c(7, 66, 2))
-  )
+  expect_true(all(out$art_strat_adult != 0))
+  expect_true(all(out$art_initiation != 0))
 
   ## Outputs cannot be negative
   expect_true(all(out$total_population >= 0))
