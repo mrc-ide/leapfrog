@@ -25,7 +25,7 @@ void run_hiv_model_simulation(int time_step,
 
     run_disease_progression_and_mortality(hiv_step, time_step, pars, state_curr, state_next, intermediate);
     run_new_infections(hiv_step, time_step, pars, state_curr, state_next, intermediate);
-    if (time_step > pars.time_art_start) {
+    if (time_step >= pars.time_art_start) {
       run_art_progression_and_mortality(hiv_step, time_step, pars, state_curr, state_next, intermediate);
       run_art_initiation(hiv_step, time_step, pars, state_curr, state_next, intermediate);
       run_update_art_stratification(hiv_step, time_step, pars, state_curr, state_next, intermediate);
@@ -267,7 +267,6 @@ void run_art_initiation(int hiv_step,
     // Use mixture of eligibility and expected mortality for initiation distribution
     for (int ha = pars.hIDX_15PLUS; ha < pars.age_groups_hiv; ha++) {
       for (int hm = intermediate.anyelig_idx; hm < pars.disease_stages; hm++) {
-
         if (intermediate.Xartelig_15plus > 0.0) {
           intermediate.artinit_hahm = intermediate.artinit_hts * intermediate.artelig_hahm(hm, ha - pars.hIDX_15PLUS) *
                                       ((1.0 - pars.art_alloc_mxweight) / intermediate.Xartelig_15plus +
