@@ -61,7 +61,7 @@ struct Parameters {
   int scale_cd4_mortality;
 
   int hIDX_15PLUS;
-  
+
   real_type art_alloc_mxweight;
 
   // Number of years in each HIV age group
@@ -124,6 +124,21 @@ struct State {
         aids_deaths_art(treatment_stages, disease_stages, age_groups_hiv, num_genders),
         art_initiation(disease_stages, age_groups_hiv, num_genders),
         hiv_deaths(age_groups_pop, num_genders) {}
+
+  void reset() {
+    total_population.setZero();
+    natural_deaths.setZero();
+    hiv_population.setZero();
+    hiv_natural_deaths.setZero();
+    hiv_strat_adult.setZero();
+    art_strat_adult.setZero();
+    aids_deaths_no_art.setZero();
+    infections.setZero();
+    aids_deaths_art.setZero();
+    art_initiation.setZero();
+    hiv_deaths.setZero();
+    births = 0;
+  }
 };
 
 namespace internal {
