@@ -130,7 +130,7 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 | deathsmig_ha              | deaths_migrate                  |                                                                           |
 | deathmigrate_ha           | deaths_migrate_rate             |                                                                           |
 | cd4elig_idx               | ?                               | Index of the maximum CD4 count category eligible for ART                  |
-| everARTelig_idx           |                                 |                                                                           |
+| everARTelig_idx           | ?                                |                                                                           |
 | anyelig_idx               |                                 |                                                                           |
 | infections_ts             | infections_ts                   | Infections occurring at a specific time step                              |
 | hivn_ag                   | hiv_negative_pop                | HIV negative population for a given age and sex                           |
