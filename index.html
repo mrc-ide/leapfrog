@@ -90,6 +90,17 @@
 <li>Ensure input data is not copied, we can read from the data that R owns (as long as don’t write to it)</li>
 <li>Convert string flags to the model to enums if we need to switch on them in several places. This should make it easier to reason about in C++ world and isolate the string checking to a single place</li>
 <li>Update <code>gender</code> terminology to sex</li>
+<li>Previously <code>hiv_negative_pop</code> was fixed size by having dimensions specified by template, how much does this speed up the code? Is there a better way to do this?</li>
+<li>Tidy up confusing looping see <a href="https://github.com/mrc-ide/frogger/pull/7#discussion_r1217847753" class="external-link uri">https://github.com/mrc-ide/frogger/pull/7#discussion_r1217847753</a>
+</li>
+<li>Add R casting helpers which return better errors than Rcpp see <a href="https://github.com/mrc-ide/frogger/pull/7#discussion_r1217884684" class="external-link uri">https://github.com/mrc-ide/frogger/pull/7#discussion_r1217884684</a>
+</li>
+<li>Add a helper to do 0 to base 1 conversion and check upper bounds see <a href="https://github.com/mrc-ide/frogger/pull/7#discussion_r1217888684" class="external-link uri">https://github.com/mrc-ide/frogger/pull/7#discussion_r1217888684</a>
+</li>
+<li>Review what we pass as parameters - can some of these be computed in the struct ctor? e.g. <a href="https://github.com/mrc-ide/frogger/pull/7#discussion_r1217890466" class="external-link uri">https://github.com/mrc-ide/frogger/pull/7#discussion_r1217890466</a>
+</li>
+<li>Add function for calculating incidence rate per sex <a href="https://github.com/mrc-ide/frogger/pull/7#discussion_r1217848792" class="external-link uri">https://github.com/mrc-ide/frogger/pull/7#discussion_r1217848792</a>
+</li>
 </ul>
 </div>
 <div class="section level2">
@@ -175,12 +186,12 @@
 </tr>
 <tr class="even">
 <td>hiv_steps_per_year</td>
-<td>?</td>
+<td>hiv_steps_per_year</td>
 <td></td>
 </tr>
 <tr class="odd">
 <td>t_ART_start</td>
-<td>?</td>
+<td>time_art_start</td>
 <td>Time step to start modelling ART</td>
 </tr>
 <tr class="even">
@@ -196,9 +207,9 @@
 </h3>
 <table class="table">
 <colgroup>
-<col width="14%">
-<col width="17%">
-<col width="67%">
+<col width="13%">
+<col width="20%">
+<col width="65%">
 </colgroup>
 <thead><tr class="header">
 <th>Leapfrog</th>
@@ -233,17 +244,17 @@
 </tr>
 <tr class="even">
 <td>incidinput</td>
-<td>?</td>
+<td>incidence_rate</td>
 <td></td>
 </tr>
 <tr class="odd">
 <td>incrr_sex</td>
-<td>?</td>
+<td>incidence_relative_risk_sex</td>
 <td>Relative risk of incidence by sex</td>
 </tr>
 <tr class="even">
 <td>incrr_age</td>
-<td>?</td>
+<td>incidence_relative_risk_age</td>
 <td>Relative risk of incidence by age</td>
 </tr>
 <tr class="odd">
@@ -253,12 +264,12 @@
 </tr>
 <tr class="even">
 <td>cd4_prog</td>
-<td>?</td>
+<td>cd4_progression</td>
 <td></td>
 </tr>
 <tr class="odd">
 <td>cd4_mort</td>
-<td>?</td>
+<td>cd4_mortality</td>
 <td></td>
 </tr>
 <tr class="even">
@@ -298,7 +309,7 @@
 </tr>
 <tr class="odd">
 <td>scale_cd4_mort</td>
-<td>?</td>
+<td>scale_cd4_mortality</td>
 <td></td>
 </tr>
 <tr class="even">
@@ -336,7 +347,7 @@
 </tr>
 <tr class="odd">
 <td>infections</td>
-<td>?</td>
+<td>infections</td>
 <td></td>
 </tr>
 <tr class="even">
@@ -371,7 +382,7 @@
 </tr>
 <tr class="even">
 <td>aidsdeaths_noart</td>
-<td>?</td>
+<td>aids_deaths_no_art</td>
 <td></td>
 </tr>
 <tr class="odd">
@@ -393,8 +404,8 @@
 <table class="table">
 <colgroup>
 <col width="20%">
-<col width="21%">
-<col width="57%">
+<col width="24%">
+<col width="55%">
 </colgroup>
 <thead><tr class="header">
 <th>Leapfrog</th>
@@ -409,7 +420,7 @@
 </tr>
 <tr class="even">
 <td>pIDX_INCIDPOP</td>
-<td>?</td>
+<td>adult_incidence_first_age_group</td>
 <td>Index of youngest age that is reflected in the adult incidence input</td>
 </tr>
 <tr class="odd">
@@ -489,7 +500,7 @@
 </tr>
 <tr class="even">
 <td>everARTelig_idx</td>
-<td></td>
+<td>?</td>
 <td></td>
 </tr>
 <tr class="odd">
@@ -499,17 +510,17 @@
 </tr>
 <tr class="even">
 <td>infections_ts</td>
-<td></td>
+<td>infections_ts</td>
 <td>Infections occurring at a specific time step</td>
 </tr>
 <tr class="odd">
 <td>hivn_ag</td>
-<td></td>
+<td>hiv_negative_pop</td>
 <td>HIV negative population for a given age and sex</td>
 </tr>
 <tr class="even">
 <td>Xhivn</td>
-<td></td>
+<td>hiv_neg_aggregate</td>
 <td></td>
 </tr>
 <tr class="odd">
@@ -524,17 +535,17 @@
 </tr>
 <tr class="odd">
 <td>incrate_g</td>
-<td></td>
+<td>incidence_rate_sex</td>
 <td>Incidence rate by sex</td>
 </tr>
 <tr class="even">
 <td>hivdeaths_ha</td>
-<td></td>
+<td>hiv_deaths_age_sex</td>
 <td></td>
 </tr>
 <tr class="odd">
 <td>grad</td>
-<td></td>
+<td>grad</td>
 <td>Movement between cd4 categories at a given time step</td>
 </tr>
 <tr class="even">
@@ -549,12 +560,12 @@
 </tr>
 <tr class="even">
 <td>infections_a</td>
-<td></td>
+<td>infections_a</td>
 <td></td>
 </tr>
 <tr class="odd">
 <td>infections_ha</td>
-<td></td>
+<td>infections_ha</td>
 <td></td>
 </tr>
 <tr class="even">
