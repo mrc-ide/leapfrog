@@ -6,7 +6,7 @@ test_that("DemProj only matches EPP-ASM", {
   ##   is corrected in leapfrog.
 
   pjnz1 <- test_path("../testdata/spectrum/v6.13/bwa_demproj-only_spectrum-v6.13_2022-02-12.PJNZ")
-  
+
   demp <- prepare_leapfrog_demp(pjnz1)
   hivp <- prepare_leapfrog_projp(pjnz1)
 
@@ -14,8 +14,8 @@ test_that("DemProj only matches EPP-ASM", {
   ## in EPP-ASM preparation
   demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
   demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
-  
-  lmod <- leapfrogR(demp, hivp)
+
+  lmod <- leapfrogR(demp, hivp, hiv_steps_per_year = 1L)
 
   expect_warning(fp <- eppasm::prepare_directincid(pjnz1),
                  "no non-missing arguments to min; returning Inf")
@@ -23,7 +23,7 @@ test_that("DemProj only matches EPP-ASM", {
 
   ## Replace ASFR because demp$asfr is normalised, but fp$asfr is not
   fp$asfr <- demp$asfr
-    
+
   mod <- eppasm::simmod(fp)
 
   expect_equal(lmod$totpop1[16:80,,], mod[1:65,,1,])
@@ -47,7 +47,7 @@ test_that("Leapfrog matches DemProj projection without migration", {
 
   ## births by age
   expect_true(all(abs(lmod1$births[-1] - specres$births[-1]) < 0.002))
-  
+
 })
 
 test_that("Leapfrog matches DemProj projection with migration", {
@@ -60,4 +60,15 @@ test_that("Leapfrog matches DemProj projection with migration", {
   diff <- lmod1$totpop1[,,2:6] - demp1$basepop[,,2:6]
 
   expect_true(all(abs(diff) < 0.01))
+})
+
+test_that("rob test", {
+
+
+  pjnz1 <- test_path("../testdata/spectrum/v6.13/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ")
+
+  demp <- prepare_leapfrog_demp(pjnz1)
+  hivp <- prepare_leapfrog_projp(pjnz1)
+
+  lmod <- leapfrogR(demp, hivp, hiv_steps_per_year = 10L)
 })

@@ -7,7 +7,7 @@
 //' @param demp list of demographic input parameters (TODO: document)
 //' @param projp list of HIV projection parameters (TODO: document)
 //' @param hiv_strat stratification of HIV population, either "full"
-//'   (default; single-year ages) or "coarse" (aggregated age groups). 
+//'   (default; single-year ages) or "coarse" (aggregated age groups).
 //' @param hiv_steps_per_year number of Euler integration steps per year
 //'   for HIV progression; default 10.
 //'
@@ -16,7 +16,7 @@
 //' to apply to the base year population (consistent with Spectrum).
 //'
 //' @export
-//' 
+//'
 // [[Rcpp::export]]
 Rcpp::List
 leapfrogR(const Rcpp::List& demp,
@@ -25,10 +25,10 @@ leapfrogR(const Rcpp::List& demp,
 	  const int hiv_steps_per_year = 10) {
 
   using namespace Rcpp;
-  
+
   NumericVector Sx = demp["Sx"];
   Dimension d = Sx.attr("dim");
-  const size_t proj_years = d[2];
+  const size_t proj_years = 2;
   const int NG = 2;
   const int pAG = 81;
   const int pIDX_HIVADULT = 15;
@@ -47,7 +47,7 @@ leapfrogR(const Rcpp::List& demp,
   } else {
     Rf_error("hiv_strat \"%s\" not found. Please select \"full\" or \"coarse\".\n", hiv_strat.get_cstring());
   }
-    
+
   // allocate memory for return object
   NumericVector totpop1(pAG * NG * proj_years);
   totpop1.attr("dim") = NumericVector::create(pAG, NG, proj_years);
@@ -83,7 +83,7 @@ leapfrogR(const Rcpp::List& demp,
 
   NumericVector artinit(hDS * hAG * NG * proj_years);
   artinit.attr("dim") = NumericVector::create(hDS, hAG, NG, proj_years);
- 
+
   if (hAG == hAG_FULL) {
     leapfrog_sim<double, NG, pAG, pIDX_FERT, pAG_FERT,
 		 pIDX_HIVADULT, hAG_FULL, hDS, hTS>
@@ -145,7 +145,7 @@ leapfrogR(const Rcpp::List& demp,
        *INTEGER(projp["art_alloc_method"]),
        *REAL(projp["art_alloc_mxweight"]),
        *INTEGER(projp["scale_cd4_mort"]),
-       REAL(projp["art_dropout"]),       
+       REAL(projp["art_dropout"]),
        proj_years,
        hiv_steps_per_year,
        *INTEGER(projp["t_ART_start"]) - 1,  // 0-based indexing vs. R 1-based
@@ -155,7 +155,7 @@ leapfrogR(const Rcpp::List& demp,
        REAL(infections),
        REAL(hivstrat_adult),
        REAL(artstrat_adult),
-       REAL(births),       
+       REAL(births),
        REAL(natdeaths),
        REAL(natdeaths_hivpop),
        REAL(hivdeaths),
@@ -171,13 +171,13 @@ leapfrogR(const Rcpp::List& demp,
 			  _("hivstrat_adult") = hivstrat_adult,
 			  _("artstrat_adult") = artstrat_adult,
 			  _("infections") = infections,
-			  _("births") = births,			  
+			  _("births") = births,
 			  _("natdeaths") = natdeaths,
 			  _("natdeaths_hivpop") = natdeaths_hivpop,
 			  _("hivdeaths") = hivdeaths,
 			  _("aidsdeaths_noart") = aidsdeaths_noart,
 			  _("aidsdeaths_art") = aidsdeaths_art,
 			  _("artinit") = artinit);
-				      
+
   return ret;
 }

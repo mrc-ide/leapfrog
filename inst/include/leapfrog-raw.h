@@ -142,7 +142,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   TensorMapX3T totpop1(p_totpop1, pAG, NG, sim_years);
   TensorMapX3T hivpop1(p_hivpop1, pAG, NG, sim_years);
   TensorMapX3T infections(p_infections, pAG, NG, sim_years);
-  TensorMapX1T births(p_births, sim_years);  
+  TensorMapX1T births(p_births, sim_years);
   TensorMapX3T natdeaths(p_natdeaths, pAG, NG, sim_years);
   TensorMapX3T natdeaths_hivpop(p_natdeaths_hivpop, pAG, NG, sim_years);
   TensorMapX3T hivdeaths(p_hivdeaths, pAG, NG, sim_years);
@@ -157,6 +157,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 
   for(int g = 0; g < NG; g++) {
     for(int a = 0; a < pAG; a++) {
+      // Total pop in 1970 takes value of input basepop
       totpop1(a, g, 0) = basepop(a, g);
     }
   }
@@ -177,22 +178,65 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     // ageing and non-HIV mortality
     for(int g = 0; g < NG; g++){
 
+      // Natural deaths at time t and age a is the age from last year from
+      // previous age group * by (1 - survival rate)
+      // Survival rate is rate of surviving from (a - 1) to a
+      // Then reduce totpop1 by the number of natural deaths
+      // Total population and natural deaths are outputs
+      //
+      // This loops to a = 80 as pAG = 81, there are 82 Sx in total
+      // At end boundary with a = 80
+      // natdeaths_80 = totalpop_79(t - 1) * (1 - survival_rate_80)
+      // totalpop_80 = totalpop_79(t - 1) - natural_deaths_80
+      // At the end of this boundary natural deaths and total pop do not
+      // include those which already existed in the 80 age group at previous
+      // time step
       for(int a = 1; a < pAG; a++) {
+        std::cout << "a: "<< a <<  ", pAG: "<< pAG << "\n";
         natdeaths(a, g, t) = totpop1(a-1, g, t-1) * (1.0 - sx(a, g, t));
         totpop1(a, g, t) = totpop1(a-1, g, t-1) - natdeaths(a, g, t);
       }
 
       // open age group
+
+      // From above we do not have the people from the open age group yet
+      // Add these now.
       Type natdeaths_open_age = totpop1(pAG-1, g, t-1) * (1.0 - sx(pAG, g, t));
       natdeaths(pAG-1, g, t) += natdeaths_open_age;
       totpop1(pAG-1, g, t) += totpop1(pAG-1, g, t-1) - natdeaths_open_age;
 
       // net migration
+
+      // Sets
+      // totpop_t = totalpop_t * (1 + (netmigr_t * (1 + sx_t) * 0.5) / totalpop_t )
+      // netmigr is a count? or a % of the population?
+      // Why do we * by 0.5?
+      // This calculates migration as a ratio of total population and increases
+      // total pop by this amount
+      // Excludes open age group
+
+      // Why 1 + survival? Not just survival?
+      // Why * 0.5, like using migrate survival rate of mean of survival
+      // rate and 1? Why is that?
+      //
+      // Model is at mid year
+      // Treatment can be end of year but is outside model adjustment
+      // netmigr(a, g, t) * (1.0 + sx(a, g, t)) * 0.5
+      // no of migrants is a value from start of the year, no one has died yet
+      // sx is survival rate by the end of the year (what proporation of people will survive within the year)
+      // To get mid year we average with 1
+      // Mid year
+
       for(int a = 1; a < pAG - 1; a++) {
 	// Number of net migrants adjusted for survivorship to end of period (qx / 2)
         migrate_ag(a, g) = netmigr(a, g, t) * (1.0 + sx(a, g, t)) * 0.5 / totpop1(a, g, t);
         totpop1(a, g, t) *= 1.0 + migrate_ag(a, g);
       }
+
+
+      // What is sx_netmig?
+      // Doesn't look like it matches up with the equation expressed below?
+      // TODO: Let's ask Jeff this one
 
       // For open age group, netmigrant survivor adjustment based on weighted
       // sx for age 79 and age 80+.
@@ -207,10 +251,23 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 
     // fertility
 
+    // pAG_FERT is 35 -> the number of age groups which could give birth
+    // So starting at pIDX_FERT = 15, births could be
+    // from 15 to 49
+    // Num of births is average of no of women (t - 1) and t * asfr
+    // where asfr is age sex fertility ratio
+    // TODO: Why do we average totalpop t - 1 and t? This is because we want a mid year value
     births(t) = 0.0;
     for(int af = 0; af < pAG_FERT; af++) {
       births(t) += (totpop1(pIDX_FERT + af, FEMALE, t-1) + totpop1(pIDX_FERT + af, FEMALE, t)) * 0.5 * asfr(af, t);
     }
+
+    // Distrbute births as male and female children
+    // Calculate deaths from survival rate and add to
+    // natural deaths and total population.
+    // TODO: Why do we add1 to survival rate here? Because this is a weighted average
+
+
 
     // add births
     for(int g = 0; g < NG; g++) {
@@ -242,8 +299,17 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     TensorFixedSize<Type, Sizes<hAG, NG>> hiv_ag_prob;
     hiv_ag_prob.setZero();
 
+    // hiv_ag_prob - probability of aging from one group to the next in hiv
+    // stratification
+
+    // hAG_SPAN can be 1, 1, 1, 1, for fine ages
+    // or for coarse 2, 3, 5, 5, 5, .., 31 which covers all ages
+    // TODO: When do we run the coarse age group model? Q for Jeff?
+    // This sums hiv population at t - 1 over the age group span
+    // Then calculates hiv_ag_prob as the proportion of hiv pop at age - 1 / the sum
+    //
     for(int g = 0; g < NG; g++){
-      int a = pIDX_HIVADULT;
+      int a = pIDX_HIVADULT; // = 15
       for(int ha = 0; ha < (hAG-1); ha++){
         for(int i = 0; i < hAG_SPAN[ha]; i++){
           hiv_ag_prob(ha, g) += hivpop1(a, g, t-1);
@@ -254,6 +320,10 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       // Note: loop stops at hAG-1; no one ages out of the open-ended age group
     }
 
+    // hivstrat_adult is adult HIV+ve population stratified by disease stage, age group and gender
+    // This loops through and moves people
+    // TODO: What is age out?
+    // Is hiv_ag_prob is the proportion of peopl from 1 HIV age span who will age into the next one
     for(int g = 0; g < NG; g++) {
       for(int ha = 1; ha < hAG; ha++) {
         for(int hm = 0; hm < hDS; hm++) {
@@ -283,6 +353,9 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
     }
 
+    // hivpop_ha is the aggregation of hivpop over the coarse
+    // age group, in full age groups will be the same has hivpop1 at time t
+
     TensorFixedSize<Type, Sizes<hAG, NG>> hivpop_ha;
     hivpop_ha.setZero();
     for(int g = 0; g < NG; g++) {
@@ -295,6 +368,9 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
     }
 
+    // netmig_ag is the count, calculates count of migrants from the rate
+    // TODO: Why do we do it in rates? Compared to raw numbers?
+
     // remove non-HIV deaths and net migration from hivpop1
     TensorFixedSize<Type, Sizes<pAG, NG>> netmig_ag;
     for(int g = 0; g < NG; g++) {
@@ -306,6 +382,10 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     }
 
     // remove non-HIV deaths and net migration from adult stratified population
+    // TODO: Question for Jeff - why is this being applied as scalar compared
+    // to just adding/subtracting from the hivstrat_adult
+
+    // Assumes same rates of deaths and migration across CD4 counts
     for(int g = 0; g < NG; g++){
       int a = pIDX_HIVADULT;
       for(int ha = 0; ha < hAG; ha++){
@@ -352,6 +432,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 
       // Calculating new infections once per year (like Spectrum)
 
+
+      // hivn_ag is the susceptible population by age and sex
       TensorFixedSize<Type, Sizes<pAG, NG>> hivn_ag;
       for(int g = 0; g < NG; g++) {
         for(int a = pIDX_INCIDPOP; a < pAG; a++) {
@@ -370,11 +452,16 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         }
       }
 
+      // Calculating sex specific incidence rate from the input incidence
+      //
       Type incrate_i = incidinput(t);
       Type incrate_g[NG];
       incrate_g[MALE] = incrate_i * (Xhivn[MALE]+Xhivn[FEMALE]) / (Xhivn[MALE] + incrr_sex(t)*Xhivn[FEMALE]);
       incrate_g[FEMALE] = incrate_i * incrr_sex(t)*(Xhivn[MALE]+Xhivn[FEMALE]) / (Xhivn[MALE] + incrr_sex(t)*Xhivn[FEMALE]);
 
+      // incrate_g and incrr are risks
+      // incrr_age is relative risk per age
+      // infections_ts is a count of the infections for this time step per age and sex
       for(int g = 0; g < NG; g++) {
         for(int a = pIDX_HIVADULT; a < pAG; a++) {
           infections_ts(a, g) = hivn_ag(a, g) * incrate_g[g] * incrr_age(a - pIDX_INCIDPOP, g, t) * Xhivn[g] / Xhivn_incagerr[g];
@@ -382,6 +469,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
     }
 
+    // Where the sub year simulation starts
     for(int hts = 0; hts < hiv_steps_per_year; hts++) {
 
       TensorFixedSize<Type, Sizes<hAG, NG>> hivdeaths_ha;
@@ -410,12 +498,14 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
               cd4mx_scale = hivstrat_adult(hm, ha, g, t) / (hivstrat_adult(hm, ha, g, t) + artpop_hahm);
             }
 
+            // Moving through cd4 categories and exposed to HIV related mortality
             Type deaths = cd4mx_scale * cd4_mort(hm, ha, g) * hivstrat_adult(hm, ha, g, t);
             hivdeaths_ha(ha, g) += dt*deaths;
             aidsdeaths_noart(hm, ha, g, t) += dt*deaths;
             grad(hm, ha, g) = -deaths;
           }
 
+          // cd4_prog is rate of progression between disease states
           for(int hm = 1; hm < hDS; hm++) {
             grad(hm-1, ha, g) -= cd4_prog(hm-1, ha, g) * hivstrat_adult(hm-1, ha, g, t);
             grad(hm, ha, g) += cd4_prog(hm-1, ha, g) * hivstrat_adult(hm-1, ha, g, t);
@@ -435,6 +525,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
             a++;
           }
 
+          // When you get HIV what is your initial CD4 distribution
+
           // add infections to grad hivpop
           for(int hm = 0; hm < hDS; hm++) {
             grad(hm, ha, g) += infections_ha * cd4_initdist(hm, ha, g);
@@ -447,18 +539,27 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 
 	TensorFixedSize<Type, Sizes<hTS, hDS, hAG, NG>> gradART;
 
+        // This should look similar to HIV above, but no progression between
+        // CD4 groups as being on ART prevents this.
+        // Has some handling for when people are eligible for ART, earlier
+        // in the pandemic only the most sick would have been given ART but
+        // in later years most people will be eligible
+
         // progression and mortality
         for(int g = 0; g < NG; g++)
           for(int ha = 0; ha < hAG; ha++)
             for(int hm = everARTelig_idx; hm < hDS; hm++){
 
               for(int hu = 0; hu < hTS; hu++){
-		Type deaths = art_mort(hu, hm, ha, g) * artmx_timerr(hu, t) * artstrat_adult(hu, hm, ha, g, t);
-		hivdeaths_ha(ha, g) += dt * deaths;
+		            Type deaths = art_mort(hu, hm, ha, g) * artmx_timerr(hu, t) * artstrat_adult(hu, hm, ha, g, t);
+		            hivdeaths_ha(ha, g) += dt * deaths;
                 aidsdeaths_art(hu, hm, ha, g, t) += dt * deaths;
                 gradART(hu, hm, ha, g) = -deaths;
               }
 
+              // Progressing through the treatment stages
+              // FOr children 0- 6 months, 6 - 12 months, etc.
+              // Ask Jeff what are they for adults?
               for(int hu = 0; hu < (hTS - 1); hu++) {
                 gradART(hu, hm, ha, g) += -artstrat_adult(hu, hm, ha, g, t) / h_art_stage_dur[hu];
                 gradART(hu+1, hm, ha, g) += artstrat_adult(hu, hm, ha, g, t) / h_art_stage_dur[hu];
@@ -479,7 +580,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         for(int g = 0; g < NG; g++){
 
           TensorFixedSize<Type, Sizes<hDS, hAG_15PLUS>> artelig_hahm;
-	  
+
           Type Xart_15plus = 0.0, Xartelig_15plus = 0.0, expect_mort_artelig15plus = 0.0;
           for(int ha = hIDX_15PLUS; ha < hAG; ha++) {
             for(int hm = everARTelig_idx; hm < hDS; hm++) {
@@ -544,7 +645,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
           // Use mixture of eligibility and expected mortality for initiation distribution
 
           for(int ha = hIDX_15PLUS; ha < hAG; ha++) {
-	    for(int hm = anyelig_idx; hm < hDS; hm++) {
+	          for(int hm = anyelig_idx; hm < hDS; hm++) {
 
               if (Xartelig_15plus > 0.0) {
                 Type artinit_hahm = artinit_hts * artelig_hahm(hm, ha-hIDX_15PLUS) * ((1.0 - art_alloc_mxweight)/Xartelig_15plus + art_alloc_mxweight * cd4_mort(hm, ha, g) / expect_mort_artelig15plus);
@@ -555,13 +656,13 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                   artinit_hahm = hivstrat_adult(hm, ha, g, t) + dt * grad(hm, ha, g);
                 }
                 grad(hm, ha, g) -= artinit_hahm / dt;
-		gradART(ART0MOS, hm, ha, g) += artinit_hahm / dt;
+		            gradART(ART0MOS, hm, ha, g) += artinit_hahm / dt;
                 artinit(hm, ha, g, t) += artinit_hahm;
-	      }
+	            }
             }
           }
         } // end ART initiation
-	
+
         for(int g = 0; g < NG; g++) {
           for(int ha = 0; ha < hAG; ha++) {
             for(int hm = everARTelig_idx; hm < hDS; hm++) {
