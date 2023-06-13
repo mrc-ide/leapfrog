@@ -42,6 +42,8 @@ State<real_type> run_model(int time_steps, const Parameters<real_type> &pars) {
   internal::IntermediateData<real_type> intermediate(pars.age_groups_pop, pars.age_groups_hiv, pars.num_genders,
                                                      pars.disease_stages, pars.treatment_stages,
                                                      pars.age_groups_hiv_15plus);
+  intermediate.reset();
+
   // Each time step is mid-point of the year
   for (int step = 1; step <= time_steps; ++step) {
     state_next.reset();
