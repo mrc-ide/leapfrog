@@ -89,7 +89,542 @@
 <li>Tidy data copying a tensor2 to matrix and a tensor n to array utility functions which should be used in C++ R interface “src/frogger.cpp”</li>
 <li>Ensure input data is not copied, we can read from the data that R owns (as long as don’t write to it)</li>
 <li>Convert string flags to the model to enums if we need to switch on them in several places. This should make it easier to reason about in C++ world and isolate the string checking to a single place</li>
+<li>Update <code>gender</code> terminology to sex</li>
 </ul>
+</div>
+<div class="section level2">
+<h2 id="leapfrog-to-frogger-glossary">Leapfrog to Frogger glossary<a class="anchor" aria-label="anchor" href="#leapfrog-to-frogger-glossary"></a>
+</h2>
+<div class="section level3">
+<h3 id="stratifications">Stratifications<a class="anchor" aria-label="anchor" href="#stratifications"></a>
+</h3>
+<table class="table">
+<colgroup>
+<col width="15%">
+<col width="27%">
+<col width="57%">
+</colgroup>
+<thead><tr class="header">
+<th>Leapfrog</th>
+<th>Frogger</th>
+<th>Details</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>NG</td>
+<td>num_genders</td>
+<td>Number of genders</td>
+</tr>
+<tr class="even">
+<td>pAG</td>
+<td>age_groups_pop</td>
+<td>Number of age groups in population, 81 for 0 to 80+</td>
+</tr>
+<tr class="odd">
+<td>pIDX_FERT</td>
+<td>fertility_first_age_group</td>
+<td>First age group index eligible for fertility</td>
+</tr>
+<tr class="even">
+<td>pAG_FERT</td>
+<td>age_groups_fertiity</td>
+<td>Number of ages eligible for fertility</td>
+</tr>
+<tr class="odd">
+<td>pIDX_HIVADULT</td>
+<td>hiv_adult_first_age_group</td>
+<td>Index of the first age group to be considered an adult</td>
+</tr>
+<tr class="even">
+<td>hAG</td>
+<td>age_groups_hiv</td>
+<td>Number of age groups in HIV population</td>
+</tr>
+<tr class="odd">
+<td>hDS</td>
+<td>disease_stages</td>
+<td>Number of disease stages</td>
+</tr>
+<tr class="even">
+<td>hTS</td>
+<td>treatment_stages</td>
+<td>Number of treatment stages</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="model-settings">Model settings<a class="anchor" aria-label="anchor" href="#model-settings"></a>
+</h3>
+<table class="table">
+<colgroup>
+<col width="26%">
+<col width="27%">
+<col width="46%">
+</colgroup>
+<thead><tr class="header">
+<th>Leapfrog</th>
+<th>Frogger</th>
+<th>Details</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>sim_years</td>
+<td>sim_years</td>
+<td>Number of simulation years to run</td>
+</tr>
+<tr class="even">
+<td>hiv_steps_per_year</td>
+<td>?</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>t_ART_start</td>
+<td>?</td>
+<td>Time step to start modelling ART</td>
+</tr>
+<tr class="even">
+<td>hAG_SPAN</td>
+<td>hiv_age_groups_span</td>
+<td>Array of HIV age group sizes</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="input-data">Input data<a class="anchor" aria-label="anchor" href="#input-data"></a>
+</h3>
+<table class="table">
+<colgroup>
+<col width="14%">
+<col width="17%">
+<col width="67%">
+</colgroup>
+<thead><tr class="header">
+<th>Leapfrog</th>
+<th>Frogger</th>
+<th>Details</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>basepop</td>
+<td>base_pop</td>
+<td>Population data by age group and sex</td>
+</tr>
+<tr class="even">
+<td>sx</td>
+<td>Survival</td>
+<td>Probability of surviving between ages, from 0 to 1, 1 to 2, …, 79 to 80+ and 80+ to 80+</td>
+</tr>
+<tr class="odd">
+<td>netmigr</td>
+<td>net_migration</td>
+<td>Net migration by age group, sex and year</td>
+</tr>
+<tr class="even">
+<td>asfr</td>
+<td>age_sex_fertility_ratio</td>
+<td>Ratio of number of live births in a year and the whole female population of childbearing age</td>
+</tr>
+<tr class="odd">
+<td>births_sex_prop</td>
+<td>births_sex_prop</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>incidinput</td>
+<td>?</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>incrr_sex</td>
+<td>?</td>
+<td>Relative risk of incidence by sex</td>
+</tr>
+<tr class="even">
+<td>incrr_age</td>
+<td>?</td>
+<td>Relative risk of incidence by age</td>
+</tr>
+<tr class="odd">
+<td>cd4_initdist</td>
+<td>?</td>
+<td>Distribution of infections by cd4 category upon infection</td>
+</tr>
+<tr class="even">
+<td>cd4_prog</td>
+<td>?</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>cd4_mort</td>
+<td>?</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>art_mort</td>
+<td>?</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>artmx_timerr</td>
+<td>?</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>art15plus_num</td>
+<td>?</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>art15plus_isperc</td>
+<td>?</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>artcd4elig_idx</td>
+<td>?</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>art_alloc_method</td>
+<td>?</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>art_alloc_mxweight</td>
+<td>?</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>scale_cd4_mort</td>
+<td>?</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>art_dropout</td>
+<td>?</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="outputs">Outputs<a class="anchor" aria-label="anchor" href="#outputs"></a>
+</h3>
+<table class="table">
+<colgroup>
+<col width="18%">
+<col width="20%">
+<col width="60%">
+</colgroup>
+<thead><tr class="header">
+<th>Leapfrog</th>
+<th>Frogger</th>
+<th>Details</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>totpop1</td>
+<td>total_population</td>
+<td>Projected total population</td>
+</tr>
+<tr class="even">
+<td>hivpop1</td>
+<td>hiv_population</td>
+<td>Projected HIV population</td>
+</tr>
+<tr class="odd">
+<td>infections</td>
+<td>?</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>hivstrat_adult</td>
+<td>hiv_strat_adult</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>artstrat_adult</td>
+<td>art_strat_adult</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>births</td>
+<td>births</td>
+<td>Projected number of births</td>
+</tr>
+<tr class="odd">
+<td>natdeaths</td>
+<td>natural_deaths</td>
+<td>Projected number of natural deaths</td>
+</tr>
+<tr class="even">
+<td>natdeaths_hivpop</td>
+<td>hiv_natural_deaths</td>
+<td>Projected number of natural deaths within HIV population</td>
+</tr>
+<tr class="odd">
+<td>hivdeaths</td>
+<td>?</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>aidsdeaths_noart</td>
+<td>?</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>aidsdeaths_art</td>
+<td>?</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>artinit</td>
+<td>?</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="internal">Internal<a class="anchor" aria-label="anchor" href="#internal"></a>
+</h3>
+<table class="table">
+<colgroup>
+<col width="20%">
+<col width="21%">
+<col width="57%">
+</colgroup>
+<thead><tr class="header">
+<th>Leapfrog</th>
+<th>Frogger</th>
+<th>Details</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>ART0MOS</td>
+<td>?</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>pIDX_INCIDPOP</td>
+<td>?</td>
+<td>Index of youngest age that is reflected in the adult incidence input</td>
+</tr>
+<tr class="odd">
+<td>pAG_INCIDPOP</td>
+<td>?</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>hAG_15PLUS</td>
+<td>?</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>hIDX_15PLUS</td>
+<td>?</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>h_art_stage_dur</td>
+<td>?</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>everARTelig_idx</td>
+<td>?</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>migrate_ag</td>
+<td>migration_rate</td>
+<td>Rate people migrate into population by age and sex</td>
+</tr>
+<tr class="odd">
+<td>sx_netmig</td>
+<td>survival_netmig</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>births_sex</td>
+<td>births_sex</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>migrate_a0</td>
+<td>migration_rate_a0</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>hiv_ag_prob</td>
+<td>hiv_age_up_prob</td>
+<td>Probability of aging from one group to the next in HIV age stratification</td>
+</tr>
+<tr class="odd">
+<td>hivpop_ha</td>
+<td>hiv_population_coarse_ages</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>netmig_ag</td>
+<td>hiv_net_migration</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>deathsmig_ha</td>
+<td>deaths_migrate</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>deathmigrate_ha</td>
+<td>deaths_migrate_rate</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>cd4elig_idx</td>
+<td>?</td>
+<td>Index of the maximum CD4 count category eligible for ART</td>
+</tr>
+<tr class="even">
+<td>everARTelig_idx</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>anyelig_idx</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>infections_ts</td>
+<td></td>
+<td>Infections occurring at a specific time step</td>
+</tr>
+<tr class="odd">
+<td>hivn_ag</td>
+<td></td>
+<td>HIV negative population for a given age and sex</td>
+</tr>
+<tr class="even">
+<td>Xhivn</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Xhivn_incagerr</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>incrate_i</td>
+<td></td>
+<td>Incidence rate input</td>
+</tr>
+<tr class="odd">
+<td>incrate_g</td>
+<td></td>
+<td>Incidence rate by sex</td>
+</tr>
+<tr class="even">
+<td>hivdeaths_ha</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>grad</td>
+<td></td>
+<td>Movement between cd4 categories at a given time step</td>
+</tr>
+<tr class="even">
+<td>artpop_hahm</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>cd4mx_scale</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>infections_a</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>infections_ha</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>gradART</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>artelig_hahm</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Xart_15plus</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Xartelig_15plus</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>expect_mort_artelig15plus</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>artnum_hts</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>artcov_hts</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>curr_coverage</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>artinit_hts</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>artinit_hahm</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>hivpop_ha</td>
+<td></td>
+<td>HIV population by coarse HIV age group stratification</td>
+</tr>
+<tr class="odd">
+<td>hivqx_ha</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>hivdeaths_a</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div class="section level2">
 <h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
