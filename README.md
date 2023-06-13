@@ -135,7 +135,7 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 | infections_ts             | infections_ts                   | Infections occurring at a specific time step                              |
 | hivn_ag                   | hiv_negative_pop                | HIV negative population for a given age and sex                           |
 | Xhivn                     | hiv_neg_aggregate               |                                                                           |
-| Xhivn_incagerr            |                                 |                                                                           |
+| Xhivn_incagerr            | ?                               |                                                                           |
 | incrate_i                 |                                 | Incidence rate input                                                      |
 | incrate_g                 | incidence_rate_sex              | Incidence rate by sex                                                     |
 | hivdeaths_ha              | hiv_deaths_age_sex              |                                                                           |
