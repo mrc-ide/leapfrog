@@ -26,9 +26,36 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// serialize_vector
+Rcpp::List serialize_vector(const Rcpp::List data, const std::string path1, const std::string path2);
+RcppExport SEXP _frogger_serialize_vector(SEXP dataSEXP, SEXP path1SEXP, SEXP path2SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::List >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< const std::string >::type path1(path1SEXP);
+    Rcpp::traits::input_parameter< const std::string >::type path2(path2SEXP);
+    rcpp_result_gen = Rcpp::wrap(serialize_vector(data, path1, path2));
+    return rcpp_result_gen;
+END_RCPP
+}
+// deserialize_vector
+Rcpp::List deserialize_vector(const std::string path1, const std::string path2);
+RcppExport SEXP _frogger_deserialize_vector(SEXP path1SEXP, SEXP path2SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::string >::type path1(path1SEXP);
+    Rcpp::traits::input_parameter< const std::string >::type path2(path2SEXP);
+    rcpp_result_gen = Rcpp::wrap(deserialize_vector(path1, path2));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_frogger_run_base_model", (DL_FUNC) &_frogger_run_base_model, 5},
+    {"_frogger_serialize_vector", (DL_FUNC) &_frogger_serialize_vector, 3},
+    {"_frogger_deserialize_vector", (DL_FUNC) &_frogger_deserialize_vector, 2},
     {NULL, NULL, 0}
 };
 

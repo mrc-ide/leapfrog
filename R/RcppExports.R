@@ -5,3 +5,11 @@ run_base_model <- function(data, projection_parameters, sim_years, hiv_steps_per
     .Call(`_frogger_run_base_model`, data, projection_parameters, sim_years, hiv_steps_per_year, hiv_age_stratification)
 }
 
+serialize_vector <- function(data, path1, path2) {
+    .Call(`_frogger_serialize_vector`, data, path1, path2)
+}
+
+deserialize_vector <- function(path1, path2) {
+    .Call(`_frogger_deserialize_vector`, path1, path2)
+}
+

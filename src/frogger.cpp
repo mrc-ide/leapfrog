@@ -2,6 +2,7 @@
 
 #include "frogger.hpp"
 #include "types.hpp"
+#include "serialize_eigen.hpp"
 
 int get_simulation_years(const Rcpp::List demp, SEXP r_sim_years) {
   Rcpp::NumericVector Sx = demp["Sx"];
@@ -143,7 +144,7 @@ Rcpp::List run_base_model(const Rcpp::List data,
                                                adult_incidence_first_age_group,
                                                pAG_INCIDPOP,
                                                hiv_steps,
-                                               (1.0 / hiv_steps),
+                                               dt,
                                                scale_cd4_mortality,
                                                hIDX_15PLUS,
                                                art_alloc_mxweight,
@@ -243,5 +244,43 @@ Rcpp::List run_base_model(const Rcpp::List data,
                          Rcpp::_["aids_deaths_art"] = r_aids_deaths_art,
                          Rcpp::_["art_initiation"] = r_art_initiation,
                          Rcpp::_["hiv_deaths"] = r_hiv_deaths);
+  return ret;
+}
+
+
+// [[Rcpp::export]]
+Rcpp::List serialize_vector(const Rcpp::List data, const std::string path1, const std::string path2) {
+  const leapfrog::TensorMap2<double> test_2d(REAL(data["test_2d_double"]), 3, 4);
+  const leapfrog::TensorMap3<int> test_3d(INTEGER(data["test_3d_int"]), 4, 3, 2);
+
+  serialize::serialize_tensor_map(test_2d, path1);
+  serialize::serialize_tensor_map(test_3d, path2);
+
+  Rcpp::List ret =
+      Rcpp::List::create(Rcpp::_["test_2d_double_path"] = path1,
+                         Rcpp::_["test_3d_int_path"] = path2);
+  return ret;
+}
+
+// [[Rcpp::export]]
+Rcpp::List deserialize_vector(const std::string path1, const std::string path2) {
+
+  const Eigen::Tensor<double, 2> test_2d = serialize::deserialize_tensor<double, 2>(path1);
+  const Eigen::Tensor<int, 3> test_3d = serialize::deserialize_tensor<int, 3>(path2);
+
+  Rcpp::NumericVector r_test_2d(3 * 4);
+  Rcpp::NumericVector r_test_3d(4 * 3 * 2);
+
+  r_test_2d.attr("dim") =
+      Rcpp::NumericVector::create(3, 4);
+  r_test_3d.attr("dim") =
+      Rcpp::NumericVector::create(4, 3, 2);
+
+  std::copy_n(test_2d.data(), test_2d.size(), REAL(r_test_2d));
+  std::copy_n(test_3d.data(), test_3d.size(), INTEGER(r_test_3d));
+
+  Rcpp::List ret =
+      Rcpp::List::create(Rcpp::_["test_2d_double"] = r_test_2d,
+                         Rcpp::_["test_3d_int"] = r_test_3d);
   return ret;
 }
