@@ -43,13 +43,13 @@ std::string trim(const std::string &s) {
 
 template<typename T>
 struct csv_contents {
-  std::vector<size_t> dim;
-  std::vector<T> data;
+  std::vector <size_t> dim;
+  std::vector <T> data;
 };
 
 template<typename T>
-std::vector<T> strsplit(const std::string &s) {
-  std::vector<T> ret;
+std::vector <T> strsplit(const std::string &s) {
+  std::vector <T> ret;
   std::stringstream ss(s);
 
   while (ss.good()) {
@@ -78,7 +78,7 @@ csv_contents<T> parse_csv(const std::string &path) {
   std::string line3;
   getline(src, line3);
   line2 = trim(line3);
-  std::vector<T> data = strsplit<size_t>(line3);
+  std::vector <T> data = strsplit<T>(line3);
   // validate data.size() is prod(dim)
 
   return csv_contents<T>{dim, data};
@@ -92,14 +92,17 @@ Eigen::Tensor <T, rank> deserialize_tensor(const std::string &path) {
   if (contents.dim.size() != rank) {
     throw std::runtime_error("Unexpected rank");
   }
-  const Eigen::Array dim(rank);
+
+  Eigen::array <Eigen::Index, rank> dim;
   for (size_t i = 0; i < rank; ++i) {
-    dim(i) = contents.dim[i];
+    dim[i] = static_cast<Eigen::Index>(contents.dim[i]);
   }
-  Eigen::Tensor<T, rank> ret(contents.data, dim)
-//  for (size_t i = 0; i < contents.data.size(); ++i) {
-//    ret(i) = contents.data[i];
-//  }
+
+  Eigen::Tensor <T, rank> ret(dim);
+  for (size_t i = 0; i < contents.data.size(); ++i) {
+    ret(i) = contents.data[i];
+  }
+
   return ret;
 }
 
