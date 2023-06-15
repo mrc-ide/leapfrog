@@ -17,6 +17,7 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 
 ## TODO
 
+* Improve variable names!
 * Restructuring the model code to identify more common code
     * There are examples like general demographic projection and hiv population demographic projection which are running
       similar processes like ageing, non HIV mortality, migration. We should be able to write a function for e.g. ageing
