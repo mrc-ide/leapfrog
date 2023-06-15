@@ -3,8 +3,15 @@
 #include <fstream>
 
 leapfrog::Parameters<double> build_parameters(int sim_years, int hiv_steps_per_year) {
-  const int proj_years = get_simulation_years(data, sim_years);
-  const int hiv_steps = get_hiv_steps_per_year(hiv_steps_per_year);
+  if (sim_years > 60) {
+    std::cout <<  "Running to max no of sim years: 60"
+    sim_years = 60;
+  }
+
+  if (hiv_steps_per_year > 10) {
+    std::cout <<  "Running max no of HIV steps per years: 10"
+    hiv_steps_per_year = 10;
+  }
   const double dt = (1.0 / hiv_steps);
   const int num_genders = 2;
   const int age_groups_pop = 81;
