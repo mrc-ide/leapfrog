@@ -12,7 +12,6 @@ Eigen::TensorMap <Eigen::Tensor<T, rank>> tensor_to_tensor_map(Eigen::Tensor <T,
 }
 
 int main(int argc, char *argv[]) {
-
   if (argc < 4) {
     std::cout <<
               "Usage: fit_model <sim_years> <hiv_steps_per_year> <intput_dir> <output_dir>" <<
