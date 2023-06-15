@@ -190,8 +190,35 @@ int main(int argc, char *argv[]) {
   std::cout << "Fit complete" << std::endl;
 
   std::filesystem::path out_path(output_abs);
-  out_path /= "hiv_population";
-  serialize::serialize_tensor<double, 2>(output_state.hiv_population, out_path);
+  std::filesystem::path total_population_path = out_path / "total_population";
+  serialize::serialize_tensor<double, 2>(output_state.total_population, total_population_path);
+  std::filesystem::path births_path = out_path / "births";
+
+  // Births is just a double so write it out
+  std::ofstream dest(births_path);
+  dest << output_state.births << std::endl;
+  dest.close();
+
+  std::filesystem::path natural_deaths_path = out_path / "natural_deaths";
+  serialize::serialize_tensor<double, 2>(output_state.natural_deaths, natural_deaths_path);
+  std::filesystem::path hiv_population_path = out_path / "hiv_population";
+  serialize::serialize_tensor<double, 2>(output_state.hiv_population, hiv_population_path);
+  std::filesystem::path hiv_natural_deaths_path = out_path / "hiv_natural_deaths";
+  serialize::serialize_tensor<double, 2>(output_state.hiv_natural_deaths, hiv_natural_deaths_path);
+  std::filesystem::path hiv_strat_adult_path = out_path / "hiv_strat_adult";
+  serialize::serialize_tensor<double, 3>(output_state.hiv_strat_adult, hiv_strat_adult_path);
+  std::filesystem::path art_strat_adult_path = out_path / "art_strat_adult";
+  serialize::serialize_tensor<double, 4>(output_state.art_strat_adult, art_strat_adult_path);
+  std::filesystem::path aids_deaths_no_art_path = out_path / "aids_deaths_no_art";
+  serialize::serialize_tensor<double, 3>(output_state.aids_deaths_no_art, aids_deaths_no_art_path);
+  std::filesystem::path infections_path = out_path / "infections";
+  serialize::serialize_tensor<double, 2>(output_state.infections, infections_path);
+  std::filesystem::path aids_deaths_art_path = out_path / "aids_deaths_art";
+  serialize::serialize_tensor<double, 4>(output_state.aids_deaths_art, aids_deaths_art_path);
+  std::filesystem::path art_initiation_path = out_path / "art_initiation";
+  serialize::serialize_tensor<double, 3>(output_state.art_initiation, art_initiation_path);
+  std::filesystem::path hiv_deaths_path = out_path / "hiv_deaths";
+  serialize::serialize_tensor<double, 2>(output_state.hiv_deaths, hiv_deaths_path);
 
   return 0;
 }

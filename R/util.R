@@ -24,3 +24,9 @@ serialize_r_to_tensor <- function(data, path) {
   writeLines(lines, path)
   path
 }
+
+deserialize_tensor_to_r <- function(path) {
+  content <- readLines(path)
+  array(unlist(read.csv(text = content[3], header = FALSE), use.names = FALSE),
+        unlist(read.csv(text = content[2], header = FALSE), use.names = FALSE))
+}
