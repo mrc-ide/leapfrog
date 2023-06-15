@@ -214,18 +214,18 @@ void run_art_initiation(int hiv_step,
 
     // calculate number on ART at end of ts, based on number or percent
     if (pars.dt * (hiv_step + 1) < 0.5) {
-      if ((!pars.art15plus_isperc(g, time_step - 2)) & (!pars.art15plus_isperc(g, time_step - 1))) {
+      if (!pars.art15plus_isperc(g, time_step - 2) && !pars.art15plus_isperc(g, time_step - 1)) {
         // Both values are numbers
         intermediate.artnum_hts =
             (0.5 - pars.dt * (hiv_step + 1)) * pars.art15plus_num(g, time_step - 2) +
             (pars.dt * (hiv_step + 1) + 0.5) * pars.art15plus_num(g, time_step - 1);
-      } else if (pars.art15plus_isperc(g, time_step - 2) & pars.art15plus_isperc(g, time_step - 1)) {
+      } else if (pars.art15plus_isperc(g, time_step - 2) && pars.art15plus_isperc(g, time_step - 1)) {
         // Both values are percentages
         intermediate.artcov_hts =
             (0.5 - pars.dt * (hiv_step + 1)) * pars.art15plus_num(g, time_step - 2) +
             (pars.dt * (hiv_step + 1) + 0.5) * pars.art15plus_num(g, time_step - 1);
         intermediate.artnum_hts = intermediate.artcov_hts * (intermediate.Xart_15plus + intermediate.Xartelig_15plus);
-      } else if ((!pars.art15plus_isperc(g, time_step - 2)) & pars.art15plus_isperc(g, time_step - 1)) {
+      } else if (!pars.art15plus_isperc(g, time_step - 2) && pars.art15plus_isperc(g, time_step - 1)) {
         // Transition from number to percentage
         intermediate.curr_coverage =
             intermediate.Xart_15plus / (intermediate.Xart_15plus + intermediate.Xartelig_15plus);
@@ -235,18 +235,18 @@ void run_art_initiation(int hiv_step,
         intermediate.artnum_hts = intermediate.artcov_hts * (intermediate.Xart_15plus + intermediate.Xartelig_15plus);
       }
     } else {
-      if ((!pars.art15plus_isperc(g, time_step - 1)) & (!pars.art15plus_isperc(g, time_step))) {
+      if (!pars.art15plus_isperc(g, time_step - 1) && !pars.art15plus_isperc(g, time_step)) {
         // Both values are numbers
         intermediate.artnum_hts =
             (1.5 - pars.dt * (hiv_step + 1)) * pars.art15plus_num(g, time_step - 1) +
             (pars.dt * (hiv_step + 1) - 0.5) * pars.art15plus_num(g, time_step);
-      } else if (pars.art15plus_isperc(g, time_step - 1) & pars.art15plus_isperc(g, time_step)) {
+      } else if (pars.art15plus_isperc(g, time_step - 1) && pars.art15plus_isperc(g, time_step)) {
         // Both values are percentages
         intermediate.artcov_hts =
             (1.5 - pars.dt * (hiv_step + 1)) * pars.art15plus_num(g, time_step - 1) +
             (pars.dt * (hiv_step + 1) - 0.5) * pars.art15plus_num(g, time_step);
         intermediate.artnum_hts = intermediate.artcov_hts * (intermediate.Xart_15plus + intermediate.Xartelig_15plus);
-      } else if ((!pars.art15plus_isperc(g, time_step - 1)) & pars.art15plus_isperc(g, time_step)) {
+      } else if (!pars.art15plus_isperc(g, time_step - 1) && pars.art15plus_isperc(g, time_step)) {
         // Transition from number to percentage
         intermediate.curr_coverage =
             intermediate.Xart_15plus / (intermediate.Xart_15plus + intermediate.Xartelig_15plus);
