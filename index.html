@@ -78,6 +78,7 @@
 <h2 id="todo">TODO<a class="anchor" aria-label="anchor" href="#todo"></a>
 </h2>
 <ul>
+<li>Improve variable names!</li>
 <li>Restructuring the model code to identify more common code
 <ul>
 <li>There are examples like general demographic projection and hiv population demographic projection which are running similar processes like ageing, non HIV mortality, migration. We should be able to write a function for e.g. ageing which we can run on each of our population matrices. Even for the HIV and ART stratified we can add overloaded function to work with higher dimension data</li>
@@ -274,7 +275,7 @@
 </tr>
 <tr class="even">
 <td>art_mort</td>
-<td>?</td>
+<td>art_mortality</td>
 <td></td>
 </tr>
 <tr class="odd">
@@ -377,7 +378,7 @@
 </tr>
 <tr class="odd">
 <td>hivdeaths</td>
-<td>?</td>
+<td>hiv_deaths</td>
 <td></td>
 </tr>
 <tr class="even">
@@ -387,12 +388,12 @@
 </tr>
 <tr class="odd">
 <td>aidsdeaths_art</td>
-<td>?</td>
+<td>aids_deaths_art</td>
 <td></td>
 </tr>
 <tr class="even">
 <td>artinit</td>
-<td>?</td>
+<td>art_initiation</td>
 <td></td>
 </tr>
 </tbody>
@@ -430,12 +431,12 @@
 </tr>
 <tr class="even">
 <td>hAG_15PLUS</td>
-<td>?</td>
+<td>age_groups_hiv_15plus</td>
 <td></td>
 </tr>
 <tr class="odd">
 <td>hIDX_15PLUS</td>
-<td>?</td>
+<td>hIDX_15PLUS</td>
 <td></td>
 </tr>
 <tr class="even">
@@ -445,7 +446,7 @@
 </tr>
 <tr class="odd">
 <td>everARTelig_idx</td>
-<td>?</td>
+<td>everARTelig_idx</td>
 <td></td>
 </tr>
 <tr class="even">
@@ -474,7 +475,7 @@
 <td>Probability of aging from one group to the next in HIV age stratification</td>
 </tr>
 <tr class="odd">
-<td>hivpop_ha</td>
+<td>hivpop_ha(ha, g)</td>
 <td>hiv_population_coarse_ages</td>
 <td></td>
 </tr>
@@ -499,13 +500,13 @@
 <td>Index of the maximum CD4 count category eligible for ART</td>
 </tr>
 <tr class="even">
-<td>everARTelig_idx</td>
-<td>?</td>
+<td>anyelig_idx</td>
+<td>anyelig_idx</td>
 <td></td>
 </tr>
 <tr class="odd">
-<td>anyelig_idx</td>
-<td></td>
+<td>everARTelig_idx</td>
+<td>?</td>
 <td></td>
 </tr>
 <tr class="even">
@@ -525,7 +526,7 @@
 </tr>
 <tr class="odd">
 <td>Xhivn_incagerr</td>
-<td></td>
+<td>?</td>
 <td></td>
 </tr>
 <tr class="even">
@@ -619,8 +620,8 @@
 <td></td>
 </tr>
 <tr class="even">
+<td>hivpop_ha(ha)</td>
 <td>hivpop_ha</td>
-<td></td>
 <td>HIV population by coarse HIV age group stratification</td>
 </tr>
 <tr class="odd">
