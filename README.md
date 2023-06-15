@@ -17,6 +17,7 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 
 ## TODO
 
+* Improve variable names!
 * Restructuring the model code to identify more common code
     * There are examples like general demographic projection and hiv population demographic projection which are running
       similar processes like ageing, non HIV mortality, migration. We should be able to write a function for e.g. ageing
@@ -82,7 +83,7 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 | cd4_initdist       | ?                           | Distribution of infections by cd4 category upon infection                                    |
 | cd4_prog           | cd4_progression             |                                                                                              |
 | cd4_mort           | cd4_mortality               |                                                                                              |
-| art_mort           | ?                           |                                                                                              |
+| art_mort           | art_mortality               |                                                                                              |
 | artmx_timerr       | ?                           |                                                                                              |
 | art15plus_num      | ?                           |                                                                                              |
 | art15plus_isperc   | ?                           |                                                                                              |
@@ -104,10 +105,10 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 | births           | births             | Projected number of births                               |
 | natdeaths        | natural_deaths     | Projected number of natural deaths                       |
 | natdeaths_hivpop | hiv_natural_deaths | Projected number of natural deaths within HIV population |
-| hivdeaths        | ?                  |                                                          |
+| hivdeaths        | hiv_deaths         |                                                          |
 | aidsdeaths_noart | aids_deaths_no_art |                                                          |
-| aidsdeaths_art   | ?                  |                                                          |
-| artinit          | ?                  |                                                          |
+| aidsdeaths_art   | aids_deaths_art    |                                                          |
+| artinit          | art_initiation     |                                                          |
 
 ### Internal
 
@@ -116,26 +117,26 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 | ART0MOS                   | ?                               |                                                                           |
 | pIDX_INCIDPOP             | adult_incidence_first_age_group | Index of youngest age that is reflected in the adult incidence input      |
 | pAG_INCIDPOP              | ?                               |                                                                           |
-| hAG_15PLUS                | ?                               |                                                                           |
-| hIDX_15PLUS               | ?                               |                                                                           |
+| hAG_15PLUS                | age_groups_hiv_15plus           |                                                                           |
+| hIDX_15PLUS               | hIDX_15PLUS                     |                                                                           |
 | h_art_stage_dur           | ?                               |                                                                           |
-| everARTelig_idx           | ?                               |                                                                           |
+| everARTelig_idx           | everARTelig_idx                 |                                                                           |
 | migrate_ag                | migration_rate                  | Rate people migrate into population by age and sex                        |
 | sx_netmig                 | survival_netmig                 |                                                                           |
 | births_sex                | births_sex                      |                                                                           |
 | migrate_a0                | migration_rate_a0               |                                                                           |
 | hiv_ag_prob               | hiv_age_up_prob                 | Probability of aging from one group to the next in HIV age stratification |
-| hivpop_ha                 | hiv_population_coarse_ages      |                                                                           |
+| hivpop_ha(ha, g)          | hiv_population_coarse_ages      |                                                                           |
 | netmig_ag                 | hiv_net_migration               |                                                                           |
 | deathsmig_ha              | deaths_migrate                  |                                                                           |
 | deathmigrate_ha           | deaths_migrate_rate             |                                                                           |
 | cd4elig_idx               | ?                               | Index of the maximum CD4 count category eligible for ART                  |
-| everARTelig_idx           | ?                                |                                                                           |
-| anyelig_idx               |                                 |                                                                           |
+| anyelig_idx               | anyelig_idx                     |                                                                           |
+| everARTelig_idx           | ?                               |                                                                           |
 | infections_ts             | infections_ts                   | Infections occurring at a specific time step                              |
 | hivn_ag                   | hiv_negative_pop                | HIV negative population for a given age and sex                           |
 | Xhivn                     | hiv_neg_aggregate               |                                                                           |
-| Xhivn_incagerr            |                                 |                                                                           |
+| Xhivn_incagerr            | ?                               |                                                                           |
 | incrate_i                 |                                 | Incidence rate input                                                      |
 | incrate_g                 | incidence_rate_sex              | Incidence rate by sex                                                     |
 | hivdeaths_ha              | hiv_deaths_age_sex              |                                                                           |
@@ -154,7 +155,7 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 | curr_coverage             |                                 |                                                                           |
 | artinit_hts               |                                 |                                                                           |
 | artinit_hahm              |                                 |                                                                           |
-| hivpop_ha                 |                                 | HIV population by coarse HIV age group stratification                     |
+| hivpop_ha(ha)             | hivpop_ha                       | HIV population by coarse HIV age group stratification                     |
 | hivqx_ha                  |                                 |                                                                           |
 | hivdeaths_a               |                                 |                                                                           |
 

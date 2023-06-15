@@ -9,7 +9,8 @@ test_that("initial state set up works as expected", {
     c(
       "total_population", "births", "natural_deaths", "hiv_population",
       "hiv_natural_deaths", "hiv_strat_adult", "art_strat_adult",
-      "aids_deaths_no_art", "infections"
+      "aids_deaths_no_art", "infections", "aids_deaths_art", "art_initiation",
+      "hiv_deaths"
     )
   )
   expect_equal(dim(out$total_population), c(81, 2))
@@ -28,10 +29,19 @@ test_that("initial state set up works as expected", {
     array(rep(0, 3 * 7 * 66 * 2), dim = c(3, 7, 66, 2))
   )
   expect_equal(
-      out$aids_deaths_no_art,
-      array(rep(0, 7 * 66 * 2), dim = c(7, 66, 2))
+    out$aids_deaths_no_art,
+    array(rep(0, 7 * 66 * 2), dim = c(7, 66, 2))
   )
   expect_equal(out$infections, matrix(0, nrow = 81, ncol = 2))
+  expect_equal(
+    out$aids_deaths_art,
+    array(rep(0, 3 * 7 * 66 * 2), dim = c(3, 7, 66, 2))
+  )
+  expect_equal(
+    out$art_initiation,
+    array(rep(0, 7 * 66 * 2), dim = c(7, 66, 2))
+  )
+  expect_equal(out$hiv_deaths, matrix(0, nrow = 81, ncol = 2))
 })
 
 test_that("initial state set up with coarse stratified HIV works as expected", {
@@ -45,7 +55,8 @@ test_that("initial state set up with coarse stratified HIV works as expected", {
     c(
       "total_population", "births", "natural_deaths", "hiv_population",
       "hiv_natural_deaths", "hiv_strat_adult", "art_strat_adult",
-      "aids_deaths_no_art", "infections"
+      "aids_deaths_no_art", "infections", "aids_deaths_art", "art_initiation",
+      "hiv_deaths"
     )
   )
   expect_equal(dim(out$total_population), c(81, 2))
@@ -68,6 +79,15 @@ test_that("initial state set up with coarse stratified HIV works as expected", {
     array(rep(0, 7 * 9 * 2), dim = c(7, 9, 2))
   )
   expect_equal(out$infections, matrix(0, nrow = 81, ncol = 2))
+  expect_equal(
+    out$aids_deaths_art,
+    array(rep(0, 3 * 7 * 9 * 2), dim = c(3, 7, 9, 2))
+  )
+  expect_equal(
+    out$art_initiation,
+    array(rep(0, 7 * 9 * 2), dim = c(7, 9, 2))
+  )
+  expect_equal(out$hiv_deaths, matrix(0, nrow = 81, ncol = 2))
 })
 
 test_that("model for 1 time step has looped", {
@@ -81,7 +101,8 @@ test_that("model for 1 time step has looped", {
     c(
       "total_population", "births", "natural_deaths", "hiv_population",
       "hiv_natural_deaths", "hiv_strat_adult", "art_strat_adult",
-      "aids_deaths_no_art", "infections"
+      "aids_deaths_no_art", "infections", "aids_deaths_art", "art_initiation",
+      "hiv_deaths"
     )
   )
   expect_equal(dim(out$total_population), c(81, 2))
@@ -96,6 +117,9 @@ test_that("model for 1 time step has looped", {
   expect_true(all(out$art_strat_adult == 0))
   expect_true(all(out$aids_deaths_no_art == 0))
   expect_true(all(out$infections == 0))
+  expect_true(all(out$aids_deaths_art == 0))
+  expect_true(all(out$art_initiation == 0))
+  expect_true(all(out$hiv_deaths == 0))
 })
 
 test_that("model can be run for all years", {
@@ -105,7 +129,8 @@ test_that("model can be run for all years", {
   out <- run_base_model(demp, parameters, NULL, NULL)
 
   ## No HIV population < age 15
-  expect_true(all(out$hiv_population[1:15, ] == 0))
+  expect_true(all(out$hiv_population[1:15, ] < 1e-20))
+  expect_true(all(out$hiv_population[1:15, ] > -1e-20))
   expect_true(all(out$hiv_natural_deaths[1:16, ] == 0))
   expect_true(all(out$infections[1:15, ] == 0))
 
@@ -117,13 +142,9 @@ test_that("model can be run for all years", {
   ## Some of older ages can be 0 infections, so check the middle chunk
   expect_true(all(out$infections[16:70, ] > 0))
 
-  ## HIV and ART strat still 0, we are not adding to these yet
-  expect_true(all(out$hiv_strat_adult == 0))
-  expect_true(all(out$art_strat_adult == 0))
-  expect_equal(
-    out$aids_deaths_no_art,
-    array(rep(0, 7 * 66 * 2), dim = c(7, 66, 2))
-  )
+  expect_true(all(out$hiv_strat_adult != 0))
+  expect_true(all(out$art_strat_adult != 0))
+  expect_true(all(out$art_initiation != 0))
 
   ## Outputs cannot be negative
   expect_true(all(out$total_population >= 0))
@@ -134,6 +155,9 @@ test_that("model can be run for all years", {
   expect_true(all(out$hiv_strat_adult >= 0))
   expect_true(all(out$art_strat_adult >= 0))
   expect_true(all(out$aids_deaths_no_art >= 0))
+  expect_true(all(out$infections >= 0))
+  expect_true(all(out$art_initiation >= 0))
+  expect_true(all(out$infections >= 0))
   expect_true(all(out$infections >= 0))
 })
 
