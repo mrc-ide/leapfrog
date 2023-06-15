@@ -52,12 +52,34 @@ test_that("can serialize from R", {
   expect_equal(content[3], paste0(1:12, collapse = ","))
 
   content <- readLines(out2)
-    expect_length(content, 3)
-    expect_equal(content[1], "int")
-    expect_equal(content[2], "2,3,4")
-    expect_equal(content[3], paste0(1:24, collapse = ","))
+  expect_length(content, 3)
+  expect_equal(content[1], "int")
+  expect_equal(content[2], "2,3,4")
+  expect_equal(content[3], paste0(1:24, collapse = ","))
 
   ## Deserializing works
   deserialized <- deserialize_vector(out1, out2)
   expect_equal(deserialized, foo)
+})
+
+test_that("R can serialize 1d vector", {
+  data <- c(1L, 2L, 3L, 10L)
+  t <- tempfile()
+  path <- serialize_r_to_tensor(data, t)
+  content <- readLines(path)
+  expect_length(content, 3)
+  expect_equal(content[1], "int")
+  expect_equal(content[2], "4")
+  expect_equal(content[3], paste0(data, collapse = ","))
+})
+
+test_that("R can serialize boolean type as int", {
+  data <- array(c(TRUE, FALSE, FALSE, TRUE), dim = c(2, 2))
+  t <- tempfile()
+  path <- serialize_r_to_tensor(data, t)
+  content <- readLines(path)
+  expect_length(content, 3)
+  expect_equal(content[1], "int")
+  expect_equal(content[2], "2,2")
+  expect_equal(content[3], paste0(c(1, 0, 0, 1), collapse = ","))
 })

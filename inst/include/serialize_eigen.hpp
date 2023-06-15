@@ -64,11 +64,19 @@ std::vector <T> strsplit(const std::string &s) {
 template<typename T>
 csv_contents<T> parse_csv(const std::string &path) {
   std::ifstream src(path);
+  if (!src.good()) {
+    std::stringstream ss;
+    ss << "File at path '" << path << "' does not exist." << std::endl;
+    throw std::runtime_error(ss.str());
+  }
   std::string line;
   getline(src, line);
   line = trim(line);
   if (line != data_name<T>()) {
-    throw std::runtime_error("Data of wrong type");
+    std::stringstream ss;
+    ss << "Data at path '" << path << "' is of wrong type. Trying to read as: '" << data_name<T>()
+       << "', data saved as: '" << line << "'." << std::endl;
+    throw std::runtime_error(ss.str());
   }
   std::string line2;
   getline(src, line2);
@@ -90,7 +98,10 @@ template<typename T, size_t rank>
 Eigen::Tensor <T, rank> deserialize_tensor(const std::string &path) {
   const auto contents = internal::parse_csv<T>(path);
   if (contents.dim.size() != rank) {
-    throw std::runtime_error("Unexpected rank");
+    std::stringstream ss;
+    ss << "Data at path '" << path << "' is of wrong rank. Trying to read with rank: '" << rank
+       << "', data saved as rank: '" << contents.dim.size() << "'." << std::endl;
+    throw std::runtime_error(ss.str());
   }
 
   Eigen::array <Eigen::Index, rank> dim;
@@ -104,6 +115,12 @@ Eigen::Tensor <T, rank> deserialize_tensor(const std::string &path) {
   }
 
   return ret;
+}
+
+template<typename T, size_t rank>
+Eigen::TensorMap <Eigen::Tensor<T, rank>> deserialize_tensor_map(const std::string &path) {
+  Eigen::Tensor <T, rank> d = deserialize_tensor<T, rank>(path);
+  return Eigen::TensorMap < Eigen::Tensor < T, rank >> (d.data(), d.dimensions());
 }
 
 // Basic seralization of tensor
