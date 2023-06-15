@@ -1,13 +1,12 @@
 test_that("We can compile the standalone program", {
   skip_for_compilation()
-  skip_on_ci()
   skip_on_os("windows")
 
   path_src <- frogger_file("fit_model")
   tmp <- tempfile()
   copy_directory(path_src, tmp)
 
-  args <- dirname(frogger_file("include"))
+  args <- c(dirname(frogger_file("include")), find.package("RcppEigen"))
 
   code <- withr::with_dir(
     tmp,

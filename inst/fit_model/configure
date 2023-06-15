@@ -19,7 +19,7 @@ if [[ -z "$2" || "$2" == "--find-eigen" ]]; then
     PATH_EIGEN=$(Rscript -e 'cat(find.package("RcppEigen"))')
     echo "Found eigen at '$PATH_EIGEN'"
 else
-    PATH_EIGEN=$1
+    PATH_EIGEN=$2
     echo "Using provided eigen '$PATH_EIGEN'"
 fi
 
