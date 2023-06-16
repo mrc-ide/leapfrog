@@ -4,19 +4,19 @@
 
 namespace leapfrog {
 
-namespace internal {
-
 template<typename real_type>
 void run_general_pop_demographic_projection(int time_step,
                                             const Parameters<real_type> &pars,
                                             const State<real_type> &state_curr,
                                             State<real_type> &state_next,
-                                            IntermediateData<real_type> &intermediate) {
+                                            internal::IntermediateData<real_type> &intermediate) {
   run_ageing_and_mortality(time_step, pars, state_curr, state_next, intermediate);
   run_migration(time_step, pars, state_curr, state_next, intermediate);
   run_fertility_and_infant_migration(time_step, pars, state_curr, state_next,
                                      intermediate);
 }
+
+namespace internal {
 
 template<typename real_type>
 void run_ageing_and_mortality(int time_step,

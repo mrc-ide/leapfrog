@@ -4,14 +4,12 @@
 
 namespace leapfrog {
 
-namespace internal {
-
 template<typename real_type>
 void run_hiv_model_simulation(int time_step,
                               const Parameters<real_type> &pars,
                               const State<real_type> &state_curr,
                               State<real_type> &state_next,
-                              IntermediateData<real_type> &intermediate) {
+                              internal::IntermediateData<real_type> &intermediate) {
   run_add_new_hiv_infections(time_step, pars, state_curr, state_next, intermediate);
 
   intermediate.everARTelig_idx =
@@ -34,6 +32,8 @@ void run_hiv_model_simulation(int time_step,
     run_remove_hiv_deaths(hiv_step, time_step, pars, state_curr, state_next, intermediate);
   }
 }
+
+namespace internal {
 
 template<typename real_type>
 void run_add_new_hiv_infections(int time_step,

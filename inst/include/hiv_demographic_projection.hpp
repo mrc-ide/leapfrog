@@ -5,14 +5,12 @@
 
 namespace leapfrog {
 
-namespace internal {
-
 template<typename real_type>
 void run_hiv_pop_demographic_projection(int time_step,
                                         const Parameters<real_type> &pars,
                                         const State<real_type> &state_curr,
                                         State<real_type> &state_next,
-                                        IntermediateData<real_type> &intermediate) {
+                                        internal::IntermediateData<real_type> &intermediate) {
   run_hiv_ageing_and_mortality(time_step, pars, state_curr, state_next,
                                intermediate);
   run_hiv_and_art_stratified_ageing(time_step, pars, state_curr, state_next,
@@ -20,6 +18,8 @@ void run_hiv_pop_demographic_projection(int time_step,
   run_hiv_and_art_stratified_deaths_and_migration(time_step, pars, state_curr,
                                                   state_next, intermediate);
 }
+
+namespace internal {
 
 template<typename real_type>
 void run_hiv_ageing_and_mortality(int time_step,
