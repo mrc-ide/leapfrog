@@ -69,7 +69,6 @@ int main(int argc, char *argv[]) {
   auto exit_handler = [&old_dir]() {
     std::filesystem::current_path(old_dir);
   };
-//  std::atexit(exit_handler);
 
   // Only fine-grained ages at first
   leapfrog::Tensor1<int> age_groups_hiv_span_data = serialize::deserialize_tensor<int, 1>(
