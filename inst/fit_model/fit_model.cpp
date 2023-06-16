@@ -11,6 +11,40 @@ Eigen::TensorMap <Eigen::Tensor<T, rank>> tensor_to_tensor_map(Eigen::Tensor <T,
   return Eigen::TensorMap < Eigen::Tensor < T, rank >> (d.data(), d.dimensions());
 }
 
+void save_output(leapfrog::State<double> &state, std::string &output_path) {
+  // Save output
+  std::filesystem::path out_path(output_path);
+  std::filesystem::path total_population_path = out_path / "total_population";
+  serialize::serialize_tensor<double, 2>(state.total_population, total_population_path);
+  std::filesystem::path births_path = out_path / "births";
+
+  // Births is just a double so write it out
+  std::ofstream dest(births_path);
+  dest << state.births << std::endl;
+  dest.close();
+
+  std::filesystem::path natural_deaths_path = out_path / "natural_deaths";
+  serialize::serialize_tensor<double, 2>(state.natural_deaths, natural_deaths_path);
+  std::filesystem::path hiv_population_path = out_path / "hiv_population";
+  serialize::serialize_tensor<double, 2>(state.hiv_population, hiv_population_path);
+  std::filesystem::path hiv_natural_deaths_path = out_path / "hiv_natural_deaths";
+  serialize::serialize_tensor<double, 2>(state.hiv_natural_deaths, hiv_natural_deaths_path);
+  std::filesystem::path hiv_strat_adult_path = out_path / "hiv_strat_adult";
+  serialize::serialize_tensor<double, 3>(state.hiv_strat_adult, hiv_strat_adult_path);
+  std::filesystem::path art_strat_adult_path = out_path / "art_strat_adult";
+  serialize::serialize_tensor<double, 4>(state.art_strat_adult, art_strat_adult_path);
+  std::filesystem::path aids_deaths_no_art_path = out_path / "aids_deaths_no_art";
+  serialize::serialize_tensor<double, 3>(state.aids_deaths_no_art, aids_deaths_no_art_path);
+  std::filesystem::path infections_path = out_path / "infections";
+  serialize::serialize_tensor<double, 2>(state.infections, infections_path);
+  std::filesystem::path aids_deaths_art_path = out_path / "aids_deaths_art";
+  serialize::serialize_tensor<double, 4>(state.aids_deaths_art, aids_deaths_art_path);
+  std::filesystem::path art_initiation_path = out_path / "art_initiation";
+  serialize::serialize_tensor<double, 3>(state.art_initiation, art_initiation_path);
+  std::filesystem::path hiv_deaths_path = out_path / "hiv_deaths";
+  serialize::serialize_tensor<double, 2>(state.hiv_deaths, hiv_deaths_path);
+}
+
 int main(int argc, char *argv[]) {
   if (argc < 4) {
     std::cout <<
@@ -181,39 +215,32 @@ int main(int argc, char *argv[]) {
                                                art15plus_num,
                                                art15plus_isperc};
 
-  auto output_state = leapfrog::run_model(sim_years, params);
+  // Fit the model
+  leapfrog::State<double> state_current(params.age_groups_pop, params.num_genders,
+                                        params.disease_stages, params.age_groups_hiv,
+                                        params.treatment_stages);
+
+  // TODO: Make this runnable without passing intermediate data in
+  leapfrog::internal::initialise_model_state(params, state_current);
+  auto state_next = state_current;
+  leapfrog::internal::IntermediateData<double> intermediate(params.age_groups_pop, params.age_groups_hiv,
+                                                            params.num_genders,
+                                                            params.disease_stages, params.treatment_stages,
+                                                            params.age_groups_hiv_15plus);
+  intermediate.reset();
+
+  // Each time step is mid-point of the year
+  for (int step = 1; step <= sim_years; ++step) {
+    state_next.reset();
+    leapfrog::run_general_pop_demographic_projection(step, params, state_current, state_next, intermediate);
+    leapfrog::run_hiv_pop_demographic_projection(step, params, state_current, state_next, intermediate);
+    leapfrog::run_hiv_model_simulation(step, params, state_current, state_next, intermediate);
+    std::swap(state_current, state_next);
+    intermediate.reset();
+  }
   std::cout << "Fit complete" << std::endl;
 
-  std::filesystem::path out_path(output_abs);
-  std::filesystem::path total_population_path = out_path / "total_population";
-  serialize::serialize_tensor<double, 2>(output_state.total_population, total_population_path);
-  std::filesystem::path births_path = out_path / "births";
-
-  // Births is just a double so write it out
-  std::ofstream dest(births_path);
-  dest << output_state.births << std::endl;
-  dest.close();
-
-  std::filesystem::path natural_deaths_path = out_path / "natural_deaths";
-  serialize::serialize_tensor<double, 2>(output_state.natural_deaths, natural_deaths_path);
-  std::filesystem::path hiv_population_path = out_path / "hiv_population";
-  serialize::serialize_tensor<double, 2>(output_state.hiv_population, hiv_population_path);
-  std::filesystem::path hiv_natural_deaths_path = out_path / "hiv_natural_deaths";
-  serialize::serialize_tensor<double, 2>(output_state.hiv_natural_deaths, hiv_natural_deaths_path);
-  std::filesystem::path hiv_strat_adult_path = out_path / "hiv_strat_adult";
-  serialize::serialize_tensor<double, 3>(output_state.hiv_strat_adult, hiv_strat_adult_path);
-  std::filesystem::path art_strat_adult_path = out_path / "art_strat_adult";
-  serialize::serialize_tensor<double, 4>(output_state.art_strat_adult, art_strat_adult_path);
-  std::filesystem::path aids_deaths_no_art_path = out_path / "aids_deaths_no_art";
-  serialize::serialize_tensor<double, 3>(output_state.aids_deaths_no_art, aids_deaths_no_art_path);
-  std::filesystem::path infections_path = out_path / "infections";
-  serialize::serialize_tensor<double, 2>(output_state.infections, infections_path);
-  std::filesystem::path aids_deaths_art_path = out_path / "aids_deaths_art";
-  serialize::serialize_tensor<double, 4>(output_state.aids_deaths_art, aids_deaths_art_path);
-  std::filesystem::path art_initiation_path = out_path / "art_initiation";
-  serialize::serialize_tensor<double, 3>(output_state.art_initiation, art_initiation_path);
-  std::filesystem::path hiv_deaths_path = out_path / "hiv_deaths";
-  serialize::serialize_tensor<double, 2>(output_state.hiv_deaths, hiv_deaths_path);
+  save_output(state_current, output_abs);
 
   return 0;
 }
