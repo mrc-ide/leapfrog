@@ -43,13 +43,13 @@ std::string trim(const std::string &s) {
 
 template<typename T>
 struct csv_contents {
-  std::vector <size_t> dim;
-  std::vector <T> data;
+  std::vector<size_t> dim;
+  std::vector<T> data;
 };
 
 template<typename T>
-std::vector <T> strsplit(const std::string &s) {
-  std::vector <T> ret;
+std::vector<T> strsplit(const std::string &s) {
+  std::vector<T> ret;
   std::stringstream ss(s);
 
   while (ss.good()) {
@@ -86,7 +86,7 @@ csv_contents<T> parse_csv(const std::string &path) {
   std::string line3;
   getline(src, line3);
   line2 = trim(line3);
-  std::vector <T> data = strsplit<T>(line3);
+  std::vector<T> data = strsplit<T>(line3);
   // validate data.size() is prod(dim)
 
   return csv_contents<T>{dim, data};
@@ -115,12 +115,6 @@ Eigen::Tensor <T, rank> deserialize_tensor(const std::string &path) {
   }
 
   return ret;
-}
-
-template<typename T, size_t rank>
-Eigen::TensorMap <Eigen::Tensor<T, rank>> deserialize_tensor_map(const std::string &path) {
-  Eigen::Tensor <T, rank> d = deserialize_tensor<T, rank>(path);
-  return Eigen::TensorMap < Eigen::Tensor < T, rank >> (d.data(), d.dimensions());
 }
 
 // Basic seralization of tensor
