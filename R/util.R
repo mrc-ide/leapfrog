@@ -41,8 +41,6 @@ serialize_r_to_tensor <- function(data, path) {
 #' @keywords internal
 deserialize_tensor_to_r <- function(path) {
   content <- readLines(path)
-  array(unlist(utils::read.csv(text = content[3], header = FALSE),
-               use.names = FALSE),
-        unlist(utils::read.csv(text = content[2], header = FALSE),
-               use.names = FALSE))
+  array(as.numeric(strsplit(content[[3]], ",\\s+")[[1]]),
+        as.numeric(strsplit(content[[2]], ",\\s+")[[1]]))
 }
