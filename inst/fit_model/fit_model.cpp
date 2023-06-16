@@ -63,12 +63,9 @@ int main(int argc, char *argv[]) {
   const int pAG_INCIDPOP = 35;
   const int time_art_start = 30;
 
-  // Set working dir whilst reading files
+  // Set working dir to read files
   std::filesystem::path old_dir = std::filesystem::current_path();
   std::filesystem::current_path(input_abs);
-  auto exit_handler = [&old_dir]() {
-    std::filesystem::current_path(old_dir);
-  };
 
   // Only fine-grained ages at first
   leapfrog::Tensor1<int> age_groups_hiv_span_data = serialize::deserialize_tensor<int, 1>(
