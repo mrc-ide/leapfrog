@@ -1,0 +1,12 @@
+PATH_FROGGER_INCLUDE=@path_frogger@/include
+PATH_EIGEN=@path_eigen@/include
+
+all: fit_model
+
+fit_model: fit_model.cpp
+	$(CXX) -I$(PATH_FROGGER_INCLUDE) -I$(PATH_EIGEN) -O2 -std=c++17 -Wno-ignored-attributes -o fit_model fit_model.cpp
+
+clean:
+	$(RM) fit_model
+
+.PHONY: all clean
