@@ -1,5 +1,15 @@
 ## Standalone use of froggers model fit
 
+### Important
+
+This standalone version of the model exists only as a proof of concept and should not actually be run this way. We
+anticipate that non-R users will want to build frogger as a library (e.g. using `pybind11`) and call directly from a
+program not from this CLI application. This standalone code just demonstrates one way that we can build frogger without
+any dependency on R.
+
+Similarly, our serialisation format here is just the simplest thing that could work and not something we expect we will
+support long term; it's just a starting point for a discussion.
+
 ### Using installed frogger & RcppEigen
 
 Install frogger, from an R terminal in this directory run
