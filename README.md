@@ -48,7 +48,7 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 
 ## Leapfrog to Frogger glossary
 
-### Stratifications
+### State space
 
 | Leapfrog      | Frogger                   | Details                                                |
 |---------------|---------------------------|--------------------------------------------------------|
@@ -61,6 +61,15 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 | hDS           | disease_stages            | Number of disease stages                               |
 | hTS           | treatment_stages          | Number of treatment stages                             |
 
+* NG, pAG, hAG, hDS, hTS: defining dimension of the state space (for cross-sectional state)
+* sim_years: defines dimenions for full simulation
+* pIDX_FERT, pIDX_HIVADULT, pAG_FERT: define key indices in state space
+* MALE, FEMALE (hard coded macros): define key indices in state space
+* t_ART_start: key index in state space
+* hiv_steps_per_year: controls temporal stratification of state space (kind of like sim_years)
+* hAG_SPAN: similar to pAG_FERT -- defining span of mapping between population and HIV age groups; similar in some respects to pAG_FERT, which could be considered a 'span' variable.
+
+
 ### Model settings
 
 | Leapfrog           | Frogger             | Details                           |
@@ -70,7 +79,11 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 | t_ART_start        | time_art_start      | Time step to start modelling ART  |
 | hAG_SPAN           | hiv_age_groups_span | Array of HIV age group sizes      |
 
+
+
 ### Input data
+
+* _Discussion: indicate in name whether demographic input, incidence input, natural history, ART inputs._
 
 | Leapfrog           | Frogger                     | Details                                                                                      |
 |--------------------|-----------------------------|----------------------------------------------------------------------------------------------|
@@ -80,9 +93,9 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 | asfr               | age_sex_fertility_ratio     | Ratio of number of live births in a year and the whole female population of childbearing age |
 | births_sex_prop    | births_sex_prop             |                                                                                              |
 | incidinput         | incidence_rate              |                                                                                              |
-| incrr_sex          | incidence_relative_risk_sex | Relative risk of incidence by sex                                                            |
-| incrr_age          | incidence_relative_risk_age | Relative risk of incidence by age                                                            |
-| cd4_initdist       | ?                           | Distribution of infections by cd4 category upon infection                                    |
+| incrr_sex          | incidence_relative_risk_sex | HIV incidence rate ratio for female : male age 15-49 years                                   |
+| incrr_age          | incidence_relative_risk_age | HIV incidence rate ratio by age (for each sex)                                               |
+| cd4_initdist       | ?                           | Distribution of infections by CD4 category upon infection                                    |
 | cd4_prog           | cd4_progression             |                                                                                              |
 | cd4_mort           | cd4_mortality               |                                                                                              |
 | art_mort           | art_mortality               |                                                                                              |
@@ -96,6 +109,12 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 | art_dropout        | ?                           |                                                                                              |
 
 ### Outputs
+
+_Discussion: naming conventions
+
+* Distinguish events vs. counts
+* Distinguish stratification of array (single-year population pXX vs. HIV population hXX
+_ 
 
 | Leapfrog         | Frogger            | Details                                                  |
 |------------------|--------------------|----------------------------------------------------------|
