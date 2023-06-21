@@ -126,7 +126,7 @@ test_that("model can be run for all years", {
   demp <- readRDS(test_path("testdata/demographic_projection_object.rds"))
   parameters <- readRDS(test_path("testdata/projection_parameters.rds"))
 
-  out <- run_base_model(demp, parameters, NULL, NULL)
+  out <- run_base_model(demp, parameters, NULL, NULL, c(1))
 
   ## No HIV population < age 15
   expect_true(all(out$hiv_population[1:15, ] < 1e-20))
