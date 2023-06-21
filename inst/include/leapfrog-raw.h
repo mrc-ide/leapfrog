@@ -88,6 +88,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                     const int *p_artpaeds_isperc,
                     const Type *p_paed_art_elig_age,
                     const Type *p_paed_art_elig_cd4,
+                    const Type *p_paed_art_ltfu,
                     
                     //mtct trans
                     const Type *p_mtct_trans,
@@ -209,10 +210,10 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   const TensorMapX1cT ctx_val(p_ctx_val, sim_years);
   const TensorMapX1cT paed_art_val(p_paed_art_val, sim_years);
   const TensorMapX1cT paed_art_elig_age(p_paed_art_elig_age, sim_years);
-  
+  const TensorMapX1cT paed_art_ltfu(p_paed_art_ltfu, sim_years);
   const TensorMapX2cT init_art_dist(p_init_art_dist, pIDX_HIVADULT, sim_years);
   const TensorMapX3cT mort_art_rr(p_mort_art_rr, hTS, pIDX_HIVADULT, sim_years);
-  
+
   
 
   //5 age categories
@@ -1532,12 +1533,47 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
     }
     
+    //LTFU, note this may be in the wrong place. Also assuming that distribution will be according to the distribution 
+    //of transmission types in the current HIV population, that might be wrong
+    TensorFixedSize<Type, Sizes<hDS, pIDX_HIVADULT, NG>> tothiv_pop;
+   for(int hm = 0; hm < hDS; hm++){
+     for(int af = 0; af < pIDX_FERT; af++){
+       for(int g = 0; g < NG; g++){
+         for(int cat = 0; cat < hTM; cat++){
+           tothiv_pop(hm, af, g) += hivstrat_paeds(hm, cat, af, g, t);
+         }
+       }
+     }
+   }
+   for(int hm = 0; hm < hDS; hm++){
+     for(int af = 0; af < pIDX_FERT; af++){
+       for(int g = 0; g < NG; g++){
+         for(int cat = 0; cat < hTM; cat++){
+           int art_total ;
+           for(int hu = 0 ; hu < hTS; hu ++){
+             art_total += artstrat_paeds(hu, hm, af, g, t);
+           }
+           if(paed_art_ltfu(t) > 0 ){
+             hivstrat_paeds(hm, cat, af, g, t) += (hivstrat_paeds(hm, cat, af, g, t) / tothiv_pop(hm, af, g)) * paed_art_ltfu(t) * art_total;
+           }
+         }
+       }
+     }
+   }
+    for(int hm = 0; hm < hDS; hm++){
+      for(int af = 0; af < pIDX_FERT; af++){
+        for(int g = 0; g < NG; g++){
+          for(int hu; hu < hTS; hu++){
+            artstrat_paeds(hu, hm, af, g, t) -= artstrat_paeds(hu, hm, af, g, t) * paed_art_ltfu(t) ;
+          }
+        }
+      }
+    }
+
+
     
     TensorFixedSize<Type, Sizes<hDS, hTM, pIDX_HIVADULT, NG>> need_art_paed;
     need_art_paed.setZero();
-
-
-
     //all children under a certain age eligible for ART
     for(int g = 0; g < NG; g++){
       for(int cat = 0; cat < hTM; cat++){
@@ -1569,9 +1605,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
             for(int cat = 0; cat < hTM; cat++){
               artnum_paed(t) += need_art_paed(hm, cat, af, g);
             }
-           for(int dur = 0; dur < hTS; dur++){
-            //  artnum_paed(t) += artstrat_paeds(dur, hm, af, g, t);
-          }
         }
       }
     }
@@ -1584,7 +1617,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
               if(paed_art_val(t) > 0){
                 init_art_paed(hm, cat, af, g, t) += need_art_paed(hm, cat, af, g);
                 for(int dur = 0; dur < hTS; dur++){
-                  //    init_art_paed(hm, cat, af, g, t) -= artstrat_paeds(dur, hm, af, g, t) / 4;
                   init_art_paed(hm, cat, af, g, t) = init_art_paed(hm, cat, af, g, t) < 0 ? 0.0 : init_art_paed(hm, cat, af, g, t);
                 }
               }
@@ -1836,8 +1868,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         }
      }
          
-
-      
       for(int hm = 0; hm < hDS; hm++){
         for(int cat = 0; cat < 1; cat++){
         //   hivstrat_paeds(hm, cat, 0, g, t) += paed_cd4_dist(hm) > 0 ? infections(0, g, t) * paed_cd4_dist(hm) : 0.0;

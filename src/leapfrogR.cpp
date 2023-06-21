@@ -120,7 +120,6 @@ leapfrogR(const Rcpp::List& demp,
   NumericVector artinit(hDS * hAG * NG * proj_years);
   artinit.attr("dim") = NumericVector::create(hDS, hAG, NG, proj_years);
   
-  
   NumericVector artnum_paed(proj_years);
   
   NumericVector deaths_paeds(hTM * hDS * pIDX_HIVADULT * NG * proj_years);
@@ -185,6 +184,7 @@ leapfrogR(const Rcpp::List& demp,
        LOGICAL(projp["artpaeds_isperc"]),
        REAL(projp["paed_art_elig_age"]),
        REAL(projp["paed_art_elig_cd4"]),
+       REAL(projp["paed_art_ltfu"]),
        REAL(projp["mtct_trans"]),
        REAL(projp["fert_mult_by_age"]),
        REAL(projp["fert_mult_offart"]),
@@ -268,6 +268,7 @@ leapfrogR(const Rcpp::List& demp,
        LOGICAL(projp["artpaeds_isperc"]),
        REAL(projp["paed_art_elig_age"]),
        REAL(projp["paed_art_elig_cd4"]),
+       REAL(projp["paed_art_ltfu"]),
        REAL(projp["mtct_trans"]),
        REAL(projp["fert_mult_by_age"]),
        REAL(projp["fert_mult_offart"]),
