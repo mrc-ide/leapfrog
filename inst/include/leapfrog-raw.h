@@ -571,13 +571,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         } // loop over hm
       } // loop over ha
     } // loop over g
-    for(int g = 0; g < NG; g++){
-      for(int hm = 0; hm < hDS; hm++){
-        for(int hu = 0; hu < hTS; hu ++){
-          tracking(0,4,t) += artstrat_adult(hu, hm, 0, g, t) ;
-        }
-      }
-    }
+
     
 
     // fertility
@@ -858,13 +852,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
           }
         }
         
-        for(int g = 0; g < NG; g++){
-          for(int hm = 0; hm < hDS; hm++){
-            for(int hu = 0; hu < hTS; hu ++){
-              tracking(0,5,t) += artstrat_adult(hu, hm, 0, g, t) ;
-            }
-          }
-        }    
+ 
 
       } // if(t >= t_ART_start)
 
@@ -946,14 +934,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
     }
    
-   for(int g = 0; g < NG; g++){
-     for(int hm = 0; hm < hDS; hm++){
-       for(int hu = 0; hu < hTS; hu ++){
-         tracking(0,5,t) += artstrat_adult(hu, hm, 0, g, t) ;
-       }
-     }
-   }
-   
+
    
    
    double asfr_sum;
@@ -1689,8 +1670,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
             for(int dur = 0; dur < hTS; dur++){
               artnum_paed(t) += (artstrat_paeds(dur, hm, af, g, t) )  ;
               artnum_paed(t) += aidsdeaths_art_paed(dur,hm, af, g, t) ;
-              
-              
             }
           }
         }
