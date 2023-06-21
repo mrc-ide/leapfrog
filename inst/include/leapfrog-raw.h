@@ -1619,17 +1619,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         }
       }
     }
-
-    
-    //Progress ART to the correct time on ART
-    for(int hm = 0; hm < hDS; hm++){
-      for(int af = 0; af < pIDX_FERT; af++){
-        for(int g = 0; g < NG; g++){
-          artstrat_paeds(1, hm, af, g, t) += artstrat_paeds(0, hm, af, g, t) > 0 ? artstrat_paeds(0, hm, af, g, t) : 0;
-          artstrat_paeds(0, hm, af, g, t) -= artstrat_paeds(0, hm, af, g, t) > 0 ? artstrat_paeds(0, hm, af, g, t) : 0;
-        }
-      }
-    }
     
     
     for(int g = 0; g < NG; g++){
@@ -1641,6 +1630,16 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
           grad_paeds_art(2,hm, af, g, t) -= aidsdeaths_art_paed(2,hm, af, g, t) ;
           artstrat_paeds(2, hm,  af, g, t) += grad_paeds_art(2, hm, af, g, t) ; 
           
+        }
+      }
+    }
+    
+    //Progress ART to the correct time on ART
+    for(int hm = 0; hm < hDS; hm++){
+      for(int af = 0; af < pIDX_FERT; af++){
+        for(int g = 0; g < NG; g++){
+          artstrat_paeds(1, hm, af, g, t) += artstrat_paeds(0, hm, af, g, t) > 0 ? artstrat_paeds(0, hm, af, g, t) : 0;
+          artstrat_paeds(0, hm, af, g, t) -= artstrat_paeds(0, hm, af, g, t) > 0 ? artstrat_paeds(0, hm, af, g, t) : 0;
         }
       }
     }
@@ -1777,7 +1776,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     }
     double adj ;
     adj = initByAge == 0 ? 1 : artnum_paed(t) / initByAge ;
-    //the nosocomial infections aren't distributed so can't just move everything forward. So going to limit hm to just go to the n+1 basically
     for(int g = 0; g < NG; g++){
       for(int cat = 0; cat < hTM; cat++){
         for(int af = 0; af < pIDX_HIVADULT; af++){
@@ -1794,8 +1792,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         }
       }
     }
-    
-    
     
 
     for(int g = 0; g < NG; g++){
