@@ -112,7 +112,7 @@ public:
     return full_state;
   }
 
-
+  
 private:
   std::vector<int> save_steps;
   OutputState full_state;
