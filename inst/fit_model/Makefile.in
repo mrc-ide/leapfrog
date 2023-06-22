@@ -6,6 +6,9 @@ all: fit_model
 fit_model: fit_model.cpp
 	$(CXX) -I$(PATH_FROGGER_INCLUDE) -I$(PATH_EIGEN) -O2 -std=c++17 -Wno-ignored-attributes -o fit_model fit_model.cpp
 
+gprofile: fit_model.cpp
+	$(CXX) -I$(PATH_FROGGER_INCLUDE) -I$(PATH_EIGEN) -Wl,--no-as-needed,-lprofiler,--as-needed -O2 -std=c++17 -Wno-ignored-attributes -o model_gprofile fit_model.cpp
+
 clean:
 	$(RM) fit_model
 

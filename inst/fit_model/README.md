@@ -60,3 +60,22 @@ Where
 * 2nd arg is number of HIV steps within the year
 * 3rd arg is the path to the input data, `data` relative to this dir
 * 3th arg is the path where output should be saved
+
+## Profiling
+
+There are 2 profile runners here, it might be worth commenting out the step in the standalone runner which saves the
+output to disk. This takes a long time and won't be run in the actual model fit process. Use the valgrind profiler to
+measure CPU instructions, the google profiler runs a sampling profiler so should be better for understanding time
+bottlenecks.
+
+1. `profile_valgrind` which runs the [callgrind valgrind](https://valgrind.org/docs/manual/cl-manual.html) tool to
+   create a profile and then open it with `kcachegrind`.
+   You need to have valgrind and kcachegrind installed, then run the script `./profile_valgrind`
+2. `profile_gperftoold` uses google [gperftools](https://github.com/gperftools/gperftools) to run the fit
+   and [google-pprof](https://github.com/google/pprof) to visualise it.
+    * Install `sudo apt-get install libgoogle-perftools-dev`
+    * You need `go` to install google-pprof
+      ```
+      sudo apt-get install golang-go
+      go install github.com/google/pprof@latest
+      ```
