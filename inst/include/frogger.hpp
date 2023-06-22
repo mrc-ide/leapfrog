@@ -46,9 +46,11 @@ typename StateSaver<real_type>::OutputState run_model(int time_steps, std::vecto
                                                      pars.age_groups_hiv_15plus);
   intermediate.reset();
 
-  StateSaver<real_type> state_output(save_steps, pars.age_groups_pop, pars.num_genders,
+  StateSaver<real_type> state_output(time_steps, save_steps, pars.age_groups_pop, pars.num_genders,
                                      pars.disease_stages, pars.age_groups_hiv,
                                      pars.treatment_stages);
+  // Save initial state
+  state_output.save_state(state, 0);
 
   // Each time step is mid-point of the year
   for (int step = 1; step <= time_steps; ++step) {

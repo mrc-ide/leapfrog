@@ -22,83 +22,90 @@ public:
     Tensor5<real_type> aids_deaths_art;
     Tensor4<real_type> art_initiation;
     Tensor3<real_type> hiv_deaths;
+
+    OutputState(int age_groups_pop,
+                int num_genders,
+                int disease_stages,
+                int age_groups_hiv,
+                int treatment_stages,
+                int no_output_years)
+        : total_population(age_groups_pop, num_genders, no_output_years),
+          natural_deaths(age_groups_pop, num_genders, no_output_years),
+          hiv_population(age_groups_pop, num_genders, no_output_years),
+          hiv_natural_deaths(age_groups_pop, num_genders, no_output_years),
+          hiv_strat_adult(disease_stages, age_groups_hiv, num_genders, no_output_years),
+          art_strat_adult(treatment_stages,
+                          disease_stages,
+                          age_groups_hiv,
+                          num_genders,
+                          no_output_years),
+          births(no_output_years),
+          aids_deaths_no_art(disease_stages, age_groups_hiv, num_genders, no_output_years),
+          infections(age_groups_pop, num_genders, no_output_years),
+          aids_deaths_art(treatment_stages, disease_stages, age_groups_hiv, num_genders, no_output_years),
+          art_initiation(disease_stages, age_groups_hiv, num_genders, no_output_years),
+          hiv_deaths(age_groups_pop, num_genders, no_output_years) {
+
+      total_population.setZero();
+      natural_deaths.setZero();
+      hiv_population.setZero();
+      hiv_natural_deaths.setZero();
+      hiv_strat_adult.setZero();
+      art_strat_adult.setZero();
+      births.setZero();
+      aids_deaths_no_art.setZero();
+      infections.setZero();
+      aids_deaths_art.setZero();
+      art_initiation.setZero();
+      hiv_deaths.setZero();
+    }
   };
 
-  StateSaver(std::vector<int> save_steps,
+  StateSaver(int time_steps,
+             std::vector<int> save_steps,
              int age_groups_pop,
              int num_genders,
              int disease_stages,
              int age_groups_hiv,
              int treatment_stages) :
-      save_steps(save_steps) {
-
-    size_t no_output_years = save_steps.size();
-    std::cout << "no output years " << no_output_years << "\n";
-    std::cout << "initialising tot pop \n";
-    full_state.total_population(age_groups_pop, num_genders, no_output_years);
-    std::cout << "initialising nat deaths \n";
-    full_state.natural_deaths(age_groups_pop, num_genders, no_output_years);
-    std::cout << "initialising hiv pop \n";
-    full_state.hiv_population(age_groups_pop, num_genders, no_output_years);
-    std::cout << "initialising hiv nat deaths \n";
-    full_state.hiv_natural_deaths(age_groups_pop, num_genders, no_output_years);
-    std::cout << "initialising hiv strat adult \n";
-    full_state.hiv_strat_adult(disease_stages, age_groups_hiv, num_genders, no_output_years);
-    std::cout << "initialising art strat \n";
-    full_state.art_strat_adult(treatment_stages,
-                               disease_stages,
-                               age_groups_hiv,
-                               num_genders,
-                               no_output_years);
-    std::cout << "initialising births \n";
-    full_state.births(no_output_years);
-    std::cout << "initialising aids deaths no \n";
-    full_state.aids_deaths_no_art(disease_stages, age_groups_hiv, num_genders, no_output_years);
-    std::cout << "initialising ifnections \n";
-    full_state.infections(age_groups_pop, num_genders, no_output_years);
-    std::cout << "initialising aids deaths art \n";
-    full_state.aids_deaths_art(treatment_stages, disease_stages, age_groups_hiv, num_genders, no_output_years);
-    std::cout << "initialising art init \n";
-    full_state.art_initiation(disease_stages, age_groups_hiv, num_genders, no_output_years);
-    std::cout << "initialising hiv deaths \n";
-    full_state.hiv_deaths(age_groups_pop, num_genders, no_output_years);
-    std::cout << "setting 0 \n";
-
-    full_state.total_population.setZero();
-    full_state.natural_deaths.setZero();
-    full_state.hiv_population.setZero();
-    full_state.hiv_natural_deaths.setZero();
-    full_state.hiv_strat_adult.setZero();
-    full_state.art_strat_adult.setZero();
-    full_state.births.setZero();
-    full_state.aids_deaths_no_art.setZero();
-    full_state.infections.setZero();
-    full_state.aids_deaths_art.setZero();
-    full_state.art_initiation.setZero();
-    full_state.hiv_deaths.setZero();
+      save_steps(save_steps),
+      full_state(age_groups_pop, num_genders, disease_stages, age_groups_hiv, treatment_stages, save_steps.size()) {
+    for (int step: save_steps) {
+      if (step < 0) {
+        std::stringstream ss;
+        ss << "Output step must be at least 0, got '" << step << "'." << std::endl;
+        throw std::runtime_error(ss.str());
+      }
+      if (step > time_steps) {
+        std::stringstream ss;
+        ss << "Output step can be at most number of time steps run which is '" << time_steps << "', got step '" << step
+           << "'." << std::endl;
+        throw std::runtime_error(ss.str());
+      }
+    }
   }
 
 
   void save_state(const State<real_type> &state, int current_year) {
-    // Always report the first year and then every nth year after that
-    for (int i = 0; i < save_steps.size(); ++i) {
+    for (size_t i = 0; i < save_steps.size(); ++i) {
       if (current_year == save_steps[i]) {
-//        full_state.total_population.chip(i, 3) = state.total_population;
-        std::cout << "reporting at time " << current_year << "\n";
+        full_state.total_population.chip(i, full_state.total_population.NumDimensions - 1) = state.total_population;
+        full_state.natural_deaths.chip(i, full_state.natural_deaths.NumDimensions - 1) = state.natural_deaths;
+        full_state.hiv_population.chip(i, full_state.hiv_population.NumDimensions - 1) = state.hiv_population;
+        full_state.hiv_natural_deaths.chip(i, full_state.hiv_natural_deaths.NumDimensions - 1) =
+            state.hiv_natural_deaths;
+        full_state.hiv_strat_adult.chip(i, full_state.hiv_strat_adult.NumDimensions - 1) = state.hiv_strat_adult;
+        full_state.art_strat_adult.chip(i, full_state.art_strat_adult.NumDimensions - 1) = state.art_strat_adult;
+        full_state.births(i) = state.births;
+        full_state.aids_deaths_no_art.chip(i, full_state.aids_deaths_no_art.NumDimensions - 1) =
+            state.aids_deaths_no_art;
+        full_state.infections.chip(i, full_state.infections.NumDimensions - 1) = state.infections;
+        full_state.aids_deaths_art.chip(i, full_state.aids_deaths_art.NumDimensions - 1) = state.aids_deaths_art;
+        full_state.art_initiation.chip(i, full_state.art_initiation.NumDimensions - 1) = state.art_initiation;
+        full_state.hiv_deaths.chip(i, full_state.hiv_deaths.NumDimensions - 1) = state.hiv_deaths;
         return;
       }
     }
-//      full_state.natural_deaths[, , report_index] = state.natural_deaths;
-//      full_state.hiv_population[, , report_index] = state.hiv_population;
-//      full_state.hiv_natural_deaths[, , report_index] = state.hiv_natural_deaths;
-//      full_state.hiv_strat_adult[, , , report_index] = state.hiv_strat_adult;
-//      full_state.art_strat_adult[, , , , report_index] = state.art_strat_adult;
-//      full_state.births[report_index] = state.births;
-//      full_state.aids_deaths_no_art[, , , report_index] = state.aids_deaths_no_art;
-//      full_state.infections[, , report_index] = state.infections;
-//      full_state.aids_deaths_art[, , , , report_index] = state.aids_deaths_art;
-//      full_state.art_initiation[, , , report_index] = state.art_initiation;
-//      full_state.hiv_deaths[, , report_index] = state.hiv_deaths;
   }
 
   OutputState get_full_state() const {
