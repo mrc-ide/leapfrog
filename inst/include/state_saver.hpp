@@ -6,9 +6,7 @@ namespace leapfrog {
 
 template<typename real_type>
 class StateSaver {
-
 public:
-
   struct OutputState {
     Tensor3<real_type> total_population;
     Tensor3<real_type> natural_deaths;
@@ -45,7 +43,6 @@ public:
           aids_deaths_art(treatment_stages, disease_stages, age_groups_hiv, num_genders, no_output_years),
           art_initiation(disease_stages, age_groups_hiv, num_genders, no_output_years),
           hiv_deaths(age_groups_pop, num_genders, no_output_years) {
-
       total_population.setZero();
       natural_deaths.setZero();
       hiv_population.setZero();
@@ -112,7 +109,7 @@ public:
     return full_state;
   }
 
-  
+
 private:
   std::vector<int> save_steps;
   OutputState full_state;
