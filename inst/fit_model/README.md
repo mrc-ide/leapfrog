@@ -63,10 +63,11 @@ Where
 
 ## Profiling
 
-There are 2 profile runners here, it might be worth commenting out the step in the standalone runner which saves the
-output to disk. This takes a long time and won't be run in the actual model fit process. Use the valgrind profiler to
-measure CPU instructions, the google profiler runs a sampling profiler so should be better for understanding time
-bottlenecks.
+There are 3 profile runners here, I've only checked these work on linux. Note it might be worth commenting out the step
+in the standalone runner which saves the output to disk. This takes a long time and won't be run in the actual model fit
+process. Use the valgrind profiler to measure CPU instructions, the google profiler and perf profiler runs a sampling
+profiler so should be better for understanding time bottlenecks. I'm not sure really which is the best to use here! Perf
+profiler can give a nice view of the callchain which can be expanded and explored.
 
 1. `profile_valgrind` which runs the [callgrind valgrind](https://valgrind.org/docs/manual/cl-manual.html) tool to
    create a profile and then open it with `kcachegrind`.
@@ -79,3 +80,8 @@ bottlenecks.
       sudo apt-get install golang-go
       go install github.com/google/pprof@latest
       ```
+3. `profile_perf`, you will need to install perf
+    * `apt-get install linux-tools-common linux-tools-generic linux-tools-`uname -r``
+    * Set the perf paranoia level with `sudo sh -c 'echo 1 >/proc/sys/kernel/perf_event_paranoid'`
+      see https://superuser.com/questions/980632/run-perf-without-root-rights
+    * Run the script as sudo `sudo ./profile_perf`
