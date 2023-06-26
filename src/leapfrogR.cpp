@@ -111,8 +111,8 @@ leapfrogR(const Rcpp::List& demp,
   NumericVector aidsdeaths_art(hTS * hDS * hAG * NG * proj_years);
   aidsdeaths_art.attr("dim") = NumericVector::create(hTS, hDS, hAG, NG, proj_years);
   
-  NumericVector aidsdeaths_noart_paed(hDS * pIDX_HIVADULT * NG * proj_years);
-  aidsdeaths_noart_paed.attr("dim") = NumericVector::create(hDS, pIDX_HIVADULT, NG, proj_years);
+  NumericVector aidsdeaths_noart_paed(hDS * hTM * pIDX_HIVADULT * NG * proj_years);
+  aidsdeaths_noart_paed.attr("dim") = NumericVector::create(hDS, hTM, pIDX_HIVADULT, NG, proj_years);
   
   NumericVector aidsdeaths_art_paed(hTS * hDS * pIDX_HIVADULT * NG * proj_years);
   aidsdeaths_art_paed.attr("dim") = NumericVector::create(hTS, hDS, pIDX_HIVADULT, NG, proj_years);
