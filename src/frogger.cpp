@@ -31,15 +31,73 @@ int get_hiv_steps_per_year(SEXP r_hiv_steps_per_year) {
   return hiv_steps_per_year;
 }
 
-leapfrog::TensorMap1<int> get_age_groups_hiv_span(const Rcpp::List projection_parameters,
-                                                  std::string hiv_age_stratification) {
+int get_age_groups_hiv(const std::string hiv_age_stratification) {
   int age_groups_hiv;
-  SEXP data;
   if (hiv_age_stratification == "full") {
     age_groups_hiv = 66;
-    data = projection_parameters["hAG_SPAN_full"];
   } else if (hiv_age_stratification == "coarse") {
     age_groups_hiv = 9;
+  } else {
+    Rcpp::stop(
+        "Invalid HIV age stratification must be 'full' or 'coarse' got '%s'.",
+        hiv_age_stratification);
+  }
+  return age_groups_hiv;
+}
+
+template<typename... Args>
+auto parse_data_int(const Rcpp::List data, const std::string& key, Args... dims) {
+  constexpr std::size_t rank = sizeof...(dims);
+  Eigen::array<int, rank> dimensions{ static_cast<int>(dims)... };
+
+  int product = 1;
+  for (size_t i = 0; i < rank; ++i) {
+    product *= dimensions[i];
+  }
+  SEXP array_data = data[key];
+  // In cases where the input data has project years we might not use all of it model fit
+  // So we can take create a Map over a smaller slice of the data
+  // As long as this is true we can be confident we're not referencing invalid memory
+  if (LENGTH(array_data) < product) {
+    Rcpp::stop("Invalid size of data for '%s', expected %d got %d",
+               key,
+               product,
+               LENGTH(array_data));
+  }
+
+  return Eigen::TensorMap<Eigen::Tensor<int, rank>>(INTEGER(array_data), static_cast<int>(dims)...);
+}
+
+template<typename... Args>
+auto parse_data_double(const Rcpp::List data, const std::string& key, Args... dims) {
+  constexpr std::size_t rank = sizeof...(dims);
+  Eigen::array<int, rank> dimensions{ static_cast<int>(dims)... };
+
+  int product = 1;
+  for (size_t i = 0; i < rank; ++i) {
+    product *= dimensions[i];
+  }
+  SEXP array_data = data[key];
+  // In cases where the input data has project years we might not use all of it model fit
+  // So we can take create a Map over a smaller slice of the data
+  // As long as this is true we can be confident we're not referencing invalid memory
+  if (LENGTH(array_data) < product) {
+    Rcpp::stop("Invalid size of data for '%s', expected %d got %d.",
+               key,
+               product,
+               LENGTH(array_data));
+  }
+
+  return Eigen::TensorMap<Eigen::Tensor<double, rank>>(REAL(array_data), static_cast<int>(dims)...);
+}
+
+leapfrog::TensorMap1<int> get_age_groups_hiv_span(const Rcpp::List projection_parameters,
+                                                  std::string hiv_age_stratification,
+                                                  int age_groups_hiv) {
+  SEXP data;
+  if (hiv_age_stratification == "full") {
+    data = projection_parameters["hAG_SPAN_full"];
+  } else if (hiv_age_stratification == "coarse") {
     data = projection_parameters["hAG_SPAN_coarse"];
   } else {
     Rcpp::stop(
@@ -82,22 +140,23 @@ Rcpp::List run_base_model(const Rcpp::List data,
   // 0-based indexing vs R 1-based
   const int time_art_start =
       Rcpp::as<int>(projection_parameters["t_ART_start"]) - 1;
+  const int age_groups_hiv = get_age_groups_hiv(hiv_age_stratification);
+
   const leapfrog::TensorMap1<int> age_groups_hiv_span =
-      get_age_groups_hiv_span(projection_parameters, hiv_age_stratification);
-  int age_groups_hiv = static_cast<int>(age_groups_hiv_span.size());
+      get_age_groups_hiv_span(projection_parameters, hiv_age_stratification, age_groups_hiv);
   int age_groups_hiv_15plus = age_groups_hiv;
   const int scale_cd4_mortality =
       Rcpp::as<int>(projection_parameters["scale_cd4_mort"]);
   int hIDX_15PLUS = 0;
   const double art_alloc_mxweight = Rcpp::as<double>(projection_parameters["art_alloc_mxweight"]);
 
-  const leapfrog::TensorMap2<double> base_pop(REAL(data["basepop"]), age_groups_pop,
-                                              num_genders);
+  const leapfrog::TensorMap2<double> base_pop = parse_data_double(data, "basepop", age_groups_pop, num_genders);
+
   // Survival has size age_groups_pop + 1 as this is the probability of
   // surviving between ages, so from 0 to 1, 1 to 2, ..., 79 to 80+ and
   // 80+ to 80+
-  const leapfrog::TensorMap3<double> survival(REAL(data["Sx"]), age_groups_pop + 1, num_genders,
-                                              proj_years);
+  const leapfrog::TensorMap3<double> survival = parse_data_double(data, "Sx", age_groups_pop + 1,
+                                                                  num_genders, proj_years);
   const leapfrog::TensorMap3<double> net_migration(REAL(data["netmigr_adj"]), age_groups_pop,
                                                    num_genders, proj_years);
   const leapfrog::TensorMap2<double> age_sex_fertility_ratio(REAL(data["asfr"]),
@@ -121,7 +180,8 @@ Rcpp::List run_base_model(const Rcpp::List data,
   }
   const leapfrog::TensorMap3<double> cd4_initdist(REAL(projection_parameters["cd4_initdist_full"]), disease_stages,
                                                   age_groups_hiv, num_genders);
-  const leapfrog::TensorMap1<int> hiv_age_groups_span(INTEGER(projection_parameters["hAG_SPAN_full"]), age_groups_hiv);
+  const leapfrog::TensorMap1<int> hiv_age_groups_span = parse_data_int(
+      projection_parameters, "hAG_SPAN_full", age_groups_hiv);
   const leapfrog::TensorMap4<double> art_mortality(REAL(projection_parameters["art_mort_full"]), treatment_stages,
                                                    disease_stages, age_groups_hiv, num_genders);
   const leapfrog::TensorMap2<double> artmx_timerr(REAL(projection_parameters["artmx_timerr"]), treatment_stages,
