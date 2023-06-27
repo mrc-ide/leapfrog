@@ -35,12 +35,9 @@ int get_age_groups_hiv(const std::string hiv_age_stratification) {
   int age_groups_hiv;
   if (hiv_age_stratification == "full") {
     age_groups_hiv = 66;
-  } else if (hiv_age_stratification == "coarse") {
-    age_groups_hiv = 9;
   } else {
-    Rcpp::stop(
-        "Invalid HIV age stratification must be 'full' or 'coarse' got '%s'.",
-        hiv_age_stratification);
+    // We've already validated that hiv_age_stratification is one of "full" or "coarse"
+    age_groups_hiv = 9;
   }
   return age_groups_hiv;
 }
@@ -95,7 +92,7 @@ std::vector<int> parse_output_steps(Rcpp::NumericVector output_steps, int proj_y
   return Rcpp::as<std::vector<int>>(output_steps);
 }
 
-void validate_stratification(std::string stratification) {
+void validate_stratification(const std::string stratification) {
   if (!(stratification == "full" || stratification == "coarse")) {
     Rcpp::stop(
         "Invalid HIV age stratification must be 'full' or 'coarse' got '%s'.",
