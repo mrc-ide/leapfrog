@@ -1,0 +1,21 @@
+#!/usr/bin/env Rscript
+
+devtools::load_all()
+demp <- readRDS(test_path("testdata/demographic_projection_object.rds"))
+parameters <- readRDS(test_path("testdata/projection_parameters.rds"))
+
+message("Benchmarking coarse stratified fit")
+bench::mark(
+  leapfrog = leapfrog::leapfrogR(demp, parameters, hiv_strat = "coarse"),
+  frogger = run_base_model(demp, parameters, NULL, NULL, 0:60, hiv_age_stratification = "coarse"),
+  iterations = 10,
+  check = FALSE
+)
+
+message("Benchmarking full fit")
+bench::mark(
+  leapfrog = leapfrog::leapfrogR(demp, parameters, hiv_strat = "full"),
+  frogger = run_base_model(demp, parameters, NULL, NULL, 0:60, hiv_age_stratification = "full"),
+  iterations = 10,
+  check = FALSE
+)
