@@ -42,7 +42,6 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
   see https://github.com/mrc-ide/frogger/pull/7#discussion_r1217888684
 * Review what we pass as parameters - can some of these be computed in the struct ctor?
   e.g. https://github.com/mrc-ide/frogger/pull/7#discussion_r1217890466
-* Add function for calculating incidence rate per sex https://github.com/mrc-ide/frogger/pull/7#discussion_r1217848792
 * Make fit work with coarse ages (at the moment not reading all of the coarse stratified data)
 * Remove duplicate reading of `hAG_SPAN_full`, read this as `hiv_age_groups_span` and `age_groups_hiv_span`
 
