@@ -1,5 +1,6 @@
 #!/usr/bin/env Rscript
 
+pkgbuild::compile_dll(debug = FALSE)
 devtools::load_all()
 demp <- readRDS(test_path("testdata/demographic_projection_object.rds"))
 parameters <- readRDS(test_path("testdata/projection_parameters.rds"))
