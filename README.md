@@ -50,63 +50,55 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 
 ### State space
 
+In `StateSpace` struct
+
+| Leapfrog           | Frogger            | Details                                             |
+|--------------------|--------------------|-----------------------------------------------------|
+| NG                 | NG                 | Number of genders                                   |
+| pAG                | pAG                | Number of age groups in population, 81 for 0 to 80+ |
+| hAG                | hAG                | Number of age groups in HIV population              |
+| hDS                | hDS                | Number of disease stages                            |
+| hTS                | hTS                | Number of treatment stages                          |
+| sim_years          | sim_years          | Number of simulation years to run                   |
+| hiv_steps_per_year | hiv_steps_per_year | Number of HIV model time steps per year             |
+
+### Key indices in state space
+
+In `?` struct
+
 | Leapfrog      | Frogger                   | Details                                                |
 |---------------|---------------------------|--------------------------------------------------------|
-| NG            | num_genders               | Number of genders                                      |
-| pAG           | age_groups_pop            | Number of age groups in population, 81 for 0 to 80+    |
 | pIDX_FERT     | fertility_first_age_group | First age group index eligible for fertility           |
 | pAG_FERT      | age_groups_fertiity       | Number of ages eligible for fertility                  |
 | pIDX_HIVADULT | hiv_adult_first_age_group | Index of the first age group to be considered an adult |
-| hAG           | age_groups_hiv            | Number of age groups in HIV population                 |
-| hDS           | disease_stages            | Number of disease stages                               |
-| hTS           | treatment_stages          | Number of treatment stages                             |
-
-* NG, pAG, hAG, hDS, hTS: defining dimension of the state space (for cross-sectional state)
-* sim_years: defines dimenions for full simulation
-* pIDX_FERT, pIDX_HIVADULT, pAG_FERT: define key indices in state space
-* MALE, FEMALE (hard coded macros): define key indices in state space
-* t_ART_start: key index in state space
-* hiv_steps_per_year: controls temporal stratification of state space (kind of like sim_years)
-* hAG_SPAN: similar to pAG_FERT -- defining span of mapping between population and HIV age groups; similar in some respects to pAG_FERT, which could be considered a 'span' variable.
-
-
-### Model settings
-
-| Leapfrog           | Frogger             | Details                           |
-|--------------------|---------------------|-----------------------------------|
-| sim_years          | sim_years           | Number of simulation years to run |
-| hiv_steps_per_year | hiv_steps_per_year  |                                   |
-| t_ART_start        | time_art_start      | Time step to start modelling ART  |
-| hAG_SPAN           | hiv_age_groups_span | Array of HIV age group sizes      |
-
-
+| t_ART_start   | time_art_start            | Time step to start modelling ART                       |
+| hAG_SPAN      | hiv_age_groups_span       | Array of HIV age group sizes                           |
 
 ### Input data
 
-* _Discussion: indicate in name whether demographic input, incidence input, natural history, ART inputs._
+In 4 structs as part of the `Parameters`, named `Demography`, `Incidence`, `NaturalHistory` and `Art`
 
-| Leapfrog           | Frogger                     | Details                                                                                      |
-|--------------------|-----------------------------|----------------------------------------------------------------------------------------------|
-| basepop            | base_pop                    | Population data by age group and sex                                                         |
-| sx                 | Survival                    | Probability of surviving between ages, from 0 to 1, 1 to 2, ..., 79 to 80+ and 80+ to 80+    |
-| netmigr            | net_migration               | Net migration by age group, sex and year                                                     |
-| asfr               | age_sex_fertility_ratio     | Ratio of number of live births in a year and the whole female population of childbearing age |
-| births_sex_prop    | births_sex_prop             |                                                                                              |
-| incidinput         | incidence_rate              |                                                                                              |
-| incrr_sex          | incidence_relative_risk_sex | HIV incidence rate ratio for female : male age 15-49 years                                   |
-| incrr_age          | incidence_relative_risk_age | HIV incidence rate ratio by age (for each sex)                                               |
-| cd4_initdist       | ?                           | Distribution of infections by CD4 category upon infection                                    |
-| cd4_prog           | cd4_progression             |                                                                                              |
-| cd4_mort           | cd4_mortality               |                                                                                              |
-| art_mort           | art_mortality               |                                                                                              |
-| artmx_timerr       | ?                           |                                                                                              |
-| art15plus_num      | ?                           |                                                                                              |
-| art15plus_isperc   | ?                           |                                                                                              |
-| artcd4elig_idx     | ?                           |                                                                                              |
-| art_alloc_method   | ?                           |                                                                                              |
-| art_alloc_mxweight | ?                           |                                                                                              |
-| scale_cd4_mort     | scale_cd4_mortality         |                                                                                              |
-| art_dropout        | ?                           |                                                                                              |
+| Leapfrog           | Frogger                                  | Details                                                                                      |
+|--------------------|------------------------------------------|----------------------------------------------------------------------------------------------|
+| basepop            | demography.base_pop                      | Population data by age group and sex                                                         |
+| sx                 | demography.survival                      | Probability of surviving between ages, from 0 to 1, 1 to 2, ..., 79 to 80+ and 80+ to 80+    |
+| netmigr            | demography.net_migration                 | Net migration by age group, sex and year                                                     |
+| asfr               | demography.fertility_ratio               | Ratio of number of live births in a year and the whole female population of childbearing age |
+| births_sex_prop    | demography.births_sex_prop               |                                                                                              |
+| incidinput         | incidence.rate                           |                                                                                              |
+| incrr_sex          | incidence.sex_rate_ratio                 | HIV incidence rate ratio for female : male age 15-49 years                                   |
+| incrr_age          | incidence.age_rate_ratio                 | HIV incidence rate ratio by age (for each sex)                                               |
+| cd4_initdist       | natural_history.cd4_initial_distribution | Distribution of infections by CD4 category upon infection                                    |
+| cd4_prog           | natural_history.cd4_progression          |                                                                                              |
+| cd4_mort           | natural_history.cd4_mortality            |                                                                                              |
+| scale_cd4_mort     | natural_history.cd4_mortality_scale      |                                                                                              |
+| art_mort           | art.mortality                            |                                                                                              |
+| artmx_timerr       | ?                                        |                                                                                              |
+| art15plus_num      | ?                                        |                                                                                              |
+| art15plus_isperc   | ?                                        |                                                                                              |
+| artcd4elig_idx     | ?                                        |                                                                                              |
+| art_alloc_mxweight | ?                                        |                                                                                              |
+| art_dropout        | ?                                        |                                                                                              |
 
 ### Outputs
 
@@ -114,13 +106,13 @@ _Discussion: naming conventions
 
 * Distinguish events vs. counts
 * Distinguish stratification of array (single-year population pXX vs. HIV population hXX
-_ 
+  _
 
 | Leapfrog         | Frogger            | Details                                                  |
 |------------------|--------------------|----------------------------------------------------------|
-| totpop1          | total_population   | Projected total population                               |
-| hivpop1          | hiv_population     | Projected HIV population                                 |
-| infections       | infections         |                                                          |
+| totpop1          | p_total_population | Projected total population                               |
+| hivpop1          | p_hiv_population   | Projected HIV population                                 |
+| infections       | p_infections       |                                                          |
 | hivstrat_adult   | hiv_strat_adult    |                                                          |
 | artstrat_adult   | art_strat_adult    |                                                          |
 | births           | births             | Projected number of births                               |
