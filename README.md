@@ -78,27 +78,27 @@ In `?` struct
 
 In 4 structs as part of the `Parameters`, named `Demography`, `Incidence`, `NaturalHistory` and `Art`
 
-| Leapfrog           | Frogger                                  | Details                                                                                      |
-|--------------------|------------------------------------------|----------------------------------------------------------------------------------------------|
-| basepop            | demography.base_pop                      | Population data by age group and sex                                                         |
-| sx                 | demography.survival                      | Probability of surviving between ages, from 0 to 1, 1 to 2, ..., 79 to 80+ and 80+ to 80+    |
-| netmigr            | demography.net_migration                 | Net migration by age group, sex and year                                                     |
-| asfr               | demography.fertility_ratio               | Ratio of number of live births in a year and the whole female population of childbearing age |
-| births_sex_prop    | demography.births_sex_prop               |                                                                                              |
-| incidinput         | incidence.rate                           |                                                                                              |
-| incrr_sex          | incidence.sex_rate_ratio                 | HIV incidence rate ratio for female : male age 15-49 years                                   |
-| incrr_age          | incidence.age_rate_ratio                 | HIV incidence rate ratio by age (for each sex)                                               |
-| cd4_initdist       | natural_history.cd4_initial_distribution | Distribution of infections by CD4 category upon infection                                    |
-| cd4_prog           | natural_history.cd4_progression          |                                                                                              |
-| cd4_mort           | natural_history.cd4_mortality            |                                                                                              |
-| scale_cd4_mort     | natural_history.cd4_mortality_scale      |                                                                                              |
-| art_mort           | art.mortality                            |                                                                                              |
-| artmx_timerr       | ?                                        |                                                                                              |
-| art15plus_num      | ?                                        |                                                                                              |
-| art15plus_isperc   | ?                                        |                                                                                              |
-| artcd4elig_idx     | ?                                        |                                                                                              |
-| art_alloc_mxweight | ?                                        |                                                                                              |
-| art_dropout        | ?                                        |                                                                                              |
+| Leapfrog           | Frogger                                  | Details                                                                                                                                                               |
+|--------------------|------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| basepop            | demography.base_pop                      | Population data by age group and sex                                                                                                                                  |
+| sx                 | demography.survival                      | Probability of surviving between ages, from 0 to 1, 1 to 2, ..., 79 to 80+ and 80+ to 80+                                                                             |
+| netmigr            | demography.net_migration                 | Net migration by age group, sex and year                                                                                                                              |
+| asfr               | demography.fertility_ratio               | Ratio of number of live births in a year and the whole female population of childbearing age                                                                          |
+| births_sex_prop    | demography.births_sex_prop               | Proportion of male and female births each year                                                                                                                        |
+| incidinput         | incidence.rate                           | Incidence rate per year                                                                                                                                               |
+| incrr_sex          | incidence.sex_rate_ratio                 | HIV incidence rate ratio for female : male age 15-49 years                                                                                                            |
+| incrr_age          | incidence.age_rate_ratio                 | HIV incidence rate ratio by age (for each sex)                                                                                                                        |
+| cd4_initdist       | natural_history.cd4_initial_distribution | Distribution of infections by CD4 category upon infection                                                                                                             |
+| cd4_prog           | natural_history.cd4_progression          | Probability of progressing from 1 CD4 stage to the next by age and sex                                                                                                |
+| cd4_mort           | natural_history.cd4_mortality            | Probability of mortality by CD4 stage, age and sex                                                                                                                    |
+| scale_cd4_mort     | natural_history.scale_cd4_mortality      | If 1 then scale HIV related mortality (i.e. cd4_mortality) as a proportion of number of people with HIV and over the number with HIV and on ART at this disease stage |
+| art_mort           | art.mortality                            | Probability of mortality by treatment stage, CD4 stage, age and sex                                                                                                   |
+| artmx_timerr       | ?                                        |                                                                                                                                                                       |
+| art15plus_num      | ?                                        |                                                                                                                                                                       |
+| art15plus_isperc   | ?                                        | TRUE if art                                                                                                                                                           |
+| artcd4elig_idx     | ?                                        | The index of the CD4 count at which people are eligible for ART by time step                                                                                          |
+| art_alloc_mxweight | ?                                        |                                                                                                                                                                       |
+| art_dropout        | art.dropout                              | ART dropout rate at each time step                                                                                                                                    |
 
 ### Outputs
 
@@ -106,22 +106,21 @@ _Discussion: naming conventions
 
 * Distinguish events vs. counts
 * Distinguish stratification of array (single-year population pXX vs. HIV population hXX
-  _
 
-| Leapfrog         | Frogger            | Details                                                  |
-|------------------|--------------------|----------------------------------------------------------|
-| totpop1          | p_total_population | Projected total population                               |
-| hivpop1          | p_hiv_population   | Projected HIV population                                 |
-| infections       | p_infections       |                                                          |
-| hivstrat_adult   | hiv_strat_adult    |                                                          |
-| artstrat_adult   | art_strat_adult    |                                                          |
-| births           | births             | Projected number of births                               |
-| natdeaths        | natural_deaths     | Projected number of natural deaths                       |
-| natdeaths_hivpop | hiv_natural_deaths | Projected number of natural deaths within HIV population |
-| hivdeaths        | hiv_deaths         |                                                          |
-| aidsdeaths_noart | aids_deaths_no_art |                                                          |
-| aidsdeaths_art   | aids_deaths_art    |                                                          |
-| artinit          | art_initiation     |                                                          |
+| Leapfrog         | Frogger              | Details                                                  |
+|------------------|----------------------|----------------------------------------------------------|
+| totpop1          | p_total_population   | Projected total population                               |
+| hivpop1          | p_hiv_population     | Projected HIV population                                 |
+| infections       | p_infections         |                                                          |
+| hivstrat_adult   | h_hiv_strat_adult    |                                                          |
+| artstrat_adult   | h_art_strat_adult    |                                                          |
+| births           | births               | Projected number of births                               |
+| natdeaths        | p_natural_deaths     | Projected number of natural deaths                       |
+| natdeaths_hivpop | p_natural_deaths_hiv | Projected number of natural deaths within HIV population |
+| hivdeaths        | p_hiv_deaths         |                                                          |
+| aidsdeaths_noart | h_aids_deaths_no_art |                                                          |
+| aidsdeaths_art   | h_aids_deaths_art    |                                                          |
+| artinit          | h_art_initiation     |                                                          |
 
 ### Internal
 
