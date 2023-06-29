@@ -45,6 +45,8 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 * Add function for calculating incidence rate per sex https://github.com/mrc-ide/frogger/pull/7#discussion_r1217848792
 * Make fit work with coarse ages (at the moment not reading all of the coarse stratified data)
 * Remove duplicate reading of `hAG_SPAN_full`, read this as `hiv_age_groups_span` and `age_groups_hiv_span`
+* Refactor `OutputState` to take a struct of state-space dimensions instead of unpacking the subset of parameters we
+  need. See https://github.com/mrc-ide/frogger/pull/12#discussion_r1245170775
 
 ## Leapfrog to Frogger glossary
 

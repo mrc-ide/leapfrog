@@ -3,7 +3,7 @@
 #include "frogger.hpp"
 #include "types.hpp"
 
-int get_simulation_years(const Rcpp::List demp, SEXP r_sim_years) {
+int transform_simulation_years(const Rcpp::List demp, SEXP r_sim_years) {
   Rcpp::NumericVector Sx = demp["Sx"];
   Rcpp::Dimension d = Sx.attr("dim");
   // Simulation initialises state from first years input data (index 0)
@@ -21,7 +21,7 @@ int get_simulation_years(const Rcpp::List demp, SEXP r_sim_years) {
   return sim_years;
 }
 
-int get_hiv_steps_per_year(SEXP r_hiv_steps_per_year) {
+int transform_hiv_steps_per_year(SEXP r_hiv_steps_per_year) {
   int hiv_steps_per_year;
   if (r_hiv_steps_per_year == R_NilValue) {
     hiv_steps_per_year = 10;
@@ -88,7 +88,7 @@ auto parse_data_double(const Rcpp::List data, const std::string& key, Args... di
   return Eigen::TensorMap<Eigen::Tensor<double, rank>>(REAL(array_data), static_cast<int>(dims)...);
 }
 
-std::vector<int> parse_output_steps(Rcpp::NumericVector output_steps, int proj_years) {
+std::vector<int> transform_output_steps(Rcpp::NumericVector output_steps) {
   return Rcpp::as<std::vector<int>>(output_steps);
 }
 
@@ -109,9 +109,9 @@ Rcpp::List run_base_model(const Rcpp::List data,
                           Rcpp::NumericVector output_steps,
                           std::string hiv_age_stratification = "full") {
   validate_stratification(hiv_age_stratification);
-  const int proj_years = get_simulation_years(data, sim_years);
-  const std::vector<int> save_steps = parse_output_steps(output_steps, proj_years);
-  const int hiv_steps = get_hiv_steps_per_year(hiv_steps_per_year);
+  const int proj_years = transform_simulation_years(data, sim_years);
+  const std::vector<int> save_steps = transform_output_steps(output_steps);
+  const int hiv_steps = transform_hiv_steps_per_year(hiv_steps_per_year);
   const double dt = (1.0 / hiv_steps);
   const int num_genders = 2;
   const int age_groups_pop = 81;
