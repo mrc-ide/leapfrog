@@ -172,9 +172,8 @@ Rcpp::List run_base_model(const Rcpp::List data,
   const leapfrog::TensorMap2<double> artmx_timerr = parse_data<double>(projection_parameters, "artmx_timerr",
                                                                       treatment_stages, proj_years);
   leapfrog::Tensor1<double> h_art_stage_dur(treatment_stages - 1);
-  for (int i = 0; i < treatment_stages - 1; ++i) {
-    h_art_stage_dur(i) = 0.5;
-  }
+  h_art_stage_dur.setConstant(0.5);
+
   const leapfrog::TensorMap1<double> art_dropout = parse_data<double>(projection_parameters, "art_dropout", proj_years);
   const leapfrog::TensorMap2<double> art15plus_num = parse_data<double>(projection_parameters, "art15plus_num",
                                                                        num_genders, proj_years);
