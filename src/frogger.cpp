@@ -42,8 +42,23 @@ int get_age_groups_hiv(const std::string hiv_age_stratification) {
   return age_groups_hiv;
 }
 
-template<typename... Args>
-auto parse_data_int(const Rcpp::List data, const std::string& key, Args... dims) {
+template <typename T>
+T* r_data(SEXP x) {
+  static_assert(sizeof(T) == 0, "Only specializations of r_data can be used");
+}
+
+template <>
+double* r_data(SEXP x) {
+  return REAL(x);
+}
+
+template <>
+int * r_data(SEXP x) {
+  return INTEGER(x);
+}
+
+template<typename T, typename... Args>
+auto parse_data(const Rcpp::List data, const std::string& key, Args... dims) {
   constexpr std::size_t rank = sizeof...(dims);
   Eigen::array<int, rank> dimensions{ static_cast<int>(dims)... };
 
@@ -62,30 +77,7 @@ auto parse_data_int(const Rcpp::List data, const std::string& key, Args... dims)
                LENGTH(array_data));
   }
 
-  return Eigen::TensorMap<Eigen::Tensor<int, rank>>(INTEGER(array_data), static_cast<int>(dims)...);
-}
-
-template<typename... Args>
-auto parse_data_double(const Rcpp::List data, const std::string& key, Args... dims) {
-  constexpr std::size_t rank = sizeof...(dims);
-  Eigen::array<int, rank> dimensions{ static_cast<int>(dims)... };
-
-  int product = 1;
-  for (size_t i = 0; i < rank; ++i) {
-    product *= dimensions[i];
-  }
-  SEXP array_data = data[key];
-  // In cases where the input data has project years we might not use all of it model fit
-  // So we can take create a Map over a smaller slice of the data
-  // As long as this is true we can be confident we're not referencing invalid memory
-  if (LENGTH(array_data) < product) {
-    Rcpp::stop("Invalid size of data for '%s', expected %d got %d.",
-               key,
-               product,
-               LENGTH(array_data));
-  }
-
-  return Eigen::TensorMap<Eigen::Tensor<double, rank>>(REAL(array_data), static_cast<int>(dims)...);
+  return Eigen::TensorMap<Eigen::Tensor<T, rank>>(r_data<T>(array_data), static_cast<int>(dims)...);
 }
 
 std::vector<int> transform_output_steps(Rcpp::NumericVector output_steps) {
@@ -138,55 +130,55 @@ Rcpp::List run_base_model(const Rcpp::List data,
     return property + "_" + hiv_age_stratification;
   };
 
-  const leapfrog::TensorMap1<int> age_groups_hiv_span = parse_data_int(
+  const leapfrog::TensorMap1<int> age_groups_hiv_span = parse_data<int>(
       projection_parameters, build_prop_name("hAG_SPAN"), age_groups_hiv);
-  const leapfrog::TensorMap2<double> base_pop = parse_data_double(data, "basepop", age_groups_pop, num_genders);
+  const leapfrog::TensorMap2<double> base_pop = parse_data<double>(data, "basepop", age_groups_pop, num_genders);
 
   // Survival has size age_groups_pop + 1 as this is the probability of
   // surviving between ages, so from 0 to 1, 1 to 2, ..., 79 to 80+ and
   // 80+ to 80+
-  const leapfrog::TensorMap3<double> survival = parse_data_double(data, "Sx",
+  const leapfrog::TensorMap3<double> survival = parse_data<double>(data, "Sx",
                                                                   age_groups_pop + 1, num_genders, proj_years);
-  const leapfrog::TensorMap3<double> net_migration = parse_data_double(data, "netmigr_adj", age_groups_pop,
+  const leapfrog::TensorMap3<double> net_migration = parse_data<double>(data, "netmigr_adj", age_groups_pop,
                                                                        num_genders, proj_years);
-  const leapfrog::TensorMap2<double> age_sex_fertility_ratio = parse_data_double(data, "asfr",
+  const leapfrog::TensorMap2<double> age_sex_fertility_ratio = parse_data<double>(data, "asfr",
                                                                                  age_groups_fert, proj_years);
-  const leapfrog::TensorMap2<double> births_sex_prop = parse_data_double(data, "births_sex_prop",
+  const leapfrog::TensorMap2<double> births_sex_prop = parse_data<double>(data, "births_sex_prop",
                                                                          num_genders, proj_years);
-  const leapfrog::TensorMap1<double> incidence_rate = parse_data_double(projection_parameters, "incidinput",
+  const leapfrog::TensorMap1<double> incidence_rate = parse_data<double>(projection_parameters, "incidinput",
                                                                         proj_years);
-  const leapfrog::TensorMap3<double> incidence_relative_risk_age = parse_data_double(
+  const leapfrog::TensorMap3<double> incidence_relative_risk_age = parse_data<double>(
       projection_parameters, "incrr_age",age_groups_pop - hiv_adult_first_age_group, num_genders, proj_years);
-  const leapfrog::TensorMap1<double> incidence_relative_risk_sex = parse_data_double(projection_parameters, "incrr_sex",
+  const leapfrog::TensorMap1<double> incidence_relative_risk_sex = parse_data<double>(projection_parameters, "incrr_sex",
                                                                                      proj_years);
-  const leapfrog::TensorMap3<double> cd4_mortality = parse_data_double(
+  const leapfrog::TensorMap3<double> cd4_mortality = parse_data<double>(
       projection_parameters, build_prop_name("cd4_mort"), disease_stages, age_groups_hiv, num_genders);
-  const leapfrog::TensorMap3<double> cd4_progression = parse_data_double(
+  const leapfrog::TensorMap3<double> cd4_progression = parse_data<double>(
       projection_parameters, build_prop_name("cd4_prog"), disease_stages - 1, age_groups_hiv, num_genders);
 
-  leapfrog::Tensor1<int> artcd4elig_idx = parse_data_int(projection_parameters, "artcd4elig_idx", proj_years + 1);
+  leapfrog::Tensor1<int> artcd4elig_idx = parse_data<int>(projection_parameters, "artcd4elig_idx", proj_years + 1);
   for (int i = 0; i <= proj_years; ++i) {
     // 0-based indexing in C++ vs 1-based indexing in R
     artcd4elig_idx(i) = artcd4elig_idx(i) - 1;
   }
 
-  const leapfrog::TensorMap3<double> cd4_initdist = parse_data_double(
+  const leapfrog::TensorMap3<double> cd4_initdist = parse_data<double>(
       projection_parameters, build_prop_name("cd4_initdist"), disease_stages, age_groups_hiv, num_genders);
-  const leapfrog::TensorMap1<int> hiv_age_groups_span = parse_data_int(
+  const leapfrog::TensorMap1<int> hiv_age_groups_span = parse_data<int>(
       projection_parameters, build_prop_name("hAG_SPAN"), age_groups_hiv);
-  const leapfrog::TensorMap4<double> art_mortality = parse_data_double(
+  const leapfrog::TensorMap4<double> art_mortality = parse_data<double>(
       projection_parameters, build_prop_name("art_mort"), treatment_stages, disease_stages, age_groups_hiv,
       num_genders);
-  const leapfrog::TensorMap2<double> artmx_timerr = parse_data_double(projection_parameters, "artmx_timerr",
+  const leapfrog::TensorMap2<double> artmx_timerr = parse_data<double>(projection_parameters, "artmx_timerr",
                                                                       treatment_stages, proj_years);
   leapfrog::Tensor1<double> h_art_stage_dur(treatment_stages - 1);
   for (int i = 0; i < treatment_stages - 1; ++i) {
     h_art_stage_dur(i) = 0.5;
   }
-  const leapfrog::TensorMap1<double> art_dropout = parse_data_double(projection_parameters, "art_dropout", proj_years);
-  const leapfrog::TensorMap2<double> art15plus_num = parse_data_double(projection_parameters, "art15plus_num",
+  const leapfrog::TensorMap1<double> art_dropout = parse_data<double>(projection_parameters, "art_dropout", proj_years);
+  const leapfrog::TensorMap2<double> art15plus_num = parse_data<double>(projection_parameters, "art15plus_num",
                                                                        num_genders, proj_years);
-  const leapfrog::TensorMap2<int> art15plus_isperc = parse_data_int(projection_parameters, "art15plus_isperc",
+  const leapfrog::TensorMap2<int> art15plus_isperc = parse_data<int>(projection_parameters, "art15plus_isperc",
                                                                     num_genders, proj_years);
 
   const leapfrog::Parameters<double> params = {num_genders,
