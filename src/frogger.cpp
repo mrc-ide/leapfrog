@@ -100,6 +100,7 @@ void validate_stratification(const std::string stratification) {
   }
 }
 
+//' @export
 // [[Rcpp::export]]
 Rcpp::List run_base_model(const Rcpp::List data,
                           const Rcpp::List projection_parameters,
