@@ -48,13 +48,21 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 
 ## Leapfrog to Frogger glossary
 
+Frogger naming rules
+
+* p prefix indicates this is age stratified by single year i.e. same age stratification as total population
+* h prefix indicates this is age stratified by same age stratification as HIV population, this might be single year from
+  15+ or could be coarse age groups
+* idx prefix means this is an index
+* Uppercase means this is a dimension of the state space e.g. `NG` or `pAG`
+
 ### State space
 
 In `StateSpace` struct
 
 | Leapfrog           | Frogger            | Details                                             |
 |--------------------|--------------------|-----------------------------------------------------|
-| NG                 | NG                 | Number of genders                                   |
+| NG                 | NG                 | Number of sexes                                     |
 | pAG                | pAG                | Number of age groups in population, 81 for 0 to 80+ |
 | hAG                | hAG                | Number of age groups in HIV population              |
 | hDS                | hDS                | Number of disease stages                            |
@@ -62,17 +70,25 @@ In `StateSpace` struct
 | sim_years          | sim_years          | Number of simulation years to run                   |
 | hiv_steps_per_year | hiv_steps_per_year | Number of HIV model time steps per year             |
 
+#### Loop variable convention
+
+* `NG` is `g`
+* `pAG` is `a`
+* `hAG` is `ha`
+* `hDS` is `hm`
+* `hTS` is `hu`
+
 ### Key indices in state space
 
 In `?` struct
 
-| Leapfrog      | Frogger                   | Details                                                |
-|---------------|---------------------------|--------------------------------------------------------|
-| pIDX_FERT     | fertility_first_age_group | First age group index eligible for fertility           |
-| pAG_FERT      | age_groups_fertiity       | Number of ages eligible for fertility                  |
-| pIDX_HIVADULT | hiv_adult_first_age_group | Index of the first age group to be considered an adult |
-| t_ART_start   | time_art_start            | Time step to start modelling ART                       |
-| hAG_SPAN      | hiv_age_groups_span       | Array of HIV age group sizes                           |
+| Leapfrog      | Frogger                | Details                                                |
+|---------------|------------------------|--------------------------------------------------------|
+| pIDX_FERT     | p_idx_fertility_first  | First age group index eligible for fertility           |
+| pAG_FERT      | p_fertility_age_groups | Number of ages eligible for fertility                  |
+| pIDX_HIVADULT | p_idx_hiv_first_adult  | Index of the first age group to be considered an adult |
+| t_ART_start   | time_art_start         | Time step to start modelling ART                       |
+| hAG_SPAN      | hAG_groups_span        | Array of HIV age group sizes                           |
 
 ### Input data
 
@@ -93,34 +109,34 @@ In 4 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 | cd4_mort           | natural_history.cd4_mortality            | Probability of mortality by CD4 stage, age and sex                                                                                                                    |
 | scale_cd4_mort     | natural_history.scale_cd4_mortality      | If 1 then scale HIV related mortality (i.e. cd4_mortality) as a proportion of number of people with HIV and over the number with HIV and on ART at this disease stage |
 | art_mort           | art.mortality                            | Probability of mortality by treatment stage, CD4 stage, age and sex                                                                                                   |
-| artmx_timerr       | ?                                        |                                                                                                                                                                       |
-| art15plus_num      | ?                                        |                                                                                                                                                                       |
-| art15plus_isperc   | ?                                        | TRUE if art                                                                                                                                                           |
-| artcd4elig_idx     | ?                                        | The index of the CD4 count at which people are eligible for ART by time step                                                                                          |
-| art_alloc_mxweight | ?                                        |                                                                                                                                                                       |
+| artmx_timerr       | art.mortaility_rate_ratio                | HIV-related mortality rate ratios by treatment stage                                                                                                                  |
+| art15plus_num      | art.adults_on_art                        | Time series of # or % of adult PLHIV on ART by sex                                                                                                                    |
+| art15plus_isperc   | art.adults_on_art_is_percent             | Time series, TRUE if art15plus_num is a %, FALSE if it is a #                                                                                                         |
+| artcd4elig_idx     | art.idx_cd4_elig                         | The index of the CD4 count at which people are eligible for ART by time step                                                                                          |
+| art_alloc_mxweight | art.initiation_mortality_weight          | Weighting for extent that expected mortality guides ART uptake                                                                                                        |
 | art_dropout        | art.dropout                              | ART dropout rate at each time step                                                                                                                                    |
 
 ### Outputs
 
-_Discussion: naming conventions
+Discussion: naming conventions
 
 * Distinguish events vs. counts
 * Distinguish stratification of array (single-year population pXX vs. HIV population hXX
 
-| Leapfrog         | Frogger              | Details                                                  |
-|------------------|----------------------|----------------------------------------------------------|
-| totpop1          | p_total_population   | Projected total population                               |
-| hivpop1          | p_hiv_population     | Projected HIV population                                 |
-| infections       | p_infections         |                                                          |
-| hivstrat_adult   | h_hiv_strat_adult    |                                                          |
-| artstrat_adult   | h_art_strat_adult    |                                                          |
-| births           | births               | Projected number of births                               |
-| natdeaths        | p_natural_deaths     | Projected number of natural deaths                       |
-| natdeaths_hivpop | p_natural_deaths_hiv | Projected number of natural deaths within HIV population |
-| hivdeaths        | p_hiv_deaths         |                                                          |
-| aidsdeaths_noart | h_aids_deaths_no_art |                                                          |
-| aidsdeaths_art   | h_aids_deaths_art    |                                                          |
-| artinit          | h_art_initiation     |                                                          |
+| Leapfrog         | Frogger              | Details                                                                  |
+|------------------|----------------------|--------------------------------------------------------------------------|
+| totpop1          | p_total_population   | Projected total population                                               |
+| hivpop1          | p_hiv_population     | Projected HIV population                                                 |
+| infections       | p_infections         | Projected number of new HIV infections by sex and age                    |
+| hivstrat_adult   | h_hiv_strat_adult    | Projected PLHIV not on ART by age, sex and CD4                           |
+| artstrat_adult   | h_art_strat_adult    | Projected PLHIV on ART by age, sex, CD4 and treatment stage              |
+| births           | births               | Projected number of births                                               |
+| natdeaths        | p_natural_deaths     | Projected number of natural deaths                                       |
+| natdeaths_hivpop | p_natural_deaths_hiv | Projected number of natural deaths within HIV population                 |
+| hivdeaths        | p_hiv_deaths         | Projected HIV-related deaths by sex and age                              |
+| aidsdeaths_noart | h_aids_deaths_no_art | Projected HIV-related deaths off ART by sex, age and CD4                 |
+| aidsdeaths_art   | h_aids_deaths_art    | Projected HIV-related deaths on ART by sex, age, CD4 and treatment stage |
+| artinit          | h_art_initiation     | Projected ART initiations by sex, age and CD4                            |
 
 ### Internal
 
@@ -158,15 +174,15 @@ _Discussion: naming conventions
 | infections_a              | infections_a                    |                                                                           |
 | infections_ha             | infections_ha                   |                                                                           |
 | gradART                   |                                 |                                                                           |
-| artelig_hahm              |                                 |                                                                           |
+| artelig_hahm              |                                 | Number of PLHIV eligible for ART by age and disease stage                 |
 | Xart_15plus               |                                 |                                                                           |
 | Xartelig_15plus           |                                 |                                                                           |
-| expect_mort_artelig15plus |                                 |                                                                           |
+| expect_mort_artelig15plus |                                 | Total mortality amongst ART eligible population                           |
 | artnum_hts                |                                 |                                                                           |
 | artcov_hts                |                                 |                                                                           |
 | curr_coverage             |                                 |                                                                           |
-| artinit_hts               |                                 |                                                                           |
-| artinit_hahm              |                                 |                                                                           |
+| artinit_hts               | art_initiation                  | Total number by sex to initiate on ART by gender                          |
+| artinit_hahm              |                                 | Number who initiate treatment by age and disease stage                    |
 | hivpop_ha(ha)             | hivpop_ha                       | HIV population by coarse HIV age group stratification                     |
 | hivqx_ha                  |                                 |                                                                           |
 | hivdeaths_a               |                                 |                                                                           |
