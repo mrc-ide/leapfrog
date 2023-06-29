@@ -105,7 +105,7 @@ public:
     }
   }
 
-  OutputState get_full_state() const {
+  const OutputState &get_full_state() const {
     return full_state;
   }
 

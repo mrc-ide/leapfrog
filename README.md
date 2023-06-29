@@ -39,6 +39,8 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 * Review what we pass as parameters - can some of these be computed in the struct ctor?
   e.g. https://github.com/mrc-ide/frogger/pull/7#discussion_r1217890466
 * Add function for calculating incidence rate per sex https://github.com/mrc-ide/frogger/pull/7#discussion_r1217848792
+* Refactor `OutputState` to take a struct of state-space dimensions instead of unpacking the subset of parameters we
+  need. See https://github.com/mrc-ide/frogger/pull/12#discussion_r1245170775
 
 ## Leapfrog to Frogger glossary
 
