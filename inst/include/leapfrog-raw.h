@@ -238,13 +238,23 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       // Doesn't look like it matches up with the equation expressed below?
       // TODO: Let's ask Jeff this one
 
+      // Sx is probability of surviving from one age to the next age
+      // sx_netmig is the survival probability for migrants
+
+
       // For open age group, netmigrant survivor adjustment based on weighted
       // sx for age 79 and age 80+.
       // * Numerator: totpop1(a, g, t-1) * (1.0 + sx(a+1, g, t)) + totpop1(a-1, g, t-1) * (1.0 + sx(a, g, t))
       // * Denominator: totpop1(a, g, t-1) + totpop1(a-1, g, t-1)
       // Re-expressed current population and deaths to open age group (already calculated):
       int a = pAG - 1;
-      Type sx_netmig = (totpop1(a, g,t) + 0.5 * natdeaths(pAG-1, g, t)) / (totpop1(a, g,t) + natdeaths(pAG-1, g, t));
+
+      // denominator is the total population and those from that age group who have died
+      // what proportion of people will migrate and survive until the end fo the period
+      // Could we translate this to ()1 - rate) / 2
+      Type sx_netmig = (totpop1(a, g,t) + 0.5 * natdeaths(a, g, t)) / (totpop1(a, g,t) + natdeaths(a, g, t));
+
+      // migrate_ag is a rate
       migrate_ag(a, g) = sx_netmig * netmigr(a, g, t) / totpop1(a, g,t);
       totpop1(a, g, t) *= 1.0 + migrate_ag(a, g);
     }
@@ -305,6 +315,14 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     // hAG_SPAN can be 1, 1, 1, 1, for fine ages
     // or for coarse 2, 3, 5, 5, 5, .., 31 which covers all ages
     // TODO: When do we run the coarse age group model? Q for Jeff?
+
+    // EPP was non age structured
+    // EPPASM runs the coarse age group model and shiny90 uses this
+    // Countries use EPPASM to do their model fitting, this is the Java windows in Spectrum
+    // They use the results of EPPASM to run spectrum to get the single year age groups
+    // incidinput is the output from the coarse fit, which we use in fine grained fit
+    // Benchmark EPPASM! 5 mins - 1 hour atm
+
     // This sums hiv population at t - 1 over the age group span
     // Then calculates hiv_ag_prob as the proportion of hiv pop at age - 1 / the sum
     //
@@ -385,6 +403,9 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     // TODO: Question for Jeff - why is this being applied as scalar compared
     // to just adding/subtracting from the hivstrat_adult
 
+    // Using a rate here assumes that deaths and migration happen proportionally
+    // across the cd4 stage and how long someone has been on treatment
+
     // Assumes same rates of deaths and migration across CD4 counts
     for(int g = 0; g < NG; g++){
       int a = pIDX_HIVADULT;
@@ -414,6 +435,10 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     ////  Adult HIV model simulation  ////
     //////////////////////////////////////
 
+    // What are these artcd4elig_idx - the index of the cd4 count at which people are eligible for ART at time t
+    // everARTelig_idx what is that?
+    // What is the intention of this section?
+
     int cd4elig_idx = artcd4elig_idx[t] - 1; // -1 for 0-based indexing vs. 1-based in R
     everARTelig_idx = cd4elig_idx < everARTelig_idx ? cd4elig_idx : everARTelig_idx;
     // !! SPECIAL POPULATION ART ELIGIBILITY NOT YET IMPLEMENTED;
@@ -424,6 +449,14 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 
     TensorFixedSize<Type, Sizes<pAG, NG>> infections_ts;
 
+    // Defines how HIV incidence rate is determined
+    // EPP_DIRECTINCID_HTS is incidence rate specified as an input rate,
+    // input every 0.1 year time step (this is current spectrum approach >v6.2)
+    // EPP_DIRECTINCID_ANN is the incidence rate specified as an input rate and
+    // input once per year, this was the spectrum approach before 6.2
+    // There are other options in EPP we need to implement
+    // see https://github.com/mrc-ide/eppasm/blob/master/src/eppasm.cpp#L42-L45
+    // Issue https://github.com/mrc-ide/leapfrog/issues/8
     const int EPP_DIRECTINCID_HTS = 0;
     const int EPP_DIRECTINCID_ANN = 1;
     const int eppmod = EPP_DIRECTINCID_HTS;
@@ -434,6 +467,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 
 
       // hivn_ag is the susceptible population by age and sex
+      // This is the total population - those who already have HIV
       TensorFixedSize<Type, Sizes<pAG, NG>> hivn_ag;
       for(int g = 0; g < NG; g++) {
         for(int a = pIDX_INCIDPOP; a < pAG; a++) {
@@ -442,6 +476,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
 
 
+      // What is this?
       Type Xhivn[NG], Xhivn_incagerr[NG];
       for(int g = 0; g < NG; g++){
         Xhivn[g] = 0.0;
@@ -486,7 +521,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
           for(int hm = 0; hm < hDS; hm++) {
 
             Type cd4mx_scale = 1.0;
-            // !!NOTE: Mortality scaling not yet implemented
+            // What does cd4mx_scale do? Why these conditions?
             if (scale_cd4_mort &
 		(t >= t_ART_start) &
                 (hm >= everARTelig_idx) &
@@ -560,6 +595,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
               // Progressing through the treatment stages
               // FOr children 0- 6 months, 6 - 12 months, etc.
               // Ask Jeff what are they for adults?
+              // Time on ART, for adults < 6 months, 6 - 12 months, 12+ but this is configurable
+              // hTS-1 because no one goes out of final group as open ended
               for(int hu = 0; hu < (hTS - 1); hu++) {
                 gradART(hu, hm, ha, g) += -artstrat_adult(hu, hm, ha, g, t) / h_art_stage_dur[hu];
                 gradART(hu+1, hm, ha, g) += artstrat_adult(hu, hm, ha, g, t) / h_art_stage_dur[hu];
@@ -579,8 +616,19 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         // ART initiation
         for(int g = 0; g < NG; g++){
 
+          // ha is HIV age group
+          // hm is HIV stage
+          // this value is the number who are eligible by age and stage
           TensorFixedSize<Type, Sizes<hDS, hAG_15PLUS>> artelig_hahm;
 
+
+          // TODO: Let's go through this bit too
+
+          // Xart_15plus - accumulate no who are on ART age 15+
+          // Xartelig_15plus - acummulate no who are eligible and untreated age 15+
+          // expect_mort_artelig15plus - accumulate the mortality rate amongst untreated population
+          // which we use to determine propensity to initiate treatment
+          // X indicates a state space, unstratified
           Type Xart_15plus = 0.0, Xartelig_15plus = 0.0, expect_mort_artelig15plus = 0.0;
           for(int ha = hIDX_15PLUS; ha < hAG; ha++) {
             for(int hm = everARTelig_idx; hm < hDS; hm++) {
@@ -613,8 +661,15 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
             // }
           } // loop over ha
 
-          // calculate number on ART at end of ts, based on number or percent
+          // TODO: and this bit
+          // artnum_hts is total number by sex to initiate on ART (we distribute this over treatment stages later)
+
+          // Make an issue for Jeff, check if this code is updated with calendar year projection in Spectrum?
+
+          // In the future it is a % target but in historic data it is a number
           Type artnum_hts = 0.0;
+
+          // Difference between  mid year - mid year and start - end year projection
           if (dt*(hts+1) < 0.5) {
             if ( (!art15plus_isperc(g, t-2)) & (!art15plus_isperc(g, t-1)) ){ // both numbers
               artnum_hts = (0.5-dt*(hts+1))*art15plus_num(g, t-2) + (dt*(hts+1)+0.5)*art15plus_num(g, t-1);
@@ -647,11 +702,18 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
           for(int ha = hIDX_15PLUS; ha < hAG; ha++) {
 	          for(int hm = anyelig_idx; hm < hDS; hm++) {
 
+	            // How many do we initiate onto treatment within a given age and disease stage
+	            // If we're trying to initiate more people onto ART than there are in this compartment, this would result in
+	            // negative people within that compartment, this condition deaths with that
               if (Xartelig_15plus > 0.0) {
                 Type artinit_hahm = artinit_hts * artelig_hahm(hm, ha-hIDX_15PLUS) * ((1.0 - art_alloc_mxweight)/Xartelig_15plus + art_alloc_mxweight * cd4_mort(hm, ha, g) / expect_mort_artelig15plus);
+
+                // Is the number I want to initiate > the number currently on ART
                 if (artinit_hahm > artelig_hahm(hm, ha-hIDX_15PLUS)) {
                   artinit_hahm = artelig_hahm(hm, ha-hIDX_15PLUS);
                 }
+
+                // Is this number > the number currently on ART accounting for the movement of people
                 if (artinit_hahm > hivstrat_adult(hm, ha, g, t) + dt * grad(hm, ha, g)) {
                   artinit_hahm = hivstrat_adult(hm, ha, g, t) + dt * grad(hm, ha, g);
                 }
