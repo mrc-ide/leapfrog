@@ -14,7 +14,7 @@ parameters <- readRDS(file.path(scripts_dir, "../tests/testthat/testdata/project
 message("Benchmarking coarse stratified fit")
 bench::mark(
   leapfrog = leapfrog::leapfrogR(demp, parameters, hiv_strat = "coarse"),
-  frogger = frogger::run_base_model(demp, parameters, NULL, NULL, 0:60, hiv_age_stratification = "coarse"),
+  frogger = frogger::run_model(demp, parameters, NULL, NULL, 0:60, hiv_age_stratification = "coarse"),
   iterations = 10,
   check = FALSE
 )
@@ -22,7 +22,7 @@ bench::mark(
 message("Benchmarking full fit")
 bench::mark(
   leapfrog = leapfrog::leapfrogR(demp, parameters, hiv_strat = "full"),
-  frogger = frogger::run_base_model(demp, parameters, NULL, NULL, 0:60, hiv_age_stratification = "full"),
+  frogger = frogger::run_model(demp, parameters, NULL, NULL, 0:60, hiv_age_stratification = "full"),
   iterations = 10,
   check = FALSE
 )
