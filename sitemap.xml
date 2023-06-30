@@ -19,6 +19,9 @@
     <loc>/reference/index.html</loc>
   </url>
   <url>
+    <loc>/reference/run_model.html</loc>
+  </url>
+  <url>
     <loc>/reference/serialize_r_to_tensor.html</loc>
   </url>
 </urlset>
