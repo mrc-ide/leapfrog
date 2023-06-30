@@ -236,21 +236,22 @@ int main(int argc, char *argv[]) {
                                             params.disease_stages, params.age_groups_hiv,
                                             params.treatment_stages);
 
-  const char *is_profiling = std::getenv("PROFILING");
+  const char *n_runs_char = std::getenv("N_RUNS");
   size_t n_runs = 1;
-  if (is_profiling != NULL) {
+  if (n_runs_char != nullptr) {
     // If we're profiling we want to get accurate info about where time is spent during the
     // main model fit. This runs so quickly though that just going through once won't sample enough
     // times for us to see. And it will sample from the tensor file serialization/deserialization more.
     // So we run the actual model fit multiple times when profiling so the sampler can actually pick
     // up the slow bits.
-    n_runs = 1000;
+    n_runs = atoi(n_runs_char);
+    std::cout << "Running model fit " << n_runs << " times" << std::endl;
   }
 
   for (size_t i = 0; i < n_runs; ++i) {
     leapfrog::internal::initialise_model_state(params, state_current);
     auto state_next = state_current;
-    
+
     // Save initial state
     state_output.save_state(state_current, 0);
 
