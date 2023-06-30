@@ -1,15 +1,9 @@
 #!/usr/bin/env Rscript
 
-args <- commandArgs()
-## Args will come through as e.g. c("/usr/lib/R/bin/exec/R", "--no-echo", "--no-restore", "--file=./scripts/benchmark")
-## We want to pull the value of the --file arg
-file <- args[vapply(args, function(arg) grepl("^--file=.*$", arg), logical(1))]
-command_path <- normalizePath(strsplit(file, "=")[[1]][2], mustWork = TRUE)
-scripts_dir <- dirname(command_path)
+root_dir <- here::here()
 
-
-demp <- readRDS(file.path(scripts_dir, "../tests/testthat/testdata/demographic_projection_object.rds"))
-parameters <- readRDS(file.path(scripts_dir, "../tests/testthat/testdata/projection_parameters.rds"))
+demp <- readRDS(file.path(root_dir, "tests/testthat/testdata/demographic_projection_object.rds"))
+parameters <- readRDS(file.path(root_dir, "tests/testthat/testdata/projection_parameters.rds"))
 
 message("Benchmarking coarse stratified fit")
 bench::mark(
