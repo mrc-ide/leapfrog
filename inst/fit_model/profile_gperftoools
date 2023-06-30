@@ -6,6 +6,6 @@ set -e
 ## reading this output
 ./configure
 make gprofile
-CPUPROFILE="myprof.log" CPUPROFILE_FREQUENCY=1000 ./model_gprofile 60 10 data output
+CPUPROFILE="myprof.log" PROFILING="true" CPUPROFILE_FREQUENCY=1000 ./model_gprofile 60 10 data output
 google-pprof --text ./model_gprofile myprof.log
 google-pprof -web ./model_gprofile myprof.log

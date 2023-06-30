@@ -215,28 +215,38 @@ int main(int argc, char *argv[]) {
                                                art15plus_num,
                                                art15plus_isperc};
 
-  // Fit the model
-  leapfrog::State<double> state_current(params.age_groups_pop, params.num_genders,
-                                        params.disease_stages, params.age_groups_hiv,
-                                        params.treatment_stages);
-
-  // TODO: Make this runnable without passing intermediate data in
-  leapfrog::internal::initialise_model_state(params, state_current);
-  auto state_next = state_current;
   leapfrog::internal::IntermediateData<double> intermediate(params.age_groups_pop, params.age_groups_hiv,
                                                             params.num_genders,
                                                             params.disease_stages, params.treatment_stages,
                                                             params.age_groups_hiv_15plus);
-  intermediate.reset();
+  leapfrog::State<double> state_current(params.age_groups_pop, params.num_genders,
+                                        params.disease_stages, params.age_groups_hiv,
+                                        params.treatment_stages);
 
-  // Each time step is mid-point of the year
-  for (int step = 1; step <= sim_years; ++step) {
-    state_next.reset();
-    leapfrog::run_general_pop_demographic_projection(step, params, state_current, state_next, intermediate);
-    leapfrog::run_hiv_pop_demographic_projection(step, params, state_current, state_next, intermediate);
-    leapfrog::run_hiv_model_simulation(step, params, state_current, state_next, intermediate);
-    std::swap(state_current, state_next);
+  const char *is_profiling = std::getenv("PROFILING");
+  size_t n_runs = 1;
+  if (is_profiling != NULL) {
+    // If we're profiling we want to get accurate info about where time is spent during the
+    // main model fit. This runs so quickly though that just going through once won't sample enough
+    // times for us to see. And it will sample from the tensor file serialization/deserialization more.
+    // So we run the actual model fit multiple times when profiling so the sampler can actually pick
+    // up the slow bits.
+    n_runs = 1000;
+  }
+  for (size_t i = 0; i < n_runs; ++i) {
+    leapfrog::internal::initialise_model_state(params, state_current);
+    auto state_next = state_current;
     intermediate.reset();
+
+    // Each time step is mid-point of the year
+    for (int step = 1; step <= sim_years; ++step) {
+      state_next.reset();
+      leapfrog::run_general_pop_demographic_projection(step, params, state_current, state_next, intermediate);
+      leapfrog::run_hiv_pop_demographic_projection(step, params, state_current, state_next, intermediate);
+      leapfrog::run_hiv_model_simulation(step, params, state_current, state_next, intermediate);
+      std::swap(state_current, state_next);
+      intermediate.reset();
+    }
   }
   std::cout << "Fit complete" << std::endl;
 

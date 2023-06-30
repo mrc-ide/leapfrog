@@ -4,5 +4,5 @@ set -e
 
 ./configure
 make
-perf record -g ./fit_model 60 10 data output
+PROFILING=true perf record -g ./fit_model 60 10 data output
 perf report
