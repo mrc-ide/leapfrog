@@ -44,3 +44,12 @@ deserialize_tensor_to_r <- function(path) {
   array(as.numeric(strsplit(content[[3]], ",\\s*")[[1]]),
         as.numeric(strsplit(content[[2]], ",\\s*")[[1]]))
 }
+
+assert_enum <- function(x, values, name = deparse(substitute(x))) {
+  if (!(x %in% values)) {
+    value_text <- paste(sprintf("'%s'", values), collapse = ", ")
+    stop(sprintf("%s must be one of %s, got '%s'", name, value_text, x),
+         call. = FALSE)
+  }
+  invisible(TRUE)
+}
