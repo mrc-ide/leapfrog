@@ -12,8 +12,8 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // run_base_model
-Rcpp::List run_base_model(const Rcpp::List data, const Rcpp::List projection_parameters, SEXP sim_years, SEXP hiv_steps_per_year, std::string hiv_age_stratification);
-RcppExport SEXP _frogger_run_base_model(SEXP dataSEXP, SEXP projection_parametersSEXP, SEXP sim_yearsSEXP, SEXP hiv_steps_per_yearSEXP, SEXP hiv_age_stratificationSEXP) {
+Rcpp::List run_base_model(const Rcpp::List data, const Rcpp::List projection_parameters, SEXP sim_years, SEXP hiv_steps_per_year, std::string hiv_age_stratification, const int n_simulations);
+RcppExport SEXP _frogger_run_base_model(SEXP dataSEXP, SEXP projection_parametersSEXP, SEXP sim_yearsSEXP, SEXP hiv_steps_per_yearSEXP, SEXP hiv_age_stratificationSEXP, SEXP n_simulationsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -22,7 +22,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< SEXP >::type sim_years(sim_yearsSEXP);
     Rcpp::traits::input_parameter< SEXP >::type hiv_steps_per_year(hiv_steps_per_yearSEXP);
     Rcpp::traits::input_parameter< std::string >::type hiv_age_stratification(hiv_age_stratificationSEXP);
-    rcpp_result_gen = Rcpp::wrap(run_base_model(data, projection_parameters, sim_years, hiv_steps_per_year, hiv_age_stratification));
+    Rcpp::traits::input_parameter< const int >::type n_simulations(n_simulationsSEXP);
+    rcpp_result_gen = Rcpp::wrap(run_base_model(data, projection_parameters, sim_years, hiv_steps_per_year, hiv_age_stratification, n_simulations));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -53,7 +54,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_frogger_run_base_model", (DL_FUNC) &_frogger_run_base_model, 5},
+    {"_frogger_run_base_model", (DL_FUNC) &_frogger_run_base_model, 6},
     {"_frogger_serialize_vector", (DL_FUNC) &_frogger_serialize_vector, 3},
     {"_frogger_deserialize_vector", (DL_FUNC) &_frogger_deserialize_vector, 2},
     {NULL, NULL, 0}

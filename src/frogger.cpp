@@ -59,7 +59,8 @@ Rcpp::List run_base_model(const Rcpp::List data,
                           const Rcpp::List projection_parameters,
                           SEXP sim_years,
                           SEXP hiv_steps_per_year,
-                          std::string hiv_age_stratification = "full") {
+                          std::string hiv_age_stratification = "full",
+			  const int n_simulations = 1) {
   const int proj_years = get_simulation_years(data, sim_years);
   const int hiv_steps = get_hiv_steps_per_year(hiv_steps_per_year);
   const double dt = (1.0 / hiv_steps);
@@ -168,7 +169,13 @@ Rcpp::List run_base_model(const Rcpp::List data,
                                                art15plus_num,
                                                art15plus_isperc};
 
+
   auto state = leapfrog::run_model(proj_years, params);
+  if (n_simulations > 1) {
+    for (int i = 1; i < n_simulations; i++) {
+      state = leapfrog::run_model(proj_years, params);
+    }
+  }
 
   Rcpp::NumericVector r_total_population(age_groups_pop * num_genders);
   Rcpp::NumericVector r_births(1);
