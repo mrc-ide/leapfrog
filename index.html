@@ -86,9 +86,6 @@
 </li>
 <li>Add a test that checks that no <code>double</code>s are used in <code>inst/include</code> dir. We should be using templated <code>real_type</code> for TMB</li>
 <li>Add a broad level overview of the algorithm - is there a diagram available?</li>
-<li>Add a test which proves that C++ code can be compiled standalone, one exists in dust that can be used as inspriration</li>
-<li>Tidy data copying a tensor2 to matrix and a tensor n to array utility functions which should be used in C++ R interface “src/frogger.cpp”</li>
-<li>Ensure input data is not copied, we can read from the data that R owns (as long as don’t write to it)</li>
 <li>Convert string flags to the model to enums if we need to switch on them in several places. This should make it easier to reason about in C++ world and isolate the string checking to a single place</li>
 <li>Update <code>gender</code> terminology to sex</li>
 <li>Previously <code>hiv_negative_pop</code> was fixed size by having dimensions specified by template, how much does this speed up the code? Is there a better way to do this?</li>
@@ -101,9 +98,6 @@
 <li>Review what we pass as parameters - can some of these be computed in the struct ctor? e.g. <a href="https://github.com/mrc-ide/frogger/pull/7#discussion_r1217890466" class="external-link uri">https://github.com/mrc-ide/frogger/pull/7#discussion_r1217890466</a>
 </li>
 <li>Add function for calculating incidence rate per sex <a href="https://github.com/mrc-ide/frogger/pull/7#discussion_r1217848792" class="external-link uri">https://github.com/mrc-ide/frogger/pull/7#discussion_r1217848792</a>
-</li>
-<li>Make fit work with coarse ages (at the moment not reading all of the coarse stratified data)</li>
-<li>Remove duplicate reading of <code>hAG_SPAN_full</code>, read this as <code>hiv_age_groups_span</code> and <code>age_groups_hiv_span</code>
 </li>
 <li>Refactor <code>OutputState</code> to take a struct of state-space dimensions instead of unpacking the subset of parameters we need. See <a href="https://github.com/mrc-ide/frogger/pull/12#discussion_r1245170775" class="external-link uri">https://github.com/mrc-ide/frogger/pull/12#discussion_r1245170775</a>
 </li>
