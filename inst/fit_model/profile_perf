@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -e
+
+./configure
+make
+N_RUNS=1000 perf record -g ./fit_model 60 10 data output
+perf report
