@@ -347,39 +347,28 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     const int EPP_DIRECTINCID_HTS = 0;
     const int EPP_DIRECTINCID_ANN = 1;
     const int eppmod = EPP_DIRECTINCID_HTS;
+
+    Type Xhivn[NG], incrate_g[NG];
     if(eppmod == EPP_DIRECTINCID_ANN ||
        eppmod == EPP_DIRECTINCID_HTS ) {
 
-      // Calculating new infections once per year (like Spectrum)
+      // Calculate incidence rate by sex
+      // 
+      // Note: In Spectrum, incidence rate by age is calculated per time-step using the
+      // **current year** HIV population, instead of the previous year HIV population.
+      // Rob Glaubius, 5 August 2022: https://github.com/mrc-ide/leapfrog/issues/18
 
-      TensorFixedSize<Type, Sizes<pAG, NG>> hivn_ag;
-      for(int g = 0; g < NG; g++) {
-        for(int a = pIDX_INCIDPOP; a < pAG; a++) {
-          hivn_ag(a, g) = totpop1(a, g, t-1) - hivpop1(a, g, t-1);
-        }
-      }
-
-
-      Type Xhivn[NG], Xhivn_incagerr[NG];
       for(int g = 0; g < NG; g++){
         Xhivn[g] = 0.0;
-        Xhivn_incagerr[g] = 0.0;
         for(int a = pIDX_INCIDPOP; a < pIDX_INCIDPOP + pAG_INCIDPOP; a++){
-          Xhivn[g] += hivn_ag(a, g);
-          Xhivn_incagerr[g] += incrr_age(a - pIDX_INCIDPOP, g, t) * hivn_ag(a, g);
+          Xhivn[g] += totpop1(a, g, t-1) - hivpop1(a, g, t-1);
         }
       }
+
 
       Type incrate_i = incidinput(t);
-      Type incrate_g[NG];
       incrate_g[MALE] = incrate_i * (Xhivn[MALE]+Xhivn[FEMALE]) / (Xhivn[MALE] + incrr_sex(t)*Xhivn[FEMALE]);
       incrate_g[FEMALE] = incrate_i * incrr_sex(t)*(Xhivn[MALE]+Xhivn[FEMALE]) / (Xhivn[MALE] + incrr_sex(t)*Xhivn[FEMALE]);
-
-      for(int g = 0; g < NG; g++) {
-        for(int a = pIDX_HIVADULT; a < pAG; a++) {
-          infections_ts(a, g) = hivn_ag(a, g) * incrate_g[g] * incrr_age(a - pIDX_INCIDPOP, g, t) * Xhivn[g] / Xhivn_incagerr[g];
-        }
-      }
     }
 
     for(int hts = 0; hts < hiv_steps_per_year; hts++) {
@@ -422,6 +411,27 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
           }
         }
       }
+
+      // calculate new infections by age
+      if (eppmod == EPP_DIRECTINCID_HTS) {
+
+	for(int g = 0; g < NG; g++) {
+
+	  TensorFixedSize<Type, Sizes<pAG, NG>> hivn_a;
+	  for(int a = pIDX_INCIDPOP; a < pAG; a++) {
+	    hivn_a(a) = totpop1(a, g, t) - hivpop1(a, g, t);
+	  }
+	  
+	  Type Xhivn_incagerr = 0.0;
+	  for(int a = pIDX_INCIDPOP; a < pIDX_INCIDPOP + pAG_INCIDPOP; a++){
+	    Xhivn_incagerr += incrr_age(a - pIDX_INCIDPOP, g, t) * hivn_a(a);
+	  }
+	  
+	  for(int a = pIDX_HIVADULT; a < pAG; a++) {
+	    infections_ts(a, g) = hivn_a(a) * incrate_g[g] * incrr_age(a - pIDX_INCIDPOP, g, t) * Xhivn[g] / Xhivn_incagerr;
+	  }
+	}
+      } 
 
       // add new infections to HIV population
       for(int g = 0; g < NG; g++){
