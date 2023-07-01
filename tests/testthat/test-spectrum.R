@@ -9,11 +9,6 @@ test_that("DemProj only matches EPP-ASM", {
   
   demp <- prepare_leapfrog_demp(pjnz1)
   hivp <- prepare_leapfrog_projp(pjnz1)
-
-  ## Replace netmigr with unadjusted age 0-4 netmigr, which are not
-  ## in EPP-ASM preparation
-  demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
-  demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
   
   lmod <- leapfrogR(demp, hivp)
 
