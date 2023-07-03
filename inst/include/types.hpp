@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unsupported/Eigen/CXX11/Tensor>
+#include "state_space.hpp"
 
 namespace leapfrog {
 
@@ -33,23 +34,14 @@ using Tensor5 = Eigen::Tensor<real_type, 5>;
 
 template<typename real_type>
 struct Parameters {
-  int num_genders;
-  // Default 81 for ages 0 to 80+
-  int age_groups_pop;
   // First index of population eligible for fertility
   int fertility_first_age_group;
   // Number of ages eligible for fertility
   int age_groups_fert;
-  // Numer of age groups in HIV population
-  int age_groups_hiv;
   // Numer of age groups in HIV 15+ population
   int age_groups_hiv_15plus;
-  // Number of HIV disease stages
-  int disease_stages;
   // First index of HIV population to model as adult
   int hiv_adult_first_age_group;
-  // Number of HIV ART treatment stages
-  int treatment_stages;
   // Time step to start ART treatment
   int time_art_start;
   // Index of the youngest age that is reflected in the adult incidence input
@@ -67,9 +59,6 @@ struct Parameters {
 
   real_type art_alloc_mxweight;
 
-  // Number of years in each HIV age group
-  TensorMap1<int> age_groups_hiv_span;
-
   // Incidence rate at each time step
   TensorMap1<real_type> incidence_rate;
 
@@ -84,7 +73,6 @@ struct Parameters {
   TensorMap3<real_type> cd4_progression;
   Tensor1<int> artcd4elig_idx;
   TensorMap3<real_type> cd4_initdist;
-  TensorMap1<int> hiv_age_groups_span;
   TensorMap4<real_type> art_mortality;
   TensorMap2<real_type> artmx_timerr;
   Tensor1<real_type> h_art_stage_dur;
