@@ -11,38 +11,45 @@ Eigen::TensorMap <Eigen::Tensor<T, rank>> tensor_to_tensor_map(Eigen::Tensor <T,
   return Eigen::TensorMap < Eigen::Tensor < T, rank >> (d.data(), d.dimensions());
 }
 
-void save_output(leapfrog::State<double> &state, std::string &output_path) {
-  // Save output
+void save_output(leapfrog::StateSaver<double> &state_saver, std::string &output_path) {
+  auto state = state_saver.get_full_state();
+
   std::filesystem::path out_path(output_path);
   std::filesystem::path total_population_path = out_path / "total_population";
-  serialize::serialize_tensor<double, 2>(state.total_population, total_population_path);
-  std::filesystem::path births_path = out_path / "births";
+  serialize::serialize_tensor<double, 3>(state.total_population, total_population_path);
 
-  // Births is just a double so write it out
-  std::ofstream dest(births_path);
-  dest << state.births << std::endl;
-  dest.close();
+  std::filesystem::path births_path = out_path / "births";
+  serialize::serialize_tensor<double, 1>(state.births, births_path);
 
   std::filesystem::path natural_deaths_path = out_path / "natural_deaths";
-  serialize::serialize_tensor<double, 2>(state.natural_deaths, natural_deaths_path);
+  serialize::serialize_tensor<double, 3>(state.natural_deaths, natural_deaths_path);
+
   std::filesystem::path hiv_population_path = out_path / "hiv_population";
-  serialize::serialize_tensor<double, 2>(state.hiv_population, hiv_population_path);
+  serialize::serialize_tensor<double, 3>(state.hiv_population, hiv_population_path);
+
   std::filesystem::path hiv_natural_deaths_path = out_path / "hiv_natural_deaths";
-  serialize::serialize_tensor<double, 2>(state.hiv_natural_deaths, hiv_natural_deaths_path);
+  serialize::serialize_tensor<double, 3>(state.hiv_natural_deaths, hiv_natural_deaths_path);
+
   std::filesystem::path hiv_strat_adult_path = out_path / "hiv_strat_adult";
-  serialize::serialize_tensor<double, 3>(state.hiv_strat_adult, hiv_strat_adult_path);
+  serialize::serialize_tensor<double, 4>(state.hiv_strat_adult, hiv_strat_adult_path);
+
   std::filesystem::path art_strat_adult_path = out_path / "art_strat_adult";
-  serialize::serialize_tensor<double, 4>(state.art_strat_adult, art_strat_adult_path);
+  serialize::serialize_tensor<double, 5>(state.art_strat_adult, art_strat_adult_path);
+
   std::filesystem::path aids_deaths_no_art_path = out_path / "aids_deaths_no_art";
-  serialize::serialize_tensor<double, 3>(state.aids_deaths_no_art, aids_deaths_no_art_path);
+  serialize::serialize_tensor<double, 4>(state.aids_deaths_no_art, aids_deaths_no_art_path);
+
   std::filesystem::path infections_path = out_path / "infections";
-  serialize::serialize_tensor<double, 2>(state.infections, infections_path);
+  serialize::serialize_tensor<double, 3>(state.infections, infections_path);
+
   std::filesystem::path aids_deaths_art_path = out_path / "aids_deaths_art";
-  serialize::serialize_tensor<double, 4>(state.aids_deaths_art, aids_deaths_art_path);
+  serialize::serialize_tensor<double, 5>(state.aids_deaths_art, aids_deaths_art_path);
+
   std::filesystem::path art_initiation_path = out_path / "art_initiation";
-  serialize::serialize_tensor<double, 3>(state.art_initiation, art_initiation_path);
+  serialize::serialize_tensor<double, 4>(state.art_initiation, art_initiation_path);
+
   std::filesystem::path hiv_deaths_path = out_path / "hiv_deaths";
-  serialize::serialize_tensor<double, 2>(state.hiv_deaths, hiv_deaths_path);
+  serialize::serialize_tensor<double, 3>(state.hiv_deaths, hiv_deaths_path);
 }
 
 int main(int argc, char *argv[]) {
@@ -215,32 +222,53 @@ int main(int argc, char *argv[]) {
                                                art15plus_num,
                                                art15plus_isperc};
 
-  // Fit the model
-  leapfrog::State<double> state_current(params.age_groups_pop, params.num_genders,
-                                        params.disease_stages, params.age_groups_hiv,
-                                        params.treatment_stages);
-
-  // TODO: Make this runnable without passing intermediate data in
-  leapfrog::internal::initialise_model_state(params, state_current);
-  auto state_next = state_current;
   leapfrog::internal::IntermediateData<double> intermediate(params.age_groups_pop, params.age_groups_hiv,
                                                             params.num_genders,
                                                             params.disease_stages, params.treatment_stages,
                                                             params.age_groups_hiv_15plus);
-  intermediate.reset();
+  leapfrog::State<double> state_current(params.age_groups_pop, params.num_genders,
+                                        params.disease_stages, params.age_groups_hiv,
+                                        params.treatment_stages);
 
-  // Each time step is mid-point of the year
-  for (int step = 1; step <= sim_years; ++step) {
-    state_next.reset();
-    leapfrog::run_general_pop_demographic_projection(step, params, state_current, state_next, intermediate);
-    leapfrog::run_hiv_pop_demographic_projection(step, params, state_current, state_next, intermediate);
-    leapfrog::run_hiv_model_simulation(step, params, state_current, state_next, intermediate);
-    std::swap(state_current, state_next);
-    intermediate.reset();
+  std::vector<int> save_steps(61);
+  std::iota(save_steps.begin(), save_steps.end(), 0);
+  leapfrog::StateSaver<double> state_output(sim_years, save_steps, params.age_groups_pop, params.num_genders,
+                                            params.disease_stages, params.age_groups_hiv,
+                                            params.treatment_stages);
+
+  const char *n_runs_char = std::getenv("N_RUNS");
+  size_t n_runs = 1;
+  if (n_runs_char != nullptr) {
+    // If we're profiling we want to get accurate info about where time is spent during the
+    // main model fit. This runs so quickly though that just going through once won't sample enough
+    // times for us to see. And it will sample from the tensor file serialization/deserialization more.
+    // So we run the actual model fit multiple times when profiling so the sampler can actually pick
+    // up the slow bits.
+    n_runs = atoi(n_runs_char);
+    std::cout << "Running model fit " << n_runs << " times" << std::endl;
+  }
+
+  for (size_t i = 0; i < n_runs; ++i) {
+    leapfrog::internal::initialise_model_state(params, state_current);
+    auto state_next = state_current;
+
+    // Save initial state
+    state_output.save_state(state_current, 0);
+
+    // Each time step is mid-point of the year
+    for (int step = 1; step <= sim_years; ++step) {
+      state_next.reset();
+      leapfrog::run_general_pop_demographic_projection(step, params, state_current, state_next, intermediate);
+      leapfrog::run_hiv_pop_demographic_projection(step, params, state_current, state_next, intermediate);
+      leapfrog::run_hiv_model_simulation(step, params, state_current, state_next, intermediate);
+      state_output.save_state(state_next, step);
+      std::swap(state_current, state_next);
+      intermediate.reset();
+    }
   }
   std::cout << "Fit complete" << std::endl;
 
-  save_output(state_current, output_abs);
+  save_output(state_output, output_abs);
 
   return 0;
 }

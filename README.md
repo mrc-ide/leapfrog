@@ -26,10 +26,6 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 * Add a test that checks that no `double`s are used in `inst/include` dir. We should be using templated `real_type` for
   TMB
 * Add a broad level overview of the algorithm - is there a diagram available?
-* Add a test which proves that C++ code can be compiled standalone, one exists in dust that can be used as inspriration
-* Tidy data copying a tensor2 to matrix and a tensor n to array utility functions which should be used in C++ R
-  interface "src/frogger.cpp"
-* Ensure input data is not copied, we can read from the data that R owns (as long as don't write to it)
 * Convert string flags to the model to enums if we need to switch on them in several places. This should make it easier
   to reason about in C++ world and isolate the string checking to a single place
 * Update `gender` terminology to sex
@@ -42,9 +38,8 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
   see https://github.com/mrc-ide/frogger/pull/7#discussion_r1217888684
 * Review what we pass as parameters - can some of these be computed in the struct ctor?
   e.g. https://github.com/mrc-ide/frogger/pull/7#discussion_r1217890466
-* Add function for calculating incidence rate per sex https://github.com/mrc-ide/frogger/pull/7#discussion_r1217848792
-* Make fit work with coarse ages (at the moment not reading all of the coarse stratified data)
-* Remove duplicate reading of `hAG_SPAN_full`, read this as `hiv_age_groups_span` and `age_groups_hiv_span`
+* Refactor `OutputState` to take a struct of state-space dimensions instead of unpacking the subset of parameters we
+  need. See https://github.com/mrc-ide/frogger/pull/12#discussion_r1245170775
 
 ## Leapfrog to Frogger glossary
 

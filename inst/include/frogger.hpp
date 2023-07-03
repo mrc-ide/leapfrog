@@ -3,6 +3,7 @@
 #include "general_demographic_projection.hpp"
 #include "hiv_demographic_projection.hpp"
 #include "model_simulation.hpp"
+#include "state_saver.hpp"
 
 namespace leapfrog {
 
@@ -32,7 +33,8 @@ void initialise_model_state(const Parameters<real_type> &pars,
 }
 
 template<typename real_type>
-State<real_type> run_model(int time_steps, const Parameters<real_type> &pars) {
+typename StateSaver<real_type>::OutputState run_model(int time_steps, std::vector<int> save_steps,
+                                                      const Parameters<real_type> &pars) {
   State<real_type> state(pars.age_groups_pop, pars.num_genders,
                          pars.disease_stages, pars.age_groups_hiv,
                          pars.treatment_stages);
@@ -44,16 +46,23 @@ State<real_type> run_model(int time_steps, const Parameters<real_type> &pars) {
                                                      pars.age_groups_hiv_15plus);
   intermediate.reset();
 
+  StateSaver<real_type> state_output(time_steps, save_steps, pars.age_groups_pop, pars.num_genders,
+                                     pars.disease_stages, pars.age_groups_hiv,
+                                     pars.treatment_stages);
+  // Save initial state
+  state_output.save_state(state, 0);
+
   // Each time step is mid-point of the year
   for (int step = 1; step <= time_steps; ++step) {
     state_next.reset();
     run_general_pop_demographic_projection(step, pars, state, state_next, intermediate);
     run_hiv_pop_demographic_projection(step, pars, state, state_next, intermediate);
     run_hiv_model_simulation(step, pars, state, state_next, intermediate);
+    state_output.save_state(state_next, step);
     std::swap(state, state_next);
     intermediate.reset();
   }
-  return state;
+  return state_output.get_full_state();
 }
 
 }

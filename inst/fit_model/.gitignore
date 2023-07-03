@@ -1,3 +1,7 @@
 Makefile
 fit_model
+model_gprofile
 output
+callgrind.out.*
+myprof.log
+perf.data*

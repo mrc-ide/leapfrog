@@ -60,15 +60,7 @@ void run_add_new_hiv_infections(int time_step,
     }
   }
 
-  intermediate.incidence_rate_sex(MALE) =
-      pars.incidence_rate(time_step) * (intermediate.hiv_neg_aggregate(MALE) + intermediate.hiv_neg_aggregate(FEMALE)) /
-      (intermediate.hiv_neg_aggregate(MALE) +
-       pars.incidence_relative_risk_sex(time_step) * intermediate.hiv_neg_aggregate(FEMALE));
-  intermediate.incidence_rate_sex(FEMALE) =
-      pars.incidence_rate(time_step) * pars.incidence_relative_risk_sex(time_step) *
-      (intermediate.hiv_neg_aggregate(MALE) + intermediate.hiv_neg_aggregate(FEMALE)) /
-      (intermediate.hiv_neg_aggregate(MALE) +
-       pars.incidence_relative_risk_sex(time_step) * intermediate.hiv_neg_aggregate(FEMALE));
+  distribute_incidence_rate_over_sexes(time_step, pars, intermediate);
 
   for (int g = 0; g < pars.num_genders; g++) {
     for (int a = pars.hiv_adult_first_age_group; a < pars.age_groups_pop; a++) {
@@ -80,6 +72,20 @@ void run_add_new_hiv_infections(int time_step,
     }
   }
 }
+
+template<typename real_type>
+void distribute_incidence_rate_over_sexes(
+    const int time_step,
+    const Parameters<real_type> &pars,
+    IntermediateData<real_type> &intermediate) {
+  real_type denominator = intermediate.hiv_neg_aggregate(MALE) +
+                          pars.incidence_relative_risk_sex(time_step) * intermediate.hiv_neg_aggregate(FEMALE);
+  real_type total_neg = intermediate.hiv_neg_aggregate(MALE) + intermediate.hiv_neg_aggregate(FEMALE);
+  intermediate.incidence_rate_sex(MALE) = pars.incidence_rate(time_step) * (total_neg) / denominator;
+  intermediate.incidence_rate_sex(FEMALE) =
+      pars.incidence_rate(time_step) * pars.incidence_relative_risk_sex(time_step) * (total_neg) / denominator;
+}
+
 
 template<typename real_type>
 void run_disease_progression_and_mortality(int hiv_step,

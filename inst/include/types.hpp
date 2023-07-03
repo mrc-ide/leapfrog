@@ -29,6 +29,9 @@ template<typename real_type>
 using Tensor4 = Eigen::Tensor<real_type, 4>;
 
 template<typename real_type>
+using Tensor5 = Eigen::Tensor<real_type, 5>;
+
+template<typename real_type>
 struct Parameters {
   int num_genders;
   // Default 81 for ages 0 to 80+
