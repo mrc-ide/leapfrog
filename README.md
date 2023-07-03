@@ -49,7 +49,7 @@ Frogger naming rules
 * h prefix indicates this is age stratified by same age stratification as HIV population, this might be single year from
   15+ or could be coarse age groups
 * idx prefix means this is an index
-* Uppercase means this is a dimension of the state space e.g. `NG` or `pAG`
+* Uppercase means this is a dimension of the state space e.g. `NS` or `pAG`
 
 ### State space
 
@@ -57,7 +57,7 @@ In `StateSpace` struct
 
 | Leapfrog           | Frogger            | Details                                             |
 |--------------------|--------------------|-----------------------------------------------------|
-| NG                 | NG                 | Number of sexes                                     |
+| NG                 | NS                 | Number of sexes                                     |
 | pAG                | pAG                | Number of age groups in population, 81 for 0 to 80+ |
 | hAG                | hAG                | Number of age groups in HIV population              |
 | hDS                | hDS                | Number of disease stages                            |
@@ -67,7 +67,7 @@ In `StateSpace` struct
 
 #### Loop variable convention
 
-* `NG` is `g`
+* `NS` is `s`
 * `pAG` is `a`
 * `hAG` is `ha`
 * `hDS` is `hm`
@@ -176,7 +176,7 @@ Discussion: naming conventions
 | artnum_hts                |                                 |                                                                           |
 | artcov_hts                |                                 |                                                                           |
 | curr_coverage             |                                 |                                                                           |
-| artinit_hts               | art_initiation                  | Total number by sex to initiate on ART by gender                          |
+| artinit_hts               | art_initiation                  | Total number by sex to initiate on ART by sex                             |
 | artinit_hahm              |                                 | Number who initiate treatment by age and disease stage                    |
 | hivpop_ha(ha)             | hivpop_ha                       | HIV population by coarse HIV age group stratification                     |
 | hivqx_ha                  |                                 |                                                                           |
