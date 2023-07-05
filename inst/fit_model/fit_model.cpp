@@ -11,7 +11,8 @@ Eigen::TensorMap <Eigen::Tensor<T, rank>> tensor_to_tensor_map(Eigen::Tensor <T,
   return Eigen::TensorMap < Eigen::Tensor < T, rank >> (d.data(), d.dimensions());
 }
 
-void save_output(leapfrog::StateSaver<double> &state_saver, std::string &output_path) {
+void save_output(leapfrog::StateSaver<double, leapfrog::HivAgeStratification::full> &state_saver,
+                 std::string &output_path) {
   auto state = state_saver.get_full_state();
 
   std::filesystem::path out_path(output_path);
@@ -207,19 +208,13 @@ int main(int argc, char *argv[]) {
                                                art15plus_num,
                                                art15plus_isperc};
 
-  leapfrog::internal::IntermediateData<double> intermediate(ss.age_groups_pop, ss.age_groups_hiv,
-                                                            ss.num_genders,
-                                                            ss.disease_stages, ss.treatment_stages,
-                                                            params.age_groups_hiv_15plus);
-  leapfrog::State<double> state_current(ss.age_groups_pop, ss.num_genders,
-                                        ss.disease_stages, ss.age_groups_hiv,
-                                        ss.treatment_stages);
+  leapfrog::internal::IntermediateData<double, leapfrog::HivAgeStratification::full> intermediate(
+      params.age_groups_hiv_15plus);
+  leapfrog::State<double, leapfrog::HivAgeStratification::full> state_current;
 
   std::vector<int> save_steps(61);
   std::iota(save_steps.begin(), save_steps.end(), 0);
-  leapfrog::StateSaver<double> state_output(sim_years, save_steps, ss.age_groups_pop, ss.num_genders,
-                                            ss.disease_stages, ss.age_groups_hiv,
-                                            ss.treatment_stages);
+  leapfrog::StateSaver<double, leapfrog::HivAgeStratification::full> state_output(sim_years, save_steps);
 
   const char *n_runs_char = std::getenv("N_RUNS");
   size_t n_runs = 1;
@@ -234,7 +229,7 @@ int main(int argc, char *argv[]) {
   }
 
   for (size_t i = 0; i < n_runs; ++i) {
-    leapfrog::internal::initialise_model_state(ss, params, state_current);
+    leapfrog::internal::initialise_model_state<double, leapfrog::HivAgeStratification::full>(params, state_current);
     auto state_next = state_current;
 
     // Save initial state

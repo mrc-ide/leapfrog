@@ -11,9 +11,9 @@ namespace leapfrog {
 namespace internal {
 
 template<typename real_type, HivAgeStratification S>
-void initialise_model_state(const StateSpace<S> &ss,
-                            const Parameters<real_type> &pars,
-                            State<real_type> &state) {
+void initialise_model_state(const Parameters<real_type> &pars,
+                            State<real_type, S> &state) {
+  constexpr auto ss = StateSpace<S>();
   for (int g = 0; g < ss.num_genders; ++g) {
     for (int a = 0; a < ss.age_groups_pop; ++a) {
       state.total_population(a, g) = pars.base_pop(a, g);
@@ -35,24 +35,17 @@ void initialise_model_state(const StateSpace<S> &ss,
 }
 
 template<typename real_type, HivAgeStratification S>
-typename StateSaver<real_type>::OutputState run_model(int time_steps,
-                                                      std::vector<int> save_steps,
-                                                      const Parameters<real_type> &pars) {
-  constexpr auto ss = StateSpace<S>();
-  State<real_type> state(ss.age_groups_pop, ss.num_genders,
-                         ss.disease_stages, ss.age_groups_hiv,
-                         ss.treatment_stages);
+typename StateSaver<real_type, S>::OutputState run_model(int time_steps,
+                                                         std::vector<int> save_steps,
+                                                         const Parameters<real_type> &pars) {
+  State<real_type, S> state;
 
-  internal::initialise_model_state(ss, pars, state);
+  internal::initialise_model_state<real_type, S>(pars, state);
   auto state_next = state;
-  internal::IntermediateData<real_type> intermediate(ss.age_groups_pop, ss.age_groups_hiv, ss.num_genders,
-                                                     ss.disease_stages, ss.treatment_stages,
-                                                     pars.age_groups_hiv_15plus);
+  internal::IntermediateData<real_type, S> intermediate(pars.age_groups_hiv_15plus);
   intermediate.reset();
 
-  StateSaver<real_type> state_output(time_steps, save_steps, ss.age_groups_pop, ss.num_genders,
-                                     ss.disease_stages, ss.age_groups_hiv,
-                                     ss.treatment_stages);
+  StateSaver<real_type, S> state_output(time_steps, save_steps);
   // Save initial state
   state_output.save_state(state, 0);
 

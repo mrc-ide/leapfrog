@@ -4,7 +4,7 @@
 
 namespace leapfrog {
 
-template<typename real_type>
+template<typename real_type, HivAgeStratification S>
 class StateSaver {
 public:
   struct OutputState {
@@ -27,22 +27,26 @@ public:
                 int age_groups_hiv,
                 int treatment_stages,
                 int no_output_years)
-        : total_population(age_groups_pop, num_genders, no_output_years),
-          natural_deaths(age_groups_pop, num_genders, no_output_years),
-          hiv_population(age_groups_pop, num_genders, no_output_years),
-          hiv_natural_deaths(age_groups_pop, num_genders, no_output_years),
-          hiv_strat_adult(disease_stages, age_groups_hiv, num_genders, no_output_years),
-          art_strat_adult(treatment_stages,
-                          disease_stages,
-                          age_groups_hiv,
-                          num_genders,
+        : total_population(StateSpace<S>().age_groups_pop, StateSpace<S>().num_genders, no_output_years),
+          natural_deaths(StateSpace<S>().age_groups_pop, StateSpace<S>().num_genders, no_output_years),
+          hiv_population(StateSpace<S>().age_groups_pop, StateSpace<S>().num_genders, no_output_years),
+          hiv_natural_deaths(StateSpace<S>().age_groups_pop, StateSpace<S>().num_genders, no_output_years),
+          hiv_strat_adult(StateSpace<S>().disease_stages, StateSpace<S>().age_groups_hiv, StateSpace<S>().num_genders,
+                          no_output_years),
+          art_strat_adult(StateSpace<S>().treatment_stages,
+                          StateSpace<S>().disease_stages,
+                          StateSpace<S>().age_groups_hiv,
+                          StateSpace<S>().num_genders,
                           no_output_years),
           births(no_output_years),
-          aids_deaths_no_art(disease_stages, age_groups_hiv, num_genders, no_output_years),
-          infections(age_groups_pop, num_genders, no_output_years),
-          aids_deaths_art(treatment_stages, disease_stages, age_groups_hiv, num_genders, no_output_years),
-          art_initiation(disease_stages, age_groups_hiv, num_genders, no_output_years),
-          hiv_deaths(age_groups_pop, num_genders, no_output_years) {
+          aids_deaths_no_art(StateSpace<S>().disease_stages, StateSpace<S>().age_groups_hiv,
+                             StateSpace<S>().num_genders, no_output_years),
+          infections(StateSpace<S>().age_groups_pop, StateSpace<S>().num_genders, no_output_years),
+          aids_deaths_art(StateSpace<S>().treatment_stages, StateSpace<S>().disease_stages,
+                          StateSpace<S>().age_groups_hiv, StateSpace<S>().num_genders, no_output_years),
+          art_initiation(StateSpace<S>().disease_stages, StateSpace<S>().age_groups_hiv,
+                         StateSpace<S>().num_genders, no_output_years),
+          hiv_deaths(StateSpace<S>().age_groups_pop, StateSpace<S>().num_genders, no_output_years) {
       total_population.setZero();
       natural_deaths.setZero();
       hiv_population.setZero();
@@ -59,14 +63,10 @@ public:
   };
 
   StateSaver(int time_steps,
-             std::vector<int> save_steps,
-             int age_groups_pop,
-             int num_genders,
-             int disease_stages,
-             int age_groups_hiv,
-             int treatment_stages) :
+             std::vector<int> save_steps) :
       save_steps(save_steps),
-      full_state(age_groups_pop, num_genders, disease_stages, age_groups_hiv, treatment_stages, save_steps.size()) {
+      full_state(StateSpace<S>().age_groups_pop, StateSpace<S>().num_genders, StateSpace<S>().disease_stages,
+                 StateSpace<S>().age_groups_hiv, StateSpace<S>().treatment_stages, save_steps.size()) {
     for (int step: save_steps) {
       if (step < 0) {
         std::stringstream ss;
@@ -83,7 +83,7 @@ public:
   }
 
 
-  void save_state(const State<real_type> &state, int current_year) {
+  void save_state(const State<real_type, S> &state, int current_year) {
     for (size_t i = 0; i < save_steps.size(); ++i) {
       if (current_year == save_steps[i]) {
         full_state.total_population.chip(i, full_state.total_population.NumDimensions - 1) = state.total_population;

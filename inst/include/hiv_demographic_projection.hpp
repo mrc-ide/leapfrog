@@ -10,9 +10,9 @@ namespace internal {
 template<typename real_type, HivAgeStratification S>
 void run_hiv_ageing_and_mortality(int time_step,
                                   const Parameters<real_type> &pars,
-                                  const State<real_type> &state_curr,
-                                  State<real_type> &state_next,
-                                  IntermediateData<real_type> &intermediate) {
+                                  const State<real_type, S> &state_curr,
+                                  State<real_type, S> &state_next,
+                                  IntermediateData<real_type, S> &intermediate) {
   constexpr auto ss = StateSpace<S>();
   // Non-hiv deaths
   for (int g = 0; g < ss.num_genders; ++g) {
@@ -35,9 +35,9 @@ void run_hiv_ageing_and_mortality(int time_step,
 template<typename real_type, HivAgeStratification S>
 void run_hiv_and_art_stratified_ageing(int time_step,
                                        const Parameters<real_type> &pars,
-                                       const State<real_type> &state_curr,
-                                       State<real_type> &state_next,
-                                       IntermediateData<real_type> &intermediate) {
+                                       const State<real_type, S> &state_curr,
+                                       State<real_type, S> &state_next,
+                                       IntermediateData<real_type, S> &intermediate) {
   constexpr auto ss = StateSpace<S>();
   // age coarse stratified HIV population
   for (int g = 0; g < ss.num_genders; ++g) {
@@ -99,9 +99,9 @@ template<typename real_type, HivAgeStratification S>
 void run_hiv_and_art_stratified_deaths_and_migration(
     int time_step,
     const Parameters<real_type> &pars,
-    const State<real_type> &state_curr,
-    State<real_type> &state_next,
-    IntermediateData<real_type> &intermediate) {
+    const State<real_type, S> &state_curr,
+    State<real_type, S> &state_next,
+    IntermediateData<real_type, S> &intermediate) {
   constexpr auto ss = StateSpace<S>();
   for (int g = 0; g < ss.num_genders; ++g) {
     int a = pars.hiv_adult_first_age_group;
@@ -154,9 +154,9 @@ void run_hiv_and_art_stratified_deaths_and_migration(
 template<typename real_type, HivAgeStratification S>
 void run_hiv_pop_demographic_projection(int time_step,
                                         const Parameters<real_type> &pars,
-                                        const State<real_type> &state_curr,
-                                        State<real_type> &state_next,
-                                        internal::IntermediateData<real_type> &intermediate) {
+                                        const State<real_type, S> &state_curr,
+                                        State<real_type, S> &state_next,
+                                        internal::IntermediateData<real_type, S> &intermediate) {
   internal::run_hiv_ageing_and_mortality<real_type, S>(time_step, pars, state_curr, state_next,
                                                        intermediate);
   internal::run_hiv_and_art_stratified_ageing<real_type, S>(time_step, pars, state_curr, state_next,

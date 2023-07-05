@@ -81,7 +81,7 @@ struct Parameters {
   TensorMap2<int> art15plus_isperc;
 };
 
-template<typename real_type>
+template<typename real_type, HivAgeStratification S>
 struct State {
   Tensor2<real_type> total_population;
   Tensor2<real_type> natural_deaths;
@@ -96,25 +96,21 @@ struct State {
   Tensor3<real_type> art_initiation;
   Tensor2<real_type> hiv_deaths;
 
-  State(int age_groups_pop,
-        int num_genders,
-        int disease_stages,
-        int age_groups_hiv,
-        int treatment_stages)
-      : total_population(age_groups_pop, num_genders),
-        natural_deaths(age_groups_pop, num_genders),
-        hiv_population(age_groups_pop, num_genders),
-        hiv_natural_deaths(age_groups_pop, num_genders),
-        hiv_strat_adult(disease_stages, age_groups_hiv, num_genders),
-        art_strat_adult(treatment_stages,
-                        disease_stages,
-                        age_groups_hiv,
-                        num_genders),
-        aids_deaths_no_art(disease_stages, age_groups_hiv, num_genders),
-        infections(age_groups_pop, num_genders),
-        aids_deaths_art(treatment_stages, disease_stages, age_groups_hiv, num_genders),
-        art_initiation(disease_stages, age_groups_hiv, num_genders),
-        hiv_deaths(age_groups_pop, num_genders) {}
+  State() : total_population(StateSpace<S>().age_groups_pop, StateSpace<S>().num_genders),
+            natural_deaths(StateSpace<S>().age_groups_pop, StateSpace<S>().num_genders),
+            hiv_population(StateSpace<S>().age_groups_pop, StateSpace<S>().num_genders),
+            hiv_natural_deaths(StateSpace<S>().age_groups_pop, StateSpace<S>().num_genders),
+            hiv_strat_adult(StateSpace<S>().disease_stages, StateSpace<S>().age_groups_hiv,
+                            StateSpace<S>().num_genders),
+            art_strat_adult(StateSpace<S>().treatment_stages, StateSpace<S>().disease_stages,
+                            StateSpace<S>().age_groups_hiv, StateSpace<S>().num_genders),
+            aids_deaths_no_art(StateSpace<S>().disease_stages, StateSpace<S>().age_groups_hiv,
+                               StateSpace<S>().num_genders),
+            infections(StateSpace<S>().age_groups_pop, StateSpace<S>().num_genders),
+            aids_deaths_art(StateSpace<S>().treatment_stages, StateSpace<S>().disease_stages,
+                            StateSpace<S>().age_groups_hiv, StateSpace<S>().num_genders),
+            art_initiation(StateSpace<S>().disease_stages, StateSpace<S>().age_groups_hiv, StateSpace<S>().num_genders),
+            hiv_deaths(StateSpace<S>().age_groups_pop, StateSpace<S>().num_genders) {}
 
   void reset() {
     total_population.setZero();
@@ -138,7 +134,7 @@ const int MALE = 0;
 const int FEMALE = 1;
 const int ART0MOS = 0;
 
-template<typename real_type>
+template<typename real_type, HivAgeStratification S>
 struct IntermediateData {
   Tensor2<real_type> migration_rate;
   Tensor2<real_type> hiv_net_migration;
@@ -174,23 +170,22 @@ struct IntermediateData {
   real_type hivqx_ha;
   real_type hivdeaths_a;
 
-  IntermediateData(int age_groups_pop, int age_groups_hiv, int num_genders, int disease_stages,
-                   int treatment_stages,
-                   int age_groups_hiv_15plus)
-      : migration_rate(age_groups_pop, num_genders),
-        hiv_net_migration(age_groups_pop, num_genders),
-        hiv_population_coarse_ages(age_groups_hiv, num_genders),
-        hiv_age_up_prob(age_groups_hiv, num_genders),
-        hiv_negative_pop(age_groups_pop, num_genders),
-        infections_ts(age_groups_pop, num_genders),
-        incidence_rate_sex(num_genders),
-        hiv_neg_aggregate(num_genders),
-        Xhivn_incagerr(num_genders),
-        hiv_deaths_age_sex(age_groups_hiv, num_genders),
-        grad(disease_stages, age_groups_hiv, num_genders),
-        gradART(treatment_stages, disease_stages, age_groups_hiv, num_genders),
-        artelig_hahm(disease_stages, age_groups_hiv_15plus),
-        hivpop_ha(age_groups_hiv),
+  IntermediateData(int age_groups_hiv_15plus)
+      : migration_rate(StateSpace<S>().age_groups_pop, StateSpace<S>().num_genders),
+        hiv_net_migration(StateSpace<S>().age_groups_pop, StateSpace<S>().num_genders),
+        hiv_population_coarse_ages(StateSpace<S>().age_groups_hiv, StateSpace<S>().num_genders),
+        hiv_age_up_prob(StateSpace<S>().age_groups_hiv, StateSpace<S>().num_genders),
+        hiv_negative_pop(StateSpace<S>().age_groups_pop, StateSpace<S>().num_genders),
+        infections_ts(StateSpace<S>().age_groups_pop, StateSpace<S>().num_genders),
+        incidence_rate_sex(StateSpace<S>().num_genders),
+        hiv_neg_aggregate(StateSpace<S>().num_genders),
+        Xhivn_incagerr(StateSpace<S>().num_genders),
+        hiv_deaths_age_sex(StateSpace<S>().age_groups_hiv, StateSpace<S>().num_genders),
+        grad(StateSpace<S>().disease_stages, StateSpace<S>().age_groups_hiv, StateSpace<S>().num_genders),
+        gradART(StateSpace<S>().treatment_stages, StateSpace<S>().disease_stages, StateSpace<S>().age_groups_hiv,
+                StateSpace<S>().num_genders),
+        artelig_hahm(StateSpace<S>().disease_stages, age_groups_hiv_15plus),
+        hivpop_ha(StateSpace<S>().age_groups_hiv),
         cd4mx_scale(1.0),
         artpop_hahm(0.0),
         deaths(0.0),
