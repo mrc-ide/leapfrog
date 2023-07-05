@@ -3,6 +3,7 @@
 #include "frogger.hpp"
 #include "types.hpp"
 #include "state_space.hpp"
+#include "model_setup.cpp"
 
 int transform_simulation_years(const Rcpp::List demp, SEXP r_sim_years) {
   Rcpp::NumericVector Sx = demp["Sx"];
@@ -44,41 +45,6 @@ leapfrog::StateSpace<S> get_state_space(const std::string hiv_age_stratification
   return ss;
 }
 
-template <typename T>
-T* r_data(SEXP x) {
-  static_assert(sizeof(T) == 0, "Only specializations of r_data can be used");
-}
-
-template <>
-double* r_data(SEXP x) {
-  return REAL(x);
-}
-
-template <>
-int * r_data(SEXP x) {
-  return INTEGER(x);
-}
-
-template<typename T, typename... Args>
-auto parse_data(const Rcpp::List data, const std::string& key, Args... dims) {
-  constexpr std::size_t rank = sizeof...(dims);
-  Eigen::array<int, rank> dimensions{ static_cast<int>(dims)... };
-
-  int length = std::accumulate(dimensions.begin(), dimensions.end(), 1, std::multiplies<int>());
-  SEXP array_data = data[key];
-  // In cases where the input data has project years we might not use all of it model fit
-  // So we can take create a Map over a smaller slice of the data
-  // As long as this is true we can be confident we're not referencing invalid memory
-  if (LENGTH(array_data) < length) {
-    Rcpp::stop("Invalid size of data for '%s', expected %d got %d",
-               key,
-               length,
-               LENGTH(array_data));
-  }
-
-  return Eigen::TensorMap<Eigen::Tensor<T, rank>>(r_data<T>(array_data), static_cast<int>(dims)...);
-}
-
 std::vector<int> transform_output_steps(Rcpp::NumericVector output_steps) {
   return Rcpp::as<std::vector<int>>(output_steps);
 }
@@ -86,104 +52,18 @@ std::vector<int> transform_output_steps(Rcpp::NumericVector output_steps) {
 template <leapfrog::HivAgeStratification S>
 Rcpp::List fit_model(const leapfrog::StateSpace<S> ss,
                      const Rcpp::List data,
-                     const Rcpp::List projection_parameters,
                      const int proj_years,
                      const int hiv_steps,
                      const std::vector<int> save_steps) {
-  const double dt = (1.0 / hiv_steps);
-  const int fertility_first_age_group = 15;
-  const int age_groups_fert = 35;
-  const int hiv_adult_first_age_group = 15;
-  const int adult_incidence_first_age_group = hiv_adult_first_age_group;
-  // Hardcoded 15-49 for now (35 groups within this band)
-  const int pAG_INCIDPOP = 35;
-  // 0-based indexing vs R 1-based
-  const int time_art_start =
-      Rcpp::as<int>(projection_parameters["t_ART_start"]) - 1;
-  int age_groups_hiv_15plus = ss.age_groups_hiv;
-  const int scale_cd4_mortality =
-      Rcpp::as<int>(projection_parameters["scale_cd4_mort"]);
-  int hIDX_15PLUS = 0;
-  const double art_alloc_mxweight = Rcpp::as<double>(projection_parameters["art_alloc_mxweight"]);
-
-  const leapfrog::TensorMap2<double> base_pop = parse_data<double>(data, "basepop",
-                                                                   ss.age_groups_pop, ss.num_genders);
-
-  // Survival has size age_groups_pop + 1 as this is the probability of
-  // surviving between ages, so from 0 to 1, 1 to 2, ..., 79 to 80+ and
-  // 80+ to 80+
-  const leapfrog::TensorMap3<double> survival = parse_data<double>(data, "Sx",
-                                                                   ss.age_groups_pop + 1, ss.num_genders, proj_years);
-  const leapfrog::TensorMap3<double> net_migration = parse_data<double>(data, "netmigr_adj",
-                                                                        ss.age_groups_pop, ss.num_genders, proj_years);
-  const leapfrog::TensorMap2<double> age_sex_fertility_ratio = parse_data<double>(data, "asfr",
-                                                                                  age_groups_fert, proj_years);
-  const leapfrog::TensorMap2<double> births_sex_prop = parse_data<double>(data, "births_sex_prop",
-                                                                          ss.num_genders, proj_years);
-  const leapfrog::TensorMap1<double> incidence_rate = parse_data<double>(projection_parameters, "incidinput",
-                                                                         proj_years);
-  const leapfrog::TensorMap3<double> incidence_relative_risk_age = parse_data<double>(
-      projection_parameters, "incrr_age", ss.age_groups_pop - hiv_adult_first_age_group, ss.num_genders, proj_years);
-  const leapfrog::TensorMap1<double> incidence_relative_risk_sex = parse_data<double>(projection_parameters,
-                                                                                      "incrr_sex", proj_years);
-  const leapfrog::TensorMap3<double> cd4_mortality = parse_data<double>(projection_parameters, "cd4_mort",
-                                                                        ss.disease_stages, ss.age_groups_hiv, ss.num_genders);
-  const leapfrog::TensorMap3<double> cd4_progression = parse_data<double>(projection_parameters, "cd4_prog",
-                                                                          ss.disease_stages - 1, ss.age_groups_hiv,
-                                                                          ss.num_genders);
-
-  leapfrog::Tensor1<int> artcd4elig_idx = parse_data<int>(projection_parameters, "artcd4elig_idx", proj_years + 1);
-  for (int i = 0; i <= proj_years; ++i) {
-    // 0-based indexing in C++ vs 1-based indexing in R
-    artcd4elig_idx(i) = artcd4elig_idx(i) - 1;
+  const leapfrog::Options<double, S> opts = {
+      (1.0 / hiv_steps),
+      hiv_adult_first_age_group,
+      Rcpp::as<int>(data["t_ART_start"]) - 1,
+      Rcpp::as<int>(data["scale_cd4_mort"]),
+      Rcpp::as<double>(data["art_alloc_mxweight"])
   }
 
-  const leapfrog::TensorMap3<double> cd4_initdist = parse_data<double>(projection_parameters, "cd4_initdist",
-                                                                       ss.disease_stages, ss.age_groups_hiv, ss.num_genders);
-  const leapfrog::TensorMap4<double> art_mortality = parse_data<double>(projection_parameters, "art_mort",
-                                                                        ss.treatment_stages, ss.disease_stages,
-                                                                        ss.age_groups_hiv, ss.num_genders);
-  const leapfrog::TensorMap2<double> artmx_timerr = parse_data<double>(projection_parameters, "artmx_timerr",
-                                                                       ss.treatment_stages, proj_years);
-  leapfrog::Tensor1<double> h_art_stage_dur(ss.treatment_stages - 1);
-  h_art_stage_dur.setConstant(0.5);
-
-  const leapfrog::TensorMap1<double> art_dropout = parse_data<double>(projection_parameters, "art_dropout", proj_years);
-  const leapfrog::TensorMap2<double> art15plus_num = parse_data<double>(projection_parameters, "art15plus_num",
-                                                                        ss.num_genders, proj_years);
-  const leapfrog::TensorMap2<int> art15plus_isperc = parse_data<int>(projection_parameters, "art15plus_isperc",
-                                                                     ss.num_genders, proj_years);
-
-  const leapfrog::Parameters<double> params = {fertility_first_age_group,
-                                               age_groups_fert,
-                                               age_groups_hiv_15plus,
-                                               hiv_adult_first_age_group,
-                                               time_art_start,
-                                               adult_incidence_first_age_group,
-                                               pAG_INCIDPOP,
-                                               hiv_steps,
-                                               dt,
-                                               scale_cd4_mortality,
-                                               hIDX_15PLUS,
-                                               art_alloc_mxweight,
-                                               incidence_rate,
-                                               base_pop,
-                                               survival,
-                                               net_migration,
-                                               age_sex_fertility_ratio,
-                                               births_sex_prop,
-                                               incidence_relative_risk_age,
-                                               incidence_relative_risk_sex,
-                                               cd4_mortality,
-                                               cd4_progression,
-                                               artcd4elig_idx,
-                                               cd4_initdist,
-                                               art_mortality,
-                                               artmx_timerr,
-                                               h_art_stage_dur,
-                                               art_dropout,
-                                               art15plus_num,
-                                               art15plus_isperc};
+  const leapfrog::Parameters<double> params = setup_model(data, opts, proj_years, hiv_steps)
 
   auto state = leapfrog::run_model<double, S>(proj_years, save_steps, params);
 

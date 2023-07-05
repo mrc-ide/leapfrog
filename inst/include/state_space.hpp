@@ -51,4 +51,38 @@ struct StateSpace<full> {
   static constexpr std::array<int, 66> hiv_age_groups_span = create_array<int, 66>(1);
 };
 
+template<typename real_type, HivAgeStratification S>
+struct Options {
+  int hiv_steps;
+  double dt;
+  const int fertility_first_age_group;
+  const int age_groups_fert;
+  const int hiv_adult_first_age_group;
+  const int adult_incidence_first_age_group;
+  const int pAG_INCIDPOP;
+  const int time_art_start;
+  const int age_groups_hiv_15plus;
+  const int scale_cd4_mortality;
+  const int hIDX_15PLUS;
+  const real_type art_alloc_mxweight;
+
+  Options(double dt,
+          int hiv_adult_first_age_group,
+          int time_art_start,
+          int scale_cd4_mortality,
+          real_type art_alloc_mxweight) :
+      hiv_steps(hiv_steps),
+      dt(dt),
+      fertility_first_age_group(15),
+      age_groups_fert(35),
+      hiv_adult_first_age_group(15),
+      adult_incidence_first_age_group(hiv_adult_first_age_group),
+      pAG_INCIDPOP(35),
+      time_art_start(time_art_start),
+      age_groups_hiv_15plus(age_groups_hiv<S>),
+      scale_cd4_mortality(scale_cd4_mortality),
+      hIDX_15PLUS(0),
+      art_alloc_mxweight(art_alloc_mxweight) {}
+};
+
 }

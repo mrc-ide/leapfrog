@@ -34,30 +34,7 @@ using Tensor5 = Eigen::Tensor<real_type, 5>;
 
 template<typename real_type>
 struct Parameters {
-  // First index of population eligible for fertility
-  int fertility_first_age_group;
-  // Number of ages eligible for fertility
-  int age_groups_fert;
-  // Numer of age groups in HIV 15+ population
-  int age_groups_hiv_15plus;
-  // First index of HIV population to model as adult
-  int hiv_adult_first_age_group;
-  // Time step to start ART treatment
-  int time_art_start;
-  // Index of the youngest age that is reflected in the adult incidence input
-  int adult_incidence_first_age_group;
-
-  int pAG_INCIDPOP;
-  // Number of time steps per year in the HIV projection
-  int hiv_steps_per_year;
-  // Difference in time for each hiv time step in HIV projection
-  double dt;
-
-  int scale_cd4_mortality;
-
-  int hIDX_15PLUS;
-
-  real_type art_alloc_mxweight;
+  Options
 
   // Incidence rate at each time step
   TensorMap1<real_type> incidence_rate;
