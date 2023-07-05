@@ -3,7 +3,7 @@
 #include "frogger.hpp"
 #include "types.hpp"
 #include "state_space.hpp"
-#include "model_setup.cpp"
+#include "model_setup.hpp"
 
 int transform_simulation_years(const Rcpp::List demp, SEXP r_sim_years) {
   Rcpp::NumericVector Sx = demp["Sx"];
@@ -55,15 +55,15 @@ Rcpp::List fit_model(const leapfrog::StateSpace<S> ss,
                      const int proj_years,
                      const int hiv_steps,
                      const std::vector<int> save_steps) {
-  const leapfrog::Options<double, S> opts = {
-      (1.0 / hiv_steps),
-      hiv_adult_first_age_group,
+  const leapfrog::Options<double> opts = {
+      hiv_steps,
       Rcpp::as<int>(data["t_ART_start"]) - 1,
+      ss.age_groups_hiv,
       Rcpp::as<int>(data["scale_cd4_mort"]),
       Rcpp::as<double>(data["art_alloc_mxweight"])
-  }
+  };
 
-  const leapfrog::Parameters<double> params = setup_model(data, opts, proj_years, hiv_steps)
+  const leapfrog::Parameters<double> params = setup_model_params<double, S>(data, opts, proj_years);
 
   auto state = leapfrog::run_model<double, S>(proj_years, save_steps, params);
 
@@ -149,7 +149,6 @@ Rcpp::List fit_model(const leapfrog::StateSpace<S> ss,
 
 // [[Rcpp::export]]
 Rcpp::List run_base_model(const Rcpp::List data,
-                          const Rcpp::List projection_parameters,
                           SEXP sim_years,
                           SEXP hiv_steps_per_year,
                           Rcpp::NumericVector output_steps,
@@ -162,12 +161,12 @@ Rcpp::List run_base_model(const Rcpp::List data,
   Rcpp::List ret;
   if (hiv_age_stratification == "full") {
     constexpr auto ss = leapfrog::StateSpace<leapfrog::HivAgeStratification::full>();
-    ret = fit_model<leapfrog::HivAgeStratification::full>(ss, data, projection_parameters,
+    ret = fit_model<leapfrog::HivAgeStratification::full>(ss, data,
                                                           proj_years, hiv_steps, save_steps);
   } else {
     // We've already validated that hiv_age_stratification is one of "full" or "coarse"
     constexpr auto ss = leapfrog::StateSpace<leapfrog::HivAgeStratification::coarse>();
-    ret = fit_model<leapfrog::HivAgeStratification::coarse>(ss, data, projection_parameters,
+    ret = fit_model<leapfrog::HivAgeStratification::coarse>(ss, data,
                                                             proj_years, hiv_steps, save_steps);
   }
 

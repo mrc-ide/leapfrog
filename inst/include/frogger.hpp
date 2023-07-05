@@ -16,7 +16,7 @@ void initialise_model_state(const Parameters<real_type> &pars,
   constexpr auto ss = StateSpace<S>();
   for (int g = 0; g < ss.num_genders; ++g) {
     for (int a = 0; a < ss.age_groups_pop; ++a) {
-      state.total_population(a, g) = pars.base_pop(a, g);
+      state.total_population(a, g) = pars.demography.base_pop(a, g);
     }
   }
   state.natural_deaths.setZero();
@@ -42,7 +42,7 @@ typename StateSaver<real_type, S>::OutputState run_model(int time_steps,
 
   internal::initialise_model_state<real_type, S>(pars, state);
   auto state_next = state;
-  internal::IntermediateData<real_type, S> intermediate(pars.age_groups_hiv_15plus);
+  internal::IntermediateData<real_type, S> intermediate(pars.options.age_groups_hiv_15plus);
   intermediate.reset();
 
   StateSaver<real_type, S> state_output(time_steps, save_steps);

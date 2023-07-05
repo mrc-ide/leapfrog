@@ -1,4 +1,9 @@
+#pragma once
+
 #include <Rcpp.h>
+#include <unsupported/Eigen/CXX11/Tensor>
+
+#include "types.hpp"
 
 template <typename T>
 T* r_data(SEXP x) {
@@ -36,10 +41,10 @@ auto parse_data(const Rcpp::List data, const std::string& key, Args... dims) {
 }
 
 template<typename real_type, leapfrog::HivAgeStratification S>
-leapfrog::Parameters <real_type> setup_model(const Rcpp::List data,
-                                             const leapfrog::Options<double, S> opts,
-                                             const int proj_years) {
-  constexpr auto ss = StateSpace<S>();
+leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List data,
+                                                    const leapfrog::Options<double> options,
+                                                    const int proj_years) {
+  constexpr auto ss = leapfrog::StateSpace<S>();
   const leapfrog::TensorMap2<double> base_pop = parse_data<double>(data, "basepop",
                                                                    ss.age_groups_pop, ss.num_genders);
   const leapfrog::TensorMap3<double> survival = parse_data<double>(data, "Sx",
@@ -47,13 +52,13 @@ leapfrog::Parameters <real_type> setup_model(const Rcpp::List data,
   const leapfrog::TensorMap3<double> net_migration = parse_data<double>(data, "netmigr_adj",
                                                                         ss.age_groups_pop, ss.num_genders, proj_years);
   const leapfrog::TensorMap2<double> age_sex_fertility_ratio = parse_data<double>(data, "asfr",
-                                                                                  ss.age_groups_fert, proj_years);
+                                                                                  options.age_groups_fert, proj_years);
   const leapfrog::TensorMap2<double> births_sex_prop = parse_data<double>(data, "births_sex_prop",
                                                                           ss.num_genders, proj_years);
   const leapfrog::TensorMap1<double> incidence_rate = parse_data<double>(data, "incidinput",
                                                                          proj_years);
   const leapfrog::TensorMap3<double> incidence_relative_risk_age = parse_data<double>(
-      data, "incrr_age", ss.age_groups_pop - ss.hiv_adult_first_age_group, ss.num_genders, proj_years);
+      data, "incrr_age", ss.age_groups_pop - options.hiv_adult_first_age_group, ss.num_genders, proj_years);
   const leapfrog::TensorMap1<double> incidence_relative_risk_sex = parse_data<double>(data,
                                                                                       "incrr_sex", proj_years);
   const leapfrog::TensorMap3<double> cd4_mortality = parse_data<double>(data, "cd4_mort",
@@ -86,23 +91,40 @@ leapfrog::Parameters <real_type> setup_model(const Rcpp::List data,
   const leapfrog::TensorMap2<int> art15plus_isperc = parse_data<int>(data, "art15plus_isperc",
                                                                      ss.num_genders, proj_years);
 
-  const leapfrog::Parameters<double> params = {incidence_rate,
-                                               base_pop,
-                                               survival,
-                                               net_migration,
-                                               age_sex_fertility_ratio,
-                                               births_sex_prop,
-                                               incidence_relative_risk_age,
-                                               incidence_relative_risk_sex,
-                                               cd4_mortality,
-                                               cd4_progression,
-                                               artcd4elig_idx,
-                                               cd4_initdist,
-                                               art_mortality,
-                                               artmx_timerr,
-                                               h_art_stage_dur,
-                                               art_dropout,
-                                               art15plus_num,
-                                               art15plus_isperc};
+  const leapfrog::Demography<double> demography = {
+      base_pop,
+      survival,
+      net_migration,
+      age_sex_fertility_ratio,
+      births_sex_prop
+  };
+
+  const leapfrog::Incidence<double> incidence = {
+      incidence_rate,
+      incidence_relative_risk_age,
+      incidence_relative_risk_sex
+  };
+
+  const leapfrog::NaturalHistory<double> natural_history = {
+      cd4_mortality,
+      cd4_progression,
+      cd4_initdist
+  };
+
+  const leapfrog::Art<double> art = {
+      artcd4elig_idx,
+      art_mortality,
+      artmx_timerr,
+      h_art_stage_dur,
+      art_dropout,
+      art15plus_num,
+      art15plus_isperc
+  };
+
+  const leapfrog::Parameters<double> params = {options,
+                                               demography,
+                                               incidence,
+                                               natural_history,
+                                               art};
   return params;
 }

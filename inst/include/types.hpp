@@ -32,46 +32,97 @@ using Tensor4 = Eigen::Tensor<real_type, 4>;
 template<typename real_type>
 using Tensor5 = Eigen::Tensor<real_type, 5>;
 
+template<HivAgeStratification S>
+constexpr int num_genders = StateSpace<S>::num_genders;
+
+template<HivAgeStratification S>
+constexpr int age_groups_pop = StateSpace<S>::age_groups_pop;
+
+template<HivAgeStratification S>
+constexpr int age_groups_hiv = StateSpace<S>::age_groups_hiv;
+
+template<HivAgeStratification S>
+constexpr int disease_stages = StateSpace<S>::disease_stages;
+
+template<HivAgeStratification S>
+constexpr int treatment_stages = StateSpace<S>::treatment_stages;
+
 template<typename real_type>
-struct Parameters {
-  Options
+struct Options {
+  int hiv_steps_per_year;
+  double dt;
+  const int fertility_first_age_group;
+  const int age_groups_fert;
+  const int hiv_adult_first_age_group;
+  const int adult_incidence_first_age_group;
+  const int pAG_INCIDPOP;
+  const int time_art_start;
+  const int age_groups_hiv_15plus;
+  const int scale_cd4_mortality;
+  const int hIDX_15PLUS;
+  const real_type art_alloc_mxweight;
 
-  // Incidence rate at each time step
-  TensorMap1<real_type> incidence_rate;
+  Options(int hiv_steps_per_year,
+          int time_art_start,
+          int age_groups_hiv_15plus,
+          int scale_cd4_mortality,
+          real_type art_alloc_mxweight) :
+      hiv_steps_per_year(hiv_steps_per_year),
+      dt(1.0 / hiv_steps_per_year),
+      fertility_first_age_group(15),
+      age_groups_fert(35),
+      hiv_adult_first_age_group(15),
+      adult_incidence_first_age_group(15),
+      pAG_INCIDPOP(35),
+      time_art_start(time_art_start),
+      age_groups_hiv_15plus(age_groups_hiv_15plus),
+      scale_cd4_mortality(scale_cd4_mortality),
+      hIDX_15PLUS(0),
+      art_alloc_mxweight(art_alloc_mxweight) {}
+};
 
+template<typename real_type>
+struct Demography {
   TensorMap2<real_type> base_pop;
   TensorMap3<real_type> survival;
   TensorMap3<real_type> net_migration;
   TensorMap2<real_type> age_sex_fertility_ratio;
   TensorMap2<real_type> births_sex_prop;
-  TensorMap3<real_type> incidence_relative_risk_age;
-  TensorMap1<real_type> incidence_relative_risk_sex;
+};
+
+template<typename real_type>
+struct Incidence {
+  TensorMap1<real_type> rate;
+  TensorMap3<real_type> relative_risk_age;
+  TensorMap1<real_type> relative_risk_sex;
+};
+
+template<typename real_type>
+struct NaturalHistory {
   TensorMap3<real_type> cd4_mortality;
   TensorMap3<real_type> cd4_progression;
-  Tensor1<int> artcd4elig_idx;
   TensorMap3<real_type> cd4_initdist;
-  TensorMap4<real_type> art_mortality;
+};
+
+template<typename real_type>
+struct Art {
+  Tensor1<int> artcd4elig_idx;
+  TensorMap4<real_type> mortality;
   TensorMap2<real_type> artmx_timerr;
   Tensor1<real_type> h_art_stage_dur;
-  TensorMap1<real_type> art_dropout;
+  TensorMap1<real_type> dropout;
   TensorMap2<real_type> art15plus_num;
   TensorMap2<int> art15plus_isperc;
 };
 
-template<HivAgeStratification S>
-constexpr size_t num_genders = StateSpace<S>::num_genders;
-
-template<HivAgeStratification S>
-constexpr size_t age_groups_pop = StateSpace<S>::age_groups_pop;
-
-template<HivAgeStratification S>
-constexpr size_t age_groups_hiv = StateSpace<S>::age_groups_hiv;
-
-template<HivAgeStratification S>
-constexpr size_t disease_stages = StateSpace<S>::disease_stages;
-
-template<HivAgeStratification S>
-constexpr size_t treatment_stages = StateSpace<S>::treatment_stages;
+template<typename real_type>
+struct Parameters {
+  Options<real_type> options;
+  Demography<real_type> demography;
+  Incidence<real_type> incidence;
+  NaturalHistory<real_type> natural_history;
+  Art<real_type> art;
+};
 
 namespace {
 using Eigen::Sizes;
