@@ -243,9 +243,16 @@ int main(int argc, char *argv[]) {
     // Each time step is mid-point of the year
     for (int step = 1; step <= sim_years; ++step) {
       state_next.reset();
-      leapfrog::run_general_pop_demographic_projection(step, ss, params, state_current, state_next, intermediate);
-      leapfrog::run_hiv_pop_demographic_projection(step, ss, params, state_current, state_next, intermediate);
-      leapfrog::run_hiv_model_simulation(step, ss, params, state_current, state_next, intermediate);
+      leapfrog::run_general_pop_demographic_projection<double, leapfrog::HivAgeStratification::full>(step, params,
+                                                                                                     state_current,
+                                                                                                     state_next,
+                                                                                                     intermediate);
+      leapfrog::run_hiv_pop_demographic_projection<double, leapfrog::HivAgeStratification::full>(step, params,
+                                                                                                 state_current,
+                                                                                                 state_next,
+                                                                                                 intermediate);
+      leapfrog::run_hiv_model_simulation<double, leapfrog::HivAgeStratification::full>(step, params, state_current,
+                                                                                       state_next, intermediate);
       state_output.save_state(state_next, step);
       std::swap(state_current, state_next);
       intermediate.reset();

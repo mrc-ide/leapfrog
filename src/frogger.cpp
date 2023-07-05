@@ -185,7 +185,7 @@ Rcpp::List fit_model(const leapfrog::StateSpace<S> ss,
                                                art15plus_num,
                                                art15plus_isperc};
 
-  auto state = leapfrog::run_model(proj_years, ss, save_steps, params);
+  auto state = leapfrog::run_model<double, S>(proj_years, save_steps, params);
 
   size_t output_years = save_steps.size();
   Rcpp::NumericVector r_total_population(ss.age_groups_pop * ss.num_genders * output_years);

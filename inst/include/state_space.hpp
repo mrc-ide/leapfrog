@@ -17,7 +17,6 @@ create_array(T value, std::index_sequence<Is...>) {
 
 }
 
-
 template<typename T, std::size_t N>
 constexpr std::array<T, N>
 create_array(const T &value) {
@@ -39,7 +38,7 @@ struct StateSpace<coarse> {
   static constexpr int age_groups_hiv = 9;
   static constexpr int disease_stages = 7;
   static constexpr int treatment_stages = 3;
-  static constexpr std::array<int, 9> hiv_age_groups_span{ 2, 3, 5, 5, 5, 5, 5, 5, 31 };
+  static constexpr std::array<int, 9> hiv_age_groups_span{2, 3, 5, 5, 5, 5, 5, 5, 31};
 };
 
 template<>

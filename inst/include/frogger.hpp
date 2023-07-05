@@ -35,9 +35,10 @@ void initialise_model_state(const StateSpace<S> &ss,
 }
 
 template<typename real_type, HivAgeStratification S>
-typename StateSaver<real_type>::OutputState run_model(int time_steps, const StateSpace<S> &ss,
+typename StateSaver<real_type>::OutputState run_model(int time_steps,
                                                       std::vector<int> save_steps,
                                                       const Parameters<real_type> &pars) {
+  constexpr auto ss = StateSpace<S>();
   State<real_type> state(ss.age_groups_pop, ss.num_genders,
                          ss.disease_stages, ss.age_groups_hiv,
                          ss.treatment_stages);
@@ -58,9 +59,9 @@ typename StateSaver<real_type>::OutputState run_model(int time_steps, const Stat
   // Each time step is mid-point of the year
   for (int step = 1; step <= time_steps; ++step) {
     state_next.reset();
-    run_general_pop_demographic_projection(step, ss, pars, state, state_next, intermediate);
-    run_hiv_pop_demographic_projection(step, ss, pars, state, state_next, intermediate);
-    run_hiv_model_simulation(step, ss, pars, state, state_next, intermediate);
+    run_general_pop_demographic_projection<real_type, S>(step, pars, state, state_next, intermediate);
+    run_hiv_pop_demographic_projection<real_type, S>(step, pars, state, state_next, intermediate);
+    run_hiv_model_simulation<real_type, S>(step, pars, state, state_next, intermediate);
     state_output.save_state(state_next, step);
     std::swap(state, state_next);
     intermediate.reset();
