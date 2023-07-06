@@ -3,7 +3,7 @@
 #include "frogger.hpp"
 #include "types.hpp"
 #include "state_space.hpp"
-#include "model_setup.hpp"
+#include "model_setup.h"
 
 int transform_simulation_years(const Rcpp::List demp, SEXP r_sim_years) {
   Rcpp::NumericVector Sx = demp["Sx"];
