@@ -50,5 +50,4 @@ struct StateSpace<full> {
   static constexpr int treatment_stages = 3;
   static constexpr std::array<int, 66> hiv_age_groups_span = create_array<int, 66>(1);
 };
-
 }

@@ -92,25 +92,21 @@ int main(int argc, char *argv[]) {
     hiv_steps_per_year = 10;
   }
 
-  const double dt = (1.0 / hiv_steps_per_year);
-  const int fertility_first_age_group = 15;
-  const int age_groups_fert = 35;
-  const int hiv_adult_first_age_group = 15;
-  const int adult_incidence_first_age_group = hiv_adult_first_age_group;
-  // Hardcoded 15-49 for now (35 groups within this band)
-  const int pAG_INCIDPOP = 35;
-  const int time_art_start = 30;
-
   // Set working dir to read files
   std::filesystem::path old_dir = std::filesystem::current_path();
   std::filesystem::current_path(input_abs);
 
   // Only fine-grained ages at first
   const leapfrog::StateSpace ss = leapfrog::StateSpace<leapfrog::HivAgeStratification::full>();
-  int age_groups_hiv_15plus = ss.age_groups_hiv;
-  const int scale_cd4_mortality = 1;
-  int hIDX_15PLUS = 0;
-  const double art_alloc_mxweight = 0.2;
+
+
+  const leapfrog::Options<double> options = {
+      hiv_steps_per_year, // HIV steps per year
+      30,                 // Time ART start
+      ss.age_groups_hiv,  // Age groups HIV 15+
+      1,                  // Scale CD4 mortality
+      0.2                 // art_alloc_mxweight
+  };
 
   leapfrog::Tensor1<int> v = serialize::deserialize_tensor<int, 1>(std::string("artcd4elig_idx"));
   for (int i = 0; i <= sim_years; ++i) {
@@ -177,39 +173,44 @@ int main(int argc, char *argv[]) {
       std::string("art15plus_isperc"));
   const leapfrog::TensorMap2<int> art15plus_isperc = tensor_to_tensor_map<int, 2>(art15plus_isperc_data);
 
-  const leapfrog::Parameters<double> params = {fertility_first_age_group,
-                                               age_groups_fert,
-                                               age_groups_hiv_15plus,
-                                               hiv_adult_first_age_group,
-                                               time_art_start,
-                                               adult_incidence_first_age_group,
-                                               pAG_INCIDPOP,
-                                               hiv_steps_per_year,
-                                               dt,
-                                               scale_cd4_mortality,
-                                               hIDX_15PLUS,
-                                               art_alloc_mxweight,
-                                               incidence_rate,
-                                               base_pop,
-                                               survival,
-                                               net_migration,
-                                               age_sex_fertility_ratio,
-                                               births_sex_prop,
-                                               incidence_relative_risk_age,
-                                               incidence_relative_risk_sex,
-                                               cd4_mortality,
-                                               cd4_progression,
-                                               artcd4elig_idx,
-                                               cd4_initdist,
-                                               art_mortality,
-                                               artmx_timerr,
-                                               h_art_stage_dur,
-                                               art_dropout,
-                                               art15plus_num,
-                                               art15plus_isperc};
+  const leapfrog::Demography<double> demography = {
+      base_pop,
+      survival,
+      net_migration,
+      age_sex_fertility_ratio,
+      births_sex_prop
+  };
+
+  const leapfrog::Incidence<double> incidence = {
+      incidence_rate,
+      incidence_relative_risk_age,
+      incidence_relative_risk_sex
+  };
+
+  const leapfrog::NaturalHistory<double> natural_history = {
+      cd4_mortality,
+      cd4_progression,
+      cd4_initdist
+  };
+
+  const leapfrog::Art<double> art = {
+      artcd4elig_idx,
+      art_mortality,
+      artmx_timerr,
+      h_art_stage_dur,
+      art_dropout,
+      art15plus_num,
+      art15plus_isperc
+  };
+
+  const leapfrog::Parameters<double> params = {options,
+                                               demography,
+                                               incidence,
+                                               natural_history,
+                                               art};
 
   leapfrog::internal::IntermediateData<leapfrog::HivAgeStratification::full, double> intermediate(
-      params.age_groups_hiv_15plus);
+      options.age_groups_hiv_15plus);
   leapfrog::State<leapfrog::HivAgeStratification::full, double> state_current;
 
   std::vector<int> save_steps(61);
