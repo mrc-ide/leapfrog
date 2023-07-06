@@ -11,7 +11,8 @@ Eigen::TensorMap <Eigen::Tensor<T, rank>> tensor_to_tensor_map(Eigen::Tensor <T,
   return Eigen::TensorMap < Eigen::Tensor < T, rank >> (d.data(), d.dimensions());
 }
 
-void save_output(leapfrog::StateSaver<double> &state_saver, std::string &output_path) {
+void save_output(leapfrog::StateSaver<leapfrog::HivAgeStratification::full, double> &state_saver,
+                 std::string &output_path) {
   auto state = state_saver.get_full_state();
 
   std::filesystem::path out_path(output_path);
@@ -92,12 +93,8 @@ int main(int argc, char *argv[]) {
   }
 
   const double dt = (1.0 / hiv_steps_per_year);
-  const int num_genders = 2;
-  const int age_groups_pop = 81;
   const int fertility_first_age_group = 15;
   const int age_groups_fert = 35;
-  const int disease_stages = 7;
-  const int treatment_stages = 3;
   const int hiv_adult_first_age_group = 15;
   const int adult_incidence_first_age_group = hiv_adult_first_age_group;
   // Hardcoded 15-49 for now (35 groups within this band)
@@ -109,11 +106,8 @@ int main(int argc, char *argv[]) {
   std::filesystem::current_path(input_abs);
 
   // Only fine-grained ages at first
-  leapfrog::Tensor1<int> age_groups_hiv_span_data = serialize::deserialize_tensor<int, 1>(
-      std::string("hAG_SPAN_full"));
-  const leapfrog::TensorMap1<int> age_groups_hiv_span = tensor_to_tensor_map<int, 1>(age_groups_hiv_span_data);
-  int age_groups_hiv = static_cast<int>(age_groups_hiv_span.size());
-  int age_groups_hiv_15plus = age_groups_hiv;
+  const leapfrog::StateSpace ss = leapfrog::StateSpace<leapfrog::HivAgeStratification::full>();
+  int age_groups_hiv_15plus = ss.age_groups_hiv;
   const int scale_cd4_mortality = 1;
   int hIDX_15PLUS = 0;
   const double art_alloc_mxweight = 0.2;
@@ -125,8 +119,8 @@ int main(int argc, char *argv[]) {
   }
   const leapfrog::TensorMap1<int> artcd4elig_idx = tensor_to_tensor_map<int, 1>(v);
 
-  leapfrog::Tensor1<double> h(treatment_stages - 1);
-  for (int i = 0; i < treatment_stages - 1; ++i) {
+  leapfrog::Tensor1<double> h(ss.treatment_stages - 1);
+  for (int i = 0; i < ss.treatment_stages - 1; ++i) {
     h(i) = 0.5;
   }
   const leapfrog::TensorMap1<double> h_art_stage_dur = tensor_to_tensor_map<double, 1>(h);
@@ -167,7 +161,6 @@ int main(int argc, char *argv[]) {
   leapfrog::Tensor3<double> cd4_initdist_data = serialize::deserialize_tensor<double, 3>(
       std::string("cd4_initdist_full"));
   const leapfrog::TensorMap3<double> cd4_initdist = tensor_to_tensor_map<double, 3>(cd4_initdist_data);
-  const leapfrog::TensorMap1<int> hiv_age_groups_span = tensor_to_tensor_map<int, 1>(age_groups_hiv_span_data);
   leapfrog::Tensor4<double> art_mortality_data = serialize::deserialize_tensor<double, 4>(
       std::string("art_mortality_full"));
   const leapfrog::TensorMap4<double> art_mortality = tensor_to_tensor_map<double, 4>(art_mortality_data);
@@ -184,15 +177,10 @@ int main(int argc, char *argv[]) {
       std::string("art15plus_isperc"));
   const leapfrog::TensorMap2<int> art15plus_isperc = tensor_to_tensor_map<int, 2>(art15plus_isperc_data);
 
-  const leapfrog::Parameters<double> params = {num_genders,
-                                               age_groups_pop,
-                                               fertility_first_age_group,
+  const leapfrog::Parameters<double> params = {fertility_first_age_group,
                                                age_groups_fert,
-                                               age_groups_hiv,
                                                age_groups_hiv_15plus,
-                                               disease_stages,
                                                hiv_adult_first_age_group,
-                                               treatment_stages,
                                                time_art_start,
                                                adult_incidence_first_age_group,
                                                pAG_INCIDPOP,
@@ -201,7 +189,6 @@ int main(int argc, char *argv[]) {
                                                scale_cd4_mortality,
                                                hIDX_15PLUS,
                                                art_alloc_mxweight,
-                                               age_groups_hiv_span,
                                                incidence_rate,
                                                base_pop,
                                                survival,
@@ -214,7 +201,6 @@ int main(int argc, char *argv[]) {
                                                cd4_progression,
                                                artcd4elig_idx,
                                                cd4_initdist,
-                                               hiv_age_groups_span,
                                                art_mortality,
                                                artmx_timerr,
                                                h_art_stage_dur,
@@ -222,19 +208,13 @@ int main(int argc, char *argv[]) {
                                                art15plus_num,
                                                art15plus_isperc};
 
-  leapfrog::internal::IntermediateData<double> intermediate(params.age_groups_pop, params.age_groups_hiv,
-                                                            params.num_genders,
-                                                            params.disease_stages, params.treatment_stages,
-                                                            params.age_groups_hiv_15plus);
-  leapfrog::State<double> state_current(params.age_groups_pop, params.num_genders,
-                                        params.disease_stages, params.age_groups_hiv,
-                                        params.treatment_stages);
+  leapfrog::internal::IntermediateData<leapfrog::HivAgeStratification::full, double> intermediate(
+      params.age_groups_hiv_15plus);
+  leapfrog::State<leapfrog::HivAgeStratification::full, double> state_current;
 
   std::vector<int> save_steps(61);
   std::iota(save_steps.begin(), save_steps.end(), 0);
-  leapfrog::StateSaver<double> state_output(sim_years, save_steps, params.age_groups_pop, params.num_genders,
-                                            params.disease_stages, params.age_groups_hiv,
-                                            params.treatment_stages);
+  leapfrog::StateSaver<leapfrog::HivAgeStratification::full, double> state_output(sim_years, save_steps);
 
   const char *n_runs_char = std::getenv("N_RUNS");
   size_t n_runs = 1;
@@ -249,7 +229,7 @@ int main(int argc, char *argv[]) {
   }
 
   for (size_t i = 0; i < n_runs; ++i) {
-    leapfrog::internal::initialise_model_state(params, state_current);
+    leapfrog::internal::initialise_model_state<leapfrog::HivAgeStratification::full, double>(params, state_current);
     auto state_next = state_current;
 
     // Save initial state
@@ -258,9 +238,16 @@ int main(int argc, char *argv[]) {
     // Each time step is mid-point of the year
     for (int step = 1; step <= sim_years; ++step) {
       state_next.reset();
-      leapfrog::run_general_pop_demographic_projection(step, params, state_current, state_next, intermediate);
-      leapfrog::run_hiv_pop_demographic_projection(step, params, state_current, state_next, intermediate);
-      leapfrog::run_hiv_model_simulation(step, params, state_current, state_next, intermediate);
+      leapfrog::run_general_pop_demographic_projection<leapfrog::HivAgeStratification::full, double>(step, params,
+                                                                                                     state_current,
+                                                                                                     state_next,
+                                                                                                     intermediate);
+      leapfrog::run_hiv_pop_demographic_projection<leapfrog::HivAgeStratification::full, double>(step, params,
+                                                                                                 state_current,
+                                                                                                 state_next,
+                                                                                                 intermediate);
+      leapfrog::run_hiv_model_simulation<leapfrog::HivAgeStratification::full, double>(step, params, state_current,
+                                                                                       state_next, intermediate);
       state_output.save_state(state_next, step);
       std::swap(state_current, state_next);
       intermediate.reset();

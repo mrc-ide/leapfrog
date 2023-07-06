@@ -194,11 +194,11 @@ test_that("error thrown if model run with invalid HIV stratification", {
 test_that("error thrown if size of stratified data does not match expected", {
   demp <- readRDS(test_path("testdata/demographic_projection_object.rds"))
   parameters <- readRDS(test_path("testdata/projection_parameters.rds"))
-  parameters[["hAG_SPAN_full"]] <- rep(1, 3)
+  parameters[["cd4_mort_full"]] <- rep(1, 3)
 
   expect_error(
     run_model(demp, parameters, NULL, NULL, 60, hiv_age_stratification = "full"),
-    "Invalid size of data for 'hAG_SPAN', expected 66 got 3"
+    "Invalid size of data for 'cd4_mort', expected 924 got 3"
   )
 })
 
