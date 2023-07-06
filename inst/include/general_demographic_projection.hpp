@@ -6,12 +6,12 @@ namespace leapfrog {
 
 namespace internal {
 
-template<typename real_type, HivAgeStratification S>
+template<HivAgeStratification S, typename real_type>
 void run_ageing_and_mortality(int time_step,
                               const Parameters<real_type> &pars,
-                              const State<real_type, S> &state_curr,
-                              State<real_type, S> &state_next,
-                              IntermediateData<real_type, S> &intermediate) {
+                              const State<S, real_type> &state_curr,
+                              State<S, real_type> &state_next,
+                              IntermediateData<S, real_type> &intermediate) {
   constexpr auto ss = StateSpace<S>();
   for (int g = 0; g < ss.num_genders; ++g) {
     // Start at index 1 as we will add infant (age 0) births and deaths later
@@ -35,12 +35,12 @@ void run_ageing_and_mortality(int time_step,
   }
 }
 
-template<typename real_type, HivAgeStratification S>
+template<HivAgeStratification S, typename real_type>
 void run_migration(int time_step,
                    const Parameters<real_type> &pars,
-                   const State<real_type, S> &state_curr,
-                   State<real_type, S> &state_next,
-                   IntermediateData<real_type, S> &intermediate) {
+                   const State<S, real_type> &state_curr,
+                   State<S, real_type> &state_next,
+                   IntermediateData<S, real_type> &intermediate) {
   constexpr auto ss = StateSpace<S>();
   for (int g = 0; g < ss.num_genders; ++g) {
     // Migration for ages 1, 2, ... 79
@@ -73,12 +73,12 @@ void run_migration(int time_step,
   }
 }
 
-template<typename real_type, HivAgeStratification S>
+template<HivAgeStratification S, typename real_type>
 void run_fertility_and_infant_migration(int time_step,
                                         const Parameters<real_type> &pars,
-                                        const State<real_type, S> &state_curr,
-                                        State<real_type, S> &state_next,
-                                        IntermediateData<real_type, S> &intermediate) {
+                                        const State<S, real_type> &state_curr,
+                                        State<S, real_type> &state_next,
+                                        IntermediateData<S, real_type> &intermediate) {
   constexpr auto ss = StateSpace<S>();
   state_next.births = 0.0;
   for (int af = 0; af < pars.age_groups_fert; ++af) {
@@ -110,15 +110,15 @@ void run_fertility_and_infant_migration(int time_step,
 }
 
 
-template<typename real_type, HivAgeStratification S>
+template<HivAgeStratification S, typename real_type>
 void run_general_pop_demographic_projection(int time_step,
                                             const Parameters<real_type> &pars,
-                                            const State<real_type, S> &state_curr,
-                                            State<real_type, S> &state_next,
-                                            internal::IntermediateData<real_type, S> &intermediate) {
-  internal::run_ageing_and_mortality<real_type, S>(time_step, pars, state_curr, state_next, intermediate);
-  internal::run_migration<real_type, S>(time_step, pars, state_curr, state_next, intermediate);
-  internal::run_fertility_and_infant_migration<real_type, S>(time_step, pars, state_curr, state_next, intermediate);
+                                            const State<S, real_type> &state_curr,
+                                            State<S, real_type> &state_next,
+                                            internal::IntermediateData<S, real_type> &intermediate) {
+  internal::run_ageing_and_mortality<S>(time_step, pars, state_curr, state_next, intermediate);
+  internal::run_migration<S>(time_step, pars, state_curr, state_next, intermediate);
+  internal::run_fertility_and_infant_migration<S>(time_step, pars, state_curr, state_next, intermediate);
 }
 
 }

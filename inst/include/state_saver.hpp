@@ -4,7 +4,7 @@
 
 namespace leapfrog {
 
-template<typename real_type, HivAgeStratification S>
+template<HivAgeStratification S, typename real_type>
 class StateSaver {
 public:
   struct OutputState {
@@ -83,7 +83,7 @@ public:
   }
 
 
-  void save_state(const State<real_type, S> &state, int current_year) {
+  void save_state(const State<S, real_type> &state, int current_year) {
     for (size_t i = 0; i < save_steps.size(); ++i) {
       if (current_year == save_steps[i]) {
         full_state.total_population.chip(i, full_state.total_population.NumDimensions - 1) = state.total_population;

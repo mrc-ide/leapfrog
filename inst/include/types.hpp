@@ -101,7 +101,7 @@ using Eigen::Sizes;
 using Eigen::TensorFixedSize;
 }
 
-template<typename real_type, HivAgeStratification S>
+template<HivAgeStratification S, typename real_type>
 struct State {
   TensorFixedSize <real_type, Sizes<age_groups_pop<S>, num_genders<S>>> total_population;
   TensorFixedSize <real_type, Sizes<age_groups_pop<S>, num_genders<S>>> natural_deaths;
@@ -142,7 +142,7 @@ const int MALE = 0;
 const int FEMALE = 1;
 const int ART0MOS = 0;
 
-template<typename real_type, HivAgeStratification S>
+template<HivAgeStratification S, typename real_type>
 struct IntermediateData {
   TensorFixedSize <real_type, Sizes<age_groups_pop<S>, num_genders<S>>> migration_rate;
   TensorFixedSize <real_type, Sizes<age_groups_pop<S>, num_genders<S>>> hiv_net_migration;
