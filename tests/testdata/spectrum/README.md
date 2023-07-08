@@ -1,8 +1,11 @@
 # Spectrum test files
 
-These are a series of test files constructed to 
+These are a series of test files constructed to verify the Leapfrog simulation against 
+Spectrum.
 
+Files were constructed using default data for Botswana in Spectrum v6.13 on 12 February 2022.
 
+The same files were resaved in Spectrum v6.18 (AIM 2022 final version) on 8 July 2023.
 
 
 Files were constructed using default data for Botswana
@@ -60,3 +63,5 @@ The default file had no 'special population' ART eligibility. This is retained.
   with distribution 15%, 30%, 55%, and percentage for 2021 onwards
 
 * Convert adult ART input to number through year 2020, percentage for 2021 onwards
+
+
