@@ -7,9 +7,8 @@ Files were constructed using default data for Botswana in Spectrum v6.13 on 12 F
 
 The same files were resaved in Spectrum v6.18 (AIM 2022 final version) on 8 July 2023.
 
-
-Files were constructed using default data for Botswana
-in Spectrum v5.13 on 12 February 2022.
+And the same files resaved in Spectrum v6.29 (AIM 2023 final version) on 8 July 2023. This version
+reflects demographic projection updates for WPP 2023.
 
 
 ## `bwa_aim-adult-no
