@@ -73,7 +73,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                     Type *p_infections,
                     Type *p_hivstrat_adult,
                     Type *p_artstrat_adult,
-		    Type *p_births,
+                    Type *p_births,
                     Type *p_natdeaths,
                     Type *p_natdeaths_hivpop,
                     Type *p_hivdeaths,
@@ -172,8 +172,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 
   for(int t = 1; t < sim_years; t++){
 
-    TensorFixedSize<Type, Sizes<pAG, NG>> migrate_ag;
-
     // ageing and non-HIV mortality
     for(int g = 0; g < NG; g++){
 
@@ -186,23 +184,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       Type natdeaths_open_age = totpop1(pAG-1, g, t-1) * (1.0 - sx(pAG, g, t));
       natdeaths(pAG-1, g, t) += natdeaths_open_age;
       totpop1(pAG-1, g, t) += totpop1(pAG-1, g, t-1) - natdeaths_open_age;
-
-      // net migration
-      for(int a = 1; a < pAG - 1; a++) {
-	// Number of net migrants adjusted for survivorship to end of period (qx / 2)
-        migrate_ag(a, g) = netmigr(a, g, t) * (1.0 + sx(a, g, t)) * 0.5 / totpop1(a, g, t);
-        totpop1(a, g, t) *= 1.0 + migrate_ag(a, g);
-      }
-
-      // For open age group, netmigrant survivor adjustment based on weighted
-      // sx for age 79 and age 80+.
-      // * Numerator: totpop1(a, g, t-1) * (1.0 + sx(a+1, g, t)) + totpop1(a-1, g, t-1) * (1.0 + sx(a, g, t))
-      // * Denominator: totpop1(a, g, t-1) + totpop1(a-1, g, t-1)
-      // Re-expressed current population and deaths to open age group (already calculated):
-      int a = pAG - 1;
-      Type sx_netmig = (totpop1(a, g,t) + 0.5 * natdeaths(pAG-1, g, t)) / (totpop1(a, g,t) + natdeaths(pAG-1, g, t));
-      migrate_ag(a, g) = sx_netmig * netmigr(a, g, t) / totpop1(a, g,t);
-      totpop1(a, g, t) *= 1.0 + migrate_ag(a, g);
     }
 
     // fertility
@@ -217,11 +198,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       Type births_sex = births(t) * births_sex_prop(g, t);
       natdeaths(0, g, t) = births_sex * (1.0 - sx(0, g, t));
       totpop1(0, g, t) =  births_sex * sx(0, g, t);
-
-      // Assume 2/3 survival rate since mortality in first six months higher than
-      // second 6 months (Spectrum manual, section 6.2.7.4)
-      Type migrate_a0 = netmigr(0, g, t) * (1.0 + 2.0 * sx(0, g, t)) / 3.0 / totpop1(0, g, t);
-      totpop1(0, g, t) *= 1.0 + migrate_a0;
     }
 
     // // demographic projection of the adult HIV population
@@ -295,33 +271,29 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
     }
 
-    // remove non-HIV deaths and net migration from hivpop1
-    TensorFixedSize<Type, Sizes<pAG, NG>> netmig_ag;
+    // remove non-HIV deaths from hivpop1
     for(int g = 0; g < NG; g++) {
       for(int a = 1; a < pAG; a++) {
         hivpop1(a, g, t) -= natdeaths_hivpop(a, g, t);
-        netmig_ag(a, g) = hivpop1(a, g, t) * migrate_ag(a, g);
-        hivpop1(a, g, t) += netmig_ag(a, g);
       }
     }
 
-    // remove non-HIV deaths and net migration from adult stratified population
+    // remove non-HIV deaths from adult stratified population
     for(int g = 0; g < NG; g++){
       int a = pIDX_HIVADULT;
       for(int ha = 0; ha < hAG; ha++){
-        Type deathsmig_ha = 0;
+        Type deaths_ha = 0;
         for(int i = 0; i < hAG_SPAN[ha]; i++){
-          deathsmig_ha -= natdeaths_hivpop(a, g, t);
-          deathsmig_ha += netmig_ag(a, g);
+          deaths_ha -= natdeaths_hivpop(a, g, t);
           a++;
         }
 
-        Type deathmigrate_ha = hivpop_ha(ha, g) > 0 ? deathsmig_ha / hivpop_ha(ha, g) : 0.0;
+        Type death_rate_ha = hivpop_ha(ha, g) > 0 ? deaths_ha / hivpop_ha(ha, g) : 0.0;
         for(int hm = 0; hm < hDS; hm++){
-          hivstrat_adult(hm, ha, g, t) *= 1.0 + deathmigrate_ha;
+          hivstrat_adult(hm, ha, g, t) *= 1.0 + death_rate_ha;
           if(t > t_ART_start) {
             for(int hu = 0; hu < hTS; hu++) {
-              artstrat_adult(hu, hm, ha, g, t) *= 1.0 + deathmigrate_ha;
+              artstrat_adult(hu, hm, ha, g, t) *= 1.0 + death_rate_ha;
             }
           }
         } // loop over hm
@@ -389,7 +361,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
             Type cd4mx_scale = 1.0;
             // !!NOTE: Mortality scaling not yet implemented
             if (scale_cd4_mort &
-		(t >= t_ART_start) &
+                (t >= t_ART_start) &
                 (hm >= everARTelig_idx) &
                 (hivstrat_adult(hm, ha, g, t) > 0.0)) {
               Type artpop_hahm = 0.0;
@@ -628,7 +600,57 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 
     } // loop hiv_steps_per_year
 
-  }
+
+    // Net migration (end-year)
+    
+    for(int g = 0; g < NG; g++){
+
+      // Aggregate hivpop by coarse age group
+      TensorFixedSize<Type, Sizes<hAG>> hivpop_ha;
+      hivpop_ha.setZero();
+      int a = pIDX_HIVADULT;
+      for(int ha = 0; ha < hAG; ha++){
+        for(int i = 0; i < hAG_SPAN[ha]; i++){
+          hivpop_ha(ha) += hivpop1(a, g, t);
+          a++;
+        }
+      }
+
+      // Remove net migration from total population and HIV population
+      // by calculating proportion migrants within each age group
+      TensorFixedSize<Type, Sizes<pAG>> netmig_hivpop1_a;
+      for(int a = 0; a < pAG; a++) {
+        Type migrate_a = netmigr(a, g, t) / totpop1(a, g, t);
+        totpop1(a, g, t) *= 1.0 + migrate_a;
+        
+        netmig_hivpop1_a(a) = hivpop1(a, g, t) * migrate_a;
+        hivpop1(a, g, t) += netmig_hivpop1_a(a);
+      }
+
+      // Aggregate net migrant count in coarse HIV age groups
+      a = pIDX_HIVADULT;
+      for(int ha = 0; ha < hAG; ha++){
+        Type netmig_hivpop_ha = 0.0;
+        for(int i = 0; i < hAG_SPAN[ha]; i++){
+          netmig_hivpop_ha += netmig_hivpop1_a(a);
+          a++;
+        }
+          
+        // remove non-HIV deaths from adult HIV stratified population
+        Type hivpop_migrate_ha = hivpop_ha(ha) > 0 ? netmig_hivpop_ha / hivpop_ha(ha) : 0.0;
+        for(int hm = 0; hm < hDS; hm++){
+          hivstrat_adult(hm, ha, g, t) *= 1.0 + hivpop_migrate_ha;
+          if(t >= t_ART_start) {
+            for(int hu = 0; hu < hTS; hu++) {
+              artstrat_adult(hu, hm, ha, g, t) *= 1.0 + hivpop_migrate_ha;
+            }
+          }
+        } // loop over hm
+      } // loop over ha
+      
+    } // loop over g
+    
+  } // loop over t (year)
 
   return;
 }

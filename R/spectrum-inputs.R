@@ -83,20 +83,6 @@ read_netmigr <- function(pjnz, use_ep5=FALSE, adjust_u5mig = TRUE, sx = NULL){
   netmigr
 }
 
-adjust_spectrum_netmigr <- function(netmigr) {
-
-  ## Spectrum adjusts net-migration to occur half in
-  ## current age group and half in next age group
-  
-  netmigr_adj <- netmigr
-  netmigr_adj[-1,,] <- (netmigr[-1,,] + netmigr[-81,,])/2
-  netmigr_adj[1,,] <- netmigr[1,,]/2
-  netmigr_adj[81,,] <- netmigr_adj[81,,] + netmigr[81,,]/2
-
-  netmigr_adj
-}
-
-
 #' Prepare demographic inputs from Spectrum PJNZ
 #'
 #' @param pjnz path to PJNZ file
@@ -113,7 +99,6 @@ prepare_leapfrog_demp <- function(pjnz) {
   demp <- eppasm::read_specdp_demog_param(pjnz)
   demp$Sx <- read_sx(pjnz)
   demp$netmigr <- read_netmigr(pjnz, sx = demp$Sx)
-  demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
 
   demp$births_sex_prop <- rbind(male = demp$srb, female = 100) / (demp$srb + 100)
 
