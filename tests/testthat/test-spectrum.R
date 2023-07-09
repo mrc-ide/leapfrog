@@ -135,7 +135,7 @@ test_that("Leapfrog HIV simulation matches EPP-ASM, no ART & WITH migration", {
 
 test_that("Leapfrog matches AIM projection with no ART and WITH migration", {
 
-  pjnz1 <- test_path("../testdata/spectrum/v6.18/bwa_aim-adult-no-art_spectrum-v6.18_2023-07-08.PJNZ")
+  pjnz1 <- test_path("../testdata/spectrum/v6.29/bwa_aim-adult-no-art_spectrum-v6.29_2023-07-08.PJNZ")
   demp1 <- prepare_leapfrog_demp(pjnz1)
   hivp1 <- prepare_leapfrog_projp(pjnz1)
   lmod1 <- leapfrogR(demp1, hivp1)
