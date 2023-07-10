@@ -53,3 +53,7 @@ assert_enum <- function(x, values, name = deparse(substitute(x))) {
   }
   invisible(TRUE)
 }
+
+vcapply <- function(X, FUN, ...) { # nolint
+  vapply(X, FUN, character(1), ...)
+}
