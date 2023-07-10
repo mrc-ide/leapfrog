@@ -92,7 +92,7 @@ In 4 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 | Leapfrog           | Frogger                                  | Details                                                                                                                                                               |
 |--------------------|------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | basepop            | demography.base_pop                      | Population data by age group and sex                                                                                                                                  |
-| sx                 | demography.survival                      | Probability of surviving between ages, from 0 to 1, 1 to 2, ..., 79 to 80+ and 80+ to 80+                                                                             |
+| sx                 | demography.survival_prob                 | Probability of surviving between ages, from 0 to 1, 1 to 2, ..., 79 to 80+ and 80+ to 80+                                                                             |
 | netmigr            | demography.net_migration                 | Net migration by age group, sex and year                                                                                                                              |
 | asfr               | demography.fertility_ratio               | Ratio of number of live births in a year and the whole female population of childbearing age                                                                          |
 | births_sex_prop    | demography.births_sex_prop               | Proportion of male and female births each year                                                                                                                        |
@@ -118,20 +118,20 @@ Discussion: naming conventions
 * Distinguish events vs. counts
 * Distinguish stratification of array (single-year population pXX vs. HIV population hXX
 
-| Leapfrog         | Frogger              | Details                                                                  |
-|------------------|----------------------|--------------------------------------------------------------------------|
-| totpop1          | p_total_population   | Projected total population                                               |
-| hivpop1          | p_hiv_population     | Projected HIV population                                                 |
-| infections       | p_infections         | Projected number of new HIV infections by sex and age                    |
-| hivstrat_adult   | h_hiv_strat_adult    | Projected PLHIV not on ART by age, sex and CD4                           |
-| artstrat_adult   | h_art_strat_adult    | Projected PLHIV on ART by age, sex, CD4 and treatment stage              |
-| births           | births               | Projected number of births                                               |
-| natdeaths        | p_natural_deaths     | Projected number of natural deaths                                       |
-| natdeaths_hivpop | p_natural_deaths_hiv | Projected number of natural deaths within HIV population                 |
-| hivdeaths        | p_hiv_deaths         | Projected HIV-related deaths by sex and age                              |
-| aidsdeaths_noart | h_aids_deaths_no_art | Projected HIV-related deaths off ART by sex, age and CD4                 |
-| aidsdeaths_art   | h_aids_deaths_art    | Projected HIV-related deaths on ART by sex, age, CD4 and treatment stage |
-| artinit          | h_art_initiation     | Projected ART initiations by sex, age and CD4                            |
+| Leapfrog         | Frogger                    | Details                                                                  |
+|------------------|----------------------------|--------------------------------------------------------------------------|
+| totpop1          | p_total_pop                | Projected total population                                               |
+| hivpop1          | p_hiv_pop                  | Projected HIV population                                                 |
+| infections       | p_infections               | Projected number of new HIV infections by sex and age                    |
+| hivstrat_adult   | h_hiv_adult                | Projected PLHIV not on ART by age, sex and CD4                           |
+| artstrat_adult   | h_art_adult                | Projected PLHIV on ART by age, sex, CD4 and treatment stage              |
+| births           | births                     | Projected number of births                                               |
+| natdeaths        | p_total_pop_natural_deaths | Projected number of natural deaths                                       |
+| natdeaths_hivpop | p_hiv_pop_natural_deaths   | Projected number of natural deaths within HIV population                 |
+| hivdeaths        | p_hiv_deaths               | Projected HIV-related deaths by sex and age                              |
+| aidsdeaths_noart | h_hiv_deaths_no_art        | Projected HIV-related deaths off ART by sex, age and CD4                 |
+| aidsdeaths_art   | h_hiv_deaths_art           | Projected HIV-related deaths on ART by sex, age, CD4 and treatment stage |
+| artinit          | h_art_initiation           | Projected ART initiations by sex, age and CD4                            |
 
 ### Internal
 
