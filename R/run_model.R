@@ -27,6 +27,7 @@ run_model <- function(data, parameters, sim_years,
     parameters$cd4_mort <- parameters[["cd4_mort_coarse"]]
     parameters$art_mort <- parameters[["art_mort_coarse"]]
   }
-  run_base_model(data, parameters, sim_years, hiv_steps_per_year, output_steps,
+  data <- c(data, parameters)
+  run_base_model(data, sim_years, hiv_steps_per_year, output_steps,
                  hiv_age_stratification)
 }

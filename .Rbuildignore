@@ -7,3 +7,6 @@ docker
 ^.vscode$
 ^.idea$
 ^scripts$
+^inst/fit_model/fit_model$
+^inst/fit_model/model_gprofile$
+^tmp$
