@@ -7,12 +7,14 @@
 #' @param output_steps Which sim years to output for
 #' @param hiv_age_stratification The age stratification for HIV population,
 #'  "coarse" or "full"
+#' @param run_child_model If TRUE then run the child model
 #'
 #' @return List of model outputs
 #' @export
 run_model <- function(data, parameters, sim_years,
                       hiv_steps_per_year, output_steps,
-                      hiv_age_stratification = "full") {
+                      hiv_age_stratification = "full",
+                      run_child_model = TRUE) {
   assert_enum(hiv_age_stratification, c("full", "coarse"))
   if (hiv_age_stratification == "full") {
     parameters$hAG_SPAN <- parameters[["hAG_SPAN_full"]]
@@ -29,5 +31,5 @@ run_model <- function(data, parameters, sim_years,
   }
   data <- c(data, parameters)
   run_base_model(data, sim_years, hiv_steps_per_year, output_steps,
-                 hiv_age_stratification)
+                 hiv_age_stratification, run_child_model)
 }

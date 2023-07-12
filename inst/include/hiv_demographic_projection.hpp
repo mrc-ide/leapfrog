@@ -34,6 +34,23 @@ void run_hiv_ageing_and_mortality(int time_step,
 }
 
 template<HivAgeStratification S, typename real_type>
+void run_age_15_entrants(int time_step,
+                         const Parameters<real_type> &pars,
+                         const State<S, real_type> &state_curr,
+                         State<S, real_type> &state_next,
+                         IntermediateData<S, real_type> &intermediate) {
+  constexpr auto ss = StateSpace<S>();
+
+  for (int g = 0; g < ss.num_genders; ++g) {
+    for (int hm = 0; hm < ss.disease_stages; ++hm) {
+      for (int htm = 0; htm < ss.hTM; ++htm) {
+        intermediate.age15_hiv_pop(hm, g) += state_curr.hc_hiv_pop(hm, htm, 14, g);
+      }
+    }
+  }
+}
+
+template<HivAgeStratification S, typename real_type>
 void run_hiv_and_art_stratified_ageing(int time_step,
                                        const Parameters<real_type> &pars,
                                        const State<S, real_type> &state_curr,
@@ -160,6 +177,10 @@ void run_hiv_pop_demographic_projection(int time_step,
                                         internal::IntermediateData<S, real_type> &intermediate) {
   internal::run_hiv_ageing_and_mortality<S>(time_step, pars, state_curr, state_next,
                                             intermediate);
+  if (pars.options.run_child_model) {
+    internal::run_age_15_entrants(time_step, pars, state_curr, state_next, intermediate);
+  }
+
   internal::run_hiv_and_art_stratified_ageing<S>(time_step, pars, state_curr, state_next,
                                                  intermediate);
   internal::run_hiv_and_art_stratified_deaths_and_migration<S>(time_step, pars, state_curr,

@@ -20,13 +20,9 @@ public:
     Tensor5<real_type> aids_deaths_art;
     Tensor4<real_type> art_initiation;
     Tensor3<real_type> hiv_deaths;
+    Tensor5<real_type> hc_hiv_pop;
 
-    OutputState(int age_groups_pop,
-                int num_genders,
-                int disease_stages,
-                int age_groups_hiv,
-                int treatment_stages,
-                int no_output_years)
+    OutputState(int no_output_years)
         : total_population(StateSpace<S>().age_groups_pop, StateSpace<S>().num_genders, no_output_years),
           natural_deaths(StateSpace<S>().age_groups_pop, StateSpace<S>().num_genders, no_output_years),
           hiv_population(StateSpace<S>().age_groups_pop, StateSpace<S>().num_genders, no_output_years),
@@ -46,7 +42,9 @@ public:
                           StateSpace<S>().age_groups_hiv, StateSpace<S>().num_genders, no_output_years),
           art_initiation(StateSpace<S>().disease_stages, StateSpace<S>().age_groups_hiv,
                          StateSpace<S>().num_genders, no_output_years),
-          hiv_deaths(StateSpace<S>().age_groups_pop, StateSpace<S>().num_genders, no_output_years) {
+          hiv_deaths(StateSpace<S>().age_groups_pop, StateSpace<S>().num_genders, no_output_years),
+          hc_hiv_pop(StateSpace<S>().disease_stages, StateSpace<S>().hTM, StateSpace<S>().age_groups_pop,
+                     StateSpace<S>().num_genders, no_output_years) {
       total_population.setZero();
       natural_deaths.setZero();
       hiv_population.setZero();
@@ -59,14 +57,14 @@ public:
       aids_deaths_art.setZero();
       art_initiation.setZero();
       hiv_deaths.setZero();
+      hc_hiv_pop.setZero();
     }
   };
 
   StateSaver(int time_steps,
              std::vector<int> save_steps) :
       save_steps(save_steps),
-      full_state(StateSpace<S>().age_groups_pop, StateSpace<S>().num_genders, StateSpace<S>().disease_stages,
-                 StateSpace<S>().age_groups_hiv, StateSpace<S>().treatment_stages, save_steps.size()) {
+      full_state(save_steps.size()) {
     for (int step: save_steps) {
       if (step < 0) {
         std::stringstream ss;
@@ -100,6 +98,7 @@ public:
         full_state.aids_deaths_art.chip(i, full_state.aids_deaths_art.NumDimensions - 1) = state.aids_deaths_art;
         full_state.art_initiation.chip(i, full_state.art_initiation.NumDimensions - 1) = state.art_initiation;
         full_state.hiv_deaths.chip(i, full_state.hiv_deaths.NumDimensions - 1) = state.hiv_deaths;
+        full_state.hc_hiv_pop.chip(i, full_state.hc_hiv_pop.NumDimensions - 1) = state.hc_hiv_pop;
         return;
       }
     }

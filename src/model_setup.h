@@ -91,6 +91,10 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List data,
   const leapfrog::TensorMap2<int> art15plus_isperc = parse_data<int>(data, "art15plus_isperc",
                                                                      ss.num_genders, proj_years);
 
+  const leapfrog::TensorMap1<double> hc_nosocomial = parse_data<double>(data, "paed_incid_input", proj_years);
+  const leapfrog::TensorMap1<double> hc1_cd4_dist = parse_data<double>(data, "paed_cd4_dist", ss.hC2_disease_stages);
+  const leapfrog::TensorMap2<double> hc_cd4_transition = parse_data<double>(data, "paed_cd4_transition", ss.hC1_disease_stages, ss.hC2_disease_stages);
+
   const leapfrog::Demography<double> demography = {
       base_pop,
       survival,
@@ -121,10 +125,17 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List data,
       art15plus_isperc
   };
 
+  const leapfrog::Children<double> children = {
+      hc_nosocomial,
+      hc1_cd4_dist,
+      hc_cd4_transition
+  };
+
   const leapfrog::Parameters<double> params = {options,
                                                demography,
                                                incidence,
                                                natural_history,
-                                               art};
+                                               art,
+                                               children};
   return params;
 }

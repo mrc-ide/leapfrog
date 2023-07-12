@@ -39,6 +39,16 @@ struct StateSpace<coarse> {
   static constexpr int disease_stages = 7;
   static constexpr int treatment_stages = 3;
   static constexpr std::array<int, 9> hiv_age_groups_span{2, 3, 5, 5, 5, 5, 5, 5, 31};
+  // Number of disease stages within the 1st child age category (0 - 4)
+  static constexpr int hC1_disease_stages = 6;
+  // Number of disease stages within the 2nd child age category (5 - 14)
+  static constexpr int hC2_disease_stages = 7;
+  // Number of transmission types
+  static constexpr int hTM = 4;
+  // Number of PMTCT types
+  static constexpr int hPS = 7;
+  // Number of breast feeting age categories
+  static constexpr int hBF = 18;
 };
 
 template<>
@@ -49,5 +59,16 @@ struct StateSpace<full> {
   static constexpr int disease_stages = 7;
   static constexpr int treatment_stages = 3;
   static constexpr std::array<int, 66> hiv_age_groups_span = create_array<int, 66>(1);
+  // Number of disease stages within the 1st child age category (0 - 4)
+  static constexpr int hC1_disease_stages = 6;
+  // Number of disease stages within the 2nd child age category (5 - 14)
+  static constexpr int hC2_disease_stages = 7;
+  // Number of transmission types
+  static constexpr int hTM = 4;
+  // Number of PMTCT types
+  static constexpr int hPS = 7;
+  // Number of breast feeting age categories
+  static constexpr int hBF = 18;
 };
+
 }

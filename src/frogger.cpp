@@ -54,13 +54,15 @@ Rcpp::List fit_model(const leapfrog::StateSpace<S> ss,
                      const Rcpp::List data,
                      const int proj_years,
                      const int hiv_steps,
+                     const bool run_child_model,
                      const std::vector<int> save_steps) {
   const leapfrog::Options<double> opts = {
       hiv_steps,
       Rcpp::as<int>(data["t_ART_start"]) - 1,
       ss.age_groups_hiv,
       Rcpp::as<int>(data["scale_cd4_mort"]),
-      Rcpp::as<double>(data["art_alloc_mxweight"])
+      Rcpp::as<double>(data["art_alloc_mxweight"]),
+      run_child_model
   };
 
   const leapfrog::Parameters<double> params = setup_model_params<double, S>(data, opts, proj_years);
@@ -83,6 +85,7 @@ Rcpp::List fit_model(const leapfrog::StateSpace<S> ss,
                                         ss.num_genders * output_years);
   Rcpp::NumericVector r_art_initiation(ss.disease_stages * ss.age_groups_hiv * ss.num_genders * output_years);
   Rcpp::NumericVector r_hiv_deaths(ss.age_groups_pop * ss.num_genders * output_years);
+  Rcpp::NumericVector r_hc_hiv_pop(ss.disease_stages * ss.hTM * ss.age_groups_pop * ss.num_genders * output_years);
 
   r_total_population.attr("dim") =
       Rcpp::NumericVector::create(ss.age_groups_pop, ss.num_genders, output_years);
@@ -105,6 +108,8 @@ Rcpp::List fit_model(const leapfrog::StateSpace<S> ss,
   r_art_initiation.attr("dim") = Rcpp::NumericVector::create(
       ss.disease_stages, ss.age_groups_hiv, ss.num_genders, output_years);
   r_hiv_deaths.attr("dim") = Rcpp::NumericVector::create(ss.age_groups_pop, ss.num_genders, output_years);
+  r_hc_hiv_pop.attr("dim") = Rcpp::NumericVector::create(ss.disease_stages, ss.hTM, ss.age_groups_pop, ss.num_genders,
+                                                         output_years);
 
   std::copy_n(state.total_population.data(), state.total_population.size(),
               REAL(r_total_population));
@@ -130,6 +135,8 @@ Rcpp::List fit_model(const leapfrog::StateSpace<S> ss,
               REAL(r_art_initiation));
   std::copy_n(state.hiv_deaths.data(), state.hiv_deaths.size(),
               REAL(r_hiv_deaths));
+  std::copy_n(state.hc_hiv_pop.data(), state.hc_hiv_pop.size(),
+              REAL(r_hc_hiv_pop));
 
   Rcpp::List ret =
       Rcpp::List::create(Rcpp::_["total_population"] = r_total_population,
@@ -143,7 +150,8 @@ Rcpp::List fit_model(const leapfrog::StateSpace<S> ss,
                          Rcpp::_["infections"] = r_infections,
                          Rcpp::_["aids_deaths_art"] = r_aids_deaths_art,
                          Rcpp::_["art_initiation"] = r_art_initiation,
-                         Rcpp::_["hiv_deaths"] = r_hiv_deaths);
+                         Rcpp::_["hiv_deaths"] = r_hiv_deaths,
+                         Rcpp::_["hc_hiv_pop"] = r_hc_hiv_pop);
   return ret;
 }
 
@@ -152,7 +160,8 @@ Rcpp::List run_base_model(const Rcpp::List data,
                           SEXP sim_years,
                           SEXP hiv_steps_per_year,
                           Rcpp::NumericVector output_steps,
-                          std::string hiv_age_stratification) {
+                          std::string hiv_age_stratification,
+                          bool run_child_model) {
   const int proj_years = transform_simulation_years(data, sim_years);
   const std::vector<int> save_steps = transform_output_steps(output_steps);
   const int hiv_steps = transform_hiv_steps_per_year(hiv_steps_per_year);
@@ -162,12 +171,12 @@ Rcpp::List run_base_model(const Rcpp::List data,
   if (hiv_age_stratification == "full") {
     constexpr auto ss = leapfrog::StateSpace<leapfrog::HivAgeStratification::full>();
     ret = fit_model<leapfrog::HivAgeStratification::full>(ss, data,
-                                                          proj_years, hiv_steps, save_steps);
+                                                          proj_years, hiv_steps, run_child_model, save_steps);
   } else {
     // We've already validated that hiv_age_stratification is one of "full" or "coarse"
     constexpr auto ss = leapfrog::StateSpace<leapfrog::HivAgeStratification::coarse>();
     ret = fit_model<leapfrog::HivAgeStratification::coarse>(ss, data,
-                                                            proj_years, hiv_steps, save_steps);
+                                                            proj_years, hiv_steps, run_child_model, save_steps);
   }
 
   return ret;

@@ -3,6 +3,7 @@
 #include "general_demographic_projection.hpp"
 #include "hiv_demographic_projection.hpp"
 #include "model_simulation.hpp"
+#include "child_model_simulation.hpp"
 #include "state_saver.hpp"
 #include "state_space.hpp"
 
@@ -30,6 +31,7 @@ void initialise_model_state(const Parameters<real_type> &pars,
   state.aids_deaths_art.setZero();
   state.art_initiation.setZero();
   state.hiv_deaths.setZero();
+  state.hc_hiv_pop.setZero();
 }
 
 }
@@ -56,6 +58,9 @@ typename StateSaver<S, real_type>::OutputState run_model(int time_steps,
     run_general_pop_demographic_projection<S>(step, pars, state, state_next, intermediate);
     run_hiv_pop_demographic_projection<S>(step, pars, state, state_next, intermediate);
     run_hiv_model_simulation<S>(step, pars, state, state_next, intermediate);
+    if (pars.options.run_child_model) {
+      run_child_model_simulation<S>(step, pars, state, state_next, intermediate);
+    }
     state_output.save_state(state_next, step);
     std::swap(state, state_next);
     intermediate.reset();

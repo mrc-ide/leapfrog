@@ -1,8 +1,8 @@
 test_that("initial state set up works as expected", {
-  demp <- readRDS(test_path("testdata/demographic_projection_object.rds"))
-  parameters <- readRDS(test_path("testdata/projection_parameters.rds"))
+  demp <- readRDS(test_path("testdata/demographic_projection_object_adult.rds"))
+  parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
 
-  out <- run_model(demp, parameters, 0L, 0L, 0)
+  out <- run_model(demp, parameters, 0L, 0L, 0, run_child_model = FALSE)
 
   expect_setequal(
     names(out),
@@ -10,7 +10,7 @@ test_that("initial state set up works as expected", {
       "total_population", "births", "natural_deaths", "hiv_population",
       "hiv_natural_deaths", "hiv_strat_adult", "art_strat_adult",
       "aids_deaths_no_art", "infections", "aids_deaths_art", "art_initiation",
-      "hiv_deaths"
+      "hiv_deaths", "hc_hiv_pop"
     )
   )
   expect_equal(dim(out$total_population), c(81, 2, 1))
@@ -45,11 +45,12 @@ test_that("initial state set up works as expected", {
 })
 
 test_that("initial state set up with coarse stratified HIV works as expected", {
-  demp <- readRDS(test_path("testdata/demographic_projection_object.rds"))
-  parameters <- readRDS(test_path("testdata/projection_parameters.rds"))
+  demp <- readRDS(test_path("testdata/demographic_projection_object_adult.rds"))
+  parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
 
   out <- run_model(demp, parameters, 0L, 0L, 0,
-                   hiv_age_stratification = "coarse")
+                   hiv_age_stratification = "coarse",
+                   run_child_model = FALSE)
 
   expect_setequal(
     names(out),
@@ -57,7 +58,7 @@ test_that("initial state set up with coarse stratified HIV works as expected", {
       "total_population", "births", "natural_deaths", "hiv_population",
       "hiv_natural_deaths", "hiv_strat_adult", "art_strat_adult",
       "aids_deaths_no_art", "infections", "aids_deaths_art", "art_initiation",
-      "hiv_deaths"
+      "hiv_deaths", "hc_hiv_pop"
     )
   )
   expect_equal(dim(out$total_population), c(81, 2, 1))
@@ -92,10 +93,11 @@ test_that("initial state set up with coarse stratified HIV works as expected", {
 })
 
 test_that("model for 1 time step has looped", {
-  demp <- readRDS(test_path("testdata/demographic_projection_object.rds"))
-  parameters <- readRDS(test_path("testdata/projection_parameters.rds"))
+  demp <- readRDS(test_path("testdata/demographic_projection_object_adult.rds"))
+  parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
 
-  out <- run_model(demp, parameters, 1L, 10L, 1)
+  out <- run_model(demp, parameters, 1L, 10L, 1,
+                   run_child_model = FALSE)
 
   expect_setequal(
     names(out),
@@ -103,7 +105,7 @@ test_that("model for 1 time step has looped", {
       "total_population", "births", "natural_deaths", "hiv_population",
       "hiv_natural_deaths", "hiv_strat_adult", "art_strat_adult",
       "aids_deaths_no_art", "infections", "aids_deaths_art", "art_initiation",
-      "hiv_deaths"
+      "hiv_deaths", "hc_hiv_pop"
     )
   )
   expect_equal(dim(out$total_population), c(81, 2, 1))
@@ -124,10 +126,11 @@ test_that("model for 1 time step has looped", {
 })
 
 test_that("model can be run for all years", {
-  demp <- readRDS(test_path("testdata/demographic_projection_object.rds"))
-  parameters <- readRDS(test_path("testdata/projection_parameters.rds"))
+  demp <- readRDS(test_path("testdata/demographic_projection_object_adult.rds"))
+  parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
 
-  out <- run_model(demp, parameters, NULL, NULL, 0:60)
+  out <- run_model(demp, parameters, NULL, NULL, 0:60,
+                   run_child_model = FALSE)
 
   ## No HIV population < age 15
   expect_true(all(out$hiv_population[1:15, , ] < 1e-20))
@@ -163,17 +166,18 @@ test_that("model can be run for all years", {
 })
 
 test_that("model can be run with ART initiation", {
-  demp <- readRDS(test_path("testdata/demographic_projection_object.rds"))
-  parameters <- readRDS(test_path("testdata/projection_parameters.rds"))
+  demp <- readRDS(test_path("testdata/demographic_projection_object_adult.rds"))
+  parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
   ## Set time ART start to some value lower than no of years in projection
   parameters[["t_ART_start"]] <- 20L
 
-  expect_silent(run_model(demp, parameters, NULL, NULL, 0:60))
+  expect_silent(run_model(demp, parameters, NULL, NULL, 0:60,
+                          run_child_model = FALSE))
 })
 
 test_that("error thrown if trying to run model for more than max years", {
-  demp <- readRDS(test_path("testdata/demographic_projection_object.rds"))
-  parameters <- readRDS(test_path("testdata/projection_parameters.rds"))
+  demp <- readRDS(test_path("testdata/demographic_projection_object_adult.rds"))
+  parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
 
   expect_error(
     run_model(demp, parameters, 100L, 10L, 100),
@@ -182,8 +186,8 @@ test_that("error thrown if trying to run model for more than max years", {
 })
 
 test_that("error thrown if model run with invalid HIV stratification", {
-  demp <- readRDS(test_path("testdata/demographic_projection_object.rds"))
-  parameters <- readRDS(test_path("testdata/projection_parameters.rds"))
+  demp <- readRDS(test_path("testdata/demographic_projection_object_adult.rds"))
+  parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
 
   expect_error(
     run_model(demp, parameters, NULL, NULL, 60, hiv_age_stratification = "fine"),
@@ -192,8 +196,8 @@ test_that("error thrown if model run with invalid HIV stratification", {
 })
 
 test_that("error thrown if size of stratified data does not match expected", {
-  demp <- readRDS(test_path("testdata/demographic_projection_object.rds"))
-  parameters <- readRDS(test_path("testdata/projection_parameters.rds"))
+  demp <- readRDS(test_path("testdata/demographic_projection_object_adult.rds"))
+  parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
   parameters[["cd4_mort_full"]] <- rep(1, 3)
 
   expect_error(
@@ -203,8 +207,8 @@ test_that("error thrown if size of stratified data does not match expected", {
 })
 
 test_that("error thrown if trying to save output from invalid steps", {
-  demp <- readRDS(test_path("testdata/demographic_projection_object.rds"))
-  parameters <- readRDS(test_path("testdata/projection_parameters.rds"))
+  demp <- readRDS(test_path("testdata/demographic_projection_object_adult.rds"))
+  parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
 
   expect_error(run_model(demp, parameters, NULL, NULL, -1),
                "Output step must be at least 0, got '-1'.")

@@ -2,8 +2,8 @@
 
 root_dir <- here::here()
 
-demp <- readRDS(file.path(root_dir, "tests/testthat/testdata/demographic_projection_object.rds"))
-parameters <- readRDS(file.path(root_dir, "tests/testthat/testdata/projection_parameters.rds"))
+demp <- readRDS(file.path(root_dir, "tests/testthat/testdata/demographic_projection_object_adult.rds"))
+parameters <- readRDS(file.path(root_dir, "tests/testthat/testdata/projection_parameters_adult.rds"))
 
 message("Benchmarking coarse stratified fit")
 bench::mark(
