@@ -1,3 +1,4 @@
 #!/usr/bin/env Rscript
 
-frogger:::generate_build_r_output(dest = "inst/r_interface/model_output.hpp")
+#frogger:::generate_input_interface(dest = "inst/r_interface/model_input.hpp")
+frogger:::generate_output_interface(dest = "inst/r_interface/model_output.hpp")

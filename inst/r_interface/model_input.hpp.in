@@ -1,3 +1,5 @@
+{{header}}
+
 #pragma once
 
 #include <Rcpp.h>
@@ -40,13 +42,25 @@ auto parse_data(const Rcpp::List data, const std::string& key, Args... dims) {
   return Eigen::TensorMap<Eigen::Tensor<T, rank>>(r_data<T>(array_data), static_cast<int>(dims)...);
 }
 
+template<typename T, std::size_t rank>
+auto convert_base(Eigen::TensorMap<Eigen::Tensor<int, rank>> map) {
+  static_assert(sizeof(T) == 0, "Only specializations of convert_base can be used");
+}
+
+template<std::size_t rank>
+auto convert_base(Eigen::TensorMap<Eigen::Tensor<double, rank>> map) {
+  for (int i = 0; i < map.size(); ++i) {
+    // 0-based indexing in C++ vs 1-based indexing in R
+    map.data()[i] = map.data()[i] - 1.0f;
+  }
+}
+
 template<std::size_t rank>
 auto convert_base(Eigen::TensorMap<Eigen::Tensor<int, rank>> map) {
   for (int i = 0; i < map.size(); ++i) {
     // 0-based indexing in C++ vs 1-based indexing in R
     map.data()[i] = map.data()[i] - 1;
   }
-  return map;
 }
 
 template<typename real_type, leapfrog::HivAgeStratification S>
@@ -54,6 +68,7 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List data,
                                                     const leapfrog::Options<double> options,
                                                     const int proj_years) {
   constexpr auto ss = leapfrog::StateSpace<S>();
+{{parse_data}}
   const leapfrog::TensorMap2<double> base_pop = parse_data<double>(data, "basepop",
                                                                    ss.age_groups_pop, ss.num_genders);
   const leapfrog::TensorMap3<double> survival = parse_data<double>(data, "Sx",
@@ -77,7 +92,7 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List data,
                                                                           ss.disease_stages - 1, ss.age_groups_hiv,
                                                                           ss.num_genders);
 
-  const leapfrog::TensorMap1<int> artcd4elig_idx = convert_base<1>(parse_data<int>(data, "artcd4elig_idx", proj_years + 1));
+  const leapfrog::Tensor1<int> artcd4elig_idx = convert_base(parse_data<int>(data, "artcd4elig_idx", proj_years + 1));
 
   const leapfrog::TensorMap3<double> cd4_initdist = parse_data<double>(data, "cd4_initdist",
                                                                        ss.disease_stages, ss.age_groups_hiv,

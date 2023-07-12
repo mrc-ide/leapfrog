@@ -1,0 +1,25 @@
+outputs:
+  - input_name: basepop
+    param_name: base_pop
+    type: double
+    dimensions:
+      - age_groups_pop
+      - num_genders
+
+  - input_name: Sx
+    param_name: survival
+    type: double
+    dimensions:
+      # Survival is survival prob from age group x to x+1, so +1 age group for open age
+      # group 80+ to 80+
+      - age_groups_pop + 1
+      - num_genders
+      - proj_years
+
+  - input_name: artcd4elig_idx
+    param_name: artcd4elig_idx
+    type: double
+    dimensions:
+      - proj_years + 1
+    # Convert from R 1-based to 0-based as this is an index
+    convert_base: true
