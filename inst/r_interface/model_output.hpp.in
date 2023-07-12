@@ -12,11 +12,11 @@ Rcpp::List build_r_output(const typename leapfrog::StateSaver<real_type, S>::Out
                           const std::vector<int> save_steps) {
   constexpr auto ss = leapfrog::StateSpace<S>();
   size_t output_years = save_steps.size();
-  {{initialise_r_memory}}
+{{initialise_r_memory}}
 
-  {{set_r_dimensions}}
+{{set_r_dimensions}}
 
-  {{copy_data}}
+{{copy_data}}
 
-  {{return_output}}
+{{return_output}}
 }
