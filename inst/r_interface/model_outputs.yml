@@ -1,0 +1,102 @@
+outputs:
+  - output_name: total_population
+    state_name: total_population
+    r_type: REAL
+    dimensions:
+      - age_groups_pop
+      - num_genders
+      - output_years
+
+  - output_name: births
+    state_name: births
+    r_type: REAL
+    dimensions:
+      - output_years
+
+  - output_name: natural_deaths
+    state_name: natural_deaths
+    r_type: REAL
+    dimensions:
+      - age_groups_pop
+      - num_genders
+      - output_years
+
+  - output_name: hiv_population
+    state_name: hiv_population
+    r_type: REAL
+    dimensions:
+      - age_groups_pop
+      - num_genders
+      - output_years
+
+  - output_name: hiv_natural_deaths
+    state_name: hiv_natural_deaths
+    r_type: REAL
+    dimensions:
+      - age_groups_pop
+      - num_genders
+      - output_years
+
+  - output_name: hiv_strat_adult
+    state_name: hiv_strat_adult
+    r_type: REAL
+    dimensions:
+      - disease_stages
+      - age_groups_hiv
+      - num_genders
+      - output_years
+
+
+  - output_name: art_strat_adult
+    state_name: art_strat_adult
+    r_type: REAL
+    dimensions:
+      - treatment_stages
+      - disease_stages
+      - age_groups_hiv
+      - num_genders
+      - output_years
+
+  - output_name: aids_deaths_no_art
+    state_name: aids_deaths_no_art
+    r_type: REAL
+    dimensions:
+      - disease_stages
+      - age_groups_hiv
+      - num_genders
+      - output_years
+
+  - output_name: infections
+    state_name: infections
+    r_type: REAL
+    dimensions:
+      - age_groups_pop
+      - num_genders
+      - output_years
+
+  - output_name: aids_deaths_art
+    state_name: aids_deaths_art
+    r_type: REAL
+    dimensions:
+      - treatment_stages
+      - disease_stages
+      - age_groups_hiv
+      - num_genders
+      - output_years
+
+  - output_name: art_initiation
+    state_name: art_initiation
+    r_type: REAL
+    dimensions:
+      - disease_stages
+      - age_groups_hiv
+      - num_genders
+      - output_years
+
+  - output_name: hiv_deaths
+    state_name: hiv_deaths
+    r_type: REAL
+    dimensions:
+      - age_groups_pop
+      - num_genders
+      - output_years

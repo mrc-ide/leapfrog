@@ -57,3 +57,23 @@ assert_enum <- function(x, values, name = deparse(substitute(x))) {
 vcapply <- function(X, FUN, ...) { # nolint
   vapply(X, FUN, character(1), ...)
 }
+
+assert_names <- function(items, required, optional,
+                         name = deparse(substitute(items))) {
+  missing <- !(required %in% names(items))
+  if (any(missing)) {
+    missing <- paste(paste0("'", required[missing], "'"), collapse = ", ")
+    stop(sprintf("Required item(s) %s are missing from %s", missing, name))
+  }
+  additional <- !(names(items) %in% c(required, optional))
+  if (any(additional)) {
+    additional <- paste(paste0("'", names(items)[additional], "'"),
+                        collapse = ", ")
+    stop(sprintf("Unknown item(s) %s are included in %s", additional, name))
+  }
+  invisible(TRUE)
+}
+
+frogger_file <- function(..., mustWork = TRUE) {
+  system.file(..., package = "frogger", mustWork = mustWork)
+}

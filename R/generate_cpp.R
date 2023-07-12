@@ -6,12 +6,17 @@
 #'
 #' @return Nothing, called to generate code in src dir
 #' @keywords internal
-generate_build_r_output <- function(dest = file.path("src/model_output.hpp")) {
-  template <- readLines(file.path("src/model_output.hpp.in"))
-  outputs <- yaml::read_yaml(file.path("src/model_outputs.yml"))$outputs
-  ## validate outputs have all required props
+generate_build_r_output <- function(
+    dest = frogger_file("r_interface/model_output.hpp", mustWork = FALSE)) {
+
+  template <- readLines(frogger_file("r_interface/model_output.hpp.in"))
+  outputs <- yaml::read_yaml(
+    frogger_file("r_interface/model_outputs.yml"))$outputs
 
   for (i in seq_along(outputs)) {
+    assert_names(outputs[[i]],
+                 c("output_name", "state_name", "r_type", "dimensions"),
+                 c())
     outputs[[i]]$dimensions <- parse_dimensions(outputs[[i]]$dimensions)
   }
 
