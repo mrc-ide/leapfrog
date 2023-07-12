@@ -45,25 +45,32 @@ remotes::install_github("mrc-ide/frogger", upgrade = FALSE)
 
 Frogger naming rules
 
-* p prefix indicates this is age stratified by single year i.e. same age stratification as total population
-* h prefix indicates this is age stratified by same age stratification as HIV population, this might be single year from
+* `p_` prefix indicates this is age stratified by total single year i.e. same age stratification as total population
+* `h_` prefix indicates this is age stratified by same age stratification as HIV adult population, this might be single
+  year from
   15+ or could be coarse age groups
-* idx prefix means this is an index
+* `hc_` prefix indicates this is age stratified by the HIV child population
+* `idx_` prefix means this is an index
 * Uppercase means this is a dimension of the state space e.g. `NS` or `pAG`
+* `ts_` prefix means this is a time step
+* `hts_` prefix means this is an HIV time step (i.e. a time step of the inner HIV loop)
+
+These prefixes can be merged e.g.
+
+* `p_idx_hiv_first_adult` - Is the index of the first age group within singe-year ages to be considered an adult
 
 ### State space
 
 In `StateSpace` struct
 
-| Leapfrog           | Frogger            | Details                                             |
-|--------------------|--------------------|-----------------------------------------------------|
-| NG                 | NS                 | Number of sexes                                     |
-| pAG                | pAG                | Number of age groups in population, 81 for 0 to 80+ |
-| hAG                | hAG                | Number of age groups in HIV population              |
-| hDS                | hDS                | Number of disease stages                            |
-| hTS                | hTS                | Number of treatment stages                          |
-| sim_years          | sim_years          | Number of simulation years to run                   |
-| hiv_steps_per_year | hiv_steps_per_year | Number of HIV model time steps per year             |
+| Leapfrog | Frogger  | Details                                                        |
+|----------|----------|----------------------------------------------------------------|
+| NG       | NS       | Number of sexes                                                |
+| pAG      | pAG      | Number of age groups in population, 81 for 0 to 80+            |
+| hAG      | hAG      | Number of age groups in coarse stratified adult HIV population |
+| hDS      | hDS      | Number of disease stages in adult HIV population               |
+| hTS      | hTS      | Number of treatment stages in adult HIV population             |
+| hAG_SPAN | hAG_span | Array of HIV age group sizes                                   |
 
 #### Loop variable convention
 
@@ -73,17 +80,17 @@ In `StateSpace` struct
 * `hDS` is `hm`
 * `hTS` is `hu`
 
-### Key indices in state space
+### Key indices in state space or other options controlling fit
 
-In `?` struct
+In `Options` struct. Some of these come from data, some are static, some are an input option
 
-| Leapfrog      | Frogger                | Details                                                |
-|---------------|------------------------|--------------------------------------------------------|
-| pIDX_FERT     | p_idx_fertility_first  | First age group index eligible for fertility           |
-| pAG_FERT      | p_fertility_age_groups | Number of ages eligible for fertility                  |
-| pIDX_HIVADULT | p_idx_hiv_first_adult  | Index of the first age group to be considered an adult |
-| t_ART_start   | time_art_start         | Time step to start modelling ART                       |
-| hAG_SPAN      | hAG_groups_span        | Array of HIV age group sizes                           |
+| Leapfrog           | Frogger                | Details                                                |
+|--------------------|------------------------|--------------------------------------------------------|
+| hiv_steps_per_year | hts_per_year           | Number of HIV model time steps per year                |
+| pIDX_FERT          | p_idx_fertility_first  | First age group index eligible for fertility           |
+| pAG_FERT           | p_fertility_age_groups | Number of ages eligible for fertility                  |
+| pIDX_HIVADULT      | p_idx_hiv_first_adult  | Index of the first age group to be considered an adult |
+| t_ART_start        | ts_art_start           | Time step to start modelling ART                       |
 
 ### Input data
 
@@ -92,9 +99,9 @@ In 4 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 | Leapfrog           | Frogger                                  | Details                                                                                                                                                               |
 |--------------------|------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | basepop            | demography.base_pop                      | Population data by age group and sex                                                                                                                                  |
-| sx                 | demography.survival_prob                 | Probability of surviving between ages, from 0 to 1, 1 to 2, ..., 79 to 80+ and 80+ to 80+                                                                             |
+| sx                 | demography.survival_probability          | Probability of surviving from age x to x+1 i.e. from 0 to 1, 1 to 2, ..., 79 to 80+ and 80+ to 80+                                                                    |
 | netmigr            | demography.net_migration                 | Net migration by age group, sex and year                                                                                                                              |
-| asfr               | demography.fertility_ratio               | Ratio of number of live births in a year and the whole female population of childbearing age                                                                          |
+| asfr               | demography.age_specific_fertility_rate   | Rate of live births in a year and the total female population of childbearing age                                                                                     |
 | births_sex_prop    | demography.births_sex_prop               | Proportion of male and female births each year                                                                                                                        |
 | incidinput         | incidence.rate                           | Incidence rate per year                                                                                                                                               |
 | incrr_sex          | incidence.sex_rate_ratio                 | HIV incidence rate ratio for female : male age 15-49 years                                                                                                            |
@@ -103,13 +110,13 @@ In 4 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 | cd4_prog           | natural_history.cd4_progression          | Probability of progressing from 1 CD4 stage to the next by age and sex                                                                                                |
 | cd4_mort           | natural_history.cd4_mortality            | Probability of mortality by CD4 stage, age and sex                                                                                                                    |
 | scale_cd4_mort     | natural_history.scale_cd4_mortality      | If 1 then scale HIV related mortality (i.e. cd4_mortality) as a proportion of number of people with HIV and over the number with HIV and on ART at this disease stage |
-| art_mort           | art.mortality                            | Probability of mortality by treatment stage, CD4 stage, age and sex                                                                                                   |
+| art_mort           | art.mortality_rate                       | Probability of mortality by treatment stage, CD4 stage, age and sex                                                                                                   |
 | artmx_timerr       | art.mortaility_rate_ratio                | HIV-related mortality rate ratios by treatment stage                                                                                                                  |
 | art15plus_num      | art.adults_on_art                        | Time series of # or % of adult PLHIV on ART by sex                                                                                                                    |
 | art15plus_isperc   | art.adults_on_art_is_percent             | Time series, TRUE if art15plus_num is a %, FALSE if it is a #                                                                                                         |
-| artcd4elig_idx     | art.idx_cd4_elig                         | The index of the CD4 count at which people are eligible for ART by time step                                                                                          |
+| artcd4elig_idx     | art.idx_hm_elig                          | The index of the CD4 count at which people are eligible for ART by time step                                                                                          |
 | art_alloc_mxweight | art.initiation_mortality_weight          | Weighting for extent that expected mortality guides ART uptake                                                                                                        |
-| art_dropout        | art.dropout                              | ART dropout rate at each time step                                                                                                                                    |
+| art_dropout        | art.dropout                              | Annual ART dropout rate                                                                                                                                               |
 
 ### Outputs
 
