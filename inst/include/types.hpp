@@ -48,6 +48,9 @@ template<HivAgeStratification S>
 constexpr int treatment_stages = StateSpace<S>::treatment_stages;
 
 template<HivAgeStratification S>
+constexpr int hC1_disease_stages = StateSpace<S>::hC1_disease_stages;
+
+template<HivAgeStratification S>
 constexpr int hC2_disease_stages = StateSpace<S>::hC2_disease_stages;
 
 template<HivAgeStratification S>
@@ -169,6 +172,8 @@ struct State {
   TensorFixedSize <real_type, Sizes<disease_stages<S>, age_groups_hiv<S>, num_genders<S>>> art_initiation;
   TensorFixedSize <real_type, Sizes<age_groups_pop<S>, num_genders<S>>> hiv_deaths;
   TensorFixedSize <real_type, Sizes<disease_stages<S>, hTM<S>, age_groups_pop<S>, num_genders<S>>> hc_hiv_pop;
+  TensorFixedSize <real_type, Sizes<treatment_stages<S>, disease_stages<S>, age_groups_pop<S>, num_genders<S>>> hc_art_pop;
+  
 
   State() {}
 
@@ -185,6 +190,7 @@ struct State {
     art_initiation.setZero();
     hiv_deaths.setZero();
     hc_hiv_pop.setZero();
+    hc_art_pop.setZero();
     births = 0;
   }
 };

@@ -41,6 +41,7 @@ void run_age_15_entrants(int time_step,
                          IntermediateData<S, real_type> &intermediate) {
   constexpr auto ss = StateSpace<S>();
 
+  //TO DO: add ART entrants here
   for (int g = 0; g < ss.num_genders; ++g) {
     for (int hm = 0; hm < ss.disease_stages; ++hm) {
       for (int htm = 0; htm < ss.hTM; ++htm) {
@@ -112,6 +113,8 @@ void run_hiv_and_art_stratified_ageing(int time_step,
     }
   }
 }
+
+
 
 template<HivAgeStratification S, typename real_type>
 void run_hiv_and_art_stratified_deaths_and_migration(

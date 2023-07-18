@@ -93,7 +93,7 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List data,
 
   const leapfrog::TensorMap1<double> hc_nosocomial = parse_data<double>(data, "paed_incid_input", proj_years);
   const leapfrog::TensorMap1<double> hc1_cd4_dist = parse_data<double>(data, "paed_cd4_dist", ss.hC2_disease_stages);
-  const leapfrog::TensorMap2<double> hc_cd4_transition = parse_data<double>(data, "paed_cd4_transition", ss.hC1_disease_stages, ss.hC2_disease_stages);
+  const leapfrog::TensorMap2<double> hc_cd4_transition = parse_data<double>(data, "paed_cd4_transition", ss.hC2_disease_stages, ss.hC1_disease_stages);
 
   const leapfrog::Demography<double> demography = {
       base_pop,
