@@ -31,3 +31,13 @@ test_that("assert_names", {
                "Unknown item(s) 'five' are included in input",
                fixed = TRUE)
 })
+
+test_that("assert_names_one_of", {
+  input <- list(foo = "1", bar = "2")
+  assert_names_one_of(input, c("foo"))
+  assert_names_one_of(input, c("bar"))
+  expect_error(
+    assert_names_one_of(input, c("foo", "bar")),
+    "Items 'foo', 'bar' are all included in input, only one should be present",
+    fixed = TRUE)
+})

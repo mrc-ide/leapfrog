@@ -1,16 +1,16 @@
 test_that("can generate output parsing", {
   t <- tempfile()
-  generate_build_r_output(t)
+  generate_output_interface(t)
 
   result <- readLines(t)
   expect_true(any(grepl("// ========= DO NOT EDIT =========", result)))
   expect_true(any(grepl(paste0(
     "Rcpp::NumericVector r_total_population",
-    "\\(ss\\.age_groups_pop \\* ss\\.num_genders \\* output_years\\);"),
+    "\\(age_groups_pop \\* num_genders \\* output_years\\);"),
     result)))
   expect_true(any(grepl(paste0(
     "r_total_population\\.attr\\(\\\"dim\\\"\\) = Rcpp::NumericVector::",
-    "create\\(ss\\.age_groups_pop, ss\\.num_genders, output_years\\);"),
+    "create\\(age_groups_pop, num_genders, output_years\\);"),
     result)))
   expect_true(any(grepl(paste0(
     "std::copy_n\\(state\\.total_population\\.data\\(\\), ",
@@ -18,5 +18,27 @@ test_that("can generate output parsing", {
     result)))
   expect_true(any(grepl(paste0(
     "Rcpp::_\\[\\\"total_population\\\"\\] = r_total_population,"),
+    result)))
+})
+
+test_that("can generate input parsing", {
+  t <- tempfile()
+  generate_input_interface(t)
+
+  result <- readLines(t)
+  expect_true(any(grepl("// ========= DO NOT EDIT =========", result)))
+  expect_true(any(grepl(paste0(
+    "const leapfrog::TensorMap2<double> base_pop = ",
+    "parse_data<double>\\(data, \"basepop\", age_groups_pop, num_genders\\);"),
+    result)))
+  expect_true(any(grepl(paste0(
+    "const leapfrog::TensorMap1<int> artcd4elig_idx = convert_base\\(",
+    "parse_data<int>\\(data, \"artcd4elig_idx\", proj_years \\+ 1\\)\\);"),
+    result)))
+  expect_true(any(grepl(
+    "leapfrog::Tensor1<double> h_art_stage_dur\\(treatment_stages - 1\\);",
+    result)))
+  expect_true(any(grepl(
+    "h_art_stage_dur.setConstant\\(0.5\\);",
     result)))
 })

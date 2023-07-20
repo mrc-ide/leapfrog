@@ -58,6 +58,10 @@ vcapply <- function(X, FUN, ...) { # nolint
   vapply(X, FUN, character(1), ...)
 }
 
+vlapply <- function(X, FUN, ...) { # nolint
+  vapply(X, FUN, logical(1), ...)
+}
+
 assert_names <- function(items, required, optional,
                          name = deparse(substitute(items))) {
   missing <- !(required %in% names(items))
@@ -72,6 +76,16 @@ assert_names <- function(items, required, optional,
     stop(sprintf("Unknown item(s) %s are included in %s", additional, name))
   }
   invisible(TRUE)
+}
+
+assert_names_one_of <- function(items, names,
+                                name = deparse(substitute(items))) {
+  present <- names %in% names(items)
+  if (sum(present) > 1) {
+    present <- paste(paste0("'", names[present], "'"), collapse = ", ")
+    stop(sprintf("Items %s are all included in %s, only one should be present",
+                 present, name))
+  }
 }
 
 frogger_file <- function(..., mustWork = TRUE) {
