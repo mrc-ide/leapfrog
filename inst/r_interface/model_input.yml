@@ -44,8 +44,8 @@ inputs:
     dimensions:
       - proj_years
 
-  - r_name: incidence_relative_risk_age
-    cpp_name: incrr_age
+  - r_name: incrr_age
+    cpp_name: incidence_relative_risk_age
     type: double
     dimensions:
       - age_groups_pop - hiv_adult_first_age_group

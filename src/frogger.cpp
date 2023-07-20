@@ -3,7 +3,7 @@
 #include "frogger.hpp"
 #include "types.hpp"
 #include "state_space.hpp"
-#include "model_setup.hpp"
+#include "model_input.hpp"
 #include "model_output.hpp"
 
 int transform_simulation_years(const Rcpp::List demp, SEXP r_sim_years) {
@@ -64,11 +64,11 @@ Rcpp::List fit_model(const leapfrog::StateSpace<S> ss,
       Rcpp::as<double>(data["art_alloc_mxweight"])
   };
 
-  const leapfrog::Parameters<double> params = setup_model_params<double, S>(data, opts, proj_years);
+  const leapfrog::Parameters<double> params = setup_model_params<S, double>(data, opts, proj_years);
 
-  auto state = leapfrog::run_model<double, S>(proj_years, save_steps, params);
+  auto state = leapfrog::run_model<S, double>(proj_years, save_steps, params);
 
-  auto ret = build_r_output<double, S>(state, save_steps);
+  auto ret = build_r_output<S, double>(state, save_steps);
 
   return ret;
 }

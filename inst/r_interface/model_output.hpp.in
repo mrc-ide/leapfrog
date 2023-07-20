@@ -7,8 +7,8 @@
 
 #include "state_saver.hpp"
 
-template<typename real_type, leapfrog::HivAgeStratification S>
-Rcpp::List build_r_output(const typename leapfrog::StateSaver<real_type, S>::OutputState &state,
+template<leapfrog::HivAgeStratification S, typename real_type>
+Rcpp::List build_r_output(const typename leapfrog::StateSaver<S, real_type>::OutputState &state,
                           const std::vector<int> save_steps) {
   constexpr auto ss = leapfrog::StateSpace<S>();
   constexpr int num_genders = ss.num_genders;

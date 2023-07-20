@@ -65,10 +65,10 @@ auto convert_base(Eigen::TensorMap<Eigen::Tensor<int, rank>> map) {
   }
 }
 
-template<typename real_type, leapfrog::HivAgeStratification S>
+template<leapfrog::HivAgeStratification S, typename real_type>
 leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List data,
-                                                    const leapfrog::Options<double> options,
-                                                    const int proj_years) {
+                                                    const leapfrog::Options<real_type> &options,
+                                                    const int &proj_years) {
   constexpr auto ss = leapfrog::StateSpace<S>();
   constexpr int num_genders = ss.num_genders;
   constexpr int age_groups_pop = ss.age_groups_pop;
@@ -84,11 +84,12 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List data,
   const leapfrog::TensorMap2<double> age_sex_fertility_ratio = parse_data<double>(data, "asfr", age_groups_fert, proj_years);
   const leapfrog::TensorMap2<double> births_sex_prop = parse_data<double>(data, "births_sex_prop", num_genders, proj_years);
   const leapfrog::TensorMap1<double> incidence_rate = parse_data<double>(data, "incidinput", proj_years);
-  const leapfrog::TensorMap3<double> incrr_age = parse_data<double>(data, "incidence_relative_risk_age", age_groups_pop - hiv_adult_first_age_group, num_genders, proj_years);
+  const leapfrog::TensorMap3<double> incidence_relative_risk_age = parse_data<double>(data, "incrr_age", age_groups_pop - hiv_adult_first_age_group, num_genders, proj_years);
   const leapfrog::TensorMap1<double> incidence_relative_risk_sex = parse_data<double>(data, "incrr_sex", proj_years);
   const leapfrog::TensorMap3<double> cd4_mortality = parse_data<double>(data, "cd4_mort", disease_stages, age_groups_hiv, num_genders);
   const leapfrog::TensorMap3<double> cd4_progression = parse_data<double>(data, "cd4_prog", disease_stages - 1, age_groups_hiv, num_genders);
-  const leapfrog::TensorMap1<int> artcd4elig_idx = convert_base(parse_data<int>(data, "artcd4elig_idx", proj_years + 1));
+  leapfrog::TensorMap1<int> artcd4elig_idx = parse_data<int>(data, "artcd4elig_idx", proj_years + 1);
+  convert_base<1>(artcd4elig_idx);
   const leapfrog::TensorMap3<double> cd4_initdist = parse_data<double>(data, "cd4_initdist", disease_stages, age_groups_hiv, num_genders);
   const leapfrog::TensorMap4<double> art_mortality = parse_data<double>(data, "art_mort", treatment_stages, disease_stages, age_groups_hiv, num_genders);
   const leapfrog::TensorMap2<double> artmx_timerr = parse_data<double>(data, "artmx_timerr", treatment_stages, proj_years);
