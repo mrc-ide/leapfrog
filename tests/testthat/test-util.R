@@ -34,8 +34,8 @@ test_that("assert_names", {
 
 test_that("assert_names_one_of", {
   input <- list(foo = "1", bar = "2")
-  assert_names_one_of(input, c("foo"))
-  assert_names_one_of(input, c("bar"))
+  assert_names_one_of(input, "foo")
+  assert_names_one_of(input, "bar")
   expect_error(
     assert_names_one_of(input, c("foo", "bar")),
     "Items 'foo', 'bar' are all included in input, only one should be present",

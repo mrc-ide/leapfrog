@@ -15,7 +15,7 @@ generate_output_interface <- function(dest) {
   for (i in seq_along(outputs)) {
     assert_names(outputs[[i]],
                  c("r_name", "cpp_name", "r_type", "dimensions"),
-                 c())
+                 NULL)
   }
 
   initialise_r_memory <- vcapply(outputs, generate_initialise_r_memory)
