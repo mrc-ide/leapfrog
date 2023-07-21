@@ -51,20 +51,28 @@ void save_output(leapfrog::StateSaver<leapfrog::HivAgeStratification::full, doub
 
   std::filesystem::path hiv_deaths_path = out_path / "hiv_deaths";
   serialize::serialize_tensor<double, 3>(state.hiv_deaths, hiv_deaths_path);
+
+  std::filesystem::path hc_hiv_pop_path = out_path / "hc_hiv_pop";
+  serialize::serialize_tensor<double, 5>(state.hc_hiv_pop, hc_hiv_pop_path);
+}
+
+bool str_to_bool(const std::string &str) {
+  return (str == "true" || str == "True" || str == "TRUE" || str == "1");
 }
 
 int main(int argc, char *argv[]) {
   if (argc < 4) {
     std::cout <<
-              "Usage: fit_model <sim_years> <hiv_steps_per_year> <intput_dir> <output_dir>" <<
+              "Usage: fit_model <sim_years> <hiv_steps_per_year> <run_child_model> <intput_dir> <output_dir>" <<
               std::endl;
     return 1;
   }
 
   int sim_years = atoi(argv[1]);
   int hiv_steps_per_year = atoi(argv[2]);
-  std::string input_dir = argv[3];
-  std::string output_dir = argv[4];
+  bool run_child_model = str_to_bool(argv[3]);
+  std::string input_dir = argv[4];
+  std::string output_dir = argv[5];
 
   std::string input_abs = std::filesystem::absolute(input_dir);
   if (!std::filesystem::exists(input_abs)) {
@@ -105,7 +113,8 @@ int main(int argc, char *argv[]) {
       30,                 // Time ART start
       ss.age_groups_hiv,  // Age groups HIV 15+
       1,                  // Scale CD4 mortality
-      0.2                 // art_alloc_mxweight
+      0.2,                // art_alloc_mxweight
+      run_child_model
   };
 
   leapfrog::Tensor1<int> v = serialize::deserialize_tensor<int, 1>(std::string("artcd4elig_idx"));
@@ -173,6 +182,16 @@ int main(int argc, char *argv[]) {
       std::string("art15plus_isperc"));
   const leapfrog::TensorMap2<int> art15plus_isperc = tensor_to_tensor_map<int, 2>(art15plus_isperc_data);
 
+  leapfrog::Tensor1<double> paed_incid_input = serialize::deserialize_tensor<double, 1>(
+      std::string("paed_incid_input"));
+  const leapfrog::TensorMap1<double> hc_nosocomial = tensor_to_tensor_map<double, 1>(paed_incid_input);
+  leapfrog::Tensor1<double> paed_cd4_dist = serialize::deserialize_tensor<double, 1>(
+      std::string("paed_cd4_dist"));
+  const leapfrog::TensorMap1<double> hc1_cd4_dist = tensor_to_tensor_map<double, 1>(paed_cd4_dist);
+  leapfrog::Tensor2<double> paed_cd4_transition = serialize::deserialize_tensor<double, 2>(
+      std::string("paed_cd4_transition"));
+  const leapfrog::TensorMap2<double> hc_cd4_transition = tensor_to_tensor_map<double, 2>(paed_cd4_transition);
+
   const leapfrog::Demography<double> demography = {
       base_pop,
       survival,
@@ -203,11 +222,18 @@ int main(int argc, char *argv[]) {
       art15plus_isperc
   };
 
+  const leapfrog::Children<double> children = {
+      hc_nosocomial,
+      hc1_cd4_dist,
+      hc_cd4_transition
+  };
+
   const leapfrog::Parameters<double> params = {options,
                                                demography,
                                                incidence,
                                                natural_history,
-                                               art};
+                                               art,
+                                               children};
 
   leapfrog::internal::IntermediateData<leapfrog::HivAgeStratification::full, double> intermediate(
       options.age_groups_hiv_15plus);
