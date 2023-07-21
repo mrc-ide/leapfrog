@@ -1,14 +1,14 @@
 inputs:
   - r_name: basepop
     cpp_name: base_pop
-    type: double
+    type: real_type
     dimensions:
       - age_groups_pop
       - num_genders
 
   - r_name: Sx
     cpp_name: survival
-    type: double
+    type: real_type
     dimensions:
       # Survival is survival prob from age group x to x+1, so +1 age group for open age
       # group 80+ to 80+
@@ -18,7 +18,7 @@ inputs:
 
   - r_name: netmigr_adj
     cpp_name: net_migration
-    type: double
+    type: real_type
     dimensions:
       - age_groups_pop
       - num_genders
@@ -26,27 +26,27 @@ inputs:
 
   - r_name: asfr
     cpp_name: age_sex_fertility_ratio
-    type: double
+    type: real_type
     dimensions:
       - age_groups_fert
       - proj_years
 
   - r_name: births_sex_prop
     cpp_name: births_sex_prop
-    type: double
+    type: real_type
     dimensions:
       - num_genders
       - proj_years
 
   - r_name: incidinput
     cpp_name: incidence_rate
-    type: double
+    type: real_type
     dimensions:
       - proj_years
 
   - r_name: incrr_age
     cpp_name: incidence_relative_risk_age
-    type: double
+    type: real_type
     dimensions:
       - age_groups_pop - hiv_adult_first_age_group
       - num_genders
@@ -54,13 +54,13 @@ inputs:
 
   - r_name: incrr_sex
     cpp_name: incidence_relative_risk_sex
-    type: double
+    type: real_type
     dimensions:
       - proj_years
 
   - r_name: cd4_mort
     cpp_name: cd4_mortality
-    type: double
+    type: real_type
     dimensions:
       - disease_stages
       - age_groups_hiv
@@ -68,7 +68,7 @@ inputs:
 
   - r_name: cd4_prog
     cpp_name: cd4_progression
-    type: double
+    type: real_type
     dimensions:
       - disease_stages - 1
       - age_groups_hiv
@@ -82,10 +82,9 @@ inputs:
     # Convert from R 1-based to 0-based as this is an index
     convert_base: true
 
-
   - r_name: cd4_initdist
     cpp_name: cd4_initdist
-    type: double
+    type: real_type
     dimensions:
       - disease_stages
       - age_groups_hiv
@@ -93,7 +92,7 @@ inputs:
 
   - r_name: art_mort
     cpp_name: art_mortality
-    type: double
+    type: real_type
     dimensions:
       - treatment_stages
       - disease_stages
@@ -102,20 +101,20 @@ inputs:
 
   - r_name: artmx_timerr
     cpp_name: artmx_timerr
-    type: double
+    type: real_type
     dimensions:
       - treatment_stages
       - proj_years
 
   - r_name: art_dropout
     cpp_name: art_dropout
-    type: double
+    type: real_type
     dimensions:
       - proj_years
 
   - r_name: art15plus_num
     cpp_name: art15plus_num
-    type: double
+    type: real_type
     dimensions:
       - num_genders
       - proj_years
@@ -128,7 +127,7 @@ inputs:
       - proj_years
 
   - cpp_name: h_art_stage_dur
-    type: double
+    type: real_type
     # Initialise as a 1D tensor all with value 0.5
     value: 0.5
     dimensions:

@@ -112,7 +112,7 @@ generate_input_from_r <- function(input) {
   rhs <- sprintf("parse_data<%s>(data, \"%s\", %s)",
                  input$type, input$r_name, dimensions)
   if (!is.null(input$convert_base) && input$convert_base) {
-    rhs <- sprintf("convert_base(%s)", rhs)
+    rhs <- sprintf("convert_base<%s>(%s)", n_dims, rhs)
   }
   paste0(lhs, " = ", rhs, ";")
 }

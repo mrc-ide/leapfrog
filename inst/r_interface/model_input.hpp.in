@@ -53,6 +53,7 @@ auto convert_base(Eigen::TensorMap<Eigen::Tensor<double, rank>> map) {
     // 0-based indexing in C++ vs 1-based indexing in R
     map.data()[i] = map.data()[i] - 1.0f;
   }
+  return map;
 }
 
 template<std::size_t rank>
@@ -61,11 +62,12 @@ auto convert_base(Eigen::TensorMap<Eigen::Tensor<int, rank>> map) {
     // 0-based indexing in C++ vs 1-based indexing in R
     map.data()[i] = map.data()[i] - 1;
   }
+  return map;
 }
 
 template<leapfrog::HivAgeStratification S, typename real_type>
-leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List data,
-                                                    const leapfrog::Options<real_type> options,
+leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
+                                                    const leapfrog::Options<real_type> &options,
                                                     const int proj_years) {
   constexpr auto ss = leapfrog::StateSpace<S>();
   constexpr int num_genders = ss.num_genders;
@@ -109,9 +111,9 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List data,
   };
 
   const leapfrog::Parameters<real_type> params = {options,
-                                                 demography,
-                                                 incidence,
-                                                 natural_history,
-                                                 art};
+                                                  demography,
+                                                  incidence,
+                                                  natural_history,
+                                                  art};
   return params;
 }
