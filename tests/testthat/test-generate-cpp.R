@@ -28,15 +28,15 @@ test_that("can generate input parsing", {
   result <- readLines(t)
   expect_true(any(grepl("// ========= DO NOT EDIT =========", result)))
   expect_true(any(grepl(paste0(
-    "const leapfrog::TensorMap2<double> base_pop = ",
-    "parse_data<double>\\(data, \"basepop\", age_groups_pop, num_genders\\);"),
+    "const leapfrog::TensorMap2<real_type> base_pop = parse_data<real_type>",
+    "\\(data, \"basepop\", age_groups_pop, num_genders\\);"),
     result)))
   expect_true(any(grepl(paste0(
-    "const leapfrog::TensorMap1<int> artcd4elig_idx = convert_base\\(",
+    "const leapfrog::TensorMap1<int> artcd4elig_idx = convert_base<1>\\(",
     "parse_data<int>\\(data, \"artcd4elig_idx\", proj_years \\+ 1\\)\\);"),
     result)))
   expect_true(any(grepl(
-    "leapfrog::Tensor1<double> h_art_stage_dur\\(treatment_stages - 1\\);",
+    "leapfrog::Tensor1<real_type> h_art_stage_dur\\(treatment_stages - 1\\);",
     result)))
   expect_true(any(grepl(
     "h_art_stage_dur.setConstant\\(0.5\\);",
