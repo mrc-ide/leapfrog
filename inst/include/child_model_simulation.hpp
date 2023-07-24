@@ -16,11 +16,11 @@ void run_paed_ageing(int time_step,
   const auto children = pars.children;
   
   constexpr auto ss = StateSpace<S>();
-  for(int g = 0; g < ss.num_genders; ++g){
+  for (int g = 0; g < ss.num_genders; ++g) {
     //less than 5 because there is a cd4 transition between ages 4 and 5
-    for(int ha = 1; ha < 5; ++ha) {
-      for(int hm = 0; hm < ss.hC1_disease_stages; ++hm){
-        for(int cat = 0 ; cat < ss.hTM; ++cat){
+    for (int ha = 1; ha < 5; ++ha) {
+      for (int hm = 0; hm < ss.hC1_disease_stages; ++hm) {
+        for (int cat = 0 ; cat < ss.hTM; ++cat) {
           state_next.hc_hiv_pop(hm, cat, ha, g) += state_curr.hc_hiv_pop(hm, cat, ha-1, g) * demog.survival(ha, g, time_step);
           
         }
