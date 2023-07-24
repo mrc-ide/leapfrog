@@ -94,6 +94,21 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List data,
   const leapfrog::TensorMap1<double> hc_nosocomial = parse_data<double>(data, "paed_incid_input", proj_years);
   const leapfrog::TensorMap1<double> hc1_cd4_dist = parse_data<double>(data, "paed_cd4_dist", ss.hC2_disease_stages);
   const leapfrog::TensorMap2<double> hc_cd4_transition = parse_data<double>(data, "paed_cd4_transition", ss.hC2_disease_stages, ss.hC1_disease_stages);
+  
+  //natural history parameters
+  const leapfrog::TensorMap3<double> hc1_cd4_mort = parse_data<double>(data, "paed_cd4_mort", ss.hC1_disease_stages, ss.hTM, ss.age_groups_hiv);
+  const leapfrog::TensorMap3<double> hc2_cd4_mort = parse_data<double>(data, "adol_cd4_mort", ss.hC2_disease_stages, ss.hTM, ss.age_groups_hiv);
+  
+  const leapfrog::TensorMap1<double> hc1_cd4_prog = parse_data<double>(data, "paed_cd4_prog", ss.hC1_disease_stages);
+  const leapfrog::TensorMap1<double> hc2_cd4_prog = parse_data<double>(data, "adol_cd4_prog", ss.hC2_disease_stages);
+  
+  //Not sure how to do just a single value, ASK ROB
+  const leapfrog::TensorMap1<double> ctx_effect = parse_data<double>(data, "ctx_effect", 1);
+  const leapfrog::TensorMap1<double> ctx_val = parse_data<double>(data, "ctx_val", proj_years);
+  
+  
+  
+  
 
   const leapfrog::Demography<double> demography = {
       base_pop,
@@ -128,7 +143,13 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List data,
   const leapfrog::Children<double> children = {
       hc_nosocomial,
       hc1_cd4_dist,
-      hc_cd4_transition
+      hc_cd4_transition,
+      hc1_cd4_mort,
+      hc2_cd4_mort,
+      hc1_cd4_prog,
+      hc2_cd4_prog,
+      ctx_effect,
+      ctx_val
   };
 
   const leapfrog::Parameters<double> params = {options,

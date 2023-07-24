@@ -54,6 +54,12 @@ template<HivAgeStratification S>
 constexpr int hC2_disease_stages = StateSpace<S>::hC2_disease_stages;
 
 template<HivAgeStratification S>
+constexpr int hc1_age_groups_hiv = StateSpace<S>::hc1_age_groups_hiv;
+
+template<HivAgeStratification S>
+constexpr int hc2_age_groups_hiv = StateSpace<S>::hc2_age_groups_hiv;
+
+template<HivAgeStratification S>
 constexpr int hTM = StateSpace<S>::hTM;
 
 template<HivAgeStratification S>
@@ -138,6 +144,12 @@ struct Children {
   TensorMap1<real_type> hc_nosocomial;
   TensorMap1<real_type> hc1_cd4_dist;
   TensorMap2<real_type> hc_cd4_transition;
+  TensorMap3<real_type> hc1_cd4_mort;
+  TensorMap3<real_type> hc2_cd4_mort;
+  TensorMap1<real_type> hc1_cd4_prog;
+  TensorMap1<real_type> hc2_cd4_prog;
+  TensorMap1<real_type> ctx_effect;
+  TensorMap1<real_type> ctx_val;
 };
 
 template<typename real_type>
@@ -218,6 +230,11 @@ struct IntermediateData {
   Tensor2<real_type> artelig_hahm;
   TensorFixedSize <real_type, Sizes<age_groups_hiv<S>>> hivpop_ha;
   TensorFixedSize <real_type, Sizes<disease_stages<S>, num_genders<S>>> age15_hiv_pop;
+  //waiting on confirmation of ages from rob
+  TensorFixedSize <real_type, Sizes<disease_stages<S>, hTM<S>, age_groups_hiv<S>, num_genders<S>>> hc_posthivmort;
+  TensorFixedSize <real_type, Sizes<disease_stages<S>, hTM<S>, age_groups_hiv<S>, num_genders<S>>> hc_grad;
+  
+
   real_type cd4mx_scale;
   real_type artpop_hahm;
   real_type deaths;
@@ -277,6 +294,8 @@ struct IntermediateData {
     artelig_hahm.setZero();
     hivpop_ha.setZero();
     age15_hiv_pop.setZero();
+    hc_posthivmort.setZero();
+    hc_grad.setZero();
     cd4mx_scale = 1.0;
     deaths = 0.0;
     everARTelig_idx = 0;
