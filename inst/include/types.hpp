@@ -54,12 +54,6 @@ template<HivAgeStratification S>
 constexpr int hC2_disease_stages = StateSpace<S>::hC2_disease_stages;
 
 template<HivAgeStratification S>
-constexpr int hc1_age_groups_hiv = StateSpace<S>::hc1_age_groups_hiv;
-
-template<HivAgeStratification S>
-constexpr int hc2_age_groups_hiv = StateSpace<S>::hc2_age_groups_hiv;
-
-template<HivAgeStratification S>
 constexpr int hTM = StateSpace<S>::hTM;
 
 template<HivAgeStratification S>

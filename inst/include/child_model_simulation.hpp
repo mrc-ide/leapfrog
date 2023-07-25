@@ -92,7 +92,7 @@ void run_hiv_child_infections(int time_step,
     }
   }
 }
-}
+
 
 template<HivAgeStratification S, typename real_type>
 void run_natural_history(int time_step,
@@ -108,7 +108,7 @@ void run_natural_history(int time_step,
    for (int hm = 0; hm < ss.hC1_disease_stages; ++hm) {
      for (int af = 0; af < 5; ++af) {
        for (int cat = 0; cat < ss.hTM; ++cat) {
-         intermediate.hc_posthivmort(hm, cat, af, g) += state_curr.hc_hiv_pop(hm, cat, af, g) - (1 - children.ctx_effect * ctx_val(time_step)) * state_curr.hc_hiv_pop(hm, cat, af, g) * children.hc1_cd4_mort(hm, cat, af) ; 
+         intermediate.hc_posthivmort(hm, cat, af, g) += state_curr.hc_hiv_pop(hm, cat, af, g) ;//- (1.0 - children.ctx_effect * children.ctx_val(time_step)) * state_curr.hc_hiv_pop(hm, cat, af, g) * children.hc1_cd4_mort(hm, cat, af) ; 
          //unsure whether this should be state_next or state_curr
         // state_next.aidsdeaths_noart_paed(hm, cat, af, g) += (1 - children.ctx_effect * children.ctx_val(t)) * state_curr.hc_hiv_pop(hm, cat, af, g) * children.hc1_cd4_mort(hm, cat, af)  ;
        }
@@ -167,7 +167,7 @@ void add_grad(int time_step,
     for (int hm = 1; hm < ss.hC1_disease_stages; ++hm) {
       for (int af = 0; af < 15; ++af) {
         for (int cat = 0; cat < ss.hTM; ++cat) {
-          state_next.hc_hiv_pop(hm, cat, af, g) +=intermediate.hc_grad(hm, cat, af, g) 
+          state_next.hc_hiv_pop(hm, cat, af, g) +=intermediate.hc_grad(hm, cat, af, g) ;
         }
       }
     }
@@ -175,6 +175,8 @@ void add_grad(int time_step,
   
 }
 
+
+}
 template<HivAgeStratification S, typename real_type>
 void run_child_model_simulation(int time_step,
                                 const Parameters<real_type> &pars,
