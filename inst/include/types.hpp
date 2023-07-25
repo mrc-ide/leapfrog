@@ -142,7 +142,7 @@ struct Children {
   TensorMap3<real_type> hc2_cd4_mort;
   TensorMap1<real_type> hc1_cd4_prog;
   TensorMap1<real_type> hc2_cd4_prog;
-  TensorMap1<real_type> ctx_effect;
+  real_type ctx_effect;
   TensorMap1<real_type> ctx_val;
 };
 
