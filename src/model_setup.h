@@ -103,7 +103,8 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List data,
   const leapfrog::TensorMap1<double> hc2_cd4_prog = parse_data<double>(data, "adol_cd4_prog", ss.hC2_disease_stages);
   
   //Not sure how to do just a single value, ASK ROB
-  const leapfrog::TensorMap1<double> ctx_effect = parse_data<double>(data, "ctx_effect", 1);
+  // !!! TODO: Ask Rob about preferred approach to assigning a single value
+  const double ctx_effect = parse_data<double>(data, "ctx_effect", 1)(0);  // select the first element of a TensorMap1 and assign to double 
   const leapfrog::TensorMap1<double> ctx_val = parse_data<double>(data, "ctx_val", proj_years);
   
   
