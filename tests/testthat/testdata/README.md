@@ -72,8 +72,6 @@ demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
 hivp$paed_cd4_dist <- c(1,rep(0,6))
 hivp$paed_cd4_mort[] <- 0
 hivp$adol_cd4_mort[] <- 0
-hivp$paed_cd4_prog[] <- 0
-hivp$adol_cd4_prog[] <- 0
 ##Only transmission is coming from nosocomial infections
 hivp$pmtct_mtct[] <- 0
 hivp$art_mtct[] <- 0
