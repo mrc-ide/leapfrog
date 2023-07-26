@@ -96,11 +96,11 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List data,
   const leapfrog::TensorMap2<double> hc_cd4_transition = parse_data<double>(data, "paed_cd4_transition", ss.hC2_disease_stages, ss.hC1_disease_stages);
   
   //natural history parameters
-  const leapfrog::TensorMap3<double> hc1_cd4_mort = parse_data<double>(data, "paed_cd4_mort", ss.hC1_disease_stages, ss.hTM, ss.age_groups_hiv);
-  const leapfrog::TensorMap3<double> hc2_cd4_mort = parse_data<double>(data, "adol_cd4_mort", ss.hC2_disease_stages, ss.hTM, ss.age_groups_hiv);
+  const leapfrog::TensorMap3<double> hc1_cd4_mort = parse_data<double>(data, "paed_cd4_mort", ss.hC1_disease_stages, ss.hTM, 5);
+  const leapfrog::TensorMap3<double> hc2_cd4_mort = parse_data<double>(data, "adol_cd4_mort", 6, ss.hTM, 10);
   
   const leapfrog::TensorMap1<double> hc1_cd4_prog = parse_data<double>(data, "paed_cd4_prog", ss.hC1_disease_stages);
-  const leapfrog::TensorMap1<double> hc2_cd4_prog = parse_data<double>(data, "adol_cd4_prog", ss.hC2_disease_stages);
+  const leapfrog::TensorMap1<double> hc2_cd4_prog = parse_data<double>(data, "adol_cd4_prog", 6);
   
   //Not sure how to do just a single value, ASK ROB
   // !!! TODO: Ask Rob about preferred approach to assigning a single value

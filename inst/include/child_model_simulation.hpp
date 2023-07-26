@@ -108,7 +108,7 @@ void run_natural_history(int time_step,
    for (int hm = 0; hm < ss.hC1_disease_stages; ++hm) {
      for (int af = 0; af < 5; ++af) {
        for (int cat = 0; cat < ss.hTM; ++cat) {
-         intermediate.hc_posthivmort(hm, cat, af, g) += state_curr.hc_hiv_pop(hm, cat, af, g) - (1.0 - children.ctx_effect * children.ctx_val(time_step)) * state_curr.hc_hiv_pop(hm, cat, af, g) * children.hc1_cd4_mort(hm, cat, af); 
+         intermediate.hc_posthivmort(hm, cat, af, g) += state_curr.hc_hiv_pop(hm, cat, af, g);// - (1.0 - children.ctx_effect * children.ctx_val(time_step)) * state_curr.hc_hiv_pop(hm, cat, af, g) * children.hc1_cd4_mort(hm, cat, af); 
          //unsure whether this should be state_next or state_curr
         // state_next.aidsdeaths_noart_paed(hm, cat, af, g) += (1 - children.ctx_effect * children.ctx_val(t)) * state_curr.hc_hiv_pop(hm, cat, af, g) * children.hc1_cd4_mort(hm, cat, af)  ;
        }
@@ -121,7 +121,7 @@ void run_natural_history(int time_step,
    for (int hm = 0; hm < ss.hC2_disease_stages; ++hm) {
      for (int af = 5; af < pars.options.fertility_first_age_group; ++af) {
        for (int cat = 0; cat < ss.hTM; ++cat) {
-         intermediate.hc_posthivmort(hm, cat, af, g) += state_curr.hc_hiv_pop(hm, cat, af, g) - (1 - children.ctx_effect * children.ctx_val(time_step)) * state_curr.hc_hiv_pop(hm, cat, af, g) * children.hc2_cd4_mort(hm, cat, af - 5); 
+         intermediate.hc_posthivmort(hm, cat, af, g) += state_curr.hc_hiv_pop(hm, cat, af, g);// - (1 - children.ctx_effect * children.ctx_val(time_step)) * state_curr.hc_hiv_pop(hm, cat, af, g) * children.hc2_cd4_mort(hm, cat, af - 5); 
          //state_next.aidsdeaths_noart_paed(hm, cat, af, g) +=  (1 - children.ctx_effect * children.ctx_val(t)) * state_curr.hc_hiv_pop(hm, cat, af, g) * children.hc2_cd4_mort(hm, cat, af - 5); // output hiv deaths, aggregated across transmission category
        }
      }
@@ -133,8 +133,10 @@ void run_natural_history(int time_step,
    for (int hm = 1; hm < ss.hC1_disease_stages; ++hm) {
      for (int af = 0; af < 5; ++af) {
        for (int cat = 0; cat < ss.hTM; ++cat) {
+       //  if(children.hc1_cd4_mort(hm, cat, af - 5) > 0 or children.hc1_cd4_mort(hm - 1, cat, af - 5) > 0){
          intermediate.hc_grad(hm - 1, cat, af, g) -=  (intermediate.hc_posthivmort(hm - 1, cat, af, g) * children.hc1_cd4_prog(hm - 1) + state_curr.hc_hiv_pop(hm - 1, cat, af, g) * children.hc1_cd4_prog(hm - 1)) / 2; //moving to next cd4 category
          intermediate.hc_grad(hm, cat, af, g) += (intermediate.hc_posthivmort(hm - 1, cat, af, g) * children.hc1_cd4_prog(hm - 1) + state_curr.hc_hiv_pop(hm - 1, cat, af, g) * children.hc1_cd4_prog(hm - 1)) / 2; //moving into this cd4 category
+       //  }
        }
      }
    }
@@ -145,8 +147,10 @@ void run_natural_history(int time_step,
    for (int hm = 1; hm < ss.hC2_disease_stages; ++hm) {
      for (int af = 5; af < pars.options.fertility_first_age_group; ++af) {
        for (int cat = 0; cat < ss.hTM; ++cat) {
-         intermediate.hc_grad(hm - 1, cat, af, g) -= (intermediate.hc_posthivmort(hm - 1, cat, af, g) *children. hc2_cd4_prog(hm - 1) + state_curr.hc_hiv_pop(hm - 1, cat, af, g) * children.hc2_cd4_prog(hm - 1)) / 2; //moving to next cd4 category
-         intermediate.hc_grad(hm, cat, af, g) += (intermediate.hc_posthivmort(hm - 1, cat, af, g) * children.hc2_cd4_prog(hm - 1) + state_curr.hc_hiv_pop(hm - 1, cat, af, g) *children. hc2_cd4_prog(hm - 1)) / 2; //moving into this cd4 category
+     //    if(children.hc2_cd4_mort(hm, cat, af - 5) > 0 or children.hc2_cd4_mort(hm - 1, cat, af - 5) > 0){
+         intermediate.hc_grad(hm - 1, cat, af, g) -= (intermediate.hc_posthivmort(hm - 1, cat, af, g) * children.hc2_cd4_prog(hm - 1) + state_curr.hc_hiv_pop(hm - 1, cat, af, g) * children.hc2_cd4_prog(hm - 1)) / 2; //moving to next cd4 category
+         intermediate.hc_grad(hm, cat, af, g) += (intermediate.hc_posthivmort(hm - 1, cat, af, g) * children.hc2_cd4_prog(hm - 1) + state_curr.hc_hiv_pop(hm - 1, cat, af, g) * children.hc2_cd4_prog(hm - 1)) / 2; //moving into this cd4 category
+      // }
        }
      }
    }
@@ -167,7 +171,7 @@ void add_grad(int time_step,
     for (int hm = 1; hm < ss.hC1_disease_stages; ++hm) {
       for (int af = 0; af < 15; ++af) {
         for (int cat = 0; cat < ss.hTM; ++cat) {
-          state_next.hc_hiv_pop(hm, cat, af, g) +=intermediate.hc_grad(hm, cat, af, g); 
+          state_next.hc_hiv_pop(hm, cat, af, g) +=intermediate.hc_grad (hm, cat, af, g); 
         }
       }
     }
@@ -176,7 +180,8 @@ void add_grad(int time_step,
 }
 
 
-}
+}// namespace internal
+
 template<HivAgeStratification S, typename real_type>
 void run_child_model_simulation(int time_step,
                                 const Parameters<real_type> &pars,
@@ -190,7 +195,7 @@ void run_child_model_simulation(int time_step,
   
 }
 
-} // namespace internal
+
 
 } // namespace leapfrog
  
