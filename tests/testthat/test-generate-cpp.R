@@ -42,3 +42,23 @@ test_that("can generate input parsing", {
     "h_art_stage_dur.setConstant\\(0.5\\);",
     result)))
 })
+
+test_that("generated files are up to date", {
+  target_input_file <- frogger_file("r_interface/model_input.hpp")
+  t_input <- tempfile()
+  generate_input_interface(t_input)
+  expect_identical(
+    readLines(t_input), readLines(target_input_file),
+    info = paste0("Your interface is out of date, regenerate by running ",
+                  "./scripts/generate")
+  )
+
+  target_output_file <- frogger_file("r_interface/model_output.hpp")
+  t_output <- tempfile()
+  generate_output_interface(t_output)
+  expect_identical(
+    readLines(t_output), readLines(target_output_file),
+    info = paste0("Your interface is out of date, regenerate by running ",
+                  "./scripts/generate")
+  )
+})
