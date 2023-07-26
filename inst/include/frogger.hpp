@@ -31,7 +31,8 @@ void initialise_model_state(const Parameters<real_type> &pars,
   state.aids_deaths_art.setZero();
   state.art_initiation.setZero();
   state.hiv_deaths.setZero();
-  state.hc_hiv_pop.setZero();
+  state.hc1_hiv_pop.setZero();
+  state.hc2_hiv_pop.setZero();
 }
 
 }

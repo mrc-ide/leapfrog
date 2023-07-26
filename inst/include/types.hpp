@@ -48,10 +48,22 @@ template<HivAgeStratification S>
 constexpr int treatment_stages = StateSpace<S>::treatment_stages;
 
 template<HivAgeStratification S>
-constexpr int hC1_disease_stages = StateSpace<S>::hC1_disease_stages;
+constexpr int hc1_disease_stages = StateSpace<S>::hc1_disease_stages;
 
 template<HivAgeStratification S>
-constexpr int hC2_disease_stages = StateSpace<S>::hC2_disease_stages;
+constexpr int hc2_disease_stages = StateSpace<S>::hc2_disease_stages;
+
+template<HivAgeStratification S>
+constexpr int hc1_ageend = StateSpace<S>::hc1_ageend;
+
+template<HivAgeStratification S>
+constexpr int hc2_agestart = StateSpace<S>::hc2_agestart;
+
+template<HivAgeStratification S>
+constexpr int hc1_age_groups = StateSpace<S>::hc1_age_groups;
+
+template<HivAgeStratification S>
+constexpr int hc2_age_groups = StateSpace<S>::hc2_age_groups;
 
 template<HivAgeStratification S>
 constexpr int hTM = StateSpace<S>::hTM;
@@ -77,6 +89,7 @@ struct Options {
   const int hIDX_15PLUS;
   const real_type art_alloc_mxweight;
   const bool run_child_model;
+
 
   Options(int hiv_steps_per_year,
           int time_art_start,
@@ -177,9 +190,13 @@ struct State {
       aids_deaths_art;
   TensorFixedSize <real_type, Sizes<disease_stages<S>, age_groups_hiv<S>, num_genders<S>>> art_initiation;
   TensorFixedSize <real_type, Sizes<age_groups_pop<S>, num_genders<S>>> hiv_deaths;
-  TensorFixedSize <real_type, Sizes<disease_stages<S>, hTM<S>, age_groups_pop<S>, num_genders<S>>> hc_hiv_pop;
-  TensorFixedSize <real_type, Sizes<treatment_stages<S>, disease_stages<S>, age_groups_pop<S>, num_genders<S>>> hc_art_pop;
-  
+
+  TensorFixedSize <real_type, Sizes<hc1_disease_stages<S>, hTM<S>, hc1_age_groups<S>, num_genders<S>>> hc1_hiv_pop;
+  TensorFixedSize <real_type, Sizes<treatment_stages<S>, hc1_disease_stages<S>, hc1_age_groups<S>, num_genders<S>>> hc1_art_pop;
+
+  TensorFixedSize <real_type, Sizes<hc2_disease_stages<S>, hTM<S>, hc2_age_groups<S>, num_genders<S>>> hc2_hiv_pop;
+  TensorFixedSize <real_type, Sizes<treatment_stages<S>, hc2_disease_stages<S>, hc2_age_groups<S>, num_genders<S>>> hc2_art_pop;
+
 
   State() {}
 
@@ -195,8 +212,10 @@ struct State {
     aids_deaths_art.setZero();
     art_initiation.setZero();
     hiv_deaths.setZero();
-    hc_hiv_pop.setZero();
-    hc_art_pop.setZero();
+    hc1_hiv_pop.setZero();
+    hc1_art_pop.setZero();
+    hc2_hiv_pop.setZero();
+    hc2_art_pop.setZero();
     births = 0;
   }
 };
@@ -227,7 +246,7 @@ struct IntermediateData {
   //waiting on confirmation of ages from rob
   TensorFixedSize <real_type, Sizes<disease_stages<S>, hTM<S>, age_groups_hiv<S>, num_genders<S>>> hc_posthivmort;
   TensorFixedSize <real_type, Sizes<disease_stages<S>, hTM<S>, age_groups_hiv<S>, num_genders<S>>> hc_grad;
-  
+
 
   real_type cd4mx_scale;
   real_type artpop_hahm;

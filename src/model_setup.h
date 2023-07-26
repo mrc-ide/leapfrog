@@ -92,24 +92,24 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List data,
                                                                      ss.num_genders, proj_years);
 
   const leapfrog::TensorMap1<double> hc_nosocomial = parse_data<double>(data, "paed_incid_input", proj_years);
-  const leapfrog::TensorMap1<double> hc1_cd4_dist = parse_data<double>(data, "paed_cd4_dist", ss.hC2_disease_stages);
-  const leapfrog::TensorMap2<double> hc_cd4_transition = parse_data<double>(data, "paed_cd4_transition", ss.hC2_disease_stages, ss.hC1_disease_stages);
-  
+  const leapfrog::TensorMap1<double> hc1_cd4_dist = parse_data<double>(data, "paed_cd4_dist", ss.hc1_disease_stages);
+  const leapfrog::TensorMap2<double> hc_cd4_transition = parse_data<double>(data, "paed_cd4_transition", ss.hc2_disease_stages, ss.hc1_disease_stages);
+
   //natural history parameters
-  const leapfrog::TensorMap3<double> hc1_cd4_mort = parse_data<double>(data, "paed_cd4_mort", ss.hC1_disease_stages, ss.hTM, 5);
-  const leapfrog::TensorMap3<double> hc2_cd4_mort = parse_data<double>(data, "adol_cd4_mort", 6, ss.hTM, 10);
-  
-  const leapfrog::TensorMap1<double> hc1_cd4_prog = parse_data<double>(data, "paed_cd4_prog", ss.hC1_disease_stages);
-  const leapfrog::TensorMap1<double> hc2_cd4_prog = parse_data<double>(data, "adol_cd4_prog", 6);
-  
+  const leapfrog::TensorMap3<double> hc1_cd4_mort = parse_data<double>(data, "paed_cd4_mort", ss.hc1_disease_stages, ss.hTM, ss.hc1_age_groups);
+  const leapfrog::TensorMap3<double> hc2_cd4_mort = parse_data<double>(data, "adol_cd4_mort", ss.hc2_disease_stages, ss.hTM, ss.hc2_age_groups);
+
+  const leapfrog::TensorMap1<double> hc1_cd4_prog = parse_data<double>(data, "paed_cd4_prog", ss.hc1_disease_stages);
+  const leapfrog::TensorMap1<double> hc2_cd4_prog = parse_data<double>(data, "adol_cd4_prog", ss.hc2_disease_stages);
+
   //Not sure how to do just a single value, ASK ROB
   // !!! TODO: Ask Rob about preferred approach to assigning a single value
-  const double ctx_effect = parse_data<double>(data, "ctx_effect", 1)(0);  // select the first element of a TensorMap1 and assign to double 
+  const double ctx_effect = parse_data<double>(data, "ctx_effect", 1)(0);  // select the first element of a TensorMap1 and assign to double
   const leapfrog::TensorMap1<double> ctx_val = parse_data<double>(data, "ctx_val", proj_years);
-  
-  
-  
-  
+
+
+
+
 
   const leapfrog::Demography<double> demography = {
       base_pop,
