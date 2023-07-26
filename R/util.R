@@ -47,7 +47,7 @@ deserialize_tensor_to_r <- function(path) {
 
 assert_enum <- function(x, values, name = deparse(substitute(x))) {
   if (!(x %in% values)) {
-    value_text <- paste(sprintf("'%s'", values), collapse = ", ")
+    value_text <- format_vector(values)
     stop(sprintf("%s must be one of %s, got '%s'", name, value_text, x),
          call. = FALSE)
   }
@@ -62,32 +62,28 @@ vlapply <- function(X, FUN, ...) { # nolint
   vapply(X, FUN, logical(1), ...)
 }
 
-assert_names <- function(items, required, optional,
-                         name = deparse(substitute(items))) {
-  missing <- !(required %in% names(items))
-  if (any(missing)) {
-    missing <- paste(paste0("'", required[missing], "'"), collapse = ", ")
-    stop(sprintf("Required item(s) %s are missing from %s", missing, name))
-  }
-  additional <- !(names(items) %in% c(required, optional))
-  if (any(additional)) {
-    additional <- paste(paste0("'", names(items)[additional], "'"),
-                        collapse = ", ")
-    stop(sprintf("Unknown item(s) %s are included in %s", additional, name))
-  }
-  invisible(TRUE)
-}
-
-assert_names_one_of <- function(items, names,
-                                name = deparse(substitute(items))) {
-  present <- names %in% names(items)
-  if (sum(present) > 1) {
-    present <- paste(paste0("'", names[present], "'"), collapse = ", ")
-    stop(sprintf("Items %s are all included in %s, only one should be present",
-                 present, name))
+assert_single_item_set <- function(items, names,
+                                   name = deparse(substitute(items))) {
+  has_a_value <- !vlapply(items[names], is_unset)
+  if (sum(has_a_value) > 1) {
+    non_null <- format_vector(names(has_a_value))
+    stop(sprintf("Items %s from '%s' all have values, only one should be set",
+                 non_null, name))
   }
 }
 
 frogger_file <- function(..., mustWork = TRUE) {
   system.file(..., package = "frogger", mustWork = mustWork)
+}
+
+is_unset <- function(x) {
+  is.null(x) || is.na(x) || x == ""
+}
+
+is_set <- function(x) {
+  !is_unset(x)
+}
+
+format_vector <- function(vector) {
+  paste(paste0("'", vector, "'"), collapse = ", ")
 }

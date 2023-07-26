@@ -9,22 +9,26 @@
 generate_output_interface <- function(dest) {
 
   template <- readLines(frogger_file("r_interface/model_output.hpp.in"))
-  outputs <- yaml::read_yaml(
-    frogger_file("r_interface/model_output.yml"))$outputs
+  output_file <- "model_output.csv"
+  outputs <- utils::read.csv(frogger_file("r_interface", output_file),
+                            colClasses = "character")
 
-  for (i in seq_along(outputs)) {
-    assert_names(outputs[[i]],
-                 c("r_name", "cpp_name", "r_type", "dimensions"),
-                 NULL)
-  }
+  validate_dimensions_columns(colnames(outputs), output_file)
 
-  initialise_r_memory <- vcapply(outputs, generate_initialise_r_memory)
+  parsed_outputs <- lapply(seq_len(nrow(outputs)), function(row_num) {
+    row <- outputs[row_num, ]
+    ## When reading csv in excel the header column is included in count
+    csv_row_num <- row_num + 1
+    parse_output(as.list(row), output_file, csv_row_num)
+  })
+
+  initialise_r_memory <- vcapply(parsed_outputs, generate_initialise_r_memory)
   initialise_r_memory <- paste(initialise_r_memory, collapse = "\n")
-  set_r_dimensions <- vcapply(outputs, generate_set_r_dimensions)
+  set_r_dimensions <- vcapply(parsed_outputs, generate_set_r_dimensions)
   set_r_dimensions <- paste(set_r_dimensions, collapse = "\n")
-  copy_data <- vcapply(outputs, generate_copy_data)
+  copy_data <- vcapply(parsed_outputs, generate_copy_data)
   copy_data <- paste(copy_data, collapse = "\n")
-  return_output <- vcapply(outputs, generate_return)
+  return_output <- vcapply(parsed_outputs, generate_return)
   return_output <- paste0("return Rcpp::List::create(\n",
                           paste(return_output, collapse = ",\n"),
                           ");")
@@ -41,12 +45,12 @@ generate_output_interface <- function(dest) {
 }
 
 generate_initialise_r_memory <- function(output) {
-  dimensions <- paste(output$dimensions, collapse = " * ")
+  dimensions <- paste(output$parsed_dims, collapse = " * ")
   sprintf("  Rcpp::NumericVector r_%s(%s);", output$r_name, dimensions)
 }
 
 generate_set_r_dimensions <- function(output) {
-  dimensions <- paste(output$dimensions, collapse = ", ")
+  dimensions <- paste(output$parsed_dims, collapse = ", ")
   sprintf("  r_%s.attr(\"dim\") = Rcpp::NumericVector::create(%s);",
           output$r_name, dimensions)
 }
@@ -58,7 +62,7 @@ generate_copy_data <- function(output) {
 }
 
 generate_return <- function(output) {
-  dimensions <- paste(output$dimensions, collapse = ", ")
+  dimensions <- paste(output$parsed_dims, collapse = ", ")
   sprintf("    Rcpp::_[\"%s\"] = r_%s",
           output$r_name, output$r_name)
 }
@@ -75,19 +79,24 @@ generate_return <- function(output) {
 generate_input_interface <- function(dest) {
 
   template <- readLines(frogger_file("r_interface/model_input.hpp.in"))
-  inputs <- yaml::read_yaml(
-    frogger_file("r_interface/model_input.yml"))$inputs
+  input_file <- "model_input.csv"
+  inputs <- utils::read.csv(frogger_file("r_interface", input_file),
+                            colClasses = "character")
 
-  for (i in seq_along(inputs)) {
-    assert_names(inputs[[i]],
-                 c("cpp_name", "type", "dimensions"),
-                 c("r_name", "value", "convert_base"))
-    assert_names_one_of(inputs[[i]], c("r_name", "value"))
-  }
+  validate_dimensions_columns(colnames(inputs), input_file)
 
-  from_r <- vlapply(inputs, function(input) "r_name" %in% names(input))
-  from_value <- inputs[!from_r]
-  from_r <- inputs[from_r]
+  parsed_inputs <- lapply(seq_len(nrow(inputs)), function(row_num) {
+    row <- inputs[row_num, ]
+    ## When reading csv in excel the header column is included in count
+    csv_row_num <- row_num + 1
+    parse_input(as.list(row), input_file, csv_row_num)
+  })
+
+  from_r <- vlapply(parsed_inputs, function(input) {
+    is_set(input$r_name)
+  })
+  from_value <- parsed_inputs[!from_r]
+  from_r <- parsed_inputs[from_r]
 
   r_parse_data <- vcapply(from_r, generate_input_from_r)
   value_data <- vcapply(from_value, generate_input_from_value)
@@ -104,25 +113,85 @@ generate_input_interface <- function(dest) {
   invisible(TRUE)
 }
 
+parse_input <- function(input, filename, row_num) {
+  assert_enum(input$type, c("real_type", "int"),
+              name = sprintf("row num: %s and col: type", row_num))
+  assert_enum(input$convert_base, c("FALSE", "TRUE", ""),
+              name = sprintf("row num: %s and col: convert_base", row_num))
+  input$convert_base <- identical(input$convert_base, "TRUE")
+  assert_single_item_set(input, c("r_name", "value"),
+                         name = paste("row num:", row_num))
+  input$parsed_dims <- validate_and_parse_dims(input, filename, row_num)
+  input
+}
+
+parse_output <- function(output, filename, row_num) {
+  assert_enum(output$r_type, c("REAL", "INTEGER"),
+              name = sprintf("row num: %s and col: r_type", row_num))
+  output$parsed_dims <- validate_and_parse_dims(output, filename, row_num)
+  output
+}
+
 generate_input_from_r <- function(input) {
-  dimensions <- paste(input$dimensions, collapse = ", ")
-  n_dims <- length(input$dimensions)
+  dimensions <- paste(input$parsed_dims, collapse = ", ")
   lhs <- sprintf("  const leapfrog::TensorMap%s<%s> %s",
-                 n_dims, input$type, input$cpp_name)
+                 input$dims, input$type, input$cpp_name)
   rhs <- sprintf("parse_data<%s>(data, \"%s\", %s)",
                  input$type, input$r_name, dimensions)
   if (!is.null(input$convert_base) && input$convert_base) {
-    rhs <- sprintf("convert_base<%s>(%s)", n_dims, rhs)
+    rhs <- sprintf("convert_base<%s>(%s)", input$dims, rhs)
   }
   paste0(lhs, " = ", rhs, ";")
 }
 
 generate_input_from_value <- function(input) {
-  dimensions <- paste(input$dimensions, collapse = ", ")
-  n_dims <- length(input$dimensions)
+  dimensions <- paste(input$parsed_dims, collapse = ", ")
   declaration <- sprintf("  leapfrog::Tensor%s<%s> %s(%s);",
-                         n_dims, input$type, input$cpp_name, dimensions)
+                         input$dims, input$type, input$cpp_name,
+                         input$parsed_dims)
   set_value <- sprintf("  %s.setConstant(%s);",
                        input$cpp_name, input$value)
   paste0(declaration, "\n", set_value)
 }
+
+validate_dimensions_columns <- function(columns, filename) {
+  dims_col <- which(columns == "dims")
+  ## All columns after "dims" must be named dim1, dim2, .., dimi, etc.
+  dimension_data <- columns[seq(dims_col + 1, length(columns))]
+  invalid_columns <- !grepl("dim\\d", dimension_data)
+  if (any(invalid_columns)) {
+    invalid_column_names <- dimension_data[invalid_columns]
+    stop(sprintf(paste("All columns after 'dims' must be a dimension",
+                       "column, got %s. Check '%s'."),
+                 format_vector(invalid_column_names), filename))
+  }
+  invisible(TRUE)
+}
+
+validate_and_parse_dims <- function(data, filename, row_num) {
+  dims_col <- which(names(data) == "dims")
+  dims <- data$dims
+
+  ## We've validated already dimension columns come after the dims column
+  ## e.g. csv has col1, col2, col3, ..., dims, dim1, dim2, dim3, ..., dimn
+  ## dims are valid if they have same number set as specified in `dim` column
+  set_dims <- vlapply(data[seq(dims_col + 1, length(data))], is_set)
+  if (!identical(as.character(sum(set_dims)), dims)) {
+    stop(sprintf("Expected %s dimensions for row %s but got %s, check '%s'.",
+                 dims, row_num, sum(set_dims), filename))
+  }
+  ## also invalid if they are not set in order i.e. if dim3 is set,
+  ## dim2 and dim1 must be we don't allow dim1 to be set, dim2 empty and
+  ## dim3 set. We could allow this but I expect if we get this in the csv
+  ## it is indicative of something being specified incorrectly so I want
+  ## to error
+  last_set <- max(which(set_dims))
+  unset <- names(set_dims)[!set_dims[seq(1, last_set)]]
+  if (length(unset) > 0) {
+    stop(sprintf(paste("'%s' set in row %s but not %s, dimensions",
+                        "must be set in order. Check '%s'."),
+      names(set_dims)[last_set], row_num, format_vector(unset), filename))
+  }
+  as.character(data[seq(dims_col + 1, dims_col + last_set)])
+}
+

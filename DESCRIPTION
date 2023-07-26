@@ -19,8 +19,7 @@ LinkingTo:
     RcppEigen
 Imports:
     glue,
-    Rcpp,
-    yaml
+    Rcpp
 Suggests:
     RcppEigen,
     testthat (>= 3.0.0),

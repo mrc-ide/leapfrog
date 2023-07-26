@@ -62,3 +62,41 @@ test_that("generated files are up to date", {
                   "./scripts/generate")
   )
 })
+
+test_that("validate_and_parse_dims", {
+  row <- data.frame(r_name = "basepop", cpp_name = "base_pop",
+                    type = "real_type", dims = "2", dim1 = "age_groups_pop",
+                    dim2 = "num_genders", dim3 = "", dim4 = NA_character_)
+  expect_equal(validate_and_parse_dims(row, "inputs.csv", 4),
+               c("age_groups_pop", "num_genders"))
+
+
+  row$dim3 <- "proj_years"
+  expect_error(
+    validate_and_parse_dims(row, "inputs.csv", 4),
+    "Expected 2 dimensions for row 4 but got 3, check 'inputs.csv'.")
+
+  row$dim2 <- ""
+  expect_error(
+    validate_and_parse_dims(row, "inputs.csv", 4),
+    paste0("'dim3' set in row 4 but not 'dim2', dimensions must ",
+           "be set in order. Check 'inputs.csv'."))
+
+  row$dim3 <- ""
+  row$dim4 <- "proj_years"
+  expect_error(
+    validate_and_parse_dims(row, "inputs.csv", 4),
+    paste0("'dim4' set in row 4 but not 'dim2', 'dim3', dimensions must ",
+           "be set in order. Check 'inputs.csv'."))
+})
+
+test_that("csv structure can be validated", {
+  colnames <- c("r_name", "cpp_name", "dims", "dim1", "dim2")
+  expect_silent(validate_dimensions_columns(colnames, "inputs.csv"))
+
+  colnames <- c(colnames, "other")
+  expect_error(
+    validate_dimensions_columns(colnames, "inputs.csv"),
+    paste("All columns after 'dims' must be a dimension column, got 'other'.",
+          "Check 'inputs.csv'."))
+})

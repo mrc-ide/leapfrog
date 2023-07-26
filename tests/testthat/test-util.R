@@ -12,32 +12,18 @@ test_that("can assert value is from valid set", {
                "input must be one of 'foo', 'bar', got 'thing'")
 })
 
-test_that("assert_names", {
-  required <- c("one", "two")
-  optional <- c("three", "four")
-  input <- list(one = 1, two = 2, three = 3, four = 4)
-  expect_true(assert_names(input, required, optional))
-
-  input <- list(one = 1, two = 2)
-  expect_true(assert_names(input, required, optional))
-
-  input <- list(one = 1, three = 3, four = 4)
-  expect_error(assert_names(input, required, optional),
-               "Required item(s) 'two' are missing from input",
-               fixed = TRUE)
-
-  input <- list(one = 1, two = 2, five = 5)
-  expect_error(assert_names(input, required, optional),
-               "Unknown item(s) 'five' are included in input",
-               fixed = TRUE)
+test_that("assert_single_item_set", {
+  input <- list(foo = "1", bar = "2")
+  expect_silent(assert_single_item_set(input, "foo"))
+  expect_silent(assert_single_item_set(input, "bar"))
+  expect_error(
+    assert_single_item_set(input, c("foo", "bar")),
+    "Items 'foo', 'bar' all have values, only one should be set",
+    fixed = TRUE)
 })
 
-test_that("assert_names_one_of", {
-  input <- list(foo = "1", bar = "2")
-  assert_names_one_of(input, "foo")
-  assert_names_one_of(input, "bar")
-  expect_error(
-    assert_names_one_of(input, c("foo", "bar")),
-    "Items 'foo', 'bar' are all included in input, only one should be present",
-    fixed = TRUE)
+
+test_that("can format a vector", {
+  expect_equal(format_vector("thing"), "'thing'")
+  expect_equal(format_vector(c("foo", "bar")), c("'foo', 'bar'"))
 })
