@@ -119,8 +119,8 @@ parse_input <- function(input, filename, row_num) {
   assert_enum(input$convert_base, c("FALSE", "TRUE", ""),
               name = sprintf("row num: %s and col: convert_base", row_num))
   input$convert_base <- identical(input$convert_base, "TRUE")
-  assert_single_item_set(input, c("r_name", "value"),
-                         name = paste("row num:", row_num))
+  assert_one_is_set(input, c("r_name", "value"),
+                    name = paste("row num:", row_num))
   input$parsed_dims <- validate_and_parse_dims(input, filename, row_num)
   input
 }

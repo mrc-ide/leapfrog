@@ -45,15 +45,6 @@ deserialize_tensor_to_r <- function(path) {
         as.numeric(strsplit(content[[2]], ",\\s*")[[1]]))
 }
 
-assert_enum <- function(x, values, name = deparse(substitute(x))) {
-  if (!(x %in% values)) {
-    value_text <- format_vector(values)
-    stop(sprintf("%s must be one of %s, got '%s'", name, value_text, x),
-         call. = FALSE)
-  }
-  invisible(TRUE)
-}
-
 vcapply <- function(X, FUN, ...) { # nolint
   vapply(X, FUN, character(1), ...)
 }
@@ -62,22 +53,12 @@ vlapply <- function(X, FUN, ...) { # nolint
   vapply(X, FUN, logical(1), ...)
 }
 
-assert_single_item_set <- function(items, names,
-                                   name = deparse(substitute(items))) {
-  has_a_value <- !vlapply(items[names], is_unset)
-  if (sum(has_a_value) > 1) {
-    non_null <- format_vector(names(has_a_value))
-    stop(sprintf("Items %s from '%s' all have values, only one should be set",
-                 non_null, name))
-  }
-}
-
 frogger_file <- function(..., mustWork = TRUE) {
   system.file(..., package = "frogger", mustWork = mustWork)
 }
 
 is_unset <- function(x) {
-  is.null(x) || is.na(x) || x == ""
+  is.null(x) || is.na(x) || trimws(x) == ""
 }
 
 is_set <- function(x) {
