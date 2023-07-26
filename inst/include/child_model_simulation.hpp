@@ -7,7 +7,7 @@ namespace leapfrog {
 namespace internal {
 
 template<HivAgeStratification S, typename real_type>
-void run_paed_ageing(int time_step,
+void run_child_ageing(int time_step,
                      const Parameters<real_type> &pars,
                      const State<S, real_type> &state_curr,
                      State<S, real_type> &state_next,
@@ -66,7 +66,7 @@ void run_paed_ageing(int time_step,
 }
 
 template<HivAgeStratification S, typename real_type>
-void run_hiv_child_infections(int time_step,
+void run_child_hiv_infections(int time_step,
                               const Parameters<real_type> &pars,
                               const State<S, real_type> &state_curr,
                               State<S, real_type> &state_next,
@@ -95,7 +95,7 @@ void run_hiv_child_infections(int time_step,
 
 
 template<HivAgeStratification S, typename real_type>
-void run_natural_history(int time_step,
+void run_child_natural_history(int time_step,
                               const Parameters<real_type> &pars,
                               const State<S, real_type> &state_curr,
                               State<S, real_type> &state_next,
@@ -158,7 +158,7 @@ void run_natural_history(int time_step,
 }
 
 template<HivAgeStratification S, typename real_type>
-void add_grad(int time_step,
+void add_child_grad(int time_step,
                          const Parameters<real_type> &pars,
                          const State<S, real_type> &state_curr,
                          State<S, real_type> &state_next,
@@ -182,7 +182,7 @@ void add_grad(int time_step,
 
 }
 
-
+}
 }// namespace internal
 
 template<HivAgeStratification S, typename real_type>
@@ -191,10 +191,10 @@ void run_child_model_simulation(int time_step,
                                 const State<S, real_type> &state_curr,
                                 State<S, real_type> &state_next,
                                 internal::IntermediateData<S, real_type> &intermediate) {
-  internal::run_paed_ageing(time_step, pars, state_curr, state_next, intermediate);
-  internal::run_hiv_child_infections(time_step, pars, state_curr, state_next, intermediate);
-  internal::run_natural_history(time_step, pars, state_curr, state_next, intermediate);
-  internal::add_grad(time_step, pars, state_curr, state_next, intermediate);
+  internal::run_child_ageing(time_step, pars, state_curr, state_next, intermediate);
+  internal::run_child_hiv_infections(time_step, pars, state_curr, state_next, intermediate);
+  internal::run_child_natural_history(time_step, pars, state_curr, state_next, intermediate);
+  internal::add_child_grad(time_step, pars, state_curr, state_next, intermediate);
 
 }
 
