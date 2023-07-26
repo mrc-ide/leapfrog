@@ -86,6 +86,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                     const double ctx_effect,
                     const Type *p_paed_art_val,
                     const int *p_artpaeds_isperc,
+                    const int *p_pmtct_input_isperc,
                     const Type *p_paed_art_elig_age,
                     const Type *p_paed_art_elig_cd4,
                     const Type *p_paed_art_ltfu,
@@ -225,6 +226,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   const TensorMapX3cT paed_art_mort(p_paed_art_mort, hDS, hTS, 5);
   const TensorMapX3cT adol_art_mort(p_adol_art_mort, hDS_adol, hTS, 10);
   const TensorMapX1cI artpaeds_isperc(p_artpaeds_isperc, sim_years);
+  const TensorMapX1cI pmtct_input_isperc(p_pmtct_input_isperc, sim_years);
+  
   
   //MTCT
   const TensorMapX1cT mtct_trans(p_mtct_trans, hDS);
@@ -1006,8 +1009,10 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    needPMTCT(t) = birthsHE;
    HIVPregwomen(t) = birthsHE_15_24;
    
-   //Maggie: TODO: make pmtct coverages variables that are automatically converted to % covered, I think that should work? 
-   //Cap so that it snaps the distribution to one if needed, with the distribution matching the input numbers 
+
+   
+   
+   
    double sumARV;
    sumARV = 0.0;
    //just doing this for percentages rn
@@ -1017,16 +1022,25 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    double numPMTCT;
    numPMTCT = sumARV ;// + PATIENTS REALLOCATED
    
+   //Maggie: TODO: make pmtct coverages variables that are automatically converted to % covered, I think that should work? 
+   //Cap so that it snaps the distribution to one if needed, with the distribution matching the input numbers 
+   TensorFixedSize<Type, Sizes<hPS>> pmtct_cov;
+   for(int hp = 0; hp < hPS; hp++){
+     if(pmtct_input_isperc(t)){
+       pmtct_cov(hp) = pmtct(hp, t, 1);
+     }else{
+       pmtct_cov(hp) = pmtct(hp, t, 0) / sumARV;
+     }
+   }
    
  
-   //need to make this more dependent on the input and now just one input
    //need to add in reallocated patients as well
-  // if(pmtct_input_num = 1){ //input is percent
+   if(pmtct_input_isperc(t)){ //input is percent
      OnPMTCT(t) = (needPMTCT(t) * sumARV) > 0 ? needPMTCT(t) * sumARV : 0.0;
-  // }else{//input is number
-
-     
-  //  }
+    }else{//input is number
+     OnPMTCT(t) = sumARV;
+    }
+    
    double need;
    need = needPMTCT(t) > numPMTCT ? needPMTCT(t) : numPMTCT;
    //ROB: PMTCT need  (end)

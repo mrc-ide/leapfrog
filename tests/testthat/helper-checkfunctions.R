@@ -109,7 +109,7 @@ spectrum_output <- function(file = "../testdata/spectrum/v6.13/bwa_aim-adult-chi
   ##pull out stratified population from the .xlsx file, This function doesn't take out the paediatric output, so going to just compare to the Spectrum software itself
   df <- file
   if(grepl(pattern = 'testdata', file)){
-    df <- test_path(df)
+   # df <- test_path(df)
   }
   df <- eppasm::read_pop1(df, country, years = 1970:2022)
   if(any(0:14 %in% ages)){

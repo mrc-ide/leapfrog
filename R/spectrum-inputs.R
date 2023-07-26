@@ -285,9 +285,9 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   v$pmtct <- pmtct_list
   
   if(sum(pmtct_list[,,1]) == 0){
-    v$pmtct_input_num = F
+    v$pmtct_input_isperc = rep(F, length(1970:2030))
   }else{
-    v$pmtct_input_pct = T
+    v$pmtct_input_isperc = rep(T, length(1970:2030))
   }
   
   ##PMTCT dropout
