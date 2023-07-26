@@ -18,6 +18,7 @@ LinkingTo:
     Rcpp,
     RcppEigen
 Imports:
+    glue,
     Rcpp,
     yaml
 Suggests:
