@@ -4,7 +4,6 @@ test_that("assert_scalar", {
   expect_error(assert_scalar(1:2), "must be a scalar")
 })
 
-
 test_that("assert_character", {
   expect_silent(assert_character("a"))
   expect_error(assert_character(1), "must be character")
@@ -18,13 +17,13 @@ test_that("can assert value is from valid set", {
                "input must be one of 'foo', 'bar', got 'thing'")
 })
 
-test_that("assert_one_is_set", {
+test_that("assert_only_one_set", {
   input <- list(foo = "1", bar = "2")
-  expect_silent(assert_one_is_set(input, "foo"))
-  expect_silent(assert_one_is_set(input, "bar"))
+  expect_silent(assert_only_one_set(input, "foo"))
+  expect_silent(assert_only_one_set(input, "bar"))
   expect_error(
-    assert_one_is_set(input, c("foo", "bar")),
-    "Items 'foo', 'bar' all have values, only one should be set",
+    assert_only_one_set(input, c("foo", "bar")),
+    "Items 'foo', 'bar' from 'input' all have values, only one should be set",
     fixed = TRUE)
 })
 

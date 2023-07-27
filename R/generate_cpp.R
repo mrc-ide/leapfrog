@@ -19,7 +19,7 @@ generate_output_interface <- function(dest) {
     row <- outputs[row_num, ]
     ## When reading csv in excel the header column is included in count
     csv_row_num <- row_num + 1
-    parse_output(as.list(row), output_file, csv_row_num)
+    validate_and_parse_output(as.list(row), output_file, csv_row_num)
   })
 
   initialise_r_memory <- vcapply(parsed_outputs, generate_initialise_r_memory)
@@ -89,7 +89,7 @@ generate_input_interface <- function(dest) {
     row <- inputs[row_num, ]
     ## When reading csv in excel the header column is included in count
     csv_row_num <- row_num + 1
-    parse_input(as.list(row), input_file, csv_row_num)
+    validate_and_parse_input(as.list(row), input_file, csv_row_num)
   })
 
   from_r <- vlapply(parsed_inputs, function(input) {
@@ -113,21 +113,26 @@ generate_input_interface <- function(dest) {
   invisible(TRUE)
 }
 
-parse_input <- function(input, filename, row_num) {
+validate_and_parse_input <- function(input, filename, row_num) {
+  assert_only_one_set(input, c("r_name", "value"),
+                      name = paste("row num:", row_num))
+  assert_set(input$cpp_name)
   assert_enum(input$type, c("real_type", "int"),
               name = sprintf("row num: %s and col: type", row_num))
   assert_enum(input$convert_base, c("FALSE", "TRUE", ""),
               name = sprintf("row num: %s and col: convert_base", row_num))
   input$convert_base <- identical(input$convert_base, "TRUE")
-  assert_one_is_set(input, c("r_name", "value"),
-                    name = paste("row num:", row_num))
+  assert_set(input$dims)
   input$parsed_dims <- validate_and_parse_dims(input, filename, row_num)
   input
 }
 
-parse_output <- function(output, filename, row_num) {
+validate_and_parse_output <- function(output, filename, row_num) {
+  assert_set(output$r_name)
+  assert_set(output$cpp_name)
   assert_enum(output$r_type, c("REAL", "INTEGER"),
               name = sprintf("row num: %s and col: r_type", row_num))
+  assert_set(output$dims)
   output$parsed_dims <- validate_and_parse_dims(output, filename, row_num)
   output
 }

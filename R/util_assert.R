@@ -31,7 +31,7 @@ assert_set <- function(x, name = deparse(substitute(x))) {
   }
 }
 
-assert_one_is_set <- function(items, names, name = deparse(substitute(items))) {
+assert_only_one_set <- function(items, names, name = deparse(substitute(items))) {
   has_a_value <- !vlapply(items[names], is_unset)
   if (sum(has_a_value) > 1) {
     non_null <- format_vector(names(has_a_value))
