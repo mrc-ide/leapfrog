@@ -38,10 +38,9 @@ generate_output_interface <- function(dest) {
     "want to make changes\n// edit `model_output.hpp.in` and run ",
     "`./scripts/generate` to regenerate.")
 
-  generated_code <- glue::glue(paste(template, collapse = "\n"),
-                               .open = "{{", .close = "}}")
+  generated_code <- generate_cpp(template)
   writeLines(generated_code, dest)
-  invisible(TRUE)
+  invisible(dest)
 }
 
 generate_initialise_r_memory <- function(output) {
@@ -107,10 +106,9 @@ generate_input_interface <- function(dest) {
     "want to make changes\n// edit `model_input.hpp.in` and run ",
     "`./scripts/generate` to regenerate.")
 
-  generated_code <- glue::glue(paste(template, collapse = "\n"),
-                               .open = "{{", .close = "}}")
+  generated_code <- generate_cpp(template)
   writeLines(generated_code, dest)
-  invisible(TRUE)
+  invisible(dest)
 }
 
 validate_and_parse_input <- function(input, filename, row_num) {
@@ -200,5 +198,11 @@ validate_and_parse_dims <- function(data, filename, row_num) {
       names(set_dims)[last_set], row_num, format_vector(unset), filename))
   }
   as.character(data[seq(dims_col + 1, dims_col + last_set)])
+}
+
+generate_cpp <- function(template) {
+  glue::glue(paste(template, collapse = "\n"),
+             .open = "{{", .close = "}}",
+             .envir = parent.frame())
 }
 
