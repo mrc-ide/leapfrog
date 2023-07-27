@@ -8,5 +8,5 @@ test_that("null-or-value works", {
 
 test_that("can format a vector", {
   expect_equal(format_vector("thing"), "'thing'")
-  expect_equal(format_vector(c("foo", "bar")), c("'foo', 'bar'"))
+  expect_equal(format_vector(c("foo", "bar")), "'foo', 'bar'")
 })
