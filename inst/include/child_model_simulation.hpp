@@ -36,25 +36,24 @@ void run_child_ageing(int time_step,
     for (int hm = 0; hm < ss.hc1_disease_stages; ++hm) {
       for (int hm_alt = 0; hm_alt < ss.hc2_disease_stages; ++hm_alt) {
         for (int cat = 0 ; cat < ss.hTM; ++cat) {
-          state_next.hc2_hiv_pop(hm_alt, cat, ss.hc2_agestart, g) +=  state_curr.hc1_hiv_pop(hm, cat, ss.hc1_ageend, g) * demog.survival(ss.hc2_agestart, g, time_step) * cpars.hc_cd4_transition(hm_alt, hm);
+          state_next.hc2_hiv_pop(hm_alt, cat, 0, g) +=  state_curr.hc1_hiv_pop(hm, cat, ss.hc1_ageend, g) * demog.survival(ss.hc2_agestart, g, time_step) * cpars.hc_cd4_transition(hm_alt, hm);
         }
         for (int dur = 0; dur < ss.treatment_stages; ++dur) {
-          state_next.hc2_art_pop(dur, hm_alt, ss.hc2_agestart, g) += state_curr.hc1_art_pop(dur, hm, ss.hc1_ageend, g) * demog.survival(ss.hc2_agestart, g, time_step) * cpars.hc_cd4_transition(hm_alt, hm);
+          state_next.hc2_art_pop(dur, hm_alt, 0, g) += state_curr.hc1_art_pop(dur, hm, ss.hc1_ageend, g) * demog.survival(ss.hc2_agestart, g, time_step) * cpars.hc_cd4_transition(hm_alt, hm);
         }
       }
     }
   }
 
   for (int g = 0; g < ss.num_genders; ++g) {
-    //thought it was ss.fertility_first_age_group but maybe not? ASK ROB
     for (int af = (ss.hc2_agestart + 1); af < pars.options.fertility_first_age_group; ++af) {
       for (int hm = 0; hm < ss.hc2_disease_stages; ++hm) {
         for (int cat = 0 ; cat < ss.hTM; ++cat) {
-          state_next.hc2_hiv_pop(hm, cat, af, g) += state_curr.hc2_hiv_pop(hm, cat, af-1, g) * demog.survival(af, g, time_step);
+          state_next.hc2_hiv_pop(hm, cat, af - ss.hc2_agestart, g) += state_curr.hc2_hiv_pop(hm, cat, af- ss.hc2_agestart-1, g) * demog.survival(af, g, time_step);
 
         }
         for (int dur = 0; dur < ss.treatment_stages; ++dur) {
-          state_next.hc2_art_pop(dur, hm, af, g) += state_curr.hc2_art_pop(dur, hm, af-1, g) * demog.survival(af, g, time_step);
+          state_next.hc2_art_pop(dur, hm, af - ss.hc2_agestart, g) += state_curr.hc2_art_pop(dur, hm, af- ss.hc2_agestart-1, g) * demog.survival(af, g, time_step);
         }
 
       }
