@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript
 
 pkgload::load_all(here::here())
-frogger:::generate_input_interface(dest = "inst/r_interface/model_input.hpp")
-frogger:::generate_output_interface(dest = "inst/r_interface/model_output.hpp")
+frogger:::generate_input_interface(dest = "inst/include/model_input.hpp")
+frogger:::generate_output_interface(dest = "inst/include/model_output.hpp")

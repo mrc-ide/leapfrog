@@ -1,1 +1,1 @@
-PKG_CPPFLAGS = -I../inst/include/ -I../inst/r_interface
+PKG_CPPFLAGS = -I../inst/include/

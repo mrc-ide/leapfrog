@@ -44,7 +44,7 @@ test_that("can generate input parsing", {
 })
 
 test_that("generated files are up to date", {
-  target_input_file <- frogger_file("r_interface/model_input.hpp")
+  target_input_file <- frogger_file("include/model_input.hpp")
   t_input <- tempfile()
   generate_input_interface(t_input)
   expect_identical(
@@ -53,7 +53,7 @@ test_that("generated files are up to date", {
                   "./scripts/generate")
   )
 
-  target_output_file <- frogger_file("r_interface/model_output.hpp")
+  target_output_file <- frogger_file("include/model_output.hpp")
   t_output <- tempfile()
   generate_output_interface(t_output)
   expect_identical(

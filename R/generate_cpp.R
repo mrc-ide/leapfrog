@@ -8,9 +8,9 @@
 #' @keywords internal
 generate_output_interface <- function(dest) {
 
-  template <- readLines(frogger_file("r_interface/model_output.hpp.in"))
+  template <- readLines(frogger_file("cpp_generation/model_output.hpp.in"))
   output_file <- "model_output.csv"
-  outputs <- utils::read.csv(frogger_file("r_interface", output_file),
+  outputs <- utils::read.csv(frogger_file("cpp_generation", output_file),
                             colClasses = "character")
 
   validate_dimensions_columns(colnames(outputs), output_file)
@@ -78,9 +78,9 @@ generate_return <- function(output) {
 #' @keywords internal
 generate_input_interface <- function(dest) {
 
-  template <- readLines(frogger_file("r_interface/model_input.hpp.in"))
+  template <- readLines(frogger_file("cpp_generation/model_input.hpp.in"))
   input_file <- "model_input.csv"
-  inputs <- utils::read.csv(frogger_file("r_interface", input_file),
+  inputs <- utils::read.csv(frogger_file("cpp_generation", input_file),
                             colClasses = "character")
 
   validate_dimensions_columns(colnames(inputs), input_file)
