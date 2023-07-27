@@ -169,7 +169,7 @@ void run_child_hiv_mort(int time_step,
           if(af < ss.hc2_agestart){
             intermediate.hc_grad(hm, cat, af, g) -= (1 - cpars.ctx_effect * cpars.ctx_val(time_step)) * state_next.hc1_hiv_pop(hm, cat, af, g) * cpars.hc1_cd4_mort(hm, cat, af)  ;
           }else{
-            intermediate.hc_grad(hm, cat, af, g) -= (1 - cpars.ctx_effect * cpars.ctx_val(time_step)) * state_next.hc2_hiv_pop(hm, cat, af - ss.hc2_disease_stages, g) * cpars.hc2_cd4_mort(hm, cat, af)  ;
+            intermediate.hc_grad(hm, cat, af, g) -= (1 - cpars.ctx_effect * cpars.ctx_val(time_step)) * state_next.hc2_hiv_pop(hm, cat, af - ss.hc2_agestart, g) * cpars.hc2_cd4_mort(hm, cat, af - ss.hc2_agestart)  ;
 
           }
         }
@@ -195,7 +195,7 @@ void add_child_grad(int time_step,
           if(af < ss.hc2_agestart){
             state_next.hc1_hiv_pop(hm, cat, af, g) +=intermediate.hc_grad(hm, cat, af, g);
           }else{
-          state_next.hc2_hiv_pop(hm, cat, af, g) +=intermediate.hc_grad(hm, cat, af, g);
+          state_next.hc2_hiv_pop(hm, cat, af- ss.hc2_agestart, g) +=intermediate.hc_grad(hm, cat, af, g);
         }
       }
     }

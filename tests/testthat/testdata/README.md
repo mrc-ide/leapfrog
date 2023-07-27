@@ -70,8 +70,7 @@ demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
 demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
 
 hivp$paed_cd4_dist <- c(1,rep(0,6))
-hivp$paed_cd4_mort[] <- 0
-hivp$adol_cd4_mort[] <- 0
+
 ##Only transmission is coming from nosocomial infections
 hivp$pmtct_mtct[] <- 0
 hivp$art_mtct[] <- 0
@@ -80,3 +79,4 @@ saveRDS(hivp, "projection_parameters_child.rds")
 saveRDS(demp, "demographic_projection_object_child.rds")
 
 ```
+
