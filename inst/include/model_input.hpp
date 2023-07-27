@@ -14,14 +14,14 @@ template<leapfrog::HivAgeStratification S, typename real_type>
 leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
                                                     const leapfrog::Options<real_type> &options,
                                                     const int proj_years) {
+  const int age_groups_fert = options.age_groups_fert;
+  const int hiv_adult_first_age_group = options.hiv_adult_first_age_group;
   constexpr auto ss = leapfrog::StateSpace<S>();
   constexpr int num_genders = ss.num_genders;
   constexpr int age_groups_pop = ss.age_groups_pop;
   constexpr int age_groups_hiv = ss.age_groups_hiv;
   constexpr int disease_stages = ss.disease_stages;
   constexpr int treatment_stages = ss.treatment_stages;
-  const int age_groups_fert = options.age_groups_fert;
-  const int hiv_adult_first_age_group = options.hiv_adult_first_age_group;
 
   const leapfrog::TensorMap2<real_type> base_pop = parse_data<real_type>(data, "basepop", age_groups_pop, num_genders);
   const leapfrog::TensorMap3<real_type> survival = parse_data<real_type>(data, "Sx", age_groups_pop + 1, num_genders, proj_years);

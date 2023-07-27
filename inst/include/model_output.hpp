@@ -12,13 +12,14 @@
 template<leapfrog::HivAgeStratification S, typename real_type>
 Rcpp::List build_r_output(const typename leapfrog::StateSaver<S, real_type>::OutputState &state,
                           const std::vector<int> save_steps) {
+  size_t output_years = save_steps.size();
   constexpr auto ss = leapfrog::StateSpace<S>();
   constexpr int num_genders = ss.num_genders;
   constexpr int age_groups_pop = ss.age_groups_pop;
   constexpr int age_groups_hiv = ss.age_groups_hiv;
   constexpr int disease_stages = ss.disease_stages;
   constexpr int treatment_stages = ss.treatment_stages;
-  size_t output_years = save_steps.size();
+
   Rcpp::NumericVector r_total_population(age_groups_pop * num_genders * output_years);
   Rcpp::NumericVector r_births(output_years);
   Rcpp::NumericVector r_natural_deaths(age_groups_pop * num_genders * output_years);

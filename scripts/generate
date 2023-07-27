@@ -1,5 +1,19 @@
 #!/usr/bin/env Rscript
 
-pkgload::load_all(here::here())
-frogger:::generate_input_interface(dest = "inst/include/model_input.hpp")
-frogger:::generate_output_interface(dest = "inst/include/model_output.hpp")
+## Source files manually so that if we break our generated code
+## we can still regenerate the interfaces without compiling
+root <- here::here()
+source(file.path(root, "R/util.R"))
+source(file.path(root, "R/util_assert.R"))
+source(file.path(root, "R/generate_cpp.R"))
+
+frogger_file <- function(..., mustWork = TRUE) {
+  path <- file.path(root, "inst", ...)
+  if (mustWork && !file.exists(path)) {
+    stop(sprintf("File at path %s does not exist", path))
+  }
+  path
+}
+
+generate_input_interface(dest = frogger_file("include/model_input.hpp"))
+generate_output_interface(dest = frogger_file("/include/model_output.hpp"))
