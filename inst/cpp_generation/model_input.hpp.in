@@ -1,0 +1,58 @@
+{{header}}
+
+#pragma once
+
+#include <Rcpp.h>
+#include <unsupported/Eigen/CXX11/Tensor>
+
+#include "types.hpp"
+#include "r_utils.hpp"
+
+template<leapfrog::HivAgeStratification S, typename real_type>
+leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
+                                                    const leapfrog::Options<real_type> &options,
+                                                    const int proj_years) {
+  const int age_groups_fert = options.age_groups_fert;
+  const int hiv_adult_first_age_group = options.hiv_adult_first_age_group;
+  constexpr auto ss = leapfrog::StateSpace<S>();
+{{unpack_state_space}}
+
+{{parse_data}}
+
+  const leapfrog::Demography<real_type> demography = {
+      base_pop,
+      survival,
+      net_migration,
+      age_sex_fertility_ratio,
+      births_sex_prop
+  };
+
+  const leapfrog::Incidence<real_type> incidence = {
+      incidence_rate,
+      incidence_relative_risk_age,
+      incidence_relative_risk_sex
+  };
+
+  const leapfrog::NaturalHistory<real_type> natural_history = {
+      cd4_mortality,
+      cd4_progression,
+      cd4_initdist
+  };
+
+  const leapfrog::Art<real_type> art = {
+      artcd4elig_idx,
+      art_mortality,
+      artmx_timerr,
+      h_art_stage_dur,
+      art_dropout,
+      art15plus_num,
+      art15plus_isperc
+  };
+
+  const leapfrog::Parameters<real_type> params = {options,
+                                                  demography,
+                                                  incidence,
+                                                  natural_history,
+                                                  art};
+  return params;
+}
