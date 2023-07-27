@@ -114,13 +114,14 @@ generate_input_interface <- function(dest) {
 }
 
 validate_and_parse_input <- function(input, filename, row_num) {
+  row_text <- paste("row: ", row_num)
   assert_only_one_set(input, c("r_name", "value"),
-                      name = paste("row num:", row_num))
-  assert_set(input$cpp_name)
+                      name = row_text)
+  assert_set(input$cpp_name, paste(row_text, "and col: cpp_name"))
   assert_enum(input$type, c("real_type", "int"),
-              name = sprintf("row num: %s and col: type", row_num))
+              name = paste(row_text, "and col: type"))
   assert_enum(input$convert_base, c("FALSE", "TRUE", ""),
-              name = sprintf("row num: %s and col: convert_base", row_num))
+              name = paste(row_text, "and col: convert_base"))
   input$convert_base <- identical(input$convert_base, "TRUE")
   assert_set(input$dims)
   input$parsed_dims <- validate_and_parse_dims(input, filename, row_num)
@@ -128,10 +129,11 @@ validate_and_parse_input <- function(input, filename, row_num) {
 }
 
 validate_and_parse_output <- function(output, filename, row_num) {
+  row_text <- paste("row: ", row_num)
   assert_set(output$r_name)
   assert_set(output$cpp_name)
   assert_enum(output$r_type, c("REAL", "INTEGER"),
-              name = sprintf("row num: %s and col: r_type", row_num))
+              name = paste(row_text, "and col: r_type"))
   assert_set(output$dims)
   output$parsed_dims <- validate_and_parse_dims(output, filename, row_num)
   output
