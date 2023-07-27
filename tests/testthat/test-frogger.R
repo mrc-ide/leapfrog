@@ -14,7 +14,8 @@ test_that("initial state set up works as expected", {
     )
   )
   expect_equal(dim(out$total_population), c(81, 2, 1))
-  expect_equal(out$total_population[, , 1], demp$basepop[, , 1], ignore_attr = TRUE)
+  expect_equal(out$total_population[, , 1], demp$basepop[, , 1],
+               ignore_attr = TRUE)
 
   expect_equal(out$births[1], 0)
   expect_equal(out$natural_deaths, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
