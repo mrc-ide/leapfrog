@@ -108,8 +108,7 @@ void run_child_natural_history(int time_step,
      for (int af = 0; af < ss.hc2_agestart; ++af) {
        for (int cat = 0; cat < ss.hTM; ++cat) {
          intermediate.hc_posthivmort(hm, cat, af, g) += state_next.hc1_hiv_pop(hm, cat, af, g) - (1.0 - cpars.ctx_effect * cpars.ctx_val(time_step)) * state_curr.hc1_hiv_pop(hm, cat, af, g) * cpars.hc1_cd4_mort(hm, cat, af);
-         //unsure whether this should be state_next or state_curr
-        // state_next.aidsdeaths_noart_paed(hm, cat, af, g) += (1 - cpars.ctx_effect * cpars.ctx_val(t)) * state_curr.hc_hiv_pop(hm, cat, af, g) * cpars.hc1_cd4_mort(hm, cat, af)  ;
+         state_next.hc1_noart_aids_deaths(hm, cat, af, g) += (1 - cpars.ctx_effect * cpars.ctx_val(time_step)) * state_curr.hc1_hiv_pop(hm, cat, af, g) * cpars.hc1_cd4_mort(hm, cat, af)  ;
        }
      }
    }
@@ -121,7 +120,7 @@ void run_child_natural_history(int time_step,
      for (int af = ss.hc2_agestart; af < pars.options.fertility_first_age_group; ++af) {
        for (int cat = 0; cat < ss.hTM; ++cat) {
          intermediate.hc_posthivmort(hm, cat, af, g) += state_next.hc2_hiv_pop(hm, cat, af - ss.hc2_agestart, g) - (1 - cpars.ctx_effect * cpars.ctx_val(time_step)) * state_curr.hc2_hiv_pop(hm, cat, af - ss.hc2_agestart, g) * cpars.hc2_cd4_mort(hm, cat, af - ss.hc2_agestart);
-         //state_next.aidsdeaths_noart_paed(hm, cat, af, g) +=  (1 - cpars.ctx_effect * cpars.ctx_val(t)) * state_curr.hc_hiv_pop(hm, cat, af, g) * cpars.hc2_cd4_mort(hm, cat, af - 5); // output hiv deaths, aggregated across transmission category
+         state_next.hc2_noart_aids_deaths(hm, cat, af, g) +=  (1 - cpars.ctx_effect * cpars.ctx_val(time_step)) * state_curr.hc2_hiv_pop(hm, cat, af - ss.hc2_agestart, g) * cpars.hc2_cd4_mort(hm, cat, af - ss.hc2_agestart); // output hiv deaths, aggregated across transmission category
        }
      }
    }

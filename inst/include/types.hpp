@@ -157,6 +157,14 @@ struct Children {
   TensorMap1<real_type> hc2_cd4_prog;
   real_type ctx_effect;
   TensorMap1<real_type> ctx_val;
+  TensorMap1<real_type> hc_art_elig_age;
+  TensorMap2<real_type> hc_art_elig_cd4;
+  TensorMap3<real_type> hc_art_mort_rr;
+  TensorMap3<real_type> hc1_art_mort;
+  TensorMap3<real_type> hc2_art_mort;
+  TensorMap1<real_type> hc_art_isperc;
+  TensorMap1<real_type> hc_art_val;
+  TensorMap1<real_type> hc_art_init_dist;
 };
 
 template<typename real_type>
@@ -197,6 +205,11 @@ struct State {
   TensorFixedSize <real_type, Sizes<hc2_disease_stages<S>, hTM<S>, hc2_age_groups<S>, num_genders<S>>> hc2_hiv_pop;
   TensorFixedSize <real_type, Sizes<treatment_stages<S>, hc2_disease_stages<S>, hc2_age_groups<S>, num_genders<S>>> hc2_art_pop;
 
+  TensorFixedSize <real_type, Sizes<treatment_stages<S>, hc1_disease_stages<S>, hc1_age_groups<S>, num_genders<S>>> hc1_art_aids_deaths;
+  TensorFixedSize <real_type, Sizes<treatment_stages<S>, hc2_disease_stages<S>, hc2_age_groups<S>, num_genders<S>>> hc2_art_aids_deaths;
+
+  TensorFixedSize <real_type, Sizes<hc1_disease_stages<S>, hTM<S>, hc1_age_groups<S>, num_genders<S>>> hc1_noart_aids_deaths;
+  TensorFixedSize <real_type, Sizes<hc2_disease_stages<S>, hTM<S>, hc2_age_groups<S>, num_genders<S>>> hc2_noart_aids_deaths;
 
   State() {}
 
@@ -216,6 +229,10 @@ struct State {
     hc1_art_pop.setZero();
     hc2_hiv_pop.setZero();
     hc2_art_pop.setZero();
+    hc1_art_aids_deaths.setZero();
+    hc2_art_aids_deaths.setZero();
+    hc1_noart_aids_deaths.setZero();
+    hc2_noart_aids_deaths.setZero();
     births = 0;
   }
 };
@@ -246,6 +263,13 @@ struct IntermediateData {
   //waiting on confirmation of ages from rob
   TensorFixedSize <real_type, Sizes<disease_stages<S>, hTM<S>, age_groups_hiv<S>, num_genders<S>>> hc_posthivmort;
   TensorFixedSize <real_type, Sizes<disease_stages<S>, hTM<S>, age_groups_hiv<S>, num_genders<S>>> hc_grad;
+  TensorFixedSize <real_type, Sizes<disease_stages<S>, hTM<S>, age_groups_hiv<S>, num_genders<S>>> hc_art_need;
+  double hc_art_num;
+  TensorFixedSize <real_type, Sizes<disease_stages<S>, hTM<S>, age_groups_hiv<S>, num_genders<S>>> hc_art_init;
+  double hc_art_init_total;
+  double hc_death_rate;
+  TensorFixedSize <real_type, Sizes<disease_stages<S>, hTM<S>, age_groups_hiv<S>, num_genders<S>>> hc_art_grad;
+  double hc_art_scalar;
 
 
   real_type cd4mx_scale;
@@ -309,6 +333,13 @@ struct IntermediateData {
     age15_hiv_pop.setZero();
     hc_posthivmort.setZero();
     hc_grad.setZero();
+    hc_art_need.setZero();
+    hc_art_num = 0.0;
+    hc_art_init.setZero();
+    hc_art_init_total = 0.0;
+    hc_death_rate = 0.0;
+    hc_art_grad.setZero();
+    hc_art_scalar = 0.0;
     cd4mx_scale = 1.0;
     deaths = 0.0;
     everARTelig_idx = 0;

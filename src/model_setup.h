@@ -102,11 +102,19 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List data,
   const leapfrog::TensorMap1<double> hc1_cd4_prog = parse_data<double>(data, "paed_cd4_prog", ss.hc1_disease_stages);
   const leapfrog::TensorMap1<double> hc2_cd4_prog = parse_data<double>(data, "adol_cd4_prog", ss.hc2_disease_stages);
 
-  //Not sure how to do just a single value, ASK ROB
   // !!! TODO: Ask Rob about preferred approach to assigning a single value
   const double ctx_effect = parse_data<double>(data, "ctx_effect", 1)(0);  // select the first element of a TensorMap1 and assign to double
   const leapfrog::TensorMap1<double> ctx_val = parse_data<double>(data, "ctx_val", proj_years);
 
+  // !!! TODO: fix hard coded values
+  const leapfrog::TensorMap1<double> hc_art_elig_age = parse_data<double>(data, "paed_art_elig_age", proj_years);
+  const leapfrog::TensorMap2<double> hc_art_elig_cd4 = parse_data<double>(data, "paed_art_elig_cd4", 15, proj_years);
+  const leapfrog::TensorMap3<double> hc_art_mort_rr = parse_data<double>(data, "mort_art_rr", ss.treatment_stages, 15, proj_years);
+  const leapfrog::TensorMap3<double> hc1_art_mort = parse_data<double>(data, "paed_art_mort", ss.hc1_disease_stages, ss.treatment_stages, 15);
+  const leapfrog::TensorMap3<double> hc2_art_mort = parse_data<double>(data, "adol_art_mort", ss.hc2_disease_stages, ss.treatment_stages, 15);
+  const leapfrog::TensorMap1<double> hc_art_isperc = parse_data<double>(data, "artpaeds_isperc", proj_years);
+  const leapfrog::TensorMap1<double> hc_art_val = parse_data<double>(data, "paed_art_val", proj_years);
+  const leapfrog::TensorMap2<double> hc_art_init_dist = parse_data<double>(data, "init_art_dist", 15, proj_years);
 
 
 
@@ -150,7 +158,16 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List data,
       hc1_cd4_prog,
       hc2_cd4_prog,
       ctx_effect,
-      ctx_val
+      ctx_val,
+      hc_art_elig_age,
+      hc_art_elig_cd4,
+      hc_art_mort_rr,
+      hc1_art_mort,
+      hc2_art_mort,
+      hc_art_isperc,
+      hc_art_val,
+      hc_art_init_dist
+
   };
 
   const leapfrog::Parameters<double> params = {options,
