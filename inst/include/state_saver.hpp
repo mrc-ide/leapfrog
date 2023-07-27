@@ -21,32 +21,32 @@ public:
     Tensor4<real_type> art_initiation;
     Tensor3<real_type> hiv_deaths;
 
-    OutputState(int age_groups_pop,
-                int num_genders,
-                int disease_stages,
-                int age_groups_hiv,
-                int treatment_stages,
+    OutputState(int pAG,
+                int NS,
+                int hDS,
+                int hAG,
+                int hTS,
                 int no_output_years)
-        : total_population(StateSpace<S>().age_groups_pop, StateSpace<S>().num_genders, no_output_years),
-          natural_deaths(StateSpace<S>().age_groups_pop, StateSpace<S>().num_genders, no_output_years),
-          hiv_population(StateSpace<S>().age_groups_pop, StateSpace<S>().num_genders, no_output_years),
-          hiv_natural_deaths(StateSpace<S>().age_groups_pop, StateSpace<S>().num_genders, no_output_years),
-          hiv_strat_adult(StateSpace<S>().disease_stages, StateSpace<S>().age_groups_hiv, StateSpace<S>().num_genders,
+        : total_population(StateSpace<S>().pAG, StateSpace<S>().NS, no_output_years),
+          natural_deaths(StateSpace<S>().pAG, StateSpace<S>().NS, no_output_years),
+          hiv_population(StateSpace<S>().pAG, StateSpace<S>().NS, no_output_years),
+          hiv_natural_deaths(StateSpace<S>().pAG, StateSpace<S>().NS, no_output_years),
+          hiv_strat_adult(StateSpace<S>().hDS, StateSpace<S>().hAG, StateSpace<S>().NS,
                           no_output_years),
-          art_strat_adult(StateSpace<S>().treatment_stages,
-                          StateSpace<S>().disease_stages,
-                          StateSpace<S>().age_groups_hiv,
-                          StateSpace<S>().num_genders,
+          art_strat_adult(StateSpace<S>().hTS,
+                          StateSpace<S>().hDS,
+                          StateSpace<S>().hAG,
+                          StateSpace<S>().NS,
                           no_output_years),
           births(no_output_years),
-          aids_deaths_no_art(StateSpace<S>().disease_stages, StateSpace<S>().age_groups_hiv,
-                             StateSpace<S>().num_genders, no_output_years),
-          infections(StateSpace<S>().age_groups_pop, StateSpace<S>().num_genders, no_output_years),
-          aids_deaths_art(StateSpace<S>().treatment_stages, StateSpace<S>().disease_stages,
-                          StateSpace<S>().age_groups_hiv, StateSpace<S>().num_genders, no_output_years),
-          art_initiation(StateSpace<S>().disease_stages, StateSpace<S>().age_groups_hiv,
-                         StateSpace<S>().num_genders, no_output_years),
-          hiv_deaths(StateSpace<S>().age_groups_pop, StateSpace<S>().num_genders, no_output_years) {
+          aids_deaths_no_art(StateSpace<S>().hDS, StateSpace<S>().hAG,
+                             StateSpace<S>().NS, no_output_years),
+          infections(StateSpace<S>().pAG, StateSpace<S>().NS, no_output_years),
+          aids_deaths_art(StateSpace<S>().hTS, StateSpace<S>().hDS,
+                          StateSpace<S>().hAG, StateSpace<S>().NS, no_output_years),
+          art_initiation(StateSpace<S>().hDS, StateSpace<S>().hAG,
+                         StateSpace<S>().NS, no_output_years),
+          hiv_deaths(StateSpace<S>().pAG, StateSpace<S>().NS, no_output_years) {
       total_population.setZero();
       natural_deaths.setZero();
       hiv_population.setZero();
@@ -65,8 +65,8 @@ public:
   StateSaver(int time_steps,
              std::vector<int> save_steps) :
       save_steps(save_steps),
-      full_state(StateSpace<S>().age_groups_pop, StateSpace<S>().num_genders, StateSpace<S>().disease_stages,
-                 StateSpace<S>().age_groups_hiv, StateSpace<S>().treatment_stages, save_steps.size()) {
+      full_state(StateSpace<S>().pAG, StateSpace<S>().NS, StateSpace<S>().hDS,
+                 StateSpace<S>().hAG, StateSpace<S>().hTS, save_steps.size()) {
     for (int step: save_steps) {
       if (step < 0) {
         std::stringstream ss;

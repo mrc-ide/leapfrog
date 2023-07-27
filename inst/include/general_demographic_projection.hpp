@@ -14,9 +14,9 @@ void run_ageing_and_mortality(int time_step,
                               IntermediateData<S, real_type> &intermediate) {
   constexpr auto ss = StateSpace<S>();
   const auto demog = pars.demography;
-  for (int g = 0; g < ss.num_genders; ++g) {
+  for (int g = 0; g < ss.NS; ++g) {
     // Start at index 1 as we will add infant (age 0) births and deaths later
-    for (int a = 1; a < ss.age_groups_pop; ++a) {
+    for (int a = 1; a < ss.pAG; ++a) {
       state_next.natural_deaths(a, g) = state_curr.total_population(a - 1, g) *
                                         (1.0 - demog.survival(a, g, time_step));
       state_next.total_population(a, g) =
@@ -26,12 +26,12 @@ void run_ageing_and_mortality(int time_step,
 
     // open age group
     real_type natural_deaths_open_age =
-        state_curr.total_population(ss.age_groups_pop - 1, g) *
-        (1.0 - demog.survival(ss.age_groups_pop, g, time_step));
-    state_next.natural_deaths(ss.age_groups_pop - 1, g) +=
+        state_curr.total_population(ss.pAG - 1, g) *
+        (1.0 - demog.survival(ss.pAG, g, time_step));
+    state_next.natural_deaths(ss.pAG - 1, g) +=
         natural_deaths_open_age;
-    state_next.total_population(ss.age_groups_pop - 1, g) +=
-        state_curr.total_population(ss.age_groups_pop - 1, g) -
+    state_next.total_population(ss.pAG - 1, g) +=
+        state_curr.total_population(ss.pAG - 1, g) -
         natural_deaths_open_age;
   }
 }
@@ -44,9 +44,9 @@ void run_migration(int time_step,
                    IntermediateData<S, real_type> &intermediate) {
   constexpr auto ss = StateSpace<S>();
   const auto demog = pars.demography;
-  for (int g = 0; g < ss.num_genders; ++g) {
+  for (int g = 0; g < ss.NS; ++g) {
     // Migration for ages 1, 2, ... 79
-    for (int a = 1; a < ss.age_groups_pop - 1; ++a) {
+    for (int a = 1; a < ss.pAG - 1; ++a) {
       // Get migration rate, as number of net migrants adjusted for survivorship
       // to end of period. Divide by 2 as (on average) half of deaths will
       // happen before they migrate. Then divide by total pop to get rate.
@@ -63,7 +63,7 @@ void run_migration(int time_step,
     // * Denominator: total_population(a, g, t-1) + total_population(a-1, g,
     // t-1) Re-expressed current population and deaths to open age group
     // (already calculated):
-    int a = ss.age_groups_pop - 1;
+    int a = ss.pAG - 1;
     real_type survival_netmig =
         (state_next.total_population(a, g) +
          0.5 * state_next.natural_deaths(a, g)) /
@@ -84,16 +84,16 @@ void run_fertility_and_infant_migration(int time_step,
   constexpr auto ss = StateSpace<S>();
   const auto demog = pars.demography;
   state_next.births = 0.0;
-  for (int af = 0; af < pars.options.age_groups_fert; ++af) {
+  for (int af = 0; af < pars.options.p_fertility_age_groups; ++af) {
     state_next.births += (state_curr.total_population(
-        pars.options.fertility_first_age_group + af, FEMALE) +
+        pars.options.p_idx_fertility_first + af, FEMALE) +
                           state_next.total_population(
-                              pars.options.fertility_first_age_group + af, FEMALE)) *
+                              pars.options.p_idx_fertility_first + af, FEMALE)) *
                          0.5 * demog.age_sex_fertility_ratio(af, time_step);
   }
 
   // add births & infant migration
-  for (int g = 0; g < ss.num_genders; ++g) {
+  for (int g = 0; g < ss.NS; ++g) {
     real_type births_sex =
         state_next.births * demog.births_sex_prop(g, time_step);
     state_next.natural_deaths(0, g) =

@@ -12,8 +12,8 @@ template<leapfrog::HivAgeStratification S, typename real_type>
 leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
                                                     const leapfrog::Options<real_type> &options,
                                                     const int proj_years) {
-  const int age_groups_fert = options.age_groups_fert;
-  const int hiv_adult_first_age_group = options.hiv_adult_first_age_group;
+  const int p_fertility_age_groups = options.p_fertility_age_groups;
+  const int p_idx_hiv_first_adult = options.p_idx_hiv_first_adult;
   constexpr auto ss = leapfrog::StateSpace<S>();
 {{unpack_state_space}}
 

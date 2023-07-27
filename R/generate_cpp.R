@@ -162,8 +162,7 @@ generate_input_from_value <- function(input) {
 }
 
 get_state_space_variables <- function() {
-  c("num_genders", "age_groups_pop", "age_groups_hiv", "disease_stages",
-    "treatment_stages")
+  c("NS", "pAG", "hAG", "hDS", "hTS")
 }
 
 generate_unpack_state_space <- function() {

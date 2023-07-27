@@ -16,8 +16,8 @@ void run_hiv_ageing_and_mortality(int time_step,
   const auto demog = pars.demography;
   constexpr auto ss = StateSpace<S>();
   // Non-hiv deaths
-  for (int g = 0; g < ss.num_genders; ++g) {
-    for (int a = 1; a < ss.age_groups_pop; ++a) {
+  for (int g = 0; g < ss.NS; ++g) {
+    for (int a = 1; a < ss.pAG; ++a) {
       state_next.hiv_natural_deaths(a, g) =
           state_curr.hiv_population(a - 1, g) *
           (1.0 - demog.survival(a, g, time_step));
@@ -25,11 +25,11 @@ void run_hiv_ageing_and_mortality(int time_step,
     }
 
     // open age group
-    state_next.hiv_natural_deaths(ss.age_groups_pop - 1, g) +=
-        state_curr.hiv_population(ss.age_groups_pop - 1, g) *
-        (1.0 - demog.survival(ss.age_groups_pop, g, time_step));
-    state_next.hiv_population(ss.age_groups_pop - 1, g) +=
-        state_curr.hiv_population(ss.age_groups_pop - 1, g);
+    state_next.hiv_natural_deaths(ss.pAG - 1, g) +=
+        state_curr.hiv_population(ss.pAG - 1, g) *
+        (1.0 - demog.survival(ss.pAG, g, time_step));
+    state_next.hiv_population(ss.pAG - 1, g) +=
+        state_curr.hiv_population(ss.pAG - 1, g);
   }
 }
 
@@ -41,12 +41,12 @@ void run_hiv_and_art_stratified_ageing(int time_step,
                                        IntermediateData<S, real_type> &intermediate) {
   constexpr auto ss = StateSpace<S>();
   // age coarse stratified HIV population
-  for (int g = 0; g < ss.num_genders; ++g) {
-    int a = pars.options.hiv_adult_first_age_group;
-    // Note: loop stops at age_groups_hiv-1; no one ages out of the open-ended
+  for (int g = 0; g < ss.NS; ++g) {
+    int a = pars.options.p_idx_hiv_first_adult;
+    // Note: loop stops at hAG-1; no one ages out of the open-ended
     // age group
-    for (int ha = 0; ha < (ss.age_groups_hiv - 1); ++ha) {
-      for (int i = 0; i < ss.hiv_age_groups_span[ha]; ++i, ++a) {
+    for (int ha = 0; ha < (ss.hAG - 1); ++ha) {
+      for (int i = 0; i < ss.hAG_span[ha]; ++i, ++a) {
         intermediate.hiv_age_up_prob(ha, g) += state_curr.hiv_population(a, g);
       }
       if (intermediate.hiv_age_up_prob(ha, g) > 0) {
@@ -58,14 +58,14 @@ void run_hiv_and_art_stratified_ageing(int time_step,
     }
   }
 
-  for (int g = 0; g < ss.num_genders; ++g) {
-    for (int ha = 1; ha < ss.age_groups_hiv; ++ha) {
-      for (int hm = 0; hm < ss.disease_stages; ++hm) {
+  for (int g = 0; g < ss.NS; ++g) {
+    for (int ha = 1; ha < ss.hAG; ++ha) {
+      for (int hm = 0; hm < ss.hDS; ++hm) {
         state_next.hiv_strat_adult(hm, ha, g) =
             ((1.0 - intermediate.hiv_age_up_prob(ha, g)) * state_curr.hiv_strat_adult(hm, ha, g)) +
             (intermediate.hiv_age_up_prob(ha - 1, g) * state_curr.hiv_strat_adult(hm, ha - 1, g));
-        if (time_step > pars.options.time_art_start)
-          for (int hu = 0; hu < ss.treatment_stages; ++hu) {
+        if (time_step > pars.options.ts_art_start)
+          for (int hu = 0; hu < ss.hTS; ++hu) {
             state_next.art_strat_adult(hu, hm, ha, g) =
                 ((1.0 - intermediate.hiv_age_up_prob(ha, g)) *
                  state_curr.art_strat_adult(hu, hm, ha, g)) +
@@ -77,13 +77,13 @@ void run_hiv_and_art_stratified_ageing(int time_step,
   }
 
   // TODO: add HIV+ 15 year old entrants see https://github.com/mrc-ide/leapfrog/issues/8
-  for (int g = 0; g < ss.num_genders; ++g) {
-    for (int hm = 0; hm < ss.disease_stages; ++hm) {
+  for (int g = 0; g < ss.NS; ++g) {
+    for (int hm = 0; hm < ss.hDS; ++hm) {
       state_next.hiv_strat_adult(hm, 0, g) =
           (1.0 - intermediate.hiv_age_up_prob(0, g)) * state_curr.hiv_strat_adult(hm, 0, g);
       // ADD HIV+ entrants here
-      if (time_step > pars.options.time_art_start) {
-        for (int hu = 0; hu < ss.treatment_stages; ++hu) {
+      if (time_step > pars.options.ts_art_start) {
+        for (int hu = 0; hu < ss.hTS; ++hu) {
           state_next.art_strat_adult(hu, hm, 0, g) =
               (1.0 - intermediate.hiv_age_up_prob(0, g)) *
               state_curr.art_strat_adult(hu, hm, 0, g);
@@ -104,18 +104,18 @@ void run_hiv_and_art_stratified_deaths_and_migration(
     State<S, real_type> &state_next,
     IntermediateData<S, real_type> &intermediate) {
   constexpr auto ss = StateSpace<S>();
-  for (int g = 0; g < ss.num_genders; ++g) {
-    int a = pars.options.hiv_adult_first_age_group;
-    for (int ha = 0; ha < ss.age_groups_hiv; ++ha) {
-      for (int i = 0; i < ss.hiv_age_groups_span[ha]; ++i, ++a) {
+  for (int g = 0; g < ss.NS; ++g) {
+    int a = pars.options.p_idx_hiv_first_adult;
+    for (int ha = 0; ha < ss.hAG; ++ha) {
+      for (int i = 0; i < ss.hAG_span[ha]; ++i, ++a) {
         intermediate.hiv_population_coarse_ages(ha, g) += state_next.hiv_population(a, g);
       }
     }
   }
 
   // remove non-HIV deaths and net migration from hiv stratified population
-  for (int g = 0; g < ss.num_genders; ++g) {
-    for (int a = 1; a < ss.age_groups_pop; ++a) {
+  for (int g = 0; g < ss.NS; ++g) {
+    for (int a = 1; a < ss.pAG; ++a) {
       state_next.hiv_population(a, g) -= state_next.hiv_natural_deaths(a, g);
       intermediate.hiv_net_migration(a, g) =
           state_next.hiv_population(a, g) * intermediate.migration_rate(a, g);
@@ -124,11 +124,11 @@ void run_hiv_and_art_stratified_deaths_and_migration(
   }
 
   // remove non-HIV deaths and net migration from adult stratified population
-  for (int g = 0; g < ss.num_genders; ++g) {
-    int a = pars.options.hiv_adult_first_age_group;
-    for (int ha = 0; ha < ss.age_groups_hiv; ++ha) {
+  for (int g = 0; g < ss.NS; ++g) {
+    int a = pars.options.p_idx_hiv_first_adult;
+    for (int ha = 0; ha < ss.hAG; ++ha) {
       real_type deaths_migrate = 0;
-      for (int i = 0; i < ss.hiv_age_groups_span[ha]; ++i, ++a) {
+      for (int i = 0; i < ss.hAG_span[ha]; ++i, ++a) {
         deaths_migrate += (intermediate.hiv_net_migration(a, g) - state_next.hiv_natural_deaths(a, g));
       }
 
@@ -137,10 +137,10 @@ void run_hiv_and_art_stratified_deaths_and_migration(
         deaths_migrate_rate = deaths_migrate / intermediate.hiv_population_coarse_ages(ha, g);
       }
 
-      for (int hm = 0; hm < ss.disease_stages; ++hm) {
+      for (int hm = 0; hm < ss.hDS; ++hm) {
         state_next.hiv_strat_adult(hm, ha, g) *= 1.0 + deaths_migrate_rate;
-        if (time_step > pars.options.time_art_start) {
-          for (int hu = 0; hu < ss.treatment_stages; ++hu) {
+        if (time_step > pars.options.ts_art_start) {
+          for (int hu = 0; hu < ss.hTS; ++hu) {
             state_next.art_strat_adult(hu, hm, ha, g) *=
                 1.0 + deaths_migrate_rate;
           }
