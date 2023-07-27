@@ -77,8 +77,8 @@ In `StateSpace` struct
 * `NS` is `s`
 * `pAG` is `a`
 * `hAG` is `ha`
-* `hDS` is `hm`
-* `hTS` is `hu`
+* `hDS` is `hd`
+* `hTS` is `ht`
 
 ### Key indices in state space or other options controlling fit
 
@@ -111,7 +111,7 @@ In 4 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 | cd4_mort           | natural_history.cd4_mortality            | Probability of mortality by CD4 stage, age and sex                                                                                                                    |
 | scale_cd4_mort     | natural_history.scale_cd4_mortality      | If 1 then scale HIV related mortality (i.e. cd4_mortality) as a proportion of number of people with HIV and over the number with HIV and on ART at this disease stage |
 | art_mort           | art.mortality_rate                       | Probability of mortality by treatment stage, CD4 stage, age and sex                                                                                                   |
-| artmx_timerr       | art.mortaility_rate_ratio                | HIV-related mortality rate ratios by treatment stage                                                                                                                  |
+| artmx_timerr       | art.mortaility_time_rate_ratio           | ART mortality rate ratio by year for <12 months and >12 months on ART                                                                                                 |
 | art15plus_num      | art.adults_on_art                        | Time series of # or % of adult PLHIV on ART by sex                                                                                                                    |
 | art15plus_isperc   | art.adults_on_art_is_percent             | Time series, TRUE if art15plus_num is a %, FALSE if it is a #                                                                                                         |
 | artcd4elig_idx     | art.idx_hm_elig                          | The index of the CD4 count at which people are eligible for ART by time step                                                                                          |
