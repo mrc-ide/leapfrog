@@ -1,0 +1,22 @@
+r_name,cpp_name,type,value,convert_base,dims,dim1,dim2,dim3,dim4
+basepop,base_pop,real_type,,FALSE,2,age_groups_pop,num_genders,,
+Sx,survival,real_type,,FALSE,3,age_groups_pop + 1,num_genders,proj_years,
+netmigr_adj,net_migration,real_type,,FALSE,3,age_groups_pop,num_genders,proj_years,
+asfr,age_sex_fertility_ratio,real_type,,FALSE,2,age_groups_fert,proj_years,,
+births_sex_prop,births_sex_prop,real_type,,FALSE,2,num_genders,proj_years,,
+incidinput,incidence_rate,real_type,,FALSE,1,proj_years,,,
+incrr_age,incidence_relative_risk_age,real_type,,FALSE,3,age_groups_pop - hiv_adult_first_age_group,num_genders,proj_years,
+incrr_sex,incidence_relative_risk_sex,real_type,,FALSE,1,proj_years,,,
+cd4_mort,cd4_mortality,real_type,,FALSE,3,disease_stages,age_groups_hiv,num_genders,
+cd4_prog,cd4_progression,real_type,,FALSE,3,disease_stages - 1,age_groups_hiv,num_genders,
+artcd4elig_idx,artcd4elig_idx,int,,TRUE,1,proj_years + 1,,,
+cd4_initdist,cd4_initdist,real_type,,FALSE,3,disease_stages,age_groups_hiv,num_genders,
+art_mort,art_mortality,real_type,,FALSE,4,treatment_stages,disease_stages,age_groups_hiv,num_genders
+artmx_timerr,artmx_timerr,real_type,,FALSE,2,treatment_stages,proj_years,,
+art_dropout,art_dropout,real_type,,FALSE,1,proj_years,,,
+art15plus_num,art15plus_num,real_type,,FALSE,2,num_genders,proj_years,,
+art15plus_isperc,art15plus_isperc,int,,FALSE,2,num_genders,proj_years,,
+,h_art_stage_dur,real_type,0.5,FALSE,1,treatment_stages - 1,,,
+paed_incid_input,hc_nosocomial,real_type,,FALSE,1,proj_years,,,
+paed_cd4_dist,hc1_cd4_dist,real_type,,FALSE,1,hC2_disease_stages,,,
+paed_cd4_transition,hc_cd4_transition,real_type,,FALSE,2,hC1_disease_stages,hC2_disease_stages

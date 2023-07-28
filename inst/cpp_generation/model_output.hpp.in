@@ -1,0 +1,24 @@
+{{header}}
+
+#pragma once
+
+#include <Rcpp.h>
+#include <unsupported/Eigen/CXX11/Tensor>
+
+#include "state_saver.hpp"
+
+template<leapfrog::HivAgeStratification S, typename real_type>
+Rcpp::List build_r_output(const typename leapfrog::StateSaver<S, real_type>::OutputState &state,
+                          const std::vector<int> save_steps) {
+  size_t output_years = save_steps.size();
+  constexpr auto ss = leapfrog::StateSpace<S>();
+{{unpack_state_space}}
+
+{{initialise_r_memory}}
+
+{{set_r_dimensions}}
+
+{{copy_data}}
+
+{{return_output}}
+}

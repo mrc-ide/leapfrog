@@ -45,11 +45,26 @@ deserialize_tensor_to_r <- function(path) {
         as.numeric(strsplit(content[[2]], ",\\s*")[[1]]))
 }
 
-assert_enum <- function(x, values, name = deparse(substitute(x))) {
-  if (!(x %in% values)) {
-    value_text <- paste(sprintf("'%s'", values), collapse = ", ")
-    stop(sprintf("%s must be one of %s, got '%s'", name, value_text, x),
-         call. = FALSE)
-  }
-  invisible(TRUE)
+vcapply <- function(X, FUN, ...) { # nolint
+  vapply(X, FUN, character(1), ...)
+}
+
+vlapply <- function(X, FUN, ...) { # nolint
+  vapply(X, FUN, logical(1), ...)
+}
+
+frogger_file <- function(..., mustWork = TRUE) {
+  system.file(..., package = "frogger", mustWork = mustWork)
+}
+
+is_unset <- function(x) {
+  is.null(x) || is.na(x) || trimws(x) == ""
+}
+
+is_set <- function(x) {
+  !is_unset(x)
+}
+
+format_vector <- function(vector) {
+  paste(paste0("'", vector, "'"), collapse = ", ")
 }
