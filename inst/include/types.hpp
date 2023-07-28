@@ -131,35 +131,35 @@ using Eigen::TensorFixedSize;
 
 template<HivAgeStratification S, typename real_type>
 struct State {
-  TensorFixedSize <real_type, Sizes<pAG<S>, NS<S>>> total_population;
-  TensorFixedSize <real_type, Sizes<pAG<S>, NS<S>>> natural_deaths;
-  TensorFixedSize <real_type, Sizes<pAG<S>, NS<S>>> hiv_population;
-  TensorFixedSize <real_type, Sizes<pAG<S>, NS<S>>> hiv_natural_deaths;
-  TensorFixedSize <real_type, Sizes<hDS<S>, hAG<S>, NS<S>>> hiv_strat_adult;
+  TensorFixedSize <real_type, Sizes<pAG<S>, NS<S>>> p_total_pop;
+  TensorFixedSize <real_type, Sizes<pAG<S>, NS<S>>> p_total_pop_natural_deaths;
+  TensorFixedSize <real_type, Sizes<pAG<S>, NS<S>>> p_hiv_pop;
+  TensorFixedSize <real_type, Sizes<pAG<S>, NS<S>>> p_hiv_pop_natural_deaths;
+  TensorFixedSize <real_type, Sizes<hDS<S>, hAG<S>, NS<S>>> h_hiv_adult;
   TensorFixedSize <real_type, Sizes<hTS<S>, hDS<S>, hAG<S>, NS<S>>>
-      art_strat_adult;
+      h_art_adult;
   real_type births;
-  TensorFixedSize <real_type, Sizes<hDS<S>, hAG<S>, NS<S>>> aids_deaths_no_art;
-  TensorFixedSize <real_type, Sizes<pAG<S>, NS<S>>> infections;
+  TensorFixedSize <real_type, Sizes<hDS<S>, hAG<S>, NS<S>>> h_hiv_deaths_no_art;
+  TensorFixedSize <real_type, Sizes<pAG<S>, NS<S>>> p_infections;
   TensorFixedSize <real_type, Sizes<hTS<S>, hDS<S>, hAG<S>, NS<S>>>
-      aids_deaths_art;
-  TensorFixedSize <real_type, Sizes<hDS<S>, hAG<S>, NS<S>>> art_initiation;
-  TensorFixedSize <real_type, Sizes<pAG<S>, NS<S>>> hiv_deaths;
+      h_hiv_deaths_art;
+  TensorFixedSize <real_type, Sizes<hDS<S>, hAG<S>, NS<S>>> h_art_initiation;
+  TensorFixedSize <real_type, Sizes<pAG<S>, NS<S>>> p_hiv_deaths;
 
   State() {}
 
   void reset() {
-    total_population.setZero();
-    natural_deaths.setZero();
-    hiv_population.setZero();
-    hiv_natural_deaths.setZero();
-    hiv_strat_adult.setZero();
-    art_strat_adult.setZero();
-    aids_deaths_no_art.setZero();
-    infections.setZero();
-    aids_deaths_art.setZero();
-    art_initiation.setZero();
-    hiv_deaths.setZero();
+    p_total_pop.setZero();
+    p_total_pop_natural_deaths.setZero();
+    p_hiv_pop.setZero();
+    p_hiv_pop_natural_deaths.setZero();
+    h_hiv_adult.setZero();
+    h_art_adult.setZero();
+    h_hiv_deaths_no_art.setZero();
+    p_infections.setZero();
+    h_hiv_deaths_art.setZero();
+    h_art_initiation.setZero();
+    p_hiv_deaths.setZero();
     births = 0;
   }
 };
@@ -174,14 +174,14 @@ template<HivAgeStratification S, typename real_type>
 struct IntermediateData {
   TensorFixedSize <real_type, Sizes<pAG<S>, NS<S>>> migration_rate;
   TensorFixedSize <real_type, Sizes<pAG<S>, NS<S>>> hiv_net_migration;
-  TensorFixedSize <real_type, Sizes<hAG<S>, NS<S>>> hiv_population_coarse_ages;
+  TensorFixedSize <real_type, Sizes<hAG<S>, NS<S>>> p_hiv_pop_coarse_ages;
   TensorFixedSize <real_type, Sizes<hAG<S>, NS<S>>> hiv_age_up_prob;
   TensorFixedSize <real_type, Sizes<pAG<S>, NS<S>>> hiv_negative_pop;
-  TensorFixedSize <real_type, Sizes<pAG<S>, NS<S>>> infections_ts;
+  TensorFixedSize <real_type, Sizes<pAG<S>, NS<S>>> p_infections_ts;
   TensorFixedSize <real_type, Sizes<NS<S>>> rate_sex;
   TensorFixedSize <real_type, Sizes<NS<S>>> hiv_neg_aggregate;
   TensorFixedSize <real_type, Sizes<NS<S>>> Xhivn_incagerr;
-  TensorFixedSize <real_type, Sizes<hAG<S>, NS<S>>> hiv_deaths_age_sex;
+  TensorFixedSize <real_type, Sizes<hAG<S>, NS<S>>> p_hiv_deaths_age_sex;
   TensorFixedSize <real_type, Sizes<hDS<S>, hAG<S>, NS<S>>> grad;
   TensorFixedSize <real_type, Sizes<hTS<S>, hDS<S>, hAG<S>, NS<S>>> gradART;
   Tensor2<real_type> artelig_hahm;
@@ -191,8 +191,8 @@ struct IntermediateData {
   real_type deaths;
   int everARTelig_idx;
   int cd4elig_idx;
-  real_type infections_a;
-  real_type infections_ha;
+  real_type p_infections_a;
+  real_type p_infections_ha;
   real_type deaths_art;
   real_type Xart_15plus;
   real_type Xartelig_15plus;
@@ -214,8 +214,8 @@ struct IntermediateData {
       deaths(0.0),
       everARTelig_idx(0),
       cd4elig_idx(0),
-      infections_a(0.0),
-      infections_ha(0.0),
+      p_infections_a(0.0),
+      p_infections_ha(0.0),
       deaths_art(0.0),
       Xart_15plus(0.0),
       Xartelig_15plus(0.0),
@@ -232,14 +232,14 @@ struct IntermediateData {
   void reset() {
     migration_rate.setZero();
     hiv_net_migration.setZero();
-    hiv_population_coarse_ages.setZero();
+    p_hiv_pop_coarse_ages.setZero();
     hiv_age_up_prob.setZero();
     hiv_negative_pop.setZero();
-    infections_ts.setZero();
+    p_infections_ts.setZero();
     hiv_neg_aggregate.setZero();
     Xhivn_incagerr.setZero();
     rate_sex.setZero();
-    hiv_deaths_age_sex.setZero();
+    p_hiv_deaths_age_sex.setZero();
     grad.setZero();
     gradART.setZero();
     artelig_hahm.setZero();
@@ -248,8 +248,8 @@ struct IntermediateData {
     deaths = 0.0;
     everARTelig_idx = 0;
     cd4elig_idx = 0;
-    infections_a = 0.0;
-    infections_ha = 0.0;
+    p_infections_a = 0.0;
+    p_infections_ha = 0.0;
     deaths_art = 0.0;
     Xart_15plus = 0.0;
     Xartelig_15plus = 0.0;
