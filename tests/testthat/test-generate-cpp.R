@@ -17,7 +17,7 @@ test_that("can generate output parsing", {
     "state.p_total_pop.size\\(\\), REAL\\(r_p_total_pop\\)\\);"),
     result)))
   expect_true(any(grepl(paste0(
-    "Rcpp::_\\[\\\"p_total_pop\\\"\\] = r_p_total_pop,"),
+    ".add\\(\\\"p_total_pop\\\", r_p_total_pop\\)"),
     result)))
 })
 

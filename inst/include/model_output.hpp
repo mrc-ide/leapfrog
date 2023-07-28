@@ -8,6 +8,7 @@
 #include <unsupported/Eigen/CXX11/Tensor>
 
 #include "state_saver.hpp"
+#include "r_utils.hpp"
 
 template<leapfrog::HivAgeStratification S, typename real_type>
 Rcpp::List build_r_output(const typename leapfrog::StateSaver<S, real_type>::OutputState &state,
@@ -59,17 +60,18 @@ Rcpp::List build_r_output(const typename leapfrog::StateSaver<S, real_type>::Out
   std::copy_n(state.h_art_initiation.data(), state.h_art_initiation.size(), REAL(r_h_art_initiation));
   std::copy_n(state.p_hiv_deaths.data(), state.p_hiv_deaths.size(), REAL(r_p_hiv_deaths));
 
-return Rcpp::List::create(
-    Rcpp::_["p_total_pop"] = r_p_total_pop,
-    Rcpp::_["births"] = r_births,
-    Rcpp::_["p_total_pop_natural_deaths"] = r_p_total_pop_natural_deaths,
-    Rcpp::_["p_hiv_pop"] = r_p_hiv_pop,
-    Rcpp::_["p_hiv_pop_natural_deaths"] = r_p_hiv_pop_natural_deaths,
-    Rcpp::_["h_hiv_adult"] = r_h_hiv_adult,
-    Rcpp::_["h_art_adult"] = r_h_art_adult,
-    Rcpp::_["h_hiv_deaths_no_art"] = r_h_hiv_deaths_no_art,
-    Rcpp::_["p_infections"] = r_p_infections,
-    Rcpp::_["h_hiv_deaths_art"] = r_h_hiv_deaths_art,
-    Rcpp::_["h_art_initiation"] = r_h_art_initiation,
-    Rcpp::_["p_hiv_deaths"] = r_p_hiv_deaths);
+  List ret = ListBuilder()
+    .add("p_total_pop", r_p_total_pop)
+    .add("births", r_births)
+    .add("p_total_pop_natural_deaths", r_p_total_pop_natural_deaths)
+    .add("p_hiv_pop", r_p_hiv_pop)
+    .add("p_hiv_pop_natural_deaths", r_p_hiv_pop_natural_deaths)
+    .add("h_hiv_adult", r_h_hiv_adult)
+    .add("h_art_adult", r_h_art_adult)
+    .add("h_hiv_deaths_no_art", r_h_hiv_deaths_no_art)
+    .add("p_infections", r_p_infections)
+    .add("h_hiv_deaths_art", r_h_hiv_deaths_art)
+    .add("h_art_initiation", r_h_art_initiation)
+    .add("p_hiv_deaths", r_p_hiv_deaths);
+  return ret;
 }
