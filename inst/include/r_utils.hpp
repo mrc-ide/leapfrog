@@ -84,9 +84,7 @@ auto convert_base(Eigen::TensorMap<Eigen::Tensor<int, rank>> map) {
 using namespace Rcpp;
 
 class ListBuilder {
-
 public:
-
   ListBuilder() {};
   ~ListBuilder() {};
 
@@ -121,10 +119,8 @@ public:
   }
 
 private:
-
   std::vector<std::string> names;
   std::vector<SEXP> elements;
 
   ListBuilder(ListBuilder const&) {};
-
 };
