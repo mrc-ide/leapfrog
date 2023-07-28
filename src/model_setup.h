@@ -110,8 +110,8 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List data,
   const leapfrog::TensorMap1<double> hc_art_elig_age = parse_data<double>(data, "paed_art_elig_age", proj_years);
   const leapfrog::TensorMap2<double> hc_art_elig_cd4 = parse_data<double>(data, "paed_art_elig_cd4", 15, proj_years);
   const leapfrog::TensorMap3<double> hc_art_mort_rr = parse_data<double>(data, "mort_art_rr", ss.treatment_stages, 15, proj_years);
-  const leapfrog::TensorMap3<double> hc1_art_mort = parse_data<double>(data, "paed_art_mort", ss.hc1_disease_stages, ss.treatment_stages, 15);
-  const leapfrog::TensorMap3<double> hc2_art_mort = parse_data<double>(data, "adol_art_mort", ss.hc2_disease_stages, ss.treatment_stages, 15);
+  const leapfrog::TensorMap3<double> hc1_art_mort = parse_data<double>(data, "paed_art_mort", ss.hc1_disease_stages, ss.treatment_stages, ss.hc1_age_groups);
+  const leapfrog::TensorMap3<double> hc2_art_mort = parse_data<double>(data, "adol_art_mort", ss.hc2_disease_stages, ss.treatment_stages, ss.hc2_age_groups);
   //!!! TODO: this needs to be a boolean
   const leapfrog::TensorMap1<int> hc_art_isperc = parse_data<int>(data, "artpaeds_isperc", proj_years);
   const leapfrog::TensorMap1<double> hc_art_val = parse_data<double>(data, "paed_art_val", proj_years);

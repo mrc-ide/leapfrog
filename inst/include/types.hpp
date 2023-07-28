@@ -162,7 +162,7 @@ struct Children {
   TensorMap3<real_type> hc_art_mort_rr;
   TensorMap3<real_type> hc1_art_mort;
   TensorMap3<real_type> hc2_art_mort;
-  TensorMap1<real_type> hc_art_isperc;
+  TensorMap1<int> hc_art_isperc;
   TensorMap1<real_type> hc_art_val;
   TensorMap2<real_type> hc_art_init_dist;
 };
