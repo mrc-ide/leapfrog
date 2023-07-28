@@ -60,13 +60,13 @@ struct Options {
   const int hAG_15plus;
   const int scale_cd4_mortality;
   const int hIDX_15PLUS;
-  const real_type art_alloc_mxweight;
+  const real_type initiation_mortality_weight;
 
   Options(int hts_per_year,
           int ts_art_start,
           int hAG_15plus,
           int scale_cd4_mortality,
-          real_type art_alloc_mxweight) :
+          real_type initiation_mortality_weight) :
       hts_per_year(hts_per_year),
       dt(1.0 / hts_per_year),
       p_idx_fertility_first(15),
@@ -78,15 +78,15 @@ struct Options {
       hAG_15plus(hAG_15plus),
       scale_cd4_mortality(scale_cd4_mortality),
       hIDX_15PLUS(0),
-      art_alloc_mxweight(art_alloc_mxweight) {}
+      initiation_mortality_weight(initiation_mortality_weight) {}
 };
 
 template<typename real_type>
 struct Demography {
   TensorMap2<real_type> base_pop;
-  TensorMap3<real_type> survival;
+  TensorMap3<real_type> survival_probability;
   TensorMap3<real_type> net_migration;
-  TensorMap2<real_type> age_sex_fertility_ratio;
+  TensorMap2<real_type> age_specific_fertility_rate;
   TensorMap2<real_type> births_sex_prop;
 };
 
@@ -101,18 +101,18 @@ template<typename real_type>
 struct NaturalHistory {
   TensorMap3<real_type> cd4_mortality;
   TensorMap3<real_type> cd4_progression;
-  TensorMap3<real_type> cd4_initdist;
+  TensorMap3<real_type> cd4_initial_distribution;
 };
 
 template<typename real_type>
 struct Art {
-  Tensor1<int> artcd4elig_idx;
+  Tensor1<int> idx_hm_elig;
   TensorMap4<real_type> mortality;
-  TensorMap2<real_type> artmx_timerr;
+  TensorMap2<real_type> mortaility_time_rate_ratio;
   Tensor1<real_type> h_art_stage_dur;
   TensorMap1<real_type> dropout;
-  TensorMap2<real_type> art15plus_num;
-  TensorMap2<int> art15plus_isperc;
+  TensorMap2<real_type> adults_on_art;
+  TensorMap2<int> adults_on_art_is_percent;
 };
 
 template<typename real_type>
@@ -178,7 +178,7 @@ struct IntermediateData {
   TensorFixedSize <real_type, Sizes<hAG<S>, NS<S>>> hiv_age_up_prob;
   TensorFixedSize <real_type, Sizes<pAG<S>, NS<S>>> hiv_negative_pop;
   TensorFixedSize <real_type, Sizes<pAG<S>, NS<S>>> infections_ts;
-  TensorFixedSize <real_type, Sizes<NS<S>>> incidence_rate_sex;
+  TensorFixedSize <real_type, Sizes<NS<S>>> rate_sex;
   TensorFixedSize <real_type, Sizes<NS<S>>> hiv_neg_aggregate;
   TensorFixedSize <real_type, Sizes<NS<S>>> Xhivn_incagerr;
   TensorFixedSize <real_type, Sizes<hAG<S>, NS<S>>> hiv_deaths_age_sex;
@@ -238,7 +238,7 @@ struct IntermediateData {
     infections_ts.setZero();
     hiv_neg_aggregate.setZero();
     Xhivn_incagerr.setZero();
-    incidence_rate_sex.setZero();
+    rate_sex.setZero();
     hiv_deaths_age_sex.setZero();
     grad.setZero();
     gradART.setZero();

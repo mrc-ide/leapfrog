@@ -20,14 +20,14 @@ void run_hiv_ageing_and_mortality(int time_step,
     for (int a = 1; a < ss.pAG; ++a) {
       state_next.hiv_natural_deaths(a, g) =
           state_curr.hiv_population(a - 1, g) *
-          (1.0 - demog.survival(a, g, time_step));
+          (1.0 - demog.survival_probability(a, g, time_step));
       state_next.hiv_population(a, g) = state_curr.hiv_population(a - 1, g);
     }
 
     // open age group
     state_next.hiv_natural_deaths(ss.pAG - 1, g) +=
         state_curr.hiv_population(ss.pAG - 1, g) *
-        (1.0 - demog.survival(ss.pAG, g, time_step));
+        (1.0 - demog.survival_probability(ss.pAG, g, time_step));
     state_next.hiv_population(ss.pAG - 1, g) +=
         state_curr.hiv_population(ss.pAG - 1, g);
   }

@@ -105,15 +105,15 @@ int main(int argc, char *argv[]) {
       30,                 // Time ART start
       ss.hAG,  // Age groups HIV 15+
       1,                  // Scale CD4 mortality
-      0.2                 // art_alloc_mxweight
+      0.2                 // initiation_mortality_weight
   };
 
-  leapfrog::Tensor1<int> v = serialize::deserialize_tensor<int, 1>(std::string("artcd4elig_idx"));
+  leapfrog::Tensor1<int> v = serialize::deserialize_tensor<int, 1>(std::string("idx_hm_elig"));
   for (int i = 0; i <= sim_years; ++i) {
     // 0-based indexing in C++ vs 1-based indexing in R
     v(i) = v[i] - 1;
   }
-  const leapfrog::TensorMap1<int> artcd4elig_idx = tensor_to_tensor_map<int, 1>(v);
+  const leapfrog::TensorMap1<int> idx_hm_elig = tensor_to_tensor_map<int, 1>(v);
 
   leapfrog::Tensor1<double> h(ss.hTS - 1);
   for (int i = 0; i < ss.hTS - 1; ++i) {
@@ -124,83 +124,86 @@ int main(int argc, char *argv[]) {
   leapfrog::Tensor2<double> base_pop_data = serialize::deserialize_tensor<double, 2>(
       std::string("basepop"));
   const leapfrog::TensorMap2<double> base_pop = tensor_to_tensor_map<double, 2>(base_pop_data);
-  leapfrog::Tensor3<double> survival_data = serialize::deserialize_tensor<double, 3>(
-      std::string("survival"));
-  const leapfrog::TensorMap3<double> survival = tensor_to_tensor_map<double, 3>(survival_data);
+  leapfrog::Tensor3<double> survival_probability_data = serialize::deserialize_tensor<double, 3>(
+      std::string("survival_probability"));
+  const leapfrog::TensorMap3<double> survival_probability = tensor_to_tensor_map<double, 3>(survival_probability_data);
   leapfrog::Tensor3<double> net_migration_data = serialize::deserialize_tensor<double, 3>(
       std::string("net_migration"));
   const leapfrog::TensorMap3<double> net_migration = tensor_to_tensor_map<double, 3>(net_migration_data);
-  leapfrog::Tensor2<double> age_sex_fertility_ratio_data = serialize::deserialize_tensor<double, 2>(
-      std::string("age_sex_fertility_ratio"));
-  const leapfrog::TensorMap2<double> age_sex_fertility_ratio = tensor_to_tensor_map<double, 2>(
-      age_sex_fertility_ratio_data);
+  leapfrog::Tensor2<double> age_specific_fertility_rate_data = serialize::deserialize_tensor<double, 2>(
+      std::string("age_specific_fertility_rate"));
+  const leapfrog::TensorMap2<double> age_specific_fertility_rate = tensor_to_tensor_map<double, 2>(
+      age_specific_fertility_rate_data);
   leapfrog::Tensor2<double> births_sex_prop_data = serialize::deserialize_tensor<double, 2>(
       std::string("births_sex_prop"));
   const leapfrog::TensorMap2<double> births_sex_prop = tensor_to_tensor_map<double, 2>(births_sex_prop_data);
   leapfrog::Tensor1<double> incidence_rate_data = serialize::deserialize_tensor<double, 1>(
       std::string("incidence_rate"));
   const leapfrog::TensorMap1<double> incidence_rate = tensor_to_tensor_map<double, 1>(incidence_rate_data);
-  leapfrog::Tensor3<double> incidence_relative_risk_age_data = serialize::deserialize_tensor<double, 3>(
-      std::string("incidence_rate_relative_risk_age"));
-  const leapfrog::TensorMap3<double> incidence_relative_risk_age = tensor_to_tensor_map<double, 3>(
-      incidence_relative_risk_age_data);
-  leapfrog::Tensor1<double> incidence_relative_risk_sex_data = serialize::deserialize_tensor<double, 1>(
-      std::string("incidence_rate_relative_risk_sex"));
-  const leapfrog::TensorMap1<double> incidence_relative_risk_sex = tensor_to_tensor_map<double, 1>(
-      incidence_relative_risk_sex_data);
+  leapfrog::Tensor3<double> incidence_age_rate_ratio_data = serialize::deserialize_tensor<double, 3>(
+      std::string("incidence_age_rate_ratio"));
+  const leapfrog::TensorMap3<double> incidence_age_rate_ratio = tensor_to_tensor_map<double, 3>(
+      incidence_age_rate_ratio_data);
+  leapfrog::Tensor1<double> incidence_sex_rate_ratio_data = serialize::deserialize_tensor<double, 1>(
+      std::string("incidence_sex_rate_ratio"));
+  const leapfrog::TensorMap1<double> incidence_sex_rate_ratio = tensor_to_tensor_map<double, 1>(
+      incidence_sex_rate_ratio_data);
   leapfrog::Tensor3<double> cd4_mortality_data = serialize::deserialize_tensor<double, 3>(
       std::string("cd4_mortality_full"));
   const leapfrog::TensorMap3<double> cd4_mortality = tensor_to_tensor_map<double, 3>(cd4_mortality_data);
   leapfrog::Tensor3<double> cd4_progression_data = serialize::deserialize_tensor<double, 3>(
       std::string("cd4_progression_full"));
   const leapfrog::TensorMap3<double> cd4_progression = tensor_to_tensor_map<double, 3>(cd4_progression_data);
-  leapfrog::Tensor3<double> cd4_initdist_data = serialize::deserialize_tensor<double, 3>(
-      std::string("cd4_initdist_full"));
-  const leapfrog::TensorMap3<double> cd4_initdist = tensor_to_tensor_map<double, 3>(cd4_initdist_data);
-  leapfrog::Tensor4<double> art_mortality_data = serialize::deserialize_tensor<double, 4>(
-      std::string("art_mortality_full"));
-  const leapfrog::TensorMap4<double> art_mortality = tensor_to_tensor_map<double, 4>(art_mortality_data);
-  leapfrog::Tensor2<double> artmx_timerr_data = serialize::deserialize_tensor<double, 2>(
-      std::string("artmx_timerr"));
-  const leapfrog::TensorMap2<double> artmx_timerr = tensor_to_tensor_map<double, 2>(artmx_timerr_data);
+  leapfrog::Tensor3<double> cd4_initial_distribution_data = serialize::deserialize_tensor<double, 3>(
+      std::string("cd4_initial_distribution_full"));
+  const leapfrog::TensorMap3<double> cd4_initial_distribution = tensor_to_tensor_map<double, 3>(
+      cd4_initial_distribution_data);
+  leapfrog::Tensor4<double> art_mortality_rate_data = serialize::deserialize_tensor<double, 4>(
+      std::string("art_mortality_rate_full"));
+  const leapfrog::TensorMap4<double> art_mortality_rate = tensor_to_tensor_map<double, 4>(art_mortality_rate_data);
+  leapfrog::Tensor2<double> art_mortality_time_rate_ratio_data = serialize::deserialize_tensor<double, 2>(
+      std::string("art_mortality_time_rate_ratio"));
+  const leapfrog::TensorMap2<double> art_mortality_time_rate_ratio = tensor_to_tensor_map<double, 2>(
+      art_mortality_time_rate_ratio_data);
   leapfrog::Tensor1<double> art_dropout_data = serialize::deserialize_tensor<double, 1>(
       std::string("art_dropout"));
   const leapfrog::TensorMap1<double> art_dropout = tensor_to_tensor_map<double, 1>(art_dropout_data);
-  Eigen::Tensor<double, 2> art15plus_num_data = serialize::deserialize_tensor<double, 2>(
-      std::string("art15plus_num"));
-  const leapfrog::TensorMap2<double> art15plus_num = tensor_to_tensor_map<double, 2>(art15plus_num_data);
-  leapfrog::Tensor2<int> art15plus_isperc_data = serialize::deserialize_tensor<int, 2>(
-      std::string("art15plus_isperc"));
-  const leapfrog::TensorMap2<int> art15plus_isperc = tensor_to_tensor_map<int, 2>(art15plus_isperc_data);
+  Eigen::Tensor<double, 2> adults_on_art_data = serialize::deserialize_tensor<double, 2>(
+      std::string("adults_on_art"));
+  const leapfrog::TensorMap2<double> adults_on_art = tensor_to_tensor_map<double, 2>(adults_on_art_data);
+  leapfrog::Tensor2<int> adults_on_art_is_percent_data = serialize::deserialize_tensor<int, 2>(
+      std::string("adults_on_art_is_percent"));
+  const leapfrog::TensorMap2<int> adults_on_art_is_percent = tensor_to_tensor_map<int, 2>(
+      adults_on_art_is_percent_data);
 
   const leapfrog::Demography<double> demography = {
       base_pop,
-      survival,
+      survival_probability,
       net_migration,
-      age_sex_fertility_ratio,
+      age_specific_fertility_rate,
       births_sex_prop
   };
 
   const leapfrog::Incidence<double> incidence = {
       incidence_rate,
-      incidence_relative_risk_age,
-      incidence_relative_risk_sex
+      incidence_age_rate_ratio,
+      incidence_sex_rate_ratio
   };
 
   const leapfrog::NaturalHistory<double> natural_history = {
       cd4_mortality,
       cd4_progression,
-      cd4_initdist
+      cd4_initial_distribution
   };
 
   const leapfrog::Art<double> art = {
-      artcd4elig_idx,
-      art_mortality,
-      artmx_timerr,
+      idx_hm_elig,
+      art_mortality_rate,
+      art_mortality_time_rate_ratio,
       h_art_stage_dur,
       art_dropout,
-      art15plus_num,
-      art15plus_isperc
+      adults_on_art,
+      adults_on_art_is_percent
   };
 
   const leapfrog::Parameters<double> params = {options,

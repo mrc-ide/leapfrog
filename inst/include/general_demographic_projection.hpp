@@ -18,7 +18,7 @@ void run_ageing_and_mortality(int time_step,
     // Start at index 1 as we will add infant (age 0) births and deaths later
     for (int a = 1; a < ss.pAG; ++a) {
       state_next.natural_deaths(a, g) = state_curr.total_population(a - 1, g) *
-                                        (1.0 - demog.survival(a, g, time_step));
+                                        (1.0 - demog.survival_probability(a, g, time_step));
       state_next.total_population(a, g) =
           state_curr.total_population(a - 1, g) -
           state_next.natural_deaths(a, g);
@@ -27,7 +27,7 @@ void run_ageing_and_mortality(int time_step,
     // open age group
     real_type natural_deaths_open_age =
         state_curr.total_population(ss.pAG - 1, g) *
-        (1.0 - demog.survival(ss.pAG, g, time_step));
+        (1.0 - demog.survival_probability(ss.pAG, g, time_step));
     state_next.natural_deaths(ss.pAG - 1, g) +=
         natural_deaths_open_age;
     state_next.total_population(ss.pAG - 1, g) +=
@@ -51,24 +51,24 @@ void run_migration(int time_step,
       // to end of period. Divide by 2 as (on average) half of deaths will
       // happen before they migrate. Then divide by total pop to get rate.
       intermediate.migration_rate(a, g) = demog.net_migration(a, g, time_step) *
-                                          (1.0 + demog.survival(a, g, time_step)) *
+                                          (1.0 + demog.survival_probability(a, g, time_step)) *
                                           0.5 / state_next.total_population(a, g);
       state_next.total_population(a, g) *= 1.0 + intermediate.migration_rate(a, g);
     }
 
     // For open age group (age 80+), net migrant survivor adjustment based on
-    // weighted survival for age 79 and age 80+.
-    // * Numerator: total_population(a, g, t-1) * (1.0 + survival(a+1, g, t))
-    // + total_population(a-1, g, t-1) * (1.0 + survival(a, g, t))
+    // weighted survival_probability for age 79 and age 80+.
+    // * Numerator: total_population(a, g, t-1) * (1.0 + survival_probability(a+1, g, t))
+    // + total_population(a-1, g, t-1) * (1.0 + survival_probability(a, g, t))
     // * Denominator: total_population(a, g, t-1) + total_population(a-1, g,
     // t-1) Re-expressed current population and deaths to open age group
     // (already calculated):
     int a = ss.pAG - 1;
-    real_type survival_netmig =
+    real_type survival_probability_netmig =
         (state_next.total_population(a, g) +
          0.5 * state_next.natural_deaths(a, g)) /
         (state_next.total_population(a, g) + state_next.natural_deaths(a, g));
-    intermediate.migration_rate(a, g) = survival_netmig *
+    intermediate.migration_rate(a, g) = survival_probability_netmig *
                                         demog.net_migration(a, g, time_step) /
                                         state_next.total_population(a, g);
     state_next.total_population(a, g) *= 1.0 + intermediate.migration_rate(a, g);
@@ -89,7 +89,7 @@ void run_fertility_and_infant_migration(int time_step,
         pars.options.p_idx_fertility_first + af, FEMALE) +
                           state_next.total_population(
                               pars.options.p_idx_fertility_first + af, FEMALE)) *
-                         0.5 * demog.age_sex_fertility_ratio(af, time_step);
+                         0.5 * demog.age_specific_fertility_rate(af, time_step);
   }
 
   // add births & infant migration
@@ -97,14 +97,14 @@ void run_fertility_and_infant_migration(int time_step,
     real_type births_sex =
         state_next.births * demog.births_sex_prop(g, time_step);
     state_next.natural_deaths(0, g) =
-        births_sex * (1.0 - demog.survival(0, g, time_step));
+        births_sex * (1.0 - demog.survival_probability(0, g, time_step));
     state_next.total_population(0, g) =
-        births_sex * demog.survival(0, g, time_step);
+        births_sex * demog.survival_probability(0, g, time_step);
 
-    // Assume 2/3 survival rate since mortality in first six months higher
+    // Assume 2/3 survival_probability rate since mortality in first six months higher
     // than second 6 months (Spectrum manual, section 6.2.7.4)
     real_type migration_rate_a0 = demog.net_migration(0, g, time_step) *
-                                  (1.0 + 2.0 * demog.survival(0, g, time_step)) /
+                                  (1.0 + 2.0 * demog.survival_probability(0, g, time_step)) /
                                   3.0 / state_next.total_population(0, g);
     state_next.total_population(0, g) *= 1.0 + migration_rate_a0;
   }

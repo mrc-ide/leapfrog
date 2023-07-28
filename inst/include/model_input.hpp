@@ -24,53 +24,53 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
   constexpr int hTS = ss.hTS;
 
   const leapfrog::TensorMap2<real_type> base_pop = parse_data<real_type>(data, "basepop", pAG, NS);
-  const leapfrog::TensorMap3<real_type> survival = parse_data<real_type>(data, "Sx", pAG + 1, NS, proj_years);
+  const leapfrog::TensorMap3<real_type> survival_probability = parse_data<real_type>(data, "Sx", pAG + 1, NS, proj_years);
   const leapfrog::TensorMap3<real_type> net_migration = parse_data<real_type>(data, "netmigr_adj", pAG, NS, proj_years);
-  const leapfrog::TensorMap2<real_type> age_sex_fertility_ratio = parse_data<real_type>(data, "asfr", p_fertility_age_groups, proj_years);
+  const leapfrog::TensorMap2<real_type> age_specific_fertility_rate = parse_data<real_type>(data, "asfr", p_fertility_age_groups, proj_years);
   const leapfrog::TensorMap2<real_type> births_sex_prop = parse_data<real_type>(data, "births_sex_prop", NS, proj_years);
-  const leapfrog::TensorMap1<real_type> incidence_rate = parse_data<real_type>(data, "incidinput", proj_years);
-  const leapfrog::TensorMap3<real_type> incidence_relative_risk_age = parse_data<real_type>(data, "incrr_age", pAG - p_idx_hiv_first_adult, NS, proj_years);
-  const leapfrog::TensorMap1<real_type> incidence_relative_risk_sex = parse_data<real_type>(data, "incrr_sex", proj_years);
+  const leapfrog::TensorMap1<real_type> rate = parse_data<real_type>(data, "incidinput", proj_years);
+  const leapfrog::TensorMap3<real_type> age_rate_ratio = parse_data<real_type>(data, "incrr_age", pAG - p_idx_hiv_first_adult, NS, proj_years);
+  const leapfrog::TensorMap1<real_type> sex_rate_ratio = parse_data<real_type>(data, "incrr_sex", proj_years);
   const leapfrog::TensorMap3<real_type> cd4_mortality = parse_data<real_type>(data, "cd4_mort", hDS, hAG, NS);
   const leapfrog::TensorMap3<real_type> cd4_progression = parse_data<real_type>(data, "cd4_prog", hDS - 1, hAG, NS);
-  const leapfrog::TensorMap1<int> artcd4elig_idx = convert_base<1>(parse_data<int>(data, "artcd4elig_idx", proj_years + 1));
-  const leapfrog::TensorMap3<real_type> cd4_initdist = parse_data<real_type>(data, "cd4_initdist", hDS, hAG, NS);
-  const leapfrog::TensorMap4<real_type> art_mortality = parse_data<real_type>(data, "art_mort", hTS, hDS, hAG, NS);
-  const leapfrog::TensorMap2<real_type> artmx_timerr = parse_data<real_type>(data, "artmx_timerr", hTS, proj_years);
-  const leapfrog::TensorMap1<real_type> art_dropout = parse_data<real_type>(data, "art_dropout", proj_years);
-  const leapfrog::TensorMap2<real_type> art15plus_num = parse_data<real_type>(data, "art15plus_num", NS, proj_years);
-  const leapfrog::TensorMap2<int> art15plus_isperc = parse_data<int>(data, "art15plus_isperc", NS, proj_years);
+  const leapfrog::TensorMap1<int> idx_hm_elig = convert_base<1>(parse_data<int>(data, "artcd4elig_idx", proj_years + 1));
+  const leapfrog::TensorMap3<real_type> cd4_initial_distribution = parse_data<real_type>(data, "cd4_initdist", hDS, hAG, NS);
+  const leapfrog::TensorMap4<real_type> mortality = parse_data<real_type>(data, "art_mort", hTS, hDS, hAG, NS);
+  const leapfrog::TensorMap2<real_type> mortaility_time_rate_ratio = parse_data<real_type>(data, "artmx_timerr", hTS, proj_years);
+  const leapfrog::TensorMap1<real_type> dropout = parse_data<real_type>(data, "art_dropout", proj_years);
+  const leapfrog::TensorMap2<real_type> adults_on_art = parse_data<real_type>(data, "art15plus_num", NS, proj_years);
+  const leapfrog::TensorMap2<int> adults_on_art_is_percent = parse_data<int>(data, "art15plus_isperc", NS, proj_years);
   leapfrog::Tensor1<real_type> h_art_stage_dur(hTS - 1);
   h_art_stage_dur.setConstant(0.5);
 
   const leapfrog::Demography<real_type> demography = {
       base_pop,
-      survival,
+      survival_probability,
       net_migration,
-      age_sex_fertility_ratio,
+      age_specific_fertility_rate,
       births_sex_prop
   };
 
   const leapfrog::Incidence<real_type> incidence = {
-      incidence_rate,
-      incidence_relative_risk_age,
-      incidence_relative_risk_sex
+      rate,
+      age_rate_ratio,
+      sex_rate_ratio
   };
 
   const leapfrog::NaturalHistory<real_type> natural_history = {
       cd4_mortality,
       cd4_progression,
-      cd4_initdist
+      cd4_initial_distribution
   };
 
   const leapfrog::Art<real_type> art = {
-      artcd4elig_idx,
-      art_mortality,
-      artmx_timerr,
+      idx_hm_elig,
+      mortality,
+      mortaility_time_rate_ratio,
       h_art_stage_dur,
-      art_dropout,
-      art15plus_num,
-      art15plus_isperc
+      dropout,
+      adults_on_art,
+      adults_on_art_is_percent
   };
 
   const leapfrog::Parameters<real_type> params = {options,

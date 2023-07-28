@@ -21,32 +21,32 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
 
   const leapfrog::Demography<real_type> demography = {
       base_pop,
-      survival,
+      survival_probability,
       net_migration,
-      age_sex_fertility_ratio,
+      age_specific_fertility_rate,
       births_sex_prop
   };
 
   const leapfrog::Incidence<real_type> incidence = {
-      incidence_rate,
-      incidence_relative_risk_age,
-      incidence_relative_risk_sex
+      rate,
+      age_rate_ratio,
+      sex_rate_ratio
   };
 
   const leapfrog::NaturalHistory<real_type> natural_history = {
       cd4_mortality,
       cd4_progression,
-      cd4_initdist
+      cd4_initial_distribution
   };
 
   const leapfrog::Art<real_type> art = {
-      artcd4elig_idx,
-      art_mortality,
-      artmx_timerr,
+      idx_hm_elig,
+      mortality,
+      mortaility_time_rate_ratio,
       h_art_stage_dur,
-      art_dropout,
-      art15plus_num,
-      art15plus_isperc
+      dropout,
+      adults_on_art,
+      adults_on_art_is_percent
   };
 
   const leapfrog::Parameters<real_type> params = {options,
