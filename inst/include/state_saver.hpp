@@ -22,7 +22,8 @@ public:
     Tensor3<real_type> hiv_deaths;
     Tensor5<real_type> hc1_hiv_pop;
     Tensor5<real_type> hc2_hiv_pop;
-
+    Tensor5<real_type> hc1_art_pop;
+    Tensor5<real_type> hc2_art_pop;
 
     OutputState(int no_output_years)
         : total_population(StateSpace<S>().age_groups_pop, StateSpace<S>().num_genders, no_output_years),
@@ -48,7 +49,11 @@ public:
           hc1_hiv_pop(StateSpace<S>().hc1_disease_stages, StateSpace<S>().hTM, StateSpace<S>().hc1_age_groups,
                      StateSpace<S>().num_genders, no_output_years),
           hc2_hiv_pop(StateSpace<S>().hc2_disease_stages, StateSpace<S>().hTM, StateSpace<S>().hc2_age_groups,
-                     StateSpace<S>().num_genders, no_output_years) {
+                     StateSpace<S>().num_genders, no_output_years),
+          hc1_art_pop(StateSpace<S>().treatment_stages, StateSpace<S>().hc1_disease_stages, StateSpace<S>().hc1_age_groups,
+                                 StateSpace<S>().num_genders, no_output_years),
+          hc2_art_pop(StateSpace<S>().treatment_stages, StateSpace<S>().hc2_disease_stages, StateSpace<S>().hc2_age_groups,
+                                             StateSpace<S>().num_genders, no_output_years) {
       total_population.setZero();
       natural_deaths.setZero();
       hiv_population.setZero();
@@ -63,6 +68,8 @@ public:
       hiv_deaths.setZero();
       hc1_hiv_pop.setZero();
       hc2_hiv_pop.setZero();
+      hc1_art_pop.setZero();
+      hc2_art_pop.setZero();
     }
   };
 
@@ -105,6 +112,8 @@ public:
         full_state.hiv_deaths.chip(i, full_state.hiv_deaths.NumDimensions - 1) = state.hiv_deaths;
         full_state.hc1_hiv_pop.chip(i, full_state.hc1_hiv_pop.NumDimensions - 1) = state.hc1_hiv_pop;
         full_state.hc2_hiv_pop.chip(i, full_state.hc2_hiv_pop.NumDimensions - 1) = state.hc2_hiv_pop;
+        full_state.hc1_art_pop.chip(i, full_state.hc1_art_pop.NumDimensions - 1) = state.hc1_hiv_pop;
+        full_state.hc2_art_pop.chip(i, full_state.hc2_art_pop.NumDimensions - 1) = state.hc2_hiv_pop;
         return;
       }
     }

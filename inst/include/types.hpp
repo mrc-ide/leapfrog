@@ -270,6 +270,8 @@ struct IntermediateData {
   double hc_death_rate;
   TensorFixedSize <real_type, Sizes<disease_stages<S>, hTM<S>, age_groups_hiv<S>, num_genders<S>>> hc_art_grad;
   double hc_art_scalar;
+  double hc_initByAge;
+  double hc_adj;
 
 
   real_type cd4mx_scale;
@@ -340,6 +342,8 @@ struct IntermediateData {
     hc_death_rate = 0.0;
     hc_art_grad.setZero();
     hc_art_scalar = 0.0;
+    hc_initByAge = 0.0;
+    hc_adj = 0.0;
     cd4mx_scale = 1.0;
     deaths = 0.0;
     everARTelig_idx = 0;

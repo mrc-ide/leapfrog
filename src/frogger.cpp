@@ -87,7 +87,8 @@ Rcpp::List fit_model(const leapfrog::StateSpace<S> ss,
   Rcpp::NumericVector r_hiv_deaths(ss.age_groups_pop * ss.num_genders * output_years);
   Rcpp::NumericVector r_hc1_hiv_pop(ss.hc1_disease_stages * ss.hTM * ss.hc1_age_groups * ss.num_genders * output_years);
   Rcpp::NumericVector r_hc2_hiv_pop(ss.hc2_disease_stages * ss.hTM * ss.hc2_age_groups * ss.num_genders * output_years);
-
+  Rcpp::NumericVector r_hc1_art_pop(ss.treatment_stages * ss.hc1_disease_stages * ss.hc1_age_groups * ss.num_genders * output_years);
+  Rcpp::NumericVector r_hc2_art_pop(ss.treatment_stages * ss.hc2_disease_stages * ss.hc2_age_groups * ss.num_genders * output_years);
 
   r_total_population.attr("dim") =
       Rcpp::NumericVector::create(ss.age_groups_pop, ss.num_genders, output_years);
@@ -114,6 +115,10 @@ Rcpp::List fit_model(const leapfrog::StateSpace<S> ss,
                                                          output_years);
   r_hc2_hiv_pop.attr("dim") = Rcpp::NumericVector::create(ss.hc2_disease_stages, ss.hTM, ss.hc2_age_groups, ss.num_genders,
                     output_years);
+  r_hc1_art_pop.attr("dim") = Rcpp::NumericVector::create(ss.treatment_stages, ss.hc1_disease_stages, ss.hc1_age_groups, ss.num_genders,
+                     output_years);
+  r_hc2_art_pop.attr("dim") = Rcpp::NumericVector::create(ss.treatment_stages, ss.hc2_disease_stages, ss.hc2_age_groups, ss.num_genders,
+                     output_years);
 
   std::copy_n(state.total_population.data(), state.total_population.size(),
               REAL(r_total_population));
@@ -143,6 +148,10 @@ Rcpp::List fit_model(const leapfrog::StateSpace<S> ss,
               REAL(r_hc1_hiv_pop));
   std::copy_n(state.hc2_hiv_pop.data(), state.hc2_hiv_pop.size(),
               REAL(r_hc2_hiv_pop));
+  std::copy_n(state.hc1_art_pop.data(), state.hc1_art_pop.size(),
+              REAL(r_hc1_art_pop));
+  std::copy_n(state.hc2_art_pop.data(), state.hc2_art_pop.size(),
+              REAL(r_hc2_art_pop));
 
   Rcpp::List ret =
       Rcpp::List::create(Rcpp::_["total_population"] = r_total_population,
@@ -158,7 +167,9 @@ Rcpp::List fit_model(const leapfrog::StateSpace<S> ss,
                          Rcpp::_["art_initiation"] = r_art_initiation,
                          Rcpp::_["hiv_deaths"] = r_hiv_deaths,
                          Rcpp::_["hc1_hiv_pop"] = r_hc1_hiv_pop,
-                         Rcpp::_["hc2_hiv_pop"] = r_hc2_hiv_pop);
+                         Rcpp::_["hc2_hiv_pop"] = r_hc2_hiv_pop,
+                         Rcpp::_["hc1_art_pop"] = r_hc1_art_pop,
+                         Rcpp::_["hc2_art_pop"] = r_hc2_art_pop);
   return ret;
 }
 
