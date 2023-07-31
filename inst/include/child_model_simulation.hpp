@@ -483,7 +483,7 @@ void run_child_art_initiation(int time_step,
 
     //TODO !!! Actually not sure how to do this, bc intermediates shouldn't have any time steps...
    // intermediate.hc_art_num = (intermediate.hc_art_num(time_step-1) + cpars.hc_art_val(time_step)) / 2 ;
-
+   intermediate.hc_art_num = (cpars.hc_art_val(time_step)) ;
 
     //Remove how many that are already on ART
     for(int g = 0; g < ss.num_genders; ++g) {
@@ -572,14 +572,14 @@ void run_child_model_simulation(int time_step,
                                 const State<S, real_type> &state_curr,
                                 State<S, real_type> &state_next,
                                 internal::IntermediateData<S, real_type> &intermediate) {
-  //internal::run_child_ageing(time_step, pars, state_curr, state_next, intermediate);
-  //internal::run_child_hiv_infections(time_step, pars, state_curr, state_next, intermediate);
-  //internal::run_child_natural_history(time_step, pars, state_curr, state_next, intermediate);
-  //internal::run_child_hiv_mort(time_step, pars, state_curr, state_next, intermediate);
- // internal::add_child_grad(time_step, pars, state_curr, state_next, intermediate);
-  //this function may need to be broken up, its around 350 lines
-  //!!!TODO: also need to fix the looping order for some loops
- // internal::run_child_art_initiation(time_step, pars, state_curr, state_next, intermediate);
+ internal::run_child_ageing(time_step, pars, state_curr, state_next, intermediate);
+ internal::run_child_hiv_infections(time_step, pars, state_curr, state_next, intermediate);
+ internal::run_child_natural_history(time_step, pars, state_curr, state_next, intermediate);
+ internal::run_child_hiv_mort(time_step, pars, state_curr, state_next, intermediate);
+ internal::add_child_grad(time_step, pars, state_curr, state_next, intermediate);
+ // this function may need to be broken up, its around 350 lines
+ // !!!TODO: also need to fix the looping order for some loops
+// internal::run_child_art_initiation(time_step, pars, state_curr, state_next, intermediate);
 
 
 }
