@@ -264,14 +264,14 @@ struct IntermediateData {
   TensorFixedSize <real_type, Sizes<disease_stages<S>, hTM<S>, age_groups_hiv<S>, num_genders<S>>> hc_posthivmort;
   TensorFixedSize <real_type, Sizes<disease_stages<S>, hTM<S>, age_groups_hiv<S>, num_genders<S>>> hc_grad;
   TensorFixedSize <real_type, Sizes<disease_stages<S>, hTM<S>, age_groups_hiv<S>, num_genders<S>>> hc_art_need;
-  double hc_art_num;
+  real_type hc_art_num;
   TensorFixedSize <real_type, Sizes<disease_stages<S>, hTM<S>, age_groups_hiv<S>, num_genders<S>>> hc_art_init;
-  double hc_art_init_total;
-  double hc_death_rate;
+  real_type hc_art_init_total;
+  real_type hc_death_rate;
   TensorFixedSize <real_type, Sizes<disease_stages<S>, hTM<S>, age_groups_hiv<S>, num_genders<S>>> hc_art_grad;
-  double hc_art_scalar;
-  double hc_initByAge;
-  double hc_adj;
+  real_type hc_art_scalar;
+  real_type hc_initByAge;
+  real_type hc_adj;
 
 
   real_type cd4mx_scale;

@@ -421,8 +421,6 @@ void run_child_art_initiation(int time_step,
 
   } else if (cpars.hc_art_isperc(time_step) && !cpars.hc_art_isperc(time_step-1)){ // num to percentage
     //Remove how many that are already on ART
-    double temp ;
-    temp = 0.0;
     for(int g = 0; g < ss.num_genders; ++g) {
       for(int af = 0; af < pars.options.fertility_first_age_group; ++af) {
         for(int hm = 0; hm < ss.hc1_disease_stages; ++hm) {
@@ -513,33 +511,31 @@ void run_child_art_initiation(int time_step,
   }
 
 
-  double initByAge = 0.0;
   for(int g = 0; g < ss.num_genders; ++g) {
     for(int af = 0; af < pars.options.fertility_first_age_group; ++af) {
       for(int hm = 0; hm < ss.hc1_disease_stages; ++hm) {
         for(int cat = 0; cat < ss.hTM; ++cat) {
-          initByAge +=  intermediate.hc_art_init(hm, cat, af, g) * cpars.hc_art_init_dist(af, time_step);
+          intermediate.hc_initByAge +=  intermediate.hc_art_init(hm, cat, af, g) * cpars.hc_art_init_dist(af, time_step);
         } //end hTM
       } // end ss.hc1_disease_stages
     } //end af
   } // end ss.num_genders
 
-  double adj ;
-  if(initByAge == 0){
-    adj = 1.0 ;
+  if(intermediate.hc_initByAge == 0.0){
+    intermediate.hc_adj = 1.0 ;
   }else{
-    adj = intermediate.hc_art_num / initByAge ;
+    intermediate.hc_adj = intermediate.hc_art_num / intermediate.hc_initByAge ;
   }
   for(int g = 0; g < ss.num_genders; ++g) {
     for(int cat = 0; cat < ss.hTM; ++cat) {
       for(int af = 0; af < pars.options.fertility_first_age_group; ++af) {
         for(int hm = 0; hm < ss.hc1_disease_stages; ++hm) {
-          if((adj * cpars.hc_art_init_dist(af, time_step)) > 1){
-            intermediate.hc_art_scalar = 1;
+          if((intermediate.hc_adj * cpars.hc_art_init_dist(af, time_step)) > 1.0){
+            intermediate.hc_art_scalar = 1.0;
           }else{
-            intermediate.hc_art_scalar = adj * cpars.hc_art_init_dist(af, time_step);
+            intermediate.hc_art_scalar = intermediate.hc_adj * cpars.hc_art_init_dist(af, time_step);
           }
-          if(intermediate.hc_art_num > 0){
+          if(intermediate.hc_art_num > 0.0){
             intermediate.hc_art_scalar = intermediate.hc_art_scalar;
           }else{
             intermediate.hc_art_scalar =  0.0;
