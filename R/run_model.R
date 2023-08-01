@@ -3,7 +3,7 @@
 #' @param data Input data
 #' @param parameters Projection parameters
 #' @param sim_years Simulation years to run model for
-#' @param hiv_steps_per_year Number of HIV time steps per year
+#' @param hts_per_year Number of HIV time steps per year
 #' @param output_steps Which sim years to output for
 #' @param hiv_age_stratification The age stratification for HIV population,
 #'  "coarse" or "full"
@@ -12,7 +12,7 @@
 #' @return List of model outputs
 #' @export
 run_model <- function(data, parameters, sim_years,
-                      hiv_steps_per_year, output_steps,
+                      hts_per_year, output_steps,
                       hiv_age_stratification = "full",
                       run_child_model = TRUE) {
   assert_enum(hiv_age_stratification, c("full", "coarse"))
@@ -30,6 +30,7 @@ run_model <- function(data, parameters, sim_years,
     parameters$art_mort <- parameters[["art_mort_coarse"]]
   }
   data <- c(data, parameters)
-  run_base_model(data, sim_years, hiv_steps_per_year, output_steps,
+
+  run_base_model(data, sim_years, hts_per_year, output_steps,
                  hiv_age_stratification, run_child_model)
 }
