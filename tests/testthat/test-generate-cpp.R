@@ -100,3 +100,21 @@ test_that("csv structure can be validated", {
     paste("All columns after 'dims' must be a dimension column, got 'other'.",
           "Check 'inputs.csv'."))
 })
+
+test_that("can generate length 1 inputs", {
+  input <- utils::read.csv(frogger_file("cpp_generation/model_input.csv"))
+  length_1_input <- data.frame(r_name = "len1", cpp_name = "len_1",
+                               type = "real_type", value = NA_character_,
+                               convert_base = FALSE, dims = 1, dim1 = 1,
+                               dim2 = "", dim3 = "", dim4 = "")
+  input <- rbind.data.frame(input, length_1_input)
+  t_input <- tempfile()
+  write.csv(input, t_input)
+  t_dest <- tempfile()
+
+  generate_input_interface(t_dest, t_input)
+  result <- readLines(t_dest)
+  expect_true(any(grepl(
+    "const real_type len_1 = Rcpp::as<real_type>\\(data\\[\"len1\"\\]\\)",
+    result)))
+})
