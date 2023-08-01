@@ -92,7 +92,7 @@ struct Demography {
 
 template<typename real_type>
 struct Incidence {
-  TensorMap1<real_type> rate;
+  TensorMap1<real_type> total_rate;
   TensorMap3<real_type> relative_risk_age;
   TensorMap1<real_type> relative_risk_sex;
 };

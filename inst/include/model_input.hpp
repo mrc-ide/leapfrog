@@ -28,7 +28,7 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
   const leapfrog::TensorMap3<real_type> net_migration = parse_data<real_type>(data, "netmigr_adj", pAG, NS, proj_years);
   const leapfrog::TensorMap2<real_type> age_specific_fertility_rate = parse_data<real_type>(data, "asfr", p_fertility_age_groups, proj_years);
   const leapfrog::TensorMap2<real_type> births_sex_prop = parse_data<real_type>(data, "births_sex_prop", NS, proj_years);
-  const leapfrog::TensorMap1<real_type> rate = parse_data<real_type>(data, "incidinput", proj_years);
+  const leapfrog::TensorMap1<real_type> total_rate = parse_data<real_type>(data, "incidinput", proj_years);
   const leapfrog::TensorMap3<real_type> age_rate_ratio = parse_data<real_type>(data, "incrr_age", pAG - p_idx_hiv_first_adult, NS, proj_years);
   const leapfrog::TensorMap1<real_type> sex_rate_ratio = parse_data<real_type>(data, "incrr_sex", proj_years);
   const leapfrog::TensorMap3<real_type> cd4_mortality = parse_data<real_type>(data, "cd4_mort", hDS, hAG, NS);
@@ -52,7 +52,7 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
   };
 
   const leapfrog::Incidence<real_type> incidence = {
-      rate,
+      total_rate,
       age_rate_ratio,
       sex_rate_ratio
   };

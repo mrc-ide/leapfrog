@@ -28,7 +28,7 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
   };
 
   const leapfrog::Incidence<real_type> incidence = {
-      rate,
+      total_rate,
       age_rate_ratio,
       sex_rate_ratio
   };

@@ -50,7 +50,10 @@ Frogger naming rules
   year from
   15+ or could be coarse age groups
 * `hc_` prefix indicates this is age stratified by the HIV child population
-* `idx_` prefix means this is an index
+* `hc1_` prefix indicates this is age stratified by child population age 0 - 4
+* `hc2_` prefix indicates this is age stratified by the child population age 5 - 14
+* `idx_` prefix means this is an index, e.g. `idx_hm_elig` is the index of the CD4 count at which people are eligible
+  for ART. Note this is not used for prefixing the loop variables
 * Uppercase means this is a dimension of the state space e.g. `NS` or `pAG`
 * `ts_` prefix means this is a time step
 * `hts_` prefix means this is an HIV time step (i.e. a time step of the inner HIV loop)
@@ -103,7 +106,7 @@ In 4 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 | netmigr            | demography.net_migration                 | Net migration by age group, sex and year                                                                                                                              |
 | asfr               | demography.age_specific_fertility_rate   | Rate of live births in a year and the total female population of childbearing age                                                                                     |
 | births_sex_prop    | demography.births_sex_prop               | Proportion of male and female births each year                                                                                                                        |
-| incidinput         | incidence.rate                           | Incidence rate per year                                                                                                                                               |
+| incidinput         | incidence.total_rate                     | Incidence rate per year                                                                                                                                               |
 | incrr_sex          | incidence.sex_rate_ratio                 | HIV incidence rate ratio for female : male age 15-49 years                                                                                                            |
 | incrr_age          | incidence.age_rate_ratio                 | HIV incidence rate ratio by age (for each sex)                                                                                                                        |
 | cd4_initdist       | natural_history.cd4_initial_distribution | Distribution of infections by CD4 category upon infection                                                                                                             |
