@@ -104,14 +104,41 @@
 <div class="section level2">
 <h2 id="leapfrog-to-frogger-glossary">Leapfrog to Frogger glossary<a class="anchor" aria-label="anchor" href="#leapfrog-to-frogger-glossary"></a>
 </h2>
+<p>Frogger naming rules</p>
+<ul>
+<li>
+<code>p_</code> prefix indicates this is age stratified by total single year i.e. same age stratification as total population</li>
+<li>
+<code>h_</code> prefix indicates this is age stratified by same age stratification as HIV adult population, this might be single year from 15+ or could be coarse age groups</li>
+<li>
+<code>hc_</code> prefix indicates this is age stratified by the HIV child population</li>
+<li>
+<code>hc1_</code> prefix indicates this is age stratified by child population age 0 - 4</li>
+<li>
+<code>hc2_</code> prefix indicates this is age stratified by the child population age 5 - 14</li>
+<li>
+<code>idx_</code> prefix means this is an index, e.g. <code>idx_hm_elig</code> is the index of the CD4 count at which people are eligible for ART. Note this is not used for prefixing the loop variables</li>
+<li>Uppercase means this is a dimension of the state space e.g. <code>NS</code> or <code>pAG</code>
+</li>
+<li>
+<code>ts_</code> prefix means this is a time step</li>
+<li>
+<code>hts_</code> prefix means this is an HIV time step (i.e. a time step of the inner HIV loop)</li>
+</ul>
+<p>These prefixes can be merged e.g.</p>
+<ul>
+<li>
+<code>p_idx_hiv_first_adult</code> - Is the index of the first age group within singe-year ages to be considered an adult</li>
+</ul>
 <div class="section level3">
-<h3 id="stratifications">Stratifications<a class="anchor" aria-label="anchor" href="#stratifications"></a>
+<h3 id="state-space">State space<a class="anchor" aria-label="anchor" href="#state-space"></a>
 </h3>
+<p>In <code>StateSpace</code> struct</p>
 <table class="table">
 <colgroup>
-<col width="15%">
-<col width="27%">
-<col width="57%">
+<col width="11%">
+<col width="11%">
+<col width="76%">
 </colgroup>
 <thead><tr class="header">
 <th>Leapfrog</th>
@@ -121,55 +148,67 @@
 <tbody>
 <tr class="odd">
 <td>NG</td>
-<td>num_genders</td>
-<td>Number of genders</td>
+<td>NS</td>
+<td>Number of sexes</td>
 </tr>
 <tr class="even">
 <td>pAG</td>
-<td>age_groups_pop</td>
+<td>pAG</td>
 <td>Number of age groups in population, 81 for 0 to 80+</td>
 </tr>
 <tr class="odd">
-<td>pIDX_FERT</td>
-<td>fertility_first_age_group</td>
-<td>First age group index eligible for fertility</td>
-</tr>
-<tr class="even">
-<td>pAG_FERT</td>
-<td>age_groups_fertiity</td>
-<td>Number of ages eligible for fertility</td>
-</tr>
-<tr class="odd">
-<td>pIDX_HIVADULT</td>
-<td>hiv_adult_first_age_group</td>
-<td>Index of the first age group to be considered an adult</td>
-</tr>
-<tr class="even">
 <td>hAG</td>
-<td>age_groups_hiv</td>
-<td>Number of age groups in HIV population</td>
-</tr>
-<tr class="odd">
-<td>hDS</td>
-<td>disease_stages</td>
-<td>Number of disease stages</td>
+<td>hAG</td>
+<td>Number of age groups in coarse stratified adult HIV population</td>
 </tr>
 <tr class="even">
+<td>hDS</td>
+<td>hDS</td>
+<td>Number of disease stages in adult HIV population</td>
+</tr>
+<tr class="odd">
 <td>hTS</td>
-<td>treatment_stages</td>
-<td>Number of treatment stages</td>
+<td>hTS</td>
+<td>Number of treatment stages in adult HIV population</td>
+</tr>
+<tr class="even">
+<td>hAG_SPAN</td>
+<td>hAG_span</td>
+<td>Array of HIV age group sizes</td>
 </tr>
 </tbody>
 </table>
+<div class="section level4">
+<h4 id="loop-variable-convention">Loop variable convention<a class="anchor" aria-label="anchor" href="#loop-variable-convention"></a>
+</h4>
+<ul>
+<li>
+<code>NS</code> is <code>s</code>
+</li>
+<li>
+<code>pAG</code> is <code>a</code>
+</li>
+<li>
+<code>hAG</code> is <code>ha</code>
+</li>
+<li>
+<code>hDS</code> is <code>hd</code>
+</li>
+<li>
+<code>hTS</code> is <code>ht</code>
+</li>
+</ul>
+</div>
 </div>
 <div class="section level3">
-<h3 id="model-settings">Model settings<a class="anchor" aria-label="anchor" href="#model-settings"></a>
+<h3 id="key-indices-in-state-space-or-other-options-controlling-fit">Key indices in state space or other options controlling fit<a class="anchor" aria-label="anchor" href="#key-indices-in-state-space-or-other-options-controlling-fit"></a>
 </h3>
+<p>In <code>Options</code> struct. Some of these come from data, some are static, some are an input option</p>
 <table class="table">
 <colgroup>
-<col width="26%">
-<col width="27%">
-<col width="46%">
+<col width="20%">
+<col width="24%">
+<col width="56%">
 </colgroup>
 <thead><tr class="header">
 <th>Leapfrog</th>
@@ -178,24 +217,29 @@
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td>sim_years</td>
-<td>sim_years</td>
-<td>Number of simulation years to run</td>
+<td>hiv_steps_per_year</td>
+<td>hts_per_year</td>
+<td>Number of HIV model time steps per year</td>
 </tr>
 <tr class="even">
-<td>hiv_steps_per_year</td>
-<td>hiv_steps_per_year</td>
-<td></td>
+<td>pIDX_FERT</td>
+<td>p_idx_fertility_first</td>
+<td>First age group index eligible for fertility</td>
+</tr>
+<tr class="odd">
+<td>pAG_FERT</td>
+<td>p_fertility_age_groups</td>
+<td>Number of ages eligible for fertility</td>
+</tr>
+<tr class="even">
+<td>pIDX_HIVADULT</td>
+<td>p_idx_hiv_first_adult</td>
+<td>Index of the first age group to be considered an adult</td>
 </tr>
 <tr class="odd">
 <td>t_ART_start</td>
-<td>time_art_start</td>
+<td>ts_art_start</td>
 <td>Time step to start modelling ART</td>
-</tr>
-<tr class="even">
-<td>hAG_SPAN</td>
-<td>hiv_age_groups_span</td>
-<td>Array of HIV age group sizes</td>
 </tr>
 </tbody>
 </table>
@@ -203,11 +247,12 @@
 <div class="section level3">
 <h3 id="input-data">Input data<a class="anchor" aria-label="anchor" href="#input-data"></a>
 </h3>
+<p>In 4 structs as part of the <code>Parameters</code>, named <code>Demography</code>, <code>Incidence</code>, <code>NaturalHistory</code> and <code>Art</code></p>
 <table class="table">
 <colgroup>
-<col width="13%">
-<col width="20%">
-<col width="65%">
+<col width="8%">
+<col width="18%">
+<col width="72%">
 </colgroup>
 <thead><tr class="header">
 <th>Leapfrog</th>
@@ -217,103 +262,98 @@
 <tbody>
 <tr class="odd">
 <td>basepop</td>
-<td>base_pop</td>
+<td>demography.base_pop</td>
 <td>Population data by age group and sex</td>
 </tr>
 <tr class="even">
 <td>sx</td>
-<td>Survival</td>
-<td>Probability of surviving between ages, from 0 to 1, 1 to 2, …, 79 to 80+ and 80+ to 80+</td>
+<td>demography.survival_probability</td>
+<td>Probability of surviving from age x to x+1 i.e. from 0 to 1, 1 to 2, …, 79 to 80+ and 80+ to 80+</td>
 </tr>
 <tr class="odd">
 <td>netmigr</td>
-<td>net_migration</td>
+<td>demography.net_migration</td>
 <td>Net migration by age group, sex and year</td>
 </tr>
 <tr class="even">
 <td>asfr</td>
-<td>age_sex_fertility_ratio</td>
-<td>Ratio of number of live births in a year and the whole female population of childbearing age</td>
+<td>demography.age_specific_fertility_rate</td>
+<td>Rate of live births in a year and the total female population of childbearing age</td>
 </tr>
 <tr class="odd">
 <td>births_sex_prop</td>
-<td>births_sex_prop</td>
-<td></td>
+<td>demography.births_sex_prop</td>
+<td>Proportion of male and female births each year</td>
 </tr>
 <tr class="even">
 <td>incidinput</td>
-<td>incidence_rate</td>
-<td></td>
+<td>incidence.total_rate</td>
+<td>Incidence rate per year</td>
 </tr>
 <tr class="odd">
 <td>incrr_sex</td>
-<td>incidence_relative_risk_sex</td>
-<td>Relative risk of incidence by sex</td>
+<td>incidence.sex_rate_ratio</td>
+<td>HIV incidence rate ratio for female : male age 15-49 years</td>
 </tr>
 <tr class="even">
 <td>incrr_age</td>
-<td>incidence_relative_risk_age</td>
-<td>Relative risk of incidence by age</td>
+<td>incidence.age_rate_ratio</td>
+<td>HIV incidence rate ratio by age (for each sex)</td>
 </tr>
 <tr class="odd">
 <td>cd4_initdist</td>
-<td>?</td>
-<td>Distribution of infections by cd4 category upon infection</td>
+<td>natural_history.cd4_initial_distribution</td>
+<td>Distribution of infections by CD4 category upon infection</td>
 </tr>
 <tr class="even">
 <td>cd4_prog</td>
-<td>cd4_progression</td>
-<td></td>
+<td>natural_history.cd4_progression</td>
+<td>Probability of progressing from 1 CD4 stage to the next by age and sex</td>
 </tr>
 <tr class="odd">
 <td>cd4_mort</td>
-<td>cd4_mortality</td>
-<td></td>
+<td>natural_history.cd4_mortality</td>
+<td>Probability of mortality by CD4 stage, age and sex</td>
 </tr>
 <tr class="even">
+<td>scale_cd4_mort</td>
+<td>natural_history.scale_cd4_mortality</td>
+<td>If 1 then scale HIV related mortality (i.e. cd4_mortality) as a proportion of number of people with HIV and over the number with HIV and on ART at this disease stage</td>
+</tr>
+<tr class="odd">
 <td>art_mort</td>
-<td>art_mortality</td>
-<td></td>
+<td>art.mortality_rate</td>
+<td>Probability of mortality by treatment stage, CD4 stage, age and sex</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>artmx_timerr</td>
-<td>?</td>
-<td></td>
+<td>art.mortaility_time_rate_ratio</td>
+<td>ART mortality rate ratio by year for &lt;12 months and &gt;12 months on ART</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>art15plus_num</td>
-<td>?</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>art15plus_isperc</td>
-<td>?</td>
-<td></td>
+<td>art.adults_on_art</td>
+<td>Time series of # or % of adult PLHIV on ART by sex</td>
 </tr>
 <tr class="even">
-<td>artcd4elig_idx</td>
-<td>?</td>
-<td></td>
+<td>art15plus_isperc</td>
+<td>art.adults_on_art_is_percent</td>
+<td>Time series, TRUE if art15plus_num is a %, FALSE if it is a #</td>
 </tr>
 <tr class="odd">
-<td>art_alloc_method</td>
-<td>?</td>
-<td></td>
+<td>artcd4elig_idx</td>
+<td>art.idx_hm_elig</td>
+<td>The index of the CD4 count at which people are eligible for ART by time step</td>
 </tr>
 <tr class="even">
 <td>art_alloc_mxweight</td>
-<td>?</td>
-<td></td>
+<td>art.initiation_mortality_weight</td>
+<td>Weighting for extent that expected mortality guides ART uptake</td>
 </tr>
 <tr class="odd">
-<td>scale_cd4_mort</td>
-<td>scale_cd4_mortality</td>
-<td></td>
-</tr>
-<tr class="even">
 <td>art_dropout</td>
-<td>?</td>
-<td></td>
+<td>art.dropout</td>
+<td>Annual ART dropout rate</td>
 </tr>
 </tbody>
 </table>
@@ -321,11 +361,16 @@
 <div class="section level3">
 <h3 id="outputs">Outputs<a class="anchor" aria-label="anchor" href="#outputs"></a>
 </h3>
+<p>Discussion: naming conventions</p>
+<ul>
+<li>Distinguish events vs. counts</li>
+<li>Distinguish stratification of array (single-year population pXX vs. HIV population hXX</li>
+</ul>
 <table class="table">
 <colgroup>
-<col width="18%">
-<col width="20%">
-<col width="60%">
+<col width="15%">
+<col width="23%">
+<col width="61%">
 </colgroup>
 <thead><tr class="header">
 <th>Leapfrog</th>
@@ -335,28 +380,28 @@
 <tbody>
 <tr class="odd">
 <td>totpop1</td>
-<td>total_population</td>
+<td>p_total_pop</td>
 <td>Projected total population</td>
 </tr>
 <tr class="even">
 <td>hivpop1</td>
-<td>hiv_population</td>
+<td>p_hiv_pop</td>
 <td>Projected HIV population</td>
 </tr>
 <tr class="odd">
 <td>infections</td>
-<td>infections</td>
-<td></td>
+<td>p_infections</td>
+<td>Projected number of new HIV infections by sex and age</td>
 </tr>
 <tr class="even">
 <td>hivstrat_adult</td>
-<td>hiv_strat_adult</td>
-<td></td>
+<td>h_hiv_adult</td>
+<td>Projected PLHIV not on ART by age, sex and CD4</td>
 </tr>
 <tr class="odd">
 <td>artstrat_adult</td>
-<td>art_strat_adult</td>
-<td></td>
+<td>h_art_adult</td>
+<td>Projected PLHIV on ART by age, sex, CD4 and treatment stage</td>
 </tr>
 <tr class="even">
 <td>births</td>
@@ -365,33 +410,33 @@
 </tr>
 <tr class="odd">
 <td>natdeaths</td>
-<td>natural_deaths</td>
+<td>p_total_pop_natural_deaths</td>
 <td>Projected number of natural deaths</td>
 </tr>
 <tr class="even">
 <td>natdeaths_hivpop</td>
-<td>hiv_natural_deaths</td>
+<td>p_hiv_pop_natural_deaths</td>
 <td>Projected number of natural deaths within HIV population</td>
 </tr>
 <tr class="odd">
 <td>hivdeaths</td>
-<td>hiv_deaths</td>
-<td></td>
+<td>p_hiv_deaths</td>
+<td>Projected HIV-related deaths by sex and age</td>
 </tr>
 <tr class="even">
 <td>aidsdeaths_noart</td>
-<td>aids_deaths_no_art</td>
-<td></td>
+<td>h_hiv_deaths_no_art</td>
+<td>Projected HIV-related deaths off ART by sex, age and CD4</td>
 </tr>
 <tr class="odd">
 <td>aidsdeaths_art</td>
-<td>aids_deaths_art</td>
-<td></td>
+<td>h_hiv_deaths_art</td>
+<td>Projected HIV-related deaths on ART by sex, age, CD4 and treatment stage</td>
 </tr>
 <tr class="even">
 <td>artinit</td>
-<td>art_initiation</td>
-<td></td>
+<td>h_art_initiation</td>
+<td>Projected ART initiations by sex, age and CD4</td>
 </tr>
 </tbody>
 </table>
@@ -574,7 +619,7 @@
 <tr class="odd">
 <td>artelig_hahm</td>
 <td></td>
-<td></td>
+<td>Number of PLHIV eligible for ART by age and disease stage</td>
 </tr>
 <tr class="even">
 <td>Xart_15plus</td>
@@ -589,7 +634,7 @@
 <tr class="even">
 <td>expect_mort_artelig15plus</td>
 <td></td>
-<td></td>
+<td>Total mortality amongst ART eligible population</td>
 </tr>
 <tr class="odd">
 <td>artnum_hts</td>
@@ -608,13 +653,13 @@
 </tr>
 <tr class="even">
 <td>artinit_hts</td>
-<td></td>
-<td></td>
+<td>art_initiation</td>
+<td>Total number by sex to initiate on ART by sex</td>
 </tr>
 <tr class="odd">
 <td>artinit_hahm</td>
 <td></td>
-<td></td>
+<td>Number who initiate treatment by age and disease stage</td>
 </tr>
 <tr class="even">
 <td>hivpop_ha(ha)</td>
