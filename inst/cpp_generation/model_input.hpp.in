@@ -12,8 +12,8 @@ template<leapfrog::HivAgeStratification S, typename real_type>
 leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
                                                     const leapfrog::Options<real_type> &options,
                                                     const int proj_years) {
-  const int age_groups_fert = options.age_groups_fert;
-  const int hiv_adult_first_age_group = options.hiv_adult_first_age_group;
+  const int p_fertility_age_groups = options.p_fertility_age_groups;
+  const int p_idx_hiv_first_adult = options.p_idx_hiv_first_adult;
   constexpr auto ss = leapfrog::StateSpace<S>();
 {{unpack_state_space}}
 
@@ -21,32 +21,32 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
 
   const leapfrog::Demography<real_type> demography = {
       base_pop,
-      survival,
+      survival_probability,
       net_migration,
-      age_sex_fertility_ratio,
+      age_specific_fertility_rate,
       births_sex_prop
   };
 
   const leapfrog::Incidence<real_type> incidence = {
-      incidence_rate,
-      incidence_relative_risk_age,
-      incidence_relative_risk_sex
+      total_rate,
+      age_rate_ratio,
+      sex_rate_ratio
   };
 
   const leapfrog::NaturalHistory<real_type> natural_history = {
       cd4_mortality,
       cd4_progression,
-      cd4_initdist
+      cd4_initial_distribution
   };
 
   const leapfrog::Art<real_type> art = {
-      artcd4elig_idx,
-      art_mortality,
-      artmx_timerr,
+      idx_hm_elig,
+      mortality,
+      mortaility_time_rate_ratio,
       h_art_stage_dur,
-      art_dropout,
-      art15plus_num,
-      art15plus_isperc
+      dropout,
+      adults_on_art,
+      adults_on_art_is_percent
   };
 
   const leapfrog::Parameters<real_type> params = {options,

@@ -24,14 +24,14 @@ int transform_simulation_years(const Rcpp::List demp, SEXP r_sim_years) {
   return sim_years;
 }
 
-int transform_hiv_steps_per_year(SEXP r_hiv_steps_per_year) {
-  int hiv_steps_per_year;
-  if (r_hiv_steps_per_year == R_NilValue) {
-    hiv_steps_per_year = 10;
+int transform_hts_per_year(SEXP r_hts_per_year) {
+  int hts_per_year;
+  if (r_hts_per_year == R_NilValue) {
+    hts_per_year = 10;
   } else {
-    hiv_steps_per_year = INTEGER(r_hiv_steps_per_year)[0];
+    hts_per_year = INTEGER(r_hts_per_year)[0];
   }
-  return hiv_steps_per_year;
+  return hts_per_year;
 }
 
 template <leapfrog::HivAgeStratification S>
@@ -59,7 +59,7 @@ Rcpp::List fit_model(const leapfrog::StateSpace<S> ss,
   const leapfrog::Options<double> opts = {
       hiv_steps,
       Rcpp::as<int>(data["t_ART_start"]) - 1,
-      ss.age_groups_hiv,
+      ss.hAG,
       Rcpp::as<int>(data["scale_cd4_mort"]),
       Rcpp::as<double>(data["art_alloc_mxweight"])
   };
@@ -76,12 +76,12 @@ Rcpp::List fit_model(const leapfrog::StateSpace<S> ss,
 // [[Rcpp::export]]
 Rcpp::List run_base_model(const Rcpp::List data,
                           SEXP sim_years,
-                          SEXP hiv_steps_per_year,
+                          SEXP hts_per_year,
                           Rcpp::NumericVector output_steps,
                           std::string hiv_age_stratification) {
   const int proj_years = transform_simulation_years(data, sim_years);
   const std::vector<int> save_steps = transform_output_steps(output_steps);
-  const int hiv_steps = transform_hiv_steps_per_year(hiv_steps_per_year);
+  const int hiv_steps = transform_hts_per_year(hts_per_year);
 
 
   Rcpp::List ret;

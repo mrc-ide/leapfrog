@@ -33,21 +33,21 @@ struct StateSpace;
 
 template<>
 struct StateSpace<coarse> {
-  static constexpr int num_genders = 2;
-  static constexpr int age_groups_pop = 81;
-  static constexpr int age_groups_hiv = 9;
-  static constexpr int disease_stages = 7;
-  static constexpr int treatment_stages = 3;
-  static constexpr std::array<int, 9> hiv_age_groups_span{2, 3, 5, 5, 5, 5, 5, 5, 31};
+  static constexpr int NS = 2;
+  static constexpr int pAG = 81;
+  static constexpr int hAG = 9;
+  static constexpr int hDS = 7;
+  static constexpr int hTS = 3;
+  static constexpr std::array<int, 9> hAG_span{2, 3, 5, 5, 5, 5, 5, 5, 31};
 };
 
 template<>
 struct StateSpace<full> {
-  static constexpr int num_genders = 2;
-  static constexpr int age_groups_pop = 81;
-  static constexpr int age_groups_hiv = 66;
-  static constexpr int disease_stages = 7;
-  static constexpr int treatment_stages = 3;
-  static constexpr std::array<int, 66> hiv_age_groups_span = create_array<int, 66>(1);
+  static constexpr int NS = 2;
+  static constexpr int pAG = 81;
+  static constexpr int hAG = 66;
+  static constexpr int hDS = 7;
+  static constexpr int hTS = 3;
+  static constexpr std::array<int, 66> hAG_span = create_array<int, 66>(1);
 };
 }
