@@ -114,7 +114,6 @@ int main(int argc, char *argv[]) {
       ss.hAG,  // Age groups HIV 15+
       1,                  // Scale CD4 mortality
       0.2,                // initiation_mortality_weight
-      run_child_model
   };
 
   leapfrog::Tensor1<int> v = serialize::deserialize_tensor<int, 1>(std::string("idx_hm_elig"));

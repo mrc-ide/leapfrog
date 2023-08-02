@@ -6,11 +6,11 @@ namespace leapfrog {
 
 namespace internal {
 
-template<HivAgeStratification S, typename real_type>
+template<typename ModelVariant, typename real_type>
 void distribute_rate_over_sexes(
     const int time_step,
-    const Parameters<real_type> &pars,
-    IntermediateData<S, real_type> &intermediate) {
+    const Parameters<ModelVariant, real_type> &pars,
+    IntermediateData<ModelVariant, real_type> &intermediate) {
   const auto incidence = pars.incidence;
   real_type denominator = intermediate.hiv_neg_aggregate(MALE) +
                           incidence.relative_risk_sex(time_step) * intermediate.hiv_neg_aggregate(FEMALE);
@@ -20,17 +20,17 @@ void distribute_rate_over_sexes(
       incidence.total_rate(time_step) * incidence.relative_risk_sex(time_step) * (total_neg) / denominator;
 }
 
-template<HivAgeStratification S, typename real_type>
+template<typename ModelVariant, typename real_type>
 void run_add_new_hiv_p_infections(int time_step,
-                                  const Parameters<real_type> &pars,
-                                  const State<S, real_type> &state_curr,
-                                  State<S, real_type> &state_next,
-                                  IntermediateData<S, real_type> &intermediate) {
+                                  const Parameters<ModelVariant, real_type> &pars,
+                                  const State<ModelVariant, real_type> &state_curr,
+                                  State<ModelVariant, real_type> &state_next,
+                                  IntermediateData<ModelVariant, real_type> &intermediate) {
   // TODO: Add different HIV incidence rates see https://github.com/mrc-ide/leapfrog/issues/8
 
   const auto incidence = pars.incidence;
   const auto adult_incidence_first_age_group = pars.options.adult_incidence_first_age_group;
-  constexpr auto ss = StateSpace<S>();
+  constexpr auto ss = StateSpace<ModelVariant>().base;
 
   // Calculating new p_infections once per year (like Spectrum)
   for (int g = 0; g < ss.NS; ++g) {
@@ -49,7 +49,7 @@ void run_add_new_hiv_p_infections(int time_step,
     }
   }
 
-  distribute_rate_over_sexes<S>(time_step, pars, intermediate);
+  distribute_rate_over_sexes<ModelVariant>(time_step, pars, intermediate);
 
   for (int g = 0; g < ss.NS; g++) {
     for (int a = pars.options.p_idx_hiv_first_adult; a < ss.pAG; a++) {
@@ -63,14 +63,14 @@ void run_add_new_hiv_p_infections(int time_step,
 }
 
 
-template<HivAgeStratification S, typename real_type>
+template<typename ModelVariant, typename real_type>
 void run_disease_progression_and_mortality(int hiv_step,
                                            int time_step,
-                                           const Parameters<real_type> &pars,
-                                           const State<S, real_type> &state_curr,
-                                           State<S, real_type> &state_next,
-                                           IntermediateData<S, real_type> &intermediate) {
-  constexpr auto ss = StateSpace<S>();
+                                           const Parameters<ModelVariant, real_type> &pars,
+                                           const State<ModelVariant, real_type> &state_curr,
+                                           State<ModelVariant, real_type> &state_next,
+                                           IntermediateData<ModelVariant, real_type> &intermediate) {
+  constexpr auto ss = StateSpace<ModelVariant>().base;
   const auto natural_history = pars.natural_history;
   const auto dt = pars.options.dt;
   for (int g = 0; g < ss.NS; g++) {
@@ -106,14 +106,14 @@ void run_disease_progression_and_mortality(int hiv_step,
   }
 }
 
-template<HivAgeStratification S, typename real_type>
+template<typename ModelVariant, typename real_type>
 void run_new_p_infections(int hiv_step,
                           int time_step,
-                          const Parameters<real_type> &pars,
-                          const State<S, real_type> &state_curr,
-                          State<S, real_type> &state_next,
-                          IntermediateData<S, real_type> &intermediate) {
-  constexpr auto ss = StateSpace<S>();
+                          const Parameters<ModelVariant, real_type> &pars,
+                          const State<ModelVariant, real_type> &state_curr,
+                          State<ModelVariant, real_type> &state_next,
+                          IntermediateData<ModelVariant, real_type> &intermediate) {
+  constexpr auto ss = StateSpace<ModelVariant>().base;
   const auto natural_history = pars.natural_history;
   for (int g = 0; g < ss.NS; g++) {
     int a = pars.options.p_idx_hiv_first_adult;
@@ -135,14 +135,14 @@ void run_new_p_infections(int hiv_step,
   }
 }
 
-template<HivAgeStratification S, typename real_type>
+template<typename ModelVariant, typename real_type>
 void run_art_progression_and_mortality(int hiv_step,
                                        int time_step,
-                                       const Parameters<real_type> &pars,
-                                       const State<S, real_type> &state_curr,
-                                       State<S, real_type> &state_next,
-                                       IntermediateData<S, real_type> &intermediate) {
-  constexpr auto ss = StateSpace<S>();
+                                       const Parameters<ModelVariant, real_type> &pars,
+                                       const State<ModelVariant, real_type> &state_curr,
+                                       State<ModelVariant, real_type> &state_next,
+                                       IntermediateData<ModelVariant, real_type> &intermediate) {
+  constexpr auto ss = StateSpace<ModelVariant>().base;
   const auto art = pars.art;
   for (int g = 0; g < ss.NS; g++) {
     for (int ha = 0; ha < ss.hAG; ha++) {
@@ -176,14 +176,14 @@ void run_art_progression_and_mortality(int hiv_step,
   }
 }
 
-template<HivAgeStratification S, typename real_type>
+template<typename ModelVariant, typename real_type>
 void run_h_art_initiation(int hiv_step,
                           int time_step,
-                          const Parameters<real_type> &pars,
-                          const State<S, real_type> &state_curr,
-                          State<S, real_type> &state_next,
-                          IntermediateData<S, real_type> &intermediate) {
-  constexpr auto ss = StateSpace<S>();
+                          const Parameters<ModelVariant, real_type> &pars,
+                          const State<ModelVariant, real_type> &state_curr,
+                          State<ModelVariant, real_type> &state_next,
+                          IntermediateData<ModelVariant, real_type> &intermediate) {
+  constexpr auto ss = StateSpace<ModelVariant>().base;
   const auto natural_history = pars.natural_history;
   const auto art = pars.art;
   const auto dt = pars.options.dt;
@@ -284,14 +284,14 @@ void run_h_art_initiation(int hiv_step,
   }
 }
 
-template<HivAgeStratification S, typename real_type>
+template<typename ModelVariant, typename real_type>
 void run_update_art_stratification(int hiv_step,
                                    int time_step,
-                                   const Parameters<real_type> &pars,
-                                   const State<S, real_type> &state_curr,
-                                   State<S, real_type> &state_next,
-                                   IntermediateData<S, real_type> &intermediate) {
-  constexpr auto ss = StateSpace<S>();
+                                   const Parameters<ModelVariant, real_type> &pars,
+                                   const State<ModelVariant, real_type> &state_curr,
+                                   State<ModelVariant, real_type> &state_next,
+                                   IntermediateData<ModelVariant, real_type> &intermediate) {
+  constexpr auto ss = StateSpace<ModelVariant>().base;
   for (int g = 0; g < ss.NS; ++g) {
     for (int ha = 0; ha < ss.hAG; ++ha) {
       for (int hm = intermediate.everARTelig_idx; hm < ss.hDS; ++hm) {
@@ -303,14 +303,14 @@ void run_update_art_stratification(int hiv_step,
   }
 }
 
-template<HivAgeStratification S, typename real_type>
+template<typename ModelVariant, typename real_type>
 void run_update_hiv_stratification(int hiv_step,
                                    int time_step,
-                                   const Parameters<real_type> &pars,
-                                   const State<S, real_type> &state_curr,
-                                   State<S, real_type> &state_next,
-                                   IntermediateData<S, real_type> &intermediate) {
-  constexpr auto ss = StateSpace<S>();
+                                   const Parameters<ModelVariant, real_type> &pars,
+                                   const State<ModelVariant, real_type> &state_curr,
+                                   State<ModelVariant, real_type> &state_next,
+                                   IntermediateData<ModelVariant, real_type> &intermediate) {
+  constexpr auto ss = StateSpace<ModelVariant>().base;
   for (int g = 0; g < ss.NS; ++g) {
     for (int ha = 0; ha < ss.hAG; ++ha) {
       for (int hm = 0; hm < ss.hDS; ++hm) {
@@ -320,14 +320,14 @@ void run_update_hiv_stratification(int hiv_step,
   }
 }
 
-template<HivAgeStratification S, typename real_type>
+template<typename ModelVariant, typename real_type>
 void run_remove_p_hiv_deaths(int hiv_step,
                              int time_step,
-                             const Parameters<real_type> &pars,
-                             const State<S, real_type> &state_curr,
-                             State<S, real_type> &state_next,
-                             IntermediateData<S, real_type> &intermediate) {
-  constexpr auto ss = StateSpace<S>();
+                             const Parameters<ModelVariant, real_type> &pars,
+                             const State<ModelVariant, real_type> &state_curr,
+                             State<ModelVariant, real_type> &state_next,
+                             IntermediateData<ModelVariant, real_type> &intermediate) {
+  constexpr auto ss = StateSpace<ModelVariant>().base;
   for (int g = 0; g < ss.NS; ++g) {
     // sum HIV+ population size in each hivpop age group
     int a = pars.options.p_idx_hiv_first_adult;
@@ -358,16 +358,16 @@ void run_remove_p_hiv_deaths(int hiv_step,
 
 }
 
-template<HivAgeStratification S, typename real_type>
+template<typename ModelVariant, typename real_type>
 void run_hiv_model_simulation(int time_step,
-                              const Parameters<real_type> &pars,
-                              const State<S, real_type> &state_curr,
-                              State<S, real_type> &state_next,
-                              internal::IntermediateData<S, real_type> &intermediate) {
-  constexpr auto ss = StateSpace<S>();
+                              const Parameters<ModelVariant, real_type> &pars,
+                              const State<ModelVariant, real_type> &state_curr,
+                              State<ModelVariant, real_type> &state_next,
+                              internal::IntermediateData<ModelVariant, real_type> &intermediate) {
+  constexpr auto ss = StateSpace<ModelVariant>().base;
   const auto art = pars.art;
 
-  internal::run_add_new_hiv_p_infections<S>(time_step, pars, state_curr, state_next, intermediate);
+  internal::run_add_new_hiv_p_infections<ModelVariant>(time_step, pars, state_curr, state_next, intermediate);
 
   intermediate.everARTelig_idx =
       art.idx_hm_elig(time_step) < ss.hDS ? art.idx_hm_elig(time_step) : ss.hDS;
@@ -378,19 +378,19 @@ void run_hiv_model_simulation(int time_step,
     intermediate.gradART.setZero();
     intermediate.p_hiv_deaths_age_sex.setZero();
 
-    internal::run_disease_progression_and_mortality<S>(hiv_step, time_step, pars, state_curr, state_next,
-                                                       intermediate);
-    internal::run_new_p_infections<S>(hiv_step, time_step, pars, state_curr, state_next, intermediate);
+    internal::run_disease_progression_and_mortality<ModelVariant>(hiv_step, time_step, pars, state_curr, state_next,
+                                                                  intermediate);
+    internal::run_new_p_infections<ModelVariant>(hiv_step, time_step, pars, state_curr, state_next, intermediate);
     if (time_step >= pars.options.ts_art_start) {
-      internal::run_art_progression_and_mortality<S>(hiv_step, time_step, pars, state_curr, state_next,
-                                                     intermediate);
-      internal::run_h_art_initiation<S>(hiv_step, time_step, pars, state_curr, state_next, intermediate);
-      internal::run_update_art_stratification<S>(hiv_step, time_step, pars, state_curr, state_next,
-                                                 intermediate);
+      internal::run_art_progression_and_mortality<ModelVariant>(hiv_step, time_step, pars, state_curr, state_next,
+                                                                intermediate);
+      internal::run_h_art_initiation<ModelVariant>(hiv_step, time_step, pars, state_curr, state_next, intermediate);
+      internal::run_update_art_stratification<ModelVariant>(hiv_step, time_step, pars, state_curr, state_next,
+                                                            intermediate);
     }
-    internal::run_update_hiv_stratification<S>(hiv_step, time_step, pars, state_curr, state_next,
-                                               intermediate);
-    internal::run_remove_p_hiv_deaths<S>(hiv_step, time_step, pars, state_curr, state_next, intermediate);
+    internal::run_update_hiv_stratification<ModelVariant>(hiv_step, time_step, pars, state_curr, state_next,
+                                                          intermediate);
+    internal::run_remove_p_hiv_deaths<ModelVariant>(hiv_step, time_step, pars, state_curr, state_next, intermediate);
   }
 }
 

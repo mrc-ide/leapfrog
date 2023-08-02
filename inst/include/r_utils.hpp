@@ -86,6 +86,7 @@ using namespace Rcpp;
 class ListBuilder {
 public:
   ListBuilder() {};
+  ListBuilder(ListBuilder const&) {};
   ~ListBuilder() {};
 
   inline ListBuilder& add(const std::string& name, SEXP x) {
@@ -121,6 +122,4 @@ public:
 private:
   std::vector<std::string> names;
   std::vector<SEXP> elements;
-
-  ListBuilder(ListBuilder const&) {};
 };

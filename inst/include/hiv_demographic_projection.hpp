@@ -7,14 +7,14 @@ namespace leapfrog {
 
 namespace internal {
 
-template<HivAgeStratification S, typename real_type>
+template<typename ModelVariant, typename real_type>
 void run_hiv_ageing_and_mortality(int time_step,
-                                  const Parameters<real_type> &pars,
-                                  const State<S, real_type> &state_curr,
-                                  State<S, real_type> &state_next,
-                                  IntermediateData<S, real_type> &intermediate) {
+                                  const Parameters<ModelVariant, real_type> &pars,
+                                  const State<ModelVariant, real_type> &state_curr,
+                                  State<ModelVariant, real_type> &state_next,
+                                  IntermediateData<ModelVariant, real_type> &intermediate) {
   const auto demog = pars.demography;
-  constexpr auto ss = StateSpace<S>();
+  constexpr auto ss = StateSpace<ModelVariant>().base;
   // Non-hiv deaths
   for (int g = 0; g < ss.NS; ++g) {
     for (int a = 1; a < ss.pAG; ++a) {
@@ -33,30 +33,34 @@ void run_hiv_ageing_and_mortality(int time_step,
   }
 }
 
-template<HivAgeStratification S, typename real_type>
+template<typename ModelVariant, typename real_type>
 void run_age_15_entrants(int time_step,
-                         const Parameters<real_type> &pars,
-                         const State<S, real_type> &state_curr,
-                         State<S, real_type> &state_next,
-                         IntermediateData<S, real_type> &intermediate) {
-  constexpr auto ss = StateSpace<S>();
+                         const Parameters<ModelVariant, real_type> &pars,
+                         const State<ModelVariant, real_type> &state_curr,
+                         State<ModelVariant, real_type> &state_next,
+                         IntermediateData<ModelVariant, real_type> &intermediate) {
 
-  for (int g = 0; g < ss.NS; ++g) {
-    for (int hm = 0; hm < ss.hDS; ++hm) {
-      for (int htm = 0; htm < ss.hTM; ++htm) {
-        intermediate.age15_hiv_pop(hm, g) += state_curr.hc_hiv_pop(hm, htm, 14, g);
+  if constexpr (ModelVariant::run_child_model) {
+    constexpr auto ss = StateSpace<ModelVariant>().base;
+    constexpr auto ss_child = StateSpace<ModelVariant>().children;
+
+    for (int g = 0; g < ss.NS; ++g) {
+      for (int hm = 0; hm < ss.hDS; ++hm) {
+        for (int htm = 0; htm < ss_child.hTM; ++htm) {
+          intermediate.age15_hiv_pop(hm, g) += state_curr.hc_hiv_pop(hm, htm, 14, g);
+        }
       }
     }
   }
 }
 
-template<HivAgeStratification S, typename real_type>
+template<typename ModelVariant, typename real_type>
 void run_hiv_and_art_stratified_ageing(int time_step,
-                                       const Parameters<real_type> &pars,
-                                       const State<S, real_type> &state_curr,
-                                       State<S, real_type> &state_next,
-                                       IntermediateData<S, real_type> &intermediate) {
-  constexpr auto ss = StateSpace<S>();
+                                       const Parameters<ModelVariant, real_type> &pars,
+                                       const State<ModelVariant, real_type> &state_curr,
+                                       State<ModelVariant, real_type> &state_next,
+                                       IntermediateData<ModelVariant, real_type> &intermediate) {
+  constexpr auto ss = StateSpace<ModelVariant>().base;
   // age coarse stratified HIV population
   for (int g = 0; g < ss.NS; ++g) {
     int a = pars.options.p_idx_hiv_first_adult;
@@ -113,14 +117,14 @@ void run_hiv_and_art_stratified_ageing(int time_step,
   }
 }
 
-template<HivAgeStratification S, typename real_type>
+template<typename ModelVariant, typename real_type>
 void run_hiv_and_art_stratified_deaths_and_migration(
     int time_step,
-    const Parameters<real_type> &pars,
-    const State<S, real_type> &state_curr,
-    State<S, real_type> &state_next,
-    IntermediateData<S, real_type> &intermediate) {
-  constexpr auto ss = StateSpace<S>();
+    const Parameters<ModelVariant, real_type> &pars,
+    const State<ModelVariant, real_type> &state_curr,
+    State<ModelVariant, real_type> &state_next,
+    IntermediateData<ModelVariant, real_type> &intermediate) {
+  constexpr auto ss = StateSpace<ModelVariant>().base;
   for (int g = 0; g < ss.NS; ++g) {
     int a = pars.options.p_idx_hiv_first_adult;
     for (int ha = 0; ha < ss.hAG; ++ha) {
@@ -169,22 +173,22 @@ void run_hiv_and_art_stratified_deaths_and_migration(
 
 }
 
-template<HivAgeStratification S, typename real_type>
+template<typename ModelVariant, typename real_type>
 void run_hiv_pop_demographic_projection(int time_step,
-                                        const Parameters<real_type> &pars,
-                                        const State<S, real_type> &state_curr,
-                                        State<S, real_type> &state_next,
-                                        internal::IntermediateData<S, real_type> &intermediate) {
-  internal::run_hiv_ageing_and_mortality<S>(time_step, pars, state_curr, state_next,
-                                            intermediate);
-  if (pars.options.run_child_model) {
-    internal::run_age_15_entrants(time_step, pars, state_curr, state_next, intermediate);
+                                        const Parameters<ModelVariant, real_type> &pars,
+                                        const State<ModelVariant, real_type> &state_curr,
+                                        State<ModelVariant, real_type> &state_next,
+                                        internal::IntermediateData<ModelVariant, real_type> &intermediate) {
+  internal::run_hiv_ageing_and_mortality<ModelVariant>(time_step, pars, state_curr, state_next,
+                                                       intermediate);
+  if (ModelVariant::run_child_model) {
+    internal::run_age_15_entrants<ModelVariant>(time_step, pars, state_curr, state_next, intermediate);
   }
 
-  internal::run_hiv_and_art_stratified_ageing<S>(time_step, pars, state_curr, state_next,
-                                                 intermediate);
-  internal::run_hiv_and_art_stratified_deaths_and_migration<S>(time_step, pars, state_curr,
-                                                               state_next, intermediate);
+  internal::run_hiv_and_art_stratified_ageing<ModelVariant>(time_step, pars, state_curr, state_next,
+                                                            intermediate);
+  internal::run_hiv_and_art_stratified_deaths_and_migration<ModelVariant>(time_step, pars, state_curr,
+                                                                          state_next, intermediate);
 }
 
 }

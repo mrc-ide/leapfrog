@@ -6,19 +6,19 @@ namespace leapfrog {
 
 namespace internal {
 
-template<HivAgeStratification S, typename real_type>
+template<typename ModelVariant, typename real_type>
 void run_ageing_and_mortality(int time_step,
-                              const Parameters<real_type> &pars,
-                              const State<S, real_type> &state_curr,
-                              State<S, real_type> &state_next,
-                              IntermediateData<S, real_type> &intermediate) {
-  constexpr auto ss = StateSpace<S>();
+                              const Parameters<ModelVariant, real_type> &pars,
+                              const State<ModelVariant, real_type> &state_curr,
+                              State<ModelVariant, real_type> &state_next,
+                              IntermediateData<ModelVariant, real_type> &intermediate) {
+  constexpr auto ss = StateSpace<ModelVariant>().base;
   const auto demog = pars.demography;
   for (int g = 0; g < ss.NS; ++g) {
     // Start at index 1 as we will add infant (age 0) births and deaths later
     for (int a = 1; a < ss.pAG; ++a) {
       state_next.p_total_pop_natural_deaths(a, g) = state_curr.p_total_pop(a - 1, g) *
-                                        (1.0 - demog.survival_probability(a, g, time_step));
+                                                    (1.0 - demog.survival_probability(a, g, time_step));
       state_next.p_total_pop(a, g) =
           state_curr.p_total_pop(a - 1, g) -
           state_next.p_total_pop_natural_deaths(a, g);
@@ -36,13 +36,13 @@ void run_ageing_and_mortality(int time_step,
   }
 }
 
-template<HivAgeStratification S, typename real_type>
+template<typename ModelVariant, typename real_type>
 void run_migration(int time_step,
-                   const Parameters<real_type> &pars,
-                   const State<S, real_type> &state_curr,
-                   State<S, real_type> &state_next,
-                   IntermediateData<S, real_type> &intermediate) {
-  constexpr auto ss = StateSpace<S>();
+                   const Parameters<ModelVariant, real_type> &pars,
+                   const State<ModelVariant, real_type> &state_curr,
+                   State<ModelVariant, real_type> &state_next,
+                   IntermediateData<ModelVariant, real_type> &intermediate) {
+  constexpr auto ss = StateSpace<ModelVariant>().base;
   const auto demog = pars.demography;
   for (int g = 0; g < ss.NS; ++g) {
     // Migration for ages 1, 2, ... 79
@@ -75,13 +75,13 @@ void run_migration(int time_step,
   }
 }
 
-template<HivAgeStratification S, typename real_type>
+template<typename ModelVariant, typename real_type>
 void run_fertility_and_infant_migration(int time_step,
-                                        const Parameters<real_type> &pars,
-                                        const State<S, real_type> &state_curr,
-                                        State<S, real_type> &state_next,
-                                        IntermediateData<S, real_type> &intermediate) {
-  constexpr auto ss = StateSpace<S>();
+                                        const Parameters<ModelVariant, real_type> &pars,
+                                        const State<ModelVariant, real_type> &state_curr,
+                                        State<ModelVariant, real_type> &state_next,
+                                        IntermediateData<ModelVariant, real_type> &intermediate) {
+  constexpr auto ss = StateSpace<ModelVariant>().base;
   const auto demog = pars.demography;
   state_next.births = 0.0;
   for (int af = 0; af < pars.options.p_fertility_age_groups; ++af) {
@@ -113,15 +113,15 @@ void run_fertility_and_infant_migration(int time_step,
 }
 
 
-template<HivAgeStratification S, typename real_type>
+template<typename ModelVariant, typename real_type>
 void run_general_pop_demographic_projection(int time_step,
-                                            const Parameters<real_type> &pars,
-                                            const State<S, real_type> &state_curr,
-                                            State<S, real_type> &state_next,
-                                            internal::IntermediateData<S, real_type> &intermediate) {
-  internal::run_ageing_and_mortality<S>(time_step, pars, state_curr, state_next, intermediate);
-  internal::run_migration<S>(time_step, pars, state_curr, state_next, intermediate);
-  internal::run_fertility_and_infant_migration<S>(time_step, pars, state_curr, state_next, intermediate);
+                                            const Parameters<ModelVariant, real_type> &pars,
+                                            const State<ModelVariant, real_type> &state_curr,
+                                            State<ModelVariant, real_type> &state_next,
+                                            internal::IntermediateData<ModelVariant, real_type> &intermediate) {
+  internal::run_ageing_and_mortality<ModelVariant>(time_step, pars, state_curr, state_next, intermediate);
+  internal::run_migration<ModelVariant>(time_step, pars, state_curr, state_next, intermediate);
+  internal::run_fertility_and_infant_migration<ModelVariant>(time_step, pars, state_curr, state_next, intermediate);
 }
 
 }
