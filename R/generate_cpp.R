@@ -74,15 +74,16 @@ generate_return <- function(output) {
 #' This generates using metadata from `src/model_inputs.yml`
 #'
 #' @param dest The destination to write generated code to.
+#' @param input_csv Path to the csv of model inputs.
 #'
 #' @return Nothing, called to generate code in src dir
 #' @keywords internal
-generate_input_interface <- function(dest) {
+generate_input_interface <- function(
+    dest, input_csv = frogger_file("cpp_generation/model_input.csv")) {
 
   template <- readLines(frogger_file("cpp_generation/model_input.hpp.in"))
-  input_file <- "model_input.csv"
-  inputs <- utils::read.csv(frogger_file("cpp_generation", input_file),
-                            colClasses = "character")
+  input_file <- basename(input_csv)
+  inputs <- utils::read.csv(input_csv, colClasses = "character")
 
   validate_dimensions_columns(colnames(inputs), input_file)
 
@@ -142,6 +143,9 @@ validate_and_parse_output <- function(output, filename, row_num) {
 
 generate_input_from_r <- function(input) {
   dimensions <- paste(input$parsed_dims, collapse = ", ")
+  if (input$dims == 1 && dimensions[1] == 1) {
+    return(generate_length1_input(input))
+  }
   lhs <- sprintf("  const leapfrog::TensorMap%s<%s> %s",
                  input$dims, input$type, input$cpp_name)
   rhs <- sprintf("parse_data<%s>(data, \"%s\", %s)",
@@ -150,6 +154,11 @@ generate_input_from_r <- function(input) {
     rhs <- sprintf("convert_base<%s>(%s)", input$dims, rhs)
   }
   paste0(lhs, " = ", rhs, ";")
+}
+
+generate_length1_input <- function(input) {
+  sprintf("  const %s %s = Rcpp::as<%s>(data[\"%s\"])",
+          input$type, input$cpp_name, input$type, input$r_name)
 }
 
 generate_input_from_value <- function(input) {
