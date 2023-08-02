@@ -45,7 +45,7 @@ void run_age_15_entrants(int time_step,
   for (int g = 0; g < ss.NS; ++g) {
     for (int hm = 0; hm < ss.hDS; ++hm) {
       for (int htm = 0; htm < ss.hTM; ++htm) {
-        intermediate.age15_hiv_pop(hm, g) += state_curr.hc2_hiv_pop(hm, htm, ss.hc2_age_groups, g);
+        intermediate.age15_hiv_pop(hm, g) += state_curr.hc2_hiv_pop(hm, htm, ss.hc2AG, g);
       }
     }
   }

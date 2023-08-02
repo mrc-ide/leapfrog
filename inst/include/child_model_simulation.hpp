@@ -79,7 +79,7 @@ void run_child_hiv_infections(int time_step,
       if (cpars.hc_nosocomial(time_step) > 0) {
         // Divide by 10 because we want to evenly distribute over 2 genders and 5 age groups
         state_next.p_infections(af, g) = cpars.hc_nosocomial(time_step) / (5.0 * ss.NS);
-        state_next.hiv_population(af, g) += state_next.p_infections(af, g);
+        state_next.p_hiv_pop(af, g) += state_next.p_infections(af, g);
 
         for (int hm = 0; hm < ss.hc1DS; ++hm) {
           // putting them all in perinatal hTM to match spec nosocomial

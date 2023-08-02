@@ -24,9 +24,9 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
   constexpr int hTS = ss.hTS;
   constexpr int hc1DS = ss.hc1DS;
   constexpr int hc2DS = ss.hc2DS;
-  constexpr int hTM = ss.hTM;
   constexpr int hc1AG = ss.hc1AG;
   constexpr int hc2AG = ss.hc2AG;
+  constexpr int hTM = ss.hTM;
 
   const leapfrog::TensorMap2<real_type> base_pop = parse_data<real_type>(data, "basepop", pAG, NS);
   const leapfrog::TensorMap3<real_type> survival_probability = parse_data<real_type>(data, "Sx", pAG + 1, NS, proj_years);
@@ -52,7 +52,7 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
   const leapfrog::TensorMap3<real_type> hc2_cd4_mort = parse_data<real_type>(data, "adol_cd4_mort", hc2DS, hTM, hc2AG);
   const leapfrog::TensorMap1<real_type> hc1_cd4_prog = parse_data<real_type>(data, "paed_cd4_prog", hc1DS);
   const leapfrog::TensorMap1<real_type> hc2_cd4_prog = parse_data<real_type>(data, "adol_cd4_prog", hc2DS);
-  const leapfrog::TensorMap1<real_type> ctx_effect = parse_data<real_type>(data, "ctx_effect", 1);
+  const real_type ctx_effect = Rcpp::as<real_type>(data["ctx_effect"]);
   const leapfrog::TensorMap1<real_type> ctx_val = parse_data<real_type>(data, "ctx_val", proj_years);
   leapfrog::Tensor1<real_type> h_art_stage_dur(hTS - 1);
   h_art_stage_dur.setConstant(0.5);

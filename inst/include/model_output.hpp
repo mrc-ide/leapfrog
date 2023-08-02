@@ -22,9 +22,9 @@ Rcpp::List build_r_output(const typename leapfrog::StateSaver<S, real_type>::Out
   constexpr int hTS = ss.hTS;
   constexpr int hc1DS = ss.hc1DS;
   constexpr int hc2DS = ss.hc2DS;
-  constexpr int hTM = ss.hTM;
   constexpr int hc1AG = ss.hc1AG;
   constexpr int hc2AG = ss.hc2AG;
+  constexpr int hTM = ss.hTM;
 
   Rcpp::NumericVector r_p_total_pop(pAG * NS * output_years);
   Rcpp::NumericVector r_births(output_years);
