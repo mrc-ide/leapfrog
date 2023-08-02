@@ -90,7 +90,13 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
   const leapfrog::Children<real_type> children = {
       hc_nosocomial,
       hc1_cd4_dist,
-      hc_cd4_transition
+      hc_cd4_transition,
+      hc1_cd4_mort,
+      hc2_cd4_mort,
+      hc1_cd4_prog,
+      hc2_cd4_prog,
+      ctx_effect,
+      ctx_val
   };
 
   const leapfrog::Parameters<real_type> params = {options,
