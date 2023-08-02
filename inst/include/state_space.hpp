@@ -33,16 +33,16 @@ struct StateSpace;
 
 template<>
 struct StateSpace<coarse> {
-  static constexpr int num_genders = 2;
-  static constexpr int age_groups_pop = 81;
-  static constexpr int age_groups_hiv = 9;
-  static constexpr int disease_stages = 7;
-  static constexpr int treatment_stages = 3;
-  static constexpr std::array<int, 9> hiv_age_groups_span{2, 3, 5, 5, 5, 5, 5, 5, 31};
+  static constexpr int NS = 2;
+  static constexpr int pAG = 81;
+  static constexpr int hAG = 9;
+  static constexpr int hDS = 7;
+  static constexpr int hTS = 3;
+  static constexpr std::array<int, 9> hAG_span{2, 3, 5, 5, 5, 5, 5, 5, 31};
   // Number of disease stages within the 1st child age category (0 - 4)
-  static constexpr int hC1_disease_stages = 6;
+  static constexpr int hc1DS = 6;
   // Number of disease stages within the 2nd child age category (5 - 14)
-  static constexpr int hC2_disease_stages = 7;
+  static constexpr int hc2DS = 7;
   // Number of transmission types
   static constexpr int hTM = 4;
   // Number of PMTCT types
@@ -53,16 +53,16 @@ struct StateSpace<coarse> {
 
 template<>
 struct StateSpace<full> {
-  static constexpr int num_genders = 2;
-  static constexpr int age_groups_pop = 81;
-  static constexpr int age_groups_hiv = 66;
-  static constexpr int disease_stages = 7;
-  static constexpr int treatment_stages = 3;
-  static constexpr std::array<int, 66> hiv_age_groups_span = create_array<int, 66>(1);
+  static constexpr int NS = 2;
+  static constexpr int pAG = 81;
+  static constexpr int hAG = 66;
+  static constexpr int hDS = 7;
+  static constexpr int hTS = 3;
+  static constexpr std::array<int, 66> hAG_span = create_array<int, 66>(1);
   // Number of disease stages within the 1st child age category (0 - 4)
-  static constexpr int hC1_disease_stages = 6;
+  static constexpr int hc1DS = 6;
   // Number of disease stages within the 2nd child age category (5 - 14)
-  static constexpr int hC2_disease_stages = 7;
+  static constexpr int hc2DS = 7;
   // Number of transmission types
   static constexpr int hTM = 4;
   // Number of PMTCT types

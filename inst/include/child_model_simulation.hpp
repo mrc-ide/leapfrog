@@ -15,18 +15,18 @@ void run_hiv_child_infections(int time_step,
   constexpr auto ss = StateSpace<S>();
   const auto children = pars.children;
 
-  for (int g = 0; g < ss.num_genders; ++g) {
+  for (int g = 0; g < ss.NS; ++g) {
     // Run only first 5 age groups in total population 0, 1, 2, 3, 4
     for (int af = 0; af < 5; ++af) {
       if (children.hc_nosocomial(time_step) > 0) {
         // Divide by 10 because we want to evenly distribute over 2 genders and 5 age groups
-        state_next.infections(af, g) = children.hc_nosocomial(time_step) / (5 * ss.num_genders);
-        state_next.hiv_population(af, g) += state_next.infections(af, g);
+        state_next.p_infections(af, g) = children.hc_nosocomial(time_step) / (5 * ss.NS);
+        state_next.p_hiv_pop(af, g) += state_next.p_infections(af, g);
 
-        for (int hm = 0; hm < ss.disease_stages; ++hm) {
+        for (int hm = 0; hm < ss.hDS; ++hm) {
           // putting them all in perinatal hTM to match spec nosocomial
           if (children.hc1_cd4_dist(hm) > 0) {
-            state_next.hc_hiv_pop(hm, 0, af, g) += state_next.infections(af, g) * children.hc1_cd4_dist(hm);
+            state_next.hc_hiv_pop(hm, 0, af, g) += state_next.p_infections(af, g) * children.hc1_cd4_dist(hm);
           }
         }
       }
