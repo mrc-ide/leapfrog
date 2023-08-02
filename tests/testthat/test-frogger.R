@@ -7,41 +7,42 @@ test_that("initial state set up works as expected", {
   expect_setequal(
     names(out),
     c(
-      "total_population", "births", "natural_deaths", "hiv_population",
-      "hiv_natural_deaths", "hiv_strat_adult", "art_strat_adult",
-      "aids_deaths_no_art", "infections", "aids_deaths_art", "art_initiation",
-      "hiv_deaths", "hc_hiv_pop"
+      "p_total_pop", "births", "p_total_pop_natural_deaths", "p_hiv_pop",
+      "p_hiv_pop_natural_deaths", "h_hiv_adult", "h_art_adult",
+      "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art", "h_art_initiation",
+      "p_hiv_deaths", "hc1_hiv_pop", "hc2_hiv_pop"
     )
   )
-  expect_equal(dim(out$total_population), c(81, 2, 1))
-  expect_equal(out$total_population[, , 1], demp$basepop[, , 1], ignore_attr = TRUE)
+  expect_equal(dim(out$p_total_pop), c(81, 2, 1))
+  expect_equal(out$p_total_pop[, , 1], demp$basepop[, , 1],
+               ignore_attr = TRUE)
 
   expect_equal(out$births[1], 0)
-  expect_equal(out$natural_deaths, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
-  expect_equal(out$hiv_population, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
-  expect_equal(out$hiv_natural_deaths, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
+  expect_equal(out$p_total_pop_natural_deaths, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
+  expect_equal(out$p_hiv_pop, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
+  expect_equal(out$p_hiv_pop_natural_deaths, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
   expect_equal(
-    out$hiv_strat_adult,
+    out$h_hiv_adult,
     array(rep(0, 7 * 66 * 2), dim = c(7, 66, 2, 1))
   )
   expect_equal(
-    out$art_strat_adult,
+    out$h_art_adult,
     array(rep(0, 3 * 7 * 66 * 2), dim = c(3, 7, 66, 2, 1))
   )
   expect_equal(
-    out$aids_deaths_no_art,
+    out$h_hiv_deaths_no_art,
     array(rep(0, 7 * 66 * 2), dim = c(7, 66, 2, 1))
   )
-  expect_equal(out$infections, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
+  expect_equal(out$p_infections, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
   expect_equal(
-    out$aids_deaths_art,
+    out$h_hiv_deaths_art,
     array(rep(0, 3 * 7 * 66 * 2), dim = c(3, 7, 66, 2, 1))
   )
   expect_equal(
-    out$art_initiation,
+    out$h_art_initiation,
     array(rep(0, 7 * 66 * 2), dim = c(7, 66, 2, 1))
   )
-  expect_equal(out$hiv_deaths, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
+  expect_equal(out$p_hiv_deaths, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
 })
 
 test_that("initial state set up with coarse stratified HIV works as expected", {
@@ -55,41 +56,41 @@ test_that("initial state set up with coarse stratified HIV works as expected", {
   expect_setequal(
     names(out),
     c(
-      "total_population", "births", "natural_deaths", "hiv_population",
-      "hiv_natural_deaths", "hiv_strat_adult", "art_strat_adult",
-      "aids_deaths_no_art", "infections", "aids_deaths_art", "art_initiation",
-      "hiv_deaths", "hc_hiv_pop"
+      "p_total_pop", "births", "p_total_pop_natural_deaths", "p_hiv_pop",
+      "p_hiv_pop_natural_deaths", "h_hiv_adult", "h_art_adult",
+      "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art", "h_art_initiation",
+      "p_hiv_deaths", "hc1_hiv_pop", "hc2_hiv_pop"
     )
   )
-  expect_equal(dim(out$total_population), c(81, 2, 1))
-  expect_equal(out$total_population[, , 1], demp$basepop[, , 1], ignore_attr = TRUE)
+  expect_equal(dim(out$p_total_pop), c(81, 2, 1))
+  expect_equal(out$p_total_pop[, , 1], demp$basepop[, , 1], ignore_attr = TRUE)
 
   expect_equal(out$births[1], 0)
-  expect_equal(out$natural_deaths, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
-  expect_equal(out$hiv_population, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
-  expect_equal(out$hiv_natural_deaths, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
+  expect_equal(out$p_total_pop_natural_deaths, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
+  expect_equal(out$p_hiv_pop, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
+  expect_equal(out$p_hiv_pop_natural_deaths, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
   expect_equal(
-    out$hiv_strat_adult,
+    out$h_hiv_adult,
     array(rep(0, 7 * 9 * 2), dim = c(7, 9, 2, 1))
   )
   expect_equal(
-    out$art_strat_adult,
+    out$h_art_adult,
     array(rep(0, 3 * 7 * 9 * 2), dim = c(3, 7, 9, 2, 1))
   )
   expect_equal(
-    out$aids_deaths_no_art,
+    out$h_hiv_deaths_no_art,
     array(rep(0, 7 * 9 * 2), dim = c(7, 9, 2, 1))
   )
-  expect_equal(out$infections, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
+  expect_equal(out$p_infections, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
   expect_equal(
-    out$aids_deaths_art,
+    out$h_hiv_deaths_art,
     array(rep(0, 3 * 7 * 9 * 2), dim = c(3, 7, 9, 2, 1))
   )
   expect_equal(
-    out$art_initiation,
+    out$h_art_initiation,
     array(rep(0, 7 * 9 * 2), dim = c(7, 9, 2, 1))
   )
-  expect_equal(out$hiv_deaths, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
+  expect_equal(out$p_hiv_deaths, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
 })
 
 test_that("model for 1 time step has looped", {
@@ -102,27 +103,27 @@ test_that("model for 1 time step has looped", {
   expect_setequal(
     names(out),
     c(
-      "total_population", "births", "natural_deaths", "hiv_population",
-      "hiv_natural_deaths", "hiv_strat_adult", "art_strat_adult",
-      "aids_deaths_no_art", "infections", "aids_deaths_art", "art_initiation",
-      "hiv_deaths", "hc_hiv_pop"
+      "p_total_pop", "births", "p_total_pop_natural_deaths", "p_hiv_pop",
+      "p_hiv_pop_natural_deaths", "h_hiv_adult", "h_art_adult",
+      "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art", "h_art_initiation",
+      "p_hiv_deaths", "hc1_hiv_pop", "hc2_hiv_pop"
     )
   )
-  expect_equal(dim(out$total_population), c(81, 2, 1))
-  expect_true(all(out$total_population > 100))
+  expect_equal(dim(out$p_total_pop), c(81, 2, 1))
+  expect_true(all(out$p_total_pop > 100))
   expect_true(out$births > 0) ## a simulation has been run this is not still 0
-  expect_equal(dim(out$natural_deaths), c(81, 2, 1))
-  expect_true(all(out$natural_deaths > 0))
-  ## These are going to stay 0 as no infections after just 1 year has been run
-  expect_true(all(out$hiv_population == 0))
-  expect_true(all(out$hiv_natural_deaths == 0))
-  expect_true(all(out$hiv_strat_adult == 0))
-  expect_true(all(out$art_strat_adult == 0))
-  expect_true(all(out$aids_deaths_no_art == 0))
-  expect_true(all(out$infections == 0))
-  expect_true(all(out$aids_deaths_art == 0))
-  expect_true(all(out$art_initiation == 0))
-  expect_true(all(out$hiv_deaths == 0))
+  expect_equal(dim(out$p_total_pop_natural_deaths), c(81, 2, 1))
+  expect_true(all(out$p_total_pop_natural_deaths > 0))
+  ## These are going to stay 0 as no p_infections after just 1 year has been run
+  expect_true(all(out$p_hiv_pop == 0))
+  expect_true(all(out$p_hiv_pop_natural_deaths == 0))
+  expect_true(all(out$h_hiv_adult == 0))
+  expect_true(all(out$h_art_adult == 0))
+  expect_true(all(out$h_hiv_deaths_no_art == 0))
+  expect_true(all(out$p_infections == 0))
+  expect_true(all(out$h_hiv_deaths_art == 0))
+  expect_true(all(out$h_art_initiation == 0))
+  expect_true(all(out$p_hiv_deaths == 0))
 })
 
 test_that("model can be run for all years", {
@@ -133,36 +134,36 @@ test_that("model can be run for all years", {
                    run_child_model = FALSE)
 
   ## No HIV population < age 15
-  expect_true(all(out$hiv_population[1:15, , ] < 1e-20))
-  expect_true(all(out$hiv_population[1:15, , ] > -1e-20))
-  expect_true(all(out$hiv_natural_deaths[1:16, , ] == 0))
-  expect_true(all(out$infections[1:15, , ] == 0))
+  expect_true(all(out$p_hiv_pop[1:15, , ] < 1e-20))
+  expect_true(all(out$p_hiv_pop[1:15, , ] > -1e-20))
+  expect_true(all(out$p_hiv_pop_natural_deaths[1:16, , ] == 0))
+  expect_true(all(out$p_infections[1:15, , ] == 0))
 
   ## There is HIV population after age 15
-  expect_true(all(out$hiv_population[16:nrow(out$hiv_population), , 61] > 0))
+  expect_true(all(out$p_hiv_pop[16:nrow(out$p_hiv_pop), , 61] > 0))
   ## Natural deaths start at index 17 as no deaths in first HIV population projection as they are calculated from
   ## the no of HIV +ve in previous year - is this right?
-  expect_true(all(out$hiv_natural_deaths[17:nrow(out$hiv_population), , 61] != 0))
-  ## Some of older ages can be 0 infections, so check the middle chunk
-  expect_true(all(out$infections[16:70, , 61] > 0))
+  expect_true(all(out$p_hiv_pop_natural_deaths[17:nrow(out$p_hiv_pop), , 61] != 0))
+  ## Some of older ages can be 0 p_infections, so check the middle chunk
+  expect_true(all(out$p_infections[16:70, , 61] > 0))
 
-  expect_true(all(out$hiv_strat_adult[, , , 61] != 0))
-  expect_true(all(out$art_strat_adult[, , , , 61] != 0))
-  expect_true(all(out$art_initiation[, , , 61] != 0))
+  expect_true(all(out$h_hiv_adult[, , , 61] != 0))
+  expect_true(all(out$h_art_adult[, , , , 61] != 0))
+  expect_true(all(out$h_art_initiation[, , , 61] != 0))
 
   ## Outputs cannot be negative
-  expect_true(all(out$total_population >= 0))
+  expect_true(all(out$p_total_pop >= 0))
   expect_true(all(out$births >= 0))
-  expect_true(all(out$natural_deaths >= 0))
-  expect_true(all(out$hiv_population >= 0))
-  expect_true(all(out$hiv_natural_deaths >= 0))
-  expect_true(all(out$hiv_strat_adult >= 0))
-  expect_true(all(out$art_strat_adult >= 0))
-  expect_true(all(out$aids_deaths_no_art >= 0))
-  expect_true(all(out$infections >= 0))
-  expect_true(all(out$art_initiation >= 0))
-  expect_true(all(out$infections >= 0))
-  expect_true(all(out$infections >= 0))
+  expect_true(all(out$p_total_pop_natural_deaths >= 0))
+  expect_true(all(out$p_hiv_pop >= 0))
+  expect_true(all(out$p_hiv_pop_natural_deaths >= 0))
+  expect_true(all(out$h_hiv_adult >= 0))
+  expect_true(all(out$h_art_adult >= 0))
+  expect_true(all(out$h_hiv_deaths_no_art >= 0))
+  expect_true(all(out$p_infections >= 0))
+  expect_true(all(out$h_art_initiation >= 0))
+  expect_true(all(out$p_infections >= 0))
+  expect_true(all(out$p_infections >= 0))
 })
 
 test_that("model can be run with ART initiation", {

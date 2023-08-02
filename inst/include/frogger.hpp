@@ -15,22 +15,22 @@ template<HivAgeStratification S, typename real_type>
 void initialise_model_state(const Parameters<real_type> &pars,
                             State<S, real_type> &state) {
   constexpr auto ss = StateSpace<S>();
-  for (int g = 0; g < ss.num_genders; ++g) {
-    for (int a = 0; a < ss.age_groups_pop; ++a) {
-      state.total_population(a, g) = pars.demography.base_pop(a, g);
+  for (int g = 0; g < ss.NS; ++g) {
+    for (int a = 0; a < ss.pAG; ++a) {
+      state.p_total_pop(a, g) = pars.demography.base_pop(a, g);
     }
   }
-  state.natural_deaths.setZero();
-  state.hiv_population.setZero();
-  state.hiv_natural_deaths.setZero();
-  state.hiv_strat_adult.setZero();
-  state.art_strat_adult.setZero();
+  state.p_total_pop_natural_deaths.setZero();
+  state.p_hiv_pop.setZero();
+  state.p_hiv_pop_natural_deaths.setZero();
+  state.h_hiv_adult.setZero();
+  state.h_art_adult.setZero();
   state.births = 0;
-  state.aids_deaths_no_art.setZero();
-  state.infections.setZero();
-  state.aids_deaths_art.setZero();
-  state.art_initiation.setZero();
-  state.hiv_deaths.setZero();
+  state.h_hiv_deaths_no_art.setZero();
+  state.p_infections.setZero();
+  state.h_hiv_deaths_art.setZero();
+  state.h_art_initiation.setZero();
+  state.p_hiv_deaths.setZero();
   state.hc1_hiv_pop.setZero();
   state.hc2_hiv_pop.setZero();
   state.hc1_art_pop.setZero();
@@ -51,7 +51,7 @@ typename StateSaver<S, real_type>::OutputState run_model(int time_steps,
 
   internal::initialise_model_state<S>(pars, state);
   auto state_next = state;
-  internal::IntermediateData<S, real_type> intermediate(pars.options.age_groups_hiv_15plus);
+  internal::IntermediateData<S, real_type> intermediate(pars.options.hAG_15plus);
 
   intermediate.reset();
 

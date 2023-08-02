@@ -1,0 +1,28 @@
+#!/usr/bin/env Rscript
+
+root_dir <- here::here()
+
+demp <- readRDS(testthat::test_path("testdata/demographic_projection_object_adult.rds"))
+parameters <- readRDS(testthat::test_path("testdata/projection_parameters_adult.rds"))
+
+frogger:::serialize_r_to_tensor(demp$basepop[, , 1], "inst/fit_model/data/basepop")
+frogger:::serialize_r_to_tensor(demp$Sx, "inst/fit_model/data/survival")
+frogger:::serialize_r_to_tensor(demp$netmigr, "inst/fit_model/data/net_migration")
+frogger:::serialize_r_to_tensor(demp$asfr, "inst/fit_model/data/age_sex_fertility_ratio")
+frogger:::serialize_r_to_tensor(demp$births_sex_prop, "inst/fit_model/data/births_sex_prop")
+frogger:::serialize_r_to_tensor(parameters$incidinput, "inst/fit_model/data/incidence_rate")
+frogger:::serialize_r_to_tensor(parameters$incrr_age, "inst/fit_model/data/incidence_rate_relative_risk_age")
+frogger:::serialize_r_to_tensor(parameters$incrr_sex, "inst/fit_model/data/incidence_rate_relative_risk_sex")
+frogger:::serialize_r_to_tensor(parameters$cd4_mort_full, "inst/fit_model/data/cd4_mortality_full")
+frogger:::serialize_r_to_tensor(parameters$cd4_prog_full, "inst/fit_model/data/cd4_progression_full")
+frogger:::serialize_r_to_tensor(parameters$cd4_initdist_full, "inst/fit_model/data/cd4_initdist_full")
+frogger:::serialize_r_to_tensor(parameters$art_mort_full, "inst/fit_model/data/art_mortality_full")
+frogger:::serialize_r_to_tensor(parameters$artmx_timerr, "inst/fit_model/data/artmx_timerr")
+frogger:::serialize_r_to_tensor(parameters$art_dropout, "inst/fit_model/data/art_dropout")
+frogger:::serialize_r_to_tensor(parameters$art15plus_num, "inst/fit_model/data/art15plus_num")
+frogger:::serialize_r_to_tensor(parameters$art15plus_isperc, "inst/fit_model/data/art15plus_isperc")
+frogger:::serialize_r_to_tensor(parameters$artcd4elig_idx, "inst/fit_model/data/artcd4elig_idx")
+
+frogger:::serialize_r_to_tensor(parameters$paed_incid_input, "inst/fit_model/data/paed_incid_input")
+frogger:::serialize_r_to_tensor(parameters$paed_cd4_dist, "inst/fit_model/data/paed_cd4_dist")
+frogger:::serialize_r_to_tensor(parameters$paed_cd4_transition, "inst/fit_model/data/paed_cd4_transition")

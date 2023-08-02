@@ -8,9 +8,10 @@ run_model(
   data,
   parameters,
   sim_years,
-  hiv_steps_per_year,
+  hts_per_year,
   output_steps,
-  hiv_age_stratification = "full"
+  hiv_age_stratification = "full",
+  run_child_model = TRUE
 )
 }
 \arguments{
@@ -20,12 +21,14 @@ run_model(
 
 \item{sim_years}{Simulation years to run model for}
 
-\item{hiv_steps_per_year}{Number of HIV time steps per year}
+\item{hts_per_year}{Number of HIV time steps per year}
 
 \item{output_steps}{Which sim years to output for}
 
 \item{hiv_age_stratification}{The age stratification for HIV population,
 "coarse" or "full"}
+
+\item{run_child_model}{If TRUE then run the child model}
 }
 \value{
 List of model outputs
