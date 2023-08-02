@@ -58,7 +58,15 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
       hc1_cd4_prog,
       hc2_cd4_prog,
       ctx_effect,
-      ctx_val
+      ctx_val,
+      hc_art_elig_age,
+      hc_art_elig_cd4,
+      hc_art_mort_rr,
+      hc1_art_mort,
+      hc2_art_mort,
+      hc_art_isperc,
+      hc_art_val,
+      hc_art_init_dist
   };
 
   const leapfrog::Parameters<real_type> params = {options,

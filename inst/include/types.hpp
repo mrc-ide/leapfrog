@@ -206,11 +206,11 @@ struct State {
   TensorFixedSize <real_type, Sizes<hTS<S>, hc2DS<S>, hc2AG<S>, NS<S>>> hc2_art_pop;
 
 
-  TensorFixedSize <real_type, Sizes<treatment_stages<S>, hc1_disease_stages<S>, hc1_age_groups<S>, num_genders<S>>> hc1_art_aids_deaths;
-  TensorFixedSize <real_type, Sizes<treatment_stages<S>, hc2_disease_stages<S>, hc2_age_groups<S>, num_genders<S>>> hc2_art_aids_deaths;
+  TensorFixedSize <real_type, Sizes<hTS<S>, hc1DS<S>, hc1AG<S>, NS<S>>> hc1_art_aids_deaths;
+  TensorFixedSize <real_type, Sizes<hTS<S>, hc2DS<S>, hc2AG<S>, NS<S>>> hc2_art_aids_deaths;
 
-  TensorFixedSize <real_type, Sizes<hc1_disease_stages<S>, hTM<S>, hc1_age_groups<S>, num_genders<S>>> hc1_noart_aids_deaths;
-  TensorFixedSize <real_type, Sizes<hc2_disease_stages<S>, hTM<S>, hc2_age_groups<S>, num_genders<S>>> hc2_noart_aids_deaths;
+  TensorFixedSize <real_type, Sizes<hc1DS<S>, hcTT<S>, hc1AG<S>, NS<S>>> hc1_noart_aids_deaths;
+  TensorFixedSize <real_type, Sizes<hc2DS<S>, hcTT<S>, hc2AG<S>, NS<S>>> hc2_noart_aids_deaths;
 
   State() {}
 

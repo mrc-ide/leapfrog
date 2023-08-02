@@ -21,11 +21,11 @@ void run_child_ageing(int time_step,
     for (int a = 1; a < ss.hc2_agestart; ++a) {
       for (int hd = 0; hd < ss.hc1DS; ++hd) {
         for (int cat = 0 ; cat < ss.hcTT; ++cat) {
-          state_next.hc1_hiv_pop(hd, cat, a, s) += state_curr.hc1_hiv_pop(hd, cat, a-1, s) * demog.survival_probability(a, g, time_step);
+          state_next.hc1_hiv_pop(hd, cat, a, s) += state_curr.hc1_hiv_pop(hd, cat, a-1, s) * demog.survival_probability(a, s, time_step);
 
         }
         for (int dur = 0; dur < ss.hTS; ++dur) {
-          state_next.hc1_art_pop(dur, hd, a, s) += state_curr.hc1_art_pop(dur, hd, a-1, s) * demog.survival_probability(a, g, time_step);
+          state_next.hc1_art_pop(dur, hd, a, s) += state_curr.hc1_art_pop(dur, hd, a-1, s) * demog.survival_probability(a, s, time_step);
         }
 
       }
@@ -36,10 +36,10 @@ void run_child_ageing(int time_step,
     for (int hd = 0; hd < ss.hc1DS; ++hd) {
       for (int hd_alt = 0; hd_alt < ss.hc2DS; ++hd_alt) {
         for (int cat = 0 ; cat < ss.hcTT; ++cat) {
-          state_next.hc2_hiv_pop(hd_alt, cat, 0, s) +=  state_curr.hc1_hiv_pop(hd, cat, ss.hc1_ageend, s) * demog.survival_probability(ss.hc2_agestart, g, time_step) * cpars.hc_cd4_transition(hd_alt, hd);
+          state_next.hc2_hiv_pop(hd_alt, cat, 0, s) +=  state_curr.hc1_hiv_pop(hd, cat, ss.hc1_ageend, s) * demog.survival_probability(ss.hc2_agestart, s, time_step) * cpars.hc_cd4_transition(hd_alt, hd);
         }
         for (int dur = 0; dur < ss.hTS; ++dur) {
-          state_next.hc2_art_pop(dur, hd_alt, 0, s) += state_curr.hc1_art_pop(dur, hd, ss.hc1_ageend, s) * demog.survival_probability(ss.hc2_agestart, g, time_step) * cpars.hc_cd4_transition(hd_alt, hd);
+          state_next.hc2_art_pop(dur, hd_alt, 0, s) += state_curr.hc1_art_pop(dur, hd, ss.hc1_ageend, s) * demog.survival_probability(ss.hc2_agestart, s, time_step) * cpars.hc_cd4_transition(hd_alt, hd);
         }
       }
     }
@@ -49,11 +49,11 @@ void run_child_ageing(int time_step,
     for (int a = (ss.hc2_agestart + 1); a < pars.options.p_idx_fertility_first; ++a) {
       for (int hd = 0; hd < ss.hc2DS; ++hd) {
         for (int cat = 0 ; cat < ss.hcTT; ++cat) {
-          state_next.hc2_hiv_pop(hd, cat, a - ss.hc2_agestart, s) += state_curr.hc2_hiv_pop(hd, cat, a- ss.hc2_agestart-1, s) * demog.survival_probability(a, g, time_step);
+          state_next.hc2_hiv_pop(hd, cat, a - ss.hc2_agestart, s) += state_curr.hc2_hiv_pop(hd, cat, a- ss.hc2_agestart-1, s) * demog.survival_probability(a, s, time_step);
 
         }
         for (int dur = 0; dur < ss.hTS; ++dur) {
-          state_next.hc2_art_pop(dur, hd, a - ss.hc2_agestart, s) += state_curr.hc2_art_pop(dur, hd, a- ss.hc2_agestart-1, s) * demog.survival_probability(a, g, time_step);
+          state_next.hc2_art_pop(dur, hd, a - ss.hc2_agestart, s) += state_curr.hc2_art_pop(dur, hd, a- ss.hc2_agestart-1, s) * demog.survival_probability(a, s, time_step);
         }
 
       }
@@ -107,7 +107,7 @@ void run_child_natural_history(int time_step,
      for (int a = 0; a < ss.hc2_agestart; ++a) {
        for (int cat = 0; cat < ss.hcTT; ++cat) {
          intermediate.hc_posthivmort(hd, cat, a, s) += state_next.hc1_hiv_pop(hd, cat, a, s) - (1.0 - cpars.ctx_effect * cpars.ctx_val(time_step)) * state_curr.hc1_hiv_pop(hd, cat, a, s) * cpars.hc1_cd4_mort(hd, cat, a);
-          state_next.aidsdeaths_noart_paed(hd, cat, a, s) += (1 - cpars.ctx_effect * cpars.ctx_val(t)) * state_curr.hc_hiv_pop(hd, cat, a, s) * cpars.hc1_cd4_mort(hd, cat, a)  ;
+          state_next.hc1_noart_aids_deaths(hd, cat, a, s) += (1 - cpars.ctx_effect * cpars.ctx_val(time_step)) * state_curr.hc1_hiv_pop(hd, cat, a, s) * cpars.hc1_cd4_mort(hd, cat, a)  ;
        }
      }
    }
@@ -119,7 +119,7 @@ void run_child_natural_history(int time_step,
      for (int a = ss.hc2_agestart; a < pars.options.p_idx_fertility_first; ++a) {
        for (int cat = 0; cat < ss.hcTT; ++cat) {
          intermediate.hc_posthivmort(hd, cat, a, s) += state_next.hc2_hiv_pop(hd, cat, a - ss.hc2_agestart, s) - (1 - cpars.ctx_effect * cpars.ctx_val(time_step)) * state_curr.hc2_hiv_pop(hd, cat, a - ss.hc2_agestart, s) * cpars.hc2_cd4_mort(hd, cat, a - ss.hc2_agestart);
-         state_next.aidsdeaths_noart_paed(hd, cat, a, s) +=  (1 - cpars.ctx_effect * cpars.ctx_val(t)) * state_curr.hc_hiv_pop(hd, cat, a, s) * cpars.hc2_cd4_mort(hd, cat, a - 5); // output hiv deaths, aggregated across transmission category
+         state_next.hc2_noart_aids_deaths(hd, cat, a, s) +=  (1 - cpars.ctx_effect * cpars.ctx_val(time_step)) * state_curr.hc2_hiv_pop(hd, cat, a, s) * cpars.hc2_cd4_mort(hd, cat, a - 5); // output hiv deaths, aggregated across transmission category
        }
      }
    }
@@ -213,158 +213,158 @@ void run_child_art_initiation(int time_step,
   const auto cpars = pars.children;
 
   //all children under a certain age eligible for ART
-  for(int g = 0; g < ss.num_genders; ++g)  {
-    for(int cat = 0; cat < ss.hTM; ++cat) {
-      for(int af = 0; af < pars.options.fertility_first_age_group; ++af) {
-        for(int hm = 0; hm < ss.hc1_disease_stages; ++hm) {
+  for(int s = 0; s <ss.NS; ++s)  {
+    for(int cat = 0; cat < ss.hcTT; ++cat) {
+      for(int a = 0; a < pars.options.fertility_first_age_group; ++a) {
+        for(int hd = 0; hd < ss.hc1DS; ++hd) {
 
-          if(af >  (cpars.hc_art_elig_cd4(af, time_step) - 2)){
-            if(af < ss.hc2_agestart){
-              intermediate.hc_art_need(hm, cat, af, g) += state_next.hc1_hiv_pop(hm, cat, af, g);
+          if(a >  (cpars.hc_art_elig_cd4(a, time_step) - 2)){
+            if(a < ss.hc2_agestart){
+              intermediate.hc_art_need(hd, cat, a, s) += state_next.hc1_hiv_pop(hd, cat, a, s);
             }else{
-              intermediate.hc_art_need(hm, cat, af, g) += state_next.hc2_hiv_pop(hm, cat, af - ss.hc2_agestart, g);
+              intermediate.hc_art_need(hd, cat, a, s) += state_next.hc2_hiv_pop(hd, cat, a - ss.hc2_agestart, s);
             }
             }
 
-            if(af >  cpars.hc_art_elig_age(time_step) & hm > (cpars.hc_art_elig_cd4(af, time_step) - 2)){
-              if(af < ss.hc2_agestart){
-                intermediate.hc_art_need(hm, cat, af, g) += state_next.hc1_hiv_pop(hm, cat, af, g);
+            if(a >  cpars.hc_art_elig_age(time_step) & hd > (cpars.hc_art_elig_cd4(a, time_step) - 2)){
+              if(a < ss.hc2_agestart){
+                intermediate.hc_art_need(hd, cat, a, s) += state_next.hc1_hiv_pop(hd, cat, a, s);
               }else{
-                intermediate.hc_art_need(hm, cat, af, g) += state_next.hc2_hiv_pop(hm, cat, af, g);
+                intermediate.hc_art_need(hd, cat, a, s) += state_next.hc2_hiv_pop(hd, cat, a, s);
               }
             }
 
-        } // end ss.hc1_disease_stages
-      } // end af
-    } // end hTM
-  } // end ss.num_genders
+        } // end ss.hc1DS
+      } // end a
+    } // end hcTT
+  } // end ss.NS
 
-  for(int g = 0; g < ss.num_genders; ++g) {
-    for(int af = 0; af < pars.options.fertility_first_age_group; ++af) {
-      for(int hm = 0; hm < ss.hc1_disease_stages; ++hm) {
-        for(int cat = 0; cat < ss.hTM; ++cat) {
-          intermediate.hc_art_num += intermediate.hc_art_need(hm, cat, af, g);
-        } // end hTM
-      } // end ss.hc1_disease_stages
-    } // end af
-  } // end ss.num_genders
+  for(int s = 0; s <ss.NS; ++s) {
+    for(int a = 0; a < pars.options.fertility_first_age_group; ++a) {
+      for(int hd = 0; hd < ss.hc1DS; ++hd) {
+        for(int cat = 0; cat < ss.hcTT; ++cat) {
+          intermediate.hc_art_num += intermediate.hc_art_need(hd, cat, a, s);
+        } // end hcTT
+      } // end ss.hc1DS
+    } // end a
+  } // end ss.NS
 
   //how many should initialize ART
-  for(int g = 0; g < ss.num_genders; ++g) {
-    for(int af = 0; af < pars.options.fertility_first_age_group; ++af) {
-      for(int hm = 0; hm < ss.hc1_disease_stages; ++hm) {
-        for(int cat = 0; cat < ss.hTM; ++cat) {
+  for(int s = 0; s <ss.NS; ++s) {
+    for(int a = 0; a < pars.options.fertility_first_age_group; ++a) {
+      for(int hd = 0; hd < ss.hc1DS; ++hd) {
+        for(int cat = 0; cat < ss.hcTT; ++cat) {
           if(cpars.hc_art_val(time_step) > 0){
-            intermediate.hc_art_init(hm, cat, af, g) += intermediate.hc_art_need(hm, cat, af, g);
+            intermediate.hc_art_init(hd, cat, a, s) += intermediate.hc_art_need(hd, cat, a, s);
             for(int dur = 0; dur < ss.treatment_stages; ++dur) {
-              if(intermediate.hc_art_init(hm, cat, af, g) < 0){
-                intermediate.hc_art_init(hm, cat, af, g) = 0.0;
+              if(intermediate.hc_art_init(hd, cat, a, s) < 0){
+                intermediate.hc_art_init(hd, cat, a, s) = 0.0;
               }else{
-                intermediate.hc_art_init(hm, cat, af, g) = intermediate.hc_art_init(hm, cat, af, g);
+                intermediate.hc_art_init(hd, cat, a, s) = intermediate.hc_art_init(hd, cat, a, s);
               }
             }// end ss.treatment_stages
           }
-        }// end hTM
-      }// end ss.hc1_disease_stages
-    }// end af
-  }// end ss.num_genders
+        }// end hcTT
+      }// end ss.hc1DS
+    }// end a
+  }// end ss.NS
 
 
-  for(int g = 0; g < ss.num_genders; ++g) {
-    for(int af = 0; af < pars.options.fertility_first_age_group; ++af) {
-      for(int hm = 0; hm < ss.hc1_disease_stages; ++hm) {
-        for(int cat = 0; cat < ss.hTM; ++cat) {
-          intermediate.hc_art_init_total += intermediate.hc_art_init(hm, cat, af, g);
-        }// end hTM
-      }// end ss.hc1_disease_stages
-    }// end af
-  }// end ss.num_genders
+  for(int s = 0; s <ss.NS; ++s) {
+    for(int a = 0; a < pars.options.fertility_first_age_group; ++a) {
+      for(int hd = 0; hd < ss.hc1DS; ++hd) {
+        for(int cat = 0; cat < ss.hcTT; ++cat) {
+          intermediate.hc_art_init_total += intermediate.hc_art_init(hd, cat, a, s);
+        }// end hcTT
+      }// end ss.hc1DS
+    }// end a
+  }// end ss.NS
 
   //!!! TODO: fix order of for loop
-  for(int g = 0; g < ss.num_genders; ++g) {
-    for(int hm = 0; hm < ss.hc1_disease_stages; ++hm) {
-      for(int af = 0; af < pars.options.fertility_first_age_group; ++af) {
-        if(af < ss.hc2_agestart){
-          intermediate.hc_death_rate =  cpars.hc_art_mort_rr(0, af, time_step) * 0.5 * (cpars.hc1_art_mort(hm, 0, af) + cpars.hc1_art_mort(hm, 1, af)) ;
-          state_next.hc1_art_aids_deaths(0,hm, af, g) =  intermediate.hc_death_rate * state_next.hc1_art_pop(0, hm, af, g)  ;
-          intermediate.hc_art_grad(0,hm, af, g) -= state_next.hc1_art_aids_deaths(0,hm, af, g) ;
-          state_next.hc1_art_pop(0, hm,  af, g) += intermediate.hc_art_grad(0, hm, af, g) ;
+  for(int s = 0; s <ss.NS; ++s) {
+    for(int hd = 0; hd < ss.hc1DS; ++hd) {
+      for(int a = 0; a < pars.options.fertility_first_age_group; ++a) {
+        if(a < ss.hc2_agestart){
+          intermediate.hc_death_rate =  cpars.hc_art_mort_rr(0, a, time_step) * 0.5 * (cpars.hc1_art_mort(hd, 0, a) + cpars.hc1_art_mort(hd, 1, a)) ;
+          state_next.hc1_art_aids_deaths(0,hd, a, s) =  intermediate.hc_death_rate * state_next.hc1_art_pop(0, hd, a, s)  ;
+          intermediate.hc_art_grad(0,hd, a, s) -= state_next.hc1_art_aids_deaths(0,hd, a, s) ;
+          state_next.hc1_art_pop(0, hd,  a, s) += intermediate.hc_art_grad(0, hd, a, s) ;
         }else{
-          if(hm < (ss.hc2_disease_stages - 1)){
-            intermediate.hc_death_rate =  cpars.hc_art_mort_rr(0, af, time_step) * 0.5 * (cpars.hc2_art_mort(hm, 0, af-ss.hc2_agestart) + cpars.hc2_art_mort(hm, 1, af-ss.hc2_agestart));
-            state_next.hc2_art_aids_deaths(0,hm, af-ss.hc2_agestart, g) =  intermediate.hc_death_rate * state_next.hc2_art_pop(0, hm, af-ss.hc2_agestart, g)  ;
-            intermediate.hc_art_grad(0, hm, af, g) -= state_next.hc2_art_aids_deaths(0,hm, af-ss.hc2_agestart, g) ;
-            state_next.hc2_art_pop(0, hm,  af-ss.hc2_agestart, g) += intermediate.hc_art_grad(0, hm, af, g) ;
+          if(hd < (ss.hc2DS - 1)){
+            intermediate.hc_death_rate =  cpars.hc_art_mort_rr(0, a, time_step) * 0.5 * (cpars.hc2_art_mort(hd, 0, a-ss.hc2_agestart) + cpars.hc2_art_mort(hd, 1, a-ss.hc2_agestart));
+            state_next.hc2_art_aids_deaths(0,hd, a-ss.hc2_agestart, s) =  intermediate.hc_death_rate * state_next.hc2_art_pop(0, hd, a-ss.hc2_agestart, s)  ;
+            intermediate.hc_art_grad(0, hd, a, s) -= state_next.hc2_art_aids_deaths(0,hd, a-ss.hc2_agestart, s) ;
+            state_next.hc2_art_pop(0, hd,  a-ss.hc2_agestart, s) += intermediate.hc_art_grad(0, hd, a, s) ;
           }
         }
-        intermediate.hc_art_grad(0, hm, af, g) = 0.0;
-      }// end af
-    }// end ss.hc1_disease_stages
-  }// end ss.num_genders
+        intermediate.hc_art_grad(0, hd, a, s) = 0.0;
+      }// end a
+    }// end ss.hc1DS
+  }// end ss.NS
 
 
-  for(int g = 0; g < ss.num_genders; ++g) {
-    for(int hm = 0; hm < ss.hc1_disease_stages; ++hm) {
-      for(int af = 0; af < pars.options.fertility_first_age_group; ++af) {
+  for(int s = 0; s <ss.NS; ++s) {
+    for(int hd = 0; hd < ss.hc1DS; ++hd) {
+      for(int a = 0; a < pars.options.fertility_first_age_group; ++a) {
         intermediate.hc_death_rate = 0;
-        if(af < ss.hc2_agestart){
-          intermediate.hc_death_rate = cpars.hc_art_mort_rr(2, af, time_step) * cpars.hc1_art_mort(hm, 2, af);
-          state_next.hc1_art_aids_deaths(2,hm, af, g) =  state_next.hc1_art_pop(2, hm, af, g) * intermediate.hc_death_rate;
-          intermediate.hc_art_grad(2,hm, af, g) -= state_next.hc1_art_aids_deaths(2,hm, af, g) ;
-          state_next.hc1_art_pop(2, hm,  af, g) += intermediate.hc_art_grad(2, hm, af, g) ;
+        if(a < ss.hc2_agestart){
+          intermediate.hc_death_rate = cpars.hc_art_mort_rr(2, a, time_step) * cpars.hc1_art_mort(hd, 2, a);
+          state_next.hc1_art_aids_deaths(2,hd, a, s) =  state_next.hc1_art_pop(2, hd, a, s) * intermediate.hc_death_rate;
+          intermediate.hc_art_grad(2,hd, a, s) -= state_next.hc1_art_aids_deaths(2,hd, a, s) ;
+          state_next.hc1_art_pop(2, hd,  a, s) += intermediate.hc_art_grad(2, hd, a, s) ;
         }else{
-          if(hm < (ss.hc2_disease_stages - 1)){
-            intermediate.hc_death_rate = cpars.hc_art_mort_rr(2, af, time_step) * cpars.hc2_art_mort(hm, 2, af-ss.hc2_agestart);
-            state_next.hc2_art_aids_deaths(2,hm, af-ss.hc2_agestart, g) =  state_next.hc2_art_pop(2, hm, af-ss.hc2_agestart, g) * intermediate.hc_death_rate;
-            intermediate.hc_art_grad(2,hm, af, g) -= state_next.hc2_art_aids_deaths(2,hm, af-ss.hc2_agestart, g) ;
-            state_next.hc2_art_pop(2, hm,  af-ss.hc2_agestart, g) += intermediate.hc_art_grad(2, hm, af, g) ;
+          if(hd < (ss.hc2DS - 1)){
+            intermediate.hc_death_rate = cpars.hc_art_mort_rr(2, a, time_step) * cpars.hc2_art_mort(hd, 2, a-ss.hc2_agestart);
+            state_next.hc2_art_aids_deaths(2,hd, a-ss.hc2_agestart, s) =  state_next.hc2_art_pop(2, hd, a-ss.hc2_agestart, s) * intermediate.hc_death_rate;
+            intermediate.hc_art_grad(2,hd, a, s) -= state_next.hc2_art_aids_deaths(2,hd, a-ss.hc2_agestart, s) ;
+            state_next.hc2_art_pop(2, hd,  a-ss.hc2_agestart, s) += intermediate.hc_art_grad(2, hd, a, s) ;
           }
         }
-      }// end af
-    }// end ss.hc1_disease_stages
-  }// end ss.num_genders
+      }// end a
+    }// end ss.hc1DS
+  }// end ss.NS
 
   //Progress ART to the correct time on ART
   //!!! TODO: fix order of for loop
-  for(int hm = 0; hm < ss.hc1_disease_stages; ++hm) {
-    for(int af = 0; af < pars.options.fertility_first_age_group; ++af) {
-      for(int g = 0; g < ss.num_genders; ++g) {
-        if(af < ss.hc2_agestart){
-          if(state_next.hc1_art_pop(0, hm, af, g) > 0){
-            state_next.hc1_art_pop(1, hm, af, g) += state_next.hc1_art_pop(0, hm, af, g);
-            state_next.hc1_art_pop(0, hm, af, g) -= state_next.hc1_art_pop(0, hm, af, g);
+  for(int hd = 0; hd < ss.hc1DS; ++hd) {
+    for(int a = 0; a < pars.options.fertility_first_age_group; ++a) {
+      for(int s = 0; s <ss.NS; ++s) {
+        if(a < ss.hc2_agestart){
+          if(state_next.hc1_art_pop(0, hd, a, s) > 0){
+            state_next.hc1_art_pop(1, hd, a, s) += state_next.hc1_art_pop(0, hd, a, s);
+            state_next.hc1_art_pop(0, hd, a, s) -= state_next.hc1_art_pop(0, hd, a, s);
           }
         }else{
-          if(state_next.hc2_art_pop(0, hm, af-ss.hc2_agestart, g) > 0){
-            if(hm < (ss.hc2_disease_stages - 1)){
-              state_next.hc2_art_pop(1, hm, af-ss.hc2_agestart, g) += state_next.hc2_art_pop(0, hm, af-ss.hc2_agestart, g);
-              state_next.hc2_art_pop(0, hm, af-ss.hc2_agestart, g) -= state_next.hc2_art_pop(0, hm, af-ss.hc2_agestart, g);
+          if(state_next.hc2_art_pop(0, hd, a-ss.hc2_agestart, s) > 0){
+            if(hd < (ss.hc2DS - 1)){
+              state_next.hc2_art_pop(1, hd, a-ss.hc2_agestart, s) += state_next.hc2_art_pop(0, hd, a-ss.hc2_agestart, s);
+              state_next.hc2_art_pop(0, hd, a-ss.hc2_agestart, s) -= state_next.hc2_art_pop(0, hd, a-ss.hc2_agestart, s);
             }
           }
         }
-      }//end ss.num_genders
-    }// end af
-  }// end ss.hc1_disease_stages
+      }//end ss.NS
+    }// end a
+  }// end ss.hc1DS
 
 
   if ( !cpars.hc_art_isperc(time_step) && !cpars.hc_art_isperc(time_step-1) ){ // both numbers
     //Remove how many that are already on ART
     intermediate.hc_art_num =  (cpars.hc_art_val(time_step) + cpars.hc_art_val(time_step-1)) / 2 ;
-    for(int g = 0; g < ss.num_genders; ++g) {
-      for(int af = 0; af < pars.options.fertility_first_age_group; ++af) {
-        for(int hm = 0; hm < ss.hc1_disease_stages; ++hm) {
+    for(int s = 0; s <ss.NS; ++s) {
+      for(int a = 0; a < pars.options.fertility_first_age_group; ++a) {
+        for(int hd = 0; hd < ss.hc1DS; ++hd) {
           for(int dur = 0; dur < ss.treatment_stages; ++dur) {
-            if(af < ss.hc2_agestart){
-              intermediate.hc_art_num -= state_next.hc1_art_pop(dur, hm, af, g)  ;
+            if(a < ss.hc2_agestart){
+              intermediate.hc_art_num -= state_next.hc1_art_pop(dur, hd, a, s)  ;
             }else{
-              if(hm < (ss.hc2_disease_stages - 1)){
-                intermediate.hc_art_num -= state_next.hc2_art_pop(dur, hm, af-ss.hc2_agestart, g)   ;
+              if(hd < (ss.hc2DS - 1)){
+                intermediate.hc_art_num -= state_next.hc2_art_pop(dur, hd, a-ss.hc2_agestart, s)   ;
               }
             }
           }// end ss.treatment_stages
-        }// end ss.hc1_disease_stages
-      }// end af
-    }// end ss.num_genders
+        }// end ss.hc1DS
+      }// end a
+    }// end ss.NS
 
     if(intermediate.hc_art_init_total < intermediate.hc_art_num){
       intermediate.hc_art_num = intermediate.hc_art_init_total;
@@ -374,44 +374,44 @@ void run_child_art_initiation(int time_step,
     }
 
   } else if (cpars.hc_art_isperc(time_step) && cpars.hc_art_isperc(time_step-1)){ // both percentages
-    for(int g = 0; g < ss.num_genders; ++g) {
-      for(int af = 0; af < pars.options.fertility_first_age_group; ++af) {
-        for(int hm = 0; hm < ss.hc1_disease_stages; ++hm) {
+    for(int s = 0; s <ss.NS; ++s) {
+      for(int a = 0; a < pars.options.fertility_first_age_group; ++a) {
+        for(int hd = 0; hd < ss.hc1DS; ++hd) {
           for(int dur = 0; dur < ss.treatment_stages; ++dur) {
-            if(af < ss.hc2_agestart){
-              intermediate.hc_art_num += state_next.hc1_art_pop(dur, hm, af, g)  ;
-              intermediate.hc_art_num += state_next.hc1_art_aids_deaths(dur,hm, af, g) ;
+            if(a < ss.hc2_agestart){
+              intermediate.hc_art_num += state_next.hc1_art_pop(dur, hd, a, s)  ;
+              intermediate.hc_art_num += state_next.hc1_art_aids_deaths(dur,hd, a, s) ;
 
             }else{
-              if(hm < (ss.hc2_disease_stages - 1)){
-                intermediate.hc_art_num += state_next.hc2_art_pop(dur, hm, af-ss.hc2_agestart, g)  ;
-                intermediate.hc_art_num += state_next.hc2_art_aids_deaths(dur,hm, af-ss.hc2_agestart, g) ;
+              if(hd < (ss.hc2DS - 1)){
+                intermediate.hc_art_num += state_next.hc2_art_pop(dur, hd, a-ss.hc2_agestart, s)  ;
+                intermediate.hc_art_num += state_next.hc2_art_aids_deaths(dur,hd, a-ss.hc2_agestart, s) ;
 
               }
             }
           } //end ss.treatment_stages
         } // end ss.hC1_disease_stages
-      } // end af
-    } // end ss.num_genders
+      } // end a
+    } // end ss.NS
 
     intermediate.hc_art_num =  intermediate.hc_art_num * (cpars.hc_art_val(time_step) + cpars.hc_art_val(time_step-1)) / 2 ;
 
     //Remove how many that are already on ART
-    for(int g = 0; g < ss.num_genders; g) {
-      for(int af = 0; af < pars.options.fertility_first_age_group; af) {
-        for(int hm = 0; hm < ss.hc1_disease_stages; hm) {
+    for(int s = 0; s <ss.NS; s) {
+      for(int a = 0; a < pars.options.fertility_first_age_group; a) {
+        for(int hd = 0; hd < ss.hc1DS; hd) {
           for(int dur = 0; dur < ss.treatment_stages; dur) {
-            if(af < ss.hc2_agestart){
-              intermediate.hc_art_num -= state_next.hc1_art_pop(dur, hm, af, g)  ;
+            if(a < ss.hc2_agestart){
+              intermediate.hc_art_num -= state_next.hc1_art_pop(dur, hd, a, s)  ;
             }else{
-              if(hm < (ss.hc2_disease_stages - 1)){
-                intermediate.hc_art_num -= state_next.hc2_art_pop(dur, hm, af-ss.hc2_agestart, g)  ;
+              if(hd < (ss.hc2DS - 1)){
+                intermediate.hc_art_num -= state_next.hc2_art_pop(dur, hd, a-ss.hc2_agestart, s)  ;
               }
             }
           } // end ss.treatment_stages
         } // end ss.hC1_disease_stages
-      } // end af
-    } // end ss.num_genders
+      } // end a
+    } // end ss.NS
     if(intermediate.hc_art_init_total < intermediate.hc_art_num){
       intermediate.hc_art_num = intermediate.hc_art_init_total;
     }
@@ -420,38 +420,38 @@ void run_child_art_initiation(int time_step,
 
   } else if (cpars.hc_art_isperc(time_step) && !cpars.hc_art_isperc(time_step-1)){ // num to percentage
     //Remove how many that are already on ART
-    for(int g = 0; g < ss.num_genders; ++g) {
-      for(int af = 0; af < pars.options.fertility_first_age_group; ++af) {
-        for(int hm = 0; hm < ss.hc1_disease_stages; ++hm) {
+    for(int s = 0; s <ss.NS; ++s) {
+      for(int a = 0; a < pars.options.fertility_first_age_group; ++a) {
+        for(int hd = 0; hd < ss.hc1DS; ++hd) {
           for(int dur = 0; dur < ss.treatment_stages; ++dur) {
-            if(af < ss.hc2_agestart){
-              intermediate.hc_art_num += state_next.hc1_art_pop(dur, hm, af, g) +  state_next.hc1_art_aids_deaths(dur,hm, af, g)  ;
+            if(a < ss.hc2_agestart){
+              intermediate.hc_art_num += state_next.hc1_art_pop(dur, hd, a, s) +  state_next.hc1_art_aids_deaths(dur,hd, a, s)  ;
             }else{
-              if(hm < (ss.hc2_disease_stages - 1)){
-                intermediate.hc_art_num += state_next.hc2_art_pop(dur, hm, af-ss.hc2_agestart, g) +  state_next.hc2_art_aids_deaths(dur,hm, af-ss.hc2_agestart, g)  ;
+              if(hd < (ss.hc2DS - 1)){
+                intermediate.hc_art_num += state_next.hc2_art_pop(dur, hd, a-ss.hc2_agestart, s) +  state_next.hc2_art_aids_deaths(dur,hd, a-ss.hc2_agestart, s)  ;
               }
             }
           } // end ss.treatment_stages
-        } // end ss.hc1_disease_stages
-      } //end af
-    } //end ss.num_genders
+        } // end ss.hc1DS
+      } //end a
+    } //end ss.NS
     intermediate.hc_art_num = (cpars.hc_art_val(time_step-1) + (intermediate.hc_art_num * cpars.hc_art_val(time_step))) / 2 ;
 
-    for(int g = 0; g < ss.num_genders; ++g) {
-      for(int af = 0; af < pars.options.fertility_first_age_group; ++af) {
-        for(int hm = 0; hm < ss.hc1_disease_stages; ++hm) {
+    for(int s = 0; s <ss.NS; ++s) {
+      for(int a = 0; a < pars.options.fertility_first_age_group; ++a) {
+        for(int hd = 0; hd < ss.hc1DS; ++hd) {
           for(int dur = 0; dur < ss.treatment_stages; ++dur) {
-            if(af < ss.hc2_agestart){
-              intermediate.hc_art_num -= state_next.hc1_art_pop(dur, hm, af, g);
+            if(a < ss.hc2_agestart){
+              intermediate.hc_art_num -= state_next.hc1_art_pop(dur, hd, a, s);
             }else{
-              if(hm < (ss.hc2_disease_stages - 1)){
-                intermediate.hc_art_num -= state_next.hc2_art_pop(dur, hm, af-ss.hc2_agestart, g);
+              if(hd < (ss.hc2DS - 1)){
+                intermediate.hc_art_num -= state_next.hc2_art_pop(dur, hd, a-ss.hc2_agestart, s);
               }
             }
           } // end ss.treatment_stages
-        } // end ss.hc1_disease_stages
-      } // end af
-    } // end ss.num_genders
+        } // end ss.hc1DS
+      } // end a
+    } // end ss.NS
 
     if(intermediate.hc_art_num < 0){
       intermediate.hc_art_num = 0;
@@ -463,21 +463,21 @@ void run_child_art_initiation(int time_step,
   } else if (cpars.hc_art_isperc(time_step-1) && !cpars.hc_art_isperc(time_step)){ //percentage to num
 
 
-    for(int g = 0; g < ss.num_genders; ++g) {
-      for(int af = 0; af < pars.options.fertility_first_age_group; ++af) {
-        for(int hm = 0; hm < ss.hc1_disease_stages; ++hm) {
+    for(int s = 0; s <ss.NS; ++s) {
+      for(int a = 0; a < pars.options.fertility_first_age_group; ++a) {
+        for(int hd = 0; hd < ss.hc1DS; ++hd) {
           for(int dur = 0; dur < ss.treatment_stages; ++dur) {
-            if(af < ss.hc2_agestart){
-              intermediate.hc_art_num -= state_next.hc1_art_pop(dur, hm, af, g)  ;
+            if(a < ss.hc2_agestart){
+              intermediate.hc_art_num -= state_next.hc1_art_pop(dur, hd, a, s)  ;
             }else{
-              if(hm < (ss.hc2_disease_stages - 1)){
-                intermediate.hc_art_num -= state_next.hc2_art_pop(dur, hm, af-ss.hc2_agestart, g)   ;
+              if(hd < (ss.hc2DS - 1)){
+                intermediate.hc_art_num -= state_next.hc2_art_pop(dur, hd, a-ss.hc2_agestart, s)   ;
               }
             }
           } // end ss.treatment_stages
-        } //end ss.hc1_disease_stages
-      } // end af
-    } //end ss.num_genders
+        } //end ss.hc1DS
+      } // end a
+    } //end ss.NS
 
 
     //TODO !!! Actually not sure how to do this, bc intermediates shouldn't have any time steps...
@@ -485,21 +485,21 @@ void run_child_art_initiation(int time_step,
    intermediate.hc_art_num = (cpars.hc_art_val(time_step)) ;
 
     //Remove how many that are already on ART
-    for(int g = 0; g < ss.num_genders; ++g) {
-      for(int af = 0; af < pars.options.fertility_first_age_group; ++af) {
-        for(int hm = 0; hm < ss.hc1_disease_stages; ++hm) {
+    for(int s = 0; s <ss.NS; ++s) {
+      for(int a = 0; a < pars.options.fertility_first_age_group; ++a) {
+        for(int hd = 0; hd < ss.hc1DS; ++hd) {
           for(int dur = 0; dur < ss.treatment_stages; ++dur) {
-            if(af < ss.hc2_agestart){
-              intermediate.hc_art_num -= state_next.hc1_art_pop(dur, hm, af, g);
+            if(a < ss.hc2_agestart){
+              intermediate.hc_art_num -= state_next.hc1_art_pop(dur, hd, a, s);
             }else{
-              if(hm < (ss.hc2_disease_stages - 1)){
-                intermediate.hc_art_num -= state_next.hc2_art_pop(dur, hm, af-ss.hc2_agestart, g);
+              if(hd < (ss.hc2DS - 1)){
+                intermediate.hc_art_num -= state_next.hc2_art_pop(dur, hd, a-ss.hc2_agestart, s);
               }
             }
           } //end ss.treatment_stages
-        } //end ss.hc1_disease_stages
-      } //end af
-    } //end ss.num_genders
+        } //end ss.hc1DS
+      } //end a
+    } //end ss.NS
 
     if(intermediate.hc_art_num < 0){
       intermediate.hc_art_num = 0;
@@ -510,54 +510,54 @@ void run_child_art_initiation(int time_step,
   }
 
 
-  for(int g = 0; g < ss.num_genders; ++g) {
-    for(int af = 0; af < pars.options.fertility_first_age_group; ++af) {
-      for(int hm = 0; hm < ss.hc1_disease_stages; ++hm) {
-        for(int cat = 0; cat < ss.hTM; ++cat) {
-          intermediate.hc_initByAge +=  intermediate.hc_art_init(hm, cat, af, g) * cpars.hc_art_init_dist(af, time_step);
-        } //end hTM
-      } // end ss.hc1_disease_stages
-    } //end af
-  } // end ss.num_genders
+  for(int s = 0; s <ss.NS; ++s) {
+    for(int a = 0; a < pars.options.fertility_first_age_group; ++a) {
+      for(int hd = 0; hd < ss.hc1DS; ++hd) {
+        for(int cat = 0; cat < ss.hcTT; ++cat) {
+          intermediate.hc_initByAge +=  intermediate.hc_art_init(hd, cat, a, s) * cpars.hc_art_init_dist(a, time_step);
+        } //end hcTT
+      } // end ss.hc1DS
+    } //end a
+  } // end ss.NS
 
   if(intermediate.hc_initByAge == 0.0){
     intermediate.hc_adj = 1.0 ;
   }else{
     intermediate.hc_adj = intermediate.hc_art_num / intermediate.hc_initByAge ;
   }
-  for(int g = 0; g < ss.num_genders; ++g) {
-    for(int cat = 0; cat < ss.hTM; ++cat) {
-      for(int af = 0; af < pars.options.fertility_first_age_group; ++af) {
-        for(int hm = 0; hm < ss.hc1_disease_stages; ++hm) {
-          if((intermediate.hc_adj * cpars.hc_art_init_dist(af, time_step)) > 1.0){
+  for(int s = 0; s <ss.NS; ++s) {
+    for(int cat = 0; cat < ss.hcTT; ++cat) {
+      for(int a = 0; a < pars.options.fertility_first_age_group; ++a) {
+        for(int hd = 0; hd < ss.hc1DS; ++hd) {
+          if((intermediate.hc_adj * cpars.hc_art_init_dist(a, time_step)) > 1.0){
             intermediate.hc_art_scalar = 1.0;
           }else{
-            intermediate.hc_art_scalar = intermediate.hc_adj * cpars.hc_art_init_dist(af, time_step);
+            intermediate.hc_art_scalar = intermediate.hc_adj * cpars.hc_art_init_dist(a, time_step);
           }
           if(intermediate.hc_art_num > 0.0){
             intermediate.hc_art_scalar = intermediate.hc_art_scalar;
           }else{
             intermediate.hc_art_scalar =  0.0;
           }
-          if(af < ss.hc2_agestart){
-            state_next.hc1_art_pop(0, hm, af, g) +=  intermediate.hc_art_scalar * intermediate.hc_art_init(hm, cat, af, g) ;
+          if(a < ss.hc2_agestart){
+            state_next.hc1_art_pop(0, hd, a, s) +=  intermediate.hc_art_scalar * intermediate.hc_art_init(hd, cat, a, s) ;
           }else{
-            if(hm < (ss.hc2_disease_stages - 1)){
-              state_next.hc2_art_pop(0, hm, af - ss.hc2_agestart, g) +=  intermediate.hc_art_scalar * intermediate.hc_art_init(hm, cat, af, g) ;
+            if(hd < (ss.hc2DS - 1)){
+              state_next.hc2_art_pop(0, hd, a - ss.hc2_agestart, s) +=  intermediate.hc_art_scalar * intermediate.hc_art_init(hd, cat, a, s) ;
             }
           }
-          if(af < ss.hc2_agestart){
-            state_next.hc1_hiv_pop(hm, cat, af, g) -=  intermediate.hc_art_scalar * intermediate.hc_art_init(hm, cat, af, g) ;
+          if(a < ss.hc2_agestart){
+            state_next.hc1_hiv_pop(hd, cat, a, s) -=  intermediate.hc_art_scalar * intermediate.hc_art_init(hd, cat, a, s) ;
           }else{
-            if(hm < (ss.hc2_disease_stages - 1)){
-              state_next.hc2_hiv_pop(hm, cat, af - ss.hc2_agestart, g) -=  intermediate.hc_art_scalar * intermediate.hc_art_init(hm, cat, af, g) ;
+            if(hd < (ss.hc2DS - 1)){
+              state_next.hc2_hiv_pop(hd, cat, a - ss.hc2_agestart, s) -=  intermediate.hc_art_scalar * intermediate.hc_art_init(hd, cat, a, s) ;
             }
           }
 
-        } //end ss.hc1_disease_stages
-      } // end af
-    } // end hTM
-  } // end ss.num_genders
+        } //end ss.hc1DS
+      } // end a
+    } // end hcTT
+  } // end ss.NS
 
 }
 
