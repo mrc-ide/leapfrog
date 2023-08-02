@@ -11,5 +11,5 @@ p_infections,p_infections,REAL,3,pAG,NS,output_years,,
 h_hiv_deaths_art,h_hiv_deaths_art,REAL,5,hTS,hDS,hAG,NS,output_years
 h_art_initiation,h_art_initiation,REAL,4,hDS,hAG,NS,output_years,
 p_hiv_deaths,p_hiv_deaths,REAL,3,pAG,NS,output_years,,
-hc1_hiv_pop,hc1_hiv_pop,REAL,5,hc1DS,hTM,hc1AG,NS,output_years
-hc2_hiv_pop,hc2_hiv_pop,REAL,5,hc2DS,hTM,hc2AG,NS,output_years
+hc1_hiv_pop,hc1_hiv_pop,REAL,5,hc1DS,hcTT,hc1AG,NS,output_years
+hc2_hiv_pop,hc2_hiv_pop,REAL,5,hc2DS,hcTT,hc2AG,NS,output_years

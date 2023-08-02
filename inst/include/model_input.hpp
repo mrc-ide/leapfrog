@@ -26,7 +26,7 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
   constexpr int hc2DS = ss.hc2DS;
   constexpr int hc1AG = ss.hc1AG;
   constexpr int hc2AG = ss.hc2AG;
-  constexpr int hTM = ss.hTM;
+  constexpr int hcTT = ss.hcTT;
 
   const leapfrog::TensorMap2<real_type> base_pop = parse_data<real_type>(data, "basepop", pAG, NS);
   const leapfrog::TensorMap3<real_type> survival_probability = parse_data<real_type>(data, "Sx", pAG + 1, NS, proj_years);
@@ -48,8 +48,8 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
   const leapfrog::TensorMap1<real_type> hc_nosocomial = parse_data<real_type>(data, "paed_incid_input", proj_years);
   const leapfrog::TensorMap1<real_type> hc1_cd4_dist = parse_data<real_type>(data, "paed_cd4_dist", hc2DS);
   const leapfrog::TensorMap2<real_type> hc_cd4_transition = parse_data<real_type>(data, "paed_cd4_transition", hc1DS, hc2DS);
-  const leapfrog::TensorMap3<real_type> hc1_cd4_mort = parse_data<real_type>(data, "paed_cd4_mort", hc1DS, hTM, hc1AG);
-  const leapfrog::TensorMap3<real_type> hc2_cd4_mort = parse_data<real_type>(data, "adol_cd4_mort", hc2DS, hTM, hc2AG);
+  const leapfrog::TensorMap3<real_type> hc1_cd4_mort = parse_data<real_type>(data, "paed_cd4_mort", hc1DS, hcTT, hc1AG);
+  const leapfrog::TensorMap3<real_type> hc2_cd4_mort = parse_data<real_type>(data, "adol_cd4_mort", hc2DS, hcTT, hc2AG);
   const leapfrog::TensorMap1<real_type> hc1_cd4_prog = parse_data<real_type>(data, "paed_cd4_prog", hc1DS);
   const leapfrog::TensorMap1<real_type> hc2_cd4_prog = parse_data<real_type>(data, "adol_cd4_prog", hc2DS);
   const real_type ctx_effect = Rcpp::as<real_type>(data["ctx_effect"]);

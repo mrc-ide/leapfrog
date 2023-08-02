@@ -44,7 +44,7 @@ void run_age_15_entrants(int time_step,
   //TO DO: add ART entrants here
   for (int g = 0; g < ss.NS; ++g) {
     for (int hm = 0; hm < ss.hDS; ++hm) {
-      for (int htm = 0; htm < ss.hTM; ++htm) {
+      for (int htm = 0; htm < ss.hcTT; ++htm) {
         intermediate.age15_hiv_pop(hm, g) += state_curr.hc2_hiv_pop(hm, htm, ss.hc2AG, g);
       }
     }

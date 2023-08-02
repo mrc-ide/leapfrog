@@ -28,7 +28,7 @@ public:
                 int hDS,
                 int hAG,
                 int hTS,
-                int hTM,
+                int hcTT,
                 int hc1DS,
                 int hc2DS,
                 int hc1AG,
@@ -55,9 +55,9 @@ public:
           h_art_initiation(StateSpace<S>().hDS, StateSpace<S>().hAG,
                          StateSpace<S>().NS, no_output_years),
           p_hiv_deaths(StateSpace<S>().pAG, StateSpace<S>().NS, no_output_years),
-          hc1_hiv_pop(StateSpace<S>().hc1DS, StateSpace<S>().hTM, StateSpace<S>().hc1AG,
+          hc1_hiv_pop(StateSpace<S>().hc1DS, StateSpace<S>().hcTT, StateSpace<S>().hc1AG,
                       StateSpace<S>().NS, no_output_years),
-         hc2_hiv_pop(StateSpace<S>().hc2DS, StateSpace<S>().hTM, StateSpace<S>().hc2AG,
+         hc2_hiv_pop(StateSpace<S>().hc2DS, StateSpace<S>().hcTT, StateSpace<S>().hc2AG,
                                   StateSpace<S>().NS, no_output_years) {
       p_total_pop.setZero();
       p_total_pop_natural_deaths.setZero();
@@ -79,7 +79,7 @@ public:
   StateSaver(int time_steps,
              std::vector<int> save_steps) :
       save_steps(save_steps),
-      full_state(StateSpace<S>().pAG, StateSpace<S>().NS, StateSpace<S>().hDS, StateSpace<S>().hAG, StateSpace<S>().hTS, StateSpace<S>().hTM, StateSpace<S>().hc1DS, StateSpace<S>().hc2DS, StateSpace<S>().hc1AG, StateSpace<S>().hc2AG, save_steps.size()) {
+      full_state(StateSpace<S>().pAG, StateSpace<S>().NS, StateSpace<S>().hDS, StateSpace<S>().hAG, StateSpace<S>().hTS, StateSpace<S>().hcTT, StateSpace<S>().hc1DS, StateSpace<S>().hc2DS, StateSpace<S>().hc1AG, StateSpace<S>().hc2AG, save_steps.size()) {
     for (int step: save_steps) {
       if (step < 0) {
         std::stringstream ss;

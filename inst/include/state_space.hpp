@@ -52,7 +52,7 @@ struct StateSpace<coarse> {
   //  Number of age groups in the hc2 category (5-14)
   static constexpr int hc2AG = 10;
   // Number of transmission types
-  static constexpr int hTM = 4;
+  static constexpr int hcTT = 4;
   // Number of PMTCT types
   static constexpr int hPS = 7;
   // Number of breast feeding age categories
@@ -80,7 +80,7 @@ struct StateSpace<full> {
   //  Number of age groups in the hc2 category (5-14)
   static constexpr int hc2AG = 10;
   // Number of transmission types
-  static constexpr int hTM = 4;
+  static constexpr int hcTT = 4;
   // Number of PMTCT types
   static constexpr int hPS = 7;
   // Number of breast feeting age categories

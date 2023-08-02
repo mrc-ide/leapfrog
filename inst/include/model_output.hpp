@@ -24,7 +24,7 @@ Rcpp::List build_r_output(const typename leapfrog::StateSaver<S, real_type>::Out
   constexpr int hc2DS = ss.hc2DS;
   constexpr int hc1AG = ss.hc1AG;
   constexpr int hc2AG = ss.hc2AG;
-  constexpr int hTM = ss.hTM;
+  constexpr int hcTT = ss.hcTT;
 
   Rcpp::NumericVector r_p_total_pop(pAG * NS * output_years);
   Rcpp::NumericVector r_births(output_years);
@@ -38,8 +38,8 @@ Rcpp::List build_r_output(const typename leapfrog::StateSaver<S, real_type>::Out
   Rcpp::NumericVector r_h_hiv_deaths_art(hTS * hDS * hAG * NS * output_years);
   Rcpp::NumericVector r_h_art_initiation(hDS * hAG * NS * output_years);
   Rcpp::NumericVector r_p_hiv_deaths(pAG * NS * output_years);
-  Rcpp::NumericVector r_hc1_hiv_pop(hc1DS * hTM * hc1AG * NS * output_years);
-  Rcpp::NumericVector r_hc2_hiv_pop(hc2DS * hTM * hc2AG * NS * output_years);
+  Rcpp::NumericVector r_hc1_hiv_pop(hc1DS * hcTT * hc1AG * NS * output_years);
+  Rcpp::NumericVector r_hc2_hiv_pop(hc2DS * hcTT * hc2AG * NS * output_years);
 
   r_p_total_pop.attr("dim") = Rcpp::NumericVector::create(pAG, NS, output_years);
   r_births.attr("dim") = Rcpp::NumericVector::create(output_years);
@@ -53,8 +53,8 @@ Rcpp::List build_r_output(const typename leapfrog::StateSaver<S, real_type>::Out
   r_h_hiv_deaths_art.attr("dim") = Rcpp::NumericVector::create(hTS, hDS, hAG, NS, output_years);
   r_h_art_initiation.attr("dim") = Rcpp::NumericVector::create(hDS, hAG, NS, output_years);
   r_p_hiv_deaths.attr("dim") = Rcpp::NumericVector::create(pAG, NS, output_years);
-  r_hc1_hiv_pop.attr("dim") = Rcpp::NumericVector::create(hc1DS, hTM, hc1AG, NS, output_years);
-  r_hc2_hiv_pop.attr("dim") = Rcpp::NumericVector::create(hc2DS, hTM, hc2AG, NS, output_years);
+  r_hc1_hiv_pop.attr("dim") = Rcpp::NumericVector::create(hc1DS, hcTT, hc1AG, NS, output_years);
+  r_hc2_hiv_pop.attr("dim") = Rcpp::NumericVector::create(hc2DS, hcTT, hc2AG, NS, output_years);
 
   std::copy_n(state.p_total_pop.data(), state.p_total_pop.size(), REAL(r_p_total_pop));
   std::copy_n(state.births.data(), state.births.size(), REAL(r_births));
