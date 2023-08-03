@@ -21,11 +21,11 @@ void run_child_ageing(int time_step,
     for (int a = 1; a < ss.hc2_agestart; ++a) {
       for (int hd = 0; hd < ss.hc1DS; ++hd) {
         for (int cat = 0 ; cat < ss.hcTT; ++cat) {
-          state_next.hc1_hiv_pop(hd, cat, a, s) += state_curr.hc1_hiv_pop(hd, cat, a-1, s) * demog.survival_probability(a, g, time_step);
+          state_next.hc1_hiv_pop(hd, cat, a, s) += state_curr.hc1_hiv_pop(hd, cat, a-1, s) * demog.survival_probability(a, s,  time_step);
 
         }
         for (int dur = 0; dur < ss.hTS; ++dur) {
-          state_next.hc1_art_pop(dur, hd, a, s) += state_curr.hc1_art_pop(dur, hd, a-1, s) * demog.survival_probability(a, g, time_step);
+          state_next.hc1_art_pop(dur, hd, a, s) += state_curr.hc1_art_pop(dur, hd, a-1, s) * demog.survival_probability(a, s,  time_step);
         }
 
       }
@@ -36,24 +36,25 @@ void run_child_ageing(int time_step,
     for (int hd = 0; hd < ss.hc1DS; ++hd) {
       for (int hd_alt = 0; hd_alt < ss.hc2DS; ++hd_alt) {
         for (int cat = 0 ; cat < ss.hcTT; ++cat) {
-          state_next.hc2_hiv_pop(hd_alt, cat, 0, s) +=  state_curr.hc1_hiv_pop(hd, cat, ss.hc1_ageend, s) * demog.survival_probability(ss.hc2_agestart, g, time_step) * cpars.hc_cd4_transition(hd_alt, hd);
+          state_next.hc2_hiv_pop(hd_alt, cat, 0, s) +=  state_curr.hc1_hiv_pop(hd, cat, ss.hc1_ageend, s) * demog.survival_probability(ss.hc2_agestart, s,  time_step) * cpars.hc_cd4_transition(hd_alt, hd);
         }
         for (int dur = 0; dur < ss.hTS; ++dur) {
-          state_next.hc2_art_pop(dur, hd_alt, 0, s) += state_curr.hc1_art_pop(dur, hd, ss.hc1_ageend, s) * demog.survival_probability(ss.hc2_agestart, g, time_step) * cpars.hc_cd4_transition(hd_alt, hd);
+          state_next.hc2_art_pop(dur, hd_alt, 0, s) += state_curr.hc1_art_pop(dur, hd, ss.hc1_ageend, s) * demog.survival_probability(ss.hc2_agestart, s,  time_step) * cpars.hc_cd4_transition(hd_alt, hd);
         }
       }
     }
   }
 
+
   for (int s = 0; s < ss.NS; ++s) {
     for (int a = (ss.hc2_agestart + 1); a < pars.options.p_idx_fertility_first; ++a) {
       for (int hd = 0; hd < ss.hc2DS; ++hd) {
         for (int cat = 0 ; cat < ss.hcTT; ++cat) {
-          state_next.hc2_hiv_pop(hd, cat, a - ss.hc2_agestart, s) += state_curr.hc2_hiv_pop(hd, cat, a- ss.hc2_agestart-1, s) * demog.survival_probability(a, g, time_step);
+          state_next.hc2_hiv_pop(hd, cat, a - ss.hc2_agestart, s) += state_curr.hc2_hiv_pop(hd, cat, a- ss.hc2_agestart-1, s) * demog.survival_probability(a, s,  time_step);
 
         }
         for (int dur = 0; dur < ss.hTS; ++dur) {
-          state_next.hc2_art_pop(dur, hd, a - ss.hc2_agestart, s) += state_curr.hc2_art_pop(dur, hd, a- ss.hc2_agestart-1, s) * demog.survival_probability(a, g, time_step);
+          state_next.hc2_art_pop(dur, hd, a - ss.hc2_agestart, s) += state_curr.hc2_art_pop(dur, hd, a- ss.hc2_agestart-1, s) * demog.survival_probability(a, s,  time_step);
         }
 
       }
@@ -188,17 +189,19 @@ void add_child_grad(int time_step,
 
   //add on transitions
   for (int s = 0; s < ss.NS; ++s) {
-    for (int hd = 0; hd < ss.hc1DS; ++hd) {
       for (int a = 0; a < pars.options.p_idx_fertility_first; ++a) {
         for (int cat = 0; cat < ss.hcTT; ++cat) {
           if(a < ss.hc2_agestart){
+            for (int hd = 0; hd < ss.hc1DS; ++hd) {
             state_next.hc1_hiv_pop(hd, cat, a, s) +=intermediate.hc_grad(hd, cat, a, s);
+            }// end hc1DS
           }else{
-          state_next.hc2_hiv_pop(hd, cat, a- ss.hc2_agestart, s) +=intermediate.hc_grad(hd, cat, a, s);
-        }
-      }
-    }
-  }
+            for (int hd = 0; hd < ss.hc2DS; ++hd){
+              state_next.hc2_hiv_pop(hd, cat, a- ss.hc2_agestart, s) += intermediate.hc_grad(hd, cat, a, s);
+            }//end hc2DS
+        }//end else
+    }//end a
+  }// end s
 
 }
 
