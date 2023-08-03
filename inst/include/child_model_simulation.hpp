@@ -215,32 +215,43 @@ void run_child_art_initiation(int time_step,
   //all children under a certain age eligible for ART
   for(int s = 0; s <ss.NS; ++s)  {
     for(int cat = 0; cat < ss.hcTT; ++cat) {
-      for(int a = 0; a < pars.options.fertility_first_age_group; ++a) {
+      for(int a = 0; a < pars.options.p_idx_fertility_first; ++a) {
         for(int hd = 0; hd < ss.hc1DS; ++hd) {
-
-          if(a >  (cpars.hc_art_elig_cd4(a, time_step) - 2)){
+          if(a < cpars.hc_art_elig_age(time_step)){
             if(a < ss.hc2_agestart){
               intermediate.hc_art_need(hd, cat, a, s) += state_next.hc1_hiv_pop(hd, cat, a, s);
             }else{
+            if(hd < ss.hc2DS){
               intermediate.hc_art_need(hd, cat, a, s) += state_next.hc2_hiv_pop(hd, cat, a - ss.hc2_agestart, s);
             }
             }
+          }
+        } // end ss.hc1DS
+      } // end a
+    } // end hcTT
+  } // end ss.NS
 
-            if(a >  cpars.hc_art_elig_age(time_step) & hd > (cpars.hc_art_elig_cd4(a, time_step) - 2)){
-              if(a < ss.hc2_agestart){
-                intermediate.hc_art_need(hd, cat, a, s) += state_next.hc1_hiv_pop(hd, cat, a, s);
-              }else{
-                intermediate.hc_art_need(hd, cat, a, s) += state_next.hc2_hiv_pop(hd, cat, a, s);
+  //all children under a certain CD4 eligible for ART
+  for(int s = 0; s <ss.NS; ++s)  {
+    for(int cat = 0; cat < ss.hcTT; ++cat) {
+      for(int a = cpars.hc_art_elig_age(time_step); a < pars.options.p_idx_fertility_first; ++a) {
+        for(int hd = 0; hd < ss.hc1DS; ++hd) {
+          if(hd > (cpars.hc_art_elig_cd4(a, time_step) - 2)){ //-2 to account for the zero-based indexing and basically as >=
+            if(a < ss.hc2_agestart){
+              intermediate.hc_art_need(hd, cat, a, s) += state_next.hc1_hiv_pop(hd, cat, a, s);
+            }else{
+              if(hd < ss.hc2DS){
+                intermediate.hc_art_need(hd, cat, a, s) += state_next.hc2_hiv_pop(hd, cat, a - ss.hc2_agestart, s);
               }
             }
-
+          }
         } // end ss.hc1DS
       } // end a
     } // end hcTT
   } // end ss.NS
 
   for(int s = 0; s <ss.NS; ++s) {
-    for(int a = 0; a < pars.options.fertility_first_age_group; ++a) {
+    for(int a = 0; a < pars.options.p_idx_fertility_first; ++a) {
       for(int hd = 0; hd < ss.hc1DS; ++hd) {
         for(int cat = 0; cat < ss.hcTT; ++cat) {
           state_next.hc_art_num += intermediate.hc_art_need(hd, cat, a, s);
@@ -251,18 +262,18 @@ void run_child_art_initiation(int time_step,
 
   //how many should initialize ART
   for(int s = 0; s <ss.NS; ++s) {
-    for(int a = 0; a < pars.options.fertility_first_age_group; ++a) {
+    for(int a = 0; a < pars.options.p_idx_fertility_first; ++a) {
       for(int hd = 0; hd < ss.hc1DS; ++hd) {
         for(int cat = 0; cat < ss.hcTT; ++cat) {
           if(cpars.hc_art_val(time_step) > 0){
             intermediate.hc_art_init(hd, cat, a, s) += intermediate.hc_art_need(hd, cat, a, s);
-            for(int dur = 0; dur < ss.treatment_stages; ++dur) {
+            for(int dur = 0; dur < ss.hTS; ++dur) {
               if(intermediate.hc_art_init(hd, cat, a, s) < 0){
                 intermediate.hc_art_init(hd, cat, a, s) = 0.0;
               }else{
                 intermediate.hc_art_init(hd, cat, a, s) = intermediate.hc_art_init(hd, cat, a, s);
               }
-            }// end ss.treatment_stages
+            }// end ss.hTS
           }
         }// end hcTT
       }// end ss.hc1DS
@@ -271,7 +282,7 @@ void run_child_art_initiation(int time_step,
 
 
   for(int s = 0; s <ss.NS; ++s) {
-    for(int a = 0; a < pars.options.fertility_first_age_group; ++a) {
+    for(int a = 0; a < pars.options.p_idx_fertility_first; ++a) {
       for(int hd = 0; hd < ss.hc1DS; ++hd) {
         for(int cat = 0; cat < ss.hcTT; ++cat) {
           intermediate.hc_art_init_total += intermediate.hc_art_init(hd, cat, a, s);
@@ -283,14 +294,14 @@ void run_child_art_initiation(int time_step,
   //!!! TODO: fix order of for loop
   for(int s = 0; s <ss.NS; ++s) {
     for(int hd = 0; hd < ss.hc1DS; ++hd) {
-      for(int a = 0; a < pars.options.fertility_first_age_group; ++a) {
+      for(int a = 0; a < pars.options.p_idx_fertility_first; ++a) {
         if(a < ss.hc2_agestart){
           intermediate.hc_death_rate =  cpars.hc_art_mort_rr(0, a, time_step) * 0.5 * (cpars.hc1_art_mort(hd, 0, a) + cpars.hc1_art_mort(hd, 1, a)) ;
           state_next.hc1_art_aids_deaths(0,hd, a, s) =  intermediate.hc_death_rate * state_next.hc1_art_pop(0, hd, a, s)  ;
           intermediate.hc_art_grad(0,hd, a, s) -= state_next.hc1_art_aids_deaths(0,hd, a, s) ;
           state_next.hc1_art_pop(0, hd,  a, s) += intermediate.hc_art_grad(0, hd, a, s) ;
         }else{
-          if(hd < (ss.hc2DS - 1)){
+          if(hd < (ss.hc2DS)){
             intermediate.hc_death_rate =  cpars.hc_art_mort_rr(0, a, time_step) * 0.5 * (cpars.hc2_art_mort(hd, 0, a-ss.hc2_agestart) + cpars.hc2_art_mort(hd, 1, a-ss.hc2_agestart));
             state_next.hc2_art_aids_deaths(0,hd, a-ss.hc2_agestart, s) =  intermediate.hc_death_rate * state_next.hc2_art_pop(0, hd, a-ss.hc2_agestart, s)  ;
             intermediate.hc_art_grad(0, hd, a, s) -= state_next.hc2_art_aids_deaths(0,hd, a-ss.hc2_agestart, s) ;
@@ -305,7 +316,7 @@ void run_child_art_initiation(int time_step,
 
   for(int s = 0; s <ss.NS; ++s) {
     for(int hd = 0; hd < ss.hc1DS; ++hd) {
-      for(int a = 0; a < pars.options.fertility_first_age_group; ++a) {
+      for(int a = 0; a < pars.options.p_idx_fertility_first; ++a) {
         intermediate.hc_death_rate = 0;
         if(a < ss.hc2_agestart){
           intermediate.hc_death_rate = cpars.hc_art_mort_rr(2, a, time_step) * cpars.hc1_art_mort(hd, 2, a);
@@ -313,7 +324,7 @@ void run_child_art_initiation(int time_step,
           intermediate.hc_art_grad(2,hd, a, s) -= state_next.hc1_art_aids_deaths(2,hd, a, s) ;
           state_next.hc1_art_pop(2, hd,  a, s) += intermediate.hc_art_grad(2, hd, a, s) ;
         }else{
-          if(hd < (ss.hc2DS - 1)){
+          if(hd < (ss.hc2DS)){
             intermediate.hc_death_rate = cpars.hc_art_mort_rr(2, a, time_step) * cpars.hc2_art_mort(hd, 2, a-ss.hc2_agestart);
             state_next.hc2_art_aids_deaths(2,hd, a-ss.hc2_agestart, s) =  state_next.hc2_art_pop(2, hd, a-ss.hc2_agestart, s) * intermediate.hc_death_rate;
             intermediate.hc_art_grad(2,hd, a, s) -= state_next.hc2_art_aids_deaths(2,hd, a-ss.hc2_agestart, s) ;
@@ -327,7 +338,7 @@ void run_child_art_initiation(int time_step,
   //Progress ART to the correct time on ART
   //!!! TODO: fix order of for loop
   for(int hd = 0; hd < ss.hc1DS; ++hd) {
-    for(int a = 0; a < pars.options.fertility_first_age_group; ++a) {
+    for(int a = 0; a < pars.options.p_idx_fertility_first; ++a) {
       for(int s = 0; s <ss.NS; ++s) {
         if(a < ss.hc2_agestart){
           if(state_next.hc1_art_pop(0, hd, a, s) > 0){
@@ -336,7 +347,7 @@ void run_child_art_initiation(int time_step,
           }
         }else{
           if(state_next.hc2_art_pop(0, hd, a-ss.hc2_agestart, s) > 0){
-            if(hd < (ss.hc2DS - 1)){
+            if(hd < (ss.hc2DS)){
               state_next.hc2_art_pop(1, hd, a-ss.hc2_agestart, s) += state_next.hc2_art_pop(0, hd, a-ss.hc2_agestart, s);
               state_next.hc2_art_pop(0, hd, a-ss.hc2_agestart, s) -= state_next.hc2_art_pop(0, hd, a-ss.hc2_agestart, s);
             }
@@ -351,17 +362,17 @@ void run_child_art_initiation(int time_step,
     //Remove how many that are already on ART
     state_next.hc_art_num =  (cpars.hc_art_val(time_step) + cpars.hc_art_val(time_step-1)) / 2 ;
     for(int s = 0; s <ss.NS; ++s) {
-      for(int a = 0; a < pars.options.fertility_first_age_group; ++a) {
+      for(int a = 0; a < pars.options.p_idx_fertility_first; ++a) {
         for(int hd = 0; hd < ss.hc1DS; ++hd) {
-          for(int dur = 0; dur < ss.treatment_stages; ++dur) {
+          for(int dur = 0; dur < ss.hTS; ++dur) {
             if(a < ss.hc2_agestart){
               state_next.hc_art_num -= state_next.hc1_art_pop(dur, hd, a, s)  ;
             }else{
-              if(hd < (ss.hc2DS - 1)){
+              if(hd < (ss.hc2DS)){
                 state_next.hc_art_num -= state_next.hc2_art_pop(dur, hd, a-ss.hc2_agestart, s)   ;
               }
             }
-          }// end ss.treatment_stages
+          }// end ss.hTS
         }// end ss.hc1DS
       }// end a
     }// end ss.NS
@@ -375,21 +386,19 @@ void run_child_art_initiation(int time_step,
 
   } else if (cpars.hc_art_isperc(time_step) && cpars.hc_art_isperc(time_step-1)){ // both percentages
     for(int s = 0; s <ss.NS; ++s) {
-      for(int a = 0; a < pars.options.fertility_first_age_group; ++a) {
+      for(int a = 0; a < pars.options.p_idx_fertility_first; ++a) {
         for(int hd = 0; hd < ss.hc1DS; ++hd) {
-          for(int dur = 0; dur < ss.treatment_stages; ++dur) {
+          for(int dur = 0; dur < ss.hTS; ++dur) {
             if(a < ss.hc2_agestart){
               state_next.hc_art_num += state_next.hc1_art_pop(dur, hd, a, s)  ;
               state_next.hc_art_num += state_next.hc1_art_aids_deaths(dur,hd, a, s) ;
-
             }else{
-              if(hd < (ss.hc2DS - 1)){
+              if(hd < (ss.hc2DS )){
                 state_next.hc_art_num += state_next.hc2_art_pop(dur, hd, a-ss.hc2_agestart, s)  ;
                 state_next.hc_art_num += state_next.hc2_art_aids_deaths(dur,hd, a-ss.hc2_agestart, s) ;
-
               }
             }
-          } //end ss.treatment_stages
+          } //end ss.hTS
         } // end ss.hC1_disease_stages
       } // end a
     } // end ss.NS
@@ -397,18 +406,18 @@ void run_child_art_initiation(int time_step,
     state_next.hc_art_num =  state_next.hc_art_num * (cpars.hc_art_val(time_step) + cpars.hc_art_val(time_step-1)) / 2 ;
 
     //Remove how many that are already on ART
-    for(int s = 0; s <ss.NS; s) {
-      for(int a = 0; a < pars.options.fertility_first_age_group; a) {
-        for(int hd = 0; hd < ss.hc1DS; hd) {
-          for(int dur = 0; dur < ss.treatment_stages; dur) {
+    for(int s = 0; s <ss.NS; ++s) {
+      for(int a = 0; a < pars.options.p_idx_fertility_first; ++a) {
+        for(int hd = 0; hd < ss.hc1DS; ++hd) {
+          for(int dur = 0; dur < ss.hTS; ++dur) {
             if(a < ss.hc2_agestart){
               state_next.hc_art_num -= state_next.hc1_art_pop(dur, hd, a, s)  ;
             }else{
-              if(hd < (ss.hc2DS - 1)){
+              if(hd < (ss.hc2DS)){
                 state_next.hc_art_num -= state_next.hc2_art_pop(dur, hd, a-ss.hc2_agestart, s)  ;
               }
             }
-          } // end ss.treatment_stages
+          } // end ss.hTS
         } // end ss.hC1_disease_stages
       } // end a
     } // end ss.NS
@@ -421,34 +430,34 @@ void run_child_art_initiation(int time_step,
   } else if (cpars.hc_art_isperc(time_step) && !cpars.hc_art_isperc(time_step-1)){ // num to percentage
     //Remove how many that are already on ART
     for(int s = 0; s <ss.NS; ++s) {
-      for(int a = 0; a < pars.options.fertility_first_age_group; ++a) {
+      for(int a = 0; a < pars.options.p_idx_fertility_first; ++a) {
         for(int hd = 0; hd < ss.hc1DS; ++hd) {
-          for(int dur = 0; dur < ss.treatment_stages; ++dur) {
+          for(int dur = 0; dur < ss.hTS; ++dur) {
             if(a < ss.hc2_agestart){
               state_next.hc_art_num += state_next.hc1_art_pop(dur, hd, a, s) +  state_next.hc1_art_aids_deaths(dur,hd, a, s)  ;
             }else{
-              if(hd < (ss.hc2DS - 1)){
+              if(hd < (ss.hc2DS)){
                 state_next.hc_art_num += state_next.hc2_art_pop(dur, hd, a-ss.hc2_agestart, s) +  state_next.hc2_art_aids_deaths(dur,hd, a-ss.hc2_agestart, s)  ;
               }
             }
-          } // end ss.treatment_stages
+          } // end ss.hTS
         } // end ss.hc1DS
       } //end a
     } //end ss.NS
     state_next.hc_art_num = (cpars.hc_art_val(time_step-1) + (state_next.hc_art_num * cpars.hc_art_val(time_step))) / 2 ;
 
     for(int s = 0; s <ss.NS; ++s) {
-      for(int a = 0; a < pars.options.fertility_first_age_group; ++a) {
+      for(int a = 0; a < pars.options.p_idx_fertility_first; ++a) {
         for(int hd = 0; hd < ss.hc1DS; ++hd) {
-          for(int dur = 0; dur < ss.treatment_stages; ++dur) {
+          for(int dur = 0; dur < ss.hTS; ++dur) {
             if(a < ss.hc2_agestart){
               state_next.hc_art_num -= state_next.hc1_art_pop(dur, hd, a, s);
             }else{
-              if(hd < (ss.hc2DS - 1)){
+              if(hd < (ss.hc2DS )){
                 state_next.hc_art_num -= state_next.hc2_art_pop(dur, hd, a-ss.hc2_agestart, s);
               }
             }
-          } // end ss.treatment_stages
+          } // end ss.hTS
         } // end ss.hc1DS
       } // end a
     } // end ss.NS
@@ -464,38 +473,37 @@ void run_child_art_initiation(int time_step,
 
 
     for(int s = 0; s <ss.NS; ++s) {
-      for(int a = 0; a < pars.options.fertility_first_age_group; ++a) {
+      for(int a = 0; a < pars.options.p_idx_fertility_first; ++a) {
         for(int hd = 0; hd < ss.hc1DS; ++hd) {
-          for(int dur = 0; dur < ss.treatment_stages; ++dur) {
+          for(int dur = 0; dur < ss.hTS; ++dur) {
             if(a < ss.hc2_agestart){
               state_next.hc_art_num -= state_next.hc1_art_pop(dur, hd, a, s)  ;
             }else{
-              if(hd < (ss.hc2DS - 1)){
+              if(hd < (ss.hc2DS)){
                 state_next.hc_art_num -= state_next.hc2_art_pop(dur, hd, a-ss.hc2_agestart, s)   ;
               }
             }
-          } // end ss.treatment_stages
+          } // end ss.hTS
         } //end ss.hc1DS
       } // end a
     } //end ss.NS
 
 
-    //TODO !!! Actually not sure how to do this, bc intermediates shouldn't have any time steps...
-    state_next.hc_art_num = (state_curr.hc_art_num + cpars.hc_art_val(time_step)) / 2 ;
+   state_next.hc_art_num = (state_curr.hc_art_num + cpars.hc_art_val(time_step)) / 2 ;
 
     //Remove how many that are already on ART
     for(int s = 0; s <ss.NS; ++s) {
-      for(int a = 0; a < pars.options.fertility_first_age_group; ++a) {
+      for(int a = 0; a < pars.options.p_idx_fertility_first; ++a) {
         for(int hd = 0; hd < ss.hc1DS; ++hd) {
-          for(int dur = 0; dur < ss.treatment_stages; ++dur) {
+          for(int dur = 0; dur < ss.hTS; ++dur) {
             if(a < ss.hc2_agestart){
               state_next.hc_art_num -= state_next.hc1_art_pop(dur, hd, a, s);
             }else{
-              if(hd < (ss.hc2DS - 1)){
+              if(hd < (ss.hc2DS)){
                 state_next.hc_art_num -= state_next.hc2_art_pop(dur, hd, a-ss.hc2_agestart, s);
               }
             }
-          } //end ss.treatment_stages
+          } //end ss.hTS
         } //end ss.hc1DS
       } //end a
     } //end ss.NS
@@ -509,8 +517,9 @@ void run_child_art_initiation(int time_step,
   }
 
 
+
   for(int s = 0; s <ss.NS; ++s) {
-    for(int a = 0; a < pars.options.fertility_first_age_group; ++a) {
+    for(int a = 0; a < pars.options.p_idx_fertility_first; ++a) {
       for(int hd = 0; hd < ss.hc1DS; ++hd) {
         for(int cat = 0; cat < ss.hcTT; ++cat) {
           intermediate.hc_initByAge +=  intermediate.hc_art_init(hd, cat, a, s) * cpars.hc_art_init_dist(a, time_step);
@@ -526,7 +535,7 @@ void run_child_art_initiation(int time_step,
   }
   for(int s = 0; s <ss.NS; ++s) {
     for(int cat = 0; cat < ss.hcTT; ++cat) {
-      for(int a = 0; a < pars.options.fertility_first_age_group; ++a) {
+      for(int a = 0; a < pars.options.p_idx_fertility_first; ++a) {
         for(int hd = 0; hd < ss.hc1DS; ++hd) {
           if((intermediate.hc_adj * cpars.hc_art_init_dist(a, time_step)) > 1.0){
             intermediate.hc_art_scalar = 1.0;
@@ -541,14 +550,14 @@ void run_child_art_initiation(int time_step,
           if(a < ss.hc2_agestart){
             state_next.hc1_art_pop(0, hd, a, s) +=  intermediate.hc_art_scalar * intermediate.hc_art_init(hd, cat, a, s) ;
           }else{
-            if(hd < (ss.hc2DS - 1)){
+            if(hd < (ss.hc2DS)){
               state_next.hc2_art_pop(0, hd, a - ss.hc2_agestart, s) +=  intermediate.hc_art_scalar * intermediate.hc_art_init(hd, cat, a, s) ;
             }
           }
           if(a < ss.hc2_agestart){
             state_next.hc1_hiv_pop(hd, cat, a, s) -=  intermediate.hc_art_scalar * intermediate.hc_art_init(hd, cat, a, s) ;
           }else{
-            if(hd < (ss.hc2DS - 1)){
+            if(hd < (ss.hc2DS )){
               state_next.hc2_hiv_pop(hd, cat, a - ss.hc2_agestart, s) -=  intermediate.hc_art_scalar * intermediate.hc_art_init(hd, cat, a, s) ;
             }
           }
@@ -560,6 +569,37 @@ void run_child_art_initiation(int time_step,
 
 }
 
+template<HivAgeStratification S, typename real_type>
+void run_child_time_on_art(int time_step,
+                        const Parameters<real_type> &pars,
+                        const State<S, real_type> &state_curr,
+                        State<S, real_type> &state_next,
+                        IntermediateData<S, real_type> &intermediate) {
+  constexpr auto ss = StateSpace<S>();
+  const auto cpars = pars.children;
+  //Progress ART to the correct time on ART
+
+    for(int hd = 0; hd < ss.hc1DS; ++hd) {
+    for(int a = 0; a < pars.options.p_idx_fertility_first; ++a) {
+      for(int s = 0; s <ss.NS; ++s) {
+        if(a < ss.hc2_agestart){
+          if(state_next.hc1_art_pop(1, hd, a, s) > 0){
+            state_next.hc1_art_pop(2, hd, a, s) += state_next.hc1_art_pop(1, hd, a, s);
+            state_next.hc1_art_pop(1, hd, a, s) -= state_next.hc1_art_pop(1, hd, a, s);
+          }
+        }else{
+          if(state_next.hc2_art_pop(1, hd, a-ss.hc2_agestart, s) > 0){
+            if(hd < (ss.hc2DS)){
+              state_next.hc2_art_pop(2, hd, a-ss.hc2_agestart, s) += state_next.hc2_art_pop(1, hd, a-ss.hc2_agestart, s);
+              state_next.hc2_art_pop(1, hd, a-ss.hc2_agestart, s) -= state_next.hc2_art_pop(1, hd, a-ss.hc2_agestart, s);
+            }
+          }
+        }
+      }//end ss.NS
+    }// end a
+  }// end ss.hc1DS
+
+}
 
 
 }// namespace internal
@@ -577,7 +617,9 @@ void run_child_model_simulation(int time_step,
  internal::add_child_grad(time_step, pars, state_curr, state_next, intermediate);
  // this function may need to be broken up, its around 350 lines
  // !!!TODO: also need to fix the looping order for some loops
-// internal::run_child_art_initiation(time_step, pars, state_curr, state_next, intermediate);
+ // !!!TODO: put this in an if statement to only run if the first year of ART has passed
+  internal::run_child_art_initiation(time_step, pars, state_curr, state_next, intermediate);
+  internal::run_child_time_on_art(time_step, pars, state_curr, state_next, intermediate);
 
 
 }
