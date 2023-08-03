@@ -39,6 +39,7 @@ void initialise_model_state(const Parameters<real_type> &pars,
   state.hc2_art_aids_deaths.setZero();
   state.hc1_noart_aids_deaths.setZero();
   state.hc2_noart_aids_deaths.setZero();
+  state.hc_art_num = 0;
 }
 
 }

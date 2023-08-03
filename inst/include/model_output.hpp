@@ -46,6 +46,7 @@ Rcpp::List build_r_output(const typename leapfrog::StateSaver<S, real_type>::Out
   Rcpp::NumericVector r_hc2_noart_aids_deaths(hc2DS * hcTT * hc2AG * NS * output_years);
   Rcpp::NumericVector r_hc1_art_aids_deaths(hTS * hc1DS * hc1AG * NS * output_years);
   Rcpp::NumericVector r_hc2_art_aids_deaths(hTS * hc2DS * hc2AG * NS * output_years);
+  Rcpp::NumericVector r_hc_art_num(output_years);
 
   r_p_total_pop.attr("dim") = Rcpp::NumericVector::create(pAG, NS, output_years);
   r_births.attr("dim") = Rcpp::NumericVector::create(output_years);
@@ -67,6 +68,7 @@ Rcpp::List build_r_output(const typename leapfrog::StateSaver<S, real_type>::Out
   r_hc2_noart_aids_deaths.attr("dim") = Rcpp::NumericVector::create(hc2DS, hcTT, hc2AG, NS, output_years);
   r_hc1_art_aids_deaths.attr("dim") = Rcpp::NumericVector::create(hTS, hc1DS, hc1AG, NS, output_years);
   r_hc2_art_aids_deaths.attr("dim") = Rcpp::NumericVector::create(hTS, hc2DS, hc2AG, NS, output_years);
+  r_hc_art_num.attr("dim") = Rcpp::NumericVector::create(output_years);
 
   std::copy_n(state.p_total_pop.data(), state.p_total_pop.size(), REAL(r_p_total_pop));
   std::copy_n(state.births.data(), state.births.size(), REAL(r_births));
@@ -88,6 +90,7 @@ Rcpp::List build_r_output(const typename leapfrog::StateSaver<S, real_type>::Out
   std::copy_n(state.hc2_noart_aids_deaths.data(), state.hc2_noart_aids_deaths.size(), REAL(r_hc2_noart_aids_deaths));
   std::copy_n(state.hc1_art_aids_deaths.data(), state.hc1_art_aids_deaths.size(), REAL(r_hc1_art_aids_deaths));
   std::copy_n(state.hc2_art_aids_deaths.data(), state.hc2_art_aids_deaths.size(), REAL(r_hc2_art_aids_deaths));
+  std::copy_n(state.hc_art_num.data(), state.hc_art_num.size(), REAL(r_hc_art_num));
 
   List ret = ListBuilder()
     .add("p_total_pop", r_p_total_pop)
@@ -109,6 +112,7 @@ Rcpp::List build_r_output(const typename leapfrog::StateSaver<S, real_type>::Out
     .add("hc1_noart_aids_deaths", r_hc1_noart_aids_deaths)
     .add("hc2_noart_aids_deaths", r_hc2_noart_aids_deaths)
     .add("hc1_art_aids_deaths", r_hc1_art_aids_deaths)
-    .add("hc2_art_aids_deaths", r_hc2_art_aids_deaths);
+    .add("hc2_art_aids_deaths", r_hc2_art_aids_deaths)
+    .add("hc_art_num", r_hc_art_num);
   return ret;
 }

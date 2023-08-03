@@ -19,3 +19,4 @@ hc1_noart_aids_deaths,hc1_noart_aids_deaths,REAL,5,hc1DS,hcTT,hc1AG,NS,output_ye
 hc2_noart_aids_deaths,hc2_noart_aids_deaths,REAL,5,hc2DS,hcTT,hc2AG,NS,output_years
 hc1_art_aids_deaths,hc1_art_aids_deaths,REAL,5,hTS,hc1DS,hc1AG,NS,output_years
 hc2_art_aids_deaths,hc2_art_aids_deaths,REAL,5,hTS,hc2DS,hc2AG,NS,output_years
+hc_art_num,hc_art_num,REAL,1,output_years,,,,

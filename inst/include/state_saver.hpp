@@ -28,6 +28,7 @@ public:
     Tensor5<real_type> hc2_art_aids_deaths;
     Tensor5<real_type> hc1_noart_aids_deaths;
     Tensor5<real_type> hc2_noart_aids_deaths;
+    Tensor1<real_type> hc_art_num;
 
 
     OutputState(int pAG,
@@ -76,7 +77,8 @@ public:
           hc1_noart_aids_deaths(StateSpace<S>().hc1DS, StateSpace<S>().hcTT, StateSpace<S>().hc1AG,
                                    StateSpace<S>().NS, no_output_years),
           hc2_noart_aids_deaths(StateSpace<S>().hc2DS, StateSpace<S>().hcTT, StateSpace<S>().hc2AG,
-                                                       StateSpace<S>().NS, no_output_years)
+                                                       StateSpace<S>().NS, no_output_years),
+          hc_art_num(no_output_years)
                                              {
             p_total_pop.setZero();
             p_total_pop_natural_deaths.setZero();
@@ -99,6 +101,7 @@ public:
       hc2_art_aids_deaths.setZero();
       hc1_noart_aids_deaths.setZero();
       hc2_noart_aids_deaths.setZero();
+      hc_art_num.setZero();
     }
   };
 
@@ -147,6 +150,7 @@ public:
         full_state.hc2_art_aids_deaths.chip(i, full_state.hc2_art_aids_deaths.NumDimensions - 1) = state.hc2_art_aids_deaths;
         full_state.hc1_noart_aids_deaths.chip(i, full_state.hc1_noart_aids_deaths.NumDimensions - 1) = state.hc1_noart_aids_deaths;
         full_state.hc2_noart_aids_deaths.chip(i, full_state.hc2_noart_aids_deaths.NumDimensions - 1) = state.hc2_noart_aids_deaths;
+        full_state.hc_art_num(i) = state.hc_art_num;
         return;
       }
     }

@@ -47,7 +47,7 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
   const leapfrog::TensorMap2<int> adults_on_art_is_percent = parse_data<int>(data, "art15plus_isperc", NS, proj_years);
   const leapfrog::TensorMap1<real_type> hc_nosocomial = parse_data<real_type>(data, "paed_incid_input", proj_years);
   const leapfrog::TensorMap1<real_type> hc1_cd4_dist = parse_data<real_type>(data, "paed_cd4_dist", hc2DS);
-  const leapfrog::TensorMap2<real_type> hc_cd4_transition = parse_data<real_type>(data, "paed_cd4_transition", hc1DS, hc2DS);
+  const leapfrog::TensorMap2<real_type> hc_cd4_transition = parse_data<real_type>(data, "paed_cd4_transition", hc2DS, hc1DS);
   const leapfrog::TensorMap3<real_type> hc1_cd4_mort = parse_data<real_type>(data, "paed_cd4_mort", hc1DS, hcTT, hc1AG);
   const leapfrog::TensorMap3<real_type> hc2_cd4_mort = parse_data<real_type>(data, "adol_cd4_mort", hc2DS, hcTT, hc2AG);
   const leapfrog::TensorMap1<real_type> hc1_cd4_prog = parse_data<real_type>(data, "paed_cd4_prog", hc1DS);

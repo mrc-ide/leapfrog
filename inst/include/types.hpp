@@ -212,6 +212,8 @@ struct State {
   TensorFixedSize <real_type, Sizes<hc1DS<S>, hcTT<S>, hc1AG<S>, NS<S>>> hc1_noart_aids_deaths;
   TensorFixedSize <real_type, Sizes<hc2DS<S>, hcTT<S>, hc2AG<S>, NS<S>>> hc2_noart_aids_deaths;
 
+  real_type hc_art_num;
+
   State() {}
 
   void reset() {
@@ -235,6 +237,7 @@ struct State {
     hc1_noart_aids_deaths.setZero();
     hc2_noart_aids_deaths.setZero();
     births = 0;
+    hc_art_num = 0;
   }
 };
 
@@ -265,7 +268,6 @@ struct IntermediateData {
   TensorFixedSize <real_type, Sizes<hDS<S>, hcTT<S>, hAG<S>, NS<S>>> hc_posthivmort;
   TensorFixedSize <real_type, Sizes<hDS<S>, hcTT<S>, hAG<S>, NS<S>>> hc_grad;
   TensorFixedSize <real_type, Sizes<hDS<S>, hcTT<S>, hAG<S>, NS<S>>> hc_art_need;
-  real_type hc_art_num;
   TensorFixedSize <real_type, Sizes<hDS<S>, hcTT<S>, hAG<S>, NS<S>>> hc_art_init;
   real_type hc_art_init_total;
   real_type hc_death_rate;
@@ -336,7 +338,6 @@ struct IntermediateData {
     hc_posthivmort.setZero();
     hc_grad.setZero();
     hc_art_need.setZero();
-    hc_art_num = 0.0;
     hc_art_init.setZero();
     hc_art_init_total = 0.0;
     hc_death_rate = 0.0;
