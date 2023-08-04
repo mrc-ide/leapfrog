@@ -63,18 +63,33 @@ Rcpp::List build_r_output(const leapfrog::OutputState<ModelVariant, real_type> &
   std::copy_n(state.p_hiv_deaths.data(), state.p_hiv_deaths.size(), REAL(r_p_hiv_deaths));
 
   Rcpp::List ret(12);
-  ret["p_total_pop"] = r_p_total_pop;
-  ret["births"] = r_births;
-  ret["p_total_pop_natural_deaths"] = r_p_total_pop_natural_deaths;
-  ret["p_hiv_pop"] = r_p_hiv_pop;
-  ret["p_hiv_pop_natural_deaths"] = r_p_hiv_pop_natural_deaths;
-  ret["h_hiv_adult"] = r_h_hiv_adult;
-  ret["h_art_adult"] = r_h_art_adult;
-  ret["h_hiv_deaths_no_art"] = r_h_hiv_deaths_no_art;
-  ret["p_infections"] = r_p_infections;
-  ret["h_hiv_deaths_art"] = r_h_hiv_deaths_art;
-  ret["h_art_initiation"] = r_h_art_initiation;
-  ret["p_hiv_deaths"] = r_p_hiv_deaths;
+  Rcpp::CharacterVector names(12);
+  names[0] = "p_total_pop";
+  ret[0] = r_p_total_pop;
+  names[1] = "births";
+  ret[1] = r_births;
+  names[2] = "p_total_pop_natural_deaths";
+  ret[2] = r_p_total_pop_natural_deaths;
+  names[3] = "p_hiv_pop";
+  ret[3] = r_p_hiv_pop;
+  names[4] = "p_hiv_pop_natural_deaths";
+  ret[4] = r_p_hiv_pop_natural_deaths;
+  names[5] = "h_hiv_adult";
+  ret[5] = r_h_hiv_adult;
+  names[6] = "h_art_adult";
+  ret[6] = r_h_art_adult;
+  names[7] = "h_hiv_deaths_no_art";
+  ret[7] = r_h_hiv_deaths_no_art;
+  names[8] = "p_infections";
+  ret[8] = r_p_infections;
+  names[9] = "h_hiv_deaths_art";
+  ret[9] = r_h_hiv_deaths_art;
+  names[10] = "h_art_initiation";
+  ret[10] = r_h_art_initiation;
+  names[11] = "p_hiv_deaths";
+  ret[11] = r_p_hiv_deaths;
+
+  ret.attr("names") = names;
 
   if constexpr (ModelVariant::run_child_model) {
     constexpr auto ss_child = leapfrog::StateSpace<ModelVariant>().children;

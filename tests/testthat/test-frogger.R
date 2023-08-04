@@ -10,7 +10,7 @@ test_that("initial state set up works as expected", {
       "p_total_pop", "births", "p_total_pop_natural_deaths", "p_hiv_pop",
       "p_hiv_pop_natural_deaths", "h_hiv_adult", "h_art_adult",
       "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art", "h_art_initiation",
-      "p_hiv_deaths", "hc_hiv_pop"
+      "p_hiv_deaths"
     )
   )
   expect_equal(dim(out$p_total_pop), c(81, 2, 1))
@@ -59,7 +59,7 @@ test_that("initial state set up with coarse stratified HIV works as expected", {
       "p_total_pop", "births", "p_total_pop_natural_deaths", "p_hiv_pop",
       "p_hiv_pop_natural_deaths", "h_hiv_adult", "h_art_adult",
       "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art", "h_art_initiation",
-      "p_hiv_deaths", "hc_hiv_pop"
+      "p_hiv_deaths"
     )
   )
   expect_equal(dim(out$p_total_pop), c(81, 2, 1))
@@ -106,7 +106,7 @@ test_that("model for 1 time step has looped", {
       "p_total_pop", "births", "p_total_pop_natural_deaths", "p_hiv_pop",
       "p_hiv_pop_natural_deaths", "h_hiv_adult", "h_art_adult",
       "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art", "h_art_initiation",
-      "p_hiv_deaths", "hc_hiv_pop"
+      "p_hiv_deaths"
     )
   )
   expect_equal(dim(out$p_total_pop), c(81, 2, 1))
