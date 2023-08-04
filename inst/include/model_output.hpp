@@ -62,19 +62,19 @@ Rcpp::List build_r_output(const leapfrog::OutputState<ModelVariant, real_type> &
   std::copy_n(state.h_art_initiation.data(), state.h_art_initiation.size(), REAL(r_h_art_initiation));
   std::copy_n(state.p_hiv_deaths.data(), state.p_hiv_deaths.size(), REAL(r_p_hiv_deaths));
 
-  ListBuilder builder = ListBuilder()
-      .add("p_total_pop", r_p_total_pop)
-      .add("births", r_births)
-      .add("p_total_pop_natural_deaths", r_p_total_pop_natural_deaths)
-      .add("p_hiv_pop", r_p_hiv_pop)
-      .add("p_hiv_pop_natural_deaths", r_p_hiv_pop_natural_deaths)
-      .add("h_hiv_adult", r_h_hiv_adult)
-      .add("h_art_adult", r_h_art_adult)
-      .add("h_hiv_deaths_no_art", r_h_hiv_deaths_no_art)
-      .add("p_infections", r_p_infections)
-      .add("h_hiv_deaths_art", r_h_hiv_deaths_art)
-      .add("h_art_initiation", r_h_art_initiation)
-      .add("p_hiv_deaths", r_p_hiv_deaths);
+  Rcpp::List ret(12);
+  ret["p_total_pop"] = r_p_total_pop;
+  ret["births"] = r_births;
+  ret["p_total_pop_natural_deaths"] = r_p_total_pop_natural_deaths;
+  ret["p_hiv_pop"] = r_p_hiv_pop;
+  ret["p_hiv_pop_natural_deaths"] = r_p_hiv_pop_natural_deaths;
+  ret["h_hiv_adult"] = r_h_hiv_adult;
+  ret["h_art_adult"] = r_h_art_adult;
+  ret["h_hiv_deaths_no_art"] = r_h_hiv_deaths_no_art;
+  ret["p_infections"] = r_p_infections;
+  ret["h_hiv_deaths_art"] = r_h_hiv_deaths_art;
+  ret["h_art_initiation"] = r_h_art_initiation;
+  ret["p_hiv_deaths"] = r_p_hiv_deaths;
 
   if constexpr (ModelVariant::run_child_model) {
     constexpr auto ss_child = leapfrog::StateSpace<ModelVariant>().children;
@@ -86,10 +86,8 @@ Rcpp::List build_r_output(const leapfrog::OutputState<ModelVariant, real_type> &
     r_hc_hiv_pop.attr("dim") = Rcpp::NumericVector::create(hDS, hTM, pAG, NS, output_years);
     std::copy_n(state.hc_hiv_pop.data(), state.hc_hiv_pop.size(), REAL(r_hc_hiv_pop));
 
-    builder.add("hc_hiv_pop", r_hc_hiv_pop);
+    ret.push_back(r_hc_hiv_pop, "hc_hiv_pop");
   }
-
-  List ret = builder;
 
   return ret;
 }
