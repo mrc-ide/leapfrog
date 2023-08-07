@@ -21,7 +21,7 @@ test_that("We can compile the standalone program", {
   input <- frogger_file("fit_model/data")
 
   res <- system2(file.path(tmp, "fit_model"),
-                 c(60, 10, "false", input, output),
+                 c(60, 10, input, output),
                  stdout = TRUE)
   expect_equal(res, c(paste0("Created output directory '", output, "'"),
                       "Fit complete"))
