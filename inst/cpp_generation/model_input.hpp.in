@@ -9,15 +9,12 @@
 #include "r_utils.hpp"
 
 template<typename ModelVariant, typename real_type>
-leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
+leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::List &data,
                                                     const leapfrog::Options<real_type> &options,
                                                     const int proj_years) {
-  const int p_fertility_age_groups = options.p_fertility_age_groups;
-  const int p_idx_hiv_first_adult = options.p_idx_hiv_first_adult;
-  constexpr auto ss = leapfrog::StateSpace<ModelVariant>().base;
-{{unpack_state_space}}
+  constexpr auto ss = leapfrog::StateSpace<ModelVariant>();
 
-{{parse_data}}
+{{default_data}}
 
   const leapfrog::Demography<real_type> demography = {
       base_pop,
@@ -49,22 +46,5 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
       adults_on_art_is_percent
   };
 
-  leapfrog::Parameters<ModelVariant, real_type> params = {
-      options,
-      demography,
-      incidence,
-      natural_history,
-      art
-  }
-
-  if constexpr (ModelVariant::run_child_model) {
-    const leapfrog::Children<real_type> children = {
-          hc_nosocomial,
-          hc1_cd4_dist,
-          hc_cd4_transition
-    };
-    params.children = children;
-  }
-
-  return params;
+{{optional_data}}
 }
