@@ -165,6 +165,17 @@ struct Children {
   TensorMap1<int> hc_art_isperc;
   TensorMap1<real_type> hc_art_val;
   TensorMap2<real_type> hc_art_init_dist;
+
+  //WLHIV fert
+  TensorMap1<real_type> fert_mult_by_age;
+  TensorMap1<real_type> fert_mult_offart;
+  TensorMap1<real_type> fert_mult_onart;
+  TensorMap1<real_type> total_fertility_rate;
+  real_type local_adj_factor;
+
+
+
+
 };
 
 template<typename real_type>
@@ -212,6 +223,8 @@ struct State {
   TensorFixedSize <real_type, Sizes<hc1DS<S>, hcTT<S>, hc1AG<S>, NS<S>>> hc1_noart_aids_deaths;
   TensorFixedSize <real_type, Sizes<hc2DS<S>, hcTT<S>, hc2AG<S>, NS<S>>> hc2_noart_aids_deaths;
 
+  real_type hiv_births;
+
   real_type hc_art_num;
 
   State() {}
@@ -237,6 +250,7 @@ struct State {
     hc1_noart_aids_deaths.setZero();
     hc2_noart_aids_deaths.setZero();
     births = 0;
+    hiv_births = 0;
     hc_art_num = 0;
   }
 };
@@ -275,6 +289,16 @@ struct IntermediateData {
   real_type hc_art_scalar;
   real_type hc_initByAge;
   real_type hc_adj;
+  real_type asfr_sum;
+  real_type births_sum;
+  real_type birthsCurrAge;
+  real_type birthsHE;
+  real_type births_HE_15_24;
+  real_type nHIVcurr;
+  real_type nHIVlast;
+  real_type totpop;
+  real_type prev;
+  real_type df;
 
   real_type cd4mx_scale;
   real_type artpop_hahm;
@@ -345,6 +369,16 @@ struct IntermediateData {
     hc_art_scalar = 0.0;
     hc_initByAge = 0.0;
     hc_adj = 0.0;
+    asfr_sum = 0.0;
+    births_sum = 0.0;
+    birthsCurrAge = 0.0;
+    birthsHE = 0.0;
+    births_HE_15_24 = 0.0;
+    nHIVcurr = 0.0;
+    nHIVlast = 0.0;
+    totpop = 0.0;
+    prev = 0.0;
+    df = 0.0;
     cd4mx_scale = 1.0;
     deaths = 0.0;
     everARTelig_idx = 0;

@@ -66,7 +66,12 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
       hc2_art_mort,
       hc_art_isperc,
       hc_art_val,
-      hc_art_init_dist
+      hc_art_init_dist,
+      fert_mult_by_age,
+      fert_mult_offart,
+      fert_mult_onart,
+      total_fertility_rate,
+      local_adj_factor
   };
 
   const leapfrog::Parameters<real_type> params = {options,
