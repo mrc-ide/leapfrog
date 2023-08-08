@@ -67,31 +67,34 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
       adults_on_art_is_percent
   };
 
+  const leapfrog::BaseModelParameters<real_type> base_model_params = {
+        options,
+        demography,
+        incidence,
+        natural_history,
+        art
+    };
+
   if constexpr (ModelVariant::run_child_model) {
     constexpr auto children = ss.children;
     const leapfrog::TensorMap1<real_type> hc_nosocomial = parse_data<real_type>(data, "paed_incid_input", proj_years);
     const leapfrog::TensorMap1<real_type> hc1_cd4_dist = parse_data<real_type>(data, "paed_cd4_dist", children.hc2DS);
     const leapfrog::TensorMap2<real_type> hc_cd4_transition = parse_data<real_type>(data, "paed_cd4_transition", children.hc1DS, children.hc2DS);
     const leapfrog::Children<real_type> child = {
-          hc_nosocomial,
-          hc1_cd4_dist,
-          hc_cd4_transition
+        hc_nosocomial,
+        hc1_cd4_dist,
+        hc_cd4_transition
+    };
+    const leapfrog::ChildModelParameters<ModelVariant, real_type> child_model_params = {
+        child
     };
     return leapfrog::Parameters<ModelVariant, real_type>{
-        options,
-        demography,
-        incidence,
-        natural_history,
-        art,
-        child
+        base_model_params,
+        child_model_params
     };
   } else {
     return leapfrog::Parameters<ModelVariant, real_type>{
-        options,
-        demography,
-        incidence,
-        natural_history,
-        art
+        base_model_params
     };
   }
 }

@@ -25,7 +25,10 @@ generate_output_interface <- function(dest) {
   output_sections <- group_list_of_lists(parsed_outputs, "output_when")
 
   default_section <- output_sections[names(output_sections) == ""][[1]]
-  default_data <- generate_output_section(default_section)
+  ## TODO: don't hardcode the struct section here, remove this after
+  ## we are generating out struct types and we know which output
+  ## belongs to which struct
+  default_data <- generate_output_section(default_section, "base")
   default_data <- paste(default_data, collapse = "\n")
   build_list <- generate_build_list(default_section)
   build_list <- paste(build_list, collapse = "\n")
@@ -46,17 +49,17 @@ generate_output_interface <- function(dest) {
   invisible(dest)
 }
 
-generate_output_section <- function(section) {
+generate_output_section <- function(section, struct_name) {
   unpack <- generate_unpack_state_space(section)
   initialise_memory <- generate_initialise_r_memory(section)
   set_r_dimensions <- generate_set_r_dimensions(section)
-  copy_data <- generate_copy_data(section)
+  copy_data <- generate_copy_data(section, struct_name)
   c(unpack, initialise_memory, set_r_dimensions, copy_data)
 }
 
 generate_optional_output_section <- function(section, output_when) {
   condition <- sprintf("  if constexpr (%s) {", output_when)
-  data <- generate_output_section(section)
+  data <- generate_output_section(section, "children")
   push_to_list <- generate_push_to_list(section)
   c(condition, paste0("  ", c(data, push_to_list)), "  }")
 }
@@ -88,11 +91,11 @@ generate_set_r_dimensions <- function(outputs) {
   })
 }
 
-generate_copy_data <- function(outputs) {
+generate_copy_data <- function(outputs, struct_name) {
   vcapply(outputs, function(output) {
-    sprintf("  std::copy_n(state.%s.data(), state.%s.size(), %s(r_%s));",
-            output$cpp_name, output$cpp_name, output$r_type,
-            output$r_name)
+    sprintf("  std::copy_n(state.%s.%s.data(), state.%s.%s.size(), %s(r_%s));",
+            struct_name, output$cpp_name, struct_name, output$cpp_name,
+            output$r_type, output$r_name)
   })
 }
 
@@ -218,25 +221,20 @@ generate_input_from_value <- function(inputs) {
 generate_return <- function() {
   ## TODO: Generate this when we have type definitions being generated
   c("  const leapfrog::Children<real_type> child = {",
-    "        hc_nosocomial,",
-    "        hc1_cd4_dist,",
-    "        hc_cd4_transition",
+    "      hc_nosocomial,",
+    "      hc1_cd4_dist,",
+    "      hc_cd4_transition",
+    "  };",
+    "  const leapfrog::ChildModelParameters<ModelVariant, real_type> child_model_params = {",
+    "      child",
     "  };",
     "  return leapfrog::Parameters<ModelVariant, real_type>{",
-    "      options,",
-    "      demography,",
-    "      incidence,",
-    "      natural_history,",
-    "      art,",
-    "      child",
+    "      base_model_params,",
+    "      child_model_params",
     "  };",
     "} else {",
     "  return leapfrog::Parameters<ModelVariant, real_type>{",
-    "      options,",
-    "      demography,",
-    "      incidence,",
-    "      natural_history,",
-    "      art",
+    "      base_model_params",
     "  };")
 }
 

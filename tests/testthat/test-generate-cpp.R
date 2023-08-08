@@ -13,8 +13,8 @@ test_that("can generate output parsing", {
     "create\\(base.pAG, base.NS, output_years\\);"),
     result)))
   expect_true(any(grepl(paste0(
-    "std::copy_n\\(state\\.p_total_pop\\.data\\(\\), ",
-    "state.p_total_pop.size\\(\\), REAL\\(r_p_total_pop\\)\\);"),
+    "std::copy_n\\(state\\.base\\.p_total_pop\\.data\\(\\), ",
+    "state\\.base\\.p_total_pop.size\\(\\), REAL\\(r_p_total_pop\\)\\);"),
     result)))
   expect_true(any(grepl(
     "names\\[0\\] = \\\"p_total_pop\\\";",

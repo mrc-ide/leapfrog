@@ -19,40 +19,40 @@ void save_output(leapfrog::StateSaver<ModelVariant, double> &state_saver,
 
   std::filesystem::path out_path(output_path);
   std::filesystem::path p_total_pop_path = out_path / "p_total_pop";
-  serialize::serialize_tensor<double, 3>(state.p_total_pop, p_total_pop_path);
+  serialize::serialize_tensor<double, 3>(state.base.p_total_pop, p_total_pop_path);
 
   std::filesystem::path births_path = out_path / "births";
-  serialize::serialize_tensor<double, 1>(state.births, births_path);
+  serialize::serialize_tensor<double, 1>(state.base.births, births_path);
 
   std::filesystem::path p_total_pop_natural_deaths_path = out_path / "p_total_pop_natural_deaths";
-  serialize::serialize_tensor<double, 3>(state.p_total_pop_natural_deaths, p_total_pop_natural_deaths_path);
+  serialize::serialize_tensor<double, 3>(state.base.p_total_pop_natural_deaths, p_total_pop_natural_deaths_path);
 
   std::filesystem::path p_hiv_pop_path = out_path / "p_hiv_pop";
-  serialize::serialize_tensor<double, 3>(state.p_hiv_pop, p_hiv_pop_path);
+  serialize::serialize_tensor<double, 3>(state.base.p_hiv_pop, p_hiv_pop_path);
 
   std::filesystem::path p_hiv_pop_natural_deaths_path = out_path / "p_hiv_pop_natural_deaths";
-  serialize::serialize_tensor<double, 3>(state.p_hiv_pop_natural_deaths, p_hiv_pop_natural_deaths_path);
+  serialize::serialize_tensor<double, 3>(state.base.p_hiv_pop_natural_deaths, p_hiv_pop_natural_deaths_path);
 
   std::filesystem::path h_hiv_adult_path = out_path / "h_hiv_adult";
-  serialize::serialize_tensor<double, 4>(state.h_hiv_adult, h_hiv_adult_path);
+  serialize::serialize_tensor<double, 4>(state.base.h_hiv_adult, h_hiv_adult_path);
 
   std::filesystem::path h_art_adult_path = out_path / "h_art_adult";
-  serialize::serialize_tensor<double, 5>(state.h_art_adult, h_art_adult_path);
+  serialize::serialize_tensor<double, 5>(state.base.h_art_adult, h_art_adult_path);
 
   std::filesystem::path h_hiv_deaths_no_art_path = out_path / "h_hiv_deaths_no_art";
-  serialize::serialize_tensor<double, 4>(state.h_hiv_deaths_no_art, h_hiv_deaths_no_art_path);
+  serialize::serialize_tensor<double, 4>(state.base.h_hiv_deaths_no_art, h_hiv_deaths_no_art_path);
 
   std::filesystem::path p_infections_path = out_path / "p_infections";
-  serialize::serialize_tensor<double, 3>(state.p_infections, p_infections_path);
+  serialize::serialize_tensor<double, 3>(state.base.p_infections, p_infections_path);
 
   std::filesystem::path h_hiv_deaths_art_path = out_path / "h_hiv_deaths_art";
-  serialize::serialize_tensor<double, 5>(state.h_hiv_deaths_art, h_hiv_deaths_art_path);
+  serialize::serialize_tensor<double, 5>(state.base.h_hiv_deaths_art, h_hiv_deaths_art_path);
 
   std::filesystem::path h_art_initiation_path = out_path / "h_art_initiation";
-  serialize::serialize_tensor<double, 4>(state.h_art_initiation, h_art_initiation_path);
+  serialize::serialize_tensor<double, 4>(state.base.h_art_initiation, h_art_initiation_path);
 
   std::filesystem::path p_hiv_deaths_path = out_path / "p_hiv_deaths";
-  serialize::serialize_tensor<double, 3>(state.p_hiv_deaths, p_hiv_deaths_path);
+  serialize::serialize_tensor<double, 3>(state.base.p_hiv_deaths, p_hiv_deaths_path);
 }
 
 int main(int argc, char *argv[]) {
