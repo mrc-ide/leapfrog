@@ -9,8 +9,8 @@ test_that("child model can be run for all years", {
     c(
       "p_total_pop", "births", "p_total_pop_natural_deaths", "p_hiv_pop",
       "p_hiv_pop_natural_deaths", "h_hiv_adult", "h_art_adult",
-      "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art", "h_art_initiation",
-      "p_hiv_deaths", "hc_hiv_pop"
+      "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art",
+      "h_art_initiation", "p_hiv_deaths", "hc_hiv_pop"
     )
   )
 

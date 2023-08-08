@@ -16,7 +16,8 @@ serialize_r_to_tensor <- function(data, path) {
   if (is.integer(data)) {
     type <- "int"
   } else if (is.logical(data)) {
-     ## using as.integer() removes any dimensions. *1 to preserve shape and convert to int
+    ## using as.integer() removes any dimensions.
+    ## *1 to preserve shape and convert to int
     data <- data * 1
     type <- "int"
   }

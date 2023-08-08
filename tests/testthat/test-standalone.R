@@ -42,41 +42,45 @@ test_that("We can compile the standalone program", {
   expected <- readRDS(test_path("testdata/leapfrog_fit.rds"))
 
   ## We're only reporting out last year atm so check final time point agrees
-  ## We're also expecting some precision loss due to serialization so check up to some tolerance
+  ## We're also expecting some precision loss due to serialization so check
+  ## up to some tolerance
   expect_equal(deserialize_tensor_to_r(file.path(output, "p_total_pop")),
                expected$totpop1,
                tolerance = 1e-5)
   expect_equal(as.numeric(deserialize_tensor_to_r(file.path(output, "births"))),
                expected$births,
                tolerance = 1e-5)
-  expect_equal(deserialize_tensor_to_r(file.path(output, "p_total_pop_natural_deaths")),
-                 expected$natdeaths,
-                 tolerance = 1e-5)
+  expect_equal(
+    deserialize_tensor_to_r(file.path(output, "p_total_pop_natural_deaths")),
+    expected$natdeaths,
+    tolerance = 1e-5)
   expect_equal(deserialize_tensor_to_r(file.path(output, "p_hiv_pop")),
-                 expected$hivpop1,
-                 tolerance = 1e-5)
-  expect_equal(deserialize_tensor_to_r(file.path(output, "p_hiv_pop_natural_deaths")),
-                 expected$natdeaths_hivpop,
-                 tolerance = 1e-5)
+               expected$hivpop1,
+               tolerance = 1e-5)
+  expect_equal(
+    deserialize_tensor_to_r(file.path(output, "p_hiv_pop_natural_deaths")),
+    expected$natdeaths_hivpop,
+    tolerance = 1e-5)
   expect_equal(deserialize_tensor_to_r(file.path(output, "h_hiv_adult")),
-                 expected$hivstrat_adult,
-                 tolerance = 1e-5)
+               expected$hivstrat_adult,
+               tolerance = 1e-5)
   expect_equal(deserialize_tensor_to_r(file.path(output, "h_art_adult")),
-                 expected$artstrat_adult,
-                 tolerance = 1e-5)
-  expect_equal(deserialize_tensor_to_r(file.path(output, "h_hiv_deaths_no_art")),
-                 expected$aidsdeaths_noart,
-                 tolerance = 1e-5)
+               expected$artstrat_adult,
+               tolerance = 1e-5)
+  expect_equal(
+    deserialize_tensor_to_r(file.path(output, "h_hiv_deaths_no_art")),
+    expected$aidsdeaths_noart,
+    tolerance = 1e-5)
   expect_equal(deserialize_tensor_to_r(file.path(output, "p_infections")),
-                 expected$infections,
-                 tolerance = 1e-5)
+               expected$infections,
+               tolerance = 1e-5)
   expect_equal(deserialize_tensor_to_r(file.path(output, "h_hiv_deaths_art")),
-                 expected$aidsdeaths_art,
-                 tolerance = 1e-5)
+               expected$aidsdeaths_art,
+               tolerance = 1e-5)
   expect_equal(deserialize_tensor_to_r(file.path(output, "h_art_initiation")),
-                 expected$artinit,
-                 tolerance = 1e-5)
+               expected$artinit,
+               tolerance = 1e-5)
   expect_equal(deserialize_tensor_to_r(file.path(output, "p_hiv_deaths")),
-                 expected$hivdeaths,
-                 tolerance = 1e-5)
+               expected$hivdeaths,
+               tolerance = 1e-5)
 })
