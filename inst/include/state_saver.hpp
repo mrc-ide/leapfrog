@@ -98,7 +98,6 @@ struct OutputState {
 template<typename ModelVariant, typename real_type>
 class StateSaver {
 public:
-
   StateSaver(int time_steps,
              std::vector<int> save_steps) :
       save_steps(save_steps),

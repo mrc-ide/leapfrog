@@ -39,7 +39,6 @@ void run_age_15_entrants(int time_step,
                          const State<ModelVariant, real_type> &state_curr,
                          State<ModelVariant, real_type> &state_next,
                          IntermediateData<ModelVariant, real_type> &intermediate) {
-
   if constexpr (ModelVariant::run_child_model) {
     constexpr auto ss = StateSpace<ModelVariant>().base;
     constexpr auto ss_child = StateSpace<ModelVariant>().children;

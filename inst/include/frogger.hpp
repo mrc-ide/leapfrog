@@ -27,8 +27,10 @@ OutputState<ModelVariant, real_type> run_model(int time_steps,
   // Each time step is mid-point of the year
   for (int step = 1; step <= time_steps; ++step) {
     state_next.reset();
-    run_general_pop_demographic_projection<ModelVariant>(step, pars, state, state_next, intermediate);
-    run_hiv_pop_demographic_projection<ModelVariant>(step, pars, state, state_next, intermediate);
+    run_general_pop_demographic_projection<ModelVariant>(step, pars, state, state_next,
+                                                         intermediate);
+    run_hiv_pop_demographic_projection<ModelVariant>(step, pars, state, state_next,
+                                                     intermediate);
     run_hiv_model_simulation<ModelVariant>(step, pars, state, state_next, intermediate);
     if constexpr (ModelVariant::run_child_model) {
       run_child_model_simulation<ModelVariant>(step, pars, state, state_next, intermediate);

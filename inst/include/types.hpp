@@ -239,7 +239,6 @@ struct BaseModelState {
 
 template<typename ModelVariant, typename real_type>
 struct ChildModelState {
-
   ChildModelState(const Parameters<ModelVariant, real_type> &pars) {}
 
   void set_initial_state(const Parameters<ModelVariant, real_type> &pars) {}
