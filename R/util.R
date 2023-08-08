@@ -88,7 +88,7 @@ format_vector <- function(vector) {
 #'   list(id = 3, type = "bar"),
 #'   list(id = 4, type = "bar")
 #' )
-#' group_list_of_lists(input_list, "type")
+#' frogger:::group_list_of_lists(input_list, "type")
 group_list_of_lists <- function(list, on) {
   property <- vcapply(list, "[[", on)
   types <- unique(property)
