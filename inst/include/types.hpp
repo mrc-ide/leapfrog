@@ -173,6 +173,13 @@ struct Children {
   TensorMap1<real_type> total_fertility_rate;
   real_type local_adj_factor;
 
+  //perinatal transmission
+  TensorMap2<real_type> pmtct;
+  TensorMap2<real_type> vertical_transmission_rate;
+  TensorMap3<real_type> pmtct_transmission_rate;
+  TensorMap2<real_type> pmtct_dropout;
+  TensorMap1<real_type> pmtct_input_is_percent;
+
 
 
 

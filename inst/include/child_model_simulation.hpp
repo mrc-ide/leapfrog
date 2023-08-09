@@ -65,6 +65,18 @@ void run_child_ageing(int time_step,
 }
 
 template<HivAgeStratification S, typename real_type>
+void run_perinatal_transmission(int time_step,
+                              const Parameters<real_type> &pars,
+                              const State<S, real_type> &state_curr,
+                              State<S, real_type> &state_next,
+                              IntermediateData<S, real_type> &intermediate) {
+  constexpr auto ss = StateSpace<S>();
+  const auto cpars = pars.children;
+
+
+}
+
+template<HivAgeStratification S, typename real_type>
 void run_child_hiv_infections(int time_step,
                               const Parameters<real_type> &pars,
                               const State<S, real_type> &state_curr,
