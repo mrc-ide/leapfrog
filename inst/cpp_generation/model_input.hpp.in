@@ -71,7 +71,12 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
       fert_mult_offart,
       fert_mult_onart,
       total_fertility_rate,
-      local_adj_factor
+      local_adj_factor,
+      pmtct,
+      vertical_transmission_rate,
+      pmtct_transmission_rate,
+      pmtct_dropout,
+      pmtct_input_is_percent
   };
 
   const leapfrog::Parameters<real_type> params = {options,
