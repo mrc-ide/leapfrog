@@ -227,6 +227,8 @@ void run_child_hiv_infections(int time_step,
                               IntermediateData<S, real_type> &intermediate) {
   constexpr auto ss = StateSpace<S>();
   const auto cpars = pars.children;
+  const auto demog = pars.demography;
+
 
   for (int s = 0; s < ss.NS; ++s) {
     // Run only first 5 age groups in total population 0, 1, 2, 3, 4
@@ -240,10 +242,21 @@ void run_child_hiv_infections(int time_step,
           if (cpars.hc1_cd4_dist(hd) > 0) {
             state_next.hc1_hiv_pop(hd, 0, a, s) += state_next.p_infections(a, s) * cpars.hc1_cd4_dist(hd);
           }
-        }
+        } // end hc1DS
       }
-    }
-  }
+    } //end a
+  } // end NS
+
+  //Perinatal transmission
+  for (int s = 0; s < ss.NS; ++s) {
+    for (int hd = 0; hd < ss.hc1DS; ++hd) {
+        state_next.hc1_hiv_pop(hd, 0, 0, s) +=  state_next.hiv_births * intermediate.perinatal_transmission_rate * demog.births_sex_prop(s,time_step) * cpars.hc1_cd4_dist(hd);
+        state_next.hc1_hiv_pop(0, s) +=  state_next.hiv_births * intermediate.perinatal_transmission_rate * demog.births_sex_prop(s,time_step);
+        state_next.p_infections(a, s) += state_next.hiv_births * intermediate.perinatal_transmission_rate * demog.births_sex_prop(s,time_step);
+    }// end hc1DS
+  }// ens NS
+
+
 }
 
 
