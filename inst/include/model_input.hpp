@@ -68,11 +68,11 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
   const leapfrog::TensorMap1<real_type> fert_mult_onart = parse_data<real_type>(data, "fert_mult_onart", p_fertility_age_groups);
   const leapfrog::TensorMap1<real_type> total_fertility_rate = parse_data<real_type>(data, "tfr", proj_years);
   const real_type local_adj_factor = Rcpp::as<real_type>(data["laf"]);
-  const leapfrog::TensorMap2<real_type> pmtct = parse_data<real_type>(data, "pmtct", hPS, proj_years);
+  const leapfrog::TensorMap2<real_type> PMTCT = parse_data<real_type>(data, "pmtct", hPS, proj_years);
   const leapfrog::TensorMap2<real_type> vertical_transmission_rate = parse_data<real_type>(data, "mtct", hDS, 2);
-  const leapfrog::TensorMap3<real_type> pmtct_transmission_rate = parse_data<real_type>(data, "pmtct_mtct", hDS, hPS, 2);
-  const leapfrog::TensorMap2<real_type> pmtct_dropout = parse_data<real_type>(data, "pmtct_dropout", hPS, proj_years);
-  const leapfrog::TensorMap1<real_type> pmtct_input_is_percent = parse_data<real_type>(data, "pmtct_input_sperc", proj_years);
+  const leapfrog::TensorMap3<real_type> PMTCT_transmission_rate = parse_data<real_type>(data, "pmtct_mtct", hDS, hPS, 2);
+  const leapfrog::TensorMap2<real_type> PMTCT_dropout = parse_data<real_type>(data, "pmtct_dropout", hPS, proj_years);
+  const leapfrog::TensorMap1<real_type> PMTCT_input_is_percent = parse_data<real_type>(data, "pmtct_input_sperc", proj_years);
   leapfrog::Tensor1<real_type> h_art_stage_dur(hTS - 1);
   h_art_stage_dur.setConstant(0.5);
 
@@ -129,11 +129,11 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
       fert_mult_onart,
       total_fertility_rate,
       local_adj_factor,
-      pmtct,
+      PMTCT,
       vertical_transmission_rate,
-      pmtct_transmission_rate,
-      pmtct_dropout,
-      pmtct_input_is_percent
+      PMTCT_transmission_rate,
+      PMTCT_dropout,
+      PMTCT_input_is_percent
   };
 
   const leapfrog::Parameters<real_type> params = {options,

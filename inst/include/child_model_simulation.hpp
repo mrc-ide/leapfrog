@@ -82,6 +82,17 @@ void calc_hiv_negative_pop(int time_step,
 
 }
 
+// void calc_need_PMTCT(int time_step,
+//                            const Parameters<real_type> &pars,
+//                            const State<S, real_type> &state_curr,
+//                            State<S, real_type> &state_next,
+//                            IntermediateData<S, real_type> &intermediate) {
+//   const auto demog = pars.demography;
+//   const auto cpars = pars.children;
+//   constexpr auto ss = StateSpace<S>();
+//
+// }
+
 template<HivAgeStratification S, typename real_type>
 void run_perinatal_transmission(int time_step,
                               const Parameters<real_type> &pars,
@@ -100,34 +111,37 @@ void run_perinatal_transmission(int time_step,
   //TODO: pull incidence infection mtct into the input object
 
   for (int hp = 0; hp < ss.hPS; ++hp) {
-    intermediate.sumARV += cpars.pmtct(hp,time_step);
+    intermediate.sumARV += cpars.PMTCT(hp,time_step);
   }
   intermediate.number_on_PMTCT = intermediate.sumARV ;// + PATIENTS REALLOCATED
+  intermediate.need_PMTCT = state_next.hiv_births;
 
-  //Maggie: TODO: make pmtct coverages variables that are automatically converted to % covered, I think that should work?
-  //Cap so that it snaps the distribution to one if intermediate.need_pmtcted, with the distribution matching the input numbers
-  for (int hp = 0; hp < ss.hPS; ++hp) {
-    if (cpars.pmtct_input_is_percent(time_step)) {
-      intermediate.pmtct_coverage(hp) = cpars.pmtct(hp, time_step);
+  if (cpars.PMTCT_input_is_percent(time_step)) { //input is percent
+    if ((intermediate.need_PMTCT(time_step) * intermediate.sumARV) > 0) {
+      intermediate.on_PMTCT = intermediate.need_PMTCT(time_step) * intermediate.sumARV ;
     }else{
-      //TODO: should this be divided by all pregnant women?
-      intermediate.pmtct_coverage(hp) = cpars.pmtct(hp, time_step) / intermediate.sumARV;
-    }
-  }
-
-  if (cpars.pmtct_input_is_percent(time_step)) { //input is percent
-    if ((intermediate.need_pmtctPMTCT(time_step) * intermediate.sumARV) > 0) {
-      intermediate.on_pmtct = intermediate.need_pmtctPMTCT(time_step) * intermediate.sumARV ;
-    }else{
-      intermediate.on_pmtct = 0.0;
+      intermediate.on_PMTCT = 0.0;
     }
   }else{//input is number
-    intermediate.on_pmtct = intermediate.sumARV;
+    intermediate.on_PMTCT = intermediate.sumARV;
+    for (int hp = 0; hp < ss.hPS; ++hp) {
+      if(intermediate.sumARV > intermediate.need_PMTCT){
+        cpars.PMTCT(hp,time_step) = cpars.PMTCT(hp, time_step) / intermediate.sumARV;
+      }else{
+        cpars.PMTCT(hp,time_step) = cpars.PMTCT(hp,time_step) /  intermediate.need_PMTCT;
+      }
+    }
   }
 
-  intermediate.need_pmtct = intermediate.need_pmtctPMTCT(time_step) > intermediate.number_on_PMTCT ? intermediate.need_pmtctPMTCT(time_step) : intermediate.number_on_PMTCT;
+//replace all instances of coverage input as numbers with percentage covered
+if(std::negate(cpars.PMTCT_input_is_percent(time_step))){
 
-  intermediate.no_pmtct = (1 - intermediate.sumARV) > 0 ? 1 - intermediate.sumARV : 0;
+}
+
+
+
+
+  intermediate.no_PMTCT = (1 - intermediate.sumARV) > 0 ? 1 - intermediate.sumARV : 0;
 
   //Proportion of pregnant women by CD4 count
   for (int a = 0; a < 35; ++a) {
@@ -154,37 +168,37 @@ void run_perinatal_transmission(int time_step,
   //Option A and B were only authorized for women with greater than 350 CD4, so if the percentage of women
   //on option A/B > the proportion of women in this cd4 category, we assume that some must have a cd4 less than 350
   //option AB will be less effective for these women so we adjust for that
-  if ((cpars.pmtct(0,time_step) + cpars.pmtct(1,time_step)) > intermediate.prop_wlhiv_gte350) {
+  if ((cpars.PMTCT(0,time_step) + cpars.PMTCT(1,time_step)) > intermediate.prop_wlhiv_gte350) {
     if (intermediate.prop_wlhiv_gte350 > 0) {
-      intermediate.excessratio = ((cpars.pmtct(0,time_step) + cpars.pmtct(1,time_step)) / intermediate.prop_wlhiv_gte350) - 1;
+      intermediate.excessratio = ((cpars.PMTCT(0,time_step) + cpars.PMTCT(1,time_step)) / intermediate.prop_wlhiv_gte350) - 1;
     }else{
       intermediate.excessratio = 0;
     }
-    intermediate.optA_transmission_rate = cpars.pmtct_transmission_rate(0,1,0) * (1 + intermediate.excessratio);
-    intermediate.optB_transmission_rate = cpars.pmtct_transmission_rate(0,2,0) * (1 + intermediate.excessratio);
+    intermediate.optA_transmission_rate = cpars.PMTCT_transmission_rate(0,1,0) * (1 + intermediate.excessratio);
+    intermediate.optB_transmission_rate = cpars.PMTCT_transmission_rate(0,2,0) * (1 + intermediate.excessratio);
   }
 
   else{
     intermediate.excessratio = 0.0;
-    intermediate.optA_transmission_rate = cpars.pmtct_transmission_rate(0,1,0) * (1 + intermediate.excessratio);
-    intermediate.optB_transmission_rate = cpars.pmtct_transmission_rate(0,2,0) * (1 + intermediate.excessratio);
+    intermediate.optA_transmission_rate = cpars.PMTCT_transmission_rate(0,1,0) * (1 + intermediate.excessratio);
+    intermediate.optB_transmission_rate = cpars.PMTCT_transmission_rate(0,2,0) * (1 + intermediate.excessratio);
   }
 
 
   ///////////////////////////////////
   //Calculate transmission rate
   ///////////////////////////////////
-  intermediate.retained_on_ART = cpars.pmtct(4,time_step) * cpars.pmtct_dropout(4,time_step);
-  intermediate.retained_started_ART = cpars.pmtct(5,time_step) * cpars.pmtct_dropout(5,time_step);
+  intermediate.retained_on_ART = cpars.PMTCT(4,time_step) * cpars.PMTCT_dropout(4,time_step);
+  intermediate.retained_started_ART = cpars.PMTCT(5,time_step) * cpars.PMTCT_dropout(5,time_step);
   //Transmission among women on treatment
-  intermediate.perinatal_transmission_rate = cpars.pmtct(2,time_step) * cpars.pmtct_transmission_rate(0,2,0) + cpars.pmtct(3,time_step) * cpars.pmtct_transmission_rate(0,3,0) + cpars.pmtct(0,time_step) * intermediate.optA_transmission_rate + cpars.pmtct(1,time_step) * intermediate.optB_transmission_rate + intermediate.retained_on_ART * cpars.pmtct_transmission_rate(0,4,0) + intermediate.retained_started_ART * cpars.pmtct_transmission_rate(0,5,0)+ cpars.pmtct(6,time_step) * cpars.pmtct_transmission_rate(0,6,0);
+  intermediate.perinatal_transmission_rate = cpars.PMTCT(2,time_step) * cpars.PMTCT_transmission_rate(0,2,0) + cpars.PMTCT(3,time_step) * cpars.PMTCT_transmission_rate(0,3,0) + cpars.PMTCT(0,time_step) * intermediate.optA_transmission_rate + cpars.PMTCT(1,time_step) * intermediate.optB_transmission_rate + intermediate.retained_on_ART * cpars.PMTCT_transmission_rate(0,4,0) + intermediate.retained_started_ART * cpars.PMTCT_transmission_rate(0,5,0)+ cpars.PMTCT(6,time_step) * cpars.PMTCT_transmission_rate(0,6,0);
 
-  intermediate.receiving_pmtct = cpars.pmtct(0,time_step) + cpars.pmtct(1,time_step) + cpars.pmtct(2,time_step) + cpars.pmtct(3,time_step) + intermediate.retained_on_ART + intermediate.retained_started_ART + cpars.pmtct(6,time_step);
-  intermediate.no_pmtct = 1 - intermediate.receiving_pmtct;
+  intermediate.receiving_PMTCT = cpars.PMTCT(0,time_step) + cpars.PMTCT(1,time_step) + cpars.PMTCT(2,time_step) + cpars.PMTCT(3,time_step) + intermediate.retained_on_ART + intermediate.retained_started_ART + cpars.PMTCT(6,time_step);
+  intermediate.no_PMTCT = 1 - intermediate.receiving_PMTCT;
 
   //Transmission among women not on treatment
   if (intermediate.num_wlhiv > 0) {
-    intermediate.perinatal_transmission_rate = intermediate.perinatal_transmission_rate + intermediate.no_pmtct * (intermediate.prop_wlhiv_lt200 * cpars.vertical_transmission_rate(4) + intermediate.prop_wlhiv_200to350 * cpars.vertical_transmission_rate(2) + intermediate.prop_wlhiv_gte350 * cpars.vertical_transmission_rate(0));
+    intermediate.perinatal_transmission_rate = intermediate.perinatal_transmission_rate + intermediate.no_PMTCT * (intermediate.prop_wlhiv_lt200 * cpars.vertical_transmission_rate(4) + intermediate.prop_wlhiv_200to350 * cpars.vertical_transmission_rate(2) + intermediate.prop_wlhiv_gte350 * cpars.vertical_transmission_rate(0));
   }else{
     intermediate.perinatal_transmission_rate = intermediate.perinatal_transmission_rate;
   }
@@ -197,10 +211,10 @@ void run_perinatal_transmission(int time_step,
   }
 
   intermediate.incidence_rate_wlhiv = intermediate.age_weighted_infections / intermediate.age_weighted_hivneg;
-  intermediate.perinatal_transmission_from_incidence = intermediate.incidence_rate_wlhiv * (9/12) * (intermediate.births_sum - intermediate.need_pmtct) *0;  //.181;
+  intermediate.perinatal_transmission_from_incidence = intermediate.incidence_rate_wlhiv * (9/12) * (intermediate.births_sum - intermediate.need_PMTCT) *0;  //.181;
 
-  if (intermediate.need_pmtct > 0) {
-    intermediate.perinatal_transmission_rate = intermediate.perinatal_transmission_rate + intermediate.perinatal_transmission_from_incidence / intermediate.need_pmtct;
+  if (intermediate.need_PMTCT > 0) {
+    intermediate.perinatal_transmission_rate = intermediate.perinatal_transmission_rate + intermediate.perinatal_transmission_from_incidence / intermediate.need_PMTCT;
   }
 
 
@@ -853,8 +867,8 @@ void run_child_model_simulation(int time_step,
  internal::run_child_natural_history(time_step, pars, state_curr, state_next, intermediate);
  internal::run_child_hiv_mort(time_step, pars, state_curr, state_next, intermediate);
  internal::add_child_grad(time_step, pars, state_curr, state_next, intermediate);
- // this function may intermediate.need_pmtct to be broken up, its around 350 lines
- // !!!TODO: also intermediate.need_pmtct to fix the looping order for some loops
+ // this function may intermediate.need_PMTCT to be broken up, its around 350 lines
+ // !!!TODO: also intermediate.need_PMTCT to fix the looping order for some loops
  // !!!TODO: put this in an if statement to only run if the first year of ART has passed
  internal::run_child_art_initiation(time_step, pars, state_curr, state_next, intermediate);
  internal::run_child_art_mortality(time_step, pars, state_curr, state_next, intermediate);

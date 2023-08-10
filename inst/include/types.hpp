@@ -174,11 +174,11 @@ struct Children {
   real_type local_adj_factor;
 
   //perinatal transmission
-  TensorMap2<real_type> pmtct;
+  TensorMap2<real_type> PMTCT;
   TensorMap2<real_type> vertical_transmission_rate;
-  TensorMap3<real_type> pmtct_transmission_rate;
-  TensorMap2<real_type> pmtct_dropout;
-  TensorMap1<real_type> pmtct_input_is_percent;
+  TensorMap3<real_type> PMTCT_transmission_rate;
+  TensorMap2<real_type> PMTCT_dropout;
+  TensorMap1<real_type> PMTCT_input_is_percent;
 
 
 
@@ -308,8 +308,8 @@ struct IntermediateData {
   real_type df;
   real_type sumARV;
   real_type number_on_PMTCT;
-  TensorFixedSize <real_type, Sizes<hPS<S>>> pmtct_coverage;
-  real_type need_pmtct;
+  TensorFixedSize <real_type, Sizes<hPS<S>>> PMTCT_coverage;
+  real_type need_PMTCT;
   real_type num_wlhiv_200to350;
   real_type num_wlhiv_lt200;
   real_type num_wlihv;
@@ -324,15 +324,15 @@ struct IntermediateData {
   real_type perinatal_transmission_rate;
   real_type retained_on_ART;
   real_type retained_started_ART;
-  real_type receiving_pmtct;
+  real_type receiving_PMTCT;
   real_type perinatal_transmission_rate_bf_calc;
   real_type incidence_rate_wlhiv;
   real_type perinatal_transmission_from_incidence;
   real_type perintal_infections;
   real_type age_weighted_hivneg;
   real_type age_weighted_infections;
-  real_type on_pmtct;
-  real_type no_pmtct;
+  real_type on_PMTCT;
+  real_type no_PMTCT;
   TensorFixedSize <real_type, Sizes<hAG<S>, NS<S>>> p_hiv_neg_pop;
 
 
@@ -417,8 +417,8 @@ struct IntermediateData {
     df = 0.0;
     sumARV = 0.0;
     number_on_PMTCT = 0.0;
-    pmtct_coverage.setZero();
-    need_pmtct = 0.0;
+    PMTCT_coverage.setZero();
+    need_PMTCT = 0.0;
     num_wlhiv_200to350 = 0.0;
     num_wlhiv_lt200 = 0.0;
     num_wlihv = 0.0;
@@ -433,15 +433,15 @@ struct IntermediateData {
     perinatal_transmission_rate = 0.0;
     retained_on_ART = 0.0;
     retained_started_ART = 0.0;
-    receiving_pmtct = 0.0;
+    receiving_PMTCT = 0.0;
     perinatal_transmission_rate_bf_calc = 0.0;
     incidence_rate_wlhiv = 0.0;
     perinatal_transmission_from_incidence = 0.0;
     perintal_infections = 0.0;
     age_weighted_hivneg = 0.0;
     age_weighted_infections = 0.0;
-    on_pmtct = 0.0;
-    no_pmtct = 0.0;
+    on_PMTCT = 0.0;
+    no_PMTCT = 0.0;
     p_hiv_neg_pop.setZero();
     cd4mx_scale = 1.0;
     deaths = 0.0;
