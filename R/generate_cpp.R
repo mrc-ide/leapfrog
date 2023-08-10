@@ -172,7 +172,7 @@ generate_input_from_value <- function(input) {
 }
 
 get_state_space_variables <- function() {
-  c("NS", "pAG", "hAG", "hDS", "hTS", "hc1DS", "hc2DS", "hc1AG", "hc2AG", "hcTT")
+  c("NS", "pAG", "hAG", "hDS", "hTS", "hc1DS", "hc2DS", "hc1AG", "hc2AG", "hcTT", "hPS")
 }
 
 generate_unpack_state_space <- function() {
