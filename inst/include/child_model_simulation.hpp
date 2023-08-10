@@ -12,6 +12,9 @@ void run_hiv_child_infections(int time_step,
                               const State<ModelVariant, real_type> &state_curr,
                               State<ModelVariant, real_type> &state_next,
                               IntermediateData<ModelVariant, real_type> &intermediate) {
+  static_assert(ModelVariant::run_child_model,
+                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
+
   constexpr auto adult_ss = StateSpace<ModelVariant>().base;
   const auto children = pars.children.children;
 

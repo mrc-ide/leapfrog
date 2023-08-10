@@ -39,15 +39,16 @@ void run_age_15_entrants(int time_step,
                          const State<ModelVariant, real_type> &state_curr,
                          State<ModelVariant, real_type> &state_next,
                          IntermediateData<ModelVariant, real_type> &intermediate) {
-  if constexpr (ModelVariant::run_child_model) {
-    constexpr auto ss = StateSpace<ModelVariant>().base;
-    constexpr auto ss_child = StateSpace<ModelVariant>().children;
+  static_assert(ModelVariant::run_child_model,
+                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
 
-    for (int g = 0; g < ss.NS; ++g) {
-      for (int hm = 0; hm < ss.hDS; ++hm) {
-        for (int htm = 0; htm < ss_child.hTM; ++htm) {
-          intermediate.age15_hiv_pop(hm, g) += state_curr.children.hc_hiv_pop(hm, htm, 14, g);
-        }
+  constexpr auto ss = StateSpace<ModelVariant>().base;
+  constexpr auto ss_child = StateSpace<ModelVariant>().children;
+
+  for (int g = 0; g < ss.NS; ++g) {
+    for (int hm = 0; hm < ss.hDS; ++hm) {
+      for (int htm = 0; htm < ss_child.hTM; ++htm) {
+        intermediate.age15_hiv_pop(hm, g) += state_curr.children.hc_hiv_pop(hm, htm, 14, g);
       }
     }
   }
@@ -180,7 +181,7 @@ void run_hiv_pop_demographic_projection(int time_step,
                                         internal::IntermediateData<ModelVariant, real_type> &intermediate) {
   internal::run_hiv_ageing_and_mortality<ModelVariant>(time_step, pars, state_curr, state_next,
                                                        intermediate);
-  if (ModelVariant::run_child_model) {
+  if constexpr (ModelVariant::run_child_model) {
     internal::run_age_15_entrants<ModelVariant>(time_step, pars, state_curr, state_next, intermediate);
   }
 
