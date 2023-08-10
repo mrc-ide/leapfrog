@@ -65,6 +65,24 @@ void run_child_ageing(int time_step,
 }
 
 template<HivAgeStratification S, typename real_type>
+void calc_hiv_negative_pop(int time_step,
+                      const Parameters<real_type> &pars,
+                      const State<S, real_type> &state_curr,
+                      State<S, real_type> &state_next,
+                      IntermediateData<S, real_type> &intermediate) {
+  const auto demog = pars.demography;
+  const auto cpars = pars.children;
+  constexpr auto ss = StateSpace<S>();
+
+  for(int s = 0; s < ss.NS; ++s){
+    for(int a = 0; a < ss.hAG; ++a){
+      intermediate.p_hiv_neg_pop(a, s) = demog.base_pop(a, s) - state_next.p_hiv_pop(a, s);
+    }// end a
+  }//end s
+
+}
+
+template<HivAgeStratification S, typename real_type>
 void run_perinatal_transmission(int time_step,
                               const Parameters<real_type> &pars,
                               const State<S, real_type> &state_curr,
@@ -80,7 +98,6 @@ void run_perinatal_transmission(int time_step,
   } // end a
   //TODO: add in patients reallocated
   //TODO: pull incidence infection mtct into the input object
-  //TODO calc hivnpop1
 
   for (int hp = 0; hp < ss.hPS; ++hp) {
     intermediate.sumARV += cpars.pmtct(hp,time_step);
@@ -175,8 +192,7 @@ void run_perinatal_transmission(int time_step,
 
   //Transmission due to incident infections
   for (int a = 0; a < 35; ++a) {
-   // intermediate.age_weighted_hivneg += demog.age_specific_fertility_rate(a, time_step) / intermediate.asfr_sum  * hivnpop1(a + 15,1,time_step) ; //HIV negative 15-49 women weighted for ASFR
-   intermediate.age_weighted_hivneg += demog.age_specific_fertility_rate(a, time_step) / intermediate.asfr_sum  * 1 ;//hivnpop1(a + 15,1,time_step) ; //HIV negative 15-49 women weighted for ASFR
+    intermediate.age_weighted_hivneg += demog.age_specific_fertility_rate(a, time_step) / intermediate.asfr_sum  * intermediate.p_hiv_neg_pop(a + 15,1) ; //HIV negative 15-49 women weighted for ASFR
     intermediate.age_weighted_infections +=  demog.age_specific_fertility_rate(a, time_step) / intermediate.asfr_sum  * state_curr.infections(a + 15,1) ; //newly infected 15-49 women, weighted for ASFR
   }
 

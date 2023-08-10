@@ -333,6 +333,8 @@ struct IntermediateData {
   real_type age_weighted_infections;
   real_type on_pmtct;
   real_type no_pmtct;
+  TensorFixedSize <real_type, Sizes<hAG<S>, NS<S>>> p_hiv_neg_pop;
+
 
   real_type cd4mx_scale;
   real_type artpop_hahm;
@@ -440,6 +442,7 @@ struct IntermediateData {
     age_weighted_infections = 0.0;
     on_pmtct = 0.0;
     no_pmtct = 0.0;
+    p_hiv_neg_pop.setZero();
     cd4mx_scale = 1.0;
     deaths = 0.0;
     everARTelig_idx = 0;
