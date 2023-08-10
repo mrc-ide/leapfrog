@@ -248,13 +248,13 @@ void run_child_hiv_infections(int time_step,
   } // end NS
 
   //Perinatal transmission
-  for (int s = 0; s < ss.NS; ++s) {
-    for (int hd = 0; hd < ss.hc1DS; ++hd) {
+   for (int s = 0; s < ss.NS; ++s) {
+   for (int hd = 0; hd < ss.hc1DS; ++hd) {
         state_next.hc1_hiv_pop(hd, 0, 0, s) +=  state_next.hiv_births * intermediate.perinatal_transmission_rate * demog.births_sex_prop(s,time_step) * cpars.hc1_cd4_dist(hd);
-        state_next.hc1_hiv_pop(0, s) +=  state_next.hiv_births * intermediate.perinatal_transmission_rate * demog.births_sex_prop(s,time_step);
-        state_next.p_infections(a, s) += state_next.hiv_births * intermediate.perinatal_transmission_rate * demog.births_sex_prop(s,time_step);
-    }// end hc1DS
-  }// ens NS
+        state_next.p_hiv_pop(0, s) +=  state_next.hiv_births * intermediate.perinatal_transmission_rate * demog.births_sex_prop(s,time_step);
+        state_next.p_infections(0, s) += state_next.hiv_births * intermediate.perinatal_transmission_rate * demog.births_sex_prop(s,time_step);
+     }// end hc1DS
+   }// ens NS
 
 
 }
