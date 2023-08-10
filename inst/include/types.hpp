@@ -307,12 +307,10 @@ struct IntermediateData {
   real_type prev;
   real_type df;
   real_type sumARV;
-  real_type number_on_PMTCT;
-  TensorFixedSize <real_type, Sizes<hPS<S>>> PMTCT_coverage;
   real_type need_PMTCT;
   real_type num_wlhiv_200to350;
   real_type num_wlhiv_lt200;
-  real_type num_wlihv;
+  real_type num_wlhiv;
   real_type num_wlhiv_gte350;
   real_type prop_wlhiv_lt200;
   real_type prop_wlhiv_200to350;
@@ -331,7 +329,7 @@ struct IntermediateData {
   real_type perintal_infections;
   real_type age_weighted_hivneg;
   real_type age_weighted_infections;
-  real_type on_PMTCT;
+  TensorFixedSize <real_type, Sizes<hPS<S>>> PMTCT_coverage;
   real_type no_PMTCT;
   TensorFixedSize <real_type, Sizes<hAG<S>, NS<S>>> p_hiv_neg_pop;
 
@@ -416,12 +414,10 @@ struct IntermediateData {
     prev = 0.0;
     df = 0.0;
     sumARV = 0.0;
-    number_on_PMTCT = 0.0;
-    PMTCT_coverage.setZero();
     need_PMTCT = 0.0;
     num_wlhiv_200to350 = 0.0;
     num_wlhiv_lt200 = 0.0;
-    num_wlihv = 0.0;
+    num_wlhiv = 0.0;
     num_wlhiv_gte350 = 0.0;
     prop_wlhiv_lt200 = 0.0;
     prop_wlhiv_200to350 = 0.0;
@@ -440,7 +436,7 @@ struct IntermediateData {
     perintal_infections = 0.0;
     age_weighted_hivneg = 0.0;
     age_weighted_infections = 0.0;
-    on_PMTCT = 0.0;
+    PMTCT_coverage.setZero();
     no_PMTCT = 0.0;
     p_hiv_neg_pop.setZero();
     cd4mx_scale = 1.0;
