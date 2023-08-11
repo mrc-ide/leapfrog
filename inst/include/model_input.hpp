@@ -28,6 +28,7 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
   constexpr int hc2AG = ss.hc2AG;
   constexpr int hcTT = ss.hcTT;
   constexpr int hPS = ss.hPS;
+  constexpr int hBF = ss.hBF;
 
   const leapfrog::TensorMap2<real_type> base_pop = parse_data<real_type>(data, "basepop", pAG, NS);
   const leapfrog::TensorMap3<real_type> survival_probability = parse_data<real_type>(data, "Sx", pAG + 1, NS, proj_years);
@@ -73,6 +74,8 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
   const leapfrog::TensorMap3<real_type> PMTCT_transmission_rate = parse_data<real_type>(data, "pmtct_mtct", hDS, hPS, 2);
   const leapfrog::TensorMap2<real_type> PMTCT_dropout = parse_data<real_type>(data, "pmtct_dropout", hPS, proj_years);
   const leapfrog::TensorMap1<real_type> PMTCT_input_is_percent = parse_data<real_type>(data, "pmtct_input_sperc", proj_years);
+  const leapfrog::TensorMap2<real_type> breastfeeding_duration_art = parse_data<real_type>(data, "bf_duration_art", hBF, proj_years);
+  const leapfrog::TensorMap2<real_type> breastfeeding_duration_no_art = parse_data<real_type>(data, "bf_duration_no_art", hBF, proj_years);
   leapfrog::Tensor1<real_type> h_art_stage_dur(hTS - 1);
   h_art_stage_dur.setConstant(0.5);
 
@@ -133,7 +136,9 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
       vertical_transmission_rate,
       PMTCT_transmission_rate,
       PMTCT_dropout,
-      PMTCT_input_is_percent
+      PMTCT_input_is_percent,
+      breastfeeding_duration_art,
+      breastfeeding_duration_no_art
   };
 
   const leapfrog::Parameters<real_type> params = {options,

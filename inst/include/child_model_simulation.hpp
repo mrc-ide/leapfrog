@@ -164,6 +164,37 @@ void adjust_optAB_transmission_rate(int time_step,
 
 }
 
+template<HivAgeStratification S, typename real_type>
+void adjust_optAB_bf_transmission_rate(int time_step,
+                                    const Parameters<real_type> &pars,
+                                    const State<S, real_type> &state_curr,
+                                    State<S, real_type> &state_next,
+                                    IntermediateData<S, real_type> &intermediate) {
+  const auto cpars = pars.children;
+  constexpr auto ss = StateSpace<S>();
+  //Option A and B were only authorized for women with greater than 350 CD4, so if the percentage of women
+  //on option A/B > the proportion of women in this cd4 category, we assume that some must have a cd4 less than 350
+  //option AB will be less effective for these women so we adjust for that
+
+  if(intermediate.propgte350 > 0){
+    //CHECK: defined in previous function
+    //CHECK: avenir: will pmtct coverage for pregnatn and bf women always be the same?
+    if((intermediate.PMTCT_coverage(0) + intermediate.PMTCT_coverage(1)) > intermediate.propgte350){
+      intermediate.excess_ratio_bf = intermediate.PMTCT_coverage(0) + intermediate.PMTCT_coverage(1) - intermediate.propgte350;
+      intermediate.optA_bf_transmission_rate = (intermediate.propgte350 * cpars.pmtct_transmission_rate(4,0,1)) + intermediate.excess_ratio_bf * (1.45 / 0.46) * cpars.pmtct_transmission_rate(4,0,1) / (intermediate.propgte350 + intermediate.excess_ratio_bf);
+      intermediate.optB_bf_transmission_rate = (intermediate.propgte350 * cpars.pmtct_transmission_rate(4,1,1)) + intermediate.excess_ratio_bf * (1.45 / 0.46) * cpars.pmtct_transmission_rate(4,1,1) / (intermediate.propgte350 + intermediate.excess_ratio_bf);
+    }else{
+      intermediate.optA_bf_transmission_rate = cpars.pmtct_transmission_rate(4,0,1);
+      intermediate.optB_bf_transmission_rate = cpars.pmtct_transmission_rate(4,1,1);
+    }
+  }else{
+    intermediate.optA_bf_transmission_rate = cpars.pmtct_transmission_rate(4,0,1);
+    intermediate.optB_bf_transmission_rate = cpars.pmtct_transmission_rate(4,1,1);
+  }
+
+
+}
+
 
 template<HivAgeStratification S, typename real_type>
 void run_calculate_perinatal_transmission_rate(int time_step,
@@ -216,6 +247,90 @@ void run_calculate_perinatal_transmission_rate(int time_step,
     intermediate.perinatal_transmission_rate = intermediate.perinatal_transmission_rate + intermediate.perinatal_transmission_from_incidence / intermediate.need_PMTCT;
   }
 
+
+}
+
+template<HivAgeStratification S, typename real_type>
+void run_calculate_transmission_from_incidence_during_breastfeeding(int time_step,
+                                               const Parameters<real_type> &pars,
+                                               const State<S, real_type> &state_curr,
+                                               State<S, real_type> &state_next,
+                                               IntermediateData<S, real_type> &intermediate) {
+  constexpr auto ss = StateSpace<S>();
+  const auto demog = pars.demography;
+  const auto cpars = pars.children;
+
+  //bf_duration is % of women no longer breast feeding
+  for (int bf = 0; bf < ss.hBF; ++bf) {
+    //CHECK: intermediate.incidence_rate_wlhiv is coming from perinatal transmission, are there
+    // any checks I should do to ensure that this is reading in properly from the previous function?
+    intermediate.bf_at_risk += intermediate.incidence_rate_wlhiv / 12 * 2 * (1 - cpars.breastfeeding_duration_no_art(bf, time_step));
+  }
+  // intermediate.bf_incident_hiv_transmission_rate = bf_at_risk * 0.269;
+  intermediate.bf_incident_hiv_transmission_rate = 0.0;
+
+}
+
+template<HivAgeStratification S, typename real_type>
+void run_bf06_transmission_rate(int time_step,
+                                               const Parameters<real_type> &pars,
+                                               const State<S, real_type> &state_curr,
+                                               State<S, real_type> &state_next,
+                                               IntermediateData<S, real_type> &intermediate) {
+  constexpr auto ss = StateSpace<S>();
+  const auto demog = pars.demography;
+  const auto cpars = pars.children;
+
+  internal::adjust_optAB_bf_transmission_rate(time_step, pars, state_curr, state_next, intermediate);
+
+
+  intermediate.bf_transmission_rate_06 = 0.0;
+  for(int bf = 0; bf < 3; bf++){
+    //intermediate.perinatal_transmission_rate_bf_calc is the transmission that has already occurred due to perinatal transmission
+    //intermediate.percent_no_treatment is the percentage of women who are still vulnerable to HIV transmission to their babies
+    intermediate.percent_no_treatment = 1 - intermediate.perinatal_transmission_rate_bf_calc - intermediate.bf_transmission_rate_06;
+
+    for(int hp = 0; hp < 7; hp++){
+      //hp = 0 is option A
+      //Dropout not used for option A
+      if(hp == 0){
+        intermediate.percent_on_treatment = intermediate.optA_bf_transmission_rate * cpars.pmtct_transmission_rate(hp,time_step,1);
+        intermediate.bf_transmission_rate_06 += intermediate.percent_on_treatment * 2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) ;
+        intermediate.percent_no_treatment -= intermediate.PMTCT_coverage(hp);
+      }
+      //hp = 1 is option B
+      //Dropout not used for option B
+      if(hp == 1){
+        intermediate.percent_on_treatment = intermediate.optB_bf_transmission_rate * cpars.pmtct_transmission_rate(hp,time_step,1) ;
+        intermediate.bf_transmission_rate_06 +=  intermediate.percent_on_treatment * 2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) ;
+        intermediate.percent_no_treatment -=  intermediate.PMTCT_coverage(hp) ;
+      }
+      if(hp > 3){
+        if(bf > 0){
+          intermediate.percent_on_treatment = intermediate.PMTCT_coverage(hp) * (pow(1 - cpars.pmtct_dropout(4,time_step) * 2, bf))  ;
+        }else{
+          intermediate.percent_on_treatment = intermediate.PMTCT_coverage(hp);
+        }
+        intermediate.bf_transmission_rate_06 += intermediate.percent_on_treatment * 2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) * cpars.pmtct_transmission_rate(4,hp,1);
+        intermediate.percent_no_treatment -= intermediate.percent_on_treatment ;
+      }
+    }
+    if(intermediate.percent_no_treatment < 0){
+      intermediate.percent_no_treatment = 0;
+    }
+
+    //No treatment
+    if(cpars.breastfeeding_duration_no_art(bf, time_step) < 1){
+      if(intermediate.optB_bf_transmission_rate > 0){
+        intermediate.bf_transmission_rate_06 +=  intermediate.percent_no_treatment * (1 - cpars.breastfeeding_duration_no_art(bf, time_step)) * (2 * (1 - intermediate.propgte350) * cpars.vertical_transmission_rate(2,1) + 2 * intermediate.propgte350 * cpars.vertical_transmission_rate(0,1));
+      }
+    }
+
+    if(bf < 1){
+      intermediate.bf_transmission_rate_06 = intermediate.bf_transmission_rate_06/ 4;
+    }
+
+  }
 
 }
 

@@ -180,6 +180,10 @@ struct Children {
   TensorMap2<real_type> PMTCT_dropout;
   TensorMap1<real_type> PMTCT_input_is_percent;
 
+  //breastfeeding transmission
+  TensorMap2<real_type> breastfeeding_duration_art;
+  TensorMap2<real_type> breastfeeding_duration_no_art;
+
 
 
 
@@ -332,7 +336,16 @@ struct IntermediateData {
   TensorFixedSize <real_type, Sizes<hPS<S>>> PMTCT_coverage;
   real_type no_PMTCT;
   TensorFixedSize <real_type, Sizes<hAG<S>, NS<S>>> p_hiv_neg_pop;
-
+  real_type bf_at_risk;
+  real_type bf_incident_hiv_transmission_rate;
+  real_type optA_bf_transmission_rate;
+  real_type optB_bf_transmission_rate;
+  real_type excess_ratio_bf;
+  real_type percent_on_treatment;
+  real_type percent_no_treatment;
+  real_type bf_tranmission_rate_612;
+  real_type bf_transmission_rate_1224;
+  real_type bf_transmission_rate_24plus;
 
   real_type cd4mx_scale;
   real_type artpop_hahm;
@@ -438,6 +451,16 @@ struct IntermediateData {
     age_weighted_infections = 0.0;
     PMTCT_coverage.setZero();
     no_PMTCT = 0.0;
+    bf_at_risk = 0.0;
+    bf_incident_hiv_transmission_rate = 0.0;
+    optA_bf_transmission_rate = 0.0;
+    optB_bf_transmission_rate = 0.0;
+    excess_ratio_bf = 0.0;
+    percent_on_treatment = 0.0;
+    percent_no_treatment = 0.0;
+    bf_tranmission_rate_612 = 0.0;
+    bf_transmission_rate_1224 = 0.0;
+    bf_transmission_rate_24plus = 0.0;
     p_hiv_neg_pop.setZero();
     cd4mx_scale = 1.0;
     deaths = 0.0;

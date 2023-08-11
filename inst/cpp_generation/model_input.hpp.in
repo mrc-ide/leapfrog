@@ -76,7 +76,9 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
       vertical_transmission_rate,
       PMTCT_transmission_rate,
       PMTCT_dropout,
-      PMTCT_input_is_percent
+      PMTCT_input_is_percent,
+      breastfeeding_duration_art,
+      breastfeeding_duration_no_art
   };
 
   const leapfrog::Parameters<real_type> params = {options,
