@@ -343,7 +343,8 @@ struct IntermediateData {
   real_type excess_ratio_bf;
   real_type percent_on_treatment;
   real_type percent_no_treatment;
-  real_type bf_tranmission_rate_612;
+  real_type bf_transmission_rate_06;
+  real_type bf_transmission_rate_612;
   real_type bf_transmission_rate_1224;
   real_type bf_transmission_rate_24plus;
 
@@ -458,7 +459,8 @@ struct IntermediateData {
     excess_ratio_bf = 0.0;
     percent_on_treatment = 0.0;
     percent_no_treatment = 0.0;
-    bf_tranmission_rate_612 = 0.0;
+    bf_transmission_rate_06 = 0.0;
+    bf_transmission_rate_612 = 0.0;
     bf_transmission_rate_1224 = 0.0;
     bf_transmission_rate_24plus = 0.0;
     p_hiv_neg_pop.setZero();
