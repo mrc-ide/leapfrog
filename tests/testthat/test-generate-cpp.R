@@ -35,7 +35,7 @@ test_that("can generate input parsing", {
     "\\(data, \"basepop\", base.pAG, base.NS\\);"),
     result)))
   expect_true(any(grepl(paste0(
-    "const leapfrog::TensorMap1<int> idx_hm_elig = convert_base<1>\\(",
+    "const leapfrog::Tensor1<int> idx_hm_elig = convert_base<1>\\(",
     "parse_data<int>\\(data, \"artcd4elig_idx\", proj_years \\+ 1\\)\\);"),
     result)))
   expect_true(any(grepl(
