@@ -5,6 +5,7 @@
 root <- here::here()
 source(file.path(root, "R/util.R"))
 source(file.path(root, "R/util_assert.R"))
+source(file.path(root, "R/generate_cpp_validation.R"))
 source(file.path(root, "R/generate_cpp.R"))
 
 frogger_file <- function(..., mustWork = TRUE) {

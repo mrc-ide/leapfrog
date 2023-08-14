@@ -7,13 +7,24 @@
 #' @param output_steps Which sim years to output for
 #' @param hiv_age_stratification The age stratification for HIV population,
 #'  "coarse" or "full"
+#' @param run_child_model If TRUE then run the child model
 #'
 #' @return List of model outputs
 #' @export
 run_model <- function(data, parameters, sim_years,
                       hts_per_year, output_steps,
-                      hiv_age_stratification = "full") {
+                      hiv_age_stratification = "full",
+                      run_child_model = TRUE) {
   assert_enum(hiv_age_stratification, c("full", "coarse"))
+  if (hiv_age_stratification == "full" && !run_child_model) {
+    model_variant <- "BaseModelFullAgeStratification"
+  } else if (hiv_age_stratification == "coarse" && !run_child_model) {
+    model_variant <- "BaseModelCoarseAgeStratification"
+  } else if (hiv_age_stratification == "full" && run_child_model) {
+    model_variant <- "ChildModel"
+  } else if (hiv_age_stratification == "coarse" && run_child_model) {
+    stop("Cannot run child model with coarse age stratification")
+  }
   if (hiv_age_stratification == "full") {
     parameters$hAG_SPAN <- parameters[["hAG_SPAN_full"]]
     parameters$cd4_initdist <- parameters[["cd4_initdist_full"]]
@@ -29,5 +40,5 @@ run_model <- function(data, parameters, sim_years,
   }
   data <- c(data, parameters)
   run_base_model(data, sim_years, hts_per_year, output_steps,
-                 hiv_age_stratification)
+                 model_variant)
 }

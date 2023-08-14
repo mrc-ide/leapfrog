@@ -59,7 +59,7 @@ Where
 * 1st arg is number of sim years
 * 2nd arg is number of HIV steps within the year
 * 3rd arg is the path to the input data, `data` relative to this dir
-* 3th arg is the path where output should be saved
+* 4th arg is the path where output should be saved
 
 ## Profiling
 
@@ -67,7 +67,7 @@ There are 3 profile runners here, I've only checked these work on linux. Note it
 in the standalone runner which saves the output to disk. This takes a long time and won't be run in the actual model fit
 process. Use the valgrind profiler to measure CPU instructions, the google profiler and perf profiler runs a sampling
 profiler so should be better for understanding time bottlenecks. I'm not sure really which is the best to use here! Perf
-profiler can give a nice view of the callchain which can be expanded and explored.
+profiler can give a nice view of the call chain which can be expanded and explored.
 
 1. `profile_valgrind` which runs the [callgrind valgrind](https://valgrind.org/docs/manual/cl-manual.html) tool to
    create a profile and then open it with `kcachegrind`.

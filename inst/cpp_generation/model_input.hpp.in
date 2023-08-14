@@ -8,16 +8,13 @@
 #include "types.hpp"
 #include "r_utils.hpp"
 
-template<leapfrog::HivAgeStratification S, typename real_type>
-leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
+template<typename ModelVariant, typename real_type>
+leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::List &data,
                                                     const leapfrog::Options<real_type> &options,
                                                     const int proj_years) {
-  const int p_fertility_age_groups = options.p_fertility_age_groups;
-  const int p_idx_hiv_first_adult = options.p_idx_hiv_first_adult;
-  constexpr auto ss = leapfrog::StateSpace<S>();
-{{unpack_state_space}}
+  constexpr auto ss = leapfrog::StateSpace<ModelVariant>();
 
-{{parse_data}}
+{{default_data}}
 
   const leapfrog::Demography<real_type> demography = {
       base_pop,
@@ -49,10 +46,13 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
       adults_on_art_is_percent
   };
 
-  const leapfrog::Parameters<real_type> params = {options,
-                                                  demography,
-                                                  incidence,
-                                                  natural_history,
-                                                  art};
-  return params;
+  const leapfrog::BaseModelParameters<real_type> base_model_params = {
+        options,
+        demography,
+        incidence,
+        natural_history,
+        art
+    };
+
+{{optional_data}}
 }

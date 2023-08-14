@@ -16,7 +16,8 @@ serialize_r_to_tensor <- function(data, path) {
   if (is.integer(data)) {
     type <- "int"
   } else if (is.logical(data)) {
-     ## using as.integer() removes any dimensions. *1 to preserve shape and convert to int
+    ## using as.integer() removes any dimensions.
+    ## *1 to preserve shape and convert to int
     data <- data * 1
     type <- "int"
   }
@@ -67,4 +68,33 @@ is_set <- function(x) {
 
 format_vector <- function(vector) {
   paste(paste0("'", vector, "'"), collapse = ", ")
+}
+
+
+#' Take a list of lists and split into groups based on some property
+#'
+#' Every list must have this property otherwise this will fail
+#'
+#' @param list List of lists to split
+#' @param on Name of property to split on
+#'
+#' @return List of lists of lists :O,
+#' @keywords internal
+#'
+#' @examples
+#' input_list <- list(
+#'   list(id = 1, type = "foo"),
+#'   list(id = 2, type = "foo"),
+#'   list(id = 3, type = "bar"),
+#'   list(id = 4, type = "bar")
+#' )
+#' frogger:::group_list_of_lists(input_list, "type")
+group_list_of_lists <- function(list, on) {
+  property <- vcapply(list, "[[", on)
+  types <- unique(property)
+  out <- lapply(types, function(type) {
+    list[property == type]
+  })
+  names(out) <- types
+  out
 }
