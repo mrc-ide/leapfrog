@@ -665,6 +665,8 @@ void run_child_hiv_mort(int time_step,
   }
 }
 
+
+
 template<HivAgeStratification S, typename real_type>
 void add_child_grad(int time_step,
                          const Parameters<real_type> &pars,
@@ -1179,8 +1181,13 @@ void run_wlhiv_births(int time_step,
     if (a < 9) {
       intermediate.births_HE_15_24 += intermediate.birthsCurrAge;
     }
-
   } // end a
+
+  if (cpars.hiv_abortion_is_percent(time_step)) {
+    intermediate.birthsHE = intermediate.birthsHE * (1.0 * cpars.hiv_abortion(time_step));
+  } else {
+    intermediate.birthsHE = intermediate.birthsHE - cpars.hiv_abortion(time_step);
+  }
 
   state_next.hiv_births = intermediate.birthsHE;
 

@@ -172,6 +172,9 @@ struct Children {
   TensorMap1<real_type> fert_mult_onart;
   TensorMap1<real_type> total_fertility_rate;
   real_type local_adj_factor;
+  TensorMap1<real_type> hiv_abortion_is_percent;
+  TensorMap1<real_type> hiv_abortion;
+
 
   //perinatal transmission
   TensorMap2<real_type> PMTCT;
