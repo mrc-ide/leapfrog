@@ -54,9 +54,10 @@ auto parse_data(const Rcpp::List data, const std::string& key, Args... dims) {
 
 template<std::size_t rank>
 auto convert_base(Eigen::TensorMap<Eigen::Tensor<int, rank>> map) {
-  for (int i = 0; i < map.size(); ++i) {
+  Eigen::Tensor<int, rank> new_tensor = map; // Create a copy
+  for (int i = 0; i < new_tensor.size(); ++i) {
     // 0-based indexing in C++ vs 1-based indexing in R
-    map.data()[i] = map.data()[i] - 1;
+    new_tensor.data()[i] = new_tensor.data()[i] - 1;
   }
-  return map;
+  return new_tensor;
 }
