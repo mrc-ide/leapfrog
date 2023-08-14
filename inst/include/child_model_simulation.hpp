@@ -284,7 +284,6 @@ void run_bf06_transmission_rate(int time_step,
   internal::adjust_optAB_bf_transmission_rate(time_step, pars, state_curr, state_next, intermediate);
 
 
-  intermediate.bf_transmission_rate_06 = 0.0;
   for(int bf = 0; bf < 3; bf++){
     //intermediate.perinatal_transmission_rate_bf_calc is the transmission that has already occurred due to perinatal transmission
     //intermediate.percent_no_treatment is the percentage of women who are still vulnerable to HIV transmission to their babies
@@ -329,10 +328,69 @@ void run_bf06_transmission_rate(int time_step,
     if(bf < 1){
       intermediate.bf_transmission_rate_06 = intermediate.bf_transmission_rate_06/ 4;
     }
-
   }
 
 }
+
+template<HivAgeStratification S, typename real_type>
+void run_bf612_transmission_rate(int time_step,
+                                const Parameters<real_type> &pars,
+                                const State<S, real_type> &state_curr,
+                                State<S, real_type> &state_next,
+                                IntermediateData<S, real_type> &intermediate) {
+    constexpr auto ss = StateSpace<S>();
+    const auto demog = pars.demography;
+    const auto cpars = pars.children;
+
+    internal::adjust_optAB_bf_transmission_rate(time_step, pars, state_curr, state_next, intermediate);
+
+
+    for(int bf = 3; bf < 6; bf++){
+      //intermediate.perinatal_transmission_rate_bf_calc is the transmission that has already occurred due to perinatal transmission
+      //intermediate.percent_no_treatment is the percentage of women who are still vulnerable to HIV transmission to their babies
+      intermediate.percent_no_treatment = 1 - intermediate.perinatal_transmission_rate_bf_calc - intermediate.bf_transmission_rate_612;
+
+      for(int hp = 0; hp < 7; hp++){
+        //hp = 0 is option A
+        //Dropout not used for option A
+        if(hp == 0){
+          intermediate.percent_on_treatment = intermediate.optA_bf_transmission_rate * cpars.PMTCT_transmission_rate(hp,time_step,1);
+          intermediate.bf_transmission_rate_612 += intermediate.percent_on_treatment * 2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) ;
+          intermediate.percent_no_treatment -= intermediate.PMTCT_coverage(hp);
+        }
+        //hp = 1 is option B
+        //Dropout not used for option B
+        if(hp == 1){
+          intermediate.percent_on_treatment = intermediate.optB_bf_transmission_rate * cpars.PMTCT_transmission_rate(hp,time_step,1) ;
+          intermediate.bf_transmission_rate_612 +=  intermediate.percent_on_treatment * 2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) ;
+          intermediate.percent_no_treatment -=  intermediate.PMTCT_coverage(hp) ;
+        }
+        if(hp > 3){
+          if(bf > 0){
+            intermediate.percent_on_treatment = intermediate.PMTCT_coverage(hp) * (pow(1 - cpars.PMTCT_dropout(4,time_step) * 2, bf))  ;
+          }else{
+            intermediate.percent_on_treatment = intermediate.PMTCT_coverage(hp);
+          }
+          intermediate.bf_transmission_rate_612 += intermediate.percent_on_treatment * 2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) * cpars.PMTCT_transmission_rate(4,hp,1);
+          intermediate.percent_no_treatment -= intermediate.percent_on_treatment ;
+        }
+      }// end hp
+      if(intermediate.percent_no_treatment < 0){
+        intermediate.percent_no_treatment = 0;
+      }
+
+      //No treatment
+      if(cpars.breastfeeding_duration_no_art(bf, time_step) < 1){
+        if(intermediate.optB_bf_transmission_rate > 0){
+          intermediate.bf_transmission_rate_612 +=  intermediate.percent_no_treatment * (1 - cpars.breastfeeding_duration_no_art(bf, time_step)) * (2 * (1 - intermediate.prop_wlhiv_gte350) * cpars.vertical_transmission_rate(2,1) + 2 * intermediate.prop_wlhiv_gte350 * cpars.vertical_transmission_rate(0,1));
+        }
+      }
+
+    }// end bf
+
+  }
+
+
 
 template<HivAgeStratification S, typename real_type>
 void run_child_hiv_infections(int time_step,
@@ -371,9 +429,11 @@ void run_child_hiv_infections(int time_step,
        state_next.p_hiv_pop(0, s) +=  state_next.hiv_births * intermediate.perinatal_transmission_rate * demog.births_sex_prop(s,time_step);
        state_next.p_infections(0, s) += state_next.hiv_births * intermediate.perinatal_transmission_rate * demog.births_sex_prop(s,time_step);
 
-   }// ens NS
+   }// end NS
 
    //Breastfeeding transmission
+
+   //0-6
     internal::run_calculate_transmission_from_incidence_during_breastfeeding(time_step, pars, state_curr, state_next, intermediate);
     internal::run_bf06_transmission_rate(time_step, pars, state_curr, state_next, intermediate);
    for (int s = 0; s < ss.NS; ++s) {
@@ -384,8 +444,19 @@ void run_child_hiv_infections(int time_step,
      }// end hc1DS
      state_next.p_hiv_pop(0, s) +=  state_next.hiv_births  * demog.births_sex_prop(s,time_step) * (intermediate.bf_incident_hiv_transmission_rate + intermediate.bf_transmission_rate_06);
      state_next.p_infections(0, s) += state_next.hiv_births  * demog.births_sex_prop(s,time_step) * (intermediate.bf_incident_hiv_transmission_rate + intermediate.bf_transmission_rate_06);
-   }// ens NS
+   }// end NS
 
+   //6-12
+   internal::run_bf06_transmission_rate(time_step, pars, state_curr, state_next, intermediate);
+   for (int s = 0; s < ss.NS; ++s) {
+     for (int hd = 0; hd < ss.hc1DS; ++hd) {
+       state_next.hc1_hiv_pop(hd, 2, 0, s) +=  state_next.hiv_births *  demog.births_sex_prop(s,time_step) * cpars.hc1_cd4_dist(hd) * intermediate.bf_transmission_rate_612;
+       state_next.p_hiv_pop(0, s) +=  state_next.hiv_births  * demog.births_sex_prop(s,time_step) * (intermediate.bf_incident_hiv_transmission_rate + intermediate.bf_transmission_rate_612);
+       state_next.p_infections(0, s) += state_next.hiv_births  * demog.births_sex_prop(s,time_step) * (intermediate.bf_incident_hiv_transmission_rate + intermediate.bf_transmission_rate_612);
+     }// end hc1DS
+     state_next.p_hiv_pop(0, s) +=  state_next.hiv_births  * demog.births_sex_prop(s,time_step) * (intermediate.bf_incident_hiv_transmission_rate + intermediate.bf_transmission_rate_612);
+     state_next.p_infections(0, s) += state_next.hiv_births  * demog.births_sex_prop(s,time_step) * (intermediate.bf_incident_hiv_transmission_rate + intermediate.bf_transmission_rate_612);
+   }// end NS
 
 }
 
