@@ -78,6 +78,7 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
   const leapfrog::TensorMap2<real_type> breastfeeding_duration_no_art = parse_data<real_type>(data, "bf_duration_no_art", hBF, proj_years);
   const leapfrog::TensorMap1<real_type> hiv_abortion_is_percent = parse_data<real_type>(data, "abortion_isperc", proj_years);
   const leapfrog::TensorMap1<real_type> hiv_abortion   = parse_data<real_type>(data, "abortions", proj_years);
+  const leapfrog::TensorMap1<real_type> patients_reallocated = parse_data<real_type>(data, "patients_reallocated", proj_years);
   leapfrog::Tensor1<real_type> h_art_stage_dur(hTS - 1);
   h_art_stage_dur.setConstant(0.5);
 
@@ -136,6 +137,7 @@ leapfrog::Parameters <real_type> setup_model_params(const Rcpp::List &data,
       local_adj_factor,
       hiv_abortion_is_percent,
       hiv_abortion,
+      patients_reallocated,
       PMTCT,
       vertical_transmission_rate,
       PMTCT_transmission_rate,

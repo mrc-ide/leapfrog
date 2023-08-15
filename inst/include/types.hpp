@@ -174,6 +174,8 @@ struct Children {
   real_type local_adj_factor;
   TensorMap1<real_type> hiv_abortion_is_percent;
   TensorMap1<real_type> hiv_abortion;
+  TensorMap1<real_type> patients_reallocated;
+
 
 
   //perinatal transmission

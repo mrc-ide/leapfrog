@@ -93,8 +93,8 @@ void convert_PMTCT_num_to_perc(int time_step,
 
   for (int hp = 0; hp < ss.hPS; ++hp) {
     intermediate.sumARV += cpars.PMTCT(hp,time_step);
-  }
-  intermediate.need_PMTCT = state_next.hiv_births;
+  } //end hPS
+  intermediate.need_PMTCT = state_next.hiv_births + cpars.patients_reallocated(time_step);
 
   //replace all instances of coverage input as numbers with percentage covered
   if(cpars.PMTCT_input_is_percent(time_step)){
@@ -102,6 +102,7 @@ void convert_PMTCT_num_to_perc(int time_step,
         intermediate.PMTCT_coverage(hp) = cpars.PMTCT(hp,time_step);
     } //end hPS
   }else{
+    intermediate.sumARV += cpars.patients_reallocated(time_step);
     for (int hp = 0; hp < ss.hPS; ++hp) {
       if(intermediate.sumARV > intermediate.need_PMTCT){
         intermediate.PMTCT_coverage(hp) = cpars.PMTCT(hp, time_step) / intermediate.sumARV;
@@ -205,7 +206,6 @@ void run_calculate_perinatal_transmission_rate(int time_step,
   constexpr auto ss = StateSpace<S>();
   const auto demog = pars.demography;
   const auto cpars = pars.children;
-  //TODO: add in patients reallocated
   //TODO: pull incidence infection mtct into the input object
 
   internal::convert_PMTCT_num_to_perc(time_step, pars, state_curr, state_next, intermediate);
