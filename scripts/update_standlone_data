@@ -1,5 +1,9 @@
 #!/usr/bin/env Rscript
 
+## Run this if you want to recreate the test data for the standalone model.
+## You might do this is say we add some new required data or if the data we are testing with
+## changes for any reason
+
 root_dir <- here::here()
 
 demp <- readRDS(testthat::test_path("testdata/demographic_projection_object_adult.rds"))

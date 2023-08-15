@@ -2,6 +2,7 @@
 
 #include <unsupported/Eigen/CXX11/Tensor>
 #include "state_space.hpp"
+#include "model_variants.hpp"
 
 namespace leapfrog {
 
@@ -32,47 +33,47 @@ using Tensor4 = Eigen::Tensor<real_type, 4>;
 template<typename real_type>
 using Tensor5 = Eigen::Tensor<real_type, 5>;
 
-template<HivAgeStratification S>
-constexpr int NS = StateSpace<S>::NS;
+template<typename ModelVariant>
+constexpr int NS = StateSpace<ModelVariant>().base.NS;
 
-template<HivAgeStratification S>
-constexpr int pAG = StateSpace<S>::pAG;
+template<typename ModelVariant>
+constexpr int pAG = StateSpace<ModelVariant>().base.pAG;
 
-template<HivAgeStratification S>
-constexpr int hAG = StateSpace<S>::hAG;
+template<typename ModelVariant>
+constexpr int hAG = StateSpace<ModelVariant>().base.hAG;
 
-template<HivAgeStratification S>
-constexpr int hDS = StateSpace<S>::hDS;
+template<typename ModelVariant>
+constexpr int hDS = StateSpace<ModelVariant>().base.hDS;
 
-template<HivAgeStratification S>
-constexpr int hTS = StateSpace<S>::hTS;
+template<typename ModelVariant>
+constexpr int hTS = StateSpace<ModelVariant>().base.hTS;
 
-template<HivAgeStratification S>
-constexpr int hc1DS = StateSpace<S>::hc1DS;
+template<typename ModelVariant>
+constexpr int hc1DS = StateSpace<ModelVariant>().children.hc1DS;
 
-template<HivAgeStratification S>
-constexpr int hc2DS = StateSpace<S>::hc2DS;
+template<typename ModelVariant>
+constexpr int hc1_ageend = StateSpace<ModelVariant>().children.hc1_ageend;
 
-template<HivAgeStratification S>
-constexpr int hc1_ageend = StateSpace<S>::hc1_ageend;
+template<typename ModelVariant>
+constexpr int hc2_agestart = StateSpace<ModelVariant>().children.hc2_agestart;
 
-template<HivAgeStratification S>
-constexpr int hc2_agestart = StateSpace<S>::hc2_agestart;
+template<typename ModelVariant>
+constexpr int hc1AG = StateSpace<ModelVariant>().children.hc1AG;
 
-template<HivAgeStratification S>
-constexpr int hc1AG = StateSpace<S>::hc1AG;
+template<typename ModelVariant>
+constexpr int hc2AG = StateSpace<ModelVariant>().children.hc2AG;
 
-template<HivAgeStratification S>
-constexpr int hc2AG = StateSpace<S>::hc2AG;
+template<typename ModelVariant>
+constexpr int hc2DS = StateSpace<ModelVariant>().children.hc2DS;
 
-template<HivAgeStratification S>
-constexpr int hcTT = StateSpace<S>::hcTT;
+template<typename ModelVariant>
+constexpr int hcTT = StateSpace<ModelVariant>().children.hcTT;
 
-template<HivAgeStratification S>
-constexpr int hPS = StateSpace<S>::hPS;
+template<typename ModelVariant>
+constexpr int hPS = StateSpace<ModelVariant>().children.hPS;
 
-template<HivAgeStratification S>
-constexpr int hBF = StateSpace<S>::hBF;
+template<typename ModelVariant>
+constexpr int hBF = StateSpace<ModelVariant>().children.hBF;
 
 template<typename real_type>
 struct Options {
@@ -88,15 +89,12 @@ struct Options {
   const int scale_cd4_mortality;
   const int hIDX_15PLUS;
   const real_type initiation_mortality_weight;
-  const bool run_child_model;
-
 
   Options(int hts_per_year,
           int ts_art_start,
           int hAG_15plus,
           int scale_cd4_mortality,
-          real_type initiation_mortality_weight,
-          bool run_child_model) :
+          real_type initiation_mortality_weight) :
       hts_per_year(hts_per_year),
       dt(1.0 / hts_per_year),
       p_idx_fertility_first(15),
@@ -108,8 +106,7 @@ struct Options {
       hAG_15plus(hAG_15plus),
       scale_cd4_mortality(scale_cd4_mortality),
       hIDX_15PLUS(0),
-      initiation_mortality_weight(initiation_mortality_weight),
-      run_child_model(run_child_model) {}
+      initiation_mortality_weight(initiation_mortality_weight) {}
 };
 
 template<typename real_type>
@@ -147,6 +144,15 @@ struct Art {
 };
 
 template<typename real_type>
+struct BaseModelParameters {
+  Options<real_type> options;
+  Demography<real_type> demography;
+  Incidence<real_type> incidence;
+  NaturalHistory<real_type> natural_history;
+  Art<real_type> art;
+};
+
+template<typename real_type>
 struct Children {
   TensorMap1<real_type> hc_nosocomial;
   TensorMap1<real_type> hc1_cd4_dist;
@@ -159,14 +165,18 @@ struct Children {
   TensorMap1<real_type> ctx_val;
 };
 
+template<typename ModelVariant, typename real_type>
+struct ChildModelParameters {};
+
 template<typename real_type>
-struct Parameters {
-  Options<real_type> options;
-  Demography<real_type> demography;
-  Incidence<real_type> incidence;
-  NaturalHistory<real_type> natural_history;
-  Art<real_type> art;
+struct ChildModelParameters<ChildModel, real_type> {
   Children<real_type> children;
+};
+
+template<typename ModelVariant, typename real_type>
+struct Parameters {
+  BaseModelParameters<real_type> base;
+  ChildModelParameters<ModelVariant, real_type> children;
 };
 
 namespace {
@@ -174,32 +184,62 @@ using Eigen::Sizes;
 using Eigen::TensorFixedSize;
 }
 
-template<HivAgeStratification S, typename real_type>
-struct State {
-  TensorFixedSize <real_type, Sizes<pAG<S>, NS<S>>> p_total_pop;
-  TensorFixedSize <real_type, Sizes<pAG<S>, NS<S>>> p_total_pop_natural_deaths;
-  TensorFixedSize <real_type, Sizes<pAG<S>, NS<S>>> p_hiv_pop;
-  TensorFixedSize <real_type, Sizes<pAG<S>, NS<S>>> p_hiv_pop_natural_deaths;
-  TensorFixedSize <real_type, Sizes<hDS<S>, hAG<S>, NS<S>>> h_hiv_adult;
-  TensorFixedSize <real_type, Sizes<hTS<S>, hDS<S>, hAG<S>, NS<S>>>
+template<typename ModelVariant, typename real_type>
+struct BaseModelState {
+  TensorFixedSize <real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>> p_total_pop;
+  TensorFixedSize <real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>> p_total_pop_natural_deaths;
+  TensorFixedSize <real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>> p_hiv_pop;
+  TensorFixedSize <real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>> p_hiv_pop_natural_deaths;
+  TensorFixedSize <real_type, Sizes<hDS<ModelVariant>, hAG<ModelVariant>, NS<ModelVariant>>> h_hiv_adult;
+  TensorFixedSize <real_type, Sizes<hTS<ModelVariant>, hDS<ModelVariant>, hAG<ModelVariant>, NS<ModelVariant>>>
       h_art_adult;
   real_type births;
-  TensorFixedSize <real_type, Sizes<hDS<S>, hAG<S>, NS<S>>> h_hiv_deaths_no_art;
-  TensorFixedSize <real_type, Sizes<pAG<S>, NS<S>>> p_infections;
-  TensorFixedSize <real_type, Sizes<hTS<S>, hDS<S>, hAG<S>, NS<S>>>
+  TensorFixedSize <real_type, Sizes<hDS<ModelVariant>, hAG<ModelVariant>, NS<ModelVariant>>> h_hiv_deaths_no_art;
+  TensorFixedSize <real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>> p_infections;
+  TensorFixedSize <real_type, Sizes<hTS<ModelVariant>, hDS<ModelVariant>, hAG<ModelVariant>, NS<ModelVariant>>>
       h_hiv_deaths_art;
-  TensorFixedSize <real_type, Sizes<hDS<S>, hAG<S>, NS<S>>> h_art_initiation;
-  TensorFixedSize <real_type, Sizes<pAG<S>, NS<S>>> p_hiv_deaths;
+  TensorFixedSize <real_type, Sizes<hDS<ModelVariant>, hAG<ModelVariant>, NS<ModelVariant>>> h_art_initiation;
+  TensorFixedSize <real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>> p_hiv_deaths;
 
-  TensorFixedSize <real_type, Sizes<hc1DS<S>, hcTT<S>, hc1AG<S>, NS<S>>> hc1_hiv_pop;
-  TensorFixedSize <real_type, Sizes<hTS<S>, hc1DS<S>, hc1AG<S>, NS<S>>> hc1_art_pop;
+  BaseModelState(const Parameters<ModelVariant, real_type> &pars) {
+    constexpr auto ss = StateSpace<ModelVariant>().base;
+    for (int g = 0; g < ss.NS; ++g) {
+      for (int a = 0; a < ss.pAG; ++a) {
+        p_total_pop(a, g) = pars.base.demography.base_pop(a, g);
+      }
+    }
+    p_total_pop_natural_deaths.setZero();
+    p_hiv_pop.setZero();
+    p_hiv_pop_natural_deaths.setZero();
+    h_hiv_adult.setZero();
+    h_art_adult.setZero();
+    births = 0;
+    h_hiv_deaths_no_art.setZero();
+    p_infections.setZero();
+    h_hiv_deaths_art.setZero();
+    h_art_initiation.setZero();
+    p_hiv_deaths.setZero();
+  }
 
-  TensorFixedSize <real_type, Sizes<hc2DS<S>, hcTT<S>, hc2AG<S>, NS<S>>> hc2_hiv_pop;
-  TensorFixedSize <real_type, Sizes<hTS<S>, hc2DS<S>, hc2AG<S>, NS<S>>> hc2_art_pop;
-
-
-
-  State() {}
+  void set_initial_state(const Parameters<ModelVariant, real_type> &pars) {
+    constexpr auto ss = StateSpace<ModelVariant>().base;
+    for (int g = 0; g < ss.NS; ++g) {
+      for (int a = 0; a < ss.pAG; ++a) {
+        p_total_pop(a, g) = pars.base.demography.base_pop(a, g);
+      }
+    }
+    p_total_pop_natural_deaths.setZero();
+    p_hiv_pop.setZero();
+    p_hiv_pop_natural_deaths.setZero();
+    h_hiv_adult.setZero();
+    h_art_adult.setZero();
+    births = 0;
+    h_hiv_deaths_no_art.setZero();
+    p_infections.setZero();
+    h_hiv_deaths_art.setZero();
+    h_art_initiation.setZero();
+    p_hiv_deaths.setZero();
+  }
 
   void reset() {
     p_total_pop.setZero();
@@ -213,11 +253,56 @@ struct State {
     h_hiv_deaths_art.setZero();
     h_art_initiation.setZero();
     p_hiv_deaths.setZero();
-    hc1_hiv_pop.setZero();
-    hc1_art_pop.setZero();
-    hc2_hiv_pop.setZero();
-    hc2_art_pop.setZero();
     births = 0;
+  }
+};
+
+template<typename ModelVariant, typename real_type>
+struct ChildModelState {
+  ChildModelState(const Parameters<ModelVariant, real_type> &pars) {}
+
+  void set_initial_state(const Parameters<ModelVariant, real_type> &pars) {}
+
+  void reset() {}
+};
+
+template<typename real_type>
+struct ChildModelState<ChildModel, real_type> {
+  TensorFixedSize <real_type, Sizes<hc1DS<ChildModel>, hcTT<ChildModel>, hc1AG<ChildModel>, NS<ChildModel>>> hc1_hiv_pop;
+  TensorFixedSize <real_type, Sizes<hc2DS<ChildModel>, hcTT<ChildModel>, hc2AG<ChildModel>, NS<ChildModel>>> hc2_hiv_pop;
+
+
+  ChildModelState(const Parameters<ChildModel, real_type> &pars) {
+    reset();
+  }
+
+  void set_initial_state(const Parameters<ChildModel, real_type> &pars) {
+    reset();
+  }
+
+  void reset() {
+    hc1_hiv_pop.setZero();
+    hc2_hiv_pop.setZero();
+  }
+};
+
+template<typename ModelVariant, typename real_type>
+struct State {
+  BaseModelState<ModelVariant, real_type> base;
+  ChildModelState<ModelVariant, real_type> children;
+
+  State(const Parameters<ModelVariant, real_type> &pars) :
+      base(pars),
+      children(pars) {}
+
+  void set_initial_state(const Parameters<ChildModel, real_type> &pars) {
+    base.set_initial_state();
+    children.set_initial_state();
+  }
+
+  void reset() {
+    base.reset();
+    children.reset();
   }
 };
 
@@ -227,27 +312,25 @@ const int MALE = 0;
 const int FEMALE = 1;
 const int ART0MOS = 0;
 
-template<HivAgeStratification S, typename real_type>
+template<typename ModelVariant, typename real_type>
 struct IntermediateData {
-  TensorFixedSize <real_type, Sizes<pAG<S>, NS<S>>> migration_rate;
-  TensorFixedSize <real_type, Sizes<pAG<S>, NS<S>>> hiv_net_migration;
-  TensorFixedSize <real_type, Sizes<hAG<S>, NS<S>>> p_hiv_pop_coarse_ages;
-  TensorFixedSize <real_type, Sizes<hAG<S>, NS<S>>> hiv_age_up_prob;
-  TensorFixedSize <real_type, Sizes<pAG<S>, NS<S>>> hiv_negative_pop;
-  TensorFixedSize <real_type, Sizes<pAG<S>, NS<S>>> p_infections_ts;
-  TensorFixedSize <real_type, Sizes<NS<S>>> rate_sex;
-  TensorFixedSize <real_type, Sizes<NS<S>>> hiv_neg_aggregate;
-  TensorFixedSize <real_type, Sizes<NS<S>>> Xhivn_incagerr;
-  TensorFixedSize <real_type, Sizes<hAG<S>, NS<S>>> p_hiv_deaths_age_sex;
-  TensorFixedSize <real_type, Sizes<hDS<S>, hAG<S>, NS<S>>> grad;
-  TensorFixedSize <real_type, Sizes<hTS<S>, hDS<S>, hAG<S>, NS<S>>> gradART;
+  TensorFixedSize <real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>> migration_rate;
+  TensorFixedSize <real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>> hiv_net_migration;
+  TensorFixedSize <real_type, Sizes<hAG<ModelVariant>, NS<ModelVariant>>> p_hiv_pop_coarse_ages;
+  TensorFixedSize <real_type, Sizes<hAG<ModelVariant>, NS<ModelVariant>>> hiv_age_up_prob;
+  TensorFixedSize <real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>> hiv_negative_pop;
+  TensorFixedSize <real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>> p_infections_ts;
+  TensorFixedSize <real_type, Sizes<NS<ModelVariant>>> rate_sex;
+  TensorFixedSize <real_type, Sizes<NS<ModelVariant>>> hiv_neg_aggregate;
+  TensorFixedSize <real_type, Sizes<NS<ModelVariant>>> Xhivn_incagerr;
+  TensorFixedSize <real_type, Sizes<hAG<ModelVariant>, NS<ModelVariant>>> p_hiv_deaths_age_sex;
+  TensorFixedSize <real_type, Sizes<hDS<ModelVariant>, hAG<ModelVariant>, NS<ModelVariant>>> grad;
+  TensorFixedSize <real_type, Sizes<hTS<ModelVariant>, hDS<ModelVariant>, hAG<ModelVariant>, NS<ModelVariant>>> gradART;
   Tensor2<real_type> artelig_hahm;
-  TensorFixedSize <real_type, Sizes<hAG<S>>> hivpop_ha;
-  TensorFixedSize <real_type, Sizes<hDS<S>, NS<S>>> age15_hiv_pop;
-//waiting on confirmation of ages from rob
-  TensorFixedSize <real_type, Sizes<hDS<S>, hcTT<S>, hAG<S>, NS<S>>> hc_posthivmort;
-  TensorFixedSize <real_type, Sizes<hDS<S>, hcTT<S>, hAG<S>, NS<S>>> hc_grad;
-
+  TensorFixedSize <real_type, Sizes<hAG<ModelVariant>>> hivpop_ha;
+  TensorFixedSize <real_type, Sizes<hDS<ModelVariant>, NS<ModelVariant>>> age15_hiv_pop;
+  TensorFixedSize <real_type, Sizes<hDS<ModelVariant>, hcTT<ModelVariant>, hAG<ModelVariant>, NS<ModelVariant>>> hc_posthivmort;
+  TensorFixedSize <real_type, Sizes<hDS<ModelVariant>, hcTT<ModelVariant>, hAG<ModelVariant>, NS<ModelVariant>>> hc_grad;
   real_type cd4mx_scale;
   real_type artpop_hahm;
   real_type deaths;
@@ -270,7 +353,7 @@ struct IntermediateData {
 
   IntermediateData(int hAG_15plus)
       :
-      artelig_hahm(hDS<S>, hAG_15plus),
+      artelig_hahm(hDS<ModelVariant>, hAG_15plus),
       cd4mx_scale(1.0),
       artpop_hahm(0.0),
       deaths(0.0),
