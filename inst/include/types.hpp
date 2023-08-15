@@ -166,7 +166,8 @@ struct Children {
 };
 
 template<typename ModelVariant, typename real_type>
-struct ChildModelParameters {};
+struct ChildModelParameters {
+};
 
 template<typename real_type>
 struct ChildModelParameters<ChildModel, real_type> {
@@ -313,7 +314,7 @@ const int FEMALE = 1;
 const int ART0MOS = 0;
 
 template<typename ModelVariant, typename real_type>
-struct IntermediateData {
+struct BaseModelIntermediateData {
   TensorFixedSize <real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>> migration_rate;
   TensorFixedSize <real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>> hiv_net_migration;
   TensorFixedSize <real_type, Sizes<hAG<ModelVariant>, NS<ModelVariant>>> p_hiv_pop_coarse_ages;
@@ -328,9 +329,6 @@ struct IntermediateData {
   TensorFixedSize <real_type, Sizes<hTS<ModelVariant>, hDS<ModelVariant>, hAG<ModelVariant>, NS<ModelVariant>>> gradART;
   Tensor2<real_type> artelig_hahm;
   TensorFixedSize <real_type, Sizes<hAG<ModelVariant>>> hivpop_ha;
-  TensorFixedSize <real_type, Sizes<hDS<ModelVariant>, NS<ModelVariant>>> age15_hiv_pop;
-  TensorFixedSize <real_type, Sizes<hDS<ModelVariant>, hcTT<ModelVariant>, hAG<ModelVariant>, NS<ModelVariant>>> hc_posthivmort;
-  TensorFixedSize <real_type, Sizes<hDS<ModelVariant>, hcTT<ModelVariant>, hAG<ModelVariant>, NS<ModelVariant>>> hc_grad;
   real_type cd4mx_scale;
   real_type artpop_hahm;
   real_type deaths;
@@ -351,7 +349,7 @@ struct IntermediateData {
   real_type hivqx_ha;
   real_type hivdeaths_a;
 
-  IntermediateData(int hAG_15plus)
+  BaseModelIntermediateData(int hAG_15plus)
       :
       artelig_hahm(hDS<ModelVariant>, hAG_15plus),
       cd4mx_scale(1.0),
@@ -389,9 +387,6 @@ struct IntermediateData {
     gradART.setZero();
     artelig_hahm.setZero();
     hivpop_ha.setZero();
-    age15_hiv_pop.setZero();
-    hc_posthivmort.setZero();
-    hc_grad.setZero();
     cd4mx_scale = 1.0;
     deaths = 0.0;
     everARTelig_idx = 0;
@@ -410,6 +405,44 @@ struct IntermediateData {
     artinit_hahm = 0.0;
     hivqx_ha = 0.0;
     hivdeaths_a = 0.0;
+  }
+};
+
+template<typename ModelVariant, typename real_type>
+struct ChildModelIntermediateData {
+  ChildModelIntermediateData() {};
+
+  void reset() {};
+};
+
+template<typename real_type>
+struct ChildModelIntermediateData<ChildModel, real_type> {
+  TensorFixedSize <real_type, Sizes<hDS<ChildModel>, NS<ChildModel>>> age15_hiv_pop;
+  TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_posthivmort;
+  TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_grad;
+
+  ChildModelIntermediateData() {};
+
+  void reset() {
+    age15_hiv_pop.setZero();
+    hc_posthivmort.setZero();
+    hc_grad.setZero();
+  };
+};
+
+template<typename ModelVariant, typename real_type>
+struct IntermediateData {
+  BaseModelIntermediateData<ModelVariant, real_type> base;
+  ChildModelIntermediateData<ModelVariant, real_type> children;
+
+  IntermediateData(int hAG_15plus)
+      :
+      base(hAG_15plus),
+      children() {}
+
+  void reset() {
+    base.reset();
+    children.reset();
   }
 };
 

@@ -50,10 +50,10 @@ void run_migration(int time_step,
       // Get migration rate, as number of net migrants adjusted for survivorship
       // to end of period. Divide by 2 as (on average) half of deaths will
       // happen before they migrate. Then divide by total pop to get rate.
-      intermediate.migration_rate(a, g) = demog.net_migration(a, g, time_step) *
-                                          (1.0 + demog.survival_probability(a, g, time_step)) *
-                                          0.5 / state_next.base.p_total_pop(a, g);
-      state_next.base.p_total_pop(a, g) *= 1.0 + intermediate.migration_rate(a, g);
+      intermediate.base.migration_rate(a, g) = demog.net_migration(a, g, time_step) *
+                                               (1.0 + demog.survival_probability(a, g, time_step)) *
+                                               0.5 / state_next.base.p_total_pop(a, g);
+      state_next.base.p_total_pop(a, g) *= 1.0 + intermediate.base.migration_rate(a, g);
     }
 
     // For open age group (age 80+), net migrant survivor adjustment based on
@@ -68,10 +68,10 @@ void run_migration(int time_step,
         (state_next.base.p_total_pop(a, g) +
          0.5 * state_next.base.p_total_pop_natural_deaths(a, g)) /
         (state_next.base.p_total_pop(a, g) + state_next.base.p_total_pop_natural_deaths(a, g));
-    intermediate.migration_rate(a, g) = survival_probability_netmig *
-                                        demog.net_migration(a, g, time_step) /
-                                        state_next.base.p_total_pop(a, g);
-    state_next.base.p_total_pop(a, g) *= 1.0 + intermediate.migration_rate(a, g);
+    intermediate.base.migration_rate(a, g) = survival_probability_netmig *
+                                             demog.net_migration(a, g, time_step) /
+                                             state_next.base.p_total_pop(a, g);
+    state_next.base.p_total_pop(a, g) *= 1.0 + intermediate.base.migration_rate(a, g);
   }
 }
 
