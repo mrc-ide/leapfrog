@@ -87,15 +87,15 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
     const real_type ctx_effect = Rcpp::as<real_type>(data["ctx_effect"]);
     const leapfrog::TensorMap1<real_type> ctx_val = parse_data<real_type>(data, "ctx_val", proj_years);
     const leapfrog::Children<real_type> child = {
-             hc_nosocomial,
-              hc1_cd4_dist,
-              hc_cd4_transition,
-              hc1_cd4_mort,
-              hc2_cd4_mort,
-              hc1_cd4_prog,
-              hc2_cd4_prog,
-              ctx_effect,
-              ctx_val
+        hc_nosocomial,
+        hc1_cd4_dist,
+        hc_cd4_transition,
+        hc1_cd4_mort,
+        hc2_cd4_mort,
+        hc1_cd4_prog,
+        hc2_cd4_prog,
+        ctx_effect,
+        ctx_val
     };
     const leapfrog::ChildModelParameters<ModelVariant, real_type> child_model_params = {
         child
