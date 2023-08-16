@@ -237,8 +237,6 @@ void add_child_grad(int time_step,
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
 
-  const auto cpars = pars.children.children;
-
   //add on transitions
   for (int s = 0; s < ss.NS; ++s) {
     for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {

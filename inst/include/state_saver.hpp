@@ -77,6 +77,8 @@ template<typename real_type>
 struct ChildModelOutputState<ChildModel, real_type> {
   Tensor5<real_type> hc1_hiv_pop;
   Tensor5<real_type> hc2_hiv_pop;
+  Tensor5<real_type> hc1_art_pop;
+  Tensor5<real_type> hc2_art_pop;
 
   ChildModelOutputState(int no_output_years)
       : hc1_hiv_pop(StateSpace<ChildModel>().children.hc1DS,
@@ -85,10 +87,20 @@ struct ChildModelOutputState<ChildModel, real_type> {
                     StateSpace<ChildModel>().base.NS, no_output_years),
         hc2_hiv_pop(StateSpace<ChildModel>().children.hc2DS,
                     StateSpace<ChildModel>().children.hcTT,
+                    StateSpace<ChildModel>().children.hc2AG,
+                    StateSpace<ChildModel>().base.NS, no_output_years),
+       hc1_art_pop(StateSpace<ChildModel>().base.hTS,
+                   StateSpace<ChildModel>().children.hc1DS,
+                   StateSpace<ChildModel>().children.hc1AG,
+                    StateSpace<ChildModel>().base.NS, no_output_years),
+       hc2_art_pop(StateSpace<ChildModel>().base.hTS,
                     StateSpace<ChildModel>().children.hc2DS,
-                    StateSpace<ChildModel>().base.NS, no_output_years) {
+                    StateSpace<ChildModel>().children.hc2AG,
+                    StateSpace<ChildModel>().base.NS, no_output_years){
     hc1_hiv_pop.setZero();
     hc2_hiv_pop.setZero();
+    hc1_art_pop.setZero();
+    hc2_art_pop.setZero();
   }
 };
 
@@ -147,6 +159,10 @@ public:
         state.children.hc1_hiv_pop;
     children_state.hc2_hiv_pop.chip(i, children_state.hc2_hiv_pop.NumDimensions - 1) =
       state.children.hc2_hiv_pop;
+    children_state.hc1_art_pop.chip(i, children_state.hc1_art_pop.NumDimensions - 1) =
+      state.children.hc1_art_pop;
+    children_state.hc2_art_pop.chip(i, children_state.hc2_art_pop.NumDimensions - 1) =
+      state.children.hc2_art_pop;
   }
 };
 

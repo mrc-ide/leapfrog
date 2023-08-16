@@ -271,7 +271,8 @@ template<typename real_type>
 struct ChildModelState<ChildModel, real_type> {
   TensorFixedSize <real_type, Sizes<hc1DS<ChildModel>, hcTT<ChildModel>, hc1AG<ChildModel>, NS<ChildModel>>> hc1_hiv_pop;
   TensorFixedSize <real_type, Sizes<hc2DS<ChildModel>, hcTT<ChildModel>, hc2AG<ChildModel>, NS<ChildModel>>> hc2_hiv_pop;
-
+  TensorFixedSize <real_type, Sizes<hTS<ChildModel>, hc1DS<ChildModel>, hc1AG<ChildModel>, NS<ChildModel>>> hc1_art_pop;
+  TensorFixedSize <real_type, Sizes<hTS<ChildModel>, hc2DS<ChildModel>, hc2AG<ChildModel>, NS<ChildModel>>> hc2_art_pop;
 
   ChildModelState(const Parameters<ChildModel, real_type> &pars) {
     reset();
@@ -284,6 +285,8 @@ struct ChildModelState<ChildModel, real_type> {
   void reset() {
     hc1_hiv_pop.setZero();
     hc2_hiv_pop.setZero();
+    hc1_art_pop.setZero();
+    hc2_art_pop.setZero();
   }
 };
 
