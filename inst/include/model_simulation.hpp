@@ -21,45 +21,22 @@ void distribute_rate_over_sexes(
 }
 
 template<typename ModelVariant, typename real_type>
-void run_add_new_hiv_p_infections(int time_step,
+void run_calculate_incidence_rate(int time_step,
                                   const Parameters<ModelVariant, real_type> &pars,
                                   const State<ModelVariant, real_type> &state_curr,
                                   State<ModelVariant, real_type> &state_next,
                                   IntermediateData<ModelVariant, real_type> &intermediate) {
-  // TODO: Add different HIV incidence rates see https://github.com/mrc-ide/leapfrog/issues/8
-
-  const auto incidence = pars.base.incidence;
   const auto adult_incidence_first_age_group = pars.base.options.adult_incidence_first_age_group;
   constexpr auto ss = StateSpace<ModelVariant>().base;
-
-  // Calculating new p_infections once per year (like Spectrum)
-  for (int g = 0; g < ss.NS; ++g) {
-    for (int a = adult_incidence_first_age_group; a < ss.pAG; a++) {
-      intermediate.hiv_negative_pop(a, g) = state_curr.base.p_total_pop(a, g) - state_curr.base.p_hiv_pop(a, g);
-    }
-  }
 
   for (int g = 0; g < ss.NS; g++) {
     for (int a = adult_incidence_first_age_group;
          a < adult_incidence_first_age_group + pars.base.options.pAG_INCIDPOP; a++) {
-      intermediate.hiv_neg_aggregate(g) += intermediate.hiv_negative_pop(a, g);
-      intermediate.Xhivn_incagerr(g) +=
-          incidence.relative_risk_age(a - adult_incidence_first_age_group, g, time_step) *
-          intermediate.hiv_negative_pop(a, g);
+      intermediate.hiv_neg_aggregate(g) += state_curr.base.p_total_pop(a, g) - state_curr.base.p_hiv_pop(a, g);
     }
   }
 
   distribute_rate_over_sexes<ModelVariant>(time_step, pars, intermediate);
-
-  for (int g = 0; g < ss.NS; g++) {
-    for (int a = pars.base.options.p_idx_hiv_first_adult; a < ss.pAG; a++) {
-      intermediate.p_infections_ts(a, g) =
-          intermediate.hiv_negative_pop(a, g) * intermediate.rate_sex(g) *
-          incidence.relative_risk_age(a - adult_incidence_first_age_group, g, time_step) *
-          intermediate.hiv_neg_aggregate(g) /
-          intermediate.Xhivn_incagerr(g);
-    }
-  }
 }
 
 
@@ -114,6 +91,39 @@ void run_new_p_infections(int hiv_step,
                           const State<ModelVariant, real_type> &state_curr,
                           State<ModelVariant, real_type> &state_next,
                           IntermediateData<ModelVariant, real_type> &intermediate) {
+  constexpr auto ss = StateSpace<ModelVariant>().base;
+  const auto incidence = pars.base.incidence;
+  const auto adult_incidence_first_age_group = pars.base.options.adult_incidence_first_age_group;
+
+  for (int g = 0; g < ss.NS; ++g) {
+    for (int a = adult_incidence_first_age_group; a < ss.pAG; ++a) {
+      intermediate.hiv_negative_pop(a) = state_next.base.p_total_pop(a, g) - state_next.base.p_hiv_pop(a, g);
+    }
+
+    for (int a = adult_incidence_first_age_group;
+         a < adult_incidence_first_age_group + adult_incidence_first_age_group; ++a) {
+      intermediate.Xhivn_incagerr(g) +=
+          incidence.relative_risk_age(a - adult_incidence_first_age_group, g, time_step) *
+          intermediate.hiv_negative_pop(a);
+    }
+
+    for (int a = adult_incidence_first_age_group; a < ss.pAG; ++a) {
+      intermediate.p_infections_ts(a, g) =
+          intermediate.hiv_negative_pop(a, g) * intermediate.rate_sex(g) *
+          incidence.relative_risk_age(a - adult_incidence_first_age_group, g, time_step) *
+          intermediate.hiv_neg_aggregate(g) /
+          intermediate.Xhivn_incagerr(g);
+    }
+  }
+}
+
+template<typename ModelVariant, typename real_type>
+void run_new_hiv_p_infections(int hiv_step,
+                              int time_step,
+                              const Parameters<ModelVariant, real_type> &pars,
+                              const State<ModelVariant, real_type> &state_curr,
+                              State<ModelVariant, real_type> &state_next,
+                              IntermediateData<ModelVariant, real_type> &intermediate) {
   constexpr auto ss = StateSpace<ModelVariant>().base;
   const auto natural_history = pars.base.natural_history;
   for (int g = 0; g < ss.NS; g++) {
@@ -369,7 +379,7 @@ void run_hiv_model_simulation(int time_step,
   constexpr auto ss = StateSpace<ModelVariant>().base;
   const auto art = pars.base.art;
 
-  internal::run_add_new_hiv_p_infections<ModelVariant>(time_step, pars, state_curr, state_next, intermediate);
+  internal::run_calculate_incidence_rate<ModelVariant>(time_step, pars, state_curr, state_next, intermediate);
 
   intermediate.everARTelig_idx =
       art.idx_hm_elig(time_step) < ss.hDS ? art.idx_hm_elig(time_step) : ss.hDS;
@@ -383,6 +393,8 @@ void run_hiv_model_simulation(int time_step,
     internal::run_disease_progression_and_mortality<ModelVariant>(hiv_step, time_step, pars, state_curr, state_next,
                                                                   intermediate);
     internal::run_new_p_infections<ModelVariant>(hiv_step, time_step, pars, state_curr, state_next, intermediate);
+    internal::run_new_hiv_p_infections<ModelVariant>(hiv_step, time_step, pars, state_curr, state_next,
+                                                     intermediate);
     if (time_step >= pars.base.options.ts_art_start) {
       internal::run_art_progression_and_mortality<ModelVariant>(hiv_step, time_step, pars, state_curr, state_next,
                                                                 intermediate);
