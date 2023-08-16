@@ -29,9 +29,9 @@ void run_calculate_incidence_rate(int time_step,
   const auto adult_incidence_first_age_group = pars.base.options.adult_incidence_first_age_group;
   constexpr auto ss = StateSpace<ModelVariant>().base;
 
-  for (int g = 0; g < ss.NS; g++) {
+  for (int g = 0; g < ss.NS; ++g) {
     for (int a = adult_incidence_first_age_group;
-         a < adult_incidence_first_age_group + pars.base.options.pAG_INCIDPOP; a++) {
+         a < adult_incidence_first_age_group + pars.base.options.pAG_INCIDPOP; ++a) {
       intermediate.base.hiv_neg_aggregate(g) += state_curr.base.p_total_pop(a, g) - state_curr.base.p_hiv_pop(a, g);
     }
   }
@@ -50,7 +50,7 @@ void run_disease_progression_and_mortality(int hiv_step,
   constexpr auto ss = StateSpace<ModelVariant>().base;
   const auto natural_history = pars.base.natural_history;
   const auto dt = pars.base.options.dt;
-  for (int g = 0; g < ss.NS; g++) {
+  for (int g = 0; g < ss.NS; ++g) {
     for (int ha = 0; ha < ss.hAG; ++ha) {
       for (int hm = 0; hm < ss.hDS; ++hm) {
         intermediate.base.cd4mx_scale = 1.0;
@@ -96,23 +96,26 @@ void run_new_p_infections(int hiv_step,
   const auto adult_incidence_first_age_group = pars.base.options.adult_incidence_first_age_group;
 
   for (int g = 0; g < ss.NS; ++g) {
+    intermediate.base.hiv_negative_pop.setZero();
+    intermediate.base.Xhivn_incagerr = 0.0;
+
     for (int a = adult_incidence_first_age_group; a < ss.pAG; ++a) {
       intermediate.base.hiv_negative_pop(a) = state_next.base.p_total_pop(a, g) - state_next.base.p_hiv_pop(a, g);
     }
 
     for (int a = adult_incidence_first_age_group;
-         a < adult_incidence_first_age_group + adult_incidence_first_age_group; ++a) {
-      intermediate.base.Xhivn_incagerr(g) +=
+         a < adult_incidence_first_age_group + pars.base.options.pAG_INCIDPOP; ++a) {
+      intermediate.base.Xhivn_incagerr +=
           incidence.relative_risk_age(a - adult_incidence_first_age_group, g, time_step) *
           intermediate.base.hiv_negative_pop(a);
     }
 
     for (int a = adult_incidence_first_age_group; a < ss.pAG; ++a) {
       intermediate.base.p_infections_ts(a, g) =
-          intermediate.base.hiv_negative_pop(a, g) * intermediate.base.rate_sex(g) *
+          intermediate.base.hiv_negative_pop(a) * intermediate.base.rate_sex(g) *
           incidence.relative_risk_age(a - adult_incidence_first_age_group, g, time_step) *
           intermediate.base.hiv_neg_aggregate(g) /
-          intermediate.base.Xhivn_incagerr(g);
+          intermediate.base.Xhivn_incagerr;
     }
   }
 }
@@ -155,10 +158,10 @@ void run_art_progression_and_mortality(int hiv_step,
                                        IntermediateData<ModelVariant, real_type> &intermediate) {
   constexpr auto ss = StateSpace<ModelVariant>().base;
   const auto art = pars.base.art;
-  for (int g = 0; g < ss.NS; g++) {
-    for (int ha = 0; ha < ss.hAG; ha++) {
-      for (int hm = intermediate.base.everARTelig_idx; hm < ss.hDS; hm++) {
-        for (int hu = 0; hu < ss.hTS; hu++) {
+  for (int g = 0; g < ss.NS; ++g) {
+    for (int ha = 0; ha < ss.hAG; ++ha) {
+      for (int hm = intermediate.base.everARTelig_idx; hm < ss.hDS; ++hm) {
+        for (int hu = 0; hu < ss.hTS; ++hu) {
           intermediate.base.deaths_art =
               art.mortality(hu, hm, ha, g) * art.mortaility_time_rate_ratio(hu, time_step) *
               state_next.base.h_art_adult(hu, hm, ha, g);
@@ -167,7 +170,7 @@ void run_art_progression_and_mortality(int hiv_step,
           intermediate.base.gradART(hu, hm, ha, g) = -intermediate.base.deaths_art;
         }
 
-        for (int hu = 0; hu < (ss.hTS - 1); hu++) {
+        for (int hu = 0; hu < (ss.hTS - 1); ++hu) {
           intermediate.base.gradART(hu, hm, ha, g) +=
               -state_next.base.h_art_adult(hu, hm, ha, g) / art.h_art_stage_dur(hu);
           intermediate.base.gradART(hu + 1, hm, ha, g) +=
@@ -176,7 +179,7 @@ void run_art_progression_and_mortality(int hiv_step,
 
         // ART dropout
         if (art.dropout(time_step) > 0) {
-          for (int hu = 0; hu < ss.hTS; hu++) {
+          for (int hu = 0; hu < ss.hTS; ++hu) {
             intermediate.base.grad(hm, ha, g) += art.dropout(time_step) * state_next.base.h_art_adult(hu, hm, ha, g);
             intermediate.base.gradART(hu, hm, ha, g) -=
                 art.dropout(time_step) * state_next.base.h_art_adult(hu, hm, ha, g);
@@ -385,11 +388,11 @@ void run_hiv_model_simulation(int time_step,
   constexpr auto ss = StateSpace<ModelVariant>().base;
   const auto art = pars.base.art;
 
-  internal::run_calculate_incidence_rate<ModelVariant>(time_step, pars, state_curr, state_next, intermediate);
-
   intermediate.base.everARTelig_idx =
       art.idx_hm_elig(time_step) < ss.hDS ? art.idx_hm_elig(time_step) : ss.hDS;
   intermediate.base.anyelig_idx = art.idx_hm_elig(time_step);
+
+  internal::run_calculate_incidence_rate<ModelVariant>(time_step, pars, state_curr, state_next, intermediate);
 
   for (int hiv_step = 0; hiv_step < pars.base.options.hts_per_year; ++hiv_step) {
     intermediate.base.grad.setZero();
