@@ -230,8 +230,8 @@ test_that("error thrown if size of stratified data does not match expected", {
 })
 
 test_that("error thrown if trying to save output from invalid steps", {
-  demp <- readRDS(test_path("testdata/demographic_projection_object_adult.rds"))
-  parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
+  demp <- readRDS(test_path("testdata/demographic_projection_object_child.rds"))
+  parameters <- readRDS(test_path("testdata/projection_parameters_child.rds"))
 
   expect_error(run_model(demp, parameters, NULL, NULL, -1),
                "Output step must be at least 0, got '-1'.")
