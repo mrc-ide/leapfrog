@@ -295,11 +295,10 @@ struct BaseModelIntermediateData {
   TensorFixedSize <real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>> hiv_net_migration;
   TensorFixedSize <real_type, Sizes<hAG<ModelVariant>, NS<ModelVariant>>> p_hiv_pop_coarse_ages;
   TensorFixedSize <real_type, Sizes<hAG<ModelVariant>, NS<ModelVariant>>> hiv_age_up_prob;
-  TensorFixedSize <real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>> hiv_negative_pop;
+  TensorFixedSize <real_type, Sizes<pAG<ModelVariant>>> hiv_negative_pop;
   TensorFixedSize <real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>> p_infections_ts;
   TensorFixedSize <real_type, Sizes<NS<ModelVariant>>> rate_sex;
   TensorFixedSize <real_type, Sizes<NS<ModelVariant>>> hiv_neg_aggregate;
-  TensorFixedSize <real_type, Sizes<NS<ModelVariant>>> Xhivn_incagerr;
   TensorFixedSize <real_type, Sizes<hAG<ModelVariant>, NS<ModelVariant>>> p_hiv_deaths_age_sex;
   TensorFixedSize <real_type, Sizes<hDS<ModelVariant>, hAG<ModelVariant>, NS<ModelVariant>>> grad;
   TensorFixedSize <real_type, Sizes<hTS<ModelVariant>, hDS<ModelVariant>, hAG<ModelVariant>, NS<ModelVariant>>> gradART;
@@ -324,6 +323,7 @@ struct BaseModelIntermediateData {
   real_type artinit_hahm;
   real_type hivqx_ha;
   real_type hivdeaths_a;
+  real_type Xhivn_incagerr;
 
   BaseModelIntermediateData(int hAG_15plus)
       :
@@ -346,7 +346,8 @@ struct BaseModelIntermediateData {
       artinit_hts(0.0),
       artinit_hahm(0.0),
       hivqx_ha(0.0),
-      hivdeaths_a(0.0) {}
+      hivdeaths_a(0.0),
+      Xhivn_incagerr(0.0) {}
 
   void reset() {
     migration_rate.setZero();
@@ -356,7 +357,6 @@ struct BaseModelIntermediateData {
     hiv_negative_pop.setZero();
     p_infections_ts.setZero();
     hiv_neg_aggregate.setZero();
-    Xhivn_incagerr.setZero();
     rate_sex.setZero();
     p_hiv_deaths_age_sex.setZero();
     grad.setZero();
@@ -381,6 +381,7 @@ struct BaseModelIntermediateData {
     artinit_hahm = 0.0;
     hivqx_ha = 0.0;
     hivdeaths_a = 0.0;
+    Xhivn_incagerr = 0.0;
   }
 };
 
