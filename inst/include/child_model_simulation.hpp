@@ -122,7 +122,6 @@ void run_child_natural_history(int time_step,
                 "run_hiv_child_infections can only be called for model variants where run_child_model is true");
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
-
   const auto cpars = pars.children.children;
 
 
@@ -130,10 +129,9 @@ void run_child_natural_history(int time_step,
     for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
       for (int a = 0; a < hc_ss.hc2_agestart; ++a) {
         for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
-          intermediate.children.hc_posthivmort(hd, cat, a, s) += state_next.children.hc1_hiv_pop(hd, cat, a, s) -
-                                                                 (1.0 - cpars.ctx_effect * cpars.ctx_val(time_step)) *
-                                                                 state_curr.children.hc1_hiv_pop(hd, cat, a, s) *
-                                                                 cpars.hc1_cd4_mort(hd, cat, a);
+          intermediate.children.hc_posthivmort(hd, cat, a, s) = state_next.children.hc1_hiv_pop(hd, cat, a, s)  * (1 - cpars.hc1_cd4_mort(hd, cat, a));
+          //intermediate.children.hc_posthivmort(hd, cat, a, s) = state_next.children.hc1_hiv_pop(hd, cat, a, s) - (1.0 - cpars.ctx_effect * cpars.ctx_val(time_step)) * state_curr.children.hc1_hiv_pop(hd, cat, a, s) * cpars.hc1_cd4_mort(hd, cat, a);
+
         }
       }
     }
@@ -161,12 +159,12 @@ void run_child_natural_history(int time_step,
         for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
           intermediate.children.hc_grad(hd - 1, cat, a, s) -=
               (intermediate.children.hc_posthivmort(hd - 1, cat, a, s) * cpars.hc1_cd4_prog(hd - 1) +
-               state_next.children.hc1_hiv_pop(hd - 1, cat, a, s) * cpars.hc1_cd4_prog(hd - 1)) /
-              2; //moving to next cd4 category
+               state_next.children.hc1_hiv_pop(hd - 1, cat, a, s) * cpars.hc1_cd4_prog(hd - 1)) / 2; //moving to next cd4 category
           intermediate.children.hc_grad(hd, cat, a, s) +=
               (intermediate.children.hc_posthivmort(hd - 1, cat, a, s) * cpars.hc1_cd4_prog(hd - 1) +
-               state_next.children.hc1_hiv_pop(hd - 1, cat, a, s) * cpars.hc1_cd4_prog(hd - 1)) /
-              2; //moving into this cd4 category
+               state_next.children.hc1_hiv_pop(hd - 1, cat, a, s) * cpars.hc1_cd4_prog(hd - 1)) / 2; //moving into this cd4 category
+
+
         }
       }
     }
@@ -189,6 +187,8 @@ void run_child_natural_history(int time_step,
       }
     }
   }
+
+
 }
 
 template<typename ModelVariant, typename real_type>
@@ -201,7 +201,6 @@ void run_child_hiv_mort(int time_step,
                 "run_hiv_child_infections can only be called for model variants where run_child_model is true");
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
-
   const auto cpars = pars.children.children;
 
 
@@ -210,15 +209,11 @@ void run_child_hiv_mort(int time_step,
       for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
         for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
           if (a < hc_ss.hc2_agestart) {
-            intermediate.children.hc_grad(hd, cat, a, s) -=
-                (1 - cpars.ctx_effect * cpars.ctx_val(time_step)) * state_next.children.hc1_hiv_pop(hd, cat, a, s) *
-                cpars.hc1_cd4_mort(hd, cat, a);
+          //  intermediate.children.hc_grad(hd, cat, a, s) -= (1 - cpars.ctx_effect * cpars.ctx_val(time_step)) * state_next.children.hc1_hiv_pop(hd, cat, a, s) * cpars.hc1_cd4_mort(hd, cat, a);
+            intermediate.children.hc_grad(hd, cat, a, s) -=  state_next.children.hc1_hiv_pop(hd, cat, a, s) * cpars.hc1_cd4_mort(hd, cat, a);
           } else {
-            intermediate.children.hc_grad(hd, cat, a, s) -= (1 - cpars.ctx_effect * cpars.ctx_val(time_step)) *
-                                                            state_next.children.hc2_hiv_pop(hd, cat,
-                                                                                            a - hc_ss.hc2_agestart, s) *
-                                                            cpars.hc2_cd4_mort(hd, cat, a - hc_ss.hc2_agestart);
-
+           // intermediate.children.hc_grad(hd, cat, a, s) -= (1 - cpars.ctx_effect * cpars.ctx_val(time_step)) * state_next.children.hc2_hiv_pop(hd, cat,a - hc_ss.hc2_agestart, s) *  cpars.hc2_cd4_mort(hd, cat, a - hc_ss.hc2_agestart);
+            intermediate.children.hc_grad(hd, cat, a, s) -= state_next.children.hc2_hiv_pop(hd, cat,a - hc_ss.hc2_agestart, s) *  cpars.hc2_cd4_mort(hd, cat, a - hc_ss.hc2_agestart);
           }
         }
       }
