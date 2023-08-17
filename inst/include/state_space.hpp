@@ -71,7 +71,6 @@ struct ChildModelStateSpace<true> {
   static constexpr int hPS = 7;
   // Number of breast feeting age categories
   static constexpr int hBF = 18;
-
 };
 
 template<>

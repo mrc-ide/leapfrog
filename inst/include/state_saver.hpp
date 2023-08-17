@@ -170,7 +170,6 @@ public:
 template<typename ModelVariant, typename real_type>
 class StateSaver {
 public:
-
   BaseModelStateSaver<ModelVariant, real_type> base;
   ChildModelStateSaver<ModelVariant, real_type> children;
 
