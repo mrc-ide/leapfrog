@@ -22,12 +22,12 @@ void run_child_ageing(int time_step,
   for (int s = 0; s < ss.NS; ++s) {
     //less than 5 because there is a cd4 transition between ages 4 and 5
     for (int a = 1; a < hc_ss.hc2_agestart; ++a) {
-      for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-        for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+      for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+         for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
           state_next.children.hc1_hiv_pop(hd, cat, a, s) +=
               state_curr.children.hc1_hiv_pop(hd, cat, a - 1, s) * demog.survival_probability(a, s, time_step);
         }
-        for (int dur = 0; dur < ss.hTS; ++dur) {
+          for (int dur = 0; dur < ss.hTS; ++dur) {
           state_next.children.hc1_art_pop(dur, hd, a, s) +=
               state_curr.children.hc1_art_pop(dur, hd, a - 1, s) * demog.survival_probability(a, s, time_step);
         }
@@ -38,13 +38,13 @@ void run_child_ageing(int time_step,
 
   for (int s = 0; s < ss.NS; ++s) {
     for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-      for (int hd_alt = 0; hd_alt < hc_ss.hc2DS; ++hd_alt) {
-        for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+      for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+         for (int hd_alt = 0; hd_alt < hc_ss.hc2DS; ++hd_alt) {
           state_next.children.hc2_hiv_pop(hd_alt, cat, 0, s) +=
               state_curr.children.hc1_hiv_pop(hd, cat, hc_ss.hc1_ageend, s) *
               demog.survival_probability(hc_ss.hc2_agestart, s, time_step) * cpars.hc_cd4_transition(hd_alt, hd);
         }
-        for (int dur = 0; dur < ss.hTS; ++dur) {
+          for (int dur = 0; dur < ss.hTS; ++dur) {
           state_next.children.hc2_art_pop(dur, hd_alt, 0, s) +=
               state_curr.children.hc1_art_pop(dur, hd, hc_ss.hc1_ageend, s) *
               demog.survival_probability(hc_ss.hc2_agestart, s, time_step) * cpars.hc_cd4_transition(hd_alt, hd);
@@ -55,13 +55,13 @@ void run_child_ageing(int time_step,
 
   for (int s = 0; s < ss.NS; ++s) {
     for (int a = (hc_ss.hc2_agestart + 1); a < pars.base.options.p_idx_fertility_first; ++a) {
-      for (int hd = 0; hd < hc_ss.hc2DS; ++hd) {
-        for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+      for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+          for (int hd = 0; hd < hc_ss.hc2DS; ++hd) {
           state_next.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s) +=
               state_curr.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart - 1, s) *
               demog.survival_probability(a, s, time_step);
         }
-        for (int dur = 0; dur < ss.hTS; ++dur) {
+          for (int dur = 0; dur < ss.hTS; ++dur) {
           state_next.children.hc2_art_pop(dur, hd, a - hc_ss.hc2_agestart, s) +=
               state_curr.children.hc2_art_pop(dur, hd, a - hc_ss.hc2_agestart - 1, s) *
               demog.survival_probability(a, s, time_step);
@@ -121,22 +121,21 @@ void run_child_natural_history(int time_step,
   const auto cpars = pars.children.children;
 
   for (int s = 0; s < ss.NS; ++s) {
-    for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-      for (int a = 0; a < hc_ss.hc2_agestart; ++a) {
-        for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+    for (int a = 0; a < hc_ss.hc2_agestart; ++a) {
+      for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+          for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
           intermediate.children.hc_posthivmort(hd, cat, a, s) =
               state_next.children.hc1_hiv_pop(hd, cat, a, s) * (1 - cpars.hc1_cd4_mort(hd, cat, a));
           //intermediate.children.hc_posthivmort(hd, cat, a, s) = state_next.children.hc1_hiv_pop(hd, cat, a, s) - (1.0 - cpars.ctx_effect * cpars.ctx_val(time_step)) * state_curr.children.hc1_hiv_pop(hd, cat, a, s) * cpars.hc1_cd4_mort(hd, cat, a);
-
         }
       }
     }
   }
 
   for (int s = 0; s < ss.NS; ++s) {
-    for (int hd = 0; hd < hc_ss.hc2DS; ++hd) {
-      for (int a = hc_ss.hc2_agestart; a < pars.base.options.p_idx_fertility_first; ++a) {
-        for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+    for (int a = hc_ss.hc2_agestart; a < pars.base.options.p_idx_fertility_first; ++a) {
+      for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+        for (int hd = 0; hd < hc_ss.hc2DS; ++hd) {
           intermediate.children.hc_posthivmort(hd, cat, a, s) +=
               state_next.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s) -
               (1 - cpars.ctx_effect * cpars.ctx_val(time_step)) *
@@ -149,9 +148,9 @@ void run_child_natural_history(int time_step,
 
   //progress through CD4 categories
   for (int s = 0; s < ss.NS; ++s) {
-    for (int hd = 1; hd < hc_ss.hc1DS; ++hd) {
-      for (int a = 0; a < hc_ss.hc2_agestart; ++a) {
-        for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+    for (int a = 0; a < hc_ss.hc2_agestart; ++a) {
+      for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+        for (int hd = 1; hd < hc_ss.hc1DS; ++hd) {
           intermediate.children.hc_grad(hd - 1, cat, a, s) -=
               (intermediate.children.hc_posthivmort(hd - 1, cat, a, s) * cpars.hc1_cd4_prog(hd - 1) +
                state_next.children.hc1_hiv_pop(hd - 1, cat, a, s) * cpars.hc1_cd4_prog(hd - 1)) /
@@ -168,9 +167,9 @@ void run_child_natural_history(int time_step,
   }
   //progress through CD4 categories
   for (int s = 0; s < ss.NS; ++s) {
-    for (int hd = 1; hd < hc_ss.hc2DS; ++hd) {
-      for (int a = hc_ss.hc2_agestart; a < pars.base.options.p_idx_fertility_first; ++a) {
-        for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+    for (int a = hc_ss.hc2_agestart; a < pars.base.options.p_idx_fertility_first; ++a) {
+      for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+        for (int hd = 1; hd < hc_ss.hc2DS; ++hd) {
           intermediate.children.hc_grad(hd - 1, cat, a, s) -=
               (intermediate.children.hc_posthivmort(hd - 1, cat, a, s) * cpars.hc2_cd4_prog(hd - 1) +
                state_next.children.hc2_hiv_pop(hd - 1, cat, a - hc_ss.hc2_agestart, s) * cpars.hc2_cd4_prog(hd - 1)) /
@@ -198,9 +197,9 @@ void run_child_hiv_mort(int time_step,
   const auto cpars = pars.children.children;
 
   for (int s = 0; s < ss.NS; ++s) {
-    for (int hd = 0; hd < hc_ss.hc2DS; ++hd) {
-      for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
-        for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+    for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
+      for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+        for (int hd = 0; hd < hc_ss.hc2DS; ++hd) {
           if (a < hc_ss.hc2_agestart) {
             //  intermediate.children.hc_grad(hd, cat, a, s) -= (1 - cpars.ctx_effect * cpars.ctx_val(time_step)) * state_next.children.hc1_hiv_pop(hd, cat, a, s) * cpars.hc1_cd4_mort(hd, cat, a);
             intermediate.children.hc_grad(hd, cat, a, s) -=
