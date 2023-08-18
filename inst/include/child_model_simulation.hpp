@@ -124,8 +124,7 @@ void run_child_natural_history(int time_step,
       for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
           for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
           intermediate.children.hc_posthivmort(hd, cat, a, s) =
-              state_next.children.hc1_hiv_pop(hd, cat, a, s) * (1 - cpars.hc1_cd4_mort(hd, cat, a));
-          //intermediate.children.hc_posthivmort(hd, cat, a, s) = state_next.children.hc1_hiv_pop(hd, cat, a, s) - (1.0 - cpars.ctx_effect * cpars.ctx_val(time_step)) * state_curr.children.hc1_hiv_pop(hd, cat, a, s) * cpars.hc1_cd4_mort(hd, cat, a);
+              state_next.children.hc1_hiv_pop(hd, cat, a, s) * (1.0 - cpars.hc1_cd4_mort(hd, cat, a)) * (1.0 - cpars.ctx_effect * cpars.ctx_val(time_step));
         }
       }
     }
