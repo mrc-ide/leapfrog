@@ -58,6 +58,7 @@ void save_output(leapfrog::StateSaver<ModelVariant, double> &state_saver,
 int main(int argc, char *argv[]) {
   if (argc < 4) {
     std::cout <<
+
               "Usage: fit_model <sim_years> <hts_per_year> <intput_dir> <output_dir>" <<
               std::endl;
     return 1;
@@ -107,6 +108,7 @@ int main(int argc, char *argv[]) {
       ss.hAG,             // Age groups HIV 15+
       1,                  // Scale CD4 mortality
       0.2,                // initiation_mortality_weight
+
   };
 
   leapfrog::Tensor1<int> v = serialize::deserialize_tensor<int, 1>(std::string("idx_hm_elig"));

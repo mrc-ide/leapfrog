@@ -39,6 +39,7 @@ run_model <- function(data, parameters, sim_years,
     parameters$art_mort <- parameters[["art_mort_coarse"]]
   }
   data <- c(data, parameters)
+
   run_base_model(data, sim_years, hts_per_year, output_steps,
                  model_variant)
 }

@@ -75,13 +75,32 @@ struct ChildModelOutputState {
 
 template<typename real_type>
 struct ChildModelOutputState<ChildModel, real_type> {
-  Tensor5<real_type> hc_hiv_pop;
+  Tensor5<real_type> hc1_hiv_pop;
+  Tensor5<real_type> hc2_hiv_pop;
+  Tensor5<real_type> hc1_art_pop;
+  Tensor5<real_type> hc2_art_pop;
 
   ChildModelOutputState(int no_output_years)
-      : hc_hiv_pop(StateSpace<ChildModel>().base.hDS, StateSpace<ChildModel>().children.hTM,
-                   StateSpace<ChildModel>().base.pAG,
-                   StateSpace<ChildModel>().base.NS, no_output_years) {
-    hc_hiv_pop.setZero();
+      : hc1_hiv_pop(StateSpace<ChildModel>().children.hc1DS,
+                    StateSpace<ChildModel>().children.hcTT,
+                    StateSpace<ChildModel>().children.hc1AG,
+                    StateSpace<ChildModel>().base.NS, no_output_years),
+        hc2_hiv_pop(StateSpace<ChildModel>().children.hc2DS,
+                    StateSpace<ChildModel>().children.hcTT,
+                    StateSpace<ChildModel>().children.hc2AG,
+                    StateSpace<ChildModel>().base.NS, no_output_years),
+       hc1_art_pop(StateSpace<ChildModel>().base.hTS,
+                   StateSpace<ChildModel>().children.hc1DS,
+                   StateSpace<ChildModel>().children.hc1AG,
+                    StateSpace<ChildModel>().base.NS, no_output_years),
+       hc2_art_pop(StateSpace<ChildModel>().base.hTS,
+                    StateSpace<ChildModel>().children.hc2DS,
+                    StateSpace<ChildModel>().children.hc2AG,
+                    StateSpace<ChildModel>().base.NS, no_output_years){
+    hc1_hiv_pop.setZero();
+    hc2_hiv_pop.setZero();
+    hc1_art_pop.setZero();
+    hc2_art_pop.setZero();
   }
 };
 
@@ -136,8 +155,14 @@ public:
   void save_state(ChildModelOutputState<ChildModel, real_type> &children_state,
                   const size_t i,
                   const State<ChildModel, real_type> &state) {
-    children_state.hc_hiv_pop.chip(i, children_state.hc_hiv_pop.NumDimensions - 1) =
-        state.children.hc_hiv_pop;
+    children_state.hc1_hiv_pop.chip(i, children_state.hc1_hiv_pop.NumDimensions - 1) =
+        state.children.hc1_hiv_pop;
+    children_state.hc2_hiv_pop.chip(i, children_state.hc2_hiv_pop.NumDimensions - 1) =
+      state.children.hc2_hiv_pop;
+    children_state.hc1_art_pop.chip(i, children_state.hc1_art_pop.NumDimensions - 1) =
+      state.children.hc1_art_pop;
+    children_state.hc2_art_pop.chip(i, children_state.hc2_art_pop.NumDimensions - 1) =
+      state.children.hc2_art_pop;
   }
 };
 

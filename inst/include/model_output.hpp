@@ -82,12 +82,24 @@ Rcpp::List build_r_output(const leapfrog::OutputState<ModelVariant, real_type> &
   ret.attr("names") = names;
 
   if constexpr (ModelVariant::run_child_model) {
-    constexpr auto base = ss.base;
     constexpr auto children = ss.children;
-    Rcpp::NumericVector r_hc_hiv_pop(base.hDS * children.hTM * base.pAG * base.NS * output_years);
-    r_hc_hiv_pop.attr("dim") = Rcpp::NumericVector::create(base.hDS, children.hTM, base.pAG, base.NS, output_years);
-    std::copy_n(state.children.hc_hiv_pop.data(), state.children.hc_hiv_pop.size(), REAL(r_hc_hiv_pop));
-    ret.push_back(r_hc_hiv_pop, "hc_hiv_pop");
+    constexpr auto base = ss.base;
+    Rcpp::NumericVector r_hc1_hiv_pop(children.hc1DS * children.hcTT * children.hc1AG * base.NS * output_years);
+    Rcpp::NumericVector r_hc2_hiv_pop(children.hc2DS * children.hcTT * children.hc2AG * base.NS * output_years);
+    Rcpp::NumericVector r_hc1_art_pop(base.hTS * children.hc1DS * children.hc1AG * base.NS * output_years);
+    Rcpp::NumericVector r_hc2_art_pop(base.hTS * children.hc2DS * children.hc2AG * base.NS * output_years);
+    r_hc1_hiv_pop.attr("dim") = Rcpp::NumericVector::create(children.hc1DS, children.hcTT, children.hc1AG, base.NS, output_years);
+    r_hc2_hiv_pop.attr("dim") = Rcpp::NumericVector::create(children.hc2DS, children.hcTT, children.hc2AG, base.NS, output_years);
+    r_hc1_art_pop.attr("dim") = Rcpp::NumericVector::create(base.hTS, children.hc1DS, children.hc1AG, base.NS, output_years);
+    r_hc2_art_pop.attr("dim") = Rcpp::NumericVector::create(base.hTS, children.hc2DS, children.hc2AG, base.NS, output_years);
+    std::copy_n(state.children.hc1_hiv_pop.data(), state.children.hc1_hiv_pop.size(), REAL(r_hc1_hiv_pop));
+    std::copy_n(state.children.hc2_hiv_pop.data(), state.children.hc2_hiv_pop.size(), REAL(r_hc2_hiv_pop));
+    std::copy_n(state.children.hc1_art_pop.data(), state.children.hc1_art_pop.size(), REAL(r_hc1_art_pop));
+    std::copy_n(state.children.hc2_art_pop.data(), state.children.hc2_art_pop.size(), REAL(r_hc2_art_pop));
+    ret.push_back(r_hc1_hiv_pop, "hc1_hiv_pop");
+    ret.push_back(r_hc2_hiv_pop, "hc2_hiv_pop");
+    ret.push_back(r_hc1_art_pop, "hc1_art_pop");
+    ret.push_back(r_hc2_art_pop, "hc2_art_pop");
   }
 
   return ret;

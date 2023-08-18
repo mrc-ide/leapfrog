@@ -74,14 +74,29 @@ In `StateSpace` struct
 | hDS      | hDS      | Number of disease stages in adult HIV population               |
 | hTS      | hTS      | Number of treatment stages in adult HIV population             |
 | hAG_SPAN | hAG_span | Array of HIV age group sizes                                   |
+|                                                                                      |
+| hDS_paed | hc1DS    | Number of disease stages in the 0-4 population                 |
+|                                                                                      |
+| hDS_adol | hc2DS    | Number of disease stages in the 5-14 population                | 
+|                                                                                      |
+| hTM      | hcTT     | Number of transmission types for the paediatric population     |
+|                                                                                      |
+| NA       | hc1AG    | Number of age groups in the 0-4 population                     |
+|                                                                                      |
+| NA       | hc2AG    | Number of age groups in the 5-14 population                    |
+|                                                                                      |
+| hBF       | hBF      | Number of 2 month breastfeeding durations                     |
 
 #### Loop variable convention
 
 * `NS` is `s`
 * `pAG` is `a`
 * `hAG` is `ha`
-* `hDS` is `hd`
+* `hDS`, `hc1DS`, and `hc2DS` are `hd`
+* `hcTT` is `cat`
 * `hTS` is `ht`
+* `hBF` is `bf`
+
 
 ### Key indices in state space or other options controlling fit
 
@@ -94,10 +109,12 @@ In `Options` struct. Some of these come from data, some are static, some are an 
 | pAG_FERT           | p_fertility_age_groups | Number of ages eligible for fertility                  |
 | pIDX_HIVADULT      | p_idx_hiv_first_adult  | Index of the first age group to be considered an adult |
 | t_ART_start        | ts_art_start           | Time step to start modelling ART                       |
+| NA                 | run_child_model        | Whether the paediatric model should be run             |
+
 
 ### Input data
 
-In 4 structs as part of the `Parameters`, named `Demography`, `Incidence`, `NaturalHistory` and `Art`
+In 5 structs as part of the `Parameters`, named `Demography`, `Incidence`, `NaturalHistory`, `Art` and `Children`
 
 | Leapfrog           | Frogger                                  | Details                                                                                                                                                               |
 |--------------------|------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -119,7 +136,15 @@ In 4 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 | art15plus_isperc   | art.adults_on_art_is_percent             | Time series, TRUE if art15plus_num is a %, FALSE if it is a #                                                                                                         |
 | artcd4elig_idx     | art.idx_hm_elig                          | The index of the CD4 count at which people are eligible for ART by time step                                                                                          |
 | art_alloc_mxweight | art.initiation_mortality_weight          | Weighting for extent that expected mortality guides ART uptake                                                                                                        |
-| art_dropout        | art.dropout                              | Annual ART dropout rate                                                                                                                                               |
+| paed_incid_input   | chidlren.hc_nosocomial                   | Nosocomial infections occuring in 0-4 year olds                                                                                                                       |
+| paed_cd4_dist      | children.hc1_cd4_dist                    | Distribution of infections by CD4 category by infection type                                                                                                          |
+| paed_cd4_transition| children.hc_cd4_transition               | CD4 mapping between 0-4 year olds and 5-14 year olds                                                                                                                  |
+| paed_cd4_mort      | children.hc1_cd4_mort                    | Probability of mortality by CD4 stage, age, and sex for 0-4 year olds                                                                                                 |
+| adol_cd4_mort      | children.hc2_cd4_mort                    | Probability of mortality by CD4 stage, age, and sex for 5-14 year olds                                                                                                |                               
+| paed_cd4_prog      | children.hc1_cd4_prog                    | Probability of progressing to the subsequent CD4 stage for 0-4 year olds                                                                                              |
+| adol_cd4_prog      | children.hc2_cd4_prog                    | Probability of progressing to the subsequent CD4 stage for 5-14 year olds                                                                                             |                                               
+| ctx_effect         | children.ctx_effect                      | Effectiveness of cotrimoxazole at averting mortality                                                                                                                  |
+| ctx_val            | children.ctx_val                         | Number of children receiving cotrimoxazole                                                                                                                            |
 
 ### Outputs
 
@@ -142,6 +167,11 @@ Discussion: naming conventions
 | aidsdeaths_noart | h_hiv_deaths_no_art        | Projected HIV-related deaths off ART by sex, age and CD4                 |
 | aidsdeaths_art   | h_hiv_deaths_art           | Projected HIV-related deaths on ART by sex, age, CD4 and treatment stage |
 | artinit          | h_art_initiation           | Projected ART initiations by sex, age and CD4                            |
+| hivstrat_paeds   | hc1_hiv_pop                | Projected PLHIV 0-4y not on ART by age, sex, transmission type, and CD4  |
+| hivstrat_paeds   | hc2_hiv_pop                | Projected PLHIV 5-14y not on ART by age, sex, transmission type, and CD4 |
+| artstrat_paeds   | hc1_art_pop                | Projected PLHIV 0-4y on ART by age, sex, treatment stage and CD4         |
+| artstrat_paeds   | hc2_art_pop                | Projected PLHIV 5-14y on ART by age, sex, treatment stage and CD4        |
+
 
 ### Internal
 
@@ -191,6 +221,12 @@ Discussion: naming conventions
 | hivpop_ha(ha)             | hivpop_ha                       | HIV population by coarse HIV age group stratification                     |
 | hivqx_ha                  |                                 |                                                                           |
 | hivdeaths_a               |                                 |                                                                           |
+| age15_hivpop              | age15_hiv_pop                   | 15 year olds aging out of the paediatric population                       |
+| deaths_paeds              | hc_posthivmort                  | PLHIV 0-14y stratified by age, sex, transmission type, and CD4 after      |
+|                           |                                 | HIV related mortality                                                     |
+| grad_paeds                | hc_grad                         | Difference in PLHIV 0-14 stratified by age, sex, transmission type,       |
+|                           |                                 | and CD4 between the current and next timestep                             |
+
 
 ## License
 

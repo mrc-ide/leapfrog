@@ -49,10 +49,25 @@ template<typename ModelVariant>
 constexpr int hTS = StateSpace<ModelVariant>().base.hTS;
 
 template<typename ModelVariant>
+constexpr int hc1DS = StateSpace<ModelVariant>().children.hc1DS;
+
+template<typename ModelVariant>
+constexpr int hc1_ageend = StateSpace<ModelVariant>().children.hc1_ageend;
+
+template<typename ModelVariant>
+constexpr int hc2_agestart = StateSpace<ModelVariant>().children.hc2_agestart;
+
+template<typename ModelVariant>
+constexpr int hc1AG = StateSpace<ModelVariant>().children.hc1AG;
+
+template<typename ModelVariant>
+constexpr int hc2AG = StateSpace<ModelVariant>().children.hc2AG;
+
+template<typename ModelVariant>
 constexpr int hc2DS = StateSpace<ModelVariant>().children.hc2DS;
 
 template<typename ModelVariant>
-constexpr int hTM = StateSpace<ModelVariant>().children.hTM;
+constexpr int hcTT = StateSpace<ModelVariant>().children.hcTT;
 
 template<typename ModelVariant>
 constexpr int hPS = StateSpace<ModelVariant>().children.hPS;
@@ -142,6 +157,12 @@ struct Children {
   TensorMap1<real_type> hc_nosocomial;
   TensorMap1<real_type> hc1_cd4_dist;
   TensorMap2<real_type> hc_cd4_transition;
+  TensorMap3<real_type> hc1_cd4_mort;
+  TensorMap3<real_type> hc2_cd4_mort;
+  TensorMap1<real_type> hc1_cd4_prog;
+  TensorMap1<real_type> hc2_cd4_prog;
+  real_type ctx_effect;
+  TensorMap1<real_type> ctx_val;
 };
 
 template<typename ModelVariant, typename real_type>
@@ -248,18 +269,24 @@ struct ChildModelState {
 
 template<typename real_type>
 struct ChildModelState<ChildModel, real_type> {
-  TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hTM<ChildModel>, pAG<ChildModel>, NS<ChildModel>>> hc_hiv_pop;
+  TensorFixedSize <real_type, Sizes<hc1DS<ChildModel>, hcTT<ChildModel>, hc1AG<ChildModel>, NS<ChildModel>>> hc1_hiv_pop;
+  TensorFixedSize <real_type, Sizes<hc2DS<ChildModel>, hcTT<ChildModel>, hc2AG<ChildModel>, NS<ChildModel>>> hc2_hiv_pop;
+  TensorFixedSize <real_type, Sizes<hTS<ChildModel>, hc1DS<ChildModel>, hc1AG<ChildModel>, NS<ChildModel>>> hc1_art_pop;
+  TensorFixedSize <real_type, Sizes<hTS<ChildModel>, hc2DS<ChildModel>, hc2AG<ChildModel>, NS<ChildModel>>> hc2_art_pop;
 
   ChildModelState(const Parameters<ChildModel, real_type> &pars) {
-    hc_hiv_pop.setZero();
+    reset();
   }
 
   void set_initial_state(const Parameters<ChildModel, real_type> &pars) {
-    hc_hiv_pop.setZero();
+    reset();
   }
 
   void reset() {
-    hc_hiv_pop.setZero();
+    hc1_hiv_pop.setZero();
+    hc2_hiv_pop.setZero();
+    hc1_art_pop.setZero();
+    hc2_art_pop.setZero();
   }
 };
 
@@ -395,11 +422,15 @@ struct ChildModelIntermediateData {
 template<typename real_type>
 struct ChildModelIntermediateData<ChildModel, real_type> {
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, NS<ChildModel>>> age15_hiv_pop;
+  TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_posthivmort;
+  TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_grad;
 
   ChildModelIntermediateData() {};
 
   void reset() {
     age15_hiv_pop.setZero();
+    hc_posthivmort.setZero();
+    hc_grad.setZero();
   };
 };
 

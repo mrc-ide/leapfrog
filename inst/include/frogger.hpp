@@ -14,7 +14,6 @@ OutputState<ModelVariant, real_type> run_model(int time_steps,
                                                std::vector<int> save_steps,
                                                const Parameters<ModelVariant, real_type> &pars) {
   auto state = State<ModelVariant, real_type>(pars);
-
   auto state_next = state;
   internal::IntermediateData<ModelVariant, real_type> intermediate(pars.base.options.hAG_15plus);
 

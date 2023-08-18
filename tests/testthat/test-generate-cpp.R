@@ -137,8 +137,8 @@ test_that("output optional data generated in conditional block", {
   closing_bracket <- closing[closing > opening_condition][1]
 
   optional_data <- which(grepl(paste0(
-    "Rcpp::NumericVector r_hc_hiv_pop\\(base.hDS ",
-    "\\* children.hTM \\* base.pAG \\* base.NS \\* output_years\\);"),
+    "Rcpp::NumericVector r_hc1_hiv_pop\\(children.hc1DS ",
+    "\\* children.hcTT \\* children.hc1AG \\* base.NS \\* output_years\\);"),
     result))
   expect_true(optional_data > opening_condition)
   expect_true(optional_data < closing_bracket)
@@ -165,3 +165,4 @@ test_that("input optional data generated in conditional block", {
   expect_true(optional_data > opening_condition)
   expect_true(optional_data < else_statement)
 })
+

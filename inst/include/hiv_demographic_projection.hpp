@@ -41,14 +41,15 @@ void run_age_15_entrants(int time_step,
                          IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "run_hiv_child_infections can only be called for model variants where run_child_model is true");
-
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto ss_child = StateSpace<ModelVariant>().children;
 
+
+  //TO DO: add ART entrants here
   for (int g = 0; g < ss.NS; ++g) {
     for (int hm = 0; hm < ss.hDS; ++hm) {
-      for (int htm = 0; htm < ss_child.hTM; ++htm) {
-        intermediate.children.age15_hiv_pop(hm, g) += state_curr.children.hc_hiv_pop(hm, htm, 14, g);
+      for (int htm = 0; htm < ss_child.hcTT; ++htm) {
+        intermediate.children.age15_hiv_pop(hm, g) += state_curr.children.hc2_hiv_pop(hm, htm, ss_child.hc2AG, g);
       }
     }
   }
@@ -116,6 +117,7 @@ void run_hiv_and_art_stratified_ageing(int time_step,
     }
   }
 }
+
 
 template<typename ModelVariant, typename real_type>
 void run_hiv_and_art_stratified_deaths_and_migration(

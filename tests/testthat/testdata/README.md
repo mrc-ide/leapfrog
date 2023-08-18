@@ -57,3 +57,26 @@ saveRDS(lmod, "fit_demography.rds")
 ```
 
 ## TODO: Add details about child model input data
+
+Test data coming from the same file but on the 'clean' branch of leapfrog. 
+
+```R
+pjnz1 <- test_path("../testdata/spectrum/v6.13/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ")
+
+demp <- prepare_leapfrog_demp(pjnz1)
+hivp <- prepare_leapfrog_projp(pjnz1)
+
+demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
+demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
+
+hivp$paed_cd4_dist <- c(1,rep(0,6))
+
+##Only transmission is coming from nosocomial infections
+hivp$pmtct_mtct[] <- 0
+hivp$art_mtct[] <- 0
+
+saveRDS(hivp, "projection_parameters_child.rds")
+saveRDS(demp, "demographic_projection_object_child.rds")
+
+```
+

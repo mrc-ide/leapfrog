@@ -54,11 +54,19 @@ struct ChildModelStateSpace;
 template<>
 struct ChildModelStateSpace<true> {
   // Number of disease stages within the 1st child age category (0 - 4)
-  static constexpr int hc1DS = 6;
+  static constexpr int hc1DS = 7;
   // Number of disease stages within the 2nd child age category (5 - 14)
-  static constexpr int hc2DS = 7;
+  static constexpr int hc2DS = 6;
+  // last age in the hc1 category
+  static constexpr int hc1_ageend = 4;
+  // first age in the hc2 category
+  static constexpr int hc2_agestart = 5;
+  //  Number of age groups in the hc1 category (0-4)
+  static constexpr int hc1AG = 5;
+  //  Number of age groups in the hc2 category (5-14)
+  static constexpr int hc2AG = 10;
   // Number of transmission types
-  static constexpr int hTM = 4;
+  static constexpr int hcTT = 4;
   // Number of PMTCT types
   static constexpr int hPS = 7;
   // Number of breast feeting age categories

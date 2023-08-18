@@ -164,6 +164,7 @@ generate_input_interface <- function(
   invisible(dest)
 }
 
+
 generate_input_section <- function(section) {
   from_r <- vlapply(section, function(input) {
     is_set(input$r_name)
@@ -206,7 +207,7 @@ generate_input_from_r <- function(inputs) {
 }
 
 generate_length1_input <- function(input) {
-  sprintf("  const %s %s = Rcpp::as<%s>(data[\"%s\"])",
+  sprintf("  const %s %s = Rcpp::as<%s>(data[\"%s\"]);",
           input$type, input$cpp_name, input$type, input$r_name)
 }
 
@@ -227,7 +228,13 @@ generate_return <- function() {
   c("  const leapfrog::Children<real_type> child = {",
     "      hc_nosocomial,",
     "      hc1_cd4_dist,",
-    "      hc_cd4_transition",
+    "      hc_cd4_transition,",
+    "      hc1_cd4_mort,",
+    "      hc2_cd4_mort,",
+    "      hc1_cd4_prog,",
+    "      hc2_cd4_prog,",
+    "      ctx_effect,",
+    "      ctx_val",
     "  };",
     "  const leapfrog::ChildModelParameters<ModelVariant, real_type> child_model_params = {",
     "      child",
