@@ -22,8 +22,8 @@ void run_child_ageing(int time_step,
   for (int s = 0; s < ss.NS; ++s) {
     //less than 5 because there is a cd4 transition between ages 4 and 5
     for (int a = 1; a < hc_ss.hc2_agestart; ++a) {
-      for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
-         for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
+      for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
+         for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
           state_next.children.hc1_hiv_pop(hd, cat, a, s) +=
               state_curr.children.hc1_hiv_pop(hd, cat, a - 1, s) * demog.survival_probability(a, s, time_step);
         }
@@ -31,15 +31,14 @@ void run_child_ageing(int time_step,
           state_next.children.hc1_art_pop(dur, hd, a, s) +=
               state_curr.children.hc1_art_pop(dur, hd, a - 1, s) * demog.survival_probability(a, s, time_step);
         }
-
       }
     }
   }
 
   for (int s = 0; s < ss.NS; ++s) {
     for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-      for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
-         for (int hd_alt = 0; hd_alt < hc_ss.hc2DS; ++hd_alt) {
+      for (int hd_alt = 0; hd_alt < hc_ss.hc2DS; ++hd_alt) {
+        for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
           state_next.children.hc2_hiv_pop(hd_alt, cat, 0, s) +=
               state_curr.children.hc1_hiv_pop(hd, cat, hc_ss.hc1_ageend, s) *
               demog.survival_probability(hc_ss.hc2_agestart, s, time_step) * cpars.hc_cd4_transition(hd_alt, hd);
@@ -55,8 +54,8 @@ void run_child_ageing(int time_step,
 
   for (int s = 0; s < ss.NS; ++s) {
     for (int a = (hc_ss.hc2_agestart + 1); a < pars.base.options.p_idx_fertility_first; ++a) {
-      for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
-          for (int hd = 0; hd < hc_ss.hc2DS; ++hd) {
+      for (int hd = 0; hd < hc_ss.hc2DS; ++hd) {
+       for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
           state_next.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s) +=
               state_curr.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart - 1, s) *
               demog.survival_probability(a, s, time_step);
