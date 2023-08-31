@@ -9,6 +9,7 @@
 
 namespace leapfrog {
 
+<<<<<<< HEAD
 namespace internal {
 
 template<HivAgeStratification S, typename real_type>
@@ -51,23 +52,32 @@ typename StateSaver<S, real_type>::OutputState run_model(int time_steps,
   State<S, real_type> state;
 
   internal::initialise_model_state<S>(pars, state);
+=======
+template<typename ModelVariant, typename real_type>
+OutputState<ModelVariant, real_type> run_model(int time_steps,
+                                               std::vector<int> save_steps,
+                                               const Parameters<ModelVariant, real_type> &pars) {
+  auto state = State<ModelVariant, real_type>(pars);
+>>>>>>> mkw_hiv_mort
   auto state_next = state;
-  internal::IntermediateData<S, real_type> intermediate(pars.options.hAG_15plus);
+  internal::IntermediateData<ModelVariant, real_type> intermediate(pars.base.options.hAG_15plus);
 
   intermediate.reset();
 
-  StateSaver<S, real_type> state_output(time_steps, save_steps);
+  StateSaver<ModelVariant, real_type> state_output(time_steps, save_steps);
   // Save initial state
   state_output.save_state(state, 0);
 
   // Each time step is mid-point of the year
   for (int step = 1; step <= time_steps; ++step) {
     state_next.reset();
-    run_general_pop_demographic_projection<S>(step, pars, state, state_next, intermediate);
-    run_hiv_pop_demographic_projection<S>(step, pars, state, state_next, intermediate);
-    run_hiv_model_simulation<S>(step, pars, state, state_next, intermediate);
-    if (pars.options.run_child_model) {
-      run_child_model_simulation<S>(step, pars, state, state_next, intermediate);
+    run_general_pop_demographic_projection<ModelVariant>(step, pars, state, state_next,
+                                                         intermediate);
+    run_hiv_pop_demographic_projection<ModelVariant>(step, pars, state, state_next,
+                                                     intermediate);
+    run_hiv_model_simulation<ModelVariant>(step, pars, state, state_next, intermediate);
+    if constexpr (ModelVariant::run_child_model) {
+      run_child_model_simulation<ModelVariant>(step, pars, state, state_next, intermediate);
     }
     state_output.save_state(state_next, step);
     std::swap(state, state_next);

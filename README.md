@@ -201,7 +201,7 @@ Discussion: naming conventions
 | Xhivn                     | hiv_neg_aggregate               |                                                                           |
 | Xhivn_incagerr            | ?                               |                                                                           |
 | incrate_i                 |                                 | Incidence rate input                                                      |
-| incrate_g                 | incidence_rate_sex              | Incidence rate by sex                                                     |
+| incrate_g                 | rate_sex                        | Incidence rate by sex                                                     |
 | hivdeaths_ha              | hiv_deaths_age_sex              |                                                                           |
 | grad                      | grad                            | Movement between cd4 categories at a given time step                      |
 | artpop_hahm               |                                 |                                                                           |
