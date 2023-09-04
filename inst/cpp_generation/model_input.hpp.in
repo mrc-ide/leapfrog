@@ -46,27 +46,7 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
       adults_on_art_is_percent
   };
 
-<<<<<<< HEAD
-  const leapfrog::Children<real_type> children = {
-      hc_nosocomial,
-      hc1_cd4_dist,
-      hc_cd4_transition,
-      hc1_cd4_mort,
-      hc2_cd4_mort,
-      hc1_cd4_prog,
-      hc2_cd4_prog,
-      ctx_effect,
-      ctx_val,
-      hc_art_elig_age,
-      hc_art_elig_cd4,
-      hc_art_mort_rr,
-      hc1_art_mort,
-      hc2_art_mort,
-      hc_art_isperc,
-      hc_art_val,
-      hc_art_init_dist
-  };
-=======
+
   const leapfrog::BaseModelParameters<real_type> base_model_params = {
         options,
         demography,
@@ -74,7 +54,6 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
         natural_history,
         art
     };
->>>>>>> mkw_hiv_mort
 
 {{optional_data}}
 }

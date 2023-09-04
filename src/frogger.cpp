@@ -57,12 +57,7 @@ Rcpp::List fit_model(const leapfrog::StateSpace<ModelVariant> ss,
 
   auto state = leapfrog::run_model<ModelVariant, double>(proj_years, save_steps, params);
 
-<<<<<<< HEAD
-
-  auto ret = build_r_output<S, double>(state, save_steps);
-=======
   auto ret = build_r_output<ModelVariant, double>(state, save_steps);
->>>>>>> mkw_hiv_mort
 
   return ret;
 }

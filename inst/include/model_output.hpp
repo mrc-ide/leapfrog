@@ -18,94 +18,6 @@ Rcpp::List build_r_output(const leapfrog::OutputState<ModelVariant, real_type> &
   constexpr auto base = ss.base;
   Rcpp::NumericVector r_p_total_pop(base.pAG * base.NS * output_years);
   Rcpp::NumericVector r_births(output_years);
-<<<<<<< HEAD
-  Rcpp::NumericVector r_p_total_pop_natural_deaths(pAG * NS * output_years);
-  Rcpp::NumericVector r_p_hiv_pop(pAG * NS * output_years);
-  Rcpp::NumericVector r_p_hiv_pop_natural_deaths(pAG * NS * output_years);
-  Rcpp::NumericVector r_h_hiv_adult(hDS * hAG * NS * output_years);
-  Rcpp::NumericVector r_h_art_adult(hTS * hDS * hAG * NS * output_years);
-  Rcpp::NumericVector r_h_hiv_deaths_no_art(hDS * hAG * NS * output_years);
-  Rcpp::NumericVector r_p_infections(pAG * NS * output_years);
-  Rcpp::NumericVector r_h_hiv_deaths_art(hTS * hDS * hAG * NS * output_years);
-  Rcpp::NumericVector r_h_art_initiation(hDS * hAG * NS * output_years);
-  Rcpp::NumericVector r_p_hiv_deaths(pAG * NS * output_years);
-  Rcpp::NumericVector r_hc1_hiv_pop(hc1DS * hcTT * hc1AG * NS * output_years);
-  Rcpp::NumericVector r_hc2_hiv_pop(hc2DS * hcTT * hc2AG * NS * output_years);
-  Rcpp::NumericVector r_hc1_art_pop(hTS * hc1DS * hc1AG * NS * output_years);
-  Rcpp::NumericVector r_hc2_art_pop(hTS * hc2DS * hc2AG * NS * output_years);
-  Rcpp::NumericVector r_hc1_noart_aids_deaths(hc1DS * hcTT * hc1AG * NS * output_years);
-  Rcpp::NumericVector r_hc2_noart_aids_deaths(hc2DS * hcTT * hc2AG * NS * output_years);
-  Rcpp::NumericVector r_hc1_art_aids_deaths(hTS * hc1DS * hc1AG * NS * output_years);
-  Rcpp::NumericVector r_hc2_art_aids_deaths(hTS * hc2DS * hc2AG * NS * output_years);
-  Rcpp::NumericVector r_hc_art_num(output_years);
-
-  r_p_total_pop.attr("dim") = Rcpp::NumericVector::create(pAG, NS, output_years);
-  r_births.attr("dim") = Rcpp::NumericVector::create(output_years);
-  r_p_total_pop_natural_deaths.attr("dim") = Rcpp::NumericVector::create(pAG, NS, output_years);
-  r_p_hiv_pop.attr("dim") = Rcpp::NumericVector::create(pAG, NS, output_years);
-  r_p_hiv_pop_natural_deaths.attr("dim") = Rcpp::NumericVector::create(pAG, NS, output_years);
-  r_h_hiv_adult.attr("dim") = Rcpp::NumericVector::create(hDS, hAG, NS, output_years);
-  r_h_art_adult.attr("dim") = Rcpp::NumericVector::create(hTS, hDS, hAG, NS, output_years);
-  r_h_hiv_deaths_no_art.attr("dim") = Rcpp::NumericVector::create(hDS, hAG, NS, output_years);
-  r_p_infections.attr("dim") = Rcpp::NumericVector::create(pAG, NS, output_years);
-  r_h_hiv_deaths_art.attr("dim") = Rcpp::NumericVector::create(hTS, hDS, hAG, NS, output_years);
-  r_h_art_initiation.attr("dim") = Rcpp::NumericVector::create(hDS, hAG, NS, output_years);
-  r_p_hiv_deaths.attr("dim") = Rcpp::NumericVector::create(pAG, NS, output_years);
-  r_hc1_hiv_pop.attr("dim") = Rcpp::NumericVector::create(hc1DS, hcTT, hc1AG, NS, output_years);
-  r_hc2_hiv_pop.attr("dim") = Rcpp::NumericVector::create(hc2DS, hcTT, hc2AG, NS, output_years);
-  r_hc1_art_pop.attr("dim") = Rcpp::NumericVector::create(hTS, hc1DS, hc1AG, NS, output_years);
-  r_hc2_art_pop.attr("dim") = Rcpp::NumericVector::create(hTS, hc2DS, hc2AG, NS, output_years);
-  r_hc1_noart_aids_deaths.attr("dim") = Rcpp::NumericVector::create(hc1DS, hcTT, hc1AG, NS, output_years);
-  r_hc2_noart_aids_deaths.attr("dim") = Rcpp::NumericVector::create(hc2DS, hcTT, hc2AG, NS, output_years);
-  r_hc1_art_aids_deaths.attr("dim") = Rcpp::NumericVector::create(hTS, hc1DS, hc1AG, NS, output_years);
-  r_hc2_art_aids_deaths.attr("dim") = Rcpp::NumericVector::create(hTS, hc2DS, hc2AG, NS, output_years);
-  r_hc_art_num.attr("dim") = Rcpp::NumericVector::create(output_years);
-
-  std::copy_n(state.p_total_pop.data(), state.p_total_pop.size(), REAL(r_p_total_pop));
-  std::copy_n(state.births.data(), state.births.size(), REAL(r_births));
-  std::copy_n(state.p_total_pop_natural_deaths.data(), state.p_total_pop_natural_deaths.size(), REAL(r_p_total_pop_natural_deaths));
-  std::copy_n(state.p_hiv_pop.data(), state.p_hiv_pop.size(), REAL(r_p_hiv_pop));
-  std::copy_n(state.p_hiv_pop_natural_deaths.data(), state.p_hiv_pop_natural_deaths.size(), REAL(r_p_hiv_pop_natural_deaths));
-  std::copy_n(state.h_hiv_adult.data(), state.h_hiv_adult.size(), REAL(r_h_hiv_adult));
-  std::copy_n(state.h_art_adult.data(), state.h_art_adult.size(), REAL(r_h_art_adult));
-  std::copy_n(state.h_hiv_deaths_no_art.data(), state.h_hiv_deaths_no_art.size(), REAL(r_h_hiv_deaths_no_art));
-  std::copy_n(state.p_infections.data(), state.p_infections.size(), REAL(r_p_infections));
-  std::copy_n(state.h_hiv_deaths_art.data(), state.h_hiv_deaths_art.size(), REAL(r_h_hiv_deaths_art));
-  std::copy_n(state.h_art_initiation.data(), state.h_art_initiation.size(), REAL(r_h_art_initiation));
-  std::copy_n(state.p_hiv_deaths.data(), state.p_hiv_deaths.size(), REAL(r_p_hiv_deaths));
-  std::copy_n(state.hc1_hiv_pop.data(), state.hc1_hiv_pop.size(), REAL(r_hc1_hiv_pop));
-  std::copy_n(state.hc2_hiv_pop.data(), state.hc2_hiv_pop.size(), REAL(r_hc2_hiv_pop));
-  std::copy_n(state.hc1_art_pop.data(), state.hc1_art_pop.size(), REAL(r_hc1_art_pop));
-  std::copy_n(state.hc2_art_pop.data(), state.hc2_art_pop.size(), REAL(r_hc2_art_pop));
-  std::copy_n(state.hc1_noart_aids_deaths.data(), state.hc1_noart_aids_deaths.size(), REAL(r_hc1_noart_aids_deaths));
-  std::copy_n(state.hc2_noart_aids_deaths.data(), state.hc2_noart_aids_deaths.size(), REAL(r_hc2_noart_aids_deaths));
-  std::copy_n(state.hc1_art_aids_deaths.data(), state.hc1_art_aids_deaths.size(), REAL(r_hc1_art_aids_deaths));
-  std::copy_n(state.hc2_art_aids_deaths.data(), state.hc2_art_aids_deaths.size(), REAL(r_hc2_art_aids_deaths));
-  std::copy_n(state.hc_art_num.data(), state.hc_art_num.size(), REAL(r_hc_art_num));
-
-  List ret = ListBuilder()
-    .add("p_total_pop", r_p_total_pop)
-    .add("births", r_births)
-    .add("p_total_pop_natural_deaths", r_p_total_pop_natural_deaths)
-    .add("p_hiv_pop", r_p_hiv_pop)
-    .add("p_hiv_pop_natural_deaths", r_p_hiv_pop_natural_deaths)
-    .add("h_hiv_adult", r_h_hiv_adult)
-    .add("h_art_adult", r_h_art_adult)
-    .add("h_hiv_deaths_no_art", r_h_hiv_deaths_no_art)
-    .add("p_infections", r_p_infections)
-    .add("h_hiv_deaths_art", r_h_hiv_deaths_art)
-    .add("h_art_initiation", r_h_art_initiation)
-    .add("p_hiv_deaths", r_p_hiv_deaths)
-    .add("hc1_hiv_pop", r_hc1_hiv_pop)
-    .add("hc2_hiv_pop", r_hc2_hiv_pop)
-    .add("hc1_art_pop", r_hc1_art_pop)
-    .add("hc2_art_pop", r_hc2_art_pop)
-    .add("hc1_noart_aids_deaths", r_hc1_noart_aids_deaths)
-    .add("hc2_noart_aids_deaths", r_hc2_noart_aids_deaths)
-    .add("hc1_art_aids_deaths", r_hc1_art_aids_deaths)
-    .add("hc2_art_aids_deaths", r_hc2_art_aids_deaths)
-    .add("hc_art_num", r_hc_art_num);
-=======
   Rcpp::NumericVector r_p_total_pop_natural_deaths(base.pAG * base.NS * output_years);
   Rcpp::NumericVector r_p_hiv_pop(base.pAG * base.NS * output_years);
   Rcpp::NumericVector r_p_hiv_pop_natural_deaths(base.pAG * base.NS * output_years);
@@ -176,20 +88,39 @@ Rcpp::List build_r_output(const leapfrog::OutputState<ModelVariant, real_type> &
     Rcpp::NumericVector r_hc2_hiv_pop(children.hc2DS * children.hcTT * children.hc2AG * base.NS * output_years);
     Rcpp::NumericVector r_hc1_art_pop(base.hTS * children.hc1DS * children.hc1AG * base.NS * output_years);
     Rcpp::NumericVector r_hc2_art_pop(base.hTS * children.hc2DS * children.hc2AG * base.NS * output_years);
+    Rcpp::NumericVector r_hc1_noart_aids_deaths(children.hc1DS * children.hcTT * children.hc1AG * base.NS * output_years);
+    Rcpp::NumericVector r_hc2_noart_aids_deaths(children.hc2DS * children.hcTT * children.hc2AG * base.NS * output_years);
+    Rcpp::NumericVector r_hc1_art_aids_deaths(base.hTS * children.hc1DS * children.hc1AG * base.NS * output_years);
+    Rcpp::NumericVector r_hc2_art_aids_deaths(base.hTS * children.hc2DS * children.hc2AG * base.NS * output_years);
+    Rcpp::NumericVector r_hc_art_num(output_years);
     r_hc1_hiv_pop.attr("dim") = Rcpp::NumericVector::create(children.hc1DS, children.hcTT, children.hc1AG, base.NS, output_years);
     r_hc2_hiv_pop.attr("dim") = Rcpp::NumericVector::create(children.hc2DS, children.hcTT, children.hc2AG, base.NS, output_years);
     r_hc1_art_pop.attr("dim") = Rcpp::NumericVector::create(base.hTS, children.hc1DS, children.hc1AG, base.NS, output_years);
     r_hc2_art_pop.attr("dim") = Rcpp::NumericVector::create(base.hTS, children.hc2DS, children.hc2AG, base.NS, output_years);
+    r_hc1_noart_aids_deaths.attr("dim") = Rcpp::NumericVector::create(children.hc1DS, children.hcTT, children.hc1AG, base.NS, output_years);
+    r_hc2_noart_aids_deaths.attr("dim") = Rcpp::NumericVector::create(children.hc2DS, children.hcTT, children.hc2AG, base.NS, output_years);
+    r_hc1_art_aids_deaths.attr("dim") = Rcpp::NumericVector::create(base.hTS, children.hc1DS, children.hc1AG, base.NS, output_years);
+    r_hc2_art_aids_deaths.attr("dim") = Rcpp::NumericVector::create(base.hTS, children.hc2DS, children.hc2AG, base.NS, output_years);
+    r_hc_art_num.attr("dim") = Rcpp::NumericVector::create(output_years);
     std::copy_n(state.children.hc1_hiv_pop.data(), state.children.hc1_hiv_pop.size(), REAL(r_hc1_hiv_pop));
     std::copy_n(state.children.hc2_hiv_pop.data(), state.children.hc2_hiv_pop.size(), REAL(r_hc2_hiv_pop));
     std::copy_n(state.children.hc1_art_pop.data(), state.children.hc1_art_pop.size(), REAL(r_hc1_art_pop));
     std::copy_n(state.children.hc2_art_pop.data(), state.children.hc2_art_pop.size(), REAL(r_hc2_art_pop));
+    std::copy_n(state.children.hc1_noart_aids_deaths.data(), state.children.hc1_noart_aids_deaths.size(), REAL(r_hc1_noart_aids_deaths));
+    std::copy_n(state.children.hc2_noart_aids_deaths.data(), state.children.hc2_noart_aids_deaths.size(), REAL(r_hc2_noart_aids_deaths));
+    std::copy_n(state.children.hc1_art_aids_deaths.data(), state.children.hc1_art_aids_deaths.size(), REAL(r_hc1_art_aids_deaths));
+    std::copy_n(state.children.hc2_art_aids_deaths.data(), state.children.hc2_art_aids_deaths.size(), REAL(r_hc2_art_aids_deaths));
+    std::copy_n(state.children.hc_art_num.data(), state.children.hc_art_num.size(), REAL(r_hc_art_num));
     ret.push_back(r_hc1_hiv_pop, "hc1_hiv_pop");
     ret.push_back(r_hc2_hiv_pop, "hc2_hiv_pop");
     ret.push_back(r_hc1_art_pop, "hc1_art_pop");
     ret.push_back(r_hc2_art_pop, "hc2_art_pop");
+    ret.push_back(r_hc1_noart_aids_deaths, "hc1_noart_aids_deaths");
+    ret.push_back(r_hc2_noart_aids_deaths, "hc2_noart_aids_deaths");
+    ret.push_back(r_hc1_art_aids_deaths, "hc1_art_aids_deaths");
+    ret.push_back(r_hc2_art_aids_deaths, "hc2_art_aids_deaths");
+    ret.push_back(r_hc_art_num, "hc_art_num");
   }
 
->>>>>>> mkw_hiv_mort
   return ret;
 }
