@@ -95,31 +95,31 @@ struct ChildModelOutputState<ChildModel, real_type> {
                     StateSpace<ChildModel>().children.hcTT,
                     StateSpace<ChildModel>().children.hc2AG,
                     StateSpace<ChildModel>().base.NS, no_output_years),
-       hc1_art_pop(StateSpace<ChildModel>().base.hTS,
-                   StateSpace<ChildModel>().children.hc1DS,
-                   StateSpace<ChildModel>().children.hc1AG,
-                    StateSpace<ChildModel>().base.NS, no_output_years),
-       hc2_art_pop(StateSpace<ChildModel>().base.hTS,
-                    StateSpace<ChildModel>().children.hc2DS,
-                    StateSpace<ChildModel>().children.hc2AG,
-                    StateSpace<ChildModel>().base.NS, no_output_years),
-       hc1_noart_aids_deaths(StateSpace<ChildModel>().children.hc1DS,
-                    StateSpace<ChildModel>().children.hcTT,
-                    StateSpace<ChildModel>().children.hc1AG,
-                    StateSpace<ChildModel>().base.NS, no_output_years),
-       hc2_noart_aids_deaths(StateSpace<ChildModel>().children.hc2DS,
-                    StateSpace<ChildModel>().children.hcTT,
-                    StateSpace<ChildModel>().children.hc2AG,
-                    StateSpace<ChildModel>().base.NS, no_output_years),
-       hc1_art_aids_deaths(StateSpace<ChildModel>().base.hTS,
+        hc1_art_pop(StateSpace<ChildModel>().base.hTS,
                     StateSpace<ChildModel>().children.hc1DS,
                     StateSpace<ChildModel>().children.hc1AG,
                     StateSpace<ChildModel>().base.NS, no_output_years),
-       hc2_art_aids_deaths(StateSpace<ChildModel>().base.hTS,
+        hc2_art_pop(StateSpace<ChildModel>().base.hTS,
                     StateSpace<ChildModel>().children.hc2DS,
                     StateSpace<ChildModel>().children.hc2AG,
                     StateSpace<ChildModel>().base.NS, no_output_years),
-       hc_art_num(no_output_years){
+        hc1_noart_aids_deaths(StateSpace<ChildModel>().children.hc1DS,
+                              StateSpace<ChildModel>().children.hcTT,
+                              StateSpace<ChildModel>().children.hc1AG,
+                              StateSpace<ChildModel>().base.NS, no_output_years),
+        hc2_noart_aids_deaths(StateSpace<ChildModel>().children.hc2DS,
+                              StateSpace<ChildModel>().children.hcTT,
+                              StateSpace<ChildModel>().children.hc2AG,
+                              StateSpace<ChildModel>().base.NS, no_output_years),
+        hc1_art_aids_deaths(StateSpace<ChildModel>().base.hTS,
+                            StateSpace<ChildModel>().children.hc1DS,
+                            StateSpace<ChildModel>().children.hc1AG,
+                            StateSpace<ChildModel>().base.NS, no_output_years),
+        hc2_art_aids_deaths(StateSpace<ChildModel>().base.hTS,
+                            StateSpace<ChildModel>().children.hc2DS,
+                            StateSpace<ChildModel>().children.hc2AG,
+                            StateSpace<ChildModel>().base.NS, no_output_years),
+        hc_art_num(no_output_years) {
     hc1_hiv_pop.setZero();
     hc2_hiv_pop.setZero();
     hc1_art_pop.setZero();
@@ -128,7 +128,7 @@ struct ChildModelOutputState<ChildModel, real_type> {
     hc2_noart_aids_deaths.setZero();
     hc1_art_aids_deaths.setZero();
     hc2_art_aids_deaths.setZero();
-    hc_art_num = 0.0;
+    hc_art_num.setZero();
   }
 };
 
@@ -186,11 +186,11 @@ public:
     children_state.hc1_hiv_pop.chip(i, children_state.hc1_hiv_pop.NumDimensions - 1) =
         state.children.hc1_hiv_pop;
     children_state.hc2_hiv_pop.chip(i, children_state.hc2_hiv_pop.NumDimensions - 1) =
-      state.children.hc2_hiv_pop;
+        state.children.hc2_hiv_pop;
     children_state.hc1_art_pop.chip(i, children_state.hc1_art_pop.NumDimensions - 1) =
-      state.children.hc1_art_pop;
+        state.children.hc1_art_pop;
     children_state.hc2_art_pop.chip(i, children_state.hc2_art_pop.NumDimensions - 1) =
-      state.children.hc2_art_pop;
+        state.children.hc2_art_pop;
   }
 };
 
