@@ -128,7 +128,7 @@ struct ChildModelOutputState<ChildModel, real_type> {
     hc2_noart_aids_deaths.setZero();
     hc1_art_aids_deaths.setZero();
     hc2_art_aids_deaths.setZero();
-    hc_art_num = 0.0;
+    hc_art_num.setZero();
   }
 };
 
