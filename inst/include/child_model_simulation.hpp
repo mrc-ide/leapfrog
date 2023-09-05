@@ -119,8 +119,9 @@ void run_child_natural_history(int time_step,
     for (int a = 0; a < hc_ss.hc2_agestart; ++a) {
       for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
           for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-          intermediate.children.hc_posthivmort(hd, cat, a, s) =
-              state_next.children.hc1_hiv_pop(hd, cat, a, s) * (1.0 - cpars.hc1_cd4_mort(hd, cat, a)) * (1.0 - cpars.ctx_effect * cpars.ctx_val(time_step));
+          intermediate.children.hc_posthivmort(hd, cat, a, s) = state_next.children.hc1_hiv_pop(hd, cat, a, s) -
+            (1.0 - cpars.ctx_effect * cpars.ctx_val(time_step)) * state_next.children.hc1_hiv_pop(hd, cat, a, s) * cpars.hc1_cd4_mort(hd, cat, a);
+
         }
       }
     }
@@ -130,9 +131,8 @@ void run_child_natural_history(int time_step,
     for (int a = hc_ss.hc2_agestart; a < pars.base.options.p_idx_fertility_first; ++a) {
       for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
         for (int hd = 0; hd < hc_ss.hc2DS; ++hd) {
-          intermediate.children.hc_posthivmort(hd, cat, a, s) =
-            (1.0 - cpars.ctx_effect * cpars.ctx_val(time_step)) * state_next.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s) *
-            (1.0 - cpars.hc2_cd4_mort(hd, cat, a - hc_ss.hc2_agestart));
+          intermediate.children.hc_posthivmort(hd, cat, a, s) = state_next.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s) -
+            (1.0 - cpars.ctx_effect * cpars.ctx_val(time_step)) * state_next.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s) * cpars.hc2_cd4_mort(hd, cat, a - hc_ss.hc2_agestart);
         }
       }
     }
@@ -238,8 +238,7 @@ void add_child_grad(int time_step,
         for (int a = hc_ss.hc2_agestart; a < pars.base.options.p_idx_fertility_first; ++a) {
           for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
               for (int hd = 0; hd < hc_ss.hc2DS; ++hd) {
-                state_next.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s) +=
-                  intermediate.children.hc_grad(hd, cat, a, s);
+                state_next.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s) += intermediate.children.hc_grad(hd, cat, a, s);
               }//end hc2DS
           }//end cat
           }//end a
@@ -257,11 +256,9 @@ void run_child_model_simulation(int time_step,
                                 internal::IntermediateData<ModelVariant, real_type> &intermediate) {
   internal::run_child_ageing(time_step, pars, state_curr, state_next, intermediate);
   internal::run_child_hiv_infections(time_step, pars, state_curr, state_next, intermediate);
-  if(time_step < 31){
-    internal::run_child_natural_history(time_step, pars, state_curr, state_next, intermediate);
-    internal::run_child_hiv_mort(time_step, pars, state_curr, state_next, intermediate);
-    internal::add_child_grad(time_step, pars, state_curr, state_next, intermediate);
-  }
+  internal::run_child_natural_history(time_step, pars, state_curr, state_next, intermediate);
+  internal::run_child_hiv_mort(time_step, pars, state_curr, state_next, intermediate);
+  internal::add_child_grad(time_step, pars, state_curr, state_next, intermediate);
 }
 
 } // namespace leapfrog
