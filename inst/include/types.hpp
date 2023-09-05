@@ -86,15 +86,11 @@ struct Options {
   const int pAG_INCIDPOP;
   const int ts_art_start;
   const int hAG_15plus;
-  const int scale_cd4_mortality;
   const int hIDX_15PLUS;
-  const real_type initiation_mortality_weight;
 
   Options(int hts_per_year,
           int ts_art_start,
-          int hAG_15plus,
-          int scale_cd4_mortality,
-          real_type initiation_mortality_weight) :
+          int hAG_15plus) :
       hts_per_year(hts_per_year),
       dt(1.0 / hts_per_year),
       p_idx_fertility_first(15),
@@ -104,9 +100,7 @@ struct Options {
       pAG_INCIDPOP(35),
       ts_art_start(ts_art_start),
       hAG_15plus(hAG_15plus),
-      scale_cd4_mortality(scale_cd4_mortality),
-      hIDX_15PLUS(0),
-      initiation_mortality_weight(initiation_mortality_weight) {}
+      hIDX_15PLUS(0) {}
 };
 
 template<typename real_type>
@@ -130,6 +124,7 @@ struct NaturalHistory {
   TensorMap3<real_type> cd4_mortality;
   TensorMap3<real_type> cd4_progression;
   TensorMap3<real_type> cd4_initial_distribution;
+  int scale_cd4_mortality;
 };
 
 template<typename real_type>
@@ -141,6 +136,7 @@ struct Art {
   TensorMap1<real_type> dropout;
   TensorMap2<real_type> adults_on_art;
   TensorMap2<int> adults_on_art_is_percent;
+  real_type initiation_mortality_weight;
 };
 
 template<typename real_type>

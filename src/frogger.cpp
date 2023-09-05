@@ -48,9 +48,7 @@ Rcpp::List simulate_model(const leapfrog::StateSpace<ModelVariant> ss,
   const leapfrog::Options<double> opts = {
       hiv_steps,
       Rcpp::as<int>(data["t_ART_start"]) - 1,
-      ss.base.hAG,
-      Rcpp::as<int>(data["scale_cd4_mort"]),
-      Rcpp::as<double>(data["art_alloc_mxweight"])
+      ss.base.hAG
   };
 
   const auto params = setup_model_params<ModelVariant, double>(data, opts, proj_years);

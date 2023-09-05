@@ -34,6 +34,8 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
   const leapfrog::TensorMap1<real_type> dropout = parse_data<real_type>(data, "art_dropout", proj_years);
   const leapfrog::TensorMap2<real_type> adults_on_art = parse_data<real_type>(data, "art15plus_num", base.NS, proj_years);
   const leapfrog::TensorMap2<int> adults_on_art_is_percent = parse_data<int>(data, "art15plus_isperc", base.NS, proj_years);
+  const int scale_cd4_mortality = Rcpp::as<int>(data["scale_cd4_mort"]);
+  const real_type initiation_mortality_weight = Rcpp::as<real_type>(data["art_alloc_mxweight"]);
   leapfrog::Tensor1<real_type> h_art_stage_dur(base.hTS - 1);
   h_art_stage_dur.setConstant(0.5);
 
@@ -54,7 +56,8 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
   const leapfrog::NaturalHistory<real_type> natural_history = {
       cd4_mortality,
       cd4_progression,
-      cd4_initial_distribution
+      cd4_initial_distribution,
+      scale_cd4_mortality
   };
 
   const leapfrog::Art<real_type> art = {
@@ -64,7 +67,8 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
       h_art_stage_dur,
       dropout,
       adults_on_art,
-      adults_on_art_is_percent
+      adults_on_art_is_percent,
+      initiation_mortality_weight
   };
 
   const leapfrog::BaseModelParameters<real_type> base_model_params = {

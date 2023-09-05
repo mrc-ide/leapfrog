@@ -124,10 +124,7 @@ int main(int argc, char *argv[]) {
   const leapfrog::Options<double> options = {
       hts_per_year,       // HIV steps per year
       30,                 // Time ART start
-      ss.hAG,             // Age groups HIV 15+
-      1,                  // Scale CD4 mortality
-      0.2,                // initiation_mortality_weight
-
+      ss.hAG              // Age groups HIV 15+
   };
 
   leapfrog::Tensor1<int> v = serialize::deserialize_tensor<int, 1>(
@@ -227,7 +224,8 @@ int main(int argc, char *argv[]) {
   const leapfrog::NaturalHistory<double> natural_history = {
       cd4_mortality,
       cd4_progression,
-      cd4_initial_distribution
+      cd4_initial_distribution,
+      1   // Scale CD4 mortality
   };
 
   const leapfrog::Art<double> art = {
@@ -237,7 +235,8 @@ int main(int argc, char *argv[]) {
       h_art_stage_dur,
       art_dropout,
       adults_on_art,
-      adults_on_art_is_percent
+      adults_on_art_is_percent,
+      0.2  // initiation_mortality_weight
   };
 
   const leapfrog::Parameters<leapfrog::BaseModelFullAgeStratification, double> params = {
