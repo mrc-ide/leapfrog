@@ -21,7 +21,6 @@ void run_child_ageing(int time_step,
 
   for (int s = 0; s < ss.NS; ++s) {
     //less than 5 because there is a cd4 transition between ages 4 and 5
-
     for (int a = 1; a < hc_ss.hc2_agestart; ++a) {
       for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
          for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
@@ -37,7 +36,6 @@ void run_child_ageing(int time_step,
   }
 
   for (int s = 0; s < ss.NS; ++s) {
-
     for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
       for (int hd_alt = 0; hd_alt < hc_ss.hc2DS; ++hd_alt) {
         for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
@@ -139,31 +137,7 @@ void run_child_natural_history(int time_step,
     }
   }
 
-  //progress through CD4 categories
-  for (int s = 0; s < ss.NS; ++s) {
-    for (int a = 0; a < hc_ss.hc2_agestart; ++a) {
-      for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
-        for (int hd = 1; hd < hc_ss.hc1DS; ++hd) {
-          intermediate.children.hc_grad(hd - 1, cat, a, s) -=
-              (intermediate.children.hc_posthivmort(hd - 1, cat, a, s) * cpars.hc1_cd4_prog(hd - 1) +
-               state_next.children.hc1_hiv_pop(hd - 1, cat, a, s) * cpars.hc1_cd4_prog(hd - 1)) /
-              2; //moving to next cd4 category
-          intermediate.children.hc_grad(hd, cat, a, s) +=
-              (intermediate.children.hc_posthivmort(hd - 1, cat, a, s) * cpars.hc1_cd4_prog(hd - 1) +
-               state_next.children.hc1_hiv_pop(hd - 1, cat, a, s) * cpars.hc1_cd4_prog(hd - 1)) /
-              2; //moving into this cd4 category
 
-
- for (int s = 0; s < ss.NS; ++s) {
-   for (int hd = 0; hd < hc_ss.hc2DS; ++hd) {
-     for (int a = hc_ss.hc2_agestart; a < pars.base.options.p_idx_fertility_first; ++a) {
-       for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
-         intermediate.children.hc_posthivmort(hd, cat, a, s) += state_next.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s) - (1 - cpars.ctx_effect * cpars.ctx_val(time_step)) * state_curr.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s) * cpars.hc2_cd4_mort(hd, cat, a - hc_ss.hc2_agestart);
-         state_next.children.hc2_noart_aids_deaths(hd, cat, a, s) +=  (1 - cpars.ctx_effect * cpars.ctx_val(time_step)) * state_curr.children.hc2_hiv_pop(hd, cat, a, s) * cpars.hc2_cd4_mort(hd, cat, a - 5); // output hiv deaths, aggregated across transmission category
-       }
-     }
-   }
- }
 
  //progress through CD4 categories
  for (int s = 0; s < ss.NS; ++s) {
@@ -707,6 +681,7 @@ void run_child_model_simulation(int time_step,
                                 const State<ModelVariant, real_type> &state_curr,
                                 State<ModelVariant, real_type> &state_next,
                                 internal::IntermediateData<ModelVariant, real_type> &intermediate) {
+ internal::run_child_ageing(time_step, pars, state_curr, state_next, intermediate);
  internal::run_child_hiv_infections(time_step, pars, state_curr, state_next, intermediate);
  internal::run_child_natural_history(time_step, pars, state_curr, state_next, intermediate);
  internal::run_child_hiv_mort(time_step, pars, state_curr, state_next, intermediate);
