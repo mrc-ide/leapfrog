@@ -71,9 +71,17 @@ demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
 
 hivp$paed_cd4_dist <- c(1,rep(0,6))
 
+##HIV starts in 2000
+hivp$paed_incid_input[] <- 0
+hivp$paed_incid_input[which(1970:2030 ==2000)] <- 100
+
 ##Only transmission is coming from nosocomial infections
 hivp$pmtct_mtct[] <- 0
 hivp$art_mtct[] <- 0
+
+##Add in treatment
+hivp$paed_art_val[which(1970:2030 == 2002)] <- 50
+hivp$artpaeds_isperc[] <- FALSE
 
 saveRDS(hivp, "projection_parameters_child.rds")
 saveRDS(demp, "demographic_projection_object_child.rds")

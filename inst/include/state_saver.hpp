@@ -199,7 +199,6 @@ public:
       state.children.hc1_art_aids_deaths;
     children_state.hc2_art_aids_deaths.chip(i, children_state.hc2_art_aids_deaths.NumDimensions - 1) =
       state.children.hc2_art_aids_deaths;
-    //TO DO: ask rob how to save out an integer (hc_art_num)
   }
 };
 
