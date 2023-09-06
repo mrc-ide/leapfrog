@@ -248,7 +248,6 @@ void run_child_art_initiation(int time_step,
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
 
-
   //all children under a certain age eligible for ART
   for(int s = 0; s <ss.NS; ++s)  {
     for(int cat = 0; cat < hc_ss.hcTT; ++cat) {
@@ -316,7 +315,6 @@ void run_child_art_initiation(int time_step,
       }// end ss.hc1DS
     }// end a
   }// end ss.NS
-
 
   for(int s = 0; s <ss.NS; ++s) {
     for(int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
@@ -391,12 +389,10 @@ void run_child_art_initiation(int time_step,
             state_next.children.hc1_art_pop(0, hd, a, s) -= state_next.children.hc1_art_pop(0, hd, a, s);
           }
         }else{
-        //  if(state_next.children.hc2_art_pop(0, hd, a-ss.hc2_agestart, s) > 0){
             if(hd < (hc_ss.hc2DS)){
               state_next.children.hc2_art_pop(1, hd, a-hc_ss.hc2_agestart, s) += state_next.children.hc2_art_pop(0, hd, a-hc_ss.hc2_agestart, s);
               state_next.children.hc2_art_pop(0, hd, a-hc_ss.hc2_agestart, s) -= state_next.children.hc2_art_pop(0, hd, a-hc_ss.hc2_agestart, s);
             }
-        //  }
         }
       }//end ss.NS
     }// end a
@@ -469,8 +465,6 @@ void run_child_art_initiation(int time_step,
     if(intermediate.children.hc_art_init_total < state_next.children.hc_art_num){
       state_next.children.hc_art_num = intermediate.children.hc_art_init_total;
     }
-
-
 
   } else if (cpars.hc_art_isperc(time_step) && !cpars.hc_art_isperc(time_step-1)){ // num to percentage
     //Remove how many that are already on ART
@@ -560,8 +554,6 @@ void run_child_art_initiation(int time_step,
       state_next.children.hc_art_num = intermediate.children.hc_art_init_total;
     }
   }
-
-
 
   for(int s = 0; s <ss.NS; ++s) {
     for(int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
@@ -660,11 +652,9 @@ void run_child_art_mortality(int time_step,
             state_next.children.hc1_art_pop(1, hd, a, s) -= state_next.children.hc1_art_pop(1, hd, a, s);
           }
         }else{
-          if(state_next.children.hc2_art_pop(1, hd, a-hc_ss.hc2_agestart, s) > 0){
-            if(hd < (hc_ss.hc2DS)){
+          if(hd < (hc_ss.hc2DS) && state_next.children.hc2_art_pop(1, hd, a-hc_ss.hc2_agestart, s) > 0){
               state_next.children.hc2_art_pop(2, hd, a-hc_ss.hc2_agestart, s) += state_next.children.hc2_art_pop(1, hd, a-hc_ss.hc2_agestart, s);
               state_next.children.hc2_art_pop(1, hd, a-hc_ss.hc2_agestart, s) -= state_next.children.hc2_art_pop(1, hd, a-hc_ss.hc2_agestart, s);
-            }
           }
         }
       }//end ss.NS
