@@ -83,6 +83,12 @@ hivp$art_mtct[] <- 0
 hivp$paed_art_val[which(1970:2030 == 2002)] <- 50
 hivp$artpaeds_isperc[] <- FALSE
 
+##Change things to length 61
+parameters$artpaeds_isperc <- c(parameters$artpaeds_isperc, FALSE)
+parameters$paed_art_elig_age <- c(parameters$paed_art_elig_age, 2)
+parameters$paed_art_elig_cd4 <- cbind(parameters$paed_art_elig_cd4, parameters$paed_art_elig_cd4[,ncol(parameters$paed_art_elig_cd4)])
+
+setwd('C:/Users/mwalters/frogger/tests/testthat/testdata/')
 saveRDS(hivp, "projection_parameters_child.rds")
 saveRDS(demp, "demographic_projection_object_child.rds")
 
