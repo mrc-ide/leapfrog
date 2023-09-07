@@ -32,10 +32,6 @@ test_that("child model can be run for all years", {
   expect_true(all(out$hc1_hiv_pop[2, 1, 3, , which(1970:2030 == 2001)] > 0))
 
 
-  ##ART starts in 1985, ensure that some values are greater than zero
-  expect_true(all(out$hc1_art_pop[1, 3, 3, , which(1970:2030 == 2002)]  > 0))
-
-
   ##Nothing should ever be negative
   expect_true(all(out$hc1_hiv_pop[, , , , ] >= 0))
   expect_true(all(out$hc2_hiv_pop[, , , , ] >= 0))

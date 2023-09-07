@@ -164,7 +164,7 @@ struct Children {
   real_type ctx_effect;
   TensorMap1<real_type> ctx_val;
   TensorMap1<real_type> hc_art_elig_age;
-  TensorMap2<real_type> hc_art_elig_cd4;
+  Tensor2<real_type> hc_art_elig_cd4;
   TensorMap3<real_type> hc_art_mort_rr;
   TensorMap3<real_type> hc1_art_mort;
   TensorMap3<real_type> hc2_art_mort;

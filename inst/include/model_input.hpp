@@ -89,7 +89,7 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
     const real_type ctx_effect = Rcpp::as<real_type>(data["ctx_effect"]);
     const leapfrog::TensorMap1<real_type> ctx_val = parse_data<real_type>(data, "ctx_val", proj_years);
     const leapfrog::TensorMap1<real_type> hc_art_elig_age = parse_data<real_type>(data, "paed_art_elig_age", proj_years);
-    const leapfrog::TensorMap2<real_type> hc_art_elig_cd4 = parse_data<real_type>(data, "paed_art_elig_cd4", options.p_idx_hiv_first_adult, proj_years);
+    const leapfrog::Tensor2<real_type> hc_art_elig_cd4 = convert_base<2>(parse_data<real_type>(data, "paed_art_elig_cd4", options.p_idx_hiv_first_adult, proj_years));
     const leapfrog::TensorMap3<real_type> hc_art_mort_rr = parse_data<real_type>(data, "mort_art_rr", base.hTS, options.p_idx_hiv_first_adult, proj_years);
     const leapfrog::TensorMap3<real_type> hc1_art_mort = parse_data<real_type>(data, "paed_art_mort", children.hc1DS, base.hTS, children.hc1AG);
     const leapfrog::TensorMap3<real_type> hc2_art_mort = parse_data<real_type>(data, "adol_art_mort", children.hc2DS, base.hTS, children.hc2AG);
