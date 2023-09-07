@@ -403,7 +403,7 @@ void run_child_art_initiation(int time_step,
               state_next.children.hc_art_num -= state_next.children.hc1_art_pop(dur, hd, a, s)  ;
             }else{
               if (hd < (hc_ss.hc2DS)) {
-                state_next.children.hc_art_num -= state_next.children.hc2_art_pop(dur, hd, a-hc_ss.hc2_agestart, s)   ;
+                state_next.children.hc_art_num -= state_next.children.hc2_art_pop(dur, hd, a-hc_ss.hc2_agestart, s);
               }
             }
           }// end ss.hTS
