@@ -337,9 +337,7 @@ void run_child_art_initiation(int time_step,
             intermediate.children.hc_art_grad(0,hd, a, s) -= state_next.children.hc1_art_aids_deaths(0,hd, a, s) ;
             state_next.children.hc1_art_pop(0, hd,  a, s) += intermediate.children.hc_art_grad(0, hd, a, s) ;
           }
-        }else{
-          if (hd < hc_ss.hc2DS) {
-            if (state_next.children.hc2_art_pop(0, hd, a-hc_ss.hc2_agestart, s) >0) {
+        } else if (hd < hc_ss.hc2DS && state_next.children.hc2_art_pop(0, hd, a-hc_ss.hc2_agestart, s) >0) {
               intermediate.children.hc_death_rate =  cpars.hc_art_mort_rr(0, a, time_step) * 0.5 * (cpars.hc2_art_mort(hd, 0, a-hc_ss.hc2_agestart) + cpars.hc2_art_mort(hd, 1, a-hc_ss.hc2_agestart));
               state_next.children.hc2_art_aids_deaths(0,hd, a-hc_ss.hc2_agestart, s) =  intermediate.children.hc_death_rate * state_next.children.hc2_art_pop(0, hd, a-hc_ss.hc2_agestart, s)  ;
               intermediate.children.hc_art_grad(0, hd, a, s) -= state_next.children.hc2_art_aids_deaths(0,hd, a-hc_ss.hc2_agestart, s) ;
