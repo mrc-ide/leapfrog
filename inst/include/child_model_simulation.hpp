@@ -247,10 +247,10 @@ void run_child_art_initiation(int time_step,
 
   //all children under a certain age eligible for ART
   for (int s = 0; s <ss.NS; ++s) {
-    for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
-      for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
-        for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-          if (a < cpars.hc_art_elig_age(time_step)) {
+    for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
+      if (a < cpars.hc_art_elig_age(time_step)) {
+        for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+          for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
             if (a < hc_ss.hc2_agestart) {
               intermediate.children.hc_art_need(hd, cat, a, s) += state_next.children.hc1_hiv_pop(hd, cat, a, s);
             }else{
