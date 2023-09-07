@@ -400,7 +400,7 @@ void run_child_art_initiation(int time_step,
         for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
           for (int dur = 0; dur < ss.hTS; ++dur) {
             if (a < hc_ss.hc2_agestart) {
-              state_next.children.hc_art_num -= state_next.children.hc1_art_pop(dur, hd, a, s)  ;
+              state_next.children.hc_art_num -= state_next.children.hc1_art_pop(dur, hd, a, s);
             }else{
               if (hd < (hc_ss.hc2DS)) {
                 state_next.children.hc_art_num -= state_next.children.hc2_art_pop(dur, hd, a-hc_ss.hc2_agestart, s);
