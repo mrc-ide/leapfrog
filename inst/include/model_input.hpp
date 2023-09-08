@@ -67,7 +67,6 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
       adults_on_art_is_percent
   };
 
-
   const leapfrog::BaseModelParameters<real_type> base_model_params = {
         options,
         demography,
