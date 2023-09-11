@@ -1,5 +1,5 @@
 Makefile
-fit_model
+simulate_model
 model_gprofile
 output
 callgrind.out.*

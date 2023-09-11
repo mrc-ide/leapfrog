@@ -33,7 +33,8 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
   const leapfrog::NaturalHistory<real_type> natural_history = {
       cd4_mortality,
       cd4_progression,
-      cd4_initial_distribution
+      cd4_initial_distribution,
+      scale_cd4_mortality
   };
 
   const leapfrog::Art<real_type> art = {
@@ -43,7 +44,8 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
       h_art_stage_dur,
       dropout,
       adults_on_art,
-      adults_on_art_is_percent
+      adults_on_art_is_percent,
+      initiation_mortality_weight
   };
 
   const leapfrog::BaseModelParameters<real_type> base_model_params = {

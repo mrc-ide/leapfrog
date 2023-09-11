@@ -2,7 +2,7 @@ test_that("We can compile the standalone program", {
   skip_for_compilation()
   skip_on_os("windows")
 
-  path_src <- frogger_file("fit_model")
+  path_src <- frogger_file("standalone_model")
   tmp <- tempfile()
   copy_directory(path_src, tmp)
 
@@ -18,9 +18,9 @@ test_that("We can compile the standalone program", {
   expect_equal(code, 0)
 
   output <- tempfile()
-  input <- frogger_file("fit_model/data")
+  input <- frogger_file("standalone_model/data")
 
-  res <- system2(file.path(tmp, "fit_model"),
+  res <- system2(file.path(tmp, "simulate_model"),
                  c(60, 10, input, output),
                  stdout = TRUE)
   expect_equal(res, c(paste0("Created output directory '", output, "'"),
