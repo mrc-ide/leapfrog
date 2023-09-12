@@ -159,6 +159,14 @@ struct Children {
   TensorMap1<real_type> hc2_cd4_prog;
   real_type ctx_effect;
   TensorMap1<real_type> ctx_val;
+  TensorMap1<real_type> hc_art_elig_age;
+  Tensor2<real_type> hc_art_elig_cd4;
+  TensorMap3<real_type> hc_art_mort_rr;
+  TensorMap3<real_type> hc1_art_mort;
+  TensorMap3<real_type> hc2_art_mort;
+  TensorMap1<int> hc_art_isperc;
+  TensorMap1<real_type> hc_art_val;
+  TensorMap2<real_type> hc_art_init_dist;
 };
 
 template<typename ModelVariant, typename real_type>
@@ -269,6 +277,12 @@ struct ChildModelState<ChildModel, real_type> {
   TensorFixedSize <real_type, Sizes<hc2DS<ChildModel>, hcTT<ChildModel>, hc2AG<ChildModel>, NS<ChildModel>>> hc2_hiv_pop;
   TensorFixedSize <real_type, Sizes<hTS<ChildModel>, hc1DS<ChildModel>, hc1AG<ChildModel>, NS<ChildModel>>> hc1_art_pop;
   TensorFixedSize <real_type, Sizes<hTS<ChildModel>, hc2DS<ChildModel>, hc2AG<ChildModel>, NS<ChildModel>>> hc2_art_pop;
+  TensorFixedSize <real_type, Sizes<hc1DS<ChildModel>, hcTT<ChildModel>, hc1AG<ChildModel>, NS<ChildModel>>> hc1_noart_aids_deaths;
+  TensorFixedSize <real_type, Sizes<hc2DS<ChildModel>, hcTT<ChildModel>, hc2AG<ChildModel>, NS<ChildModel>>> hc2_noart_aids_deaths;
+  TensorFixedSize <real_type, Sizes<hTS<ChildModel>, hc1DS<ChildModel>, hc1AG<ChildModel>, NS<ChildModel>>> hc1_art_aids_deaths;
+  TensorFixedSize <real_type, Sizes<hTS<ChildModel>, hc2DS<ChildModel>, hc2AG<ChildModel>, NS<ChildModel>>> hc2_art_aids_deaths;
+
+  real_type hc_art_num;
 
   ChildModelState(const Parameters<ChildModel, real_type> &pars) {
     reset();
@@ -283,6 +297,11 @@ struct ChildModelState<ChildModel, real_type> {
     hc2_hiv_pop.setZero();
     hc1_art_pop.setZero();
     hc2_art_pop.setZero();
+    hc1_noart_aids_deaths.setZero();
+    hc2_noart_aids_deaths.setZero();
+    hc1_art_aids_deaths.setZero();
+    hc2_art_aids_deaths.setZero();
+    hc_art_num = 0.0;
   }
 };
 
@@ -420,6 +439,14 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, NS<ChildModel>>> age15_hiv_pop;
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_posthivmort;
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_grad;
+  TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_art_need;
+  TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_art_init;
+  real_type hc_art_init_total;
+  real_type hc_death_rate;
+  TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_art_grad;
+  real_type hc_art_scalar;
+  real_type hc_initByAge;
+  real_type hc_adj;
 
   ChildModelIntermediateData() {};
 
@@ -427,6 +454,14 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
     age15_hiv_pop.setZero();
     hc_posthivmort.setZero();
     hc_grad.setZero();
+    hc_art_need.setZero();
+    hc_art_init.setZero();
+    hc_art_init_total = 0.0;
+    hc_death_rate = 0.0;
+    hc_art_grad.setZero();
+    hc_art_scalar = 0.0;
+    hc_initByAge = 0.0;
+    hc_adj = 0.0;
   };
 };
 
