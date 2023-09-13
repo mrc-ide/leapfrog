@@ -81,6 +81,7 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
 
   if constexpr (ModelVariant::run_child_model) {
     constexpr auto children = ss.children;
+    constexpr auto base = ss.base;
     const leapfrog::TensorMap1<real_type> hc_nosocomial = parse_data<real_type>(data, "paed_incid_input", proj_years);
     const leapfrog::TensorMap1<real_type> hc1_cd4_dist = parse_data<real_type>(data, "paed_cd4_dist", children.hc2DS);
     const leapfrog::TensorMap2<real_type> hc_cd4_transition = parse_data<real_type>(data, "paed_cd4_transition", children.hc2DS, children.hc1DS);
@@ -90,6 +91,14 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
     const leapfrog::TensorMap1<real_type> hc2_cd4_prog = parse_data<real_type>(data, "adol_cd4_prog", children.hc2DS);
     const real_type ctx_effect = Rcpp::as<real_type>(data["ctx_effect"]);
     const leapfrog::TensorMap1<real_type> ctx_val = parse_data<real_type>(data, "ctx_val", proj_years);
+    const leapfrog::TensorMap1<real_type> hc_art_elig_age = parse_data<real_type>(data, "paed_art_elig_age", proj_years);
+    const leapfrog::Tensor2<real_type> hc_art_elig_cd4 = convert_base<2>(parse_data<real_type>(data, "paed_art_elig_cd4", options.p_idx_hiv_first_adult, proj_years));
+    const leapfrog::TensorMap3<real_type> hc_art_mort_rr = parse_data<real_type>(data, "mort_art_rr", base.hTS, options.p_idx_hiv_first_adult, proj_years);
+    const leapfrog::TensorMap3<real_type> hc1_art_mort = parse_data<real_type>(data, "paed_art_mort", children.hc1DS, base.hTS, children.hc1AG);
+    const leapfrog::TensorMap3<real_type> hc2_art_mort = parse_data<real_type>(data, "adol_art_mort", children.hc2DS, base.hTS, children.hc2AG);
+    const leapfrog::TensorMap1<int> hc_art_isperc = parse_data<int>(data, "artpaeds_isperc", proj_years);
+    const leapfrog::TensorMap1<real_type> hc_art_val = parse_data<real_type>(data, "paed_art_val", proj_years);
+    const leapfrog::TensorMap2<real_type> hc_art_init_dist = parse_data<real_type>(data, "init_art_dist", options.p_idx_hiv_first_adult, proj_years);
     const leapfrog::Children<real_type> child = {
         hc_nosocomial,
         hc1_cd4_dist,
@@ -99,7 +108,15 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
         hc1_cd4_prog,
         hc2_cd4_prog,
         ctx_effect,
-        ctx_val
+        ctx_val,
+        hc_art_elig_age,
+        hc_art_elig_cd4,
+        hc_art_mort_rr,
+        hc1_art_mort,
+        hc2_art_mort,
+        hc_art_isperc,
+        hc_art_val,
+        hc_art_init_dist
     };
     const leapfrog::ChildModelParameters<ModelVariant, real_type> child_model_params = {
         child
