@@ -172,7 +172,7 @@ void run_child_hiv_mort(int time_step,
   if (time_step == 1) {
     // This will read from uninitialised memory
     if (intermediate.children.hc_grad(8, hc_ss.hcTT - 1, hc_ss.hc2_agestart - 1, ss.NS - 1) > 0) {
-      std::cout << "It is true!"
+      std::cout << "It is true!";
     }
   }
 
