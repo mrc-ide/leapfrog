@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -e
+
+./configure
+make
+valgrind --tool=callgrind --dump-instr=yes --collect-jumps=yes ./simulate_model 60 10 data output &
+PID=$!
+wait $PID
+kcachegrind callgrind.out.$PID

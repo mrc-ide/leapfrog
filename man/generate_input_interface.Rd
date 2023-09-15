@@ -4,10 +4,15 @@
 \alias{generate_input_interface}
 \title{Generate C++ for passing input data in model fit}
 \usage{
-generate_input_interface(dest)
+generate_input_interface(
+  dest,
+  input_csv = frogger_file("cpp_generation/model_input.csv")
+)
 }
 \arguments{
 \item{dest}{The destination to write generated code to.}
+
+\item{input_csv}{Path to the csv of model inputs.}
 }
 \value{
 Nothing, called to generate code in src dir
