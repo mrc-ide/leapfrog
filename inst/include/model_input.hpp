@@ -122,7 +122,12 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
         hc2_art_mort,
         hc_art_isperc,
         hc_art_val,
-        hc_art_init_dist
+        hc_art_init_dist,
+        fert_mult_by_age,
+        fert_mult_offart,
+        fert_mult_onart,
+        total_fertility_rate,
+        local_adj_factor
     };
     const leapfrog::ChildModelParameters<ModelVariant, real_type> child_model_params = {
         child
