@@ -1,6 +1,7 @@
 test_that("child model can be run for all years", {
   demp <- readRDS(test_path("testdata/demographic_projection_object_child.rds"))
   parameters <- readRDS(test_path("testdata/projection_parameters_child.rds"))
+  parameters$laf = 1
 
   expect_silent(out <- run_model(demp, parameters, NULL, NULL, 0:60))
 
@@ -12,7 +13,7 @@ test_that("child model can be run for all years", {
       "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art",
       "h_art_initiation", "p_hiv_deaths", "hc1_hiv_pop", "hc2_hiv_pop",
       "hc1_art_pop", "hc2_art_pop", "hc1_noart_aids_deaths", "hc2_noart_aids_deaths",
-      "hc1_art_aids_deaths", "hc2_art_aids_deaths", "hc_art_num"
+      "hc1_art_aids_deaths", "hc2_art_aids_deaths", "hc_art_num", "hiv_births"
     )
   )
 
@@ -41,6 +42,7 @@ test_that("child model can be run for all years", {
   expect_true(all(out$hc2_noart_aids_deaths[, , , , ] >= 0))
   expect_true(all(out$hc1_art_aids_deaths[, , , , ] >= 0))
   expect_true(all(out$hc2_art_aids_deaths[, , , , ] >= 0))
+  expect_true(all(out$hiv_births >= 0))
 
 
 })
