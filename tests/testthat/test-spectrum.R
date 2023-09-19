@@ -564,7 +564,7 @@ test_that('Perinatal transmission of HIV', {
   ## in EPP-ASM preparation
   demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
   demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
-  hivp$paed_cd4_dist <- c(0.515952304221721, 0.159523042217209, 0.114405414115372, 0.088623912342894, 0.0615533354817918, 0.0380277151144054, 0.0219142765066065)
+  #hivp$paed_cd4_dist <- c(0.515952304221721, 0.159523042217209, 0.114405414115372, 0.088623912342894, 0.0615533354817918, 0.0380277151144054, 0.0219142765066065)
   
   ##look to make sure understanding about HIV incident infections 
   ##fertility discounting differences, change all of the FRR to one and see if it lines up
@@ -573,17 +573,12 @@ test_that('Perinatal transmission of HIV', {
   ##check that asfr is divided by 5 in the spectrum inputs file
   
   hivp$pmtct_mtct[,2:5,1] <- 0
-  ## turn off hiv mort
-  hivp$paed_cd4_mort[] <- 0
-  ## turn off ART
   hivp$paed_art_val[] <- 0
-  hivp$adol_cd4_mort[] <- 0
   hivp$cd4_mort_full[] <- 0
   hivp$cd4_mort_coarse[] <- 0
 
   lmod <- leapfrogR(demp, hivp)
-  plot(specres$hivpregwomen)
-  lines(lmod$hiv_births)
+
   
   x <- data.table(lmod = as.vector(lmod$hiv_births), spec = specres$hivpregwomen)
   x[,diff := spec - lmod]
@@ -591,7 +586,7 @@ test_that('Perinatal transmission of HIV', {
   x[,year := 1970:2030]
   
   lmod_out <- lmod_output_paed(lmod = lmod)
-  ##df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_MTCT_perinatal_pop1.xlsx", ages =0:14, country = 'Botswana')
+  df_out <- spectrum_output(file = "C:/Users/mwalters/leapfrog/tests/testdata/spectrum/v6.13/TEST_MTCT_perinatal_pop1.xlsx", ages =0:14, country = 'Botswana')
  ## df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_MTCT_perinatal_pop1.xlsx", ages =15:49, country = 'Botswana')
   
   
