@@ -41,3 +41,4 @@ fert_mult_offart,fert_mult_offart,real_type,ModelVariant::run_child_model,,FALSE
 fert_mult_onart,fert_mult_onart,real_type,ModelVariant::run_child_model,,FALSE,1,options.p_fertility_age_groups,,,
 tfr,total_fertility_rate,real_type,ModelVariant::run_child_model,,FALSE,1,proj_years,,,
 laf,local_adj_factor,real_type,ModelVariant::run_child_model,,FALSE,1,1,,,
+adult_cd4_dist,adult_cd4_dist,real_type,ModelVariant::run_child_model,,FALSE,2,base.hDS,children.hc2DS,,

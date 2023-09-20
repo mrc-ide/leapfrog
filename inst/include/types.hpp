@@ -167,6 +167,7 @@ struct Children {
   TensorMap1<int> hc_art_isperc;
   TensorMap1<real_type> hc_art_val;
   TensorMap2<real_type> hc_art_init_dist;
+  TensorMap2<real_type> adult_cd4_dist;
 
   //WLHIV fert
   TensorMap1<real_type> fert_mult_by_age;
@@ -452,6 +453,7 @@ struct ChildModelIntermediateData {
 template<typename real_type>
 struct ChildModelIntermediateData<ChildModel, real_type> {
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, NS<ChildModel>>> age15_hiv_pop;
+  TensorFixedSize <real_type, Sizes<hTS<ChildModel>, hDS<ChildModel>, NS<ChildModel>>> age15_art_pop;
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_posthivmort;
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_grad;
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_art_need;
@@ -476,6 +478,7 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
 
   void reset() {
     age15_hiv_pop.setZero();
+    age15_art_pop.setZero();
     hc_posthivmort.setZero();
     hc_grad.setZero();
     hc_art_need.setZero();
