@@ -333,6 +333,11 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 
   for(int t = 1; t < sim_years; t++){
 
+    if(t == 31){
+     // std::cout << hivstrat_paeds(0,0,2,0,t);
+    }
+
+
     TensorFixedSize<Type, Sizes< hDS, NG>> age15_hivpop;
     age15_hivpop.setZero();
     for(int g = 0; g < NG; g++){
@@ -466,8 +471,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 
 
 
-
-
     for(int g = 0; g < NG; g++){
       for(int ha = 1; ha < 5; ha++) {
         for(int hm = 0; hm < hDS; hm++){
@@ -482,6 +485,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         }
       }
     }
+
 
     for(int g = 0; g < NG; g++){
         for(int hm = 0; hm < hDS; hm++){
@@ -514,8 +518,9 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
     }
 
-
-
+    if(t == 31){
+    //  std::cout << hivstrat_paeds(0,0,3,0,t);
+    }
 
     TensorFixedSize<Type, Sizes<hAG, NG>> hivpop_ha;
     hivpop_ha.setZero();
@@ -931,7 +936,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
     }
    //ROB: population adjustment fx (end)
-
 
 
    //ROB: births to HIV+ women (start)
@@ -1473,6 +1477,10 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    }
    //ROB: distribute MTCT infections (end)
 
+   if(t == 31){
+     //9.99071
+     //std::cout << hivstrat_paeds(0,0,3,0,t);
+   }
    //ROB: paediatric natural history (start)
    for(int g = 0; g < NG; g++){
       for(int hm = 0; hm < hDS; hm++){
@@ -1484,7 +1492,10 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         }
       }
     }
-
+   if(t == 31){
+     //20.0099
+     std::cout << deaths_paeds(0,0,3,0,t);
+   }
 
     for(int g = 0; g < NG; g++){
       for(int hm = 0; hm < hDS_adol; hm++){
@@ -1564,6 +1575,11 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
           }
         }
       }
+    }
+
+    if(t == 31){
+      //17.9098
+     // std::cout << hivstrat_paeds(0,0,3,0,t);
     }
 
   //ROB: paediatric ART retention (start)
@@ -1898,7 +1914,10 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     }
     //ROB: onART mortality (end)
 
-
+    if(t == 31){
+      //17.9098
+      //std::cout << hivstrat_paeds(0,0,3,0,t);
+    }
   //ROB: nosocomial infections (start)
     //distribute across eligible ages, right now just going to hardcode
     for(int g = 0; g < NG; g++){
@@ -1942,7 +1961,10 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
     }
 
-
+    if(t == 31){
+      //17.9098
+      //std::cout << hivstrat_paeds(0,0,3,0,t);
+    }
   }
 
   return;
