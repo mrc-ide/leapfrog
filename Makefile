@@ -22,6 +22,9 @@ README.md: README.Rmd
 	sed -i.bak 's/[[:space:]]*$$//' README.md
 	rm -f $@.bak
 
+test_leaks:
+	R -d 'valgrind --leak-check=full' -e 'testthat::test_local(".")'
+
 check:
 	_R_CHECK_CRAN_INCOMING_=FALSE make check_all
 
