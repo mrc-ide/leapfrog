@@ -69,10 +69,8 @@ void run_hiv_and_art_stratified_ageing(int time_step,
                                        State<ModelVariant, real_type> &state_next,
                                        IntermediateData<ModelVariant, real_type> &intermediate) {
   constexpr auto ss = StateSpace<ModelVariant>().base;
-//  if constexpr (ModelVariant::run_child_model) {
-    constexpr auto hc_ss = StateSpace<ModelVariant>().children;
-    const auto cpars = pars.children.children;
-//  }
+  constexpr auto hc_ss = StateSpace<ModelVariant>().children;
+  const auto cpars = pars.children;
   // age coarse stratified HIV population
   for (int g = 0; g < ss.NS; ++g) {
     int a = pars.base.options.p_idx_hiv_first_adult;
@@ -113,10 +111,10 @@ void run_hiv_and_art_stratified_ageing(int time_step,
   for (int g = 0; g < ss.NS; ++g) {
     for (int hm = 0; hm < ss.hDS; ++hm) {
       if constexpr (ModelVariant::run_child_model) {
-        for(int hm_adol = 0; hm < hc_ss.hc2DS; ++hm_adol){
-          state_next.base.h_hiv_adult(hm, 0, g) = intermediate.children.age15_hiv_pop(hm_adol, g) * cpars.adult_cd4_dist(hm, hm_adol);
+        for (int hm_adol = 0; hm_adol < hc_ss.hc2DS; ++hm_adol){
+          state_next.base.h_hiv_adult(hm, 0, g) = intermediate.children.age15_hiv_pop(hm_adol, g) * cpars.children.adult_cd4_dist(hm, hm_adol);
         }
-      }else{
+      } else {
         state_next.base.h_hiv_adult(hm, 0, g) =
           (1.0 - intermediate.base.hiv_age_up_prob(0, g)) * state_curr.base.h_hiv_adult(hm, 0, g);
       }
@@ -124,10 +122,10 @@ void run_hiv_and_art_stratified_ageing(int time_step,
       if (time_step > pars.base.options.ts_art_start) {
         for (int hu = 0; hu < ss.hTS; ++hu) {
           if constexpr (ModelVariant::run_child_model) {
-            for(int hm_adol = 0; hm < hc_ss.hc2DS; ++hm_adol){
-              state_next.base.h_art_adult(hu,hm, 0, g) = intermediate.children.age15_art_pop(hu, hm_adol, g) * cpars.adult_cd4_dist(hm, hm_adol);
+            for (int hm_adol = 0; hm_adol < hc_ss.hc2DS; ++hm_adol){
+              state_next.base.h_art_adult(hu,hm, 0, g) = intermediate.children.age15_art_pop(hu, hm_adol, g) * cpars.children.adult_cd4_dist(hm, hm_adol);
             }
-          }else{
+          } else {
             state_next.base.h_art_adult(hu, hm, 0, g) =
               (1.0 - intermediate.base.hiv_age_up_prob(0, g)) *
               state_curr.base.h_art_adult(hu, hm, 0, g);
