@@ -74,7 +74,7 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
         incidence_params,
         natural_history_params,
         art_params
-   };
+  };
 
   if constexpr (ModelVariant::run_child_model) {
     constexpr auto children = ss.children;

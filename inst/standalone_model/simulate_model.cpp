@@ -232,10 +232,10 @@ int main(int argc, char *argv[]) {
       idx_hm_elig,
       art_mortality_rate,
       art_mortality_time_rate_ratio,
-      h_art_stage_dur,
       art_dropout,
       adults_on_art,
       adults_on_art_is_percent,
+      h_art_stage_dur,
       0.2  // initiation_mortality_weight
   };
 

@@ -317,7 +317,7 @@ generate_struct_def <- function(inputs) {
   input_text <- vcapply(inputs, function(input) {
     if (input$dims == 1 && input$dim1 == 1) {
       type <- input$type
-    } else if (input$convert_base) {
+    } else if (input$convert_base || nzchar(input$value)) {
       type <- sprintf("Tensor%s<%s>", input$dims, input$type)
     } else {
       type <- sprintf("TensorMap%s<%s>", input$dims, input$type)

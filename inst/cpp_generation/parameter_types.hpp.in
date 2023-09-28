@@ -1,3 +1,5 @@
+{{header}}
+
 #pragma once
 
 #include "types.hpp"
