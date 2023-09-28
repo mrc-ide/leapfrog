@@ -170,14 +170,11 @@ struct Children {
   TensorMap2<real_type> adult_cd4_dist;
 
   //WLHIV fert
- //HEREMKW TensorMap1<real_type> fert_mult_by_age;
-  // TensorMap1<real_type> fert_mult_offart;
-  // TensorMap1<real_type> fert_mult_onart;
-  // TensorMap1<real_type> total_fertility_rate;
-  // real_type local_adj_factor;
-
-
-
+  TensorMap1<real_type> fert_mult_by_age;
+  TensorMap1<real_type> fert_mult_offart;
+  TensorMap1<real_type> fert_mult_onart;
+  TensorMap1<real_type> total_fertility_rate;
+  real_type local_adj_factor;
 
 };
 
