@@ -243,6 +243,7 @@ generate_return <- function() {
     "      hc_art_isperc,",
     "      hc_art_val,",
     "      hc_art_init_dist,",
+    "      adult_cd4_dist,",
     "      fert_mult_by_age,",
     "      fert_mult_offart,",
     "      fert_mult_onart,",
