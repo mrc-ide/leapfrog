@@ -63,20 +63,11 @@ struct Art {
   Tensor1<int> idx_hm_elig;
   TensorMap4<real_type> mortality;
   TensorMap2<real_type> mortaility_time_rate_ratio;
-  Tensor1<real_type> h_art_stage_dur;
   TensorMap1<real_type> dropout;
   TensorMap2<real_type> adults_on_art;
   TensorMap2<int> adults_on_art_is_percent;
+  TensorMap1<real_type> h_art_stage_dur;
   real_type initiation_mortality_weight;
-};
-
-template<typename real_type>
-struct BaseModelParameters {
-  Options<real_type> options;
-  Demography<real_type> demography;
-  Incidence<real_type> incidence;
-  NaturalHistory<real_type> natural_history;
-  Art<real_type> art;
 };
 
 template<typename real_type>
@@ -98,6 +89,16 @@ struct Children {
   TensorMap1<int> hc_art_isperc;
   TensorMap1<real_type> hc_art_val;
   TensorMap2<real_type> hc_art_init_dist;
+};
+
+
+template<typename real_type>
+struct BaseModelParameters {
+  Options<real_type> options;
+  Demography<real_type> demography;
+  Incidence<real_type> incidence;
+  NaturalHistory<real_type> natural_history;
+  Art<real_type> art;
 };
 
 template<typename ModelVariant, typename real_type>

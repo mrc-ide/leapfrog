@@ -23,8 +23,8 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
   const leapfrog::TensorMap2<real_type> age_specific_fertility_rate = parse_data<real_type>(data, "asfr", options.p_fertility_age_groups, proj_years);
   const leapfrog::TensorMap2<real_type> births_sex_prop = parse_data<real_type>(data, "births_sex_prop", base.NS, proj_years);
   const leapfrog::TensorMap1<real_type> total_rate = parse_data<real_type>(data, "incidinput", proj_years);
-  const leapfrog::TensorMap3<real_type> age_rate_ratio = parse_data<real_type>(data, "incrr_age", base.pAG - options.p_idx_hiv_first_adult, base.NS, proj_years);
-  const leapfrog::TensorMap1<real_type> sex_rate_ratio = parse_data<real_type>(data, "incrr_sex", proj_years);
+  const leapfrog::TensorMap3<real_type> relative_risk_age = parse_data<real_type>(data, "incrr_age", base.pAG - options.p_idx_hiv_first_adult, base.NS, proj_years);
+  const leapfrog::TensorMap1<real_type> relative_risk_sex = parse_data<real_type>(data, "incrr_sex", proj_years);
   const leapfrog::TensorMap3<real_type> cd4_mortality = parse_data<real_type>(data, "cd4_mort", base.hDS, base.hAG, base.NS);
   const leapfrog::TensorMap3<real_type> cd4_progression = parse_data<real_type>(data, "cd4_prog", base.hDS - 1, base.hAG, base.NS);
   const leapfrog::Tensor1<int> idx_hm_elig = convert_base<1>(parse_data<int>(data, "artcd4elig_idx", proj_years + 1));
@@ -39,45 +39,42 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
   leapfrog::Tensor1<real_type> h_art_stage_dur(base.hTS - 1);
   h_art_stage_dur.setConstant(0.5);
 
-  const leapfrog::Demography<real_type> demography = {
+  const leapfrog::Demography<real_type> demography_params = {
       base_pop,
       survival_probability,
       net_migration,
       age_specific_fertility_rate,
-      births_sex_prop
+      births_sex_prop,
   };
-
-  const leapfrog::Incidence<real_type> incidence = {
+  const leapfrog::Incidence<real_type> incidence_params = {
       total_rate,
-      age_rate_ratio,
-      sex_rate_ratio
+      relative_risk_age,
+      relative_risk_sex,
   };
-
-  const leapfrog::NaturalHistory<real_type> natural_history = {
+  const leapfrog::NaturalHistory<real_type> natural_history_params = {
       cd4_mortality,
       cd4_progression,
       cd4_initial_distribution,
-      scale_cd4_mortality
+      scale_cd4_mortality,
   };
-
-  const leapfrog::Art<real_type> art = {
+  const leapfrog::Art<real_type> art_params = {
       idx_hm_elig,
       mortality,
       mortaility_time_rate_ratio,
-      h_art_stage_dur,
       dropout,
       adults_on_art,
       adults_on_art_is_percent,
-      initiation_mortality_weight
+      h_art_stage_dur,
+      initiation_mortality_weight,
   };
 
   const leapfrog::BaseModelParameters<real_type> base_model_params = {
         options,
-        demography,
-        incidence,
-        natural_history,
-        art
-    };
+        demography_params,
+        incidence_params,
+        natural_history_params,
+        art_params
+   };
 
   if constexpr (ModelVariant::run_child_model) {
     constexpr auto children = ss.children;
@@ -99,7 +96,7 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
     const leapfrog::TensorMap1<int> hc_art_isperc = parse_data<int>(data, "artpaeds_isperc", proj_years);
     const leapfrog::TensorMap1<real_type> hc_art_val = parse_data<real_type>(data, "paed_art_val", proj_years);
     const leapfrog::TensorMap2<real_type> hc_art_init_dist = parse_data<real_type>(data, "init_art_dist", options.p_idx_hiv_first_adult, proj_years);
-    const leapfrog::Children<real_type> child = {
+    const leapfrog::Children<real_type> children_params = {
         hc_nosocomial,
         hc1_cd4_dist,
         hc_cd4_transition,
@@ -116,17 +113,17 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
         hc2_art_mort,
         hc_art_isperc,
         hc_art_val,
-        hc_art_init_dist
+        hc_art_init_dist,
     };
     const leapfrog::ChildModelParameters<ModelVariant, real_type> child_model_params = {
-        child
+        children_params
     };
-    return leapfrog::Parameters<ModelVariant, real_type>{
+    return leapfrog::Parameters<ModelVariant, real_type> {
         base_model_params,
         child_model_params
     };
   } else {
-    return leapfrog::Parameters<ModelVariant, real_type>{
+    return leapfrog::Parameters<ModelVariant, real_type> {
         base_model_params
     };
   }
