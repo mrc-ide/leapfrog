@@ -757,9 +757,7 @@ void run_wlhiv_births(int time_step,
       } //end hTS
     } //end hDS
 
-    // intermediate.children.totpop = intermediate.children.nHIVcurr + state_next.hivnpop1(a + 15,1);
     intermediate.children.prev = intermediate.children.nHIVcurr / state_next.base.p_total_pop(a + 15,1);
-
 
     for (int hd = 0; hd < ss.hDS; ++hd) {
       intermediate.children.df += cpars.local_adj_factor * cpars.fert_mult_by_age(a) * cpars.fert_mult_offart(hd) * ((state_next.base.h_hiv_adult(hd, a, 1) + state_curr.base.h_hiv_adult(hd, a, 1)) / 2);
@@ -776,6 +774,7 @@ void run_wlhiv_births(int time_step,
     }else{
       intermediate.children.df = 1;
     }
+
 
     intermediate.children.birthsCurrAge = (intermediate.children.nHIVcurr + intermediate.children.nHIVlast) / 2 * cpars.total_fertility_rate(time_step) * intermediate.children.df / (intermediate.children.df * intermediate.children.prev + 1 - intermediate.children.prev) *  demog.age_specific_fertility_rate(a, time_step) / intermediate.children.asfr_sum ;
     intermediate.children.birthsHE += intermediate.children.birthsCurrAge;

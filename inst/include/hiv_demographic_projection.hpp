@@ -60,21 +60,6 @@ void run_age_15_entrants(int time_step,
     }
   }
 
-  double maggie;
-  maggie = 0.0;
-  for (int g = 0; g < ss.NS; ++g) {
-    for (int hm = 0; hm < hc_ss.hc2DS; ++hm) {
-      for (int hu = 0; hu < ss.hTS; ++hu) {
-        maggie +=  state_curr.children.hc2_art_pop(hu, hm, (hc_ss.hc2AG - 1), g);
-      }
-    }
-  }
-  if(time_step == 41){
-    std::cout << maggie;
-  }
-
-
-
 }
 
 template<typename ModelVariant, typename real_type>
