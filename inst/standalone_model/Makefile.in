@@ -1,0 +1,15 @@
+PATH_FROGGER_INCLUDE=@path_frogger@/include
+PATH_EIGEN=@path_eigen@/include
+
+all: simulate_model
+
+simulate_model: simulate_model.cpp
+	$(CXX) -I$(PATH_FROGGER_INCLUDE) -I$(PATH_EIGEN) -g -O2 -std=c++17 -Wno-ignored-attributes -o simulate_model simulate_model.cpp
+
+model_gprofile: simulate_model.cpp
+	$(CXX) -I$(PATH_FROGGER_INCLUDE) -I$(PATH_EIGEN) -g -Wl,--no-as-needed,-lprofiler,--as-needed -O2 -std=c++17 -Wno-ignored-attributes -o model_gprofile simulate_model.cpp
+
+clean:
+	$(RM) simulate_model
+
+.PHONY: all clean
