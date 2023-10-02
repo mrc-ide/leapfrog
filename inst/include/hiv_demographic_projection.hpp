@@ -60,6 +60,17 @@ void run_age_15_entrants(int time_step,
     }
   }
 
+  double mag;
+  mag = 0.0;
+    for (int hm = 0; hm < hc_ss.hc2DS; ++hm) {
+      for (int hu = 0; hu < ss.hTS; ++hu) {
+       mag += intermediate.children.age15_art_pop(hu, hm, 1);
+      }
+    }
+    if(time_step == 41){
+      std::cout << mag;
+    }
+
 }
 
 template<typename ModelVariant, typename real_type>
