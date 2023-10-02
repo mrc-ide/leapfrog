@@ -762,6 +762,11 @@ void run_wlhiv_births(int time_step,
     for (int hd = 0; hd < ss.hDS; ++hd) {
       intermediate.children.df += cpars.local_adj_factor * cpars.fert_mult_by_age(a) * cpars.fert_mult_offart(hd) * ((state_next.base.h_hiv_adult(hd, a, 1) + state_curr.base.h_hiv_adult(hd, a, 1)) / 2);
       //women on ART less than 6 months use the off art fertility multiplier
+      if(time_step == 41 & a == 0 & hd == 1){
+        // std::cout << cpars.local_adj_factor * cpars.fert_mult_by_age(0) * cpars.fert_mult_offart(0) * ((state_next.base.h_art_adult(0, 0, 0, 1) + state_curr.base.h_art_adult(0, 0, 0, 1)) / 2);
+        //std::cout << state_next.base.h_art_adult(0, hd, a, 1) ;
+
+      }
        intermediate.children.df += cpars.local_adj_factor * cpars.fert_mult_by_age(a) * cpars.fert_mult_offart(hd) * ((state_next.base.h_art_adult(0, hd, a, 1) + state_curr.base.h_art_adult(0, hd, a, 1)) / 2);
        for (int ht = 1; ht < ss.hTS; ++ht) {
        intermediate.children.df += cpars.local_adj_factor * cpars.fert_mult_onart(a) * ((state_next.base.h_art_adult(ht, hd, a, 1) + state_curr.base.h_art_adult(ht, hd, a, 1)) / 2);

@@ -69,11 +69,6 @@ hivp <- prepare_leapfrog_projp(pjnz1)
 demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
 demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
 
-demp$Sx[] <- 1
-demp$netmigr[] <- 0
-demp$netmigr_adj[] <- 0
-parameters$art_dropout[] <- 0
-
 hivp$paed_cd4_dist <- c(1,rep(0,6))
 
 ##HIV starts in 2000
