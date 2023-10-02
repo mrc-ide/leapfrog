@@ -65,9 +65,11 @@ pjnz1 <- test_path("../testdata/spectrum/v6.13/bwa_aim-adult-art-no-special-elig
 
 demp <- prepare_leapfrog_demp(pjnz1)
 hivp <- prepare_leapfrog_projp(pjnz1)
+hivp = prepare_hc_leapfrog_projp(pjnz1, hivp)
 
 demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
 demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
+hivp$incidinput[which(1970:2030 == 2000):length(parameters$incidinput)] <- 0
 
 hivp$paed_cd4_dist <- c(1,rep(0,6))
 
@@ -84,12 +86,11 @@ hivp$paed_art_val[which(1970:2030 == 2002)] <- 50
 hivp$artpaeds_isperc[] <- FALSE
 
 ##Change things to length 61
-parameters$artpaeds_isperc <- c(parameters$artpaeds_isperc, FALSE)
-parameters$paed_art_elig_age <- c(parameters$paed_art_elig_age, 2)
-parameters$paed_art_elig_cd4 <- cbind(parameters$paed_art_elig_cd4, parameters$paed_art_elig_cd4[,ncol(parameters$paed_art_elig_cd4)])
+hivp$artpaeds_isperc <- c(hivp$artpaeds_isperc, FALSE)
+hivp$paed_art_elig_age <- c(hivp$paed_art_elig_age, 2)
+hivp$paed_art_elig_cd4 <- cbind(hivp$paed_art_elig_cd4, hivp$paed_art_elig_cd4[,ncol(hivp$paed_art_elig_cd4)])
 
-parameters$laf = 1
-hivp = parameters
+hivp$laf = 1
 
 
 setwd('C:/Users/mwalters/frogger/tests/testthat/testdata/')
