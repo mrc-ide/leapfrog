@@ -196,6 +196,20 @@ test_that("model can be run twice on the same data", {
   expect_identical(out, out2)
 })
 
+test_that("child model can be run twice on the same data", {
+  ## Regression test as we saw the 2nd run failing as the first fit
+  ## was modifying the R stored data causing the 2nd run on the same
+  ## data to read from an index of -1
+  demp <- readRDS(test_path("testdata/demographic_projection_object_child.rds"))
+  parameters <- readRDS(test_path("testdata/projection_parameters_child.rds"))
+
+  out <- run_model(demp, parameters, NULL, NULL, 0:60,
+                   run_child_model = TRUE)
+  out2 <- run_model(demp, parameters, NULL, NULL, 0:60,
+                    run_child_model = TRUE)
+  expect_identical(out, out2)
+})
+
 test_that("error thrown if trying to run model for more than max years", {
   demp <- readRDS(test_path("testdata/demographic_projection_object_adult.rds"))
   parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))

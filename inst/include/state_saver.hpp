@@ -86,8 +86,6 @@ struct ChildModelOutputState<ChildModel, real_type> {
   Tensor1<real_type> hc_art_num;
   Tensor1<real_type> hiv_births;
 
-
-
   ChildModelOutputState(int no_output_years)
       : hc1_hiv_pop(StateSpace<ChildModel>().children.hc1DS,
                     StateSpace<ChildModel>().children.hcTT,
