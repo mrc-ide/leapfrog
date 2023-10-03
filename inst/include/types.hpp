@@ -75,6 +75,9 @@ constexpr int hPS = StateSpace<ModelVariant>().children.hPS;
 template<typename ModelVariant>
 constexpr int hBF = StateSpace<ModelVariant>().children.hBF;
 
+template<typename ModelVariant>
+constexpr int hBF_coarse = StateSpace<ModelVariant>().children.hBF_coarse;
+
 template<typename real_type>
 struct Options {
   int hts_per_year;
@@ -181,7 +184,7 @@ struct Children {
   TensorMap2<real_type> vertical_transmission_rate;
   TensorMap3<real_type> PMTCT_transmission_rate;
   TensorMap2<real_type> PMTCT_dropout;
-  TensorMap1<real_type> PMTCT_input_is_percent;
+  TensorMap1<int> PMTCT_input_is_percent;
 
   //breastfeeding transmission
   TensorMap2<real_type> breastfeeding_duration_art;
@@ -514,10 +517,7 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
   real_type bf_incident_hiv_transmission_rate;
   real_type percent_no_treatment;
   real_type percent_on_treatment;
-  real_type bf_transmission_rate_06;
-  real_type bf_transmission_rate_612;
-  real_type bf_transmission_rate_1224;
-  real_type bf_transmission_rate_24plus;
+  TensorFixedSize <real_type, Sizes<hBF_coarse<ChildModel>>> bf_transmission_rate;
 
 
   ChildModelIntermediateData() {};
@@ -576,10 +576,7 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
     bf_incident_hiv_transmission_rate = 0.0;
     percent_no_treatment = 0.0;
     percent_on_treatment = 0.0;
-    bf_transmission_rate_06 = 0.0;
-    bf_transmission_rate_612 = 0.0;
-    bf_transmission_rate_1224 = 0.0;
-    bf_transmission_rate_24plus = 0.0;
+    bf_transmission_rate.setZero();
   };
 };
 

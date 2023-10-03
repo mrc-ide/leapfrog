@@ -15,6 +15,8 @@ void run_hiv_ageing_and_mortality(int time_step,
                                   IntermediateData<ModelVariant, real_type> &intermediate) {
   const auto demog = pars.base.demography;
   constexpr auto ss = StateSpace<ModelVariant>().base;
+
+
   // Non-hiv deaths
   for (int g = 0; g < ss.NS; ++g) {
     for (int a = 1; a < ss.pAG; ++a) {
@@ -31,6 +33,8 @@ void run_hiv_ageing_and_mortality(int time_step,
     state_next.base.p_hiv_pop(ss.pAG - 1, g) +=
         state_curr.base.p_hiv_pop(ss.pAG - 1, g);
   }
+
+
 }
 
 template<typename ModelVariant, typename real_type>
@@ -57,18 +61,6 @@ void run_age_15_entrants(int time_step,
         intermediate.children.age15_art_pop(hu, hm, g) += state_curr.children.hc2_art_pop(hu, hm, (hc_ss.hc2AG-1), g);
       }
     }
-  }
-
-  if(time_step == 41 ){
-    double mag;
-    mag = 0.0;
-      for (int hm = 0; hm < hc_ss.hc2DS; ++hm) {
-        for (int hu = 0; hu < ss.hTS; ++hu) {
-          mag += intermediate.children.age15_art_pop(hu, hm, 1);
-        }
-      }
-
-    std::cout << mag;
   }
 
 
@@ -102,6 +94,7 @@ void run_hiv_and_art_stratified_ageing(int time_step,
     }
   }
 
+
   for (int g = 0; g < ss.NS; ++g) {
     for (int ha = 1; ha < ss.hAG; ++ha) {
       for (int hm = 0; hm < ss.hDS; ++hm) {
@@ -119,6 +112,7 @@ void run_hiv_and_art_stratified_ageing(int time_step,
       }
     }
   }
+
 
   // TODO: add HIV+ 15 year old entrants see https://github.com/mrc-ide/leapfrog/issues/8
   if constexpr (ModelVariant::run_child_model) {
@@ -154,6 +148,8 @@ void run_hiv_and_art_stratified_ageing(int time_step,
   // ADD HIV+ entrants here
   //       artpop_t(hu, hm, 0, g, t) += paedsurv_g *
   //       paedsurv_artcd4dist(hu, hm, g, t) * entrantartcov(g, t);
+
+
   }
 
 

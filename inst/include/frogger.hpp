@@ -16,6 +16,8 @@ OutputState<ModelVariant, real_type> run_model(int time_steps,
                                                const Parameters<ModelVariant, real_type> &pars) {
   auto state = State<ModelVariant, real_type>(pars);
   auto state_next = state;
+
+
   internal::IntermediateData<ModelVariant, real_type> intermediate(pars.base.options.hAG_15plus);
 
   intermediate.reset();
@@ -27,6 +29,7 @@ OutputState<ModelVariant, real_type> run_model(int time_steps,
   // Each time step is mid-point of the year
   for (int step = 1; step <= time_steps; ++step) {
     state_next.reset();
+
     run_general_pop_demographic_projection<ModelVariant>(step, pars, state, state_next,
                                                          intermediate);
     run_hiv_pop_demographic_projection<ModelVariant>(step, pars, state, state_next,
