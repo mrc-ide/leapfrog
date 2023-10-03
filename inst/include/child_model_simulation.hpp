@@ -226,9 +226,9 @@ void run_calculate_perinatal_transmission_rate(int time_step,
   internal::convert_PMTCT_num_to_perc(time_step, pars, state_curr, state_next, intermediate);
   internal::adjust_optAB_transmission_rate(time_step, pars, state_curr, state_next, intermediate);
 
-  ///////////////////////////////////
-  //Calculate transmission rate
-  ///////////////////////////////////
+  // ///////////////////////////////////
+  // //Calculate transmission rate
+  // ///////////////////////////////////
   intermediate.children.retained_on_ART = intermediate.children.PMTCT_coverage(4) * cpars.PMTCT_dropout(0,time_step);
   intermediate.children.retained_started_ART = intermediate.children.PMTCT_coverage(5) * cpars.PMTCT_dropout(1,time_step);
   //Transmission among women on treatment
@@ -392,16 +392,16 @@ void run_child_hiv_infections(int time_step,
     } //end a
   } // end NS
 
-  // internal::run_calculate_perinatal_transmission_rate(time_step, pars, state_curr, state_next, intermediate);
-  // //Perinatal transmission
-  //  for (int s = 0; s < ss.NS; ++s) {
-  //  for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-  //       state_next.children.hc1_hiv_pop(hd, 0, 0, s) +=  state_next.children.hiv_births * intermediate.children.perinatal_transmission_rate * demog.births_sex_prop(s,time_step) * cpars.hc1_cd4_dist(hd);
-  //      }// end hc1DS
-  //      state_next.base.p_hiv_pop(0, s) +=  state_next.children.hiv_births * intermediate.children.perinatal_transmission_rate * demog.births_sex_prop(s,time_step);
-  //      state_next.base.p_infections(0, s) += state_next.children.hiv_births * intermediate.children.perinatal_transmission_rate * demog.births_sex_prop(s,time_step);
+  internal::run_calculate_perinatal_transmission_rate(time_step, pars, state_curr, state_next, intermediate);
+  //Perinatal transmission
+  // for (int s = 0; s < ss.NS; ++s) {
+  // for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
+  //      state_next.children.hc1_hiv_pop(hd, 0, 0, s) +=  state_next.children.hiv_births * intermediate.children.perinatal_transmission_rate * demog.births_sex_prop(s,time_step) * cpars.hc1_cd4_dist(hd);
+  //     }// end hc1DS
+  //     state_next.base.p_hiv_pop(0, s) +=  state_next.children.hiv_births * intermediate.children.perinatal_transmission_rate * demog.births_sex_prop(s,time_step);
+  //     state_next.base.p_infections(0, s) += state_next.children.hiv_births * intermediate.children.perinatal_transmission_rate * demog.births_sex_prop(s,time_step);
   //
-  //  }// end NS
+  // }// end NS
   //
   //  //Breastfeeding transmission
   //
@@ -1085,6 +1085,7 @@ void run_wlhiv_births(int time_step,
   const auto cpars = pars.children.children;
   const auto demog = pars.base.demography;
 
+  intermediate.children.asfr_sum = 0.0;
   for (int a = 0; a < pars.base.options.p_fertility_age_groups; ++a) {
     intermediate.children.asfr_sum += demog.age_specific_fertility_rate(a, time_step);
   } // end a
