@@ -62,14 +62,6 @@ void run_age_15_entrants(int time_step,
       }
     }
   }
-  if(time_step == 21){
-    double mag;
-    mag = 0.0;
-    for (int hm = 0; hm < ss.hDS; ++hm) {
-        mag += intermediate.children.age15_hiv_pop(hm, 1);
-    }
-    std::cout << mag;
-  }
 
 
 

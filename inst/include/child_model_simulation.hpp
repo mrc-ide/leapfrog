@@ -108,7 +108,7 @@ void convert_PMTCT_num_to_perc(int time_step,
   //replace all instances of coverage input as numbers with percentage covered
   if(cpars.PMTCT_input_is_percent(time_step)){
     for (int hp = 0; hp < hc_ss.hPS; ++hp) {
-        intermediate.children.PMTCT_coverage(hp) = cpars.PMTCT(hp,time_step);
+        intermediate.children.PMTCT_coverage(hp) = cpars.PMTCT(hp,time_step) / 100;
     } //end hPS
   }else{
     for (int hp = 0; hp < hc_ss.hPS; ++hp) {
@@ -240,6 +240,9 @@ void run_calculate_perinatal_transmission_rate(int time_step,
 
   intermediate.children.receiving_PMTCT = intermediate.children.PMTCT_coverage(0) + intermediate.children.PMTCT_coverage(1) + intermediate.children.PMTCT_coverage(2) + intermediate.children.PMTCT_coverage(3) + intermediate.children.retained_on_ART + intermediate.children.retained_started_ART + intermediate.children.PMTCT_coverage(6);
   intermediate.children.no_PMTCT = 1 - intermediate.children.receiving_PMTCT;
+  if(time_step == 30){
+    std::cout << intermediate.children.no_PMTCT;
+  }
 
   //Transmission among women not on treatment
   if (intermediate.children.num_wlhiv > 0) {

@@ -12,9 +12,11 @@ parameters <- readRDS(("C:/Users/mwalters/frogger/tests/testthat/testdata/projec
 parameters$ctx_effect[] <- 0
 parameters$ctx_val[] <- 0
 # parameters$mtct[] <- 0
-parameters$pmtct[] <- 0
+# parameters$pmtct[] <- 0
+save = parameters$pmtct
+parameters$pmtct <- parameters$pmtct[,,2]
 parameters$pmtct_dropout[] <- 0
-parameters$pmtct_input_isperc[] <- as.integer(0)
+parameters$pmtct_input_isperc[] <- as.integer(1)
 parameters$bf_duration_art[] <- 1
 parameters$bf_duration_no_art[] <- 1
 parameters$incidinput[which(1970:2030 == 1991):length(1970:2030)] <- 0
@@ -25,6 +27,8 @@ parameters$bf_duration[] <- 1
 parameters$paed_art_elig_age <- as.integer(parameters$paed_art_elig_age)
 out <- run_model(demp, parameters, NULL, NULL, 0:60, run_child_model = TRUE)
 
+parameters$pmtct <- save
+parameters$pmtct[,,2] <- parameters$pmtct[,,2]/ 100
 parameters$paed_art_elig_age <- as.numeric(parameters$paed_art_elig_age)
 parameters$pmtct_input_isperc <- as.logical(parameters$pmtct_input_isperc[])
 pmtct_mtct <- array(unlist(list(cbind(parameters$mtct[,1], parameters$pmtct_mtct[,,1]), cbind(parameters$mtct[,2], parameters$pmtct_mtct[,,2]))), dim = c(7,8,2))
@@ -64,18 +68,6 @@ lfrog.x = as.vector(lmod$hiv_births)
 births = data.table(year = 1970:2030, fr = fr.x, lfrog = lfrog.x)
 births[,diff := fr - lfrog]
 births
-#births[,births_vec := births.vec]
-
-# expect_true(all(lmod$hivstrat_paeds[, , 1:5, , ] == out$hc1_hiv_pop[, , 1:5, , ] ))
-# #out$hc2_hiv_pop[is.nan(out$hc2_hiv_pop)] <- 0
-# ##replacing really really small numbers to zero to match with leapfrog
-# #out$hc2_hiv_pop[(out$hc2_hiv_pop) < 1e-6] <- 0
-# expect_true(all(lmod$hivstrat_paeds[1:6, , 6:15, , ] == out$hc2_hiv_pop[, , , , ] ))
-#
-#
-# ##check that art pop is the same
-# expect_true(all(lmod$artstrat_paeds[, , 1:5, , ] == out$hc1_art_pop[, , 1:5, , ] ))
-# expect_true(all(lmod$artstrat_paeds[, 1:6, 6:15, , ] == out$hc2_art_pop[, , , , ] ))
 
 ##NO ART
 {
