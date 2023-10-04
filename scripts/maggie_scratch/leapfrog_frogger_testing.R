@@ -15,7 +15,7 @@ parameters$ctx_val[] <- 0
 # parameters$pmtct[] <- 0
 save = parameters$pmtct
 parameters$pmtct <- parameters$pmtct[,,2]
-parameters$pmtct_dropout[] <- 0
+#parameters$pmtct_dropout[] <- 0
 parameters$pmtct_input_isperc[] <- as.integer(1)
 parameters$bf_duration_art[] <- 1
 parameters$bf_duration_no_art[] <- 1

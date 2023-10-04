@@ -233,20 +233,29 @@ void run_calculate_perinatal_transmission_rate(int time_step,
   // ///////////////////////////////////
   // //Calculate transmission rate
   // ///////////////////////////////////
-  intermediate.children.retained_on_ART = intermediate.children.PMTCT_coverage(4) * cpars.PMTCT_dropout(0,time_step);
-  intermediate.children.retained_started_ART = intermediate.children.PMTCT_coverage(5) * cpars.PMTCT_dropout(1,time_step);
+  intermediate.children.retained_on_ART = intermediate.children.PMTCT_coverage(4) * cpars.PMTCT_dropout(0,time_step) / 100;
+  intermediate.children.retained_started_ART = intermediate.children.PMTCT_coverage(5) * cpars.PMTCT_dropout(1,time_step) / 100;
   //Transmission among women on treatment
-  intermediate.children.perinatal_transmission_rate = intermediate.children.PMTCT_coverage(2) * cpars.PMTCT_transmission_rate(0,2,0) + intermediate.children.PMTCT_coverage(3) * cpars.PMTCT_transmission_rate(0,3,0) + intermediate.children.PMTCT_coverage(0) * intermediate.children.optA_transmission_rate + intermediate.children.PMTCT_coverage(1) * intermediate.children.optB_transmission_rate + intermediate.children.retained_on_ART * cpars.PMTCT_transmission_rate(0,4,0) + intermediate.children.retained_started_ART * cpars.PMTCT_transmission_rate(0,5,0)+ intermediate.children.PMTCT_coverage(6) * cpars.PMTCT_transmission_rate(0,6,0);
+  intermediate.children.perinatal_transmission_rate = intermediate.children.PMTCT_coverage(2) * cpars.PMTCT_transmission_rate(0,2,0) +
+    intermediate.children.PMTCT_coverage(3) * cpars.PMTCT_transmission_rate(0,3,0) +
+    intermediate.children.PMTCT_coverage(0) * intermediate.children.optA_transmission_rate +
+    intermediate.children.PMTCT_coverage(1) * intermediate.children.optB_transmission_rate +
+    intermediate.children.retained_on_ART * cpars.PMTCT_transmission_rate(0,4,0) +
+    intermediate.children.retained_started_ART * cpars.PMTCT_transmission_rate(0,5,0) +
+    intermediate.children.PMTCT_coverage(6) * cpars.PMTCT_transmission_rate(0,6,0);
 
   intermediate.children.receiving_PMTCT = intermediate.children.PMTCT_coverage(0) + intermediate.children.PMTCT_coverage(1) + intermediate.children.PMTCT_coverage(2) + intermediate.children.PMTCT_coverage(3) + intermediate.children.retained_on_ART + intermediate.children.retained_started_ART + intermediate.children.PMTCT_coverage(6);
   intermediate.children.no_PMTCT = 1 - intermediate.children.receiving_PMTCT;
-  if(time_step == 30){
-    std::cout << intermediate.children.no_PMTCT;
+  if(time_step == 33){
+    std::cout <<  intermediate.children.retained_started_ART ;
   }
 
   //Transmission among women not on treatment
   if (intermediate.children.num_wlhiv > 0) {
-    intermediate.children.perinatal_transmission_rate = intermediate.children.perinatal_transmission_rate + intermediate.children.no_PMTCT * (intermediate.children.prop_wlhiv_lt200 * cpars.vertical_transmission_rate(4,0) + intermediate.children.prop_wlhiv_200to350 * cpars.vertical_transmission_rate(2,0) + intermediate.children.prop_wlhiv_gte350 * cpars.vertical_transmission_rate(0,0));
+    intermediate.children.perinatal_transmission_rate = intermediate.children.perinatal_transmission_rate +
+      intermediate.children.no_PMTCT * (intermediate.children.prop_wlhiv_lt200 * cpars.vertical_transmission_rate(4,0) +
+      intermediate.children.prop_wlhiv_200to350 * cpars.vertical_transmission_rate(2,0) +
+      intermediate.children.prop_wlhiv_gte350 * cpars.vertical_transmission_rate(0,0));
   }else{
     intermediate.children.perinatal_transmission_rate = intermediate.children.perinatal_transmission_rate;
   }
