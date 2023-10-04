@@ -246,9 +246,6 @@ void run_calculate_perinatal_transmission_rate(int time_step,
 
   intermediate.children.receiving_PMTCT = intermediate.children.PMTCT_coverage(0) + intermediate.children.PMTCT_coverage(1) + intermediate.children.PMTCT_coverage(2) + intermediate.children.PMTCT_coverage(3) + intermediate.children.retained_on_ART + intermediate.children.retained_started_ART + intermediate.children.PMTCT_coverage(6);
   intermediate.children.no_PMTCT = 1 - intermediate.children.receiving_PMTCT;
-  if(time_step == 33){
-    std::cout <<  intermediate.children.retained_started_ART ;
-  }
 
   //Transmission among women not on treatment
   if (intermediate.children.num_wlhiv > 0) {
