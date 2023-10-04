@@ -8,8 +8,7 @@ pjnz1 <- test_path("../testdata/spectrum/v6.13/bwa_aim-adult-art-no-special-elig
 demp <- readRDS(("C:/Users/mwalters/frogger/tests/testthat/testdata/demographic_projection_object_child.rds"))
 parameters <- readRDS(("C:/Users/mwalters/frogger/tests/testthat/testdata/projection_parameters_child.rds"))
 
-demp$netmigr[] <- 0
-demp$netmigr_adj[] <- 0
+
 parameters$ctx_effect[] <- 0
 parameters$ctx_val[] <- 0
 # parameters$mtct[] <- 0
@@ -18,7 +17,6 @@ parameters$pmtct_dropout[] <- 0
 parameters$pmtct_input_isperc[] <- as.integer(0)
 parameters$bf_duration_art[] <- 1
 parameters$bf_duration_no_art[] <- 1
-parameters$paed_art_val[] <- 0
 parameters$incidinput[which(1970:2030 == 1991):length(1970:2030)] <- 0
 parameters$paed_incid_input[which(1970:2030 == 2000)] <- 0
 # parameters$pmtct_mtct[] <- 0
