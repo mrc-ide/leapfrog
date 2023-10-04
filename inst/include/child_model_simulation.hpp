@@ -272,10 +272,6 @@ if(intermediate.children.age_weighted_hivneg > 0.0){
   }else{
     intermediate.children.perinatal_transmission_rate = intermediate.children.perinatal_transmission_rate;
   }
-  if(time_step == 6){
-    std::cout << intermediate.children.perinatal_transmission_rate  ;
-  }
-
 
 }
 
