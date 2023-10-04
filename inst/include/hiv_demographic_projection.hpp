@@ -128,8 +128,11 @@ void run_hiv_and_art_stratified_ageing(int time_step,
         }
       }
     }
-
-
+    for (int g = 0; g < ss.NS; ++g) {
+        for (int hm_adol = 0; hm_adol < hc_ss.hc2DS; ++hm_adol){
+       //   state_next.base.p_hiv_pop(0, g) += intermediate.children.age15_hiv_pop(hm_adol, g);
+        }
+    }
 
   }else{
     for (int g = 0; g < ss.NS; ++g) {
@@ -215,16 +218,20 @@ void run_hiv_pop_demographic_projection(int time_step,
                                         const State<ModelVariant, real_type> &state_curr,
                                         State<ModelVariant, real_type> &state_next,
                                         internal::IntermediateData<ModelVariant, real_type> &intermediate) {
+
   internal::run_hiv_ageing_and_mortality<ModelVariant>(time_step, pars, state_curr, state_next,
                                                        intermediate);
+
   if constexpr (ModelVariant::run_child_model) {
     internal::run_age_15_entrants<ModelVariant>(time_step, pars, state_curr, state_next, intermediate);
   }
 
   internal::run_hiv_and_art_stratified_ageing<ModelVariant>(time_step, pars, state_curr, state_next,
                                                             intermediate);
+
   internal::run_hiv_and_art_stratified_deaths_and_migration<ModelVariant>(time_step, pars, state_curr,
                                                                           state_next, intermediate);
+
 }
 
 }
