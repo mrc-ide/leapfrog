@@ -353,13 +353,14 @@ void run_bf_transmission_rate(int time_step,
     //intermediate.children.percent_no_treatment is the percentage of women who are still vulnerable to HIV transmission to their babies
     intermediate.children.percent_no_treatment = 1 - intermediate.children.perinatal_transmission_rate_bf_calc - intermediate.children.bf_transmission_rate(index);
 
-    if(time_step > 29){
       for(int hp = 0; hp < hc_ss.hPS; hp++){
         //hp = 0 is option A
         //Dropout not used for option A
         if(hp == 0){
+          // intermediate.children.percent_on_treatment = intermediate.children.optA_bf_transmission_rate *
+          //   cpars.PMTCT_transmission_rate(hp,time_step,1);
           intermediate.children.percent_on_treatment = intermediate.children.optA_bf_transmission_rate *
-            cpars.PMTCT_transmission_rate(hp,time_step,1);
+            intermediate.children.PMTCT_coverage(hp);
           intermediate.children.bf_transmission_rate(index) += intermediate.children.percent_on_treatment *
             2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) ;
 
@@ -368,8 +369,10 @@ void run_bf_transmission_rate(int time_step,
         //hp = 1 is option B
         //Dropout not used for option B
         if(hp == 1){
+          // intermediate.children.percent_on_treatment = intermediate.children.optB_bf_transmission_rate *
+          //   cpars.PMTCT_transmission_rate(hp,time_step,1) ;
           intermediate.children.percent_on_treatment = intermediate.children.optB_bf_transmission_rate *
-            cpars.PMTCT_transmission_rate(hp,time_step,1) ;
+            intermediate.children.PMTCT_coverage(hp);
           intermediate.children.bf_transmission_rate(index) +=  intermediate.children.percent_on_treatment *
             2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) ;
           intermediate.children.percent_no_treatment -=  intermediate.children.PMTCT_coverage(hp) ;
@@ -392,7 +395,6 @@ void run_bf_transmission_rate(int time_step,
 
         }
       }
-    }
 
     if(intermediate.children.percent_no_treatment < 0){
       intermediate.children.percent_no_treatment = 0;
@@ -410,9 +412,6 @@ void run_bf_transmission_rate(int time_step,
 
     if(bf < 1){
       intermediate.children.bf_transmission_rate(index) = intermediate.children.bf_transmission_rate(index)/ 4;
-    }
-    if(time_step == 12 & bf < 3){
-      std::cout << intermediate.children.bf_transmission_rate(index) ;
     }
   }
 
@@ -462,9 +461,6 @@ void run_child_hiv_infections(int time_step,
       state_next.base.p_infections(0, s) += state_next.children.hiv_births * intermediate.children.perinatal_transmission_rate * demog.births_sex_prop(s,time_step);
 
   }// end NS
-if(time_step == 12){
-  std::cout << intermediate.children.perinatal_transmission_rate_bf_calc;
-}
 
 
    //Breastfeeding transmission

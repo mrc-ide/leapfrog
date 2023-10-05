@@ -123,8 +123,8 @@ x[order(year)]
 
 
 ##Focus on ones that aren't aligning
-prob = dt[abs(diff) > 1e-3]
-
+prob = dt[abs(diff) > 1e-4]
+prob[order(year)]
 
 
 
