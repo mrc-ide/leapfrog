@@ -21,8 +21,6 @@ parameters$bf_duration_art[] <- 1
 parameters$bf_duration_no_art[] <- 1
 parameters$incidinput[which(1970:2030 == 1991):length(1970:2030)] <- 0
 parameters$paed_incid_input[which(1970:2030 == 2000)] <- 0
-# parameters$pmtct_mtct[] <- 0
-parameters$art_mtct[] <- 0
 parameters$bf_duration[] <- 1
 parameters$paed_art_elig_age <- as.integer(parameters$paed_art_elig_age)
 out <- run_model(demp, parameters, NULL, NULL, 0:60, run_child_model = TRUE)

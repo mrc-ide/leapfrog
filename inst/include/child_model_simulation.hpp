@@ -159,11 +159,13 @@ void adjust_optAB_transmission_rate(int time_step,
     intermediate.children.prop_wlhiv_gte350 = 0;
   }
 
+
+
   intermediate.children.prop_wlhiv_lt350 = intermediate.children.prop_wlhiv_lt200 + intermediate.children.prop_wlhiv_200to350;
 
-  if ((cpars.PMTCT(0,time_step) + cpars.PMTCT(1,time_step)) > intermediate.children.prop_wlhiv_gte350) {
+  if ((intermediate.children.PMTCT_coverage(0) + intermediate.children.PMTCT_coverage(1)) > intermediate.children.prop_wlhiv_gte350) {
     if (intermediate.children.prop_wlhiv_gte350 > 0) {
-      intermediate.children.excessratio = ((cpars.PMTCT(0,time_step) + cpars.PMTCT(1,time_step)) / intermediate.children.prop_wlhiv_gte350) - 1;
+      intermediate.children.excessratio = ((intermediate.children.PMTCT_coverage(0) + intermediate.children.PMTCT_coverage(1)) / intermediate.children.prop_wlhiv_gte350) - 1;
     }else{
       intermediate.children.excessratio = 0;
     }
@@ -175,8 +177,6 @@ void adjust_optAB_transmission_rate(int time_step,
     intermediate.children.optA_transmission_rate = cpars.PMTCT_transmission_rate(0,0,0) * (1 + intermediate.children.excessratio);
     intermediate.children.optB_transmission_rate = cpars.PMTCT_transmission_rate(0,1,0) * (1 + intermediate.children.excessratio);
   }
-
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -236,13 +236,16 @@ void run_calculate_perinatal_transmission_rate(int time_step,
   intermediate.children.retained_on_ART = intermediate.children.PMTCT_coverage(4) * cpars.PMTCT_dropout(0,time_step) / 100;
   intermediate.children.retained_started_ART = intermediate.children.PMTCT_coverage(5) * cpars.PMTCT_dropout(1,time_step) / 100;
   //Transmission among women on treatment
-  intermediate.children.perinatal_transmission_rate = intermediate.children.PMTCT_coverage(2) * cpars.PMTCT_transmission_rate(0,2,0) +
-    intermediate.children.PMTCT_coverage(3) * cpars.PMTCT_transmission_rate(0,3,0) +
+  intermediate.children.perinatal_transmission_rate = intermediate.children.PMTCT_coverage(2) * cpars.PMTCT_transmission_rate(0,2,0) + //SDNVP
+    intermediate.children.PMTCT_coverage(3) * cpars.PMTCT_transmission_rate(0,3,0) + //dual ARV
     intermediate.children.PMTCT_coverage(0) * intermediate.children.optA_transmission_rate +
     intermediate.children.PMTCT_coverage(1) * intermediate.children.optB_transmission_rate +
     intermediate.children.retained_on_ART * cpars.PMTCT_transmission_rate(0,4,0) +
     intermediate.children.retained_started_ART * cpars.PMTCT_transmission_rate(0,5,0) +
     intermediate.children.PMTCT_coverage(6) * cpars.PMTCT_transmission_rate(0,6,0);
+  if(time_step == 33){
+ //   std::cout <<  intermediate.children.optA_transmission_rate;
+  }
 
   intermediate.children.receiving_PMTCT = intermediate.children.PMTCT_coverage(0) + intermediate.children.PMTCT_coverage(1) + intermediate.children.PMTCT_coverage(2) + intermediate.children.PMTCT_coverage(3) + intermediate.children.retained_on_ART + intermediate.children.retained_started_ART + intermediate.children.PMTCT_coverage(6);
   intermediate.children.no_PMTCT = 1 - intermediate.children.receiving_PMTCT;
