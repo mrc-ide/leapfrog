@@ -12,16 +12,16 @@ parameters <- readRDS(("C:/Users/mwalters/frogger/tests/testthat/testdata/projec
 parameters$ctx_effect[] <- 0
 parameters$ctx_val[] <- 0
 # parameters$mtct[] <- 0
-# parameters$pmtct[] <- 0
+#parameters$pmtct[] <- 0
 save = parameters$pmtct
 parameters$pmtct <- parameters$pmtct[,,2]
-#parameters$pmtct_dropout[] <- 0
+# parameters$pmtct_dropout[] <- 0
 parameters$pmtct_input_isperc[] <- as.integer(1)
-parameters$bf_duration_art[] <- 1
-parameters$bf_duration_no_art[] <- 1
+# parameters$bf_duration_art[] <- 1
+# parameters$bf_duration_no_art[] <- 1
 parameters$incidinput[which(1970:2030 == 1991):length(1970:2030)] <- 0
 parameters$paed_incid_input[which(1970:2030 == 2000)] <- 0
-parameters$bf_duration[] <- 1
+# parameters$bf_duration[] <- 1
 parameters$paed_art_elig_age <- as.integer(parameters$paed_art_elig_age)
 out <- run_model(demp, parameters, NULL, NULL, 0:60, run_child_model = TRUE)
 
@@ -35,16 +35,15 @@ lmod <- leapfrogR(demp, parameters)
 save <- (lmod)
 library(data.table)
 
-# if(time_step == 16){
-#   std::cout << intermediate.children.age15_hiv_pop(0, 0);
+# if(time_step == 26){
+#   std::cout << intermediate.children.prop_wlhiv_gte350;
 # }
-
 
 # #
 # # ##Check number of women with HIV
-fr <- out$h_hiv_adult[,1,2,]
+fr <- out$h_hiv_adult[,1:35,2,]
 fr <- apply(fr, MARGIN = length(dim(fr)), FUN = sum)
-lf <- lmod$hivstrat_adult[,1,2,]
+lf <- lmod$hivstrat_adult[,1:35,2,]
 lf <- apply(lf, MARGIN = length(dim(lf)), FUN = sum)
 # plot(x = 1970:2030, y = fr) + lines(x = 1970:2030, y = lf)
 dt <- data.table(year = 1970:2030, lfrog = lf, frogger = fr)
@@ -119,17 +118,23 @@ noart <- dt[,type := 'noart']
 
 
 dt <- rbind(art, noart, fill = T)
+x = dt[value_o > 1e10]
+x[order(year)]
+
 
 ##Focus on ones that aren't aligning
-prob = dt[abs(diff) > 1e-6]
+prob = dt[abs(diff) > 1e-3]
 
 
 
 
 ##deaths
 {
-deaths <- data.table(melt((out$hc2_art_aids_deaths)))
- deaths <- deaths[,.(tt = Var1, cd4 = Var2, age = Var3 + 4, sex = Var4, year = Var5 + 1969, value)]
+deaths <- data.table(melt((out$hc2_noart_aids_deaths)))
+  deaths <- deaths[,.(cd4 = Var1, tt = Var2, age = Var3 + 4, sex = Var4, year = Var5 + 1969, value)]
+
+  deaths_lmod <- data.table(melt(lmod$deaths_paeds))
+  deaths_lmod <- deaths_lmod[,.(cd4 = Var1, tt = Var2, age = Var3 - 1, sex = Var4, year = Var5 + 1969, value)]
 
 
 }
