@@ -41,9 +41,9 @@ library(data.table)
 
 # #
 # # ##Check number of women with HIV
-fr <- out$h_hiv_adult[,1:35,2,]
+fr <- out$h_hiv_adult[,1,2,]
 fr <- apply(fr, MARGIN = length(dim(fr)), FUN = sum)
-lf <- lmod$hivstrat_adult[,1:35,2,]
+lf <- lmod$hivstrat_adult[,1,2,]
 lf <- apply(lf, MARGIN = length(dim(lf)), FUN = sum)
 # plot(x = 1970:2030, y = fr) + lines(x = 1970:2030, y = lf)
 dt <- data.table(year = 1970:2030, lfrog = lf, frogger = fr)
@@ -125,6 +125,7 @@ x[order(year)]
 ##Focus on ones that aren't aligning
 prob = dt[abs(diff) > 1e-4]
 prob[order(year)]
+x = prob[order(year)]
 
 
 
