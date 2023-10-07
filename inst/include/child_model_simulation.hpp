@@ -766,7 +766,7 @@ void run_wlhiv_births(int time_step,
       //women on ART less than 6 months use the off art fertility multiplier
        intermediate.children.df += cpars.local_adj_factor * cpars.fert_mult_by_age(a) * cpars.fert_mult_offart(hd) * ((state_next.base.h_art_adult(0, hd, a, 1) + state_curr.base.h_art_adult(0, hd, a, 1)) / 2);
        for (int ht = 1; ht < ss.hTS; ++ht) {
-       intermediate.children.df += cpars.local_adj_factor * cpars.fert_mult_onart(a) * ((state_next.base.h_art_adult(ht, hd, a, 1) + state_curr.base.h_art_adult(ht, hd, a, 1)) / 2);
+         intermediate.children.df += cpars.local_adj_factor * cpars.fert_mult_onart(a) * ((state_next.base.h_art_adult(ht, hd, a, 1) + state_curr.base.h_art_adult(ht, hd, a, 1)) / 2);
       } //end hTS
     } // end hDS
 
