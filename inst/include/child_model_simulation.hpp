@@ -731,7 +731,7 @@ void run_wlhiv_births(int time_step,
                       State<ModelVariant, real_type> &state_next,
                       IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
+                "run_wlhiv_births can only be called for model variants where run_child_model is true");
   constexpr auto ss = StateSpace<ModelVariant>().base;
   const auto cpars = pars.children.children;
   const auto demog = pars.base.demography;
