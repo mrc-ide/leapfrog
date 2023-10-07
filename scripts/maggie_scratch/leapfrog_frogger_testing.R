@@ -22,7 +22,7 @@ parameters$pmtct_input_isperc[] <- as.integer(1)
 parameters$incidinput[which(1970:2030 == 1991):length(1970:2030)] <- 0
 parameters$paed_incid_input[which(1970:2030 == 2000)] <- 0
 # parameters$bf_duration[] <- 1
-parameters$paed_art_elig_age <- as.integer(parameters$paed_art_elig_age)
+parameters$art15plus_num[] <- 0
 out <- run_model(demp, parameters, NULL, NULL, 0:60, run_child_model = TRUE)
 
 parameters$pmtct <- save
@@ -30,10 +30,13 @@ parameters$pmtct[,,2] <- parameters$pmtct[,,2]/ 100
 parameters$paed_art_elig_age <- as.numeric(parameters$paed_art_elig_age)
 parameters$pmtct_input_isperc <- as.logical(parameters$pmtct_input_isperc[])
 pmtct_mtct <- array(unlist(list(cbind(parameters$mtct[,1], parameters$pmtct_mtct[,,1]), cbind(parameters$mtct[,2], parameters$pmtct_mtct[,,2]))), dim = c(7,8,2))
+parameters$pmtct_mtct <- NULL
 parameters$pmtct_mtct <- pmtct_mtct
 lmod <- leapfrogR(demp, parameters)
 save <- (lmod)
 library(data.table)
+
+##Maggie notes: option a/b tr is the same, but overall bftr_1 is different
 
 # if(time_step == 26){
 #   std::cout << intermediate.children.prop_wlhiv_gte350;
