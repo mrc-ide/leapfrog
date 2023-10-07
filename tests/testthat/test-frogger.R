@@ -203,9 +203,9 @@ test_that("child model can be run twice on the same data", {
   demp <- readRDS(test_path("testdata/demographic_projection_object_child.rds"))
   parameters <- readRDS(test_path("testdata/projection_parameters_child.rds"))
 
-  out <- run_model(demp, parameters, NULL, NULL, 0:60,
+  out <- run_model(demp, parameters, NULL, NULL, 0:59,
                    run_child_model = TRUE)
-  out2 <- run_model(demp, parameters, NULL, NULL, 0:60,
+  out2 <- run_model(demp, parameters, NULL, NULL, 0:59,
                     run_child_model = TRUE)
   expect_identical(out, out2)
 })
