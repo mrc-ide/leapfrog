@@ -16,6 +16,7 @@ OutputState<ModelVariant, real_type> run_model(int time_steps,
                                                const Parameters<ModelVariant, real_type> &pars) {
   auto state = State<ModelVariant, real_type>(pars);
   auto state_next = state;
+  const auto demog = pars.base.demography;
 
 
   internal::IntermediateData<ModelVariant, real_type> intermediate(pars.base.options.hAG_15plus);
@@ -35,8 +36,14 @@ OutputState<ModelVariant, real_type> run_model(int time_steps,
     run_hiv_pop_demographic_projection<ModelVariant>(step, pars, state, state_next,
                                                      intermediate);
     run_hiv_model_simulation<ModelVariant>(step, pars, state, state_next, intermediate);
+ //   if constexpr (demog.pop_adjust) {
+      run_base_population_adjustment<ModelVariant>(step, pars, state, state_next, intermediate);
+  //  }
     if constexpr (ModelVariant::run_child_model) {
       run_child_model_simulation<ModelVariant>(step, pars, state, state_next, intermediate);
+    //  if constexpr (demog.pop_adjust) {
+        run_child_population_adjustment<ModelVariant>(step, pars, state, state_next, intermediate);
+ //     }
     }
     state_output.save_state(state_next, step);
     std::swap(state, state_next);

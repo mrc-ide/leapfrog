@@ -372,6 +372,8 @@ struct BaseModelIntermediateData {
   TensorFixedSize <real_type, Sizes<hTS<ModelVariant>, hDS<ModelVariant>, hAG<ModelVariant>, NS<ModelVariant>>> gradART;
   Tensor2<real_type> artelig_hahm;
   TensorFixedSize <real_type, Sizes<hAG<ModelVariant>>> hivpop_ha;
+  TensorFixedSize <real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>> hivneg_pop;
+
 
   real_type cd4mx_scale;
   real_type artpop_hahm;
@@ -393,6 +395,11 @@ struct BaseModelIntermediateData {
   real_type hivqx_ha;
   real_type hivdeaths_a;
   real_type Xhivn_incagerr;
+  real_type popadj_ha;
+  real_type hivadj_ha;
+  real_type popadjrate_a;
+  real_type hpopadj_a;
+  real_type popadjrate_ha;
 
   BaseModelIntermediateData(int hAG_15plus)
       :
@@ -451,6 +458,12 @@ struct BaseModelIntermediateData {
     hivqx_ha = 0.0;
     hivdeaths_a = 0.0;
     Xhivn_incagerr = 0.0;
+    popadj_ha = 0.0;
+    hivadj_ha = 0.0;
+    popadjrate_a = 0.0;
+    hivneg_pop.setZero();
+    hpopadj_a = 0.0;
+    popadjrate_ha = 0.0;
   }
 };
 
@@ -518,7 +531,11 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
   real_type percent_no_treatment;
   real_type percent_on_treatment;
   TensorFixedSize <real_type, Sizes<hBF_coarse<ChildModel>>> bf_transmission_rate;
-
+  real_type popadj_ha;
+  real_type hivadj_ha;
+  real_type popadjrate_a;
+  real_type hpopadj_a;
+  real_type popadjrate_ha;
 
   ChildModelIntermediateData() {};
 
@@ -577,6 +594,11 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
     percent_no_treatment = 0.0;
     percent_on_treatment = 0.0;
     bf_transmission_rate.setZero();
+    popadj_ha = 0.0;
+    hivadj_ha = 0.0;
+    popadjrate_a = 0.0;
+    hpopadj_a = 0.0;
+    popadjrate_ha = 0.0;
   };
 };
 
