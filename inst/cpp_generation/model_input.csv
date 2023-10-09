@@ -49,3 +49,4 @@ pmtct_dropout,PMTCT_dropout,real_type,ModelVariant::run_child_model,,FALSE,2,6,p
 pmtct_input_isperc,PMTCT_input_is_percent,int,ModelVariant::run_child_model,,FALSE,1,proj_years,,,
 bf_duration_art,breastfeeding_duration_art,real_type,ModelVariant::run_child_model,,FALSE,2,children.hBF,proj_years,,
 bf_duration_no_art,breastfeeding_duration_no_art,real_type,ModelVariant::run_child_model,,FALSE,2,children.hBF,proj_years,,
+abortion,abortion_rate,real_type,ModelVariant::run_child_model,,FALSE,1,proj_years,,,

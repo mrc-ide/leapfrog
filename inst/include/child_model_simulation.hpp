@@ -1206,7 +1206,7 @@ void run_wlhiv_births(int time_step,
 
 
 //MKW at this point this is giving NAN at 1986
-  state_next.children.hiv_births = intermediate.children.birthsHE;
+  state_next.children.hiv_births = intermediate.children.birthsHE * (1 - cpars.abortion_rate(time_step));
 
 }
 

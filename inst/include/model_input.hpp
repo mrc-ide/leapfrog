@@ -113,6 +113,7 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
     const leapfrog::TensorMap1<int> PMTCT_input_is_percent = parse_data<int>(data, "pmtct_input_isperc", proj_years);
     const leapfrog::TensorMap2<real_type> breastfeeding_duration_art = parse_data<real_type>(data, "bf_duration_art", children.hBF, proj_years);
     const leapfrog::TensorMap2<real_type> breastfeeding_duration_no_art = parse_data<real_type>(data, "bf_duration_no_art", children.hBF, proj_years);
+    const leapfrog::TensorMap1<real_type> abortion_rate = parse_data<real_type>(data, "abortion", proj_years);
     const leapfrog::Children<real_type> child = {
         hc_nosocomial,
         hc1_cd4_dist,
@@ -143,7 +144,8 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
         PMTCT_dropout,
         PMTCT_input_is_percent,
         breastfeeding_duration_art,
-        breastfeeding_duration_no_art
+        breastfeeding_duration_no_art,
+        abortion_rate
     };
     const leapfrog::ChildModelParameters<ModelVariant, real_type> child_model_params = {
         child
