@@ -691,7 +691,7 @@ void hc_initiate_art_by_cd4(int time_step,
     for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
       for (int a = cpars.hc_art_elig_age(time_step); a < pars.base.options.p_idx_fertility_first; ++a) {
         for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-         if (hd >= (cpars.hc_art_elig_cd4(a, time_step))) {
+          if (hd >= (cpars.hc_art_elig_cd4(a, time_step))) {
             if (a < hc_ss.hc2_agestart) {
               intermediate.children.hc_art_need(hd, cat, a, s) += state_next.children.hc1_hiv_pop(hd, cat, a, s);
             } else if (hd < hc_ss.hc2DS) {
@@ -1149,7 +1149,7 @@ void run_wlhiv_births(int time_step,
                       State<ModelVariant, real_type> &state_next,
                       IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
+                "run_wlhiv_births can only be called for model variants where run_child_model is true");
   constexpr auto ss = StateSpace<ModelVariant>().base;
   const auto cpars = pars.children.children;
   const auto demog = pars.base.demography;
@@ -1220,20 +1220,6 @@ void run_child_model_simulation(int time_step,
                                 State<ModelVariant, real_type> &state_next,
                                 internal::IntermediateData<ModelVariant, real_type> &intermediate) {
 
-  // internal::run_child_ageing(time_step, pars, state_curr, state_next, intermediate);
-  // internal::run_child_natural_history(time_step, pars, state_curr, state_next, intermediate);
-  // internal::run_child_hiv_mort(time_step, pars, state_curr, state_next, intermediate);
-  // internal::add_child_grad(time_step, pars, state_curr, state_next, intermediate);
-  // //This is only the order for nosocomial infections
-  // //order from mkw_bf_trans: run_child_ageing, run_wlhiv_births, run_child_hiv_infections, run_child_natural_history,
-  // //run_child_hiv_mort, add_child_trad, run_child_art_initiation, run_child_art_mortality
-  // internal::run_child_hiv_infections(time_step, pars, state_curr, state_next, intermediate);
-  // // !!!TODO: also need to fix the looping order for some loops
-  // // !!!TODO: put this in an if statement to only run if the first year of ART has passed
-  // internal::run_child_art_initiation(time_step, pars, state_curr, state_next, intermediate);
-  // internal::run_child_art_mortality(time_step, pars, state_curr, state_next, intermediate);
-  // internal::run_wlhiv_births(time_step, pars, state_curr, state_next, intermediate);
-
   internal::run_child_ageing(time_step, pars, state_curr, state_next, intermediate);
   internal::run_wlhiv_births(time_step, pars, state_curr, state_next, intermediate);
   internal::run_child_hiv_infections(time_step, pars, state_curr, state_next, intermediate);
@@ -1247,6 +1233,6 @@ void run_child_model_simulation(int time_step,
   // !!!TODO: put this in an if statement to only run if the first year of ART has passed
   internal::run_child_art_initiation(time_step, pars, state_curr, state_next, intermediate);
   internal::run_child_art_mortality(time_step, pars, state_curr, state_next, intermediate);
-  }
+
 
 } // namespace leapfrog

@@ -63,9 +63,6 @@ void run_age_15_entrants(int time_step,
     }
   }
 
-
-
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -129,11 +126,7 @@ void run_hiv_and_art_stratified_ageing(int time_step,
         }
       }
     }
-    for (int g = 0; g < ss.NS; ++g) {
-        for (int hm_adol = 0; hm_adol < hc_ss.hc2DS; ++hm_adol){
-       //   state_next.base.p_hiv_pop(0, g) += intermediate.children.age15_hiv_pop(hm_adol, g);
-        }
-    }
+
 
   }else{
     for (int g = 0; g < ss.NS; ++g) {
@@ -149,9 +142,6 @@ void run_hiv_and_art_stratified_ageing(int time_step,
       }
     }
   }
-  // ADD HIV+ entrants here
-  //       artpop_t(hu, hm, 0, g, t) += paedsurv_g *
-  //       paedsurv_artcd4dist(hu, hm, g, t) * entrantartcov(g, t);
 
 
   }
