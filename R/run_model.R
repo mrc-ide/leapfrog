@@ -14,7 +14,8 @@
 run_model <- function(data, parameters, sim_years,
                       hts_per_year, output_steps,
                       hiv_age_stratification = "full",
-                      run_child_model = TRUE) {
+                      run_child_model = TRUE,
+                      pop_adjust = TRUE) {
   assert_enum(hiv_age_stratification, c("full", "coarse"))
   if (hiv_age_stratification == "full" && !run_child_model) {
     model_variant <- "BaseModelFullAgeStratification"
@@ -41,5 +42,5 @@ run_model <- function(data, parameters, sim_years,
   data <- c(data, parameters)
 
   run_base_model(data, sim_years, hts_per_year, output_steps,
-                 model_variant)
+                 model_variant, pop_adjust)
 }

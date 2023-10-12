@@ -39,7 +39,7 @@ std::vector<int> transform_output_steps(Rcpp::NumericVector output_steps) {
   return Rcpp::as<std::vector<int>>(output_steps);
 }
 
-template<typename ModelVariant>
+template<typename ModelVariant, bool pop_adjust>
 Rcpp::List simulate_model(const leapfrog::StateSpace<ModelVariant> ss,
                           const Rcpp::List data,
                           const int proj_years,
@@ -53,7 +53,7 @@ Rcpp::List simulate_model(const leapfrog::StateSpace<ModelVariant> ss,
 
   const auto params = setup_model_params<ModelVariant, double>(data, opts, proj_years);
 
-  auto state = leapfrog::run_model<ModelVariant, double>(proj_years, save_steps, params);
+  auto state = leapfrog::run_model<ModelVariant, pop_adjust, double>(proj_years, save_steps, params);
 
   auto ret = build_r_output<ModelVariant, double>(state, save_steps);
 
@@ -65,7 +65,8 @@ Rcpp::List run_base_model(const Rcpp::List data,
                           SEXP sim_years,
                           SEXP hts_per_year,
                           Rcpp::NumericVector output_steps,
-                          std::string model_variant) {
+                          std::string model_variant,
+                          bool pop_adjust) {
   const int proj_years = transform_simulation_years(data, sim_years);
   const std::vector<int> save_steps = transform_output_steps(output_steps);
   const int hiv_steps = transform_hts_per_year(hts_per_year);
@@ -74,13 +75,25 @@ Rcpp::List run_base_model(const Rcpp::List data,
   Rcpp::List ret;
   if (model_variant == "ChildModel") {
     constexpr auto ss = leapfrog::StateSpace<leapfrog::ChildModel>();
-    ret = simulate_model<leapfrog::ChildModel>(ss, data, proj_years, hiv_steps, save_steps);
+    if (pop_adjust) {
+      ret = simulate_model<leapfrog::ChildModel, true>(ss, data, proj_years, hiv_steps, save_steps);
+    }else{
+      ret = simulate_model<leapfrog::ChildModel, false>(ss, data, proj_years, hiv_steps, save_steps);
+    }
   } else if (model_variant == "BaseModelFullAgeStratification") {
     constexpr auto ss = leapfrog::StateSpace<leapfrog::BaseModelFullAgeStratification>();
-    ret = simulate_model<leapfrog::BaseModelFullAgeStratification>(ss, data, proj_years, hiv_steps, save_steps);
+    if (pop_adjust) {
+      ret = simulate_model<leapfrog::BaseModelFullAgeStratification, true>(ss, data, proj_years, hiv_steps, save_steps);
+    }else{
+      ret = simulate_model<leapfrog::BaseModelFullAgeStratification, false>(ss, data, proj_years, hiv_steps, save_steps);
+    }
   } else if (model_variant == "BaseModelCoarseAgeStratification") {
     constexpr auto ss = leapfrog::StateSpace<leapfrog::BaseModelCoarseAgeStratification>();
-    ret = simulate_model<leapfrog::BaseModelCoarseAgeStratification>(ss, data, proj_years, hiv_steps, save_steps);
+    if (pop_adjust) {
+      ret = simulate_model<leapfrog::BaseModelCoarseAgeStratification, true>(ss, data, proj_years, hiv_steps, save_steps);
+    }else{
+      ret = simulate_model<leapfrog::BaseModelCoarseAgeStratification, false>(ss, data, proj_years, hiv_steps, save_steps);
+    }
   } else {
     Rcpp::stop("Invalid model variant " + model_variant + " must be one of " +
                "'BaseModelFullAgeStratification', 'BaseModelCoarseAgeStratification' or 'ChildModel'");

@@ -12,8 +12,8 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // run_base_model
-Rcpp::List run_base_model(const Rcpp::List data, SEXP sim_years, SEXP hts_per_year, Rcpp::NumericVector output_steps, std::string model_variant);
-RcppExport SEXP _frogger_run_base_model(SEXP dataSEXP, SEXP sim_yearsSEXP, SEXP hts_per_yearSEXP, SEXP output_stepsSEXP, SEXP model_variantSEXP) {
+Rcpp::List run_base_model(const Rcpp::List data, SEXP sim_years, SEXP hts_per_year, Rcpp::NumericVector output_steps, std::string model_variant, bool pop_adjust);
+RcppExport SEXP _frogger_run_base_model(SEXP dataSEXP, SEXP sim_yearsSEXP, SEXP hts_per_yearSEXP, SEXP output_stepsSEXP, SEXP model_variantSEXP, SEXP pop_adjustSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -22,7 +22,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< SEXP >::type hts_per_year(hts_per_yearSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type output_steps(output_stepsSEXP);
     Rcpp::traits::input_parameter< std::string >::type model_variant(model_variantSEXP);
-    rcpp_result_gen = Rcpp::wrap(run_base_model(data, sim_years, hts_per_year, output_steps, model_variant));
+    Rcpp::traits::input_parameter< bool >::type pop_adjust(pop_adjustSEXP);
+    rcpp_result_gen = Rcpp::wrap(run_base_model(data, sim_years, hts_per_year, output_steps, model_variant, pop_adjust));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -53,7 +54,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_frogger_run_base_model", (DL_FUNC) &_frogger_run_base_model, 5},
+    {"_frogger_run_base_model", (DL_FUNC) &_frogger_run_base_model, 6},
     {"_frogger_serialize_vector", (DL_FUNC) &_frogger_serialize_vector, 3},
     {"_frogger_deserialize_vector", (DL_FUNC) &_frogger_deserialize_vector, 2},
     {NULL, NULL, 0}

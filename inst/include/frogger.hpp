@@ -12,7 +12,7 @@
 namespace leapfrog {
 
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, bool pop_adjust, typename real_type>
 OutputState<ModelVariant, real_type> run_model(int time_steps,
                                                std::vector<int> save_steps,
                                                const Parameters<ModelVariant, real_type> &pars) {
@@ -38,14 +38,14 @@ OutputState<ModelVariant, real_type> run_model(int time_steps,
     run_hiv_pop_demographic_projection<ModelVariant>(step, pars, state, state_next,
                                                      intermediate);
     run_hiv_model_simulation<ModelVariant>(step, pars, state, state_next, intermediate);
- //   if constexpr (demog.pop_adjust) {
+   if constexpr (pop_adjust) {
        run_base_population_adjustment<ModelVariant>(step, pars, state, state_next, intermediate);
-  //  }
+    }
     if constexpr (ModelVariant::run_child_model) {
       run_child_model_simulation<ModelVariant>(step, pars, state, state_next, intermediate);
-    //  if constexpr (demog.pop_adjust) {
+      if constexpr (pop_adjust) {
         run_child_population_adjustment<ModelVariant>(step, pars, state, state_next, intermediate);
- //     }
+     }
     }
     state_output.save_state(state_next, step);
     std::swap(state, state_next);

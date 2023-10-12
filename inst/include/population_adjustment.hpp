@@ -5,8 +5,6 @@
 
 namespace leapfrog {
 
-namespace internal {
-
 
 template<typename ModelVariant, typename real_type>
 void calc_hiv_negative_population(
@@ -135,5 +133,5 @@ void run_child_population_adjustment(
   } // loop over g
 
 }
-}
+
 }
