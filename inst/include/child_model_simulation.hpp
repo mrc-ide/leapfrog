@@ -773,7 +773,7 @@ void run_wlhiv_births(int time_step,
 
     if (intermediate.children.nHIVcurr > 0) {
       intermediate.children.df = intermediate.children.df / ((intermediate.children.nHIVcurr + intermediate.children.nHIVlast) / 2);
-    }else{
+    } else {
       intermediate.children.df = 1;
     }
 
