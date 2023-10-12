@@ -787,9 +787,7 @@ void run_wlhiv_births(int time_step,
   } // end a
 
   state_next.children.hiv_births = intermediate.children.birthsHE;
-
 }
-
 
 }// namespace internal
 
