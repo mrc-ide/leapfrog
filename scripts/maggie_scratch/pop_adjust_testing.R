@@ -30,3 +30,15 @@ totalpop <- totalpop[,.(Var1 = Var1 - 1, Var2, Var3 = Var3 + 1969, value)]
 pop <- merge(basepop, totalpop, by = c('Var1', 'Var2', 'Var3'))
 pop[,diff := value.x - value.y]
 
+
+fr <- data.table(melt(out$h_hiv_adult))
+fr <- fr[,.(cd4 = Var1, age = Var2 + 14, sex = ifelse(Var3 == 1, 'Male', 'Female'), year = Var4 + 1969, fr = value)]
+spec = spectrum_output(file = 'C:/Users/mwalters/leapfrog/tests/testdata/spectrum/v6.13/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18_pop1.xlsx', ages = 15:49, country = 'bwa')
+
+spec <- data.table(spec$total)
+
+cd4_cat = data.table(cd4 = 1:7, cd4_cat = c('gte500', '350-500', '250-349', '200-249', '100-199','50-99', 'lte50'))
+fr <- merge(fr, cd4_cat, by = 'cd4')
+fr[,cd4 := NULL]
+
+dt <- merge(spec, fr, by = c('age', 'sex', 'year', 'cd4_cat'))

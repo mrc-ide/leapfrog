@@ -40,18 +40,18 @@ void run_base_population_adjustment(
     }
   }
   for(int g = 0; g < ss.NS; ++g){
-    int a = 0;
+    int a = pars.base.options.p_idx_fertility_first;
     for(int ha = 0; ha < ss.hAG; ha++){
+      intermediate.base.hivadj_ha = 0.0;
+      intermediate.base.popadj_ha = 0.0;
       for(int i = 0; i < ss.hAG_span[ha]; i++){
         //base_pop <== targetpop
         //hivpop <== pop?
         intermediate.base.hivadj_ha += state_next.base.p_hiv_pop(a,g);
-
         intermediate.base.popadjrate_a = demog.target_pop(a,g,time_step) / (intermediate.base.hivneg_pop(a, g) + state_next.base.p_hiv_pop(a, g));
-
-        intermediate.base.hpopadj_a = (intermediate.base.popadjrate_a - 1.0) * state_curr.base.p_hiv_pop(a, g);
+        intermediate.base.hpopadj_a = (intermediate.base.popadjrate_a - 1.0) * state_next.base.p_hiv_pop(a, g);
         intermediate.base.popadj_ha += intermediate.base.hpopadj_a;
-     //   state_curr.base.p_hiv_pop(a, g) += intermediate.base.hpopadj_a;
+      //  state_curr.base.p_hiv_pop(a, g) += intermediate.base.hpopadj_a;
         a++;
       }
 
@@ -62,13 +62,16 @@ void run_base_population_adjustment(
          intermediate.base.popadjrate_ha = 0.0;
         }
 
-  if(a >= pars.base.options.p_idx_fertility_first){
+        if(time_step == 10 & ha == 5 & g == 1){
+          std::cout << intermediate.base.popadjrate_ha;
+        }
     for(int hm = 0; hm < ss.hDS; ++hm){
-      state_next.base.h_hiv_adult(hm, ha, g) *= 1+intermediate.base.popadjrate_ha;
-      if(time_step >= pars.base.options.ts_art_start)
-        for(int hu = 0; hu < ss.hTS; ++hu)
-          state_next.base.h_art_adult(hu, hm, ha, g) *= 1+intermediate.base.popadjrate_ha;
-    } // loop over hm
+       state_next.base.h_hiv_adult(hm, ha, g) *= 1+intermediate.base.popadjrate_ha;
+      if(time_step >= pars.base.options.ts_art_start){
+        for(int hu = 0; hu < ss.hTS; ++hu){
+         state_next.base.h_art_adult(hu, hm, ha, g) *= 1+intermediate.base.popadjrate_ha;
+        } // loop over hm
+      }
   }
 
     } // loop over ha
@@ -100,7 +103,7 @@ void run_child_population_adjustment(
         intermediate.children.popadjrate_a = demog.target_pop(a,g,time_step) / (intermediate.base.hivneg_pop(a, g) + state_next.base.p_hiv_pop(a, g));
         intermediate.children.hpopadj_a = (intermediate.children.popadjrate_a - 1.0) * state_curr.base.p_hiv_pop(a, g);
         intermediate.children.popadj_ha += intermediate.children.hpopadj_a;
-   //     state_curr.base.p_hiv_pop(a, g) += intermediate.children.hpopadj_a;
+     //   state_curr.base.p_hiv_pop(a, g) += intermediate.children.hpopadj_a;
 
       // population adjustment for hivpop
       if(intermediate.children.hivadj_ha > 0 ){
