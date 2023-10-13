@@ -21,7 +21,8 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
       survival_probability,
       net_migration,
       age_specific_fertility_rate,
-      births_sex_prop
+      births_sex_prop,
+      target_pop
   };
 
   const leapfrog::Incidence<real_type> incidence = {

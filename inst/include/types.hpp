@@ -113,6 +113,7 @@ struct Demography {
   TensorMap3<real_type> net_migration;
   TensorMap2<real_type> age_specific_fertility_rate;
   TensorMap2<real_type> births_sex_prop;
+  TensorMap3<real_type> target_pop;
 };
 
 template<typename real_type>

@@ -32,6 +32,7 @@ void run_base_population_adjustment(
     internal::IntermediateData<ModelVariant, real_type> &intermediate) {
   constexpr auto ss = StateSpace<ModelVariant>().base;
   const auto demog = pars.base.demography;
+
   // internal::calc_hiv_negative_population(time_step, pars, state_curr, state_next, intermediate);
   for (int g = 0; g < ss.NS; ++g) {
     for (int a = 0; a < ss.pAG; ++a) {
@@ -46,7 +47,7 @@ void run_base_population_adjustment(
         //hivpop <== pop?
         intermediate.base.hivadj_ha += state_next.base.p_hiv_pop(a,g);
 
-        intermediate.base.popadjrate_a = demog.base_pop(a,g,time_step) / (intermediate.base.hivneg_pop(a, g) + state_next.base.p_hiv_pop(a, g));
+        intermediate.base.popadjrate_a = demog.target_pop(a,g,time_step) / (intermediate.base.hivneg_pop(a, g) + state_next.base.p_hiv_pop(a, g));
 
         intermediate.base.hpopadj_a = (intermediate.base.popadjrate_a - 1.0) * state_curr.base.p_hiv_pop(a, g);
         intermediate.base.popadj_ha += intermediate.base.hpopadj_a;
@@ -96,7 +97,7 @@ void run_child_population_adjustment(
     for(int a = 0; a < pars.base.options.p_idx_fertility_first; a++){
 
         intermediate.children.hivadj_ha += state_next.base.p_hiv_pop(a,g);
-        intermediate.children.popadjrate_a = demog.base_pop(a,g,time_step) / (intermediate.base.hivneg_pop(a, g) + state_next.base.p_hiv_pop(a, g));
+        intermediate.children.popadjrate_a = demog.target_pop(a,g,time_step) / (intermediate.base.hivneg_pop(a, g) + state_next.base.p_hiv_pop(a, g));
         intermediate.children.hpopadj_a = (intermediate.children.popadjrate_a - 1.0) * state_curr.base.p_hiv_pop(a, g);
         intermediate.children.popadj_ha += intermediate.children.hpopadj_a;
    //     state_curr.base.p_hiv_pop(a, g) += intermediate.children.hpopadj_a;
