@@ -75,7 +75,7 @@ void calc_hiv_negative_pop(int time_step,
   const auto demog = pars.base.demography;
   const auto cpars = pars.children.children;
   static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
+                "calc_hiv_negative_pop can only be called for model variants where run_child_model is true");
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
 
