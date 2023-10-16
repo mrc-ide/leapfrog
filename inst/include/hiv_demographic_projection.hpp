@@ -63,6 +63,20 @@ void run_age_15_entrants(int time_step,
     }
   }
 
+  if(time_step == 41 ){
+    double mag;
+    mag = 0.0;
+      for (int hm = 0; hm < hc_ss.hc2DS; ++hm) {
+        for (int hu = 0; hu < ss.hTS; ++hu) {
+          mag += intermediate.children.age15_art_pop(hu, hm, 1);
+        }
+      }
+
+    std::cout << mag;
+  }
+
+
+
 }
 
 template<typename ModelVariant, typename real_type>
@@ -128,6 +142,7 @@ void run_hiv_and_art_stratified_ageing(int time_step,
     }
 
 
+
   }else{
     for (int g = 0; g < ss.NS; ++g) {
       for (int hm = 0; hm < ss.hDS; ++hm) {
@@ -142,7 +157,6 @@ void run_hiv_and_art_stratified_ageing(int time_step,
       }
     }
   }
-
 
   }
 
