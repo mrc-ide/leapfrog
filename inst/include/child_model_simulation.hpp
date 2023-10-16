@@ -1240,6 +1240,7 @@ void run_child_model_simulation(int time_step,
   // !!!TODO: put this in an if statement to only run if the first year of ART has passed
   internal::run_child_art_initiation(time_step, pars, state_curr, state_next, intermediate);
   internal::run_child_art_mortality(time_step, pars, state_curr, state_next, intermediate);
+  }
 
 
 } // namespace leapfrog
