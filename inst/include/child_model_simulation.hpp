@@ -691,7 +691,7 @@ void hc_initiate_art_by_cd4(int time_step,
     for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
       for (int a = cpars.hc_art_elig_age(time_step); a < pars.base.options.p_idx_fertility_first; ++a) {
         for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-         if (hd >= (cpars.hc_art_elig_cd4(a, time_step))) {
+          if (hd >= (cpars.hc_art_elig_cd4(a, time_step))) {
             if (a < hc_ss.hc2_agestart) {
               intermediate.children.hc_art_need(hd, cat, a, s) += state_next.children.hc1_hiv_pop(hd, cat, a, s);
             } else if (hd < hc_ss.hc2DS) {
@@ -1149,7 +1149,7 @@ void run_wlhiv_births(int time_step,
                       State<ModelVariant, real_type> &state_next,
                       IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
+                "run_wlhiv_births can only be called for model variants where run_child_model is true");
   constexpr auto ss = StateSpace<ModelVariant>().base;
   const auto cpars = pars.children.children;
   const auto demog = pars.base.demography;
@@ -1194,6 +1194,15 @@ void run_wlhiv_births(int time_step,
       }else{
         intermediate.children.df = 1;
       }
+
+    for (int hd = 0; hd < ss.hDS; ++hd) {
+      intermediate.children.df += cpars.local_adj_factor * cpars.fert_mult_by_age(a) * cpars.fert_mult_offart(hd) * ((state_next.base.h_hiv_adult(hd, a, 1) + state_curr.base.h_hiv_adult(hd, a, 1)) / 2);
+      //women on ART less than 6 months use the off art fertility multiplier
+       intermediate.children.df += cpars.local_adj_factor * cpars.fert_mult_by_age(a) * cpars.fert_mult_offart(hd) * ((state_next.base.h_art_adult(0, hd, a, 1) + state_curr.base.h_art_adult(0, hd, a, 1)) / 2);
+       for (int ht = 1; ht < ss.hTS; ++ht) {
+         intermediate.children.df += cpars.local_adj_factor * cpars.fert_mult_onart(a) * ((state_next.base.h_art_adult(ht, hd, a, 1) + state_curr.base.h_art_adult(ht, hd, a, 1)) / 2);
+      } //end hTS
+    } // end hDS
 
 
       intermediate.children.birthsCurrAge = (intermediate.children.nHIVcurr + intermediate.children.nHIVlast) / 2 * cpars.total_fertility_rate(time_step) * intermediate.children.df / (intermediate.children.df * intermediate.children.prev + 1 - intermediate.children.prev) *  demog.age_specific_fertility_rate(a, time_step) / intermediate.children.asfr_sum ;
@@ -1248,5 +1257,6 @@ void run_child_model_simulation(int time_step,
   internal::run_child_art_initiation(time_step, pars, state_curr, state_next, intermediate);
   internal::run_child_art_mortality(time_step, pars, state_curr, state_next, intermediate);
   }
+
 
 } // namespace leapfrog
