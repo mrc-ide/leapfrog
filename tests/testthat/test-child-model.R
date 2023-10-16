@@ -17,11 +17,12 @@ test_that("child model can be run for all years", {
     )
   )
 
+  expect_true(all(out$hc1_hiv_pop[, , , , 1:which(1970:2030 == 1999)] == 0))
 
   ## All 10 as seeded with 100 infections which are distributed over 5 age
   ## groups and genders evenly
-  expect_true(all(out$infections[1:5, , ] > 0))
-  expect_true(all(out$hiv_population[1:5, ,] > 0))
+  expect_true(all(out$infections[1:5, , which(1970:2030 == 2000)] == 10))
+  expect_true(all(out$hiv_population[1:5, , which(1970:2030 == 2000)] == 10))
 
   ## HIV population should be larger than zero in age 6 in 2001 because ageing
   ## is allowed
