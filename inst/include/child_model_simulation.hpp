@@ -467,8 +467,8 @@ void run_child_hiv_infections(int time_step,
 
    //0-6
    internal::adjust_optAB_bf_transmission_rate(time_step, pars, state_curr, state_next, intermediate);
-    internal::run_calculate_transmission_from_incidence_during_breastfeeding(time_step, pars, state_curr, state_next, intermediate);
-    internal::run_bf_transmission_rate(time_step, pars, intermediate, 0, 3, 0);
+   internal::run_calculate_transmission_from_incidence_during_breastfeeding(time_step, pars, state_curr, state_next, intermediate);
+   internal::run_bf_transmission_rate(time_step, pars, intermediate, 0, 3, 0);
    for (int s = 0; s < ss.NS; ++s) {
      for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
        state_next.children.hc1_hiv_pop(hd, 1, 0, s) +=  state_next.children.hiv_births *  demog.births_sex_prop(s,time_step) * cpars.hc1_cd4_dist(hd) * (intermediate.children.bf_incident_hiv_transmission_rate + intermediate.children.bf_transmission_rate(0));
