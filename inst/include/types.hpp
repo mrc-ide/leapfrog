@@ -190,6 +190,7 @@ struct Children {
   TensorMap2<real_type> breastfeeding_duration_art;
   TensorMap2<real_type> breastfeeding_duration_no_art;
 
+
 };
 
 template<typename ModelVariant, typename real_type>

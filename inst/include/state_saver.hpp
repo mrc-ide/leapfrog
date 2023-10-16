@@ -203,7 +203,6 @@ public:
       state.children.hc2_art_aids_deaths;
     children_state.hc_art_num(i) = state.children.hc_art_num;
     children_state.hiv_births(i) = state.children.hiv_births;
-
   }
 };
 
@@ -211,7 +210,6 @@ public:
 template<typename ModelVariant, typename real_type>
 class StateSaver {
 public:
-
   BaseModelStateSaver<ModelVariant, real_type> base;
   ChildModelStateSaver<ModelVariant, real_type> children;
 

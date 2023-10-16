@@ -734,7 +734,7 @@ void hc_adjust_art_initiates_for_mort(int time_step,
             for (int dur = 0; dur < ss.hTS; ++dur) {
               if (intermediate.children.hc_art_init(hd, cat, a, s) < 0) {
                 intermediate.children.hc_art_init(hd, cat, a, s) = 0.0;
-              }else{
+              } else {
                 intermediate.children.hc_art_init(hd, cat, a, s) = intermediate.children.hc_art_init(hd, cat, a, s);
               }
             }// end ss.hTS
@@ -819,7 +819,7 @@ void hc_art_num_num(int time_step,
         for (int dur = 0; dur < ss.hTS; ++dur) {
           if (a < hc_ss.hc2_agestart) {
             state_next.children.hc_art_num -= state_next.children.hc1_art_pop(dur, hd, a, s);
-          }else if (hd < (hc_ss.hc2DS)) {
+          } else if (hd < (hc_ss.hc2DS)) {
             state_next.children.hc_art_num -= state_next.children.hc2_art_pop(dur, hd, a-hc_ss.hc2_agestart, s);
           }
         }// end ss.hTS
@@ -854,7 +854,7 @@ void hc_art_pct_pct(int time_step,
           if (a < hc_ss.hc2_agestart) {
             state_next.children.hc_art_num += state_next.children.hc1_art_pop(dur, hd, a, s);
             state_next.children.hc_art_num += state_next.children.hc1_art_aids_deaths(dur,hd, a, s);
-          }else if (hd < (hc_ss.hc2DS )) {
+          } else if (hd < (hc_ss.hc2DS )) {
             state_next.children.hc_art_num += state_next.children.hc2_art_pop(dur, hd, a-hc_ss.hc2_agestart, s);
             state_next.children.hc_art_num += state_next.children.hc2_art_aids_deaths(dur,hd, a-hc_ss.hc2_agestart, s);
           }
@@ -871,7 +871,7 @@ void hc_art_pct_pct(int time_step,
         for (int dur = 0; dur < ss.hTS; ++dur) {
           if (a < hc_ss.hc2_agestart) {
             state_next.children.hc_art_num -= state_next.children.hc1_art_pop(dur, hd, a, s);
-          }else if (hd < (hc_ss.hc2DS)) {
+          } else if (hd < (hc_ss.hc2DS)) {
             state_next.children.hc_art_num -= state_next.children.hc2_art_pop(dur, hd, a-hc_ss.hc2_agestart, s);
           }
         } // end ss.hTS
@@ -951,7 +951,7 @@ void hc_art_pct_num(int time_step,
         for (int dur = 0; dur < ss.hTS; ++dur) {
           if (a < hc_ss.hc2_agestart) {
             state_next.children.hc_art_num -= state_next.children.hc1_art_pop(dur, hd, a, s);
-          }else if (hd < (hc_ss.hc2DS)) {
+          } else if (hd < (hc_ss.hc2DS)) {
             state_next.children.hc_art_num -= state_next.children.hc2_art_pop(dur, hd, a-hc_ss.hc2_agestart, s);
           }
         } // end ss.hTS
@@ -1007,7 +1007,7 @@ void hc_art_initiation_by_age(int time_step,
   } // end ss.NS
   if (intermediate.children.hc_initByAge == 0.0) {
     intermediate.children.hc_adj = 1.0 ;
-  }else{
+  } else {
     intermediate.children.hc_adj = state_next.children.hc_art_num / intermediate.children.hc_initByAge;
   }
   for (int s = 0; s <ss.NS; ++s) {
@@ -1016,26 +1016,27 @@ void hc_art_initiation_by_age(int time_step,
         for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
           if ((intermediate.children.hc_adj * cpars.hc_art_init_dist(a, time_step)) > 1.0) {
             intermediate.children.hc_art_scalar = 1.0;
-          }else{
+          } else {
             intermediate.children.hc_art_scalar = intermediate.children.hc_adj * cpars.hc_art_init_dist(a, time_step);
           }
           if (state_next.children.hc_art_num > 0.0) {
             intermediate.children.hc_art_scalar = intermediate.children.hc_art_scalar;
-          }else{
+          } else {
             intermediate.children.hc_art_scalar = 0.0;
           }
           if (a < hc_ss.hc2_agestart) {
             state_next.children.hc1_art_pop(0, hd, a, s) += intermediate.children.hc_art_scalar * intermediate.children.hc_art_init(hd, cat, a, s);
-          }else if (hd < (hc_ss.hc2DS)) {
+          } else if (hd < (hc_ss.hc2DS)) {
             state_next.children.hc2_art_pop(0, hd, a - hc_ss.hc2_agestart, s) += intermediate.children.hc_art_scalar * intermediate.children.hc_art_init(hd, cat, a, s);
           }
           if (a < hc_ss.hc2_agestart) {
             state_next.children.hc1_hiv_pop(hd, cat, a, s) -= intermediate.children.hc_art_scalar * intermediate.children.hc_art_init(hd, cat, a, s);
-          }else if (hd < (hc_ss.hc2DS )) {
+          } else if (hd < (hc_ss.hc2DS )) {
             state_next.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s) -=  intermediate.children.hc_art_scalar * intermediate.children.hc_art_init(hd, cat, a, s);
           }
 
         } //end hc_ss.hc1DS
+
       } // end a
     } // end hcTT
   } // end ss.NS
@@ -1066,10 +1067,10 @@ void run_child_art_initiation(int time_step,
             state_next.children.hc1_art_pop(1, hd, a, s) += state_next.children.hc1_art_pop(0, hd, a, s);
             state_next.children.hc1_art_pop(0, hd, a, s) -= state_next.children.hc1_art_pop(0, hd, a, s);
           }
-        }else if (hd < (hc_ss.hc2DS)) {
-            state_next.children.hc2_art_pop(1, hd, a-hc_ss.hc2_agestart, s) += state_next.children.hc2_art_pop(0, hd, a-hc_ss.hc2_agestart, s);
-            state_next.children.hc2_art_pop(0, hd, a-hc_ss.hc2_agestart, s) -= state_next.children.hc2_art_pop(0, hd, a-hc_ss.hc2_agestart, s);
-          }
+        } else if (hd < (hc_ss.hc2DS)) {
+          state_next.children.hc2_art_pop(1, hd, a-hc_ss.hc2_agestart, s) += state_next.children.hc2_art_pop(0, hd, a-hc_ss.hc2_agestart, s);
+          state_next.children.hc2_art_pop(0, hd, a-hc_ss.hc2_agestart, s) -= state_next.children.hc2_art_pop(0, hd, a-hc_ss.hc2_agestart, s);
+        }
       }//end ss.NS
     }// end a
   }// end hc_ss.hc1DS
@@ -1193,6 +1194,7 @@ void run_wlhiv_births(int time_step,
         intermediate.children.df = 1;
       }
 
+
     for (int hd = 0; hd < ss.hDS; ++hd) {
       intermediate.children.df += cpars.local_adj_factor * cpars.fert_mult_by_age(a) * cpars.fert_mult_offart(hd) * ((state_next.base.h_hiv_adult(hd, a, 1) + state_curr.base.h_hiv_adult(hd, a, 1)) / 2);
       //women on ART less than 6 months use the off art fertility multiplier
@@ -1212,11 +1214,10 @@ void run_wlhiv_births(int time_step,
     } // end a
 
 
+
 //MKW at this point this is giving NAN at 1986
   state_next.children.hiv_births = intermediate.children.birthsHE;
-
 }
-
 
 }// namespace internal
 
