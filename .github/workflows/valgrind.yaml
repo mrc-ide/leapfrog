@@ -45,9 +45,23 @@ jobs:
         with:
           extra-packages: |
             any::pkgbuild
+            rlib::withr
 
       - name: compile package
-        run: R -e 'pkgbuild::compile_dll(quiet = TRUE)'
+        run: |
+          makevars = paste(
+            "-Wall",
+            "-pedantic",
+            "-Wno-unused-parameter",
+            "-Wno-cast-function-type",
+            "-Wno-missing-field-initializers",
+            "-Wno-ignored-attributes",
+            "-Wno-deprecated-copy"
+          )
+          withr::with_makevars(c(CXXFLAGS = makevars),
+            pkgbuild::compile_dll(quiet = TRUE)
+          )
+        shell: Rscript {0}
 
       - name: valgrind leak check
         run: make test_leaks
