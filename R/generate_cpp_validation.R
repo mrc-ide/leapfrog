@@ -10,14 +10,9 @@ validate_and_parse_input <- function(input, filename, row_num) {
   input$convert_base <- identical(input$convert_base, "TRUE")
   assert_set(input$dims)
   input$parsed_dims <- validate_and_parse_dims(input, filename, row_num)
-  cpp_name <- strsplit(input$cpp_name, "\\.")[[1]]
-  if (length(cpp_name) != 2) {
-    stop(paste("Each value in column 'cpp_name' must have a value of",
-               "format 'x.y' where x is the struct name and y is the",
-               sprintf("name of the variable. Got '%s'.", input$cpp_name)))
-  }
-  input$struct <- cpp_name[[1]]
-  input$cpp_name <- cpp_name[[2]]
+  split_name <- split_cpp_name(input$cpp_name)
+  input$struct <- split_name[[1]]
+  input$cpp_name <- split_name[[2]]
   input
 }
 
@@ -29,7 +24,25 @@ validate_and_parse_output <- function(output, filename, row_num) {
               name = paste(row_text, "and col: r_type"))
   assert_set(output$dims)
   output$parsed_dims <- validate_and_parse_dims(output, filename, row_num)
+  validate_output_dims(output)
+  if (output$model_variant == "ModelVariant") {
+    ## If it is included for all model variants then data is stored on
+    ## structs called "BaseModel"
+    output$struct <- "BaseModel"
+  } else {
+    output$struct <- output$model_variant
+  }
   output
+}
+
+split_cpp_name <- function(cpp_name) {
+  split_name <- strsplit(cpp_name, "\\.")[[1]]
+  if (length(split_name) != 2) {
+    stop(paste("Each value in column 'cpp_name' must have a value of",
+               "format 'x.y' where x is the struct name and y is the",
+               sprintf("name of the variable. Got '%s'.", cpp_name)))
+  }
+  split_name
 }
 
 validate_dimensions_columns <- function(columns, filename) {
@@ -72,4 +85,13 @@ validate_and_parse_dims <- function(data, filename, row_num) {
                  format_vector(unset), filename))
   }
   as.character(data[seq(dims_col + 1, dims_col + last_set)])
+}
+
+validate_output_dims <- function(output) {
+  ## In output, output_years must be the last dimension
+  last_dim <- output$parsed_dims[length(output$parsed_dims)]
+  if (last_dim != "output_years") {
+    stop(paste("Last dimension of model output must be 'output_years'.",
+               sprintf("Got '%s' for output '%s'.", last_dim, output$r_name)))
+  }
 }
