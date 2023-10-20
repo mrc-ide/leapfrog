@@ -169,13 +169,6 @@ void run_child_hiv_mort(int time_step,
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
 
-  if (time_step == 1) {
-    // This will read from uninitialised memory
-    if (intermediate.children.hc_grad(8, hc_ss.hcTT - 1, hc_ss.hc2_agestart - 1, ss.NS - 1) > 0) {
-      std::cout << "It is true!";
-    }
-  }
-
   for (int s = 0; s < ss.NS; ++s) {
     for (int a = 0; a < hc_ss.hc2_agestart; ++a) {
       for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
