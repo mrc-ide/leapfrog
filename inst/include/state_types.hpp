@@ -1,7 +1,7 @@
 #pragma once
 
 #include "types.hpp"
-#include "parameter_types.hpp"
+#include "parameters.hpp"
 #include "state_space.hpp"
 #include "model_variants.hpp"
 

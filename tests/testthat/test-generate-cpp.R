@@ -112,9 +112,8 @@ test_that("csv structure can be validated", {
 
 test_that("can generate length 1 inputs", {
   input <- utils::read.csv(frogger_file("cpp_generation/model_input.csv"))
-  length_1_input <- data.frame(r_name = "len1", cpp_name = "len_1",
+  length_1_input <- data.frame(r_name = "len1", cpp_name = "Demography.len_1",
                                type = "real_type", input_when = "",
-                               struct = "Demography",
                                value = NA_character_,
                                convert_base = FALSE, dims = 1, dim1 = 1,
                                dim2 = "", dim3 = "", dim4 = "")
@@ -197,4 +196,20 @@ test_that("can generate parameter types", {
   expect_true(any(grepl("int scale_cd4_mortality;", result)))
   expect_true(any(grepl("Tensor1<int> idx_hm_elig;", result)))
   expect_true(any(grepl("Tensor1<real_type> h_art_stage_dur;", result)))
+})
+
+test_that("error raised if cpp_name malformed", {
+  input <- data.frame(r_name = "r_name", cpp_name = "name",
+                      type = "real_type", input_when = "",
+                      value = NA_character_,
+                      convert_base = FALSE, dims = 1, dim1 = 1,
+                      dim2 = "", dim3 = "", dim4 = "")
+  t_input <- tempfile()
+  write.csv(input, t_input)
+  t_dest <- tempfile()
+
+  expect_error(generate_input_interface(t_dest, t_input),
+               paste("Each value in column 'cpp_name' must have a value of",
+                     "format 'x.y' where x is the struct name and y is the",
+                     "name of the variable. Got 'name'."))
 })

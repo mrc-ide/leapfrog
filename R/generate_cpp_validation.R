@@ -10,6 +10,14 @@ validate_and_parse_input <- function(input, filename, row_num) {
   input$convert_base <- identical(input$convert_base, "TRUE")
   assert_set(input$dims)
   input$parsed_dims <- validate_and_parse_dims(input, filename, row_num)
+  cpp_name <- strsplit(input$cpp_name, "\\.")[[1]]
+  if (length(cpp_name) != 2) {
+    stop(paste("Each value in column 'cpp_name' must have a value of",
+               "format 'x.y' where x is the struct name and y is the",
+               sprintf("name of the variable. Got '%s'.", input$cpp_name)))
+  }
+  input$struct <- cpp_name[[1]]
+  input$cpp_name <- cpp_name[[2]]
   input
 }
 
