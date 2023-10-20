@@ -42,9 +42,12 @@ jobs:
           use-public-rspm: true
 
       - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: |
+            any::pkgbuild
 
       - name: compile package
-        run: R -e 'install.packages("pkgbuild"); pkgbuild::compile_dll(quiet = TRUE)'
+        run: R -e 'pkgbuild::compile_dll(quiet = TRUE)'
 
       - name: valgrind leak check
         run: make test_leaks
