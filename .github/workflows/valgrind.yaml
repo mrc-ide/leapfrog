@@ -45,7 +45,7 @@ jobs:
         with:
           extra-packages: |
             any::pkgbuild
-            rlib::withr
+            any::withr
 
       - name: compile package
         run: |
