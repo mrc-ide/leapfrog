@@ -9,7 +9,6 @@ pjnz1 <- testthat::test_path("testdata/bwa_aim-no-special-elig.PJNZ")
 demp <- prepare_leapfrog_demp(pjnz1)
 saveRDS(demp, testthat::test_path("testdata/demographic_projection_object_adult.rds"))
 proj <- prepare_leapfrog_projp(pjnz1)
-proj = leapfrog:::prepare_hc_leapfrog_projp(pjnz1, proj)
 saveRDS(proj, testthat::test_path("testdata/projection_parameters_adult.rds"))
 
 ## Used as reference data
