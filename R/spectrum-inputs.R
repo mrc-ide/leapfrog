@@ -140,7 +140,7 @@ prepare_leapfrog_demp <- function(pjnz) {
 #' @export
 prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
 
-  projp <- read_hivproj_param(pjnz)
+  projp <- eppasm::read_hivproj_param(pjnz)
 
   ## Hard coded to expand age groups 15-24, 25-34, 35-44, 45+ to
   ## single-year ages 15:80.
@@ -260,7 +260,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params){
 
   v = params
   ## paed input
-  v$paed_incid_input <- params$nosocom_infections_04
+  v$paed_incid_input <- dp_read_nosocom_infections(pjnz)
   ## Hardcoded, this is putting all individuals in the highest cd4 category bc i think thats how the nosocomial infections work
   v$paed_cd4_dist <- c(0.6, 0.12, 0.1, 0.09, 0.05, 0.03, 0.01)
   ## v$paed_cd4_dist <- c(1, 0, 0, 0, 0, 0, 0)
@@ -375,7 +375,8 @@ prepare_hc_leapfrog_projp <- function(pjnz, params){
                                                        transmission_type = c('perinatal', 'breastfeeding')))
   mtct_trt[,1,1] <- 0.041
   mtct_trt[,2,1] <-  0.019
-  mtct_trt[,3,1] <- 0.022
+  mtct_trt[,3,1] <- 0.075
+  mtct_trt[,4,1] <- 0.022
   mtct_trt[5:7,1,2] <- 0.002
   mtct_trt[5:7,2,2] <- 0.0013
   mtct_trt[1:4,3,2] <- 0.0099

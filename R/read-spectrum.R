@@ -383,3 +383,24 @@ dp_read_child_mort_mult <- function(dp) {
 
   child_mort_mult
 }
+
+
+#' @rdname dp_read_anc_testing
+#' @export
+dp_read_nosocom_infections <- function(dp) {
+
+  dp <- get_dp_data(dp)
+  dpy <- get_dp_years(dp)
+
+
+  if (exists_dptag(dp, "<NosocomialInfectionsByAge MV>")) {
+    ##only extracting 0-4 for right now
+    nosocomial_inf <- dpsub(dp, "<NosocomialInfectionsByAge MV>", 2, dpy$time_data_idx)
+    nosocomial_inf <- sapply(nosocomial_inf, as.numeric)
+    names(nosocomial_inf) <- dpy$proj_years
+  } else {
+    stop("Nosocomial infections tag not recognized. Function probably needs update for this .DP file.")
+  }
+
+  nosocomial_inf
+}
