@@ -119,6 +119,7 @@ prepare_leapfrog_demp <- function(pjnz) {
 
   ## normalise ASFR distribution
   demp$asfr <- sweep(demp$asfr, 2, demp$tfr / colSums(demp$asfr), "*")
+  
 
   demp
 }
@@ -138,9 +139,11 @@ prepare_leapfrog_demp <- function(pjnz) {
 #'
 #' @export
 prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
-
-  projp <- eppasm::read_hivproj_param(pjnz)
-
+ 
+  ## projp <- eppasm::read_hivproj_param(pjnz)
+  source('C:/Users/mwalters/leapfrog/R/read-spectrum-files.R')
+  projp <- read_hivproj_param(pjnz)
+    
   ## Hard coded to expand age groups 15-24, 25-34, 35-44, 45+ to
   ## single-year ages 15:80.
   ## Requires extension for coarse HIV age group stratification
@@ -151,6 +154,23 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   v$incidinput <- eppasm::read_incid_input(pjnz)
   v$incidpopage <- attr(v$incidinput, "incidpopage")
   v$incrr_sex <- projp$incrr_sex
+  
+  ## HIV effects on fertilty
+  ## mkw: should this be normalized as well?
+  x <- apply(projp$fert_rat, 2, rep, each = 5)
+  x <- rbind(array(data = 0, dim = c(15,61)), x, array(data = 0, dim = c(31,61)))
+  rownames(x) <- 0:80
+  v$fert_rat <- x
+  
+  ## paed input
+  v$paed_incid_input <- projp$nosocom_infections_04
+  ## Hardcoded, this is putting all individuals in the highest cd4 category bc i think thats how the nosocomial infections work
+ ## v$paed_cd4_dist <- c(0.6, 0.12, 0.1, 0.09, 0.05, 0.03, 0.01)
+  v$paed_cd4_dist <- c(1, 0, 0, 0, 0, 0, 0)
+  
+  
+  ## HIV positive entrants, right now just doing those without ART
+  v$age15hivpop <- projp$age15hivpop
 
   ## Use Beer's coefficients to distribution IRRs by age/sex
   Amat <- eppasm:::create_beers(17)
@@ -208,6 +228,14 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   ## State space dimensions
   v$hAG_SPAN_full <- rep(1L, 66L)
   v$hAG_SPAN_coarse <- c(2L, 3L, 5L, 5L, 5L, 5L, 5L, 5L, 31L)
+  
+  ## Add in pediatric components
+  v$fert_rat <- apply(projp$fert_rat, 2, rep, each = 5)
+  rownames(v$fert_rat) <- 15:49
+  v$cd4fert_rat <- projp$cd4fert_rat
+  v$frr_art6mos <- projp$frr_art6mos
+  v$frr_scalar <- projp$frr_scalar
+  
 
   v
 }
