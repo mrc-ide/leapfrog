@@ -9,7 +9,7 @@
 //' @param demp list of demographic input parameters (TODO: document)
 //' @param projp list of HIV projection parameters (TODO: document)
 //' @param hiv_strat stratification of HIV population, either "full"
-//'   (default; single-year ages) or "coarse" (aggregated age groups). 
+//'   (default; single-year ages) or "coarse" (aggregated age groups).
 //' @param hiv_steps_per_year number of Euler integration steps per year
 //'   for HIV progression; default 10.
 //'
@@ -18,7 +18,7 @@
 //' to apply to the base year population (consistent with Spectrum).
 //'
 //' @export
-//' 
+//'
 // [[Rcpp::export]]
 Rcpp::List
 leapfrogR(const Rcpp::List& demp,
@@ -27,7 +27,7 @@ leapfrogR(const Rcpp::List& demp,
 	  const int hiv_steps_per_year = 10) {
 
   using namespace Rcpp;
-  
+
   NumericVector Sx = demp["Sx"];
   Dimension d = Sx.attr("dim");
   const size_t proj_years = d[2];
@@ -55,7 +55,7 @@ leapfrogR(const Rcpp::List& demp,
     Rf_error("hiv_strat \"%s\" not found. Please select \"full\" or \"coarse\".\n", hiv_strat.get_cstring());
   }
 
-    
+
   // allocate memory for return object
   NumericVector totpop1(pAG * NG * proj_years);
   totpop1.attr("dim") = NumericVector::create(pAG, NG, proj_years);
@@ -74,27 +74,27 @@ leapfrogR(const Rcpp::List& demp,
 
   NumericVector artstrat_adult(hTS * hDS * hAG * NG * proj_years);
   artstrat_adult.attr("dim") = NumericVector::create(hTS, hDS, hAG, NG, proj_years);
-  
+
   NumericVector hivstrat_paeds(hTM * hDS * pIDX_HIVADULT * NG * proj_years);
   hivstrat_paeds.attr("dim") = NumericVector::create(hDS, hTM, pIDX_HIVADULT, NG, proj_years);
-  
+
   NumericVector artstrat_paeds(hTS * hDS * pIDX_HIVADULT * NG * proj_years);
   artstrat_paeds.attr("dim") = NumericVector::create(hTS, hDS, pIDX_HIVADULT, NG, proj_years);
-  
+
   NumericVector artelig_paeds(hDS * hTM * pIDX_HIVADULT * NG * proj_years);
   artelig_paeds.attr("dim") = NumericVector::create(hDS, hTM, pIDX_HIVADULT, NG, proj_years);
-  
+
   NumericVector coarse_totpop1(hAG * NG * proj_years);
   coarse_totpop1.attr("dim") = NumericVector::create(hAG, NG, proj_years);
 
   NumericVector births(proj_years);
-  
+
   //NumericVector hiv_births(hDS * proj_years);
  // hiv_births.attr("dim") = NumericVector::create(hDS, proj_years);
  NumericVector hiv_births(proj_years);
  hiv_births.attr("dim") = NumericVector::create( proj_years);
- 
- 
+
+
 
   NumericVector natdeaths(pAG * NG * proj_years);
   natdeaths.attr("dim") = NumericVector::create(pAG, NG, proj_years);
@@ -110,37 +110,37 @@ leapfrogR(const Rcpp::List& demp,
 
   NumericVector aidsdeaths_art(hTS * hDS * hAG * NG * proj_years);
   aidsdeaths_art.attr("dim") = NumericVector::create(hTS, hDS, hAG, NG, proj_years);
-  
+
   NumericVector aidsdeaths_noart_paed(hDS * hTM * pIDX_HIVADULT * NG * proj_years);
   aidsdeaths_noart_paed.attr("dim") = NumericVector::create(hDS, hTM, pIDX_HIVADULT, NG, proj_years);
-  
+
   NumericVector aidsdeaths_art_paed(hTS * hDS * pIDX_HIVADULT * NG * proj_years);
   aidsdeaths_art_paed.attr("dim") = NumericVector::create(hTS, hDS, pIDX_HIVADULT, NG, proj_years);
 
   NumericVector artinit(hDS * hAG * NG * proj_years);
   artinit.attr("dim") = NumericVector::create(hDS, hAG, NG, proj_years);
-  
+
   NumericVector artnum_paed(proj_years);
-  
+
   NumericVector deaths_paeds(hTM * hDS * pIDX_HIVADULT * NG * proj_years);
   deaths_paeds.attr("dim") = NumericVector::create(hDS, hTM,  pIDX_HIVADULT, NG, proj_years);
-  
+
   NumericVector deaths_paeds_art(hTM * hDS * pIDX_HIVADULT * NG * proj_years);
   deaths_paeds_art.attr("dim") = NumericVector::create(hDS, hTM,  pIDX_HIVADULT, NG, proj_years);
-  
+
   NumericVector grad_paeds(hTM * hDS * pIDX_HIVADULT * NG * proj_years);
   grad_paeds.attr("dim") = NumericVector::create(hDS, hTM,  pIDX_HIVADULT, NG, proj_years);
-  
+
   NumericVector grad_paeds_art(hTS * hDS * pIDX_HIVADULT * NG * proj_years);
   grad_paeds_art.attr("dim") = NumericVector::create(hTS, hDS,  pIDX_HIVADULT, NG, proj_years);
-  
-  
+
+
   NumericVector init_art_paed(hTM * hDS * pIDX_HIVADULT * NG * proj_years);
   init_art_paed.attr("dim") = NumericVector::create(hDS, hTM,  pIDX_HIVADULT, NG, proj_years);
-  
+
   NumericVector tracking(18 *35 * proj_years);
   tracking.attr("dim") = NumericVector::create(18,35, proj_years);
- 
+
   if (hAG == hAG_FULL) {
     leapfrog_sim<double, NG, pAG, pIDX_FERT, pAG_FERT,
 		 pIDX_HIVADULT, hAG_FULL, hDS, hDS_adol, hTM, hTS, hPS, hBF>
@@ -190,7 +190,6 @@ leapfrogR(const Rcpp::List& demp,
        REAL(projp["fert_mult_by_age"]),
        REAL(projp["fert_mult_offart"]),
        REAL(projp["fert_mult_onart"]),
-       REAL(projp["art_mtct"]),
        REAL(projp["pmtct_mtct"]),
        REAL(projp["pmtct"]),
        REAL(projp["bf_duration"]),
@@ -249,7 +248,7 @@ leapfrogR(const Rcpp::List& demp,
        *INTEGER(projp["art_alloc_method"]),
        *REAL(projp["art_alloc_mxweight"]),
        *INTEGER(projp["scale_cd4_mort"]),
-       REAL(projp["art_dropout"]), 
+       REAL(projp["art_dropout"]),
        REAL(projp["age15hivpop"]),
        REAL(projp["paed_incid_input"]),
        REAL(projp["paed_cd4_dist"]),
@@ -275,7 +274,6 @@ leapfrogR(const Rcpp::List& demp,
        REAL(projp["fert_mult_by_age"]),
        REAL(projp["fert_mult_offart"]),
        REAL(projp["fert_mult_onart"]),
-       REAL(projp["art_mtct"]),
        REAL(projp["pmtct_mtct"]),
        REAL(projp["pmtct"]),
        REAL(projp["bf_duration"]),
@@ -315,7 +313,7 @@ leapfrogR(const Rcpp::List& demp,
     Rf_error("Invalid HIV stratification age groups (hAG)");
   }
 
-  
+
   List ret = ListBuilder()
     .add("totpop1", totpop1)
     .add("hivpop1", hivpop1)

@@ -1,3 +1,5 @@
+load('C:/Users/mwalters/eppasm/R/sysdata.rda')
+
 get_dp_version <- function(dp){
 
   ## Check the following tags to identify the version:
@@ -5,9 +7,9 @@ get_dp_version <- function(dp){
   ## * <General5>: 2015 Spectrum files
   ## * <FirstYear MV>: 2016 Spectrum file
   ## * <FirstYear MV2>: 2017+ spectrum file
-  
+
   exists_dptag <- function(tag, tagcol=1){tag %in% dp[,tagcol]}
-  
+
   dp.vers <- if (exists_dptag("<General 3>")) {
     "<General 3>"
   } else if (exists_dptag("<General5>")) {
@@ -314,7 +316,7 @@ read_hivproj_output <- function(pjnz, single.age=TRUE){
 ######################################################
 
 #' @export
-#' 
+#'
 read_hivproj_param <- function(pjnz, use_ep5=FALSE){
 
   ## read .DP file
@@ -425,12 +427,12 @@ read_hivproj_param <- function(pjnz, use_ep5=FALSE){
     nosocom_infections <- dp[nosocom_infections + 2,4:64]
     nosocom_infections <- as.numeric(nosocom_infections)
     names(nosocom_infections) <- yr_start:yr_end
-    
+
     ##not sure where this is in the projp so right now just going to manually extract
     paed_cd4_dist_index <- which(dp[,1] ==  "<CD4DistributionWithARTChild MV2>")
     paed_cd4_dist <- c(60,12,10,9,5,3,1) / 100
     names(paed_cd4_dist) <- c(">30", "26-30", "21-25", "16-20", "11-15", "5-10", "<5")
-    
+
   }
 
   if(dp.vers == "Spectrum2017")
@@ -484,7 +486,7 @@ read_hivproj_param <- function(pjnz, use_ep5=FALSE){
         stop("DP tag <HIVSexRatio MV> not parsed correctly")
       }
       incrr_sex <- setNames(as.numeric(dpsub("<HIVSexRatio MV>", data_row, timedat.idx)), proj.years)
-      
+
     } else if (exists_dptag("<SexRatioByEpidPatt MV>")) {
       sexincrr_idx <- as.integer(dpsub("<IncEpidemicRGIdx MV>", 2, 4)) # 0-based index
       incrr_sex <- dpsub("<SexRatioByEpidPatt MV>", 3:8, timedat.idx)[sexincrr_idx+1, ]
@@ -712,6 +714,11 @@ read_hivproj_param <- function(pjnz, use_ep5=FALSE){
   } else
     age14totpop <- NULL
 
+  ##Pull out abortion: Done by MKW not in the correct format probably. changing from percent to rate
+  abort <- dpsub("<PregTermAbortionPerNum MV2>", 2, timedat.idx)
+  abort <- as.numeric(abort) / 100 / 100
+
+
   projp <- list("yr_start" = yr_start,
                 "yr_end" = yr_end,
                 "relinfectART" = relinfectART,
@@ -741,7 +748,8 @@ read_hivproj_param <- function(pjnz, use_ep5=FALSE){
                 "age15hivpop" = age15hivpop,
                 "age14totpop" = age14totpop,
                 "nosocom_infections_04" = nosocom_infections,
-                "paed_cd4_dist" = paed_cd4_dist)
+                "paed_cd4_dist" = paed_cd4_dist,
+                "abortion" = abort)
   class(projp) <- "projp"
   attr(projp, "version") <- version
   attr(projp, "validdate") <- validdate
@@ -1034,7 +1042,7 @@ read_epp_t0 <- function(pjnz){
 
   obj <- xml2::xml_find_all(r, ".//object")
   projsets <- obj[which(xml2::xml_attr(obj, "class") == "epp2011.core.sets.ProjectionSet")]
-  
+
   t0 <- list()
   for(nd in projsets) {
     ns <- xml2::xml_children(nd)

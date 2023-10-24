@@ -3,7 +3,7 @@
 #'
 #' This function returns the Spectrum .DP file read as character CSV. Not intended
 #' for direct use, but passing to other functions to parse.
-#' 
+#'
 #' @param pjnz file path to Spectrum PJNZ file
 #'
 #' @return Matrix with class "spectrum_dp". Not intended for direct use.
@@ -18,10 +18,10 @@
 read_dp <- function(pjnz) {
 
   stopifnot(grepl("\\.(pjnz|zip)$", pjnz, ignore.case = TRUE))
-  
+
   dpfile <- grep("\\.DP$", unzip(pjnz, list = TRUE)$Name, value = TRUE)
   stopifnot(length(dpfile) == 1)
-    
+
   dp <- read.csv(unz(pjnz, dpfile), as.is = TRUE)
   class(dp) <- c(class(dp), "spectrum_dp")
 
@@ -33,15 +33,15 @@ read_dp <- function(pjnz) {
 #' This function operates as a pass-through if the file is already
 #' a parsed DP file, or extracts it from the CSV if it is a filepath
 #' to a PJNZ file.
-#' 
+#'
 #' @param dp_pjnz either a `"spectrum_dp"` object or a file path to
 #'   a PJNZ file.
 #'
 #' @return An object of class `"spectrum_dp"`, which is the .DP file
 #'   read by `read.csv()`.
-#' 
 #'
-#' @noRd 
+#'
+#' @noRd
 get_dp_data <- function(dp_pjnz) {
 
   if (inherits(dp_pjnz, "spectrum_dp")) {
@@ -51,14 +51,14 @@ get_dp_data <- function(dp_pjnz) {
   } else {
     stop("Valid input not found. Provide path to PJNZ file.")
   }
-  
+
 }
 
 exists_dptag <- function(dp, tag, tagcol = 1) {
 
   stopifnot(inherits(dp, "spectrum_dp"))
   stopifnot(is.character(tag))
-  
+
   tag %in% dp[, tagcol]
 }
 
@@ -68,14 +68,14 @@ dpsub <- function(dp, tag, rows, cols, tagcol = 1) {
   stopifnot(is.character(tag))
   all.equal(rows, as.integer(rows))
   all.equal(cols, as.integer(cols))
-    
+
   dp[which(dp[, tagcol] == tag) + rows, cols]
 }
 
 get_dp_years <- function(dp) {
   yr_start <- as.integer(dpsub(dp, "<FirstYear MV2>", 2, 4))
   yr_end <- as.integer(dpsub(dp, "<FinalYear MV2>", 2, 4))
-  
+
   proj_years <- yr_start:yr_end
   time_data_idx <- 4 + 1:length(proj_years) - 1
 
@@ -85,7 +85,7 @@ get_dp_years <- function(dp) {
 
 
 #' Read Spectrum programme data inputs
-#' 
+#'
 #' @param dp An `"spectrum_dp"` object created by `read_dp()` or a path to a Spectrum
 #'   PJNZ file.
 #'
@@ -96,7 +96,7 @@ get_dp_years <- function(dp) {
 #' `dp_read_abortion()` returns a list in which the vector `pregtermabortion` is the
 #' numerical values and `pregtermabortion_isperc` is a logical indicating whether each
 #' value corresponds to a number (count) input or percentage input.
-#' 
+#'
 #' @details
 #'
 #' These functions accepts either a path to a PJNZ file or an already parsed `.DP`
@@ -122,17 +122,17 @@ get_dp_years <- function(dp) {
 #' anc_testing1 <- dp_read_anc_testing(pjnz)
 #' anc_testing2 <- dp_read_anc_testing(dp)
 #' all.equal(anc_testing1, anc_testing2)
-#' 
-#' @export 
+#'
+#' @export
 dp_read_anc_testing <- function(dp) {
 
   dp <- get_dp_data(dp)
   dpy <- get_dp_years(dp)
-  
+
   anc_indicators <- c("anc_clients", "anc_tested", "anc_tested_pos", "anc_known_pos",
                       "anc_prevalence", "anc_retested", "anc_retested_pos",
                       "facility_births", "anc_known_neg")
-  
+
   if (exists_dptag(dp, "<ANCTestingValues MV>")) {
     anc_testing <- dpsub(dp, "<ANCTestingValues MV>", 2:5, dpy$time_data_idx)
     anc_testing <- sapply(anc_testing, as.numeric)
@@ -148,19 +148,19 @@ dp_read_anc_testing <- function(dp) {
   } else {
     stop("ANC testing tag not recognized. Function probably needs update for this .DP file.")
   }
-  
+
   anc_testing[anc_testing == -9999] <- NA_real_
-  
+
   anc_testing
 }
 
 #' @rdname dp_read_anc_testing
-#' @export 
+#' @export
 dp_read_pmtct <- function(dp) {
 
   dp <- get_dp_data(dp)
   dpy <- get_dp_years(dp)
-  
+
   pmtct_indicators <- c("pmtct_noprophylaxis_percent",
                         "pmtct_singledosenvp_number",
                         "pmtct_singledosenvp_percent",
@@ -187,7 +187,7 @@ dp_read_pmtct <- function(dp) {
                         "pmtct_postnatal_monthlydropout_optionb",
                         "pmtct_postnatal_monthlydropout_art0to12months",
                         "pmtct_postnatal_monthlydropout_art12plusmonths")
-  
+
 
   ## Note: these values start 1 column later than other arrays in the .DP file
   ## If value is 0, interpret as not entered (NA)
@@ -201,20 +201,20 @@ dp_read_pmtct <- function(dp) {
   }
 
   pmtct_arv[pmtct_arv == 0.0] <- NA_real_
-  
+
   pmtct_arv
 }
 
 
 #' @rdname dp_read_anc_testing
-#' @export 
+#' @export
 dp_read_pmtct_retained <- function(dp) {
 
   dp <- get_dp_data(dp)
   dpy <- get_dp_years(dp)
 
   indicator_names <- c("pmtct_retained_alreadyart", "pmtct_retained_newart")
-  
+
   if (exists_dptag(dp, "<PercentARTDelivery MV>")) {
     pmtct_retained <- dpsub(dp, "<PercentARTDelivery MV>", 2:3, dpy$time_data_idx)
   } else {
@@ -223,7 +223,7 @@ dp_read_pmtct_retained <- function(dp) {
 
   pmtct_retained <- sapply(pmtct_retained, as.numeric)
   dimnames(pmtct_retained) <- list(indicator = indicator_names, year = dpy$proj_years)
-  
+
   pmtct_retained
 }
 
@@ -234,7 +234,7 @@ dp_read_abortion <- function(dp) {
   dp <- get_dp_data(dp)
   dpy <- get_dp_years(dp)
 
-  ## Note: If 0s are entered for both, output = 1 defaults to "percentage" 
+  ## Note: If 0s are entered for both, output = 1 defaults to "percentage"
   if (exists_dptag(dp, "<PregTermAbortionPerNum MV2>")) {
     pregtermabortion_ispercent <- dpsub(dp, "<PregTermAbortionPerNum MV2>", 2, dpy$time_data_idx)
   } else {
@@ -266,10 +266,10 @@ dp_read_breastfeeding <- function(dp) {
                     "M12_13", "M14_15", "M16_17", "M18_19", "M20_21", "M22_23",
                     "M24_25", "M26_27", "M28_29", "M30_31", "M32_33", "M34_35")
 
-  ## Note: If 0s are entered for both, output = 1 defaults to "percentage" 
+  ## Note: If 0s are entered for both, output = 1 defaults to "percentage"
   if (exists_dptag(dp, "<InfantFeedingOptions MV>")) {
     notbreastfeeding_percent <- dpsub(dp, "<InfantFeedingOptions MV>", 2:37, dpy$time_data_idx)
-    
+
   } else {
     stop("Not Breastfeeding Percent tag not found. Function probably needs update for this .DP file.")
   }
@@ -336,9 +336,50 @@ dp_read_childltfu <- function(dp) {
     stop("Child ART LTFU tag not recognized. Function probably needs update for this .DP file.")
   }
 
-  
+
   childart_ltfu <- as.numeric(childart_ltfu)
   names(childart_ltfu) <- dpy$proj_years
 
   childart_ltfu
+}
+
+#' @rdname dp_read_anc_testing
+#' @export
+dp_read_art_dist <- function(dp) {
+
+  dp <- get_dp_data(dp)
+  dpy <- get_dp_years(dp)
+
+  if (exists_dptag(dp, "<ChildARTDist MV>")) {
+    child_mort_mult <- dpsub(dp, "<ChildARTDist MV>", 2:16, dpy$time_data_idx)
+    child_mort_mult <- sapply(child_mort_mult, as.numeric)
+    dimnames(child_mort_mult) <- list(age = 0:14, year = dpy$proj_years)
+  } else {
+    stop("Child ART distribution tag not recognized. Function probably needs update for this .DP file.")
+  }
+
+  child_mort_mult
+}
+
+#' @rdname dp_read_anc_testing
+#' @export
+dp_read_child_mort_mult <- function(dp) {
+
+  dp <- get_dp_data(dp)
+  dpy <- get_dp_years(dp)
+
+  indicator_names <- c('Age <5, <12 months on ART',
+                       'Age <5, 12+ months on ART',
+                       'Age >=5, <12 months on ART',
+                       'Age >=5, 12+ months on ART')
+
+  if (exists_dptag(dp, "<ChildMortalityRates MV2>")) {
+    child_mort_mult <- dpsub(dp, "<ChildMortalityRates MV2>", 2:5, dpy$time_data_idx)
+    child_mort_mult <- sapply(child_mort_mult, as.numeric)
+    dimnames(child_mort_mult) <- list(mrr = indicator_names, year = dpy$proj_years)
+  } else {
+    stop("Child ART multiplier tag not recognized. Function probably needs update for this .DP file.")
+  }
+
+  child_mort_mult
 }
