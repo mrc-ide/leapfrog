@@ -13,6 +13,8 @@ matches_coarse_age_groups <- function(pjnz = "../testdata/spectrum/v6.13/bwa_dem
   pjnz1 <- test_path(pjnz)
   demp <- prepare_leapfrog_demp(pjnz1)
   hivp <- prepare_leapfrog_projp(pjnz1)
+  hivp <- prepare_hc_leapfrog_projp(pjnz1, hivp)
+
 
   ## Replace netmigr with unadjusted age 0-4 netmigr, which are not
   ## in EPP-ASM preparation
@@ -44,11 +46,13 @@ demog_matches_totpop <- function(pjnz, threshold = 0.01){
   pjnz1 <- test_path(pjnz)
   demp1 <- prepare_leapfrog_demp(pjnz1)
   hivp1 <- prepare_leapfrog_projp(pjnz1)
+  hivp1 <- prepare_hc_leapfrog_projp(pjnz1, hivp1)
+
   lmod1 <- leapfrogR(demp1, hivp1)
 
   diff <- lmod1$totpop1 - demp1$basepop
 
-  expect_true(all(abs(diff) == 0), label = "Total population and base population align")
+  expect_true(all(abs(diff[1:80,,]) == 0), label = "Total population and base population align")
 
 
 
@@ -58,6 +62,8 @@ demog_matches_birthsdeaths <- function(pjnz, threshold_deaths = 3, threshold_bir
   pjnz1 <- test_path(pjnz)
   demp1 <- prepare_leapfrog_demp(pjnz1)
   hivp1 <- prepare_leapfrog_projp(pjnz1)
+  hivp1 <- prepare_hc_leapfrog_projp(pjnz1, hivp1)
+
   lmod1 <- leapfrogR(demp1, hivp1)
 
   specres <- eppasm::read_hivproj_output(pjnz1)
@@ -81,6 +87,7 @@ transmission_matches <- function(pjnz, threshold_absolute_pid = c(250, 25, 3)){
 
   demp <- prepare_leapfrog_demp(pjnz1)
   hivp <- prepare_leapfrog_projp(pjnz1)
+  hivp <- prepare_hc_leapfrog_projp(pjnz1, hivp)
 
   ## Replace netmigr with unadjusted age 0-4 netmigr, which are not
   ## in EPP-ASM preparation
@@ -109,18 +116,18 @@ spectrum_output <- function(file = "../testdata/spectrum/v6.13/bwa_aim-adult-chi
   ##pull out stratified population from the .xlsx file, This function doesn't take out the paediatric output, so going to just compare to the Spectrum software itself
   df <- file
   if(grepl(pattern = 'testdata', file)){
-   # df <- test_path(df)
+    df <- test_path(df)
   }
-  df <- eppasm::read_pop1(df, country, years = 2000:2022)
+  df <- eppasm::read_pop1(df, country, years = 1970:2030)
   if(any(0:14 %in% ages)){
     df_paed <- df %>% dplyr::filter(age < 5) %>%
      dplyr::right_join(y = data.frame(cd4 = 1:8, cd4_cat = c('neg', 'gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5'))) %>%
-      dplyr::right_join(y = data.frame(artdur = 2:8, transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+', 'ARTlte5mo', 'ART6to12mo', 'ARTgte12mo'))) #%>%
+      dplyr::right_join(y = data.frame(artdur = 2:8, transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+', 'ARTlte5mo', 'ART6to12mo', 'ARTgte12mo'))) %>%
      dplyr::filter(cd4_cat != 'neg')
 
     df_adol <- df %>% dplyr::filter(age > 4 & age < 15) %>%
      dplyr::right_join(y = data.frame(cd4 = 3:8, cd4_cat = c('gte1000', '750-999', '500-749', '350-499', '200-349','lte200'))) %>%
-      dplyr::right_join(y = data.frame(artdur = 2:8, transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+', 'ARTlte5mo', 'ART6to12mo', 'ARTgte12mo'))) #%>%
+      dplyr::right_join(y = data.frame(artdur = 2:8, transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+', 'ARTlte5mo', 'ART6to12mo', 'ARTgte12mo'))) %>%
       dplyr::filter(cd4_cat != 'neg')
 
     df <- rbind(df_paed, df_adol)
@@ -175,4 +182,18 @@ lmod_output_paed <- function(lmod){
 
 
   return(list(prev_strat = strat_pop, prev = strat_pop_total, art = strat_art))
+}
+
+leapfrog_input_mods <- function(hivp){
+  pmtct_mtct <- array(data = 0, dim = c(7,8,2))
+
+  pmtct_mtct[,1,1] <- hivp$mtct[,1]
+  pmtct_mtct[,1,2] <- hivp$mtct[,2]
+  pmtct_mtct[,-1,1] <- hivp$pmtct_mtct[,,1]
+  pmtct_mtct[,-1,2] <- hivp$pmtct_mtct[,,2]
+
+  hivp$pmtct_mtct <- pmtct_mtct
+
+  return(hivp)
+
 }

@@ -261,84 +261,92 @@ prepare_hc_leapfrog_projp <- function(pjnz, params){
   v = params
   ## paed input
   v$paed_incid_input <- dp_read_nosocom_infections(pjnz)
-  ## Hardcoded, this is putting all individuals in the highest cd4 category bc i think thats how the nosocomial infections work
-  v$paed_cd4_dist <- c(0.6, 0.12, 0.1, 0.09, 0.05, 0.03, 0.01)
-  ## v$paed_cd4_dist <- c(1, 0, 0, 0, 0, 0, 0)
-  paed_cd4_prog <- array(data = 0, dim = c(7), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', 'lte5')) )
-  paed_cd4_prog[] <- c(0.14, 0.37, 0.3, 0.35, 0.4, 0.4, 0)
+  v$paed_cd4_dist <- dp_read_paed_cd4_dist(pjnz) / 100
 
-  adol_cd4_prog <- array(data = 0, dim = c(6), dimnames = list(cd4 = c('>1000', '750-999', '500-749', '350-499', '200-349', 'lte200')) )
-  adol_cd4_prog[] <- c(0.3028, 0.3028, 0.2575, 0.2122, 0.1669, 0)
+  prog = dp_read_paed_cd4_prog(pjnz)
+  paed_cd4_prog <- array(c(prog[1,1:6],0), dim = 7, dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5')))
+
+  adol_cd4_prog <- array(c(prog[1,14:18],0), dim = 6, dimnames = list(cd4 = c('>1000', '750-999', '500-749', '350-499', '200-349', 'lte200')))
 
   v$paed_cd4_prog <- paed_cd4_prog
   v$adol_cd4_prog <- adol_cd4_prog
 
+  mort <- dp_read_paed_cd4_mort(pjnz)
   paed_cd4_mort <- array(data = 0, dim = c(7, 4, 5), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'),
                                                                      transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'),
                                                                      age = c(0:4)))
   ## 0-2
-  paed_cd4_mort[,1,1:3] <- c(0.25801, 0.31513, 0.38490, 0.47011, 0.57418, 0.70129, 0.85655)
-  paed_cd4_mort[,2,1:3] <- c(0.15385, 0.18791, 0.22951, 0.28031, 0.34237, 0.41817, 0.51074)
-  paed_cd4_mort[,3,1:3] <- rep(0.08743, times = 7)
-  paed_cd4_mort[,4,1:3] <- rep(0.02450, times = 7)
+  paed_cd4_mort[,1,1:3] <- mort[1,]
+  paed_cd4_mort[,2,1:3] <- mort[2,]
+  paed_cd4_mort[,3,1:3] <- mort[3,]
+  paed_cd4_mort[,4,1:3] <- mort[4,]
 
   ## 3-4
-  paed_cd4_mort[,1,4:5] <- c(0.06470, 0.07902, 0.09652, 0.11789, 0.14398, 0.175860, 0.21479)
-  paed_cd4_mort[,2,4:5] <- rep(0.04622, times = 7)
-  paed_cd4_mort[,3,4:5] <- c(0.03383, 0.03485, 0.03609, 0.03761, 0.03946, 0.04172, 0.04449)
-  paed_cd4_mort[,4,4:5] <- c(0.02144, 0.02347, 0.02596, 0.02899, 0.03270, 0.03723, 0.04276)
-
-
-
-
-
-  paed_art_mort <- array(data = 0, dim = c(7, 3, 5), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'),
-                                                                     transmission = c('0to6mo', '7to12mo', '12+mo'),
-                                                                     age = c(0:4)))
-  ## 0-6 mo on treatment
-  paed_art_mort[,1,1] <- c(0.133460, 0.142490, 0.154150, 0.170110, 0.194100, 0.237140, 0.364790)
-  paed_art_mort[,1,2:3] <- c(0.061010, 0.065140, 0.070470, 0.077770, 0.088730, 0.108400, 0.166760)
-  paed_art_mort[,1,4:5] <- c(0.028720, 0.030660, 0.033170, 0.036600, 0.041760, 0.051020, 0.078490)
-
-  ## 7-12 mo on treatment
-  paed_art_mort[,2,1] <- c(0.048660, 0.051950, 0.056200, 0.062020, 0.070770, 0.086460, 0.133000)
-  paed_art_mort[,2,2:3] <- c(0.022240, 0.023750, 0.025690, 0.028350, 0.032350, 0.039520, 0.060800)
-  paed_art_mort[,2,4:5] <- c(0.010470, 0.011180, 0.012090, 0.013340, 0.015230, 0.018600, 0.028620)
-
-  ## 12+ mo on treatment
-  paed_art_mort[,3,1] <- rep(0, 7)
-  paed_art_mort[,3,2:3] <- c(0.018610, 0.019340, 0.020260, 0.021480, 0.023220, 0.026140, 0.033720)
-  paed_art_mort[,3,4:5] <- c(0.008760, 0.009100, 0.009540, 0.010110, 0.010930, 0.012300, 0.015870)
+  paed_cd4_mort[,1,4:5] <- mort[5,]
+  paed_cd4_mort[,2,4:5] <- mort[6,]
+  paed_cd4_mort[,3,4:5] <- mort[7,]
+  paed_cd4_mort[,4,4:5] <- mort[8,]
 
   adol_cd4_mort <- array(data = 0, dim = c(6, 4, 10), dimnames = list(cd4 = c('>1000', '750-999', '500-749', '350-499', '200-349', '<200'),
                                                                       transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'),
                                                                       age =5:14))
   ## 5 - 14
-  adol_cd4_mort[,1,] <- c(0.02617, 0.03197, 0.03905, 0.04769, 0.05825, 0.07114)
-  adol_cd4_mort[,2,] <- c(0.02572, 0.03142, 0.03837, 0.04687, 0.05724, 0.06991)
-  adol_cd4_mort[,3,] <- c(0.02409, 0.02942, 0.03593, 0.04388, 0.05360, 0.06547)
-  adol_cd4_mort[,4,] <- c(0.02245, 0.02742, 0.03349, 0.04090, 0.04996, 0.06102)
+  adol_cd4_mort[,1,] <- mort[9,2:7]
+  adol_cd4_mort[,2,] <- mort[10,2:7]
+  adol_cd4_mort[,3,] <- mort[11,2:7]
+  adol_cd4_mort[,4,] <- mort[12,2:7]
+
+
+  mort <- dp_read_paed_art_mort(pjnz)
+  paed_art_mort <- array(data = 0, dim = c(7, 3, 5), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'),
+                                                                     transmission = c('0to6mo', '7to12mo', '12+mo'),
+                                                                     age = c(0:4)))
+  ## 0-6 mo on treatment
+  paed_art_mort[,1,1] <- mort$hc1_lt6[,1,1]
+  paed_art_mort[,1,2:3] <- mort$hc1_lt6[,2,1]
+  paed_art_mort[,1,4:5] <- mort$hc1_lt6[,3,1]
+
+  ## 7-12 mo on treatment
+  paed_art_mort[,2,1] <- mort$hc1_6to12[,1,1]
+  paed_art_mort[,2,2:3] <- mort$hc1_6to12[,2,1]
+  paed_art_mort[,2,4:5] <- mort$hc1_6to12[,3,1]
+
+  ## 12+ mo on treatment
+  paed_art_mort[,3,1] <- mort$hc1_gte12[,1,1]
+  paed_art_mort[,3,2:3] <- mort$hc1_gte12[,2,1]
+  paed_art_mort[,3,4:5] <- mort$hc1_gte12[,3,1]
+
 
   adol_art_mort <- array(data = 0, dim = c(6, 3, 10), dimnames = list(cd4 = c('>1000', '750-999', '500-749', '350-499', '200-349', '<200'),
                                                                       transmission = c('0to6mo', '7to12mo', '12+mo'),
                                                                       age = c(5:14)))
   ## 0-6 mo on treatment
-  adol_art_mort[,1,1:5] <- c(0.013800, 0.015860, 0.019110, 0.023650, 0.030090, 0.052640)
-  adol_art_mort[,1,6:10] <- c(0.015140, 0.017400, 0.020950, 0.025930, 0.032990, 0.057730)
+  adol_art_mort[,1,1:5] <- mort$hc2_lt6[,1,1]
+  adol_art_mort[,1,6:10] <- mort$hc2_lt6[,2,1]
 
   ## 7-12 mo on treatment
-  adol_art_mort[,2,1:5] <- c(0.005180, 0.005960, 0.007170, 0.008880, 0.011300, 0.019770)
-  adol_art_mort[,2,6:10] <- c(0.005680, 0.006530, 0.007870, 0.009740, 0.012390, 0.021680)
+  adol_art_mort[,2,1:5] <- mort$hc2_6to12[,1,1]
+  adol_art_mort[,2,6:10] <- mort$hc2_6to12[,2,1]
 
   ## 12+ mo on treatment
-  adol_art_mort[,3,1:5] <- c(0.005240, 0.005620, 0.006170, 0.006880, 0.007770, 0.010320)
-  adol_art_mort[,3,6:10] <- c(0.005740, 0.006160, 0.006770, 0.007540, 0.008520, 0.011320)
+  adol_art_mort[,3,1:5] <- mort$hc2_gte12[,1,1]
+  adol_art_mort[,3,6:10] <- mort$hc2_gte12[,2,1]
 
   v$paed_cd4_mort <- paed_cd4_mort
   v$adol_cd4_mort <- adol_cd4_mort
   v$paed_art_mort <- paed_art_mort
   v$adol_art_mort <- adol_art_mort
 
+  mtct_rates_input <- dp_read_mtct_rates(pjnz)
+  art_mtct <- array(0, dim = c(7,3,2), dimnames = list(cd4 = c('>500', '350-500', '250-349', '200-249', '100-199', '50-99', '<50'),
+                                                       time = c('ART <4 weeks before delivery', 'ART >4 weeks before delivery', 'ART before pregnancy'), trans_type = c('perinatal', 'bf')))
+  art_mtct[,1,1] <- mtct_rates_input[11,1] / 100
+  art_mtct[,2,1] <- mtct_rates_input[10,1] / 100
+  art_mtct[,3,1] <- mtct_rates_input[9,1] / 100
+  art_mtct[5:7,1,2] <- mtct_rates_input[11,2] / 100
+  art_mtct[5:7,2,2] <- mtct_rates_input[10,2] / 100
+  art_mtct[5:7,3,2] <- mtct_rates_input[9,2] / 100
+  v$art_mtct <- art_mtct
 
   art_dist_paed <- dp_read_art_dist(pjnz)
   v$art_dist_paed <- art_dist_paed
@@ -373,26 +381,28 @@ prepare_hc_leapfrog_projp <- function(pjnz, params){
                                                        pmtct_reg = c('option A', 'option B', 'single dose nevirapine', 'WHO 2006 dual ARV regimen', 'ART before pregnancy',
                                                                      'ART >4 weeks before delivery', 'ART <4 weeks before delivery'),
                                                        transmission_type = c('perinatal', 'breastfeeding')))
-  mtct_trt[,1,1] <- 0.041
-  mtct_trt[,2,1] <-  0.019
-  mtct_trt[,3,1] <- 0.075
-  mtct_trt[,4,1] <- 0.022
-  mtct_trt[5:7,1,2] <- 0.002
-  mtct_trt[5:7,2,2] <- 0.0013
-  mtct_trt[1:4,3,2] <- 0.0099
-  mtct_trt[5:7,3,2] <- 0.0040
-  mtct_trt[,4,2] <- 0.0018
-  mtct_trt[,5,1] <- 0.0026
-  mtct_trt[,6,1] <- 0.014
-  mtct_trt[,7,1] <- 0.082
-  mtct_trt[5:7,5,2] <- 0.00023
-  mtct_trt[5:7,6,2] <- 0.0011
-  mtct_trt[5:7,7,2] <- 0.002
+  mtct_trt[,1,1] <-  mtct_rates_input[7,1] /100
+  mtct_trt[,2,1] <-  mtct_rates_input[8,1]/100
+  mtct_trt[,3,1] <- mtct_rates_input[5,1]/100
+  mtct_trt[,4,1] <- mtct_rates_input[6,1]/100
+  mtct_trt[5:7,1,2] <- mtct_rates_input[7,3]/100
+  mtct_trt[5:7,2,2] <- mtct_rates_input[8,3]/100
+  mtct_trt[1:4,3,2] <- mtct_rates_input[5,2]/100
+  mtct_trt[5:7,3,2] <- mtct_rates_input[5,3]/100
+  mtct_trt[,4,2] <- mtct_rates_input[6,3]/100
+  mtct_trt[,5,1] <- mtct_rates_input[9,1]/100
+  mtct_trt[,6,1] <- mtct_rates_input[10,1]/100
+  mtct_trt[,7,1] <- mtct_rates_input[11,1]/100
+  mtct_trt[5:7,5,2] <- mtct_rates_input[9,2]/100
+  mtct_trt[5:7,6,2] <- mtct_rates_input[10,2]/100
+  mtct_trt[5:7,7,2] <- mtct_rates_input[11,2]/100
   v$pmtct_mtct <- mtct_trt
 
   mtct <- array(data = NA, dim = c(7,2), dimnames = list(cd4 = c('>500', '350-500', '250-349', '200-249', '100-199', '50-99', '<50'), trans_type = c('perinatal', 'bf')))
-  mtct[,1] <- c(0.15, 0.15, 0.27, 0.27, 0.37, 0.37, 0.37)
-  mtct[,2] <- c(rep(0.51,2), rep(0.81,2), rep(0.89,3)) / 100
+  mtct[,1] <- c(mtct_rates_input[3,1], mtct_rates_input[3,1],
+                mtct_rates_input[2,1], mtct_rates_input[2,1],
+                rep(mtct_rates_input[1,1],3)) /100
+  mtct[,2] <- c(rep(mtct_rates_input[3,3],2), rep(mtct_rates_input[2,2],2), rep(mtct_rates_input[1,2],3)) / 100
   v$mtct <- mtct
 
   mort_rr_art <- dp_read_child_mort_mult(pjnz)
@@ -412,19 +422,60 @@ prepare_hc_leapfrog_projp <- function(pjnz, params){
   v$bf_duration_no_art <- bf_duration[,,1]
   ##only keeping this for leapfrog
   v$bf_duration = bf_duration
-  ## ART eligibility age, doing this in years rather than months
-  v$paed_art_elig_age <- c(rep(0, 37), rep(1, 3), rep(2, 20))
-  paed_art_elig_cd4 <- array(data = NA, dim = c(length(0:14), length(1970:2029)), dimnames = list(age = c(0:14), year = c(1970:2029)))
-  ## corresponds with less than 25
-  paed_art_elig_cd4[1:5,] <- 3
-  ## correspond with 200 then 300
-  paed_art_elig_cd4[6:15,1:40] <- 6
-  paed_art_elig_cd4[6:15,41:60] <- 5
+
+  art_elig = dp_read_paed_art_eligibility(pjnz)
+  v$paed_art_elig_age <- art_elig$age_elig / 12 ##converts from months to years
+
+  ##MKW: stopped here
+  cd4_elig <- art_elig$cd4_elig[c(1:3,8),]
+  ##Changing the input from CD4 count or percentages to ordinal categories
+  ###Easier to do it here than in the leapfrog code
+  get_ordinal <- function(vec){
+    out <- c()
+    for (i in 1:length(vec)) {
+      if(vec[i] >= 1000){
+        val = 0
+      }else if( vec[i] >= 750){
+        val = 1
+      }else if(vec[i] >= 500 ){
+        val = 2
+      }else if(vec[i] >= 350 ){
+        val = 3
+      }else if(vec[i] >= 200 ){
+        val = 4
+      }else if(vec[i] >= 50 ){
+        val = 5
+      }else if(vec[i] > 30 ){
+        val = 0
+      }else if(vec[i] >= 26 ){
+        val = 1
+      }else if(vec[i] >= 21 ){
+        val = 2
+      }else if(vec[i] >= 16 ){
+        val = 3
+      }else if(vec[i] >= 11 ){
+        val = 4
+      }else if(vec[i] >= 5 ){
+        val = 5
+      }else {
+        val = 6
+      }
+      out[i] <- val
+    }
+    out
+  }
+
+  paed_art_elig_cd4 <- array(data = NA, dim = c(length(0:14), length(1970:2030)), dimnames = list(age = c(0:14), year = c(1970:2030)))
+  paed_art_elig_cd4[1,] <- get_ordinal(unname(cd4_elig[1,]))
+  paed_art_elig_cd4[2:3,] <- get_ordinal(unname(cd4_elig[2,]))
+  paed_art_elig_cd4[4:5,] <- get_ordinal(unname(cd4_elig[3,]))
+  paed_art_elig_cd4[6:15,] <- get_ordinal(cd4_elig[4,])
   v$paed_art_elig_cd4 <- paed_art_elig_cd4
 
-  v$paed_art_ltfu <- rep(0, length(1970:2030))
 
-  paed_cd4_transition <- array(0, dim = c(6,7), dimnames = list(cd4_count = c('gte1000', '750-1000', '500-749', '350-499', '200-349', 'lte200'), cd4_pct = c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5')))
+  v$paed_art_ltfu <- leapfrog:::input_childart_ltfu(pjnz) / 100
+
+  paed_cd4_transition <- array(0, dim = c(6,7), dimnames = list(cd4_count = c('gte1000', '750-1000', '500-749', '350-499', '200-349', 'lte200'), cd4_pct = c('gte30', '26-30', '21-25', '16-20', '11-15', '5-10', 'lte5')))
   paed_cd4_transition[1:6,1] <- c(0.608439, 0.185181, 0.105789, 0.055594, 0.018498, 0.026497)
   paed_cd4_transition[1:6,2] <- c(0.338733873, 0.222622262, 0.293529353, 0.093509351, 0.03550355, 0.01610161)
   paed_cd4_transition[1:6,3] <- c(0.2004, 0.2562, 0.3636, 0.1074, 0.0579, 0.0145)

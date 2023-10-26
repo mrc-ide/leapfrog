@@ -62,6 +62,14 @@ exists_dptag <- function(dp, tag, tagcol = 1) {
   tag %in% dp[, tagcol]
 }
 
+exists_dpdescription <- function(dp, description, descriptioncol = 2) {
+
+  stopifnot(inherits(dp, "spectrum_dp"))
+  stopifnot(is.character(description))
+
+  description %in% dp[, descriptioncol]
+}
+
 dpsub <- function(dp, tag, rows, cols, tagcol = 1) {
 
   stopifnot(inherits(dp, "spectrum_dp"))
@@ -70,6 +78,15 @@ dpsub <- function(dp, tag, rows, cols, tagcol = 1) {
   all.equal(cols, as.integer(cols))
 
   dp[which(dp[, tagcol] == tag) + rows, cols]
+}
+
+dpdescription <- function(dp, description, rows, cols, tagcol = 2) {
+
+  stopifnot(inherits(dp, "spectrum_dp"))
+  all.equal(rows, as.integer(rows))
+  all.equal(cols, as.integer(cols))
+
+  dp[which(dp[, tagcol] == description) + rows, cols]
 }
 
 get_dp_years <- function(dp) {
@@ -404,3 +421,209 @@ dp_read_nosocom_infections <- function(dp) {
 
   nosocomial_inf
 }
+
+#' @rdname dp_read_anc_testing
+#' @export
+dp_read_mtct_rates <- function(dp) {
+
+  dp <- get_dp_data(dp)
+  dpy <- get_dp_years(dp)
+
+
+  if (exists_dpdescription(dp, "Peripartum and breastfeeding transmission rates (%)")) {
+    ##only extracting 0-4 for right now
+    mtct_rates <- dpdescription(dp, "Peripartum and breastfeeding transmission rates (%)" , 1:11, 4:6)
+    mtct_rates <- sapply(mtct_rates, as.numeric)
+  } else {
+    stop("MTCT rates description not recognized. Function probably needs update for this .DP file.")
+  }
+
+  mtct_rates
+}
+
+#' @rdname dp_read_anc_testing
+#' @export
+dp_read_paed_cd4_dist <- function(dp) {
+
+  dp <- get_dp_data(dp)
+  dpy <- get_dp_years(dp)
+
+
+  if (exists_dpdescription(dp, "Distribution of new infections by CD4 percent for Children")) {
+    ##only extracting 0-4 for right now
+    cd4_dist <- dpdescription(dp, "Distribution of new infections by CD4 percent for Children" , 1, 4:10)
+    cd4_dist <- sapply(cd4_dist, as.numeric)
+  } else {
+    stop("CD4 distribution for paeds description not recognized. Function probably needs update for this .DP file.")
+  }
+
+  cd4_dist
+}
+
+#' @rdname dp_read_anc_testing
+#' @export
+dp_read_paed_cd4_prog <- function(dp) {
+
+  dp <- get_dp_data(dp)
+  dpy <- get_dp_years(dp)
+
+  cd4 <- c(rep(c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10'), 2), NA,
+           c('>1000', '750-999', '500-749', '350-499', '200-349'))
+  ages <- c('<5', '5-14')
+
+  if (exists_dpdescription(dp, "Annual rate of progression to next lower CD4 category for Children")) {
+    ##only extracting 0-4 for right now
+    cd4_prog <- dpdescription(dp, "Annual rate of progression to next lower CD4 category for Children", 2:3, 4:21)
+    cd4_prog <- sapply(cd4_prog, as.numeric)
+    dimnames(cd4_prog) <- list(sex = c('Male', 'Female'), cd4_cat = cd4)
+
+
+  } else {
+    stop("CD4 distribution for paeds description not recognized. Function probably needs update for this .DP file.")
+  }
+
+  cd4_prog
+}
+
+#' @rdname dp_read_anc_testing
+#' @export
+dp_read_paed_cd4_mort <- function(dp) {
+
+  dp <- get_dp_data(dp)
+  dpy <- get_dp_years(dp)
+
+  cd4 <- 1:7
+  trans_type = rep(c('perinatal', 'bf 0-6', 'bf 7-12', 'bf 12+'),3)
+
+  if (exists_dpdescription(dp, "Annual probability of HIV-related mortality among those not on ART by CD4 category for Children")) {
+    ##only extracting 0-4 for right now
+    cd4_mort <- dpdescription(dp, "Annual probability of HIV-related mortality among those not on ART by CD4 category for Children", 1:12, 4:10)
+    cd4_mort <- sapply(cd4_mort, as.numeric)
+    dimnames(cd4_mort) <- list(trans = trans_type, cd4_cat = cd4)
+
+
+  } else {
+    stop("CD4 mortality for paeds description not recognized. Function probably needs update for this .DP file.")
+  }
+
+  cd4_mort
+}
+
+#' @rdname dp_read_anc_testing
+#' @export
+dp_read_paed_art_mort <- function(dp) {
+
+  dp <- get_dp_data(dp)
+  dpy <- get_dp_years(dp)
+
+  cd4 <- 1:7
+  trans_type = rep(c('perinatal', 'bf 0-6', 'bf 7-12', 'bf 12+'),3)
+
+  if (exists_dptag(dp, "<ChildMortByCD4WithART0to6 MV2>")) {
+    ##only extracting 0-4 for right now
+    art_mort <- dpsub(dp,"<ChildMortByCD4WithART0to6 MV2>",
+                              2:3, 4:25)
+    art_mort <- sapply(art_mort, as.numeric)
+    males_lt6mo <- array(art_mort[1,], dim = c(7, 3), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'), ages = c('0', '1-2', '3-4')))
+    females_lt6mo <- array(art_mort[2,], dim = c(7, 3), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'), ages = c('0', '1-2', '3-4')))
+    art_mort_lt6mo <- array(0, dim = c(7, 3, 2), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'), ages = c('0', '1-2', '3-4'), sex = c('Male', 'Female')))
+    art_mort_lt6mo[,,1] <- males_lt6mo
+    art_mort_lt6mo[,,2] <- females_lt6mo
+
+
+    ##only extracting 0-4 for right now
+    art_mort <- dpsub(dp,"<ChildMortByCD4WithART0to6 MV2>",
+                      2:3, 26:38)
+    art_mort <- sapply(art_mort, as.numeric)
+    art_mort <- art_mort[,-7]
+    adol_males_lt6mo <- array(art_mort[1,], dim = c(6, 2), dimnames = list(cd4 = c('>1000', '750-999', '500-749', '350-499', '200-349', '<200'), ages = c('5-9', '10-14')))
+    adol_females_lt6mo <- array(art_mort[2,], dim = c(6, 2), dimnames = list(cd4 = c('>1000', '750-999', '500-749', '350-499', '200-349', '<200'), ages = c('5-9', '10-14')))
+    adol_art_mort_lt6mo <- array(0, dim = c(6, 2, 2), dimnames = list(cd4 = c('>1000', '750-999', '500-749', '350-499', '200-349', '<200'), ages = c('5-9', '10-14'), sex = c('Male', 'Female')))
+    adol_art_mort_lt6mo[,,1] <- adol_males_lt6mo
+    adol_art_mort_lt6mo[,,2] <- adol_females_lt6mo
+
+  } else {
+    stop("ART mortality less than 6 months for paeds description not recognized. Function probably needs update for this .DP file.")
+  }
+
+  if (exists_dptag(dp, "<ChildMortByCD4WithART7to12 MV>")) {
+    ##only extracting 0-4 for right now
+    art_mort <- dpsub(dp,"<ChildMortByCD4WithART7to12 MV>",
+                      3:4, 4:25)
+    art_mort <- sapply(art_mort, as.numeric)
+    males_6to12mo <- array(art_mort[1,], dim = c(7, 3), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'), ages = c('0', '1-2', '3-4')))
+    females_6to12mo <- array(art_mort[2,], dim = c(7, 3), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'), ages = c('0', '1-2', '3-4')))
+    art_mort_6to12mo <- array(0, dim = c(7, 3, 2), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'), ages = c('0', '1-2', '3-4'), sex = c('Male', 'Female')))
+    art_mort_6to12mo[,,1] <- males_6to12mo
+    art_mort_6to12mo[,,2] <- females_6to12mo
+
+    art_mort <- dpsub(dp,"<ChildMortByCD4WithART7to12 MV>",
+                      3:4, 26:38)
+    art_mort <- sapply(art_mort, as.numeric)
+    art_mort <- art_mort[,-7]
+    adol_males_6to12mo <- array(art_mort[1,], dim = c(6, 2), dimnames = list(cd4 = c('>1000', '750-999', '500-749', '350-499', '200-349', '<200'), ages = c('5-9', '10-14')))
+    adol_females_6to12mo <- array(art_mort[2,], dim = c(6, 2), dimnames = list(cd4 = c('>1000', '750-999', '500-749', '350-499', '200-349', '<200'), ages = c('5-9', '10-14')))
+    adol_art_mort_6to12mo <- array(0, dim = c(6, 2, 2), dimnames = list(cd4 = c('>1000', '750-999', '500-749', '350-499', '200-349', '<200'), ages = c('5-9', '10-14'), sex = c('Male', 'Female')))
+    adol_art_mort_6to12mo[,,1] <- adol_males_6to12mo
+    adol_art_mort_6to12mo[,,2] <- adol_females_6to12mo
+
+  } else {
+    stop("ART mortality 6 to 12 months for paeds description not recognized. Function probably needs update for this .DP file.")
+  }
+
+  if (exists_dptag(dp, "<ChildMortByCD4WithARTGT12 MV>")) {
+    ##only extracting 0-4 for right now
+    art_mort <- dpsub(dp,"<ChildMortByCD4WithARTGT12 MV>",
+                      3:4, 4:25)
+    art_mort <- sapply(art_mort, as.numeric)
+    males_gte12mo <- array(art_mort[1,], dim = c(7, 3), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'), ages = c('0', '1-2', '3-4')))
+    females_gte12mo <- array(art_mort[2,], dim = c(7, 3), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'), ages = c('0', '1-2', '3-4')))
+    art_mort_gte12mo <- array(0, dim = c(7, 3, 2), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'), ages = c('0', '1-2', '3-4'), sex = c('Male', 'Female')))
+    art_mort_gte12mo[,,1] <- males_gte12mo
+    art_mort_gte12mo[,,2] <- females_gte12mo
+
+    art_mort <- dpsub(dp,"<ChildMortByCD4WithARTGT12 MV>",
+                      3:4, 26:38)
+    art_mort <- sapply(art_mort, as.numeric)
+    art_mort <- art_mort[,-7]
+    adol_males_gte12mo <- array(art_mort[1,],  dim = c(6, 2), dimnames = list(cd4 = c('>1000', '750-999', '500-749', '350-499', '200-349', '<200'), ages = c('5-9', '10-14')))
+    adol_females_gte12mo <- array(art_mort[2,], dim = c(6, 2), dimnames = list(cd4 = c('>1000', '750-999', '500-749', '350-499', '200-349', '<200'), ages = c('5-9', '10-14')))
+    adol_art_mort_gte12mo <- array(0, dim = c(6, 2, 2), dimnames = list(cd4 = c('>1000', '750-999', '500-749', '350-499', '200-349', '<200'), ages = c('5-9', '10-14'), sex = c('Male', 'Female')))
+    adol_art_mort_gte12mo[,,1] <- adol_males_gte12mo
+    adol_art_mort_gte12mo[,,2] <- adol_females_gte12mo
+
+  } else {
+    stop("ART mortality greater than 12 months for paeds description not recognized. Function probably needs update for this .DP file.")
+  }
+
+   return(list(hc1_lt6 = art_mort_lt6mo, hc1_6to12 = art_mort_6to12mo, hc1_gte12 = art_mort_gte12mo,
+               hc2_lt6 = adol_art_mort_lt6mo, hc2_6to12 = adol_art_mort_6to12mo, hc2_gte12 = adol_art_mort_gte12mo))
+}
+
+#' @rdname dp_read_anc_testing
+#' @export
+dp_read_paed_art_eligibility <- function(dp) {
+
+  dp <- get_dp_data(dp)
+  dpy <- get_dp_years(dp)
+
+  specs <- c(paste0('CD4 count: ', c('Age < 11 months', 'Age 12-35 months', 'Age 35-39 months', 'Age >= 5 years')),
+             paste0('CD4 percent: ', c('Age < 11 months', 'Age 12-35 months', 'Age 35-39 months', 'Age >= 5 years')))
+
+  if (exists_dpdescription(dp, "Eligibility for treatment - Children")) {
+    ##only extracting 0-4 for right now
+    art_elig <- dpdescription(dp, "Eligibility for treatment - Children", 1:8, dpy$time_data_idx)
+    art_elig <- sapply(art_elig, as.numeric)
+    dimnames(art_elig) <- list(age = specs, years = dpy$proj_years)
+
+    art_elig_age <- dpdescription(dp, "Age below which all HIV+ children should be on treatment (months)", 1, dpy$time_data_idx)
+    art_elig_age <- sapply(art_elig_age, as.numeric)
+    names(art_elig_age) <-  dpy$proj_years
+
+  } else {
+    stop("CD4 mortality for paeds description not recognized. Function probably needs update for this .DP file.")
+  }
+
+  list(cd4_elig = art_elig, age_elig = art_elig_age)
+}
+
