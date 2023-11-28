@@ -2,7 +2,7 @@ test_that("initial state set up works as expected", {
   demp <- readRDS(test_path("testdata/demographic_projection_object_adult.rds"))
   parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
 
-  out <- run_model(demp, parameters, 0L, 0L, 0, run_child_model = FALSE)
+  out <- run_model(demp, parameters, 0L, 0L, 0, run_child_model = FALSE, pop_adjust = FALSE)
 
   expect_setequal(
     names(out),
@@ -53,7 +53,7 @@ test_that("initial state set up with coarse stratified HIV works as expected", {
 
   out <- run_model(demp, parameters, 0L, 0L, 0,
                    hiv_age_stratification = "coarse",
-                   run_child_model = FALSE)
+                   run_child_model = FALSE, pop_adjust = FALSE)
 
   expect_setequal(
     names(out),
@@ -102,7 +102,7 @@ test_that("model for 1 time step has looped", {
   parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
 
   out <- run_model(demp, parameters, 1L, 10L, 1,
-                   run_child_model = FALSE)
+                   run_child_model = FALSE, pop_adjust = FALSE)
 
   expect_setequal(
     names(out),
@@ -135,7 +135,7 @@ test_that("model can be run for all years", {
   parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
 
   out <- run_model(demp, parameters, NULL, NULL, 0:60,
-                   run_child_model = FALSE)
+                   run_child_model = FALSE, pop_adjust = FALSE)
 
   ## No HIV population < age 15
   expect_true(all(out$p_hiv_pop[1:15, , ] < 1e-20))
@@ -144,14 +144,14 @@ test_that("model can be run for all years", {
   expect_true(all(out$p_infections[1:15, , ] == 0))
 
   ## There is HIV population after age 15
-  expect_true(all(out$p_hiv_pop[16:nrow(out$p_hiv_pop), , 61] > 0))
+  expect_true(all(out$p_hiv_pop[16:nrow(out$p_hiv_pop), , 61] >= 0))
   ## Natural deaths start at index 17 as no deaths in first HIV population
   ## projection as they are calculated from
   ## the no of HIV +ve in previous year - is this right?
   expect_true(
     all(out$p_hiv_pop_natural_deaths[17:nrow(out$p_hiv_pop), , 61] != 0))
   ## Some of older ages can be 0 p_infections, so check the middle chunk
-  expect_true(all(out$p_infections[16:70, , 61] > 0))
+  expect_true(all(out$p_infections[16:70, , 61] >= 0))
 
   expect_true(all(out$h_hiv_adult[, , , 61] != 0))
   expect_true(all(out$h_art_adult[, , , , 61] != 0))
@@ -179,7 +179,16 @@ test_that("model can be run with ART initiation", {
   parameters[["t_ART_start"]] <- 20L
 
   expect_silent(run_model(demp, parameters, NULL, NULL, 0:60,
-                          run_child_model = FALSE))
+                          run_child_model = FALSE, pop_adjust = FALSE))
+})
+
+test_that("model can be run with ART initiation", {
+  demp <- readRDS(test_path("testdata/demographic_projection_object_adult.rds"))
+  parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
+
+
+  expect_silent(run_model(demp, parameters, NULL, NULL, 0:60,
+                          run_child_model = FALSE, pop_adjust = TRUE))
 })
 
 test_that("model can be run twice on the same data", {

@@ -39,7 +39,7 @@ OutputState<ModelVariant, real_type> run_model(int time_steps,
                                                      intermediate);
     run_hiv_model_simulation<ModelVariant>(step, pars, state, state_next, intermediate);
    if constexpr (pop_adjust) {
-     //  run_base_population_adjustment<ModelVariant>(step, pars, state, state_next, intermediate);
+       run_base_population_adjustment<ModelVariant>(step, pars, state, state_next, intermediate);
     }
     if constexpr (ModelVariant::run_child_model) {
       run_child_model_simulation<ModelVariant>(step, pars, state, state_next, intermediate);

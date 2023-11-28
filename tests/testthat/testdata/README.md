@@ -65,7 +65,7 @@ pjnz1 <- test_path("../testdata/spectrum/v6.13/bwa_aim-adult-art-no-special-elig
 
 demp <- prepare_leapfrog_demp(pjnz1)
 hivp <- prepare_leapfrog_projp(pjnz1)
-hivp = prepare_hc_leapfrog_projp(pjnz1, hivp)
+hivp = leapfrog:::prepare_hc_leapfrog_projp(pjnz1, hivp)
 
 demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
 demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)

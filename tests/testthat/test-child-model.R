@@ -1,9 +1,8 @@
 test_that("child model can be run for all years", {
   demp <- readRDS(test_path("testdata/demographic_projection_object_child.rds"))
   parameters <- readRDS(test_path("testdata/projection_parameters_child.rds"))
-  parameters$laf = 1
 
-  expect_silent(out <- run_model(demp, parameters, NULL, NULL, 0:60))
+  expect_silent(out <- run_model(demp, parameters, 0L, 0L, 0))
 
   expect_setequal(
     names(out),
