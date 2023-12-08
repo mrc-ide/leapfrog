@@ -1,9 +1,11 @@
 rm(list = ls())
+devtools::load_all(".")
 library(tidyr)
 library(tidyverse)
 library(dplyr)
 library(data.table)
-library(leapfrog)
+#library(leapfrog)
+devtools::load_all('C:/Users/mwalters/leapfrog')
 
 spectrum_output <- function(file = "../testdata/spectrum/v6.13/bwa_aim-adult-child-input-art-elig_spectrum-v6.13_2022-02-12_pop1.xlsx", ages = 0:14, country = 'Botswana'){
   ##pull out stratified population from the .xlsx file, This function doesn't take out the paediatric output, so going to just compare to the Spectrum software itself
@@ -41,11 +43,21 @@ spectrum_output <- function(file = "../testdata/spectrum/v6.13/bwa_aim-adult-chi
 
 }
 
-demp <- readRDS(test_path("testdata/demographic_projection_object_adult.rds"))
-parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
+demp <- readRDS(testthat::test_path("testdata/demographic_projection_object_adult.rds"))
+parameters <- readRDS(testthat::test_path("testdata/projection_parameters_adult.rds"))
 
 out <- run_model(demp, parameters, NULL, NULL, 0:60,
                  run_child_model = FALSE, pop_adjust = TRUE)
+
+pjnz1 <- testthat::test_path("testdata/bwa_aim-no-special-elig.PJNZ")
+ #parameters <- leapfrog:::prepare_hc_leapfrog_projp(pjnz1, parameters)
+
+ lmod1 <- leapfrogR(demp, parameters)
+#
+#
+#
+ saveRDS(lmod1, 'C:/Users/mwalters/Desktop/leapfrog.RDS')
+specres <- eppasm::read_hivproj_output(pjnz1)
 
 spec = spectrum_output(file = 'C:/Users/mwalters/frogger/tests/testthat/testdata/bwa_aim-no-special-elig_pop1.xlsx', ages = 15:49, country = 'bwa')
 
@@ -57,6 +69,8 @@ spec_hivpop <- spec_hivpop[age == 15,]
 frog_hivpop <- apply(out$p_hiv_pop[16,,which(1970:2030 %in% spec_hivpop$year)], MARGIN = 2, sum)
 spec_hivpop[,frogger := frog_hivpop]
 spec_hivpop[,diff := pop - frog_hivpop]
+frog_strat_pop <- apply(out$h_hiv_adult[,1,,which(1970:2030 %in% spec_hivpop$year)], MARGIN = c(3), sum)
+spec_hivpop[,strat := frog_strat_pop]
 spec_hivpop
 
 
@@ -68,5 +82,6 @@ spec_total[,frogger := frog_total]
 spec_total[,diff := pop - frogger]
 spec_total
 
-
+#0.10996644 / 0.10925
+#1.006558
 demp$targetpop[16,2,2]

@@ -46,34 +46,43 @@ void run_base_population_adjustment(
       intermediate.base.hivadj_ha = 0.0;
       intermediate.base.popadj_ha = 0.0;
       for(int i = 0; i < ss.hAG_span[ha]; i++){
-        //base_pop <== targetpop
-        //hivpop <== pop?
         intermediate.base.hivadj_ha += state_next.base.p_hiv_pop(a,g);
-        intermediate.base.popadjrate_a = demog.target_pop(a ,g,time_step) / (intermediate.base.hivneg_pop(a , g) + state_next.base.p_hiv_pop(a, g));
-        intermediate.base.hpopadj_a = (intermediate.base.popadjrate_a - 1.0) * state_next.base.p_hiv_pop(a, g);
-        intermediate.base.popadj_ha += intermediate.base.hpopadj_a;
-        //state_curr.base.p_hiv_pop(a, g) += intermediate.base.hpopadj_a;
+        intermediate.base.popadjrate_a = demog.target_pop(a ,g,time_step) / state_next.base.p_total_pop(a,g);
+        // intermediate.base.hpopadj_a = (intermediate.base.popadjrate_a - 1.0) * state_next.base.p_hiv_pop(a, g);
+        // intermediate.base.popadj_ha += intermediate.base.hpopadj_a;
+        // state_next.base.p_hiv_pop(a, g) += intermediate.base.hpopadj_a;
+        //added for testing
+        state_next.base.p_hiv_pop(a, g) *= intermediate.base.popadjrate_a;
+         for(int hm = 0; hm < ss.hDS; ++hm){
+          state_next.base.h_hiv_adult(hm, ha, g) *= intermediate.base.popadjrate_ha;
+           if(time_step >= pars.base.options.ts_art_start){
+             for(int hu = 0; hu < ss.hTS; ++hu){
+               state_next.base.h_art_adult(hu, hm, ha, g) *= intermediate.base.popadjrate_ha;
+             } // loop over hm
+           }
+         }
+
         a++;
       }
 
 
     // population adjustment for hivpop
-        if(intermediate.base.hivadj_ha > 0 ){
-        intermediate.base.popadjrate_ha = intermediate.base.popadj_ha / intermediate.base.hivadj_ha;
-        }else{
-         intermediate.base.popadjrate_ha = 0.0;
-        }
+        // if(intermediate.base.hivadj_ha > 0 ){
+        // intermediate.base.popadjrate_ha = intermediate.base.popadj_ha / intermediate.base.hivadj_ha;
+        // }else{
+        //  intermediate.base.popadjrate_ha = 0.0;
+        // }
 
 
 
-    for(int hm = 0; hm < ss.hDS; ++hm){
-       state_next.base.h_hiv_adult(hm, ha, g) *= 1+intermediate.base.popadjrate_ha;
-      if(time_step >= pars.base.options.ts_art_start){
-        for(int hu = 0; hu < ss.hTS; ++hu){
-         state_next.base.h_art_adult(hu, hm, ha, g) *= 1+intermediate.base.popadjrate_ha;
-        } // loop over hm
-      }
-  }
+  //   for(int hm = 0; hm < ss.hDS; ++hm){
+  //      state_next.base.h_hiv_adult(hm, ha, g) *= 1+intermediate.base.popadjrate_ha;
+  //     if(time_step >= pars.base.options.ts_art_start){
+  //       for(int hu = 0; hu < ss.hTS; ++hu){
+  //        state_next.base.h_art_adult(hu, hm, ha, g) *= 1+intermediate.base.popadjrate_ha;
+  //       } // loop over hm
+  //     }
+  // }
 
 
 
@@ -89,9 +98,6 @@ void run_base_population_adjustment(
       for(int i = 0; i < ss.hAG_span[ha]; i++){
         intermediate.base.popadjrate_a = demog.target_pop(a ,g,time_step) / (intermediate.base.hivneg_pop(a , g) + state_next.base.p_hiv_pop(a, g));
         state_next.base.p_total_pop(a,g) *= intermediate.base.popadjrate_a;
-        if(time_step == 6){
-          std::cout << state_next.base.p_total_pop(a,g);
-        }
         a++;
       }
 
