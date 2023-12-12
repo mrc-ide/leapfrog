@@ -10,20 +10,12 @@ test_that("DemProj only matches EPP-ASM", {
   demp <- prepare_leapfrog_demp(pjnz1)
   hivp <- prepare_leapfrog_projp(pjnz1)
 
-  ## Replace netmigr with unadjusted age 0-4 netmigr, which are not
-  ## in EPP-ASM preparation
-  demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
-  demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
-  
   lmod <- leapfrogR(demp, hivp)
 
   expect_warning(fp <- eppasm::prepare_directincid(pjnz1),
                  "no non-missing arguments to min; returning Inf")
   fp$tARTstart <- 61L
 
-  ## Replace ASFR because demp$asfr is normalised, but fp$asfr is not
-  fp$asfr <- demp$asfr
-    
   mod <- eppasm::simmod(fp)
 
   expect_equal(lmod$totpop1[16:80,,], mod[1:65,,1,])
