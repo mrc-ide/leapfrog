@@ -197,8 +197,6 @@ struct Children {
   //cotrim
   TensorMap1<real_type> ctx_coverage_is_number;
 
-
-
 };
 
 template<typename ModelVariant, typename real_type>

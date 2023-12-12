@@ -1,0 +1,32 @@
+#!/usr/bin/env Rscript
+
+## Run this if you want to recreate the test data for the standalone model.
+## You might do this is say we add some new required data or if the data we are testing with
+## changes for any reason
+
+root_dir <- here::here()
+
+demp <- readRDS(testthat::test_path("testdata/demographic_projection_object_adult.rds"))
+parameters <- readRDS(testthat::test_path("testdata/projection_parameters_adult.rds"))
+
+frogger:::serialize_r_to_tensor(demp$basepop[, , 1], "inst/standalone_model/data/basepop")
+frogger:::serialize_r_to_tensor(demp$Sx, "inst/standalone_model/data/survival")
+frogger:::serialize_r_to_tensor(demp$netmigr, "inst/standalone_model/data/net_migration")
+frogger:::serialize_r_to_tensor(demp$asfr, "inst/standalone_model/data/age_sex_fertility_ratio")
+frogger:::serialize_r_to_tensor(demp$births_sex_prop, "inst/standalone_model/data/births_sex_prop")
+frogger:::serialize_r_to_tensor(parameters$incidinput, "inst/standalone_model/data/incidence_rate")
+frogger:::serialize_r_to_tensor(parameters$incrr_age, "inst/standalone_model/data/incidence_rate_relative_risk_age")
+frogger:::serialize_r_to_tensor(parameters$incrr_sex, "inst/standalone_model/data/incidence_rate_relative_risk_sex")
+frogger:::serialize_r_to_tensor(parameters$cd4_mort_full, "inst/standalone_model/data/cd4_mortality_full")
+frogger:::serialize_r_to_tensor(parameters$cd4_prog_full, "inst/standalone_model/data/cd4_progression_full")
+frogger:::serialize_r_to_tensor(parameters$cd4_initdist_full, "inst/standalone_model/data/cd4_initdist_full")
+frogger:::serialize_r_to_tensor(parameters$art_mort_full, "inst/standalone_model/data/art_mortality_full")
+frogger:::serialize_r_to_tensor(parameters$artmx_timerr, "inst/standalone_model/data/artmx_timerr")
+frogger:::serialize_r_to_tensor(parameters$art_dropout, "inst/standalone_model/data/art_dropout")
+frogger:::serialize_r_to_tensor(parameters$art15plus_num, "inst/standalone_model/data/art15plus_num")
+frogger:::serialize_r_to_tensor(parameters$art15plus_isperc, "inst/standalone_model/data/art15plus_isperc")
+frogger:::serialize_r_to_tensor(parameters$artcd4elig_idx, "inst/standalone_model/data/artcd4elig_idx")
+
+frogger:::serialize_r_to_tensor(parameters$paed_incid_input, "inst/standalone_model/data/paed_incid_input")
+frogger:::serialize_r_to_tensor(parameters$paed_cd4_dist, "inst/standalone_model/data/paed_cd4_dist")
+frogger:::serialize_r_to_tensor(parameters$paed_cd4_transition, "inst/standalone_model/data/paed_cd4_transition")
