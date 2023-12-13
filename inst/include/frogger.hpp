@@ -34,6 +34,9 @@ OutputState<ModelVariant, real_type> run_model(int time_steps,
     if constexpr (ModelVariant::run_child_model) {
       run_child_model_simulation<ModelVariant>(step, pars, state, state_next, intermediate);
     }
+    run_end_year_migration<ModelVariant>(step, pars, state, state_next, intermediate);
+    run_hiv_pop_end_year_migration<ModelVariant>(step, pars, state, state_next, intermediate);
+    
     state_output.save_state(state_next, step);
     std::swap(state, state_next);
     intermediate.reset();

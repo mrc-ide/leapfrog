@@ -150,7 +150,7 @@ void run_hiv_and_art_stratified_deaths_and_migration(
   for (int g = 0; g < ss.NS; ++g) {
     int a = pars.base.options.p_idx_hiv_first_adult;
     for (int ha = 0; ha < ss.hAG; ++ha) {
-      real_type deaths_migrate = 0;
+      real_type deaths_migrate = 0.0;
       for (int i = 0; i < ss.hAG_span[ha]; ++i, ++a) {
         deaths_migrate += (intermediate.base.hiv_net_migration(a, g) - state_next.base.p_hiv_pop_natural_deaths(a, g));
       }
@@ -173,6 +173,61 @@ void run_hiv_and_art_stratified_deaths_and_migration(
   }
 }
 
+template<typename ModelVariant, typename real_type>
+void run_hiv_pop_end_year_migration(
+    int time_step,
+    const Parameters<ModelVariant, real_type> &pars,
+    const State<ModelVariant, real_type> &state_curr,
+    State<ModelVariant, real_type> &state_next,
+    IntermediateData<ModelVariant, real_type> &intermediate) {
+  
+  constexpr auto ss = StateSpace<ModelVariant>().base;
+  
+  for (int g = 0; g < ss.NS; ++g) {
+    int a = pars.base.options.p_idx_hiv_first_adult;
+    for (int ha = 0; ha < ss.hAG; ++ha) {
+      for (int i = 0; i < ss.hAG_span[ha]; ++i, ++a) {
+        intermediate.base.p_hiv_pop_coarse_ages(ha, g) += state_next.base.p_hiv_pop(a, g);
+      }
+    }
+  }
+  
+  // remove net migration from hiv stratified population
+  for (int g = 0; g < ss.NS; ++g) {
+    for (int a = 1; a < ss.pAG; ++a) {
+      intermediate.base.hiv_net_migration(a, g) =
+	state_next.base.p_hiv_pop(a, g) * intermediate.base.migration_rate(a, g);
+      state_next.base.p_hiv_pop(a, g) += intermediate.base.hiv_net_migration(a, g);
+    }
+  }
+  
+  // remove net migration from adult stratified population
+  for (int g = 0; g < ss.NS; ++g) {
+    int a = pars.base.options.p_idx_hiv_first_adult;
+    for (int ha = 0; ha < ss.hAG; ++ha) {
+      real_type migration_num_ha = 0.0;
+      for (int i = 0; i < ss.hAG_span[ha]; ++i, ++a) {
+	migration_num_ha += intermediate.base.hiv_net_migration(a, g);
+      }
+
+      real_type migration_rate = 0.0;
+      if (intermediate.base.p_hiv_pop_coarse_ages(ha, g) > 0) {
+	migration_rate = migration_num_ha / intermediate.base.p_hiv_pop_coarse_ages(ha, g);
+      }
+
+      for (int hm = 0; hm < ss.hDS; ++hm) {
+        state_next.base.h_hiv_adult(hm, ha, g) *= 1.0 + migration_rate;
+        if (time_step > pars.base.options.ts_art_start) {
+          for (int hu = 0; hu < ss.hTS; ++hu) {
+            state_next.base.h_art_adult(hu, hm, ha, g) *=
+                1.0 + migration_rate;
+          }
+        }
+      }
+    }
+  }
+}
+  
 }
 
 template<typename ModelVariant, typename real_type>
