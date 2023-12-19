@@ -107,6 +107,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                     const int hiv_steps_per_year,
                     const int t_ART_start,
                     const int *hAG_SPAN,
+		    const int projection_period_int,
                     //
                     //outputs
                     Type *p_totpop1,
@@ -166,6 +167,11 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   const int hAG_15PLUS = hAG;
   const int hIDX_15PLUS = 0;
   const Type h_art_stage_dur[hTS-1] = {0.5, 0.5};
+
+
+  const int PROJPERIOD_MIDYEAR = 0;   // mid-year projection period
+  const int PROJPERIOD_CALENDAR = 1;  // calendar-year projection (Spectrum 6.2 update; December 2022)
+
 
 
   // // inputs
@@ -389,25 +395,47 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       natdeaths(pAG-1, g, t) += natdeaths_open_age;
       totpop1(pAG-1, g, t) += totpop1(pAG-1, g, t-1) - natdeaths_open_age;
 
-      // net migration
-      for(int a = 1; a < pAG - 1; a++) {
-	// Number of net migrants adjusted for survivorship to end of period (qx / 2)
-        migrate_ag(a, g) = netmigr(a, g, t) * (1.0 + sx(a, g, t)) * 0.5 / totpop1(a, g, t);
-        totpop1(a, g, t) *= 1.0 + migrate_ag(a, g);
-      }
+      if (projection_period_int == PROJPERIOD_MIDYEAR) {
+	// net migration
+	for(int a = 1; a < pAG - 1; a++) {
+	  // Number of net migrants adjusted for survivorship to end of period (qx / 2)
+	  migrate_ag(a, g) = netmigr(a, g, t) * (1.0 + sx(a, g, t)) * 0.5 / totpop1(a, g, t);
+	  totpop1(a, g, t) *= 1.0 + migrate_ag(a, g);
+	}
 
-      // For open age group, netmigrant survivor adjustment based on weighted
-      // sx for age 79 and age 80+.
-      // * Numerator: totpop1(a, g, t-1) * (1.0 + sx(a+1, g, t)) + totpop1(a-1, g, t-1) * (1.0 + sx(a, g, t))
-      // * Denominator: totpop1(a, g, t-1) + totpop1(a-1, g, t-1)
-      // Re-expressed current population and deaths to open age group (already calculated):
-      int a = pAG - 1;
-      Type sx_netmig = (totpop1(a, g,t) + 0.5 * natdeaths(pAG-1, g, t)) / (totpop1(a, g,t) + natdeaths(pAG-1, g, t));
-      migrate_ag(a, g) = sx_netmig * netmigr(a, g, t) / totpop1(a, g,t);
-      totpop1(a, g, t) *= 1.0 + migrate_ag(a, g);
+	// For open age group, netmigrant survivor adjustment based on weighted
+	// sx for age 79 and age 80+.
+	// * Numerator: totpop1(a, g, t-1) * (1.0 + sx(a+1, g, t)) + totpop1(a-1, g, t-1) * (1.0 + sx(a, g, t))
+	// * Denominator: totpop1(a, g, t-1) + totpop1(a-1, g, t-1)
+	// Re-expressed current population and deaths to open age group (already calculated):
+	int a = pAG - 1;
+	Type sx_netmig = (totpop1(a, g,t) + 0.5 * natdeaths(pAG-1, g, t)) / (totpop1(a, g,t) + natdeaths(pAG-1, g, t));
+	migrate_ag(a, g) = sx_netmig * netmigr(a, g, t) / totpop1(a, g,t);
+	totpop1(a, g, t) *= 1.0 + migrate_ag(a, g);
+      }
     }
 
 
+
+    births(t) = 0.0;
+    for(int af = 0; af < pAG_FERT; af++) {
+      births(t) += (totpop1(pIDX_FERT + af, FEMALE, t-1) + totpop1(pIDX_FERT + af, FEMALE, t)) * 0.5 * asfr(af, t);
+    }
+
+    // add births
+    for(int g = 0; g < NG; g++) {
+      Type births_sex = births(t) * births_sex_prop(g, t);
+      natdeaths(0, g, t) = births_sex * (1.0 - sx(0, g, t));
+      totpop1(0, g, t) =  births_sex * sx(0, g, t);
+
+      if (projection_period_int == PROJPERIOD_MIDYEAR) {
+
+	// Assume 2/3 survival rate since mortality in first six months higher than
+	// second 6 months (Spectrum manual, section 6.2.7.4)
+	Type migrate_a0 = netmigr(0, g, t) * (1.0 + 2.0 * sx(0, g, t)) / 3.0 / totpop1(0, g, t);
+	totpop1(0, g, t) *= 1.0 + migrate_a0;
+      }
+    }
 
     // // demographic projection of the adult HIV population
 
@@ -556,8 +584,10 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     for(int g = 0; g < NG; g++) {
       for(int a = 1; a < pAG; a++) {
         hivpop1(a, g, t) -= natdeaths_hivpop(a, g, t);
-        netmig_ag(a, g) = hivpop1(a, g, t) * migrate_ag(a, g);
-        hivpop1(a, g, t) += netmig_ag(a, g);
+	if (projection_period_int == PROJPERIOD_MIDYEAR) {
+	  netmig_ag(a, g) = hivpop1(a, g, t) * migrate_ag(a, g);
+	  hivpop1(a, g, t) += netmig_ag(a, g);
+	}
       }
     }
 
@@ -569,7 +599,9 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         Type deathsmig_ha = 0;
         for(int i = 0; i < hAG_SPAN[ha]; i++){
           deathsmig_ha -= natdeaths_hivpop(a, g, t);
-          deathsmig_ha += netmig_ag(a, g);
+	  if (projection_period_int == PROJPERIOD_MIDYEAR) {
+	    deathsmig_ha += netmig_ag(a, g);
+	  }
           a++;
         }
 
@@ -1972,6 +2004,61 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         }
       }
     }
+
+
+
+    // Net migration for calendar-year projection option with end-year migration
+    if (projection_period_int == PROJPERIOD_CALENDAR) {
+
+      for(int g = 0; g < NG; g++){
+
+	for(int a = 0; a < pAG - 1; a++) {
+	  migrate_ag(a, g) = netmigr(a, g, t) / totpop1(a, g, t);
+	  totpop1(a, g, t) *= 1.0 + migrate_ag(a, g);
+	}
+
+	// For open age group, netmigrant survivor adjustment based on weighted
+	// sx for age 79 and age 80+.
+	// * Numerator: totpop1(a, g, t-1) * (1.0 + sx(a+1, g, t)) + totpop1(a-1, g, t-1) * (1.0 + sx(a, g, t))
+	// * Denominator: totpop1(a, g, t-1) + totpop1(a-1, g, t-1)
+	// Re-expressed current population and deaths to open age group (already calculated):
+	int a = pAG - 1;
+	Type sx_netmig = (totpop1(a, g,t) + 0.5 * natdeaths(pAG-1, g, t)) / (totpop1(a, g,t) + natdeaths(pAG-1, g, t));
+	migrate_ag(a, g) = sx_netmig * netmigr(a, g, t) / totpop1(a, g,t);
+	totpop1(a, g, t) *= 1.0 + migrate_ag(a, g);
+      }
+
+      // remove net migration from hivpop1
+      TensorFixedSize<Type, Sizes<pAG, NG>> netmig_ag;
+      for(int g = 0; g < NG; g++) {
+	for(int a = 0; a < pAG; a++) {
+	  netmig_ag(a, g) = hivpop1(a, g, t) * migrate_ag(a, g);
+	  hivpop1(a, g, t) += netmig_ag(a, g);
+	}
+      }
+
+      // remove net migration from adult stratified population
+      for(int g = 0; g < NG; g++){
+	int a = pIDX_HIVADULT;
+	for(int ha = 0; ha < hAG; ha++){
+	  Type mig_ha = 0;
+	  for(int i = 0; i < hAG_SPAN[ha]; i++){
+	    mig_ha += netmig_ag(a, g);
+	    a++;
+	  }
+
+	  Type migrate_ha = hivpop_ha(ha, g) > 0 ? mig_ha / hivpop_ha(ha, g) : 0.0;
+	  for(int hm = 0; hm < hDS; hm++){
+	    hivstrat_adult(hm, ha, g, t) *= 1.0 + migrate_ha;
+	    if(t > t_ART_start) {
+	      for(int hu = 0; hu < hTS; hu++) {
+		artstrat_adult(hu, hm, ha, g, t) *= 1.0 + migrate_ha;
+	      }
+	    }
+	  }
+	}
+      }
+    } // if (projection_period_int == PROJPERIOD_CALENDAR)
 
 
   }

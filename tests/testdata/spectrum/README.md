@@ -91,3 +91,11 @@ The default file had no 'special population' ART eligibility. This is retained.
 * Convert adult ART input to number through year 2020, percentage for 2021 onwards
 
 
+
+## `v6.28/` 
+
+These files are copies of the `v6.13` test files re-projected and saved with Spectrum v6.28,
+used for the 2023 UNAIDS Estimates.
+
+A key update in Spectrum v6.28 is calendar-year demographic projection with net migration
+all added at end-year, following UN WPP 2022 changes.

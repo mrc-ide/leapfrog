@@ -55,6 +55,15 @@ leapfrogR(const Rcpp::List& demp,
     Rf_error("hiv_strat \"%s\" not found. Please select \"full\" or \"coarse\".\n", hiv_strat.get_cstring());
   }
 
+  int projection_period_int = 0;
+  String projection_period_str  = demp["projection_period"];
+  if (projection_period_str  == "midyear") {
+    projection_period_int = 0;
+  } else if (projection_period_str  == "calendar") {
+    projection_period_int = 1;
+  } else {
+    Rf_error("projection_period \"%s\" not found. Please select \"midyear\" or \"calendar\".\n",  projection_period_str.get_cstring());
+  }
 
   // allocate memory for return object
   NumericVector totpop1(pAG * NG * proj_years);
@@ -141,6 +150,7 @@ leapfrogR(const Rcpp::List& demp,
   NumericVector tracking(18 *35 * proj_years);
   tracking.attr("dim") = NumericVector::create(18,35, proj_years);
 
+
   if (hAG == hAG_FULL) {
     leapfrog_sim<double, NG, pAG, pIDX_FERT, pAG_FERT,
 		 pIDX_HIVADULT, hAG_FULL, hDS, hDS_adol, hTM, hTS, hPS, hBF>
@@ -199,6 +209,7 @@ leapfrogR(const Rcpp::List& demp,
        hiv_steps_per_year,
        *INTEGER(projp["t_ART_start"]) - 1, // 0-based indexing vs. R 1-based
        INTEGER(projp["hAG_SPAN_full"]),
+       projection_period_int,
        REAL(totpop1),
        REAL(hivpop1),
        REAL(hivnpop1),
@@ -284,6 +295,7 @@ leapfrogR(const Rcpp::List& demp,
        hiv_steps_per_year,
        *INTEGER(projp["t_ART_start"]) - 1,  // 0-based indexing vs. R 1-based
        INTEGER(projp["hAG_SPAN_coarse"]),
+       projection_period_int,
        REAL(totpop1),
        REAL(hivpop1),
        REAL(hivnpop1),

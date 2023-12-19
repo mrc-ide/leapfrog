@@ -1,5 +1,5 @@
 
-read_sx <- function(pjnz, use_ep5=FALSE){
+read_sx <- function(pjnz, use_ep5=FALSE) {
 
   if(use_ep5) {
     dpfile <- grep(".ep5$", utils::unzip(pjnz, list=TRUE)$Name, value=TRUE)
@@ -9,8 +9,11 @@ read_sx <- function(pjnz, use_ep5=FALSE){
 
   dp <- utils::read.csv(unz(pjnz, dpfile), as.is=TRUE)
 
-  exists_dptag <- function(tag, tagcol=1){tag %in% dp[,tagcol]}
-  dpsub <- function(tag, rows, cols, tagcol=1){
+  exists_dptag <- function(tag, tagcol=1) {
+    tag %in% dp[,tagcol]
+  }
+
+  dpsub <- function(tag, rows, cols, tagcol=1) {
     dp[which(dp[,tagcol]==tag)+rows, cols]
   }
 
@@ -28,7 +31,7 @@ read_sx <- function(pjnz, use_ep5=FALSE){
   Sx
 }
 
-read_netmigr <- function(pjnz, use_ep5=FALSE, adjust_u5mig = TRUE, sx = NULL){
+read_netmigr <- function(pjnz, use_ep5=FALSE, adjust_u5mig = TRUE, sx = NULL) {
 
   if(use_ep5) {
     dpfile <- grep(".ep5$", utils::unzip(pjnz, list=TRUE)$Name, value=TRUE)
@@ -38,8 +41,10 @@ read_netmigr <- function(pjnz, use_ep5=FALSE, adjust_u5mig = TRUE, sx = NULL){
 
   dp <- utils::read.csv(unz(pjnz, dpfile), as.is=TRUE)
 
-  exists_dptag <- function(tag, tagcol=1){tag %in% dp[,tagcol]}
-  dpsub <- function(tag, rows, cols, tagcol=1){
+  exists_dptag <- function(tag, tagcol=1) {
+    tag %in% dp[,tagcol]
+  }
+  dpsub <- function(tag, rows, cols, tagcol=1) {
     dp[which(dp[,tagcol]==tag)+rows, cols]
   }
 
@@ -96,7 +101,6 @@ adjust_spectrum_netmigr <- function(netmigr) {
   netmigr_adj
 }
 
-
 #' Prepare demographic inputs from Spectrum PJNZ
 #'
 #' @param pjnz path to PJNZ file
@@ -111,9 +115,9 @@ adjust_spectrum_netmigr <- function(netmigr) {
 prepare_leapfrog_demp <- function(pjnz) {
 
   demp <- eppasm::read_specdp_demog_param(pjnz)
+
   demp$Sx <- read_sx(pjnz)
   demp$netmigr <- read_netmigr(pjnz, sx = demp$Sx)
-  demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
 
   demp$births_sex_prop <- rbind(male = demp$srb, female = 100) / (demp$srb + 100)
 
@@ -121,8 +125,27 @@ prepare_leapfrog_demp <- function(pjnz) {
   demp$asfr <- sweep(demp$asfr, 2, demp$tfr / colSums(demp$asfr), "*")
 
 
+  ## NOTE: Reading this to obtain the Spectrum version number
+  ##       This is a lot of redundant effort.
+  projp <- eppasm::read_hivproj_param(pjnz)
+  if (!grepl("^[4-6]\\.[0-9]", projp$spectrum_version)) {
+    stop(paste0("Spectrum version not recognized: ", projp$spectrum_version))
+  }
+  demp$projection_period <- if (projp$spectrum_version >= "6.2") {
+    "calendar"
+  } else {
+    "midyear"
+  }
+
+  if (demp$projection_period == "midyear") {
+    demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
+  } else {
+    demp$netmigr_adj <- demp$netmigr
+  }
+
   demp
 }
+
 
 #' Prepare adult HIV projection parameters from Spectrum PJNZ
 #'
