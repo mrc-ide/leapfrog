@@ -6,9 +6,9 @@ test_that("DemProj only matches EPP-ASM", {
   ##   is corrected in leapfrog.
 
   pjnz1 <- test_path("../testdata/spectrum/v6.13/bwa_demproj-only_spectrum-v6.13_2022-02-12.PJNZ")
-  
+
   demp1 <- prepare_leapfrog_demp(pjnz1)
-  hivp2 <- prepare_leapfrog_projp(pjnz1)
+  hivp1 <- prepare_leapfrog_projp(pjnz1)
 
   lmod1 <- leapfrogR(demp1, hivp1)
 
@@ -22,7 +22,7 @@ test_that("DemProj only matches EPP-ASM", {
 
   ## v6.28 -- net-migration at end year
   pjnz2 <- test_path("../testdata/spectrum/v6.28/bwa_demproj-only_spectrum-v6.28_2023-12-12.PJNZ")
-  
+
   demp2 <- prepare_leapfrog_demp(pjnz2)
   hivp2 <- prepare_leapfrog_projp(pjnz2)
 
@@ -35,7 +35,7 @@ test_that("DemProj only matches EPP-ASM", {
   mod2 <- eppasm::simmod(fp2)
 
   expect_equal(lmod2$totpop1[16:80,,], mod2[1:65,,1,])
-  
+
 })
 
 test_that("Leapfrog matches DemProj projection without migration", {
@@ -76,7 +76,7 @@ test_that("Leapfrog matches DemProj projection without migration", {
 
   ## births by age
   expect_true(all(abs(lmod2$births[-1] - specres2$births[-1]) < 0.002))
-  
+
 })
 
 test_that("Leapfrog matches DemProj projection with migration", {
