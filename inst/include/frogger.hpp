@@ -22,7 +22,16 @@ void set_initial_state(State<ModelVariant, real_type> &state,
   }
 }
 
-
+/**
+ * @brief Run a simulation model over a specified number of time steps.
+ *
+ * @tparam ModelVariant The variant of the model to be run, used for compile time switching.
+ * @tparam real_type The data type used for real numbers in the simulation, usually a double.
+ * @param time_steps The total number of time steps to run the simulation for.
+ * @param save_steps A vector containing step intervals at which to save states.
+ * @param pars The parameters required for running the simulation.
+ * @return An OutputState object containing output from every save_step in the simulation.
+ */
 template<typename ModelVariant, typename real_type>
 OutputState<ModelVariant, real_type> run_model(int time_steps,
                                                std::vector<int> save_steps,

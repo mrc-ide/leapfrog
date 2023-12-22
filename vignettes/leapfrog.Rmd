@@ -1,0 +1,102 @@
+---
+title: "Leapfrog"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Leapfrog}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(frogger)
+```
+
+# Introduction
+
+Leapfrog is designed to be fast, extensible and compatible with TMB. This vignette covers how you can use the leapfrog to extend the model.
+
+# Structure
+
+## Input 
+
+If you want to make changes to the model there are two important interfaces to think about. The R function `run_model` from `R/run_model.R` and the C++ function `run_model` from `inst/include/frogger.hpp`. These both run the leapfrog model end to end and provide ways to switch the type of model that is being run. 
+
+The R interface provides takes some data, parameters and then further options which control the type of model which is run. See `?run_model` for full details of options. These options are converted into a `model_variant` this is the main tool for switching the type of model in the underlying C++ code. All C++ is templated over the model variant meaning that we can have compile time switching between different model types. 
+
+We can also do runtime switching via the C++ Options struct. In general, you should use a model variant to compile a specific model type you want to use in some specific context and use runtime switching when this is something which could change depending on different input data or when run within the same context. 
+
+At the time of writing we have two compile time switches
+* HIV age stratification - whether the HIV age groups are coarse or fully stratified. The coarse stratification is used for generating uncertainty when we have to run the model many times.
+* Child model - if true then the compiled code expects child model data to be available and adds several processes to simualte children within the model.
+
+Note that there is a BaseModel model variant which is always run and is used as the default model type.
+
+The code also compiles with a static state space. This means that sizes of dimensions are known at compile time making the Eigen indexing much faster. This means that every time we refer to the index of an input or an output we should try and do it in reference to the state space. The state space is defined in the C++ code in `inst/include/state_space.hpp` this is important for input and output parsing which we will detail later.
+
+## Output
+
+What is output by frogger is also flexible, you can set what time steps you want to output and what data to include. This is controlled by the `StateSaver` struct. When you run the model from R or C++ you can set the `output_steps` or `save_steps` respectively to a vector of ints. This will include the iterations to output, from R you can do e.g. `60` to only include the final year, `0:60` to include every year `seq(0, 60, 5)` to include every 5th year etc.
+
+What state model types are included etc??
+
+# Use cases
+
+## As a model user how can I switch between different models?
+
+### R
+
+If you are running the model from R just call the R function with the desired arguments e.g. to run with full age stratification and child model turned on.
+
+```R
+run_model <- function(data, parameters, sim_years,
+                      hts_per_year, output_steps,
+                      hiv_age_stratification = "full",
+                      run_child_model = TRUE)
+```
+
+### C++
+
+If you are running the model from C++, create the `ModelVariant` struct you want to fit and call `run_model` with this template param e.g. to run the child model
+
+```C++
+constexpr auto ss = leapfrog::StateSpace<leapfrog::ChildModel>();
+ret = leapfrog::run_model<leapfrog::ChildModel>(proj_years, save_steps, params);
+```
+
+## As a model developer how can I add new input data?
+
+To try and make including input data as streamlined as possible we use code generation to generate types and input parsing code. So to add a new piece of input data add a new row to the csv in `inst/cpp_generation/model_input.csv`. This contains rows
+
+* r_name - The name of the variable in R
+* cpp_name - The name of the variable in C++ including the struct it belongs to, e.g. `Demography.base_pop` to call the input `base_pop` in the `Demography` struct
+* type - The type of the variable, usually double or int. This should use `real_type` if it is something TMB needs to integrate over
+* input_when - For what model variant is this input data included? If blank then it is part of the base model. Otherwise this needs to be an expression which will evaluate as a boolean. You can use properties of `ModelVariant` to control this e.g. `ModelVariant::run_child_model` to include the data for the child model.
+* value - Optionally, a static value to initialise this input data as. If you want to initialise some data type as a constant.
+* convert_base - Optionally, whether to convert from R base-1 to C++ base-0. Use this if you are passing in some data which refers to an index in another data structure
+* dims, dim1, dim2, dim3, dim4 - The dimension of this input data. dims should be the number of dimensions and dim1, dim2, ... should contain the size of those dimensions. These should refer to items from the state space where possible. Note that this limits us to 4 dimensions for input data. If we need more we'll need to add a new column here, amongst adding some new types in C++.
+
+Couple of things to node:
+* Data from R is passed through as an Eigen TensorMap, this means it is eigen structure over data owned by the R process. This avoids copying data on the way in but means that the input data is read only.
+* If an input has dims 1 and dim1 is length 1 then this will be parsed as a literal of `type` not as an eigen tensor, i.e. as a `real_type` not `Eigen::Tensor<real_type>`
+* If `convert_base` is true then the input type will be an Eigen::Tensor, not a TensorMap. This is because we need to `-1` off every value within the tensor. In this case, the data is copied and then the copy is modified to `-1` off every value.
+
+After adding a new row, you can then generate the new input code using `./scripts/generate`. This will rewrite the `inst/include/model_input.hpp` file to include new parsing code. And will add the new input data to the types. With this you should immediately be able to use the new data in the body of C++ functions.
+
+If you want to add a new struct there is one further step required. The new struct will be generated out for you from the `cpp_name`, but you will need to add this to relevant model variant. Edit `inst/include/parameters.hpp` to add the new struct into the relevant parameters struct.
+
+## As a model developer how can I add a new output type
+
+## As a model developer how can I add a new process to the model?
+
+## How can I make my code less verbose?
+
+
+
+

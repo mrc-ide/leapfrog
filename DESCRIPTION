@@ -21,7 +21,10 @@ Imports:
     glue,
     Rcpp
 Suggests:
+    knitr,
     RcppEigen,
+    rmarkdown,
     testthat (>= 3.0.0),
     withr,
     xml2
+VignetteBuilder: knitr
