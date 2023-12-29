@@ -66,7 +66,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                     const int hiv_steps_per_year,
                     const int t_ART_start,
                     const int *hAG_SPAN,
-		    const int projection_period_int,
+		    const int projection_period_int,  // integer flag for projection
+		                                      // period (0 = midyear, 1 = calendar)
                     //
                     //outputs
                     Type *p_totpop1,
