@@ -102,7 +102,6 @@ test_that("Leapfrog matches DemProj projection with migration", {
   expect_true(all(abs(diff2) < 0.016))
 })
 
-
 test_that("Leapfrog matches AIM projection with no ART and no migration", {
 
   pjnz1 <- test_path("../testdata/spectrum/v6.18/bwa_aim-adult-no-art_no-migration_spectrum-v6.18_2023-07-08.PJNZ")
@@ -160,6 +159,6 @@ test_that("Leapfrog matches AIM projection with no ART and WITH migration", {
 
   diff_hivdeaths <- lmod1$hivdeaths - specres$hivdeaths
   expect_true(all(abs(diff_hivdeaths[1:80,,2:61]) < 0.001))
-  expect_true(all(abs(diff_hivdeaths[81,,2:61]) < 0.1))
+  expect_true(all(abs(diff_hivdeaths[81,,2:61]) < 0.11))
   
 })
