@@ -648,42 +648,30 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       
       for(int g = 0; g < NG; g++){
 
-	for(int a = 0; a < pAG - 1; a++) {
+	for(int a = 0; a < pAG; a++) {
 	  migrate_ag(a, g) = netmigr(a, g, t) / totpop1(a, g, t);
 	  totpop1(a, g, t) *= 1.0 + migrate_ag(a, g);
 	}
 	
-	// For open age group, netmigrant survivor adjustment based on weighted
-	// sx for age 79 and age 80+.
-	// * Numerator: totpop1(a, g, t-1) * (1.0 + sx(a+1, g, t)) + totpop1(a-1, g, t-1) * (1.0 + sx(a, g, t))
-	// * Denominator: totpop1(a, g, t-1) + totpop1(a-1, g, t-1)
-	// Re-expressed current population and deaths to open age group (already calculated):
-	int a = pAG - 1;
-	Type sx_netmig = (totpop1(a, g,t) + 0.5 * natdeaths(pAG-1, g, t)) / (totpop1(a, g,t) + natdeaths(pAG-1, g, t));
-	migrate_ag(a, g) = sx_netmig * netmigr(a, g, t) / totpop1(a, g,t);
-	totpop1(a, g, t) *= 1.0 + migrate_ag(a, g);
-      }
-
-      // remove net migration from hivpop1
-      TensorFixedSize<Type, Sizes<pAG, NG>> netmig_ag;
-      for(int g = 0; g < NG; g++) {
+	// remove net migration from hivpop1
+	TensorFixedSize<Type, Sizes<pAG>> netmig_a;
 	for(int a = 0; a < pAG; a++) {
-	  netmig_ag(a, g) = hivpop1(a, g, t) * migrate_ag(a, g);
-	  hivpop1(a, g, t) += netmig_ag(a, g);
+	  netmig_a(a) = hivpop1(a, g, t) * migrate_ag(a, g);
+	  hivpop1(a, g, t) += netmig_a(a);
 	}
-      }
-      
-      // remove net migration from adult stratified population
-      for(int g = 0; g < NG; g++){
+	
+	// remove net migration from adult stratified population
 	int a = pIDX_HIVADULT;
 	for(int ha = 0; ha < hAG; ha++){
-	  Type mig_ha = 0;
+	  Type mig_ha = 0.0;
+	  Type hivpop_ha_postmig = 0.0;
 	  for(int i = 0; i < hAG_SPAN[ha]; i++){
-	    mig_ha += netmig_ag(a, g);
+	    hivpop_ha_postmig += hivpop1(a, g, t);
+	    mig_ha += netmig_a(a);
 	    a++;
 	  }
 	  
-	  Type migrate_ha = hivpop_ha(ha, g) > 0 ? mig_ha / hivpop_ha(ha, g) : 0.0;
+	  Type migrate_ha = hivpop_ha_postmig > 0 ? mig_ha / (hivpop_ha_postmig - mig_ha) : 0.0;
 	  for(int hm = 0; hm < hDS; hm++){
 	    hivstrat_adult(hm, ha, g, t) *= 1.0 + migrate_ha;
 	    if(t > t_ART_start) {
