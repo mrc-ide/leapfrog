@@ -87,10 +87,12 @@ struct Options {
   const int ts_art_start;
   const int hAG_15plus;
   const int hIDX_15PLUS;
+  const int proj_period_int;
 
   Options(int hts_per_year,
           int ts_art_start,
-          int hAG_15plus) :
+          int hAG_15plus,
+	  int proj_period_int) :
       hts_per_year(hts_per_year),
       dt(1.0 / hts_per_year),
       p_idx_fertility_first(15),
@@ -100,7 +102,8 @@ struct Options {
       pAG_INCIDPOP(35),
       ts_art_start(ts_art_start),
       hAG_15plus(hAG_15plus),
-      hIDX_15PLUS(0) {}
+      hIDX_15PLUS(0),
+      proj_period_int(proj_period_int) {}
 };
 
 template<typename real_type>
@@ -330,6 +333,9 @@ namespace internal {
 const int MALE = 0;
 const int FEMALE = 1;
 const int ART0MOS = 0;
+
+const int PROJPERIOD_MIDYEAR = 0;   // mid-year projection period 
+const int PROJPERIOD_CALENDAR = 1;  // calendar-year projection (Spectrum 6.2 update; December 2022)
 
 template<typename ModelVariant, typename real_type>
 struct BaseModelIntermediateData {
