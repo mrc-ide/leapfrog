@@ -82,38 +82,19 @@ void run_end_year_migration(int time_step,
 			    State<ModelVariant, real_type> &state_next,
 			    IntermediateData<ModelVariant, real_type> &intermediate) {
 
-  printf("Running in here!\n");
-  
   constexpr auto ss = StateSpace<ModelVariant>().base;
   const auto demog = pars.base.demography;
 
   for (int g = 0; g < ss.NS; ++g) {
 
-    // Migration for ages 0, ..., 79
-    for (int a = 0; a < ss.pAG - 1; ++a) {
+    // Migration for ages 0, ..., 80+
+    for (int a = 0; a < ss.pAG; ++a) {
 
       // Calculate migration rate as number of net migrants divided by total pop.
       intermediate.base.migration_rate(a, g) = demog.net_migration(a, g, time_step) /
                                                state_next.base.p_total_pop(a, g);
       state_next.base.p_total_pop(a, g) *= 1.0 + intermediate.base.migration_rate(a, g);
     }
-
-    // For open age group (age 80+), net migrant survivor adjustment based on
-    // weighted survival_probability for age 79 and age 80+.
-    // * Numerator: p_total_pop(a, g, t-1) * (1.0 + survival_probability(a+1, g, t))
-    // + p_total_pop(a-1, g, t-1) * (1.0 + survival_probability(a, g, t))
-    // * Denominator: p_total_pop(a, g, t-1) + p_total_pop(a-1, g,
-    // t-1) Re-expressed current population and deaths to open age group
-    // (already calculated):
-    int a = ss.pAG - 1;
-    real_type survival_probability_netmig =
-        (state_next.base.p_total_pop(a, g) +
-         0.5 * state_next.base.p_total_pop_natural_deaths(a, g)) /
-        (state_next.base.p_total_pop(a, g) + state_next.base.p_total_pop_natural_deaths(a, g));
-    intermediate.base.migration_rate(a, g) = survival_probability_netmig *
-                                             demog.net_migration(a, g, time_step) /
-                                             state_next.base.p_total_pop(a, g);
-    state_next.base.p_total_pop(a, g) *= 1.0 + intermediate.base.migration_rate(a, g);
   }
 }
   
