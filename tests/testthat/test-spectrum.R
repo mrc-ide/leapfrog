@@ -5,7 +5,7 @@ test_that("DemProj only matches EPP-ASM", {
   ##   not handle survivorship of the open age group correctly. This
   ##   is corrected in leapfrog.
 
-  pjnz1 <- test_path("../testdata/spectrum/v6.13/bwa_demproj-only_spectrum-v6.13_2022-02-12.PJNZ")
+  pjnz1 <- test_path("../testdata/spectrum/v6.18/bwa_demproj-only_spectrum-v6.18_2023-07-08.PJNZ")
   
   demp1 <- prepare_leapfrog_demp(pjnz1)
   hivp1 <- prepare_leapfrog_projp(pjnz1)
@@ -40,8 +40,8 @@ test_that("DemProj only matches EPP-ASM", {
 
 test_that("Leapfrog matches DemProj projection without migration", {
 
-  ## v6.13 -- net-migration half at start / half end year
-  pjnz1 <- test_path("../testdata/spectrum/v6.13/bwa_demproj-only-no-mig_spectrum-v6.13_2022-02-12.PJNZ")
+  ## v6.18 -- net-migration half at start / half end year
+  pjnz1 <- test_path("../testdata/spectrum/v6.18/bwa_demproj-only-no-mig_spectrum-v6.18_2023-07-08.PJNZ")
   demp1 <- prepare_leapfrog_demp(pjnz1)
   hivp1 <- prepare_leapfrog_projp(pjnz1)
   lmod1 <- leapfrogR(demp1, hivp1)
@@ -101,6 +101,7 @@ test_that("Leapfrog matches DemProj projection with migration", {
 
   expect_true(all(abs(diff2) < 0.016))
 })
+
 
 test_that("Leapfrog matches AIM projection with no ART and no migration", {
 
@@ -162,4 +163,3 @@ test_that("Leapfrog matches AIM projection with no ART and WITH migration", {
   expect_true(all(abs(diff_hivdeaths[81,,2:61]) < 0.1))
   
 })
-
