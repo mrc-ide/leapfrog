@@ -82,8 +82,6 @@ void run_end_year_migration(int time_step,
 			    State<ModelVariant, real_type> &state_next,
 			    IntermediateData<ModelVariant, real_type> &intermediate) {
 
-  printf("Running in here!\n");
-  
   constexpr auto ss = StateSpace<ModelVariant>().base;
   const auto demog = pars.base.demography;
 

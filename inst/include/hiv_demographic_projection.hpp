@@ -15,6 +15,7 @@ void run_hiv_ageing_and_mortality(int time_step,
                                   IntermediateData<ModelVariant, real_type> &intermediate) {
   const auto demog = pars.base.demography;
   constexpr auto ss = StateSpace<ModelVariant>().base;
+  
   // Non-hiv deaths
   for (int g = 0; g < ss.NS; ++g) {
     for (int a = 1; a < ss.pAG; ++a) {
@@ -140,9 +141,12 @@ void run_hiv_and_art_stratified_deaths_and_migration(
   for (int g = 0; g < ss.NS; ++g) {
     for (int a = 1; a < ss.pAG; ++a) {
       state_next.base.p_hiv_pop(a, g) -= state_next.base.p_hiv_pop_natural_deaths(a, g);
-      intermediate.base.hiv_net_migration(a, g) =
+
+      if (pars.base.options.proj_period_int == internal::PROJPERIOD_MIDYEAR) {
+	intermediate.base.hiv_net_migration(a, g) =
           state_next.base.p_hiv_pop(a, g) * intermediate.base.migration_rate(a, g);
-      state_next.base.p_hiv_pop(a, g) += intermediate.base.hiv_net_migration(a, g);
+	state_next.base.p_hiv_pop(a, g) += intermediate.base.hiv_net_migration(a, g);
+      }
     }
   }
 
@@ -152,7 +156,10 @@ void run_hiv_and_art_stratified_deaths_and_migration(
     for (int ha = 0; ha < ss.hAG; ++ha) {
       real_type deaths_migrate = 0.0;
       for (int i = 0; i < ss.hAG_span[ha]; ++i, ++a) {
-        deaths_migrate += (intermediate.base.hiv_net_migration(a, g) - state_next.base.p_hiv_pop_natural_deaths(a, g));
+        deaths_migrate -= state_next.base.p_hiv_pop_natural_deaths(a, g);
+	if (pars.base.options.proj_period_int == internal::PROJPERIOD_MIDYEAR) {
+	  deaths_migrate += intermediate.base.hiv_net_migration(a, g);
+	}
       }
 
       real_type deaths_migrate_rate = 0.0;
@@ -164,9 +171,8 @@ void run_hiv_and_art_stratified_deaths_and_migration(
         state_next.base.h_hiv_adult(hm, ha, g) *= 1.0 + deaths_migrate_rate;
         if (time_step > pars.base.options.ts_art_start) {
           for (int hu = 0; hu < ss.hTS; ++hu) {
-            state_next.base.h_art_adult(hu, hm, ha, g) *=
-                1.0 + deaths_migrate_rate;
-          }
+            state_next.base.h_art_adult(hu, hm, ha, g) *= 1.0 + deaths_migrate_rate;
+         } 
         }
       }
     }
@@ -180,21 +186,12 @@ void run_hiv_pop_end_year_migration(
     const State<ModelVariant, real_type> &state_curr,
     State<ModelVariant, real_type> &state_next,
     IntermediateData<ModelVariant, real_type> &intermediate) {
-  
+
   constexpr auto ss = StateSpace<ModelVariant>().base;
-  
-  for (int g = 0; g < ss.NS; ++g) {
-    int a = pars.base.options.p_idx_hiv_first_adult;
-    for (int ha = 0; ha < ss.hAG; ++ha) {
-      for (int i = 0; i < ss.hAG_span[ha]; ++i, ++a) {
-        intermediate.base.p_hiv_pop_coarse_ages(ha, g) += state_next.base.p_hiv_pop(a, g);
-      }
-    }
-  }
   
   // remove net migration from hiv stratified population
   for (int g = 0; g < ss.NS; ++g) {
-    for (int a = 1; a < ss.pAG; ++a) {
+    for (int a = 0; a < ss.pAG; ++a) {
       intermediate.base.hiv_net_migration(a, g) =
 	state_next.base.p_hiv_pop(a, g) * intermediate.base.migration_rate(a, g);
       state_next.base.p_hiv_pop(a, g) += intermediate.base.hiv_net_migration(a, g);
@@ -206,21 +203,22 @@ void run_hiv_pop_end_year_migration(
     int a = pars.base.options.p_idx_hiv_first_adult;
     for (int ha = 0; ha < ss.hAG; ++ha) {
       real_type migration_num_ha = 0.0;
+      real_type hivpop_ha_postmig = 0.0;
       for (int i = 0; i < ss.hAG_span[ha]; ++i, ++a) {
+	hivpop_ha_postmig += state_next.base.p_hiv_pop(a, g);
 	migration_num_ha += intermediate.base.hiv_net_migration(a, g);
       }
-
+      
       real_type migration_rate = 0.0;
-      if (intermediate.base.p_hiv_pop_coarse_ages(ha, g) > 0) {
-	migration_rate = migration_num_ha / intermediate.base.p_hiv_pop_coarse_ages(ha, g);
+      if (hivpop_ha_postmig > 0.0) {
+	migration_rate = migration_num_ha / (hivpop_ha_postmig - migration_num_ha);
       }
-
+      
       for (int hm = 0; hm < ss.hDS; ++hm) {
         state_next.base.h_hiv_adult(hm, ha, g) *= 1.0 + migration_rate;
         if (time_step > pars.base.options.ts_art_start) {
           for (int hu = 0; hu < ss.hTS; ++hu) {
-            state_next.base.h_art_adult(hu, hm, ha, g) *=
-                1.0 + migration_rate;
+            state_next.base.h_art_adult(hu, hm, ha, g) *= 1.0 + migration_rate;
           }
         }
       }
