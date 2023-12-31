@@ -216,7 +216,7 @@ void run_hiv_pop_end_year_migration(
       
       for (int hm = 0; hm < ss.hDS; ++hm) {
         state_next.base.h_hiv_adult(hm, ha, g) *= 1.0 + migration_rate;
-        if (time_step > pars.base.options.ts_art_start) {
+        if (time_step >= pars.base.options.ts_art_start) {
           for (int hu = 0; hu < ss.hTS; ++hu) {
             state_next.base.h_art_adult(hu, hm, ha, g) *= 1.0 + migration_rate;
           }
