@@ -675,7 +675,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 	  Type migrate_ha = hivpop_ha_postmig > 0 ? mig_ha / (hivpop_ha_postmig - mig_ha) : 0.0;
 	  for(int hm = 0; hm < hDS; hm++){
 	    hivstrat_adult(hm, ha, g, t) *= 1.0 + migrate_ha;
-	    if(t > t_ART_start) {
+	    if(t >= t_ART_start) {
 	      for(int hu = 0; hu < hTS; hu++) {
 		artstrat_adult(hu, hm, ha, g, t) *= 1.0 + migrate_ha;
 	      }
