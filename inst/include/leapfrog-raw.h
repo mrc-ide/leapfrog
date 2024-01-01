@@ -539,26 +539,40 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 
           // calculate number on ART at end of ts, based on number or percent
           Type artnum_hts = 0.0;
-          if (dt*(hts+1) < 0.5) {
-            if ( (!art15plus_isperc(g, t-2)) & (!art15plus_isperc(g, t-1)) ){ // both numbers
+	  if (projection_period_int == PROJPERIOD_MIDYEAR && dt*(hts+1) < 0.5) {
+            if ( (!art15plus_isperc(g, t-2)) && (!art15plus_isperc(g, t-1)) ){ // both numbers
               artnum_hts = (0.5-dt*(hts+1))*art15plus_num(g, t-2) + (dt*(hts+1)+0.5)*art15plus_num(g, t-1);
-            } else if (art15plus_isperc(g, t-2) & art15plus_isperc(g, t-1)){ // both percentages
+            } else if (art15plus_isperc(g, t-2) && art15plus_isperc(g, t-1)){ // both percentages
               Type artcov_hts = (0.5-dt*(hts+1))*art15plus_num(g, t-2) + (dt*(hts+1)+0.5)*art15plus_num(g, t-1);
               artnum_hts = artcov_hts * (Xart_15plus + Xartelig_15plus);
-            } else if ( (!art15plus_isperc(g, t-2)) & art15plus_isperc(g, t-1)) { // transition from number to percentage
+            } else if ( (!art15plus_isperc(g, t-2)) && art15plus_isperc(g, t-1)) { // transition from number to percentage
               Type curr_coverage = Xart_15plus / (Xart_15plus + Xartelig_15plus);
               Type artcov_hts = curr_coverage + (art15plus_num(g, t-1) - curr_coverage) * dt / (0.5-dt*hts);
               artnum_hts = artcov_hts * (Xart_15plus + Xartelig_15plus);
             }
           } else {
-            if( (!art15plus_isperc(g, t-1)) & (!art15plus_isperc(g, t)) ){ // both numbers
-              artnum_hts = (1.5-dt*(hts+1))*art15plus_num(g, t-1) + (dt*(hts+1)-0.5)*art15plus_num(g, t);
-            } else if(art15plus_isperc(g, t-1) & art15plus_isperc(g, t)){ // both percentages
-              Type artcov_hts = (1.5-dt*(hts+1))*art15plus_num(g, t-1) + (dt*(hts+1)-0.5)*art15plus_num(g, t);
+
+	    // If the projection period is calendar year (>= Spectrum v6.2), 
+	    // this condition is always followed, and it interpolates between
+	    // end of last year and current year (+ 1.0).
+	    // If projection period was mid-year (<= Spectrum v6.19), the second
+	    // half of the projection year interpolates the first half of the
+	    // calendar year (e.g. hts 7/10 for 2019 interpolates December 2018
+	    // to December 2019)
+
+	    Type art_interp_w = dt * (hts + 1.0);
+	    if (projection_period_int == PROJPERIOD_MIDYEAR) {
+	      art_interp_w -= 0.5;
+	    }
+
+            if( (!art15plus_isperc(g, t-1)) && (!art15plus_isperc(g, t)) ){ // both numbers
+              artnum_hts = (1.0 - art_interp_w) * art15plus_num(g, t-1) + art_interp_w * art15plus_num(g, t);
+            } else if(art15plus_isperc(g, t-1) && art15plus_isperc(g, t)){ // both percentages
+              Type artcov_hts = (1.0 - art_interp_w) * art15plus_num(g, t-1) + art_interp_w * art15plus_num(g, t);
               artnum_hts = artcov_hts * (Xart_15plus + Xartelig_15plus);
             } else if( (!art15plus_isperc(g, t-1)) & art15plus_isperc(g, t)){ // transition from number to percentage
               Type curr_coverage = Xart_15plus / (Xart_15plus + Xartelig_15plus);
-              Type artcov_hts = curr_coverage + (art15plus_num(g, t) - curr_coverage) * dt / (1.5-dt*hts);
+              Type artcov_hts = curr_coverage + (art15plus_num(g, t) - curr_coverage) * dt / (1.0 - art_interp_w + dt);
               artnum_hts = artcov_hts * (Xart_15plus + Xartelig_15plus);
             }
           }
