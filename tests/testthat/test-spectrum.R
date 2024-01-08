@@ -12,6 +12,8 @@ test_that("v6.28 works..", {
 
   demp1 <- prepare_leapfrog_demp(pjnz1)
   hivp1 <- prepare_leapfrog_projp(pjnz1)
+  hivp1 <- prepare_hc_leapfrog_projp(pjnz1, hivp1)
+
 
   lmod1 <- leapfrogR(demp1, hivp1)
 
@@ -28,6 +30,7 @@ test_that("v6.28 works..", {
 
   demp2 <- prepare_leapfrog_demp(pjnz2)
   hivp2 <- prepare_leapfrog_projp(pjnz2)
+  hivp2 <- prepare_hc_leapfrog_projp(pjnz2, hivp2)
 
   lmod2 <- leapfrogR(demp2, hivp2)
 
