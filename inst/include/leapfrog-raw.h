@@ -370,18 +370,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     }
 
 
-    if(t == 19){
-      double mag;
-      mag = 0.0;
-      for(int g = 0; g < NG; g++){
-        for(int hm = 0; hm < hDS; hm++){
-            mag += age15_hivpop(hm, g)  ;
-        }
-      }
-   //   std::cout << mag;
-    }
-
-
     TensorFixedSize<Type, Sizes<pAG, NG>> migrate_ag;
     // ageing and non-HIV mortality
     for(int g = 0; g < NG; g++){
@@ -510,10 +498,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       }
     }
 
-    if(t == 31){
-      std::cout << age15_hivpop(0, 1) + age15_hivpop(1, 1) + age15_hivpop(2, 1);
-      std::cout <<  hivstrat_adult(0, 0, 1, t);
-    }
 
 
 
@@ -955,27 +939,27 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     // adjust population to match target population size
     // TensorFixedSize<Type, Sizes<hAG, NG>> popadjprob;
     // TensorFixedSize<Type, Sizes<hAG, NG>> hivpopadjprob;
-    for(int g = 0; g < NG; g++){
-      for(int ha = 0; ha < (pAG-1); ha++){
-        //popadjprob(ha, g) = 0.0;
-        //popadjprob(ha, g) = basepop(ha, g, t) / totpop1(ha, g, t);
-        // maybe need to change this for coarse age groups
-        // hivpopadjprob(ha, g) = popadjprob(ha, g) ;
-
-
-       totpop1(ha, g, t) = basepop(ha, g, t);
-       hivpop1(ha, g, t) =  hivpop1(ha, g, t) * basepop(ha, g, t) / totpop1(ha, g, t);
-       for(int hm = 0; hm < hDS; hm++){
-         hivstrat_adult(hm, ha, g, t) =  hivstrat_adult(hm, ha, g, t) * basepop(ha, g, t) / totpop1(ha, g, t);
-       }
-
-        //hivpop1(ha, g, t) = hivpopadjprob(ha, g) * hivpop1(ha, g, t);
-        //if (t >= t_ART_start) {
-        //to do: need to add in scalar to ART population
-        //}
-
-      }
-    }
+    // for(int g = 0; g < NG; g++){
+    //   for(int ha = 0; ha < (pAG-1); ha++){
+    //     //popadjprob(ha, g) = 0.0;
+    //     //popadjprob(ha, g) = basepop(ha, g, t) / totpop1(ha, g, t);
+    //     // maybe need to change this for coarse age groups
+    //     // hivpopadjprob(ha, g) = popadjprob(ha, g) ;
+    //
+    //
+    //    totpop1(ha, g, t) = basepop(ha, g, t);
+    //    hivpop1(ha, g, t) =  hivpop1(ha, g, t) * basepop(ha, g, t) / totpop1(ha, g, t);
+    //    for(int hm = 0; hm < hDS; hm++){
+    //      hivstrat_adult(hm, ha, g, t) =  hivstrat_adult(hm, ha, g, t) * basepop(ha, g, t) / totpop1(ha, g, t);
+    //    }
+    //
+    //     //hivpop1(ha, g, t) = hivpopadjprob(ha, g) * hivpop1(ha, g, t);
+    //     //if (t >= t_ART_start) {
+    //     //to do: need to add in scalar to ART population
+    //     //}
+    //
+    //   }
+    // }
 
     //going to put ART here for right now, it might be the wrong place eventually
 
