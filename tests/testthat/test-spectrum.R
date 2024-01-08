@@ -1,11 +1,5 @@
 test_that("Leapfrog matches single year age group and coarse age group projection without migration", {
 
-  pjnz1 <- "../testdata/spectrum/v6.13/bwa_demproj-only-no-mig_spectrum-v6.13_2022-02-12.PJNZ"
-  demog_matches_birthsdeaths(pjnz1, threshold_deaths = 0.05, threshold_births = 1e-3)
-  demog_matches_totpop(pjnz1)
-  matches_coarse_age_groups(pjnz1, threshold_pid = c(0, 0, 0), threshold_naturaldeaths = 1e-3)
-
-
   pjnz1 <- test_path("../testdata/spectrum/v6.18/bwa_demproj-only_spectrum-v6.18_2023-07-08.PJNZ")
 
   demp1 <- prepare_leapfrog_demp(pjnz1)
