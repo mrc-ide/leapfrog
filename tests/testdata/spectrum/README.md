@@ -1,37 +1,12 @@
 # Spectrum test files
 
-These are a series of test files constructed to ensure that development of leapfrog follows the already established EPP-ASM and Spectrum models. 
+
+These are a series of test files constructed to verify the Leapfrog simulation against 
+Spectrum.
 
 Files were constructed using default data for Botswana in Spectrum v6.13 on 12 February 2022.
 
-## `v6.13/bwa_demproj-only_spectrum-v6.13_2022-02-12.PJNZ`
-This file only has the demographic projection component of Spectrum. These inputs are run through Leapfrog and EPP-ASM to ensure that population projections matches at the coarse age group level. It is not compared to Spectrum as previous testing shows that Spectrum and EPP-ASM are approximately equal at the coarse age structure.
-
-## `v6.13/bwa_demproj-only-no-mig_spectrum-v6.13_2022-02-12.PJNZ`
-This file only has the demographic projection component of Spectrum, and migration is set to zero. The resulting Spectrum projection's births, deaths, and total population were compared to those estimated in leapfrog.
-
-## `v6.13/bwa_aim-adult-no-art-no-hiv-deaths_spectrum-v6.13_2022-02-12.pjnz`
-This file has the demographic and AIM modules included, with the following constraints placed on the AIM model:
-
-* Adult ART coverage set to zero
-* No MTCT
-* FRR for HIV+ women set to one
-* Child treatment (cotrim, PMTCT, and ART) set to zero
-* HIV-related mortality set to zero.
-
-Purpose: Ensure that incidence and disease progression between Spectrum and leapfrog align.
-
-## `v6.13/bwa_aim-adult-no-art-spectrum-v6.13_2022-02-12.pjnz`
-This file has the demographic and AIM modules included, with the following constraints placed on the AIM model:
-
-* Adult ART coverage set to zero
-* No MTCT
-* FRR for HIV+ women set to one
-* Child treatment (cotrim, PMTCT, and ART) set to zero
-
-Purpose: Ensure that incidence, disease progression, and HIV related mortality between Spectrum and leapfrog align. Also confirm that the introduction of HIV-related mortality doesn't change functionality of the demographic projection model.
-
-
+The same files were resaved in Spectrum v6.18 (AIM 2022 final version) on 8 July 2023.
 
 
 ## Jeff's drafts below
