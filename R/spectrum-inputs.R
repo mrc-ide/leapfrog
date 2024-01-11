@@ -185,7 +185,7 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
                                                                    hc2_cd4_categories = c('>1000', '750-999', '500-749', '350-499', '200-349', '<200')))
   adult_cd4_dist[1,1:3] <- 1
   adult_cd4_dist[2,4] <- 1
-  adult_cd4_dist[3:4,5] <- c(0.67, 0.33)
+  adult_cd4_dist[3:4,5] <- c(0.6665589, 1-0.6665589)
   adult_cd4_dist[5:7,6] <- c(0.35, 0.21, 0.44)
 
 
@@ -506,6 +506,8 @@ prepare_hc_leapfrog_projp <- function(pjnz, params){
   paed_cd4_transition[1:6,5] <- c(0.03880388, 0.090309031, 0.275927593, 0.259925993, 0.255725573, 0.079307931)
   paed_cd4_transition[1:6,6] <- c(0.018615705, 0.018615705, 0.099217744, 0.165065848, 0.363501337, 0.334983662)
   paed_cd4_transition[1:6,7] <- c(0, 0.0014, 0.00990099, 0.00710071, 0.04960496, 0.931993199)
+  paed_cd4_transition[6,1] <- 1 - sum(paed_cd4_transition[-6,1])
+  paed_cd4_transition[6,7] <- 1 - sum(paed_cd4_transition[-6,7])
   v$paed_cd4_transition <- paed_cd4_transition
 
 

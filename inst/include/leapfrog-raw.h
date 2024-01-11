@@ -1152,6 +1152,10 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    onARTretained = pmtct_cov(4) * ((pmtct_dropout(0,t)));
    startingARTretained = pmtct_cov(5) * ((pmtct_dropout(1,t)));
    ptr1 = pmtct_cov(2) * pmtct_mtct(0,2,0) + pmtct_cov(3) * pmtct_mtct(0,3,0)  + pmtct_cov(0) * optA_tr + pmtct_cov(1) *  optB_tr  + onARTretained * art_mtct(0,0,0)  + startingARTretained * art_mtct(0,1,0)+ pmtct_cov(6) * art_mtct(0,2,0);
+   if(t == 6){
+     std::cout << pmtct_cov(2);
+   }
+
 
    double percent_in_program;
    percent_in_program = pmtct_cov(0) + pmtct_cov(1) + pmtct_cov(2) + pmtct_cov(3) + onARTretained + startingARTretained + pmtct_cov(6);
