@@ -43,6 +43,7 @@ test_that("Leapfrog matches DemProj projection without migration", {
   pjnz1 <- test_path("../testdata/spectrum/v6.18/bwa_demproj-only-no-mig_spectrum-v6.18_2023-07-08.PJNZ")
   demp1 <- prepare_leapfrog_demp(pjnz1)
   hivp1 <- prepare_leapfrog_projp(pjnz1)
+  hivp1 <- prepare_hc_leapfrog_projp(pjnz1, hivp1)
   lmod1 <- leapfrogR(demp1, hivp1)
 
   diff1 <- lmod1$totpop[,,2] - demp1$basepop[,,2]
@@ -62,6 +63,7 @@ test_that("Leapfrog matches DemProj projection without migration", {
   pjnz2 <- test_path("../testdata/spectrum/v6.28/bwa_demproj-only-no-mig_spectrum-v6.28_2023-12-12.PJNZ")
   demp2 <- prepare_leapfrog_demp(pjnz2)
   hivp2 <- prepare_leapfrog_projp(pjnz2)
+  hivp2 <- prepare_hc_leapfrog_projp(pjnz2, hivp2)
   lmod2 <- leapfrogR(demp2, hivp2)
 
   diff2 <- lmod2$totpop[,,2] - demp2$basepop[,,2]
@@ -78,12 +80,14 @@ test_that("Leapfrog matches DemProj projection without migration", {
 
 })
 
-test_that("v6.28 works..", {
+
+test_that("Leapfrog matches DemProj projection with migration", {
 
   ## v6.18 -- net-migration half at start / half end year
   pjnz1 <- test_path("../testdata/spectrum/v6.18/bwa_demproj-only_spectrum-v6.18_2023-07-08.PJNZ")
   demp1 <- prepare_leapfrog_demp(pjnz1)
   hivp1 <- prepare_leapfrog_projp(pjnz1)
+  hivp1 <- prepare_hc_leapfrog_projp(pjnz1, hivp1)
   lmod1 <- leapfrogR(demp1, hivp1)
 
   diff1 <- lmod1$totpop1 - demp1$basepop
@@ -94,6 +98,7 @@ test_that("v6.28 works..", {
   pjnz2 <- test_path("../testdata/spectrum/v6.28/bwa_demproj-only_spectrum-v6.28_2023-12-12.PJNZ")
   demp2 <- prepare_leapfrog_demp(pjnz2)
   hivp2 <- prepare_leapfrog_projp(pjnz2)
+  hivp2 <- prepare_hc_leapfrog_projp(pjnz2, hivp2)
   lmod2 <- leapfrogR(demp2, hivp2)
 
   diff2 <- lmod2$totpop1 - demp2$basepop
@@ -101,11 +106,13 @@ test_that("v6.28 works..", {
   expect_true(all(abs(diff2) < 0.016))
 })
 
+
 test_that("Leapfrog matches AIM projection with no ART and no migration", {
 
   pjnz1 <- test_path("../testdata/spectrum/v6.18/bwa_aim-adult-no-art_no-migration_spectrum-v6.18_2023-07-08.PJNZ")
   demp1 <- prepare_leapfrog_demp(pjnz1)
   hivp1 <- prepare_leapfrog_projp(pjnz1)
+  hivp1 <- prepare_hc_leapfrog_projp(pjnz1, hivp1)
   lmod1 <- leapfrogR(demp1, hivp1)
 
   specres <- eppasm::read_hivproj_output(pjnz1)
@@ -129,6 +136,16 @@ test_that("Leapfrog matches AIM projection with no ART and no migration", {
   expect_true(all(abs(diff_hivdeaths[1:80,,2:61]) < 0.001))
   expect_true(all(abs(diff_hivdeaths[81,,2:61]) < 0.1))
 
+  ##Maggie added this 08/01/2024
+  pjnz2 <- test_path("../testdata/spectrum/v6.28/bwa_aim-adult-no-art_no-migration_spectrum-v6.28_2024-08-01.PJNZ")
+  demp2 <- prepare_leapfrog_demp(pjnz2)
+  hivp2 <- prepare_leapfrog_projp(pjnz2)
+  hivp2 <- prepare_hc_leapfrog_projp(pjnz2, hivp2)
+  lmod2 <- leapfrogR(demp2, hivp2)
+
+  specres2 <- eppasm::read_hivproj_output(pjnz2)
+
+
 })
 
 
@@ -137,6 +154,7 @@ test_that("Leapfrog matches AIM projection with no ART and WITH migration", {
   pjnz1 <- test_path("../testdata/spectrum/v6.28/bwa_aim-adult-no-art_spectrum-v6.28_2023-12-12.PJNZ")
   demp1 <- prepare_leapfrog_demp(pjnz1)
   hivp1 <- prepare_leapfrog_projp(pjnz1)
+  hivp1 <- prepare_hc_leapfrog_projp(pjnz1, hivp1)
   lmod1 <- leapfrogR(demp1, hivp1)
 
   specres <- eppasm::read_hivproj_output(pjnz1)
@@ -564,29 +582,28 @@ test_that('BWA normal treatment', {
   expect_true(all(diff_art < 1e-3), label = 'On treatment paediatric population in leapfrog and spectrum match')
 })
 
-##Currently have the right number of births to HIV+ women (checking that with output from spectrum variable hivpregwomen)
+##08/01/2024 working
 test_that('Perinatal transmission of HIV', {
-  pjnz <- "../testdata/spectrum/v6.13/TEST_MTCT_perinatal.PJNZ"
+  pjnz <- "../testdata/spectrum/v6.28/TEST_MTCT_perinatal.PJNZ"
   pjnz1 <- test_path(pjnz)
 
   demp <- prepare_leapfrog_demp(pjnz1)
   hivp <- prepare_leapfrog_projp(pjnz1)
   hivp <- prepare_hc_leapfrog_projp(pjnz1, hivp)
-  hivp <- leapfrog_input_mods(hivp)
   hivp$ctx_effect <- 0
+  hivp$paed_cd4_transition[6,1] <- 1 - sum(hivp$paed_cd4_transition[-6,1])
+  hivp$paed_cd4_transition[6,7] <- 1 - sum(hivp$paed_cd4_transition[-6,7])
+  hivp$adult_cd4_dist[3,5] <- 0.6665589
+  hivp$adult_cd4_dist[4,5] <- 1 - hivp$adult_cd4_dist[3,5]
+
 
   ## Replace netmigr with unadjusted age 0-4 netmigr, which are not
   ## in EPP-ASM preparation
   demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
   demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
 
-  ##look to make sure understanding about HIV incident infections
-  ##fertility discounting differences, change all of the FRR to one and see if it lines up
-  ##should then just reflect prevalence by age
-  ##then account for age, then CD4
-  ##check that asfr is divided by 5 in the spectrum inputs file
 
-
+## issue is that lmod doesn't have any kids? in hivpop1?
   lmod <- leapfrogR(demp, hivp)
   specres <- read_hivproj_output(pjnz1)
 
@@ -596,8 +613,8 @@ test_that('Perinatal transmission of HIV', {
   x[,year := 1970:2030]
 
   lmod_out <- lmod_output_paed(lmod = lmod)
-  df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_MTCT_perinatal_pop1.xlsx", ages =0:14, country = 'Botswana')
-  #y <- df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_MTCT_perinatal_pop1.xlsx", ages =15, country = 'Botswana')
+  df_out <- spectrum_output(file = "../testdata/spectrum/v6.28/TEST_MTCT_perinatal_pop1.xlsx", ages =0:14, country = 'Botswana')
+  y <- spectrum_output(file = "../testdata/spectrum/v6.28/TEST_MTCT_perinatal_pop1.xlsx", ages =15, country = 'Botswana')
 
   dt <- dplyr::left_join(lmod_out$prev, df_out$off_treatment)
   dt <- dt %>% dplyr::filter(!is.na(pop)) %>% unique()
@@ -621,133 +638,218 @@ test_that('Perinatal transmission of HIV', {
   expect_true(all(diff_art < 1e-3), label = 'On treatment paediatric population in leapfrog and spectrum match')
 })
 
+##09/01/2024 working
 test_that('Perinatal transmission of HIV, some pmtct', {
-  pjnz <- "../testdata/spectrum/v6.13/TEST_MTCT_perinatal_options.PJNZ"
+  pjnz <- "../testdata/spectrum/v6.28/TEST_MTCT_perinatal_options.PJNZ"
   pjnz1 <- test_path(pjnz)
 
   demp <- prepare_leapfrog_demp(pjnz1)
   hivp <- prepare_leapfrog_projp(pjnz1)
+  hivp <- prepare_hc_leapfrog_projp(pjnz1, hivp)
   hivp$ctx_effect <- 0
-  hivp$ctx_val[] <- 0
-
-  hivp$artpaeds_isperc[] <- TRUE
-
-  ##I have no idea what these are
-  ## hivp$scalar_art[] <- 1
-  ##hivp$fert_rat[] <- 1
-
-  hivp$pmtct[] <- 0
-  hivp$pmtct[1:4,which(1970:2030 %in% c(1980:1991)),2] <- 0.1
-  hivp$pmtct_mtct[,,2] <- 0
+  hivp$paed_cd4_transition[6,1] <- 1 - sum(hivp$paed_cd4_transition[-6,1])
+  hivp$paed_cd4_transition[6,7] <- 1 - sum(hivp$paed_cd4_transition[-6,7])
+  hivp$adult_cd4_dist[3,5] <- 0.6665589
+  hivp$adult_cd4_dist[4,5] <- 1 - hivp$adult_cd4_dist[3,5]
+  hivp$pmtct_input_isperc[] <- T
 
   ## Replace netmigr with unadjusted age 0-4 netmigr, which are not
   ## in EPP-ASM preparation
   demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
   demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
-  hivp$paed_cd4_dist <- c(0.515952304221721, 0.159523042217209, 0.114405414115372, 0.088623912342894, 0.0615533354817918, 0.0380277151144054, 0.0219142765066065)
 
-  ##look to make sure understanding about HIV incident infections
-  ##fertility discounting differences, change all of the FRR to one and see if it lines up
-  ##should then just reflect prevalence by age
-  ##then account for age, then CD4
-  ##check that asfr is divided by 5 in the spectrum inputs file
-
-  ## turn off hiv mort
-  hivp$paed_cd4_mort[] <- 0
-  ## turn off ART
-  hivp$paed_art_val[] <- 0
-  hivp$adol_cd4_mort[] <- 0
-  hivp$cd4_mort_full[] <- 0
-  hivp$cd4_mort_coarse[] <- 0
 
   lmod <- leapfrogR(demp, hivp)
-
   lmod_out <- lmod_output_paed(lmod = lmod)
-  df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_MTCT_perinatal_options_pop1.xlsx", ages =0:14, country = 'Botswana')
-  ## df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_MTCT_perinatal_pop1.xlsx", ages =15:49, country = 'Botswana')
 
+  specres <- read_hivproj_output(pjnz1)
+  x <- data.table(lmod = as.vector(lmod$hiv_births), spec = specres$hivpregwomen)
+  x[,diff := spec - lmod]
+  x[,ratio := spec/  lmod]
+  x[,year := 1970:2030]
 
+  df_out <- spectrum_output(file = "../testdata/spectrum/v6.28/TEST_MTCT_perinatal_options_pop1.xlsx", ages =0:14, country = 'Botswana')
+  ## y <- spectrum_output(file = "../testdata/spectrum/v6.28/TEST_MTCT_perinatal_pop1.xlsx", ages =15, country = 'Botswana')
 
   dt <- dplyr::left_join(lmod_out$prev, df_out$off_treatment)
   dt <- dt %>% dplyr::filter(!is.na(pop)) %>% unique()
-  ##filtering to earlier than 1991 to remove effects of people having kids who were born with hiv
-  dt <- dt %>% dplyr::mutate(diff = lfrog - pop) %>% unique() %>% filter(year < 1991)
+  dt <- dt %>% dplyr::mutate(diff = lfrog - pop) %>% unique() %>% filter(year < 2030)
   diff = dt$diff
   expect_true(all(abs(diff) < 1e-2), label = 'Off treatment paediatric population in leapfrog and spectrum match')
 
 
-  # dt_onart <- dplyr::left_join(lmod_out$art, df_out$on_treatment)
-  # dt_onart <- dt_onart%>% dplyr::filter(!is.na(pop)) %>% dplyr::mutate(diff = lfrog - pop) %>%  dplyr::ungroup()
-  # diff_art <- abs(dplyr::select(dt_onart, diff))
-  # expect_true(all(diff_art < 1e-3), label = 'On treatment paediatric population in leapfrog and spectrum match')
-  #
-
-
 })
 
-
+##09/01/2024 working
 test_that('BF transmission of HIV', {
-  pjnz <- "../testdata/spectrum/v6.13/TEST_MTCT_bf.PJNZ"
+  pjnz <- "../testdata/spectrum/v6.28/TEST_MTCT_bf.PJNZ"
   pjnz1 <- test_path(pjnz)
 
   demp <- prepare_leapfrog_demp(pjnz1)
   hivp <- prepare_leapfrog_projp(pjnz1)
+  hivp <- prepare_hc_leapfrog_projp(pjnz1, hivp)
   hivp$ctx_effect <- 0
-  hivp$ctx_val[] <- 0
+  hivp$paed_cd4_transition[6,1] <- 1 - sum(hivp$paed_cd4_transition[-6,1])
+  hivp$paed_cd4_transition[6,7] <- 1 - sum(hivp$paed_cd4_transition[-6,7])
+  hivp$adult_cd4_dist[3,5] <- 0.6665589
+  hivp$adult_cd4_dist[4,5] <- 1 - hivp$adult_cd4_dist[3,5]
+  hivp$pmtct_input_isperc[] <- T
 
-  hivp$artpaeds_isperc[] <- TRUE
-
-  ##I have no idea what these are
-  ## hivp$scalar_art[] <- 1
-  ##hivp$fert_rat[] <- 1
-
-  hivp$pmtct[] <- 0
-  hivp$pmtct_mtct[,,1] <- 0
-  hivp$pmtct_mtct[,2:5,2] <- 0
 
   ## Replace netmigr with unadjusted age 0-4 netmigr, which are not
   ## in EPP-ASM preparation
   demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
   demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
-  hivp$paed_cd4_dist <- c(0.515952304221721, 0.159523042217209, 0.114405414115372, 0.088623912342894, 0.0615533354817918, 0.0380277151144054, 0.0219142765066065)
-
-  ##look to make sure understanding about HIV incident infections
-  ##fertility discounting differences, change all of the FRR to one and see if it lines up
-  ##should then just reflect prevalence by age
-  ##then account for age, then CD4
-  ##check that asfr is divided by 5 in the spectrum inputs file
-
-  ## turn off hiv mort
-  hivp$paed_cd4_mort[] <- 0
-  ## turn off ART
-  hivp$paed_art_val[] <- 0
-  hivp$adol_cd4_mort[] <- 0
-  hivp$cd4_mort_full[] <- 0
-  hivp$cd4_mort_coarse[] <- 0
 
   lmod <- leapfrogR(demp, hivp)
-
   lmod_out <- lmod_output_paed(lmod = lmod)
-  df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_MTCT_bf_pop1.xlsx", ages =0:14, country = 'Botswana')
-  ## df_out <- spectrum_output(file = "../testdata/spectrum/v6.13/TEST_MTCT_perinatal_pop1.xlsx", ages =15:49, country = 'Botswana')
 
+  specres <- read_hivproj_output(pjnz1)
+  x <- data.table(lmod = as.vector(lmod$hiv_births), spec = specres$hivpregwomen)
+  x[,diff := spec - lmod]
+  x[,ratio := spec/  lmod]
+  x[,year := 1970:2030]
 
+  df_out <- spectrum_output(file = "../testdata/spectrum/v6.28/TEST_MTCT_bf_pop1.xlsx", ages =0:14, country = 'Botswana')
 
-  dt <- dplyr::left_join(lmod_out$prev, df_out$off_treatment)
+  dt <- dplyr::left_join(lmod_out$prev_strat, df_out$off_treatment)
   dt <- dt %>% dplyr::filter(!is.na(pop)) %>% unique()
-  ##filtering to earlier than 1991 to remove effects of people having kids who were born with hiv
-  dt <- dt %>% dplyr::mutate(diff = lfrog - pop) %>% unique() %>% filter(year < 1991)
+  dt <- dt %>% dplyr::mutate(diff = lfrog - pop) %>% unique() %>% filter(year < 2030)
   diff = dt$diff
   expect_true(all(abs(diff) < 1e-2), label = 'Off treatment paediatric population in leapfrog and spectrum match')
 
+})
 
-  # dt_onart <- dplyr::left_join(lmod_out$art, df_out$on_treatment)
-  # dt_onart <- dt_onart%>% dplyr::filter(!is.na(pop)) %>% dplyr::mutate(diff = lfrog - pop) %>%  dplyr::ungroup()
-  # diff_art <- abs(dplyr::select(dt_onart, diff))
-  # expect_true(all(diff_art < 1e-3), label = 'On treatment paediatric population in leapfrog and spectrum match')
-  #
+##09/01/2024 working
+test_that('BF transmission of HIV with pmtct', {
+  pjnz <- "../testdata/spectrum/v6.28/TEST_MTCT_bf_options.PJNZ"
+  pjnz1 <- test_path(pjnz)
 
+  demp <- prepare_leapfrog_demp(pjnz1)
+  hivp <- prepare_leapfrog_projp(pjnz1)
+  hivp <- prepare_hc_leapfrog_projp(pjnz1, hivp)
+  hivp$ctx_effect <- 0
+  hivp$paed_cd4_transition[6,1] <- 1 - sum(hivp$paed_cd4_transition[-6,1])
+  hivp$paed_cd4_transition[6,7] <- 1 - sum(hivp$paed_cd4_transition[-6,7])
+  hivp$adult_cd4_dist[3,5] <- 0.6665589
+  hivp$adult_cd4_dist[4,5] <- 1 - hivp$adult_cd4_dist[3,5]
+  hivp$pmtct_input_isperc[] <- T
+
+
+  ## Replace netmigr with unadjusted age 0-4 netmigr, which are not
+  ## in EPP-ASM preparation
+  demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
+  demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
+
+  lmod <- leapfrogR(demp, hivp)
+  lmod_out <- lmod_output_paed(lmod = lmod)
+
+  specres <- read_hivproj_output(pjnz1)
+  x <- data.table(lmod = as.vector(lmod$hiv_births), spec = specres$hivpregwomen)
+  x[,diff := spec - lmod]
+  x[,ratio := spec/  lmod]
+  x[,year := 1970:2030]
+
+  df_out <- spectrum_output(file = "../testdata/spectrum/v6.28/TEST_MTCT_bf_options_pop1.xlsx", ages =0:14, country = 'Botswana')
+
+  dt <- dplyr::left_join(lmod_out$prev_strat, df_out$off_treatment)
+  dt <- dt %>% dplyr::filter(!is.na(pop)) %>% unique()
+  dt <- dt %>% dplyr::mutate(diff = lfrog - pop) %>% unique() %>% filter(year < 2030)
+  diff = dt$diff
+  expect_true(all(abs(diff) < 1e-2), label = 'Off treatment paediatric population in leapfrog and spectrum match')
 
 })
 
+##09/01/2024 working
+test_that('BF and perinatal transmission of HIV, no pmtct', {
+  pjnz <- "../testdata/spectrum/v6.28/TEST_MTCT_BF_PERI.PJNZ"
+  pjnz1 <- test_path(pjnz)
+
+  demp <- prepare_leapfrog_demp(pjnz1)
+  hivp <- prepare_leapfrog_projp(pjnz1)
+  hivp <- prepare_hc_leapfrog_projp(pjnz1, hivp)
+  hivp$ctx_effect <- 0
+  hivp$paed_cd4_transition[6,1] <- 1 - sum(hivp$paed_cd4_transition[-6,1])
+  hivp$paed_cd4_transition[6,7] <- 1 - sum(hivp$paed_cd4_transition[-6,7])
+  hivp$adult_cd4_dist[3,5] <- 0.6665589
+  hivp$adult_cd4_dist[4,5] <- 1 - hivp$adult_cd4_dist[3,5]
+  hivp$pmtct_input_isperc[] <- T
+
+
+  ## Replace netmigr with unadjusted age 0-4 netmigr, which are not
+  ## in EPP-ASM preparation
+  demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
+  demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
+
+  lmod <- leapfrogR(demp, hivp)
+  lmod_out <- lmod_output_paed(lmod = lmod)
+
+  specres <- read_hivproj_output(pjnz1)
+  x <- data.table(lmod = as.vector(lmod$hiv_births), spec = specres$hivpregwomen)
+  x[,diff := spec - lmod]
+  x[,ratio := spec/  lmod]
+  x[,year := 1970:2030]
+
+  df_out <- spectrum_output(file = "../testdata/spectrum/v6.28/TEST_MTCT_BF_PERI_pop1.xlsx", ages =0:14, country = 'Botswana')
+
+  dt <- dplyr::left_join(lmod_out$prev_strat, df_out$off_treatment)
+  dt <- dt %>% dplyr::filter(!is.na(pop)) %>% unique()
+  dt <- dt %>% dplyr::mutate(diff = lfrog - pop) %>% unique() %>% filter(year < 2030)
+  diff = dt$diff
+  expect_true(all(abs(diff) < 1e-2), label = 'Off treatment paediatric population in leapfrog and spectrum match')
+
+})
+
+##09/01/2024 stopped here
+##Working... sort of?? not working when combining no treatment and treatment groups, off by just a bit
+test_that('BF and perinatal transmission of HIV, pmtct', {
+  pjnz <- "../testdata/spectrum/v6.28/TEST_MTCT_BF_PERI_pmtct.PJNZ"
+  pjnz1 <- test_path(pjnz)
+
+  demp <- prepare_leapfrog_demp(pjnz1)
+  hivp <- prepare_leapfrog_projp(pjnz1)
+  hivp <- prepare_hc_leapfrog_projp(pjnz1, hivp)
+  hivp$ctx_effect <- 0
+  hivp$paed_cd4_transition[6,1] <- 1 - sum(hivp$paed_cd4_transition[-6,1])
+  hivp$paed_cd4_transition[6,7] <- 1 - sum(hivp$paed_cd4_transition[-6,7])
+  hivp$adult_cd4_dist[3,5] <- 0.6665589
+  hivp$adult_cd4_dist[4,5] <- 1 - hivp$adult_cd4_dist[3,5]
+  hivp$pmtct_input_isperc[] <- T
+  hivp$art_mtct[,,2] <- hivp$art_mtct[,c(3,2,1),2]
+
+  ## Replace netmigr with unadjusted age 0-4 netmigr, which are not
+  ## in EPP-ASM preparation
+  demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
+  demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
+
+  lmod <- leapfrogR(demp, hivp)
+  lmod_out <- lmod_output_paed(lmod = lmod)
+
+  specres <- read_hivproj_output(pjnz1)
+  x <- data.table(lmod = as.vector(lmod$hiv_births), spec = specres$hivpregwomen)
+  x[,diff := spec - lmod]
+  x[,ratio := spec/  lmod]
+  x[,year := 1970:2030]
+  x
+
+  df_out <- spectrum_output(file = "../testdata/spectrum/v6.28/TEST_MTCT_BF_PERI_pmtct_pop1.xlsx", ages =0:14, country = 'Botswana', years_in = 2015:2022)
+
+  dt <- dplyr::left_join(lmod_out$prev_strat, df_out$off_treatment)
+  dt <- dt %>% dplyr::filter(!is.na(pop)) %>% unique()
+  dt <- dt %>% dplyr::mutate(diff = lfrog - pop) %>% unique() %>% filter(year < 2030)
+  x <- data.table(dt)
+ # x[year == 2000 & age == 0 & transmission == 'bf0-6']
+  x[ age == 0 & year == 2018 & sex == 'Male']
+  y = x[ age == 0 & year == 2018 & sex == 'Male']
+  y[,ratio := pop / lfrog]
+  y
+  x[year == 2018 & age == 0 & transmission == 'bf0-6']
+  x[,ratio := pop / lfrog]
+  x[year == 2018 & age == 0 & transmission == 'bf0-6']
+
+
+  diff = dt$diff
+  expect_true(all(abs(diff) < 1e-2), label = 'Off treatment paediatric population in leapfrog and spectrum match')
+
+})
 

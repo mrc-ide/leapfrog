@@ -112,13 +112,13 @@ transmission_matches <- function(pjnz, threshold_absolute_pid = c(250, 25, 3)){
 
 }
 
-spectrum_output <- function(file = "../testdata/spectrum/v6.13/bwa_aim-adult-child-input-art-elig_spectrum-v6.13_2022-02-12_pop1.xlsx", ages = 0:14, country = 'Botswana'){
+spectrum_output <- function(file = "../testdata/spectrum/v6.13/bwa_aim-adult-child-input-art-elig_spectrum-v6.13_2022-02-12_pop1.xlsx", ages = 0:14, country = 'Botswana', years_in = 1970:2030){
   ##pull out stratified population from the .xlsx file, This function doesn't take out the paediatric output, so going to just compare to the Spectrum software itself
   df <- file
   if(grepl(pattern = 'testdata', file)){
     df <- test_path(df)
   }
-  df <- eppasm::read_pop1(df, country, years = 1970:2030)
+  df <- eppasm::read_pop1(df, country, years = years_in)
   if(any(0:14 %in% ages)){
     df_paed <- df %>% dplyr::filter(age < 5) %>%
      dplyr::right_join(y = data.frame(cd4 = 1:8, cd4_cat = c('neg', 'gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5'))) %>%
