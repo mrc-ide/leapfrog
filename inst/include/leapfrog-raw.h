@@ -83,7 +83,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                     const Type *p_mort_art_rr,
                     const Type *p_paed_cd4_transition,
                     const Type *p_adult_cd4_dist,
-                    const double ctx_effect,
+                    const Type *p_ctx_effect,
                     const Type *p_paed_art_val,
                     const int *p_artpaeds_isperc,
                     const int *p_pmtct_input_isperc,
@@ -223,6 +223,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   const TensorMapX3cT paed_cd4_mort(p_paed_cd4_mort, hDS, hTM, 5);
   const TensorMapX3cT adol_cd4_mort(p_adol_cd4_mort, hDS_adol, hTM, 10);
   const TensorMapX1cT ctx_val(p_ctx_val, sim_years);
+  const TensorMapX1cT ctx_effect(p_ctx_effect, sim_years);
   const TensorMapX1cT paed_art_val(p_paed_art_val, sim_years);
   const TensorMapX1cT paed_art_elig_age(p_paed_art_elig_age, sim_years);
   const TensorMapX1cT paed_art_ltfu(p_paed_art_ltfu, sim_years);
@@ -1177,9 +1178,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    }
    double ptr3;
    ptr3 = ptr1;
-   if(t == 6) {
-     std::cout << ptr1;
-   }
+
+
 
    //Add in transmission due to incident infections
    sum2 = 0.0; //HIV negative 15-49 women weighted for ASFR
@@ -1194,7 +1194,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   // if(sum2 > need){
      IncRate = sum3 / sum2;
  //  }else{
-  //   IncRate = 0;
+ //MAGGIE THIS IS A TEMPORARY MEASURE FOR THE VERSION THAT DOESNT HAVE ADULTS
+     IncRate = 0;
   // }
 
    double v3;
@@ -1204,6 +1205,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    if(need > 0){
      ptr1 = ptr1 + v3 / need;
    }
+
    double hivpos_births;
    hivpos_births = birthsHE * ptr1;
 
@@ -1611,7 +1613,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 
    double ctx_mean;
    ctx_mean = ctx_val(t-1) ;
-   ctx_mean = (1-ctx_effect) * ctx_mean+ (1 - ctx_mean);
+   ctx_mean = (1-ctx_effect(t)) * ctx_mean + (1 - ctx_mean);
 
    //ROB: paediatric natural history (start)
    for(int g = 0; g < NG; g++){
@@ -1619,7 +1621,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         for(int af = 0; af < 5; af++){
           for(int cat = 0; cat < hTM; cat++){
               deaths_paeds(hm, cat, af, g, t) += hivstrat_paeds(hm, cat, af, g, t) -  ctx_mean * hivstrat_paeds(hm, cat, af, g, t) * paed_cd4_mort(hm, cat, af) ;
-              aidsdeaths_noart_paed(hm, cat, af, g, t) +=  ctx_mean* hivstrat_paeds(hm, cat, af, g, t) * paed_cd4_mort(hm, cat, af)  ;
+              aidsdeaths_noart_paed(hm, cat, af, g, t) +=  ctx_mean * hivstrat_paeds(hm, cat, af, g, t) * paed_cd4_mort(hm, cat, af)  ;
           }
         }
       }

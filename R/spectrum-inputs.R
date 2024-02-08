@@ -377,9 +377,9 @@ prepare_hc_leapfrog_projp <- function(pjnz, params){
   ## pull in cotrim coverage numbers
   ctx_pct <- T
   ## ctx_effect_notrt <- c(rep(0.33, 5), rep(0,5))
-  ctx_effect <- 0.33
+  ctx_effect <- rep(0.33,61)
   v$ctx_val <- leapfrog:::input_childart(pjnz)$ctx / 100
-  v$ctx_effect <- ctx_effect
+  v$ctx_effect <- as.array(ctx_effect)
 
   ## pull in ART coverage numbers
   v$artpaeds_isperc <- rep(T,  length(1970:2029))

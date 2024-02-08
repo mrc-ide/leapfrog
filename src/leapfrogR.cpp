@@ -44,7 +44,6 @@ leapfrogR(const Rcpp::List& demp,
   const int hTS = 3;
   const int hPS = 7;
   const int hBF = 18;
-  const double ctx_effect = 0.33;
 
   int hAG;
   if (hiv_strat == "full") {
@@ -131,6 +130,8 @@ leapfrogR(const Rcpp::List& demp,
 
   NumericVector artnum_paed(proj_years);
 
+  NumericVector ctx_effect(proj_years);
+
   NumericVector deaths_paeds(hTM * hDS * pIDX_HIVADULT * NG * proj_years);
   deaths_paeds.attr("dim") = NumericVector::create(hDS, hTM,  pIDX_HIVADULT, NG, proj_years);
 
@@ -189,7 +190,7 @@ leapfrogR(const Rcpp::List& demp,
        REAL(projp["mort_art_rr"]),
        REAL(projp["paed_cd4_transition"]),
        REAL(projp["adult_cd4_dist"]),
-       ctx_effect,
+       REAL(projp["ctx_effect"]),
        REAL(projp["paed_art_val"]),
        LOGICAL(projp["artpaeds_isperc"]),
        LOGICAL(projp["pmtct_input_isperc"]),
@@ -279,7 +280,7 @@ leapfrogR(const Rcpp::List& demp,
        REAL(projp["mort_art_rr"]),
        REAL(projp["paed_cd4_transition"]),
        REAL(projp["adult_cd4_dist"]),
-       ctx_effect,
+       REAL(projp["ctx_effect"]),
        REAL(projp["paed_art_val"]),
        LOGICAL(projp["artpaeds_isperc"]),
        LOGICAL(projp["pmtct_input_isperc"]),
