@@ -24,7 +24,7 @@ Imports:
     testthat (>= 2.1.0)
 Suggests:
     bench,
-    covr,
+    covr
 Remotes:
     mrc-ide/beers,
     mrc-ide/eppasm
