@@ -528,26 +528,6 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   abort <- as.numeric(abort) / 100 / 100
   v$abortions <- abort
 
-  ## add in maternal births and cd4 breakdown
-  specres <- eppasm::read_hivproj_output(pjnz)
-  v$mat_hiv_births <- specres$hivpregwomen
-
-  library(data.table)
-  df <- eppasm::read_pop1(pop_1, 'RWA', years = 1970:2030)
-  df <- df %>% dplyr::filter(age %in%  c(15:49)) %>%
-    dplyr::right_join(y = data.frame(cd4 = 2:8, cd4_cat = c('gte500', '350-500', '250-349', '200-249', '100-199','50-99', 'lte50'))) %>%
-    dplyr::right_join(y = data.frame(artdur = 2:8, transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+', 'ARTlte5mo', 'ART6to12mo', 'ARTgte12mo'))) %>%
-    dplyr::filter(cd4_cat != 'neg')
-  df <- data.table(df)
-  df <- df[sex == 'Female',.(pop = sum(pop)), by = c('year', 'cd4_cat')]
-  df[,total := sum(pop), by = 'year']
-  df[cd4_cat %in% c('gte500', '350-500') ,cd4_cat := 'gte350']
-  df[cd4_cat %in% c('100-199', '50-99', 'lte50'), cd4_cat := 'lt200']
-  df <- df[,.(ratio = sum(pop) / total), by = c('year', 'cd4_cat')]
-  df <- unique(df)
-
-  v$prop_gte350 <- c(rep(0,6),df[cd4_cat == 'gte350', ratio])
-  v$prop_lt200 <- c(rep(0,6),df[cd4_cat == 'lt200', ratio])
 
 
   return(v)
