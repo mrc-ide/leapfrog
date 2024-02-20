@@ -106,27 +106,19 @@ input_childart <- function(pjnz){
   ######################
   ##Sort whether ART is being input by age or aggregate
   ######################
-  if(all(is.na(art$childart[3:5,]))){
-    age_specific = F
-  }else{
-    age_specific = T
-  }
+  age_spec.vec <- which(is.na(art$childart[2,]))
+  age_spec <- rep(F, times = length(as.integer(colnames(art$childart))))
+  age_spec[age_spec.vec] <- T
 
-  if(age_specific){
-    out <- array(data = NA, dim = c(3,ncol(art$childart)), dimnames = list(age = row.names(art$childart)[3:5], year = colnames(art$childart)))
-    out[] <- art$childart[3:5,]
-
-    out <- array(data = NA, dim = c(3,ncol(art$childart)), dimnames = list(age = row.names(art$childart)[3:5], year = colnames(art$childart)))
-    out[] <- art$childart[3:5,]
-
-  }else{
-    out <- array(data = NA, dim = c(1,ncol(art$childart)), dimnames = list(age = row.names(art$childart)[2], year = colnames(art$childart)))
-    out[] <- art$childart[2,]
-  }
+  out <- array(data = NA, dim = c(4,ncol(art$childart)), dimnames = list(age = row.names(art$childart)[2:5], year = colnames(art$childart)))
+  out[] <- art$childart[2:5,]
+  ##temp measure, need to change
+  out[is.na(out)] <- 0
+  out <- colSums(out)
 
   list(ctx = cotrim,
        ctx_percent = cotrim_pct,
-       age_spec = age_specific,
+       age_spec = age_spec,
        child_art = out)
 
 }
