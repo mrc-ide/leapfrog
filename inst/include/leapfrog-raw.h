@@ -107,6 +107,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                     const Type *p_mat_hiv_births,
                     const Type *p_prop_gte350,
                     const Type *p_prop_lt200,
+                    const Type *p_incrate,
+
 
                     //
                     //settings
@@ -272,6 +274,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   const TensorMapX1cT mat_hiv_births(p_mat_hiv_births, sim_years);
   const TensorMapX1cT prop_gte350(p_prop_gte350, sim_years);
   const TensorMapX1cT prop_lt200(p_prop_lt200, sim_years);
+  const TensorMapX1cT incrate(p_incrate, sim_years);
 
 
   // outputs
@@ -1192,10 +1195,10 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 
    double IncRate ;
   // if(sum2 > need){
-     IncRate = sum3 / sum2;
+     IncRate = incrate(t);
  //  }else{
  //MAGGIE THIS IS A TEMPORARY MEASURE FOR THE VERSION THAT DOESNT HAVE ADULTS
-     IncRate = 0;
+ //    IncRate = 0;
   // }
 
    double v3;
