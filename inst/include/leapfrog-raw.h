@@ -1200,7 +1200,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 
    double v3;
    //need to pull incidence infection mtct into the input object
-   v3 = IncRate * (9/12) * (births_sum - need) *0;  //.181;
+   v3 = IncRate * (9/12) * (births_sum - need) *0.181;
 
    if(need > 0){
      ptr1 = ptr1 + v3 / need;
@@ -1227,8 +1227,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
      v2 += IncRate / 12 * 2 * (1 - bf_duration(bf, t, 0));
    }
    double v4;
-  // v4 = v2 * 0.269;
-   v4 = 0.0;
+   v4 = v2 * 0.269;
+  // v4 = 0.0;
    //Incident infections are hiv+mothers minus hiv births * v4 (which has already been adjusted for prevalence)
    double IncidentInfectionsBF;
    IncidentInfectionsBF = (births_sum - needPMTCT(t)) * v4;
