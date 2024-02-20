@@ -532,6 +532,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   specres <- eppasm::read_hivproj_output(pjnz)
   v$mat_hiv_births <- specres$hivpregwomen
 
+  library(data.table)
   df <- eppasm::read_pop1(pop_1, 'RWA', years = 1970:2030)
   df <- df %>% dplyr::filter(age %in%  c(15:49)) %>%
     dplyr::right_join(y = data.frame(cd4 = 2:8, cd4_cat = c('gte500', '350-500', '250-349', '200-249', '100-199','50-99', 'lte50'))) %>%
