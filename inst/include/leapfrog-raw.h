@@ -1573,11 +1573,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 
    }
    //ROB: calcBF (end)
-   tracking(0,0,t) = ptr1;
-   tracking(1,0,t) = bftr_1;
-   tracking(2,0,t) = bftr_2;
-   tracking(3,0,t) = bftr_3;
-   tracking(4,0,t) = bftr_4;
+
 
 
    //ROB: distribute MTCT infections (start)
@@ -1633,9 +1629,40 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    }
    //ROB: distribute MTCT infections (end)
 
+   double ctx_need ;
+   ctx_need = 0.0;
+   for(int g = 0; g < NG; g++){
+     for(int hm = 0; hm < hDS; hm++){
+       for(int af = 0; af < pIDX_FERT; af++){
+         for(int cat = 0; cat < hTM; cat++){
+           ctx_need += hivstrat_paeds(hm, cat, af, g, t);
+         }
+       }
+     }
+   }
+
+   for(int g = 0; g < NG; g++){
+     for(int af = 0; af < pIDX_HIVADULT; af++){
+       for(int hm = 0; hm < hDS; hm++){
+         for(int dur = 0; dur < hTS; dur++){
+           ctx_need += artstrat_paeds(dur, hm, af, g, t);
+         }
+       }
+     }
+   }
+
+   tracking(0,0,t) = ctx_need;
+
+
    double ctx_mean;
-   ctx_mean = ctx_val(t-1) ;
-   ctx_mean = (1-ctx_effect(t)) * ctx_mean + (1 - ctx_mean);
+   ctx_mean = 1.0;
+    if(ctx_need > 0){
+     ctx_mean = ctx_val(t-1) /  ctx_need;
+     ctx_mean = (1-ctx_effect(t)) * ctx_mean + (1 - ctx_mean);
+   }else{
+     ctx_mean = 1;
+   }
+   tracking(1,0,t) = ctx_mean;
 
    //ROB: paediatric natural history (start)
    for(int g = 0; g < NG; g++){
@@ -1648,7 +1675,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         }
       }
     }
-
 
     for(int g = 0; g < NG; g++){
       for(int hm = 0; hm < hDS_adol; hm++){
