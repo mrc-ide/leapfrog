@@ -414,9 +414,6 @@ void run_bf_transmission_rate(int time_step,
       intermediate.children.bf_transmission_rate(index) = intermediate.children.bf_transmission_rate(index)/ 4;
     }
   }
-
-
-
 }
 
 
@@ -513,6 +510,52 @@ void run_child_hiv_infections(int time_step,
 
 }
 
+template<typename ModelVariant, typename real_type>
+void ctx_need_cov(int time_step,
+                  const Parameters<ModelVariant, real_type> &pars,
+                  const State<ModelVariant, real_type> &state_curr,
+                  State<ModelVariant, real_type> &state_next,
+                  IntermediateData<ModelVariant, real_type> &intermediate) {
+  static_assert(ModelVariant::run_child_model,
+                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
+  const auto demog = pars.base.demography;
+  constexpr auto ss = StateSpace<ModelVariant>().base;
+  constexpr auto hc_ss = StateSpace<ModelVariant>().children;
+  const auto cpars = pars.children.children;
+
+  for (int s = 0; s < ss.NS; ++s) {
+    for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+      for (int a = 0; a < hc_ss.hc2_agestart; ++a) {
+        for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
+          state_next.children.ctx_need += state_next.children.hc1_hiv_pop(hd, cat, a, s);
+          for (int dur = 0; dur < ss.hTS; ++dur) {
+            state_next.children.ctx_need += state_next.children.hc1_art_pop(dur, hd, a, s);
+          } // end hTS
+        } // end hc1DS
+      } //end a
+    } // end hcTT
+  } // end NS
+
+  for (int s = 0; s < ss.NS; ++s) {
+    for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+      for (int a = hc_ss.hc2_agestart; a < hc_ss.hc2DS; ++a) {
+        for (int hd = 0; hd < hc_ss.hc2DS; ++hd) {
+          state_next.children.ctx_need += state_next.children.hc2_hiv_pop(hd, cat, a, s);
+          for (int dur = 0; dur < ss.hTS; ++dur) {
+            state_next.children.ctx_need += state_next.children.hc1_art_pop(dur, hd, a, s);
+          } // end hTS
+        } // end hc1DS
+      } //end a
+    } // end hcTT
+  } // end NS
+
+  if(state_next.children.ctx_need > 0){
+    state_next.children.ctx_mean = cpars.ctx_val(time_step-1) /  state_next.children.ctx_need;
+    state_next.children.ctx_mean = (1-cpars.ctx_effect) * state_next.children.ctx_mean + (1 - state_next.children.ctx_mean);
+  }
+
+}
+
 
 template<typename ModelVariant, typename real_type>
 void run_child_natural_history(int time_step,
@@ -526,12 +569,14 @@ void run_child_natural_history(int time_step,
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
 
+  internal::ctx_need_cov(time_step, pars, state_curr, state_next, intermediate);
+
   for (int s = 0; s < ss.NS; ++s) {
     for (int a = 0; a < hc_ss.hc2_agestart; ++a) {
       for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
         for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
           intermediate.children.hc_posthivmort(hd, cat, a, s) = state_next.children.hc1_hiv_pop(hd, cat, a, s) -
-            (1.0 - cpars.ctx_effect * cpars.ctx_val(time_step)) * state_next.children.hc1_hiv_pop(hd, cat, a, s) * cpars.hc1_cd4_mort(hd, cat, a);
+            state_next.children.ctx_mean * state_next.children.hc1_hiv_pop(hd, cat, a, s) * cpars.hc1_cd4_mort(hd, cat, a);
         }
       }
     }
@@ -542,7 +587,7 @@ void run_child_natural_history(int time_step,
       for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
         for (int hd = 0; hd < hc_ss.hc2DS; ++hd) {
           intermediate.children.hc_posthivmort(hd, cat, a, s) = state_next.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s) -
-            (1.0 - cpars.ctx_effect * cpars.ctx_val(time_step)) * state_next.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s) * cpars.hc2_cd4_mort(hd, cat, a - hc_ss.hc2_agestart);
+            state_next.children.ctx_mean * state_next.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s) * cpars.hc2_cd4_mort(hd, cat, a - hc_ss.hc2_agestart);
         }
       }
     }
