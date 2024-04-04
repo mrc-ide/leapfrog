@@ -4,7 +4,6 @@ test_that("child model can be run for all years", {
   parameters$laf = 1
 
   expect_silent(out <- run_model(demp, parameters, NULL, NULL, 0:60))
-
   expect_setequal(
     names(out),
     c(

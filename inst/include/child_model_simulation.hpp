@@ -103,6 +103,7 @@ void convert_PMTCT_num_to_perc(int time_step,
   for (int hp = 0; hp < hc_ss.hPS; ++hp) {
     intermediate.children.sumARV += cpars.PMTCT(hp,time_step);
   }
+
   intermediate.children.need_PMTCT = state_next.children.hiv_births;
 
   //replace all instances of coverage input as numbers with percentage covered
@@ -112,14 +113,16 @@ void convert_PMTCT_num_to_perc(int time_step,
     } //end hPS
   }else{
     for (int hp = 0; hp < hc_ss.hPS; ++hp) {
-      if(intermediate.children.sumARV > intermediate.children.need_PMTCT){
-        intermediate.children.PMTCT_coverage(hp) = cpars.PMTCT(hp, time_step) / intermediate.children.sumARV;
+      if((intermediate.children.need_PMTCT * intermediate.children.sumARV) > 0){
+        intermediate.children.OnPMTCT = intermediate.children.need_PMTCT * intermediate.children.sumARV ;
       }else{
-        if(intermediate.children.need_PMTCT > 0){
-          intermediate.children.PMTCT_coverage(hp) = cpars.PMTCT(hp,time_step) /  intermediate.children.need_PMTCT;
-        }else{
-          intermediate.children.PMTCT_coverage(hp) = 0;
-        }
+        intermediate.children.OnPMTCT = 0.0;
+      }
+
+      if (intermediate.children.sumARV == 0) {
+        intermediate.children.PMTCT_coverage(hp) = 0.0;
+      } else {
+        intermediate.children.PMTCT_coverage(hp) = (cpars.PMTCT(hp,time_step) / intermediate.children.sumARV) * (intermediate.children.OnPMTCT / intermediate.children.need_PMTCT);
       }
     } //end hPS
   }
@@ -358,11 +361,9 @@ void run_bf_transmission_rate(int time_step,
         //Dropout not used for option A
         if(hp == 0){
           // intermediate.children.percent_on_treatment = intermediate.children.optA_bf_transmission_rate *
-          //   cpars.PMTCT_transmission_rate(hp,time_step,1);
-          intermediate.children.percent_on_treatment = intermediate.children.optA_bf_transmission_rate *
-            intermediate.children.PMTCT_coverage(hp);
-          intermediate.children.bf_transmission_rate(index) += intermediate.children.percent_on_treatment *
-            2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) ;
+          //   intermediate.children.PMTCT_coverage(hp);
+          // intermediate.children.bf_transmission_rate(index) += intermediate.children.percent_on_treatment *
+          //   2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) ;
 
           intermediate.children.percent_no_treatment -= intermediate.children.PMTCT_coverage(hp);
         }
@@ -370,18 +371,44 @@ void run_bf_transmission_rate(int time_step,
         //Dropout not used for option B
         if(hp == 1){
           // intermediate.children.percent_on_treatment = intermediate.children.optB_bf_transmission_rate *
-          //   cpars.PMTCT_transmission_rate(hp,time_step,1) ;
-          intermediate.children.percent_on_treatment = intermediate.children.optB_bf_transmission_rate *
-            intermediate.children.PMTCT_coverage(hp);
-          intermediate.children.bf_transmission_rate(index) +=  intermediate.children.percent_on_treatment *
-            2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) ;
+          //   intermediate.children.PMTCT_coverage(hp);
+          // intermediate.children.bf_transmission_rate(index) +=  intermediate.children.percent_on_treatment *
+          //   2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) ;
+
           intermediate.children.percent_no_treatment -=  intermediate.children.PMTCT_coverage(hp) ;
 
         }
+        if(hp == 2){
+          intermediate.children.percent_on_treatment = cpars.PMTCT_transmission_rate(4,hp,1) *
+            intermediate.children.PMTCT_coverage(hp);
+
+          intermediate.children.bf_transmission_rate(index) +=  intermediate.children.percent_on_treatment *
+            2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) ;
+
+          intermediate.children.percent_no_treatment -=  intermediate.children.PMTCT_coverage(hp) ;
+
+        }
+        if(hp == 3){
+          intermediate.children.percent_on_treatment = cpars.PMTCT_transmission_rate(4,hp,1) *
+            intermediate.children.PMTCT_coverage(hp);
+
+          intermediate.children.bf_transmission_rate(index) +=  intermediate.children.percent_on_treatment *
+            2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) ;
+
+          intermediate.children.percent_no_treatment -=  intermediate.children.PMTCT_coverage(hp) ;
+
+        }
+
         if(hp > 3){
+
+          //check about the dropout rates being double applied for 4 and five https://github.com/mrc-ide/leapfrog/blob/c4b50084cb2068c2956931cfc89d394bd75b053b/inst/include/leapfrog-raw.h#L1516
           if(bf > 0){
-            intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp) *
-              (pow(1 - cpars.PMTCT_dropout(4,time_step) * 2, bf))  ;
+            if(cpars.PMTCT_dropout(4,time_step) > 0){
+              intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp) *
+                (pow(1 - cpars.PMTCT_dropout(4,time_step) * 2, bf))  ;
+            }else{
+              intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp) ;
+            }
 
           }else{
             intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp);
@@ -391,7 +418,7 @@ void run_bf_transmission_rate(int time_step,
           intermediate.children.bf_transmission_rate(index) += intermediate.children.percent_on_treatment *
             2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) * cpars.PMTCT_transmission_rate(4,hp,1);
 
-          intermediate.children.percent_no_treatment -= intermediate.children.percent_on_treatment ;
+          intermediate.children.percent_no_treatment -= intermediate.children.PMTCT_coverage(hp);
 
         }
       }

@@ -494,6 +494,7 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
   real_type sumARV;
   real_type need_PMTCT;
   TensorFixedSize <real_type, Sizes<hPS<ChildModel>>> PMTCT_coverage;
+  real_type OnPMTCT;
   real_type num_wlhiv_lt200;
   real_type num_wlhiv_200to350;
   real_type num_wlhiv_gte350;
@@ -553,6 +554,7 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
     sumARV = 0.0;
     need_PMTCT = 0.0;
     PMTCT_coverage.setZero();
+    OnPMTCT = 0.0;
     num_wlhiv_lt200 = 0.0;
     num_wlhiv_200to350 = 0.0;
     num_wlhiv_gte350 = 0.0;
