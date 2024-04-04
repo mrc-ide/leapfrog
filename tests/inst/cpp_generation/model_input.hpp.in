@@ -1,0 +1,61 @@
+{{header}}
+
+#pragma once
+
+#include <Rcpp.h>
+#include <unsupported/Eigen/CXX11/Tensor>
+
+#include "types.hpp"
+#include "r_utils.hpp"
+
+template<typename ModelVariant, typename real_type>
+leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::List &data,
+                                                    const leapfrog::Options<real_type> &options,
+                                                    const int proj_years) {
+  constexpr auto ss = leapfrog::StateSpace<ModelVariant>();
+
+{{default_data}}
+
+  const leapfrog::Demography<real_type> demography = {
+      base_pop,
+      survival_probability,
+      net_migration,
+      age_specific_fertility_rate,
+      births_sex_prop
+  };
+
+  const leapfrog::Incidence<real_type> incidence = {
+      total_rate,
+      age_rate_ratio,
+      sex_rate_ratio
+  };
+
+  const leapfrog::NaturalHistory<real_type> natural_history = {
+      cd4_mortality,
+      cd4_progression,
+      cd4_initial_distribution,
+      scale_cd4_mortality
+  };
+
+  const leapfrog::Art<real_type> art = {
+      idx_hm_elig,
+      mortality,
+      mortaility_time_rate_ratio,
+      h_art_stage_dur,
+      dropout,
+      adults_on_art,
+      adults_on_art_is_percent,
+      initiation_mortality_weight
+  };
+
+
+  const leapfrog::BaseModelParameters<real_type> base_model_params = {
+        options,
+        demography,
+        incidence,
+        natural_history,
+        art
+    };
+
+{{optional_data}}
+}

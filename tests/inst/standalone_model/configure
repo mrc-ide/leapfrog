@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Not intended to be a real configure script, just enough to let us
+# find frogger (working around the issue that we can't use Rscript
+# from with R CMD check)
+
+USAGE="Usage:
+./configure [(<path_frogger> | --find-frogger) (<path_eigen> | --find-eigen)]"
+
+if [[ -z "$1" || "$1" == "--find-frogger" ]]; then
+    PATH_FROGGER=$(Rscript -e 'cat(find.package("frogger"))')
+    echo "Found frogger at '$PATH_FROGGER'"
+else
+    PATH_FROGGER=$1
+    echo "Using provided frogger '$PATH_FROGGER'"
+fi
+
+if [[ -z "$2" || "$2" == "--find-eigen" ]]; then
+    PATH_EIGEN=$(Rscript -e 'cat(find.package("RcppEigen"))')
+    echo "Found eigen at '$PATH_EIGEN'"
+else
+    PATH_EIGEN=$2
+    echo "Using provided eigen '$PATH_EIGEN'"
+fi
+
+sed -e "s|@path_frogger@|$PATH_FROGGER|" Makefile.in | \
+    sed -e "s|@path_eigen@|$PATH_EIGEN|" > \
+        Makefile

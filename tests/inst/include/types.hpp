@@ -196,10 +196,8 @@ struct Children {
   TensorMap1<real_type> prop_lt200;
   TensorMap1<real_type> prop_gte350;
 
-
   //cotrim
   TensorMap1<real_type> ctx_coverage_is_number;
-
 
 };
 
@@ -318,8 +316,6 @@ struct ChildModelState<ChildModel, real_type> {
   TensorFixedSize <real_type, Sizes<hTS<ChildModel>, hc2DS<ChildModel>, hc2AG<ChildModel>, NS<ChildModel>>> hc2_art_aids_deaths;
   real_type hc_art_num;
   real_type hiv_births;
-  real_type ctx_need;
-  real_type ctx_mean;
 
 
   ChildModelState(const Parameters<ChildModel, real_type> &pars) {
@@ -341,8 +337,6 @@ struct ChildModelState<ChildModel, real_type> {
     hc2_art_aids_deaths.setZero();
     hc_art_num = 0.0;
     hiv_births = 0.0;
-    ctx_need = 0.0;
-    ctx_mean = 1.0;
   }
 };
 
@@ -504,7 +498,6 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
   real_type sumARV;
   real_type need_PMTCT;
   TensorFixedSize <real_type, Sizes<hPS<ChildModel>>> PMTCT_coverage;
-  real_type OnPMTCT;
   real_type num_wlhiv_lt200;
   real_type num_wlhiv_200to350;
   real_type num_wlhiv_gte350;
@@ -566,7 +559,6 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
     sumARV = 0.0;
     need_PMTCT = 0.0;
     PMTCT_coverage.setZero();
-    OnPMTCT = 0.0;
     num_wlhiv_lt200 = 0.0;
     num_wlhiv_200to350 = 0.0;
     num_wlhiv_gte350 = 0.0;
