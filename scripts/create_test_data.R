@@ -14,17 +14,17 @@ proj <- prepare_leapfrog_projp(pjnz1)
 saveRDS(proj, testthat::test_path("testdata/projection_parameters_adult.rds"))
 
 ## Used as reference data (Run from leapfrog/master)
-lmod <- leapfrogR(demp, proj)
-saveRDS(lmod, testthat::test_path("testdata/leapfrog_fit.rds"))
+# lmod <- leapfrogR(demp, proj)
+# saveRDS(lmod, testthat::test_path("testdata/leapfrog_fit.rds"))
+#
+# lmod <- leapfrogR(demp, proj, hiv_strat = "coarse")
+# saveRDS(lmod, testthat::test_path("testdata/leapfrog_fit_coarse.rds"))
+#
+# mod <- leapfrogR(demp, proj, hiv_steps_per_year = 0L)
+# saveRDS(lmod, testthat::test_path("testdata/fit_demography.rds"))
 
-lmod <- leapfrogR(demp, proj, hiv_strat = "coarse")
-saveRDS(lmod, testthat::test_path("testdata/leapfrog_fit_coarse.rds"))
 
-mod <- leapfrogR(demp, proj, hiv_steps_per_year = 0L)
-saveRDS(lmod, testthat::test_path("testdata/fit_demography.rds"))
-
-
-#Create paeds parameters (Run from leapfrog/clean)
+#Create paeds parameters (Run from leapfrog/uncertainrt_analysis_working)
 demp <- prepare_leapfrog_demp(pjnz1)
 proj <- prepare_leapfrog_projp(pjnz1)
 proj <- leapfrog:::prepare_hc_leapfrog_projp(pjnz1, proj)
@@ -32,7 +32,6 @@ lmod <- leapfrogR(demp, proj)
 
 demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
 demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
-
 
 setwd('C:/Users/mwalters/frogger/tests/testthat/testdata/')
 saveRDS(proj, "projection_parameters_child.rds")

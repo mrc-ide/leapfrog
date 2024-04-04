@@ -51,6 +51,6 @@ bf_duration_art,breastfeeding_duration_art,real_type,ModelVariant::run_child_mod
 bf_duration_no_art,breastfeeding_duration_no_art,real_type,ModelVariant::run_child_model,,FALSE,2,children.hBF,proj_years,,
 mat_hiv_births,mat_hiv_births,real_type,ModelVariant::run_child_model,,FALSE,1,proj_years,,,
 mat_prev_input,mat_prev_input,int,ModelVariant::run_child_model,,FALSE,1,proj_years,,,
-cotrim_is_number,ctx_coverage_is_number,real_type,ModelVariant::run_child_model,,FALSE,1,proj_years,,,
 prop_lt200,prop_lt200,real_type,ModelVariant::run_child_model,,FALSE,1,proj_years,,,
 prop_gte350,prop_gte350,real_type,ModelVariant::run_child_model,,FALSE,1,proj_years,,,
+incrate,incrate,real_type,ModelVariant::run_child_model,,FALSE,1,proj_years,,,

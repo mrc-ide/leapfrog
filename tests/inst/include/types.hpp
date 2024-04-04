@@ -195,6 +195,7 @@ struct Children {
   TensorMap1<int> mat_prev_input;
   TensorMap1<real_type> prop_lt200;
   TensorMap1<real_type> prop_gte350;
+  TensorMap1<real_type> incrate;
 
   //cotrim
   TensorMap1<real_type> ctx_coverage_is_number;

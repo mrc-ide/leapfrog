@@ -115,9 +115,9 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
     const leapfrog::TensorMap2<real_type> breastfeeding_duration_no_art = parse_data<real_type>(data, "bf_duration_no_art", children.hBF, proj_years);
     const leapfrog::TensorMap1<real_type> mat_hiv_births = parse_data<real_type>(data, "mat_hiv_births", proj_years);
     const leapfrog::TensorMap1<int> mat_prev_input = parse_data<int>(data, "mat_prev_input", proj_years);
-    const leapfrog::TensorMap1<real_type> ctx_coverage_is_number = parse_data<real_type>(data, "cotrim_is_number", proj_years);
     const leapfrog::TensorMap1<real_type> prop_lt200 = parse_data<real_type>(data, "prop_lt200", proj_years);
     const leapfrog::TensorMap1<real_type> prop_gte350 = parse_data<real_type>(data, "prop_gte350", proj_years);
+    const leapfrog::TensorMap1<real_type> incrate = parse_data<real_type>(data, "incrate", proj_years);
     const leapfrog::Children<real_type> child = {
         hc_nosocomial,
         hc1_cd4_dist,
@@ -153,7 +153,8 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
         mat_prev_input,
         ctx_coverage_is_number,
         prop_lt200,
-        prop_gte350
+        prop_gte350,
+        incrate
     };
     const leapfrog::ChildModelParameters<ModelVariant, real_type> child_model_params = {
         child
