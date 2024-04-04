@@ -1,8 +1,11 @@
 test_that("child model can be run for all years", {
-  demp <- readRDS(test_path("testdata/demographic_projection_object_child.rds"))
-  parameters <- readRDS(test_path("testdata/projection_parameters_child.rds"))
+  input <- readRDS(test_path("testdata/child_parms.rds"))
+  demp <- input$demp
+  parameters <- input$proj
   parameters$ctx_effect <- 0.33
   parameters$laf <- 1
+  parameters$paed_art_elig_age <- as.integer(parameters$paed_art_elig_age)
+  parameters$mat_prev_input = rep(TRUE,61)
 
   expect_silent(out <- run_model(demp, parameters, NULL, NULL, 0:60, run_child_model = TRUE))
   expect_setequal(
@@ -18,6 +21,19 @@ test_that("child model can be run for all years", {
   )
 
   expect_true(all(out$hc1_hiv_pop >= 0))
+
+  ##Ensure that infections under one match
+  dpfile <- grep(".DP$", utils::unzip(pjnz, list=TRUE)$Name, value=TRUE)
+  dp <- utils::read.csv(unz(pjnz, dpfile), as.is=TRUE)
+  dpsub <- function(tag, rows, cols, tagcol=1){
+    dp[which(dp[,tagcol]==tag)+rows, cols]
+  }
+  dp = input$dp
+  u1_inf_spec <- dpsub("<NewInfantInfections MV>", 2, input$timedat.idx)
+  ##this isn't true right now
+  expect_true(abs(as.numeric(u1_inf_spec[7:length(input$timedat.idx)]) - colSums(out$p_infections[1,,7:length(input$timedat.idx)])) < 1e-1)
+
+
 
   ## All 10 as seeded with 100 infections which are distributed over 5 age
   ## groups and genders evenly

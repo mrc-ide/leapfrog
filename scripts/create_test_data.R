@@ -33,9 +33,18 @@ lmod <- leapfrogR(demp, proj)
 demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
 demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
 
+dpfile <- grep(".DP$", utils::unzip(pjnz1, list=TRUE)$Name, value=TRUE)
+dp <- utils::read.csv(unz(pjnz1, dpfile), as.is=TRUE)
+dpsub <- function(tag, rows, cols, tagcol=1){
+  dp[which(dp[,tagcol]==tag)+rows, cols]
+}
+yr_start <- as.integer(dpsub("<FirstYear MV2>",2,4))
+yr_end <- as.integer(dpsub("<FinalYear MV2>",2,4))
+proj.years <- yr_start:yr_end
+timedat.idx <- 4+1:length(proj.years)-1
+
 setwd('C:/Users/mwalters/frogger/tests/testthat/testdata/')
-saveRDS(proj, "projection_parameters_child.rds")
-saveRDS(demp, "demographic_projection_object_child.rds")
+saveRDS(list(proj = proj, demp = demp, dp = dp, timedat.idx = timedat.idx), "child_parms.rds")
 
 
 

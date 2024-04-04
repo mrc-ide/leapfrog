@@ -259,7 +259,6 @@ generate_return <- function() {
     "      breastfeeding_duration_no_art,",
     "      mat_hiv_births,",
     "      mat_prev_input,",
-    "      ctx_coverage_is_number,",
     "      prop_lt200,",
     "      prop_gte350,",
     "      incrate",

@@ -148,6 +148,7 @@ void calc_wlhiv_cd4_proportion(int time_step,
     intermediate.children.prop_wlhiv_200to350 = 1.0 - cpars.prop_gte350(time_step) - cpars.prop_lt200(time_step);
     intermediate.children.prop_wlhiv_gte350 = cpars.prop_gte350(time_step);
     intermediate.children.prop_wlhiv_lt350 = 1 - cpars.prop_gte350(time_step);
+    intermediate.children.num_wlhiv = cpars.mat_hiv_births(time_step);
 
   }else{
     intermediate.children.num_wlhiv_lt200 = 0.0;
@@ -270,15 +271,11 @@ void run_calculate_perinatal_transmission_rate(int time_step,
   internal::convert_PMTCT_num_to_perc(time_step, pars, state_curr, state_next, intermediate);
   internal::adjust_optAB_transmission_rate(time_step, pars, state_curr, state_next, intermediate);
 
-
-
-
   // ///////////////////////////////////
   // //Calculate transmission rate
   // ///////////////////////////////////
   intermediate.children.retained_on_ART = intermediate.children.PMTCT_coverage(4) * cpars.PMTCT_dropout(0,time_step);
   intermediate.children.retained_started_ART = intermediate.children.PMTCT_coverage(5) * cpars.PMTCT_dropout(1,time_step);
-
 
   //Transmission among women on treatment
   intermediate.children.perinatal_transmission_rate = intermediate.children.PMTCT_coverage(2) * cpars.PMTCT_transmission_rate(0,2,0) + //SDNVP
@@ -292,6 +289,13 @@ void run_calculate_perinatal_transmission_rate(int time_step,
   intermediate.children.receiving_PMTCT = intermediate.children.PMTCT_coverage(0) + intermediate.children.PMTCT_coverage(1) + intermediate.children.PMTCT_coverage(2) + intermediate.children.PMTCT_coverage(3) + intermediate.children.retained_on_ART + intermediate.children.retained_started_ART + intermediate.children.PMTCT_coverage(6);
   intermediate.children.no_PMTCT = 1 - intermediate.children.receiving_PMTCT;
 
+  if(time_step == 6){
+    std::cout << intermediate.children.prop_wlhiv_lt200 ;
+    std::cout << intermediate.children.prop_wlhiv_200to350;
+    std::cout << intermediate.children.prop_wlhiv_gte350;
+    std::cout << intermediate.children.no_PMTCT;
+
+  }
 
   //Transmission among women not on treatment
   if (intermediate.children.num_wlhiv > 0) {
@@ -304,6 +308,9 @@ void run_calculate_perinatal_transmission_rate(int time_step,
     intermediate.children.perinatal_transmission_rate = intermediate.children.perinatal_transmission_rate;
   }
   intermediate.children.perinatal_transmission_rate_bf_calc = intermediate.children.perinatal_transmission_rate;
+  if(time_step == 6){
+    std::cout << intermediate.children.perinatal_transmission_rate;
+  }
 
   //Transmission due to incident infections
   intermediate.children.asfr_sum = 0.0;
@@ -501,20 +508,12 @@ void run_child_hiv_infections(int time_step,
 
     }
       }// end hc1DS
-  if(s == 0){
+
     state_next.base.p_hiv_pop(0, s) +=  state_next.children.hiv_births * intermediate.children.perinatal_transmission_rate * demog.births_sex_prop(s,time_step);
     state_next.base.p_infections(0, s) += state_next.children.hiv_births * intermediate.children.perinatal_transmission_rate * demog.births_sex_prop(s,time_step);
-  }else{
-    state_next.base.p_hiv_pop(0, s) +=  state_next.children.hiv_births * intermediate.children.perinatal_transmission_rate * (1- demog.births_sex_prop(0,time_step));
-    state_next.base.p_infections(0, s) += state_next.children.hiv_births * intermediate.children.perinatal_transmission_rate * (1 -demog.births_sex_prop(0,time_step));
-  }
 
 
   }// end NS
-
-  if(time_step == 30){
-    std::cout <<  state_next.base.p_hiv_pop(0, 0) + state_next.base.p_hiv_pop(0, 1);
-  }
 
    //Breastfeeding transmission
 
