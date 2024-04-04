@@ -529,6 +529,29 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   v$abortions <- abort
 
 
+  ##extract needed outputs to just run paed model
+  wlhiv_births <- dpsub("<ChildNeedPMTCT MV>", 2, timedat.idx) %>% unname()
+  names(wlhiv_births) <- proj.years
+  rownames(wlhiv_births) <- NULL
+  v$mat_hiv_births <- wlhiv_births
+
+  pjnz1 <- pjnz
+  specres <- eppasm::read_hivproj_output(pjnz1)
+  newinf <- specres$newinf.f[4:10,] %>% colSums()
+  newinf_rate <- newinf / colSums(specres$totpop.f[1:10,])
+  v$incrate <- newinf_rate
+
+  fp1 <- eppasm::prepare_directincid(pjnz1)
+  fp1$tARTstart <- 61L
+  #Need to run the adult model to pull out the propotion by CD4 category
+  mod1 <- eppasm::simmod(fp1)
+
+  prop_gte350 <- apply(attr(mod1, "hivpop")[1:2, 1:8, 2, ], MARGIN = 3, FUN = sum) / apply(attr(mod1, "hivpop")[, 1:8, 2, ], MARGIN = 3, FUN = sum)
+  prop_lt200 <- apply(attr(mod1, "hivpop")[6:7, 1:8, 2, ], MARGIN = 3, FUN = sum) / apply(attr(mod1, "hivpop")[, 1:8, 2, ], MARGIN = 3, FUN = sum)
+  names(prop_gte350) <- proj.years
+  names(prop_lt200) <- proj.years
+  v$prop_gte350 <- prop_gte350
+  v$prop_lt200 <- prop_lt200
 
   return(v)
 }
