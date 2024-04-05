@@ -6,6 +6,7 @@ test_that("child model can be run for all years", {
   parameters$laf <- 1
   parameters$paed_art_elig_age <- as.integer(parameters$paed_art_elig_age)
   parameters$mat_prev_input = rep(TRUE,61)
+  parameters$pmtct <- parameters$pmtct[,,2]
 
   expect_silent(out <- run_model(demp, parameters, NULL, NULL, 0:60, run_child_model = TRUE))
   expect_setequal(
@@ -22,31 +23,29 @@ test_that("child model can be run for all years", {
 
   expect_true(all(out$hc1_hiv_pop >= 0))
 
-  ##Ensure that infections under one match
+  ##load in DP functions
+  pjnz = input$pjnz
   dpfile <- grep(".DP$", utils::unzip(pjnz, list=TRUE)$Name, value=TRUE)
   dp <- utils::read.csv(unz(pjnz, dpfile), as.is=TRUE)
   dpsub <- function(tag, rows, cols, tagcol=1){
     dp[which(dp[,tagcol]==tag)+rows, cols]
   }
   dp = input$dp
+
+  ##Ensure that infections under one match
   u1_inf_spec <- dpsub("<NewInfantInfections MV>", 2, input$timedat.idx)
-  ##this isn't true right now
-  expect_true(abs(as.numeric(u1_inf_spec[7:length(input$timedat.idx)]) - colSums(out$p_infections[1,,7:length(input$timedat.idx)])) < 1e-1)
+  expect_true(all(abs(as.numeric(u1_inf_spec[7:length(input$timedat.idx)]) - colSums(out$p_infections[1,,7:length(input$timedat.idx)])) < 1e-1))
 
+  #Ensure that deaths align-- Not working rn
+  aidsdeaths <- array(as.numeric(unlist(dpsub("<AidsDeathsByAge MV2>"  , 3:(end.id - start.id - 2), timedat.idx))), dim = c(length(3:(end.id - start.id - 2)),length(timedat.idx)))
+  m = aidsdeaths[1:15,]
+  f = aidsdeaths[82:96,]
+  aidsdeaths <- array(0, dim = c(15,2,61))
+  aidsdeaths[,1,] <- m
+  aidsdeaths[,2,] <- f
+  expect_true(all(abs(aidsdeaths - out$p_hiv_deaths[1:15,,]) < 1e-1))
 
-
-  ## All 10 as seeded with 100 infections which are distributed over 5 age
-  ## groups and genders evenly
-  expect_true(all(out$infections[1:5, , which(1970:2030 == 2000)] == 10))
-  expect_true(all(out$hiv_population[1:5, , which(1970:2030 == 2000)] == 10))
-
-  ## HIV population should be larger than zero in age 6 in 2001 because ageing
-  ## is allowed
-  expect_true(all(out$hc2_hiv_pop[1, 1, 0, , which(1970:2030 == 2001)] >= 0))
-
-  ## HIV population should be larger than zero in CD4 categories after the
-  ## highest as natural history now allowed
-  expect_true(all(out$hc1_hiv_pop[2, 1, 3, , which(1970:2030 == 2001)] >= 0))
+  #Ensure that prevalence aligns
 
 
   ##Nothing should ever be negative

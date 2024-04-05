@@ -28,6 +28,7 @@ saveRDS(proj, testthat::test_path("testdata/projection_parameters_adult.rds"))
 demp <- prepare_leapfrog_demp(pjnz1)
 proj <- prepare_leapfrog_projp(pjnz1)
 proj <- leapfrog:::prepare_hc_leapfrog_projp(pjnz1, proj)
+proj$paed_cd4_dist <- c(0.60016463, 0.12003293, 0.10002740, 0.09002469, 0.05001375, 0.03000823, 0.01000271)
 lmod <- leapfrogR(demp, proj)
 
 demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
@@ -43,8 +44,9 @@ yr_end <- as.integer(dpsub("<FinalYear MV2>",2,4))
 proj.years <- yr_start:yr_end
 timedat.idx <- 4+1:length(proj.years)-1
 
-setwd('C:/Users/mwalters/frogger/tests/testthat/testdata/')
-saveRDS(list(proj = proj, demp = demp, dp = dp, timedat.idx = timedat.idx), "child_parms.rds")
+
+saveRDS(list(proj = proj, demp = demp, dp = dp, timedat.idx = timedat.idx, pjnz = pjnz1,
+             pop1 = paste0(getwd(), '/', gsub(x = pjnz1, pattern = '.PJNZ', replacement = '_pop1.xlsx'))), "C:/Users/mwalters/frogger/tests/testthat/testdata/child_parms.rds")
 
 
 
