@@ -664,9 +664,7 @@ void run_child_natural_history(int time_step,
       }
     }
   }
-  if(time_step == 18){
-    std::cout << intermediate.children.hc_grad(0, 0, 0, 0);
-  }
+
 
 }
 
@@ -732,7 +730,7 @@ void run_child_hiv_mort(int time_step,
           intermediate.children.hc_grad(hd, cat, a, s) -=
             state_next.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s) *
             cpars.hc2_cd4_mort(hd, cat, a - hc_ss.hc2_agestart);
-          state_next.children.hc2_noart_aids_deaths(hd, cat, a, s) +=
+          state_next.children.hc2_noart_aids_deaths(hd, cat, a - hc_ss.hc2_agestart, s) +=
             state_next.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s) * cpars.hc2_cd4_mort(hd, cat, a - hc_ss.hc2_agestart);
         }
       }
@@ -1430,15 +1428,8 @@ void run_child_model_simulation(int time_step,
     internal::run_wlhiv_births(time_step, pars, state_curr, state_next, intermediate);
   }
   internal::run_child_hiv_infections(time_step, pars, state_curr, state_next, intermediate);
-  if(time_step == 18){
-    std::cout << state_next.children.hc1_hiv_pop(0,0,0,0);
-  }
   internal::run_child_natural_history(time_step, pars, state_curr, state_next, intermediate);
-
   internal::run_child_hiv_mort(time_step, pars, state_curr, state_next, intermediate);
-  if(time_step == 18){
-  //  std::cout << intermediate.children.hc_grad(0, 0, 0, 0);
-  }
   internal::add_child_grad(time_step, pars, state_curr, state_next, intermediate);
   //This is only the order for nosocomial infections
   //order from mkw_bf_trans: run_child_ageing, run_wlhiv_births, run_child_hiv_infections, run_child_natural_history,

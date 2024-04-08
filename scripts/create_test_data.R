@@ -46,7 +46,8 @@ timedat.idx <- 4+1:length(proj.years)-1
 
 
 saveRDS(list(proj = proj, demp = demp, dp = dp, timedat.idx = timedat.idx, pjnz = pjnz1,
-             pop1 = paste0(getwd(), '/', gsub(x = pjnz1, pattern = '.PJNZ', replacement = '_pop1.xlsx'))), "C:/Users/mwalters/frogger/tests/testthat/testdata/child_parms.rds")
+             pop1 = paste0(getwd(), '/', gsub(x = pjnz1, pattern = '.PJNZ', replacement = '_pop1.xlsx'))),
+        "C:/Users/mwalters/frogger/tests/testthat/testdata/child_parms.rds")
 
 
 
