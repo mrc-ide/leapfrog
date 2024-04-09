@@ -607,7 +607,7 @@ test_that('Perinatal transmission of HIV', {
 
 ## issue is that lmod doesn't have any kids? in hivpop1?
   lmod <- leapfrogR(demp, hivp)
-  specres <- read_hivproj_output(pjnz1)
+  specres <- eppasm::read_hivproj_output(pjnz1)
 
   x <- data.table(lmod = as.vector(lmod$hiv_births), spec = specres$hivpregwomen)
   x[,diff := spec - lmod]
@@ -664,7 +664,7 @@ test_that('Perinatal transmission of HIV, some pmtct', {
   lmod <- leapfrogR(demp, hivp)
   lmod_out <- lmod_output_paed(lmod = lmod)
 
-  specres <- read_hivproj_output(pjnz1)
+  specres <- eppasm::read_hivproj_output(pjnz1)
   x <- data.table(lmod = as.vector(lmod$hiv_births), spec = specres$hivpregwomen)
   x[,diff := spec - lmod]
   x[,ratio := spec/  lmod]
