@@ -1310,7 +1310,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       NoPMTCT_bf = 1 - ptr3 - bftr_1;
 
 
-
      if(sumARV > 0){
        for(int hp = 0; hp < 7; hp++){
          //hp = 0 is option A
@@ -1318,6 +1317,11 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
          if(hp == 0){
            trt_pct = pmtct_cov(0);// * (1 - (pmtct_dropout(2,t) / 100) * 2);
            NoPMTCT_bf -= trt_pct  *  (pow(1 - pmtct_dropout(hp + 2,t) * 2, bf));
+           if(bf == 2 & t == 31){
+             std::cout << pmtct(hp, t, 1);
+             std::cout << pmtct_dropout(hp + 2,t);
+             std::cout << NoPMTCT_bf;
+           }
          }
 
          //hp = 1 is option B
@@ -1377,12 +1381,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       if(bf < 1){
          bftr_1 = bftr_1/ 4;
        }
-
-      if(t == 6 & bf == 0){
-        std::cout << bftr_1;
-
-
-      }
    }
 
 
