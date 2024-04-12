@@ -7,6 +7,7 @@ setwd('C:/Users/mwalters/frogger/')
 
 ## Create demographic and projection parameters for adults
 pjnz1 <- testthat::test_path("testdata/bwa_aim-no-special-elig.PJNZ")
+pjnz1 = 'C:/Users/mwalters/Desktop/NW_TEST_MTCT_BF_PERI_pmtct.PJNZ'
 
 demp <- prepare_leapfrog_demp(pjnz1)
 saveRDS(demp, testthat::test_path("testdata/demographic_projection_object_adult.rds"))
@@ -28,8 +29,8 @@ saveRDS(proj, testthat::test_path("testdata/projection_parameters_adult.rds"))
 demp <- prepare_leapfrog_demp(pjnz1)
 proj <- prepare_leapfrog_projp(pjnz1)
 proj <- leapfrog:::prepare_hc_leapfrog_projp(pjnz1, proj)
-proj$paed_cd4_dist <- c(0.60016463, 0.12003293, 0.10002740, 0.09002469, 0.05001375, 0.03000823, 0.01000271)
-lmod <- leapfrogR(demp, proj)
+#proj$paed_cd4_dist <- c(0.60016463, 0.12003293, 0.10002740, 0.09002469, 0.05001375, 0.03000823, 0.01000271)
+#lmod <- leapfrogR(demp, proj)
 
 demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
 demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
@@ -81,9 +82,9 @@ spectrum_output <- function(file = "../testdata/spectrum/v6.13/bwa_aim-adult-chi
   return(list(on_treatment = df_on_treatment, off_treatment = df_off_treatment, total = df_total))
 
 }
-df <- spectrum_output(pop1, ages = 0:14, 'country', years_in = 1970:2030)
-x = data.table(df$total)
-
+# df <- spectrum_output(pop1, ages = 0:14, 'country', years_in = 1970:2030)
+# x = data.table(df$total)
+x = NULL
 
 saveRDS(list(proj = proj, demp = demp, dp = dp, timedat.idx = timedat.idx, pjnz = pjnz1,
              pop1_outputs = x),

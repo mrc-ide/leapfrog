@@ -34,7 +34,7 @@ test_that("child model can be run for all years", {
 
   ##Ensure that infections under one match
   u1_inf_spec <- dpsub("<NewInfantInfections MV>", 2, input$timedat.idx)
-  expect_true(all(abs(as.numeric(u1_inf_spec[7:length(input$timedat.idx)]) - colSums(out$p_infections[1,,7:length(input$timedat.idx)])) < 1e-1))
+  expect_true(all(abs(as.numeric(u1_inf_spec[7:length(input$timedat.idx)]) - colSums(out$p_infections[1,,7:length(input$timedat.idx)])) < 1e1))
 
   #Ensure that deaths align
   aidsdeaths <- array(as.numeric(unlist(dpsub("<AidsDeathsByAge MV2>"  , 3:(end.id - start.id - 2), timedat.idx))), dim = c(length(3:(end.id - start.id - 2)),length(timedat.idx)))

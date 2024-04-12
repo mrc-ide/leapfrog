@@ -4,6 +4,7 @@
 
 namespace leapfrog {
 
+
 namespace internal {
 
 template<typename ModelVariant, typename real_type>
@@ -111,7 +112,7 @@ void convert_PMTCT_num_to_perc(int time_step,
   //replace all instances of coverage input as numbers with percentage covered
   if(cpars.PMTCT_input_is_percent(time_step)){
     for (int hp = 0; hp < hc_ss.hPS; ++hp) {
-        intermediate.children.PMTCT_coverage(hp) = cpars.PMTCT(hp,time_step) / 100;
+        intermediate.children.PMTCT_coverage(hp) =  cpars.PMTCT(hp,time_step) / 100;
     } //end hPS
   }else{
     for (int hp = 0; hp < hc_ss.hPS; ++hp) {
@@ -128,6 +129,55 @@ void convert_PMTCT_num_to_perc(int time_step,
       }
     } //end hPS
   }
+
+}
+
+template<typename ModelVariant, typename real_type>
+void convert_PMTCT_pre_bf(int time_step,
+                               const Parameters<ModelVariant, real_type> &pars,
+                               const State<ModelVariant, real_type> &state_curr,
+                               State<ModelVariant, real_type> &state_next,
+                               IntermediateData<ModelVariant, real_type> &intermediate) {
+  const auto cpars = pars.children.children;
+  static_assert(ModelVariant::run_child_model,
+                "convert_PMTCT_num_to_perc can only be called for model variants where run_child_model is true");
+  constexpr auto hc_ss = StateSpace<ModelVariant>().children;
+
+  // for (int hp = 0; hp < hc_ss.hPS; ++hp) {
+  //   intermediate.children.sumARV += cpars.PMTCT(hp,time_step);
+  // }
+  //
+  // intermediate.children.need_PMTCT = state_next.children.hiv_births;
+
+  //replace all instances of coverage input as numbers with percentage covered
+  //if(cpars.PMTCT_input_is_percent(time_step)){
+    for (int hp = 0; hp < hc_ss.hPS; ++hp) {
+      if(hp == 0){
+        intermediate.children.PMTCT_coverage(hp) = (1 - intermediate.children.optA_transmission_rate) * cpars.PMTCT(hp,time_step) / 100;
+      }
+      if(hp == 1){
+        intermediate.children.PMTCT_coverage(hp) = (1 - intermediate.children.optB_transmission_rate) * cpars.PMTCT(hp,time_step) / 100;
+      }
+      if(hp > 1){
+        intermediate.children.PMTCT_coverage(hp) = (1 - cpars.PMTCT_transmission_rate(4,hp,0)) * cpars.PMTCT(hp,time_step) / 100;
+      }
+
+    } //end hPS
+  // }else{
+  //   for (int hp = 0; hp < hc_ss.hPS; ++hp) {
+  //     if((intermediate.children.need_PMTCT * intermediate.children.sumARV) > 0){
+  //       intermediate.children.OnPMTCT = intermediate.children.need_PMTCT * intermediate.children.sumARV ;
+  //     }else{
+  //       intermediate.children.OnPMTCT = 0.0;
+  //     }
+  //
+  //     if (intermediate.children.sumARV == 0) {
+  //       intermediate.children.PMTCT_coverage(hp) = 0.0;
+  //     } else {
+  //       intermediate.children.PMTCT_coverage(hp) = (cpars.PMTCT(hp,time_step) / intermediate.children.sumARV) * (intermediate.children.OnPMTCT / intermediate.children.need_PMTCT);
+  //     }
+  //   } //end hPS
+  // }
 
 }
 
@@ -293,8 +343,7 @@ void run_calculate_perinatal_transmission_rate(int time_step,
 
   //Transmission among women not on treatment
   if (intermediate.children.num_wlhiv > 0) {
-    intermediate.children.perinatal_transmission_rate = intermediate.children.perinatal_transmission_rate +
-      intermediate.children.no_PMTCT *
+    intermediate.children.perinatal_transmission_rate += intermediate.children.no_PMTCT *
       (intermediate.children.prop_wlhiv_lt200 * cpars.vertical_transmission_rate(4,0) +
       intermediate.children.prop_wlhiv_200to350 * cpars.vertical_transmission_rate(2,0) +
       intermediate.children.prop_wlhiv_gte350 * cpars.vertical_transmission_rate(0,0));
@@ -302,7 +351,6 @@ void run_calculate_perinatal_transmission_rate(int time_step,
     intermediate.children.perinatal_transmission_rate = intermediate.children.perinatal_transmission_rate;
   }
   intermediate.children.perinatal_transmission_rate_bf_calc = intermediate.children.perinatal_transmission_rate;
-
 
   //Transmission due to incident infections
   intermediate.children.asfr_sum = 0.0;
@@ -357,6 +405,8 @@ void run_calculate_transmission_from_incidence_during_breastfeeding(int time_ste
 template<typename ModelVariant, typename real_type>
 void run_bf_transmission_rate(int time_step,
                               const Parameters<ModelVariant, real_type> &pars,
+                              const State<ModelVariant, real_type> &state_curr,
+                              State<ModelVariant, real_type> &state_next,
                               IntermediateData<ModelVariant, real_type> &intermediate,
                               int bf_start, int bf_end, int index) {
   const auto cpars = pars.children.children;
@@ -364,95 +414,122 @@ void run_bf_transmission_rate(int time_step,
   static_assert(ModelVariant::run_child_model,
                 "run_hiv_child_infections can only be called for model variants where run_child_model is true");
 
-  intermediate.children.percent_no_treatment = 1.0;
+  internal::adjust_optAB_bf_transmission_rate(time_step, pars, state_curr, state_next, intermediate);
+  internal::convert_PMTCT_pre_bf(time_step, pars, state_curr, state_next, intermediate);
+
+
   for(int bf = bf_start; bf < bf_end; bf++){
     //intermediate.children.perinatal_transmission_rate_bf_calc is the transmission that has already occurred due to perinatal transmission
     //intermediate.children.percent_no_treatment is the percentage of women who are still vulnerable to HIV transmission to their babies
     intermediate.children.percent_no_treatment = 1 - intermediate.children.perinatal_transmission_rate_bf_calc - intermediate.children.bf_transmission_rate(index);
 
+
       for(int hp = 0; hp < hc_ss.hPS; hp++){
         //hp = 0 is option A
         //Dropout not used for option A
         if(hp == 0){
-          // intermediate.children.percent_on_treatment = intermediate.children.optA_bf_transmission_rate *
-          //   intermediate.children.PMTCT_coverage(hp);
+           intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp) *(pow(1 - cpars.PMTCT_dropout(hp + 2,time_step) * 2, bf));
           // intermediate.children.bf_transmission_rate(index) += intermediate.children.percent_on_treatment *
-          //   2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) ;
-          intermediate.children.percent_no_treatment -= intermediate.children.PMTCT_coverage(hp);
+          //   2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) * intermediate.children.optA_bf_transmission_rate;
+           intermediate.children.percent_no_treatment -=  intermediate.children.percent_on_treatment;
+
         }
+
         //hp = 1 is option B
         //Dropout not used for option B
         if(hp == 1){
-          // intermediate.children.percent_on_treatment = intermediate.children.optB_bf_transmission_rate *
-          //   intermediate.children.PMTCT_coverage(hp);
-          // intermediate.children.bf_transmission_rate(index) +=  intermediate.children.percent_on_treatment *
-          //   2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) ;
-          intermediate.children.percent_no_treatment -=  intermediate.children.PMTCT_coverage(hp) ;
+          intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp) *(pow(1 - cpars.PMTCT_dropout(hp + 2,time_step) * 2, bf));
+          // intermediate.children.bf_transmission_rate(index) += intermediate.children.percent_on_treatment *
+          //   2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) * intermediate.children.optB_bf_transmission_rate;
+          intermediate.children.percent_no_treatment -=  intermediate.children.percent_on_treatment;
+
 
         }
+
+        //sdnvp
         if(hp == 2){
-          intermediate.children.percent_on_treatment = cpars.PMTCT_transmission_rate(4,hp,1) *
-            intermediate.children.PMTCT_coverage(hp);
 
-          intermediate.children.bf_transmission_rate(index) +=  intermediate.children.percent_on_treatment *
-            2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) ;
-
+          intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp) * cpars.PMTCT_transmission_rate(0,hp,1) ;
+          intermediate.children.bf_transmission_rate(index) +=  intermediate.children.percent_on_treatment * 2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) ;
           intermediate.children.percent_no_treatment -=  intermediate.children.PMTCT_coverage(hp) ;
 
         }
+
+
+        //dual arv
         if(hp == 3){
-          intermediate.children.percent_on_treatment = cpars.PMTCT_transmission_rate(4,hp,1) *
-            intermediate.children.PMTCT_coverage(hp);
+          intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp);
 
           intermediate.children.bf_transmission_rate(index) +=  intermediate.children.percent_on_treatment *
+            cpars.PMTCT_transmission_rate(4,hp,1) *
             2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) ;
 
           intermediate.children.percent_no_treatment -=  intermediate.children.PMTCT_coverage(hp) ;
 
         }
 
+        //on art pre preg
         if(hp > 3){
+            if(bf < 6){
+              if(cpars.PMTCT_dropout(4,time_step) > 0){
+                intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp) *
+                  (pow(1 - cpars.PMTCT_dropout(4,time_step) * 2, bf))  ;
+              }else{
+                intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp)  ;
+              }
+                }else{
+                  if(cpars.PMTCT_dropout(5,time_step) > 0){
+                    intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp) *
+                      (pow(1 - cpars.PMTCT_dropout(5,time_step) * 2, bf))  ;
+                  }else{
+                    intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp)  ;
+                  }
+                }
 
-          //check about the dropout rates being double applied for 4 and five https://github.com/mrc-ide/leapfrog/blob/c4b50084cb2068c2956931cfc89d394bd75b053b/inst/include/leapfrog-raw.h#L1516
-          if(bf > 0){
-            if(cpars.PMTCT_dropout(4,time_step) > 0){
-              intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp) *
-                (pow(1 - cpars.PMTCT_dropout(4,time_step) * 2, bf))  ;
-            }else{
-              intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp) ;
-
-            }
-
-          }else{
-            intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp);
-          }
-
-
-          intermediate.children.bf_transmission_rate(index) += intermediate.children.percent_on_treatment *
-            2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) * cpars.PMTCT_transmission_rate(4,hp,1);
-
-          intermediate.children.percent_no_treatment -= intermediate.children.PMTCT_coverage(hp);
+                if(hp == 4){
+                  intermediate.children.bf_transmission_rate(index) += intermediate.children.percent_on_treatment *
+                  2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) * cpars.PMTCT_transmission_rate(4,hp,1);
+                }
+                if(hp == 5){
+                  intermediate.children.bf_transmission_rate(index) += intermediate.children.percent_on_treatment *
+                     2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) * cpars.PMTCT_transmission_rate(4,hp,1);
+                }
+                if(hp == 6){
+                  intermediate.children.bf_transmission_rate(index) += intermediate.children.percent_on_treatment *
+                    2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) * cpars.PMTCT_transmission_rate(4,hp,1);
+                }
+          intermediate.children.percent_no_treatment -= intermediate.children.percent_on_treatment;
 
         }
+
+      }
+
+      if(time_step == 30 & bf == 2){
+        std::cout << intermediate.children.bf_transmission_rate(index);
       }
 
     if(intermediate.children.percent_no_treatment < 0){
       intermediate.children.percent_no_treatment = 0;
     }
 
+
     //No treatment
     if(cpars.breastfeeding_duration_no_art(bf, time_step) < 1){
-      if(intermediate.children.optB_bf_transmission_rate > 0){
+
         intermediate.children.bf_transmission_rate(index) +=
           intermediate.children.percent_no_treatment * (1 - cpars.breastfeeding_duration_no_art(bf, time_step)) *
-          (2 * (1 - intermediate.children.prop_wlhiv_gte350) * cpars.vertical_transmission_rate(2,1) +
+          (2 * (1 - intermediate.children.prop_wlhiv_gte350) * cpars.vertical_transmission_rate(4,1) +
           2 * intermediate.children.prop_wlhiv_gte350 * cpars.vertical_transmission_rate(0,1));
-      }
+
     }
+
 
     if(bf < 1){
       intermediate.children.bf_transmission_rate(index) = intermediate.children.bf_transmission_rate(index)/ 4;
     }
+
+
+
   }
 }
 
@@ -490,6 +567,7 @@ void run_child_hiv_infections(int time_step,
 
   internal::run_calculate_perinatal_transmission_rate(time_step, pars, state_curr, state_next, intermediate);
 
+
   //Perinatal transmission
   for (int s = 0; s < ss.NS; ++s) {
   for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
@@ -510,9 +588,9 @@ void run_child_hiv_infections(int time_step,
    //Breastfeeding transmission
 
    //0-6
-   internal::adjust_optAB_bf_transmission_rate(time_step, pars, state_curr, state_next, intermediate);
    internal::run_calculate_transmission_from_incidence_during_breastfeeding(time_step, pars, state_curr, state_next, intermediate);
-   internal::run_bf_transmission_rate(time_step, pars, intermediate, 0, 3, 0);
+   internal::run_bf_transmission_rate(time_step, pars,  state_curr, state_next, intermediate, 0, 3, 0);
+
    for (int s = 0; s < ss.NS; ++s) {
      for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
        state_next.children.hc1_hiv_pop(hd, 1, 0, s) +=  state_next.children.hiv_births *  demog.births_sex_prop(s,time_step) * cpars.hc1_cd4_dist(hd) * (intermediate.children.bf_incident_hiv_transmission_rate + intermediate.children.bf_transmission_rate(0));
@@ -521,9 +599,8 @@ void run_child_hiv_infections(int time_step,
      state_next.base.p_infections(0, s) += state_next.children.hiv_births  * demog.births_sex_prop(s,time_step) * (intermediate.children.bf_incident_hiv_transmission_rate + intermediate.children.bf_transmission_rate(0));
    }// end NS
 
-
    //6-12
-   internal::run_bf_transmission_rate(time_step, pars, intermediate, 3, 6, 1);
+   internal::run_bf_transmission_rate(time_step, pars,  state_curr, state_next,intermediate, 3, 6, 1);
    for (int s = 0; s < ss.NS; ++s) {
      for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
        state_next.children.hc1_hiv_pop(hd, 2, 0, s) +=  state_next.children.hiv_births *  demog.births_sex_prop(s,time_step) * cpars.hc1_cd4_dist(hd) * intermediate.children.bf_transmission_rate(1);
@@ -533,8 +610,8 @@ void run_child_hiv_infections(int time_step,
    }// end NS
 
    //12plus
-   internal::run_bf_transmission_rate(time_step, pars, intermediate, 6, 12, 2);
-   internal::run_bf_transmission_rate(time_step, pars, intermediate, 12, hc_ss.hBF, 3);
+   internal::run_bf_transmission_rate(time_step, pars, state_curr, state_next, intermediate, 6, 12, 2);
+   internal::run_bf_transmission_rate(time_step, pars, state_curr, state_next, intermediate, 12, hc_ss.hBF, 3);
    for (int s = 0; s < ss.NS; ++s) {
      for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
        //12-24

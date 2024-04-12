@@ -145,6 +145,32 @@ In 5 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 | adol_cd4_prog      | children.hc2_cd4_prog                    | Probability of progressing to the subsequent CD4 stage for 5-14 year olds                                                                                             |                                               
 | ctx_effect         | children.ctx_effect                      | Effectiveness of cotrimoxazole at averting mortality                                                                                                                  |
 | ctx_val            | children.ctx_val                         | Number of children receiving cotrimoxazole                                                                                                                            |
+| paed_art_elig_age  | children.hc_art_elig_age                 | Age at which children are eligible for ART by year                                                                                                                    |
+| paed_art_elig_cd4  | children.hc_art_elig_cd4                 | CD4 at which children are eligible for ART by year                                                                                                                    |
+| mort_art_rr        | children.hc_art_mort_rr                  | Mortality rate ratios by age and treatment duration                                                                                                                   |
+| paed_art_mort      | children.hc1_art_mort                    | Mortality rate for children 0-4y by CD4 and treatment duration                                                                                                        |
+| adol_art_mort      | children.hc2_art_mort                    | Mortality rate for children 5-14y by CD4 and treatment duration                                                                                                       |
+| artpaeds_isperc    | children.hc_art_isperc                   | Boolean vector indicating whether input is a percent                                                                                                                  |
+| paed_art_val       | children.hc_art_val                      | Percent or number of children on ART each year                                                                                                                        |
+| init_art_dist      | children.hc_art_init_dist                | ART initiation by age                                                                                                                                                 |
+| adult_cd4_dist     | children.adult_cd4_dist                  | Transition matrix converting 5-14y CD4 categories to adult CD4 categories                                                                                             |
+| fert_mult_by_age   | children.fert_mult_by_age                | Fertility ratio for WLHIV by age                                                                                                                                      |
+| fert_mult_offart   | children.fert_mult_offart                | Fertility ratio for WLHIV not on treatment by CD4                                                                                                                     |
+| fert_mult_onart    | children.fert_mult_onart                 | Fertility ratio for WLHIV on treatment by age                                                                                                                         |
+| tfr                | children.total_fertility_rate            | Total fertility rate                                                                                                                                                  |
+| laf                | children.local_adj_factor                | Local fertility adjustment to match progromattic data                                                                                                                 |
+| pmtct              | children.PMTCT                           | Number of percent of women receiving ARVs for PMTCT                                                                                                                   |
+| mtct               | children.vertical_transmission_rate      | Vertical transmsision rate for pregnant and breastfeeding women not receiving ARV by CD4 category                                                                     |
+| pmtct_mtct         | children.PMTCT_transmission_rate         | Vertical transmission rate for pregnant and breastfeeding women by PMTCT regimen                                                                                      |
+| pmtct_dropout      | children.PMTCT_dropout                   | Dropout rates for women receiving ARV for PMTCT during pregnancy and breastfeeding                                                                                    |
+| pmtct_input_is_perc| children.PMTCT_input_is_percent          | Boolean vector indicating whether PMTCT values were input as percent or number                                                                                        |
+| bf_duration_art    | children.breastfeeding_duration_art      | Percent of women on ART still breastfeeding at two month invervals                                                                                                    |
+| bf_duration_no_art | children.breastfeeding_duration_no_art   | Percent of women not on ART still breastfeeding at two month intervals                                                                                                |
+| mat_hiv_births     | children.mat_hiv_births                  | Number of births to WLHIV                                                                                                                                             |
+| mat_prev_input     | children.mat_prev_input                  | Boolean vector indicating if input mat_hiv_births should be used for vertical transmission rather than results from adult model                                       |
+| prop_lt200         | children.prop_lt200                      | Proportion of WLHIV with CD4 less than 200 by year                                                                                                                    |
+| prop_gte350        | children.prop_gte350                     | Proportion of WLHIV with CD4 greater than 350 by year                                                                                                                 |
+| incrate            | children.incrate                         | Incidence rate among women 15-49y by year                                                                                                                             |
 
 ### Outputs
 
@@ -153,25 +179,30 @@ Discussion: naming conventions
 * Distinguish events vs. counts
 * Distinguish stratification of array (single-year population pXX vs. HIV population hXX
 
-| Leapfrog         | Frogger                    | Details                                                                  |
-|------------------|----------------------------|--------------------------------------------------------------------------|
-| totpop1          | p_total_pop                | Projected total population                                               |
-| hivpop1          | p_hiv_pop                  | Projected HIV population                                                 |
-| infections       | p_infections               | Projected number of new HIV infections by sex and age                    |
-| hivstrat_adult   | h_hiv_adult                | Projected PLHIV not on ART by age, sex and CD4                           |
-| artstrat_adult   | h_art_adult                | Projected PLHIV on ART by age, sex, CD4 and treatment stage              |
-| births           | births                     | Projected number of births                                               |
-| natdeaths        | p_total_pop_natural_deaths | Projected number of natural deaths                                       |
-| natdeaths_hivpop | p_hiv_pop_natural_deaths   | Projected number of natural deaths within HIV population                 |
-| hivdeaths        | p_hiv_deaths               | Projected HIV-related deaths by sex and age                              |
-| aidsdeaths_noart | h_hiv_deaths_no_art        | Projected HIV-related deaths off ART by sex, age and CD4                 |
-| aidsdeaths_art   | h_hiv_deaths_art           | Projected HIV-related deaths on ART by sex, age, CD4 and treatment stage |
-| artinit          | h_art_initiation           | Projected ART initiations by sex, age and CD4                            |
-| hivstrat_paeds   | hc1_hiv_pop                | Projected PLHIV 0-4y not on ART by age, sex, transmission type, and CD4  |
-| hivstrat_paeds   | hc2_hiv_pop                | Projected PLHIV 5-14y not on ART by age, sex, transmission type, and CD4 |
-| artstrat_paeds   | hc1_art_pop                | Projected PLHIV 0-4y on ART by age, sex, treatment stage and CD4         |
-| artstrat_paeds   | hc2_art_pop                | Projected PLHIV 5-14y on ART by age, sex, treatment stage and CD4        |
-
+| Leapfrog         | Frogger                    | Details                                                                                    |
+|------------------|----------------------------|--------------------------------------------------------------------------------------------|
+| totpop1          | p_total_pop                | Projected total population                                                                 |
+| hivpop1          | p_hiv_pop                  | Projected HIV population                                                                   |
+| infections       | p_infections               | Projected number of new HIV infections by sex and age                                      |
+| hivstrat_adult   | h_hiv_adult                | Projected PLHIV not on ART by age, sex and CD4                                             |
+| artstrat_adult   | h_art_adult                | Projected PLHIV on ART by age, sex, CD4 and treatment stage                                |
+| births           | births                     | Projected number of births                                                                 |
+| natdeaths        | p_total_pop_natural_deaths | Projected number of natural deaths                                                         |
+| natdeaths_hivpop | p_hiv_pop_natural_deaths   | Projected number of natural deaths within HIV population                                   |
+| hivdeaths        | p_hiv_deaths               | Projected HIV-related deaths by sex and age                                                |
+| aidsdeaths_noart | h_hiv_deaths_no_art        | Projected HIV-related deaths off ART by sex, age and CD4                                   |
+| aidsdeaths_art   | h_hiv_deaths_art           | Projected HIV-related deaths on ART by sex, age, CD4 and treatment stage                   |
+| artinit          | h_art_initiation           | Projected ART initiations by sex, age and CD4                                              |
+| hivstrat_paeds   | hc1_hiv_pop                | Projected PLHIV 0-4y not on ART by age, sex, transmission type, and CD4                    |
+| hivstrat_paeds   | hc2_hiv_pop                | Projected PLHIV 5-14y not on ART by age, sex, transmission type, and CD4                   |
+| artstrat_paeds   | hc1_art_pop                | Projected PLHIV 0-4y on ART by age, sex, treatment stage and CD4                           |
+| artstrat_paeds   | hc2_art_pop                | Projected PLHIV 5-14y on ART by age, sex, treatment stage and CD4                          |
+|                  | hc1_noart_aids_deaths      | Projected deaths among PLHIV 0-4y not on ART by CD4, transmission type, age, sex, and year |
+|                  | hc2_noart_aids_deaths      | Projected deaths among PLHIV 5-14y not on ART by CD4, transmission type, age, sex, and year|
+|                  | hc1_art_aids_deaths        | Projected deaths among PLHIV 0-4y on ART by time on treatment, CD4, age, sex, and year     |
+|                  | hc2_art_aids_deaths        | Projected deaths among PLHIV 5-14y on ART by time on treatment, CD4, age, sex, and year    |
+|                  | hc_art_num                 | Number of children on ART by year                                                          |
+|                  | hiv_births                 | Number of births to WLHIV by year                                                          |
 
 ### Internal
 
