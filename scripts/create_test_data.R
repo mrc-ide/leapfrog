@@ -82,9 +82,8 @@ spectrum_output <- function(file = "../testdata/spectrum/v6.13/bwa_aim-adult-chi
   return(list(on_treatment = df_on_treatment, off_treatment = df_off_treatment, total = df_total))
 
 }
-# df <- spectrum_output(pop1, ages = 0:14, 'country', years_in = 1970:2030)
-# x = data.table(df$total)
-x = NULL
+df <- spectrum_output(pop1, ages = 0:14, 'country', years_in = 1970:2030)
+x = data.table(df$total)
 
 saveRDS(list(proj = proj, demp = demp, dp = dp, timedat.idx = timedat.idx, pjnz = pjnz1,
              pop1_outputs = x),

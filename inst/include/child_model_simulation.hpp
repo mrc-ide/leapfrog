@@ -433,9 +433,6 @@ void run_bf_transmission_rate(int time_step,
           // intermediate.children.bf_transmission_rate(index) += intermediate.children.percent_on_treatment *
           //   2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) * intermediate.children.optA_bf_transmission_rate;
            intermediate.children.percent_no_treatment -=  intermediate.children.percent_on_treatment;
-           if(time_step == 35 & bf == 0 & hp == 0){
-             std::cout << intermediate.children.PMTCT_coverage(hp);
-           }
         }
 
         //hp = 1 is option B
@@ -546,6 +543,7 @@ void run_child_hiv_infections(int time_step,
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
+
 
   for (int s = 0; s < ss.NS; ++s) {
     // Run only first 5 age groups in total population 0, 1, 2, 3, 4
@@ -1496,6 +1494,10 @@ void run_child_model_simulation(int time_step,
                                 State<ModelVariant, real_type> &state_next,
                                 internal::IntermediateData<ModelVariant, real_type> &intermediate) {
   const auto cpars = pars.children.children;
+  constexpr auto ss = StateSpace<ModelVariant>().base;
+  constexpr auto hc_ss = StateSpace<ModelVariant>().children;
+
+
 
   internal::run_child_ageing(time_step, pars, state_curr, state_next, intermediate);
 
@@ -1504,18 +1506,55 @@ void run_child_model_simulation(int time_step,
   }else{
     internal::run_wlhiv_births(time_step, pars, state_curr, state_next, intermediate);
   }
-  internal::run_child_hiv_infections(time_step, pars, state_curr, state_next, intermediate);
-  internal::run_child_natural_history(time_step, pars, state_curr, state_next, intermediate);
-  internal::run_child_hiv_mort(time_step, pars, state_curr, state_next, intermediate);
-  internal::add_child_grad(time_step, pars, state_curr, state_next, intermediate);
-  //This is only the order for nosocomial infections
-  //order from mkw_bf_trans: run_child_ageing, run_wlhiv_births, run_child_hiv_infections, run_child_natural_history,
-  //run_child_hiv_mort, add_child_trad, run_child_art_initiation, run_child_art_mortality
-  // !!!TODO: also need to fix the looping order for some loops
-  // !!!TODO: put this in an if statement to only run if the first year of ART has passed
-  internal::run_child_art_initiation(time_step, pars, state_curr, state_next, intermediate);
-  internal::run_child_art_mortality(time_step, pars, state_curr, state_next, intermediate);
-  internal::fill_model_outputs(time_step, pars, state_curr, state_next, intermediate);
+
+  if(state_next.children.hiv_births > 0){
+    internal::run_child_hiv_infections(time_step, pars, state_curr, state_next, intermediate);
+    internal::run_child_natural_history(time_step, pars, state_curr, state_next, intermediate);
+    internal::run_child_hiv_mort(time_step, pars, state_curr, state_next, intermediate);
+    internal::add_child_grad(time_step, pars, state_curr, state_next, intermediate);
+    if(time_step == 6){
+      double test = 0.0;
+      for (int hd = 0; hd < ss.hDS; ++hd) {
+        for (int s = 0; s < ss.NS; ++s) {
+          for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+            test += state_next.children.hc1_hiv_pop(hd, cat, 0, s);
+          }// end hcTT
+        }//end ss.NS
+      }// end hDS
+      std::cout << test;
+    }
+    //This is only the order for nosocomial infections
+    //order from mkw_bf_trans: run_child_ageing, run_wlhiv_births, run_child_hiv_infections, run_child_natural_history,
+    //run_child_hiv_mort, add_child_trad, run_child_art_initiation, run_child_art_mortality
+    // !!!TODO: also need to fix the looping order for some loops
+    // !!!TODO: put this in an if statement to only run if the first year of ART has passed
+    internal::run_child_art_initiation(time_step, pars, state_curr, state_next, intermediate);
+    if(time_step == 6){
+      double test = 0.0;
+      for (int hd = 0; hd < ss.hDS; ++hd) {
+        for (int s = 0; s < ss.NS; ++s) {
+          for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+            test += state_next.children.hc1_hiv_pop(hd, cat, 0, s);
+          }// end hcTT
+        }//end ss.NS
+      }// end hDS
+      std::cout << test;
+    }
+    internal::run_child_art_mortality(time_step, pars, state_curr, state_next, intermediate);
+    if(time_step == 6){
+      double test = 0.0;
+      for (int hd = 0; hd < ss.hDS; ++hd) {
+        for (int s = 0; s < ss.NS; ++s) {
+          for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+            test += state_next.children.hc1_hiv_pop(hd, cat, 0, s);
+          }// end hcTT
+        }//end ss.NS
+      }// end hDS
+      std::cout << test;
+    }
+    internal::fill_model_outputs(time_step, pars, state_curr, state_next, intermediate);
+  }
+
 
   }
 
