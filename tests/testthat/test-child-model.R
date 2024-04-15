@@ -34,7 +34,7 @@ test_that("child model can be run for all years", {
 
   ##Ensure that infections under one match
   u1_inf_spec <- dpsub("<NewInfantInfections MV>", 2, input$timedat.idx)
-  expect_true(all(abs(as.numeric(u1_inf_spec[7:length(input$timedat.idx)]) - colSums(out$p_infections[1,,7:length(input$timedat.idx)])) < 1e1))
+  expect_true(all(abs(as.numeric(u1_inf_spec[7:length(input$timedat.idx)]) - colSums(out$p_infections[1,,7:length(input$timedat.idx)])) < 1e-3))
 
   #Ensure that deaths align
   start.id = 21292
@@ -49,8 +49,8 @@ test_that("child model can be run for all years", {
 
   #Ensure that prevalence aligns
   spec_prev <- input$pop1_outputs
-  hc1 = merge(data.table(melt(out$hc1_hiv_pop)), data.table(Var1 = 1:7, cd4_cat = c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5')), by = 'Var1')
-  hc2 = merge(data.table(melt(out$hc2_hiv_pop)), data.table(Var1 = 1:6, cd4_cat = c('gte1000', '750-999', '500-749', '350-499', '200-349','lte200')), by = 'Var1')
+  hc1 = merge(data.table::data.table(melt(out$hc1_hiv_pop)), data.table::data.table(Var1 = 1:7, cd4_cat = c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5')), by = 'Var1')
+  hc2 = merge(data.table::data.table(melt(out$hc2_hiv_pop)), data.table::data.table(Var1 = 1:6, cd4_cat = c('gte1000', '750-999', '500-749', '350-499', '200-349','lte200')), by = 'Var1')
   hc1 <- hc1[,.(age = Var3 - 1, cd4_cat, sex = ifelse(Var4 == 1, 'Male', 'Female'), year = Var5 + 1969, fr = value)]
   hc2 <- hc2[,.(age = Var3 + 4, cd4_cat, sex = ifelse(Var4 == 1, 'Male', 'Female'), year = Var5 + 1969, fr = value)]
   hc <- rbind(hc1, hc2)
