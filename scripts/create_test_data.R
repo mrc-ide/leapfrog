@@ -7,7 +7,7 @@ setwd('C:/Users/mwalters/frogger/')
 
 ## Create demographic and projection parameters for adults
 pjnz1 <- testthat::test_path("testdata/bwa_aim-no-special-elig.PJNZ")
-pjnz1 = 'C:/Users/mwalters/Desktop/NW_TEST_MTCT_BF_PERI_pmtct.PJNZ'
+#pjnz1 = 'C:/Users/mwalters/Desktop/NW_TEST_MTCT_BF_PERI_pmtct.PJNZ'
 
 demp <- prepare_leapfrog_demp(pjnz1)
 saveRDS(demp, testthat::test_path("testdata/demographic_projection_object_adult.rds"))

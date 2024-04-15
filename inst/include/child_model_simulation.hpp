@@ -152,15 +152,15 @@ void convert_PMTCT_pre_bf(int time_step,
   //replace all instances of coverage input as numbers with percentage covered
   //if(cpars.PMTCT_input_is_percent(time_step)){
     for (int hp = 0; hp < hc_ss.hPS; ++hp) {
-      if(hp == 0){
-        intermediate.children.PMTCT_coverage(hp) = (1 - intermediate.children.optA_transmission_rate) * cpars.PMTCT(hp,time_step) / 100;
-      }
-      if(hp == 1){
-        intermediate.children.PMTCT_coverage(hp) = (1 - intermediate.children.optB_transmission_rate) * cpars.PMTCT(hp,time_step) / 100;
-      }
-      if(hp > 1){
+      // if(hp == 0){
+      //   intermediate.children.PMTCT_coverage(hp) = (1 - intermediate.children.optA_transmission_rate) * cpars.PMTCT(hp,time_step) / 100;
+      // }
+      // if(hp == 1){
+      //   intermediate.children.PMTCT_coverage(hp) = (1 - intermediate.children.optB_transmission_rate) * cpars.PMTCT(hp,time_step) / 100;
+      // }
+      // if(hp > 1){
         intermediate.children.PMTCT_coverage(hp) = (1 - cpars.PMTCT_transmission_rate(4,hp,0)) * cpars.PMTCT(hp,time_step) / 100;
-      }
+      // }
 
     } //end hPS
   // }else{
@@ -268,6 +268,7 @@ void adjust_optAB_transmission_rate(int time_step,
     intermediate.children.optA_transmission_rate = cpars.PMTCT_transmission_rate(0,0,0) * (1 + intermediate.children.excessratio);
     intermediate.children.optB_transmission_rate = cpars.PMTCT_transmission_rate(0,1,0) * (1 + intermediate.children.excessratio);
   }
+
 }
 
 template<typename ModelVariant, typename real_type>
@@ -285,22 +286,22 @@ void adjust_optAB_bf_transmission_rate(int time_step,
   //Option A and B were only authorized for women with greater than 350 CD4, so if the percentage of women
   //on option A/B > the proportion of women in this cd4 category, we assume that some must have a cd4 less than 350
   //option AB will be less effective for these women so we adjust for that
-
-  if(intermediate.children.prop_wlhiv_gte350 > 0){
-    //CHECK: defined in previous function
-    //CHECK: avenir: will PMTCT coverage for pregnatn and bf women always be the same?
-    if((intermediate.children.PMTCT_coverage(0) + intermediate.children.PMTCT_coverage(1)) > intermediate.children.prop_wlhiv_gte350){
-      intermediate.children.excessratio_bf = intermediate.children.PMTCT_coverage(0) + intermediate.children.PMTCT_coverage(1) - intermediate.children.prop_wlhiv_gte350;
-      intermediate.children.optA_bf_transmission_rate = (intermediate.children.prop_wlhiv_gte350 * cpars.PMTCT_transmission_rate(4,0,1)) + intermediate.children.excessratio_bf * (1.45 / 0.46) * cpars.PMTCT_transmission_rate(4,0,1) / (intermediate.children.prop_wlhiv_gte350 + intermediate.children.excessratio_bf);
-      intermediate.children.optB_bf_transmission_rate = (intermediate.children.prop_wlhiv_gte350 * cpars.PMTCT_transmission_rate(4,1,1)) + intermediate.children.excessratio_bf * (1.45 / 0.46) * cpars.PMTCT_transmission_rate(4,1,1) / (intermediate.children.prop_wlhiv_gte350 + intermediate.children.excessratio_bf);
-    }else{
-      intermediate.children.optA_bf_transmission_rate = cpars.PMTCT_transmission_rate(4,0,1);
-      intermediate.children.optB_bf_transmission_rate = cpars.PMTCT_transmission_rate(4,1,1);
-    }
-  }else{
-    intermediate.children.optA_bf_transmission_rate = cpars.PMTCT_transmission_rate(4,0,1);
-    intermediate.children.optB_bf_transmission_rate = cpars.PMTCT_transmission_rate(4,1,1);
-  }
+//
+//   if(intermediate.children.prop_wlhiv_gte350 > 0){
+//     //CHECK: defined in previous function
+//     //CHECK: avenir: will PMTCT coverage for pregnatn and bf women always be the same?
+//     if((intermediate.children.PMTCT_coverage(0) + intermediate.children.PMTCT_coverage(1)) > intermediate.children.prop_wlhiv_gte350){
+//       intermediate.children.excessratio_bf = intermediate.children.PMTCT_coverage(0) + intermediate.children.PMTCT_coverage(1) - intermediate.children.prop_wlhiv_gte350;
+//       intermediate.children.optA_bf_transmission_rate = (intermediate.children.prop_wlhiv_gte350 * cpars.PMTCT_transmission_rate(4,0,1)) + intermediate.children.excessratio_bf * (1.45 / 0.46) * cpars.PMTCT_transmission_rate(4,0,1) / (intermediate.children.prop_wlhiv_gte350 + intermediate.children.excessratio_bf);
+//       intermediate.children.optB_bf_transmission_rate = (intermediate.children.prop_wlhiv_gte350 * cpars.PMTCT_transmission_rate(4,1,1)) + intermediate.children.excessratio_bf * (1.45 / 0.46) * cpars.PMTCT_transmission_rate(4,1,1) / (intermediate.children.prop_wlhiv_gte350 + intermediate.children.excessratio_bf);
+//     }else{
+//       intermediate.children.optA_bf_transmission_rate = cpars.PMTCT_transmission_rate(4,0,1);
+//       intermediate.children.optB_bf_transmission_rate = cpars.PMTCT_transmission_rate(4,1,1);
+//     }
+//   }else{
+//     intermediate.children.optA_bf_transmission_rate = cpars.PMTCT_transmission_rate(4,0,1);
+//     intermediate.children.optB_bf_transmission_rate = cpars.PMTCT_transmission_rate(4,1,1);
+//   }
 
 
 }
@@ -414,7 +415,7 @@ void run_bf_transmission_rate(int time_step,
   static_assert(ModelVariant::run_child_model,
                 "run_hiv_child_infections can only be called for model variants where run_child_model is true");
 
-  internal::adjust_optAB_bf_transmission_rate(time_step, pars, state_curr, state_next, intermediate);
+ // internal::adjust_optAB_bf_transmission_rate(time_step, pars, state_curr, state_next, intermediate);
   internal::convert_PMTCT_pre_bf(time_step, pars, state_curr, state_next, intermediate);
 
 
@@ -432,7 +433,9 @@ void run_bf_transmission_rate(int time_step,
           // intermediate.children.bf_transmission_rate(index) += intermediate.children.percent_on_treatment *
           //   2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) * intermediate.children.optA_bf_transmission_rate;
            intermediate.children.percent_no_treatment -=  intermediate.children.percent_on_treatment;
-
+           if(time_step == 35 & bf == 0 & hp == 0){
+             std::cout << intermediate.children.PMTCT_coverage(hp);
+           }
         }
 
         //hp = 1 is option B
@@ -504,9 +507,6 @@ void run_bf_transmission_rate(int time_step,
 
       }
 
-      if(time_step == 30 & bf == 2){
-        std::cout << intermediate.children.bf_transmission_rate(index);
-      }
 
     if(intermediate.children.percent_no_treatment < 0){
       intermediate.children.percent_no_treatment = 0;
