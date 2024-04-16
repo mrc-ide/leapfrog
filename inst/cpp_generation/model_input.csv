@@ -54,3 +54,4 @@ mat_prev_input,mat_prev_input,int,ModelVariant::run_child_model,,FALSE,1,proj_ye
 prop_lt200,prop_lt200,real_type,ModelVariant::run_child_model,,FALSE,1,proj_years,,,
 prop_gte350,prop_gte350,real_type,ModelVariant::run_child_model,,FALSE,1,proj_years,,,
 incrate,incrate,real_type,ModelVariant::run_child_model,,FALSE,1,proj_years,,,
+ctx_val_ispercent,ctx_val_is_percent,int,ModelVariant::run_child_model,,FALSE,1,proj_years,,,

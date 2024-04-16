@@ -198,7 +198,7 @@ struct Children {
   TensorMap1<real_type> incrate;
 
   //cotrim
-  TensorMap1<real_type> ctx_coverage_is_number;
+  TensorMap1<int> ctx_val_is_percent;
 
 };
 

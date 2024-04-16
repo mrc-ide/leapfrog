@@ -197,6 +197,8 @@ struct Children {
   TensorMap1<real_type> prop_gte350;
   TensorMap1<real_type> incrate;
 
+  TensorMap1<int> ctx_val_is_percent;
+
 
 
 };

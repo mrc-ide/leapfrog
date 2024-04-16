@@ -6,8 +6,8 @@ library(dplyr)
 setwd('C:/Users/mwalters/frogger/')
 
 ## Create demographic and projection parameters for adults
-pjnz1 <- testthat::test_path("testdata/bwa_aim-no-special-elig.PJNZ")
-#pjnz1 = 'C:/Users/mwalters/Desktop/NW_TEST_MTCT_BF_PERI_pmtct.PJNZ'
+#pjnz1 <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct.PJNZ")
+pjnz1 <- testthat::test_path("testdata/bwa_aim-no-special-elig_ctx.PJNZ")
 
 demp <- prepare_leapfrog_demp(pjnz1)
 saveRDS(demp, testthat::test_path("testdata/demographic_projection_object_adult.rds"))
@@ -29,6 +29,7 @@ saveRDS(proj, testthat::test_path("testdata/projection_parameters_adult.rds"))
 demp <- prepare_leapfrog_demp(pjnz1)
 proj <- prepare_leapfrog_projp(pjnz1)
 proj <- leapfrog:::prepare_hc_leapfrog_projp(pjnz1, proj)
+proj$ctx_val_ispercent <- rep(T, 61)
 #proj$paed_cd4_dist <- c(0.60016463, 0.12003293, 0.10002740, 0.09002469, 0.05001375, 0.03000823, 0.01000271)
 #lmod <- leapfrogR(demp, proj)
 

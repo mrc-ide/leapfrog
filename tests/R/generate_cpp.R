@@ -259,7 +259,7 @@ generate_return <- function() {
     "      breastfeeding_duration_no_art,",
     "      mat_hiv_births,",
     "      mat_prev_input,",
-    "      ctx_coverage_is_number",
+    "      ctx_val_is_percent",
     "  };",
     "  const leapfrog::ChildModelParameters<ModelVariant, real_type> child_model_params = {",
     "      child",
