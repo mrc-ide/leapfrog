@@ -61,7 +61,8 @@ test_that("HIV related deaths among children align", {
   aidsdeaths <- array(0, dim = c(15,2,61))
   aidsdeaths[,1,] <- m
   aidsdeaths[,2,] <- f
-
+  aidsdeaths[,,which(1970:2030 == 2002)]-
+  out$p_hiv_deaths[1:15,,which(1970:2030 == 2002)]
   expect_true(all(abs(aidsdeaths - out$p_hiv_deaths[1:15,,]) < 1e-1))
 })
 
@@ -103,4 +104,45 @@ test_that("CLHIV align", {
   expect_true(all(abs(dt$diff) < 1e-1))
 })
 
+test_that("CLHIV on ART align", {
+  input <- setup_childmodel(testinput = "testdata/child_parms.rds")
+  demp = input$demp
+  parameters = input$parameters
+  dp = input$dp
+  pjnz = input$pjnz
+
+  out <- run_model(demp, parameters, NULL, NULL, 0:60, run_child_model = TRUE)
+
+  spec_prev <- input$ontrt
+  spec_prev <- spec_prev %>%
+    rename(time_art = transmission)
+  hc1 = right_join(data.frame(reshape2::melt(out$hc1_art_pop)), data.frame(Var2 = 1:7, cd4_cat = c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5')), by = ('Var2'))
+  hc1 = right_join(hc1, data.frame(Var1 = 1:3, time_art = c('ARTlte5mo', 'ART6to12mo', 'ARTgte12mo')), by = ('Var1'))
+  hc2 = right_join(data.frame(reshape2::melt(out$hc2_art_pop)), data.frame(Var2 = 1:6, cd4_cat = c('gte1000', '750-999', '500-749', '350-499', '200-349','lte200')), by = 'Var2')
+  hc2 = right_join(hc2, data.frame(Var1 = 1:3, time_art = c('ARTlte5mo', 'ART6to12mo', 'ARTgte12mo')), by = ('Var1'))
+  hc1 <- hc1 %>%
+    mutate(age = Var3 - 1,
+           sex = if_else(Var4 == 1, 'Male', 'Female'),
+           year = Var5 + 1969,
+           fr = value) %>%
+    select(age, cd4_cat, time_art, sex, year, fr)
+  hc2 <- hc2 %>%
+    mutate(age = Var3 + 4,
+           sex = if_else(Var4 == 1, 'Male', 'Female'),
+           year = Var5 + 1969,
+           fr = value) %>%
+    select(age, cd4_cat, time_art, sex, year, fr)
+  hc <- rbind(hc1, hc2)
+  hc <- hc %>%
+    mutate(age = as.integer(age),
+           cd4_cat = as.factor(cd4_cat),
+           time_art = as.factor(time_art),
+           sex = as.factor(sex),
+           year = as.integer(year)) %>%
+    group_by(age, cd4_cat, time_art, sex, year)
+  dt <- right_join(hc, spec_prev, by = c('sex', 'age', 'cd4_cat', 'year', 'time_art'))
+  dt <- dt %>%
+    mutate(diff = pop - fr)
+  expect_true(all(abs(dt$diff) < 1e-1))
+})
 

@@ -17,7 +17,8 @@ setup_childmodel <- function(testinput = "testdata/child_parms.rds"){
 
   return(list(dp = input$dp, demp = demp, parameters = parameters,
               pjnz = input$pjnz, timedat.idx = input$timedat.idx,
-              pop1 = input$pop1_outputs))
+              pop1 = input$pop1_outputs,
+              ontrt = input$on_treatment))
 }
 
 dpsub <- function(tag, rows, cols, tagcol = 1){

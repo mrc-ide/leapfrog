@@ -710,6 +710,40 @@ void ctx_need_cov_new(int time_step,
     }else{
       state_next.children.ctx_mean = 1;
     }
+  }else{
+    for (int s = 0; s < ss.NS; ++s) {
+      for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+        for (int a = 0; a < hc_ss.hc2_agestart; ++a) {
+          for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
+            state_next.children.ctx_need += state_next.children.hc1_hiv_pop(hd, cat, a, s);
+            for (int dur = 0; dur < ss.hTS; ++dur) {
+              state_next.children.ctx_need += state_next.children.hc1_art_pop(dur, hd, a, s);
+            } // end hTS
+          } // end hc1DS
+        } //end a
+      } // end hcTT
+    } // end NS
+
+    for (int s = 0; s < ss.NS; ++s) {
+      for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+        for (int a = hc_ss.hc2_agestart; a < hc_ss.hc2DS; ++a) {
+          for (int hd = 0; hd < hc_ss.hc2DS; ++hd) {
+            //state_next.children.ctx_need += state_next.children.hc2_hiv_pop(hd, cat, a, s);
+            for (int dur = 0; dur < ss.hTS; ++dur) {
+            //  state_next.children.ctx_need += state_next.children.hc1_art_pop(dur, hd, a, s);
+            } // end hTS
+          } // end hc1DS
+        } //end a
+      } // end hcTT
+    } // end NS
+
+    state_next.children.ctx_need += state_next.children.hiv_births;
+
+    if(state_next.children.ctx_need > 0){
+       state_next.children.ctx_mean = cpars.ctx_val(time_step-1) /  state_next.children.ctx_need;
+       state_next.children.ctx_mean = (1-cpars.ctx_effect) * state_next.children.ctx_mean + (1 - state_next.children.ctx_mean);
+      // state_next.children.ctx_mean = 1.0;
+    }
   }
 
 }
@@ -942,6 +976,7 @@ void hc_initiate_art_by_cd4(int time_step,
       } // end a
     } // end hcTT
   } // end ss.NS
+
 }
 
 template<typename ModelVariant, typename real_type>
@@ -1075,6 +1110,7 @@ void hc_art_num_num(int time_step,
   if (state_next.children.hc_art_num < 0) {
     state_next.children.hc_art_num =  0;
   }
+
 }
 
 template<typename ModelVariant, typename real_type>
@@ -1247,6 +1283,8 @@ void hc_art_initiation_by_age(int time_step,
       } // end hc_ss.hc1DS
     } //end a
   } // end ss.NS
+
+
   if (intermediate.children.hc_initByAge == 0.0) {
     intermediate.children.hc_adj = 1.0 ;
   } else {
@@ -1532,6 +1570,9 @@ void run_child_model_simulation(int time_step,
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
 
   internal::run_child_ageing(time_step, pars, state_curr, state_next, intermediate);
+  if(time_step == 34){
+    std::cout << state_next.children.hc2_art_pop(0,0,0,0);
+  }
   if(cpars.mat_prev_input(time_step)){
     internal::run_wlhiv_births_input_mat_prev(time_step, pars, state_curr, state_next, intermediate);
   }else{
@@ -1548,8 +1589,17 @@ void run_child_model_simulation(int time_step,
     //run_child_hiv_mort, add_child_trad, run_child_art_initiation, run_child_art_mortality
     // !!!TODO: also need to fix the looping order for some loops
     // !!!TODO: put this in an if statement to only run if the first year of ART has passed
+    if(time_step == 34){
+      std::cout << state_next.children.hc2_art_pop(0,0,0,0);
+    }
     internal::run_child_art_initiation(time_step, pars, state_curr, state_next, intermediate);
+    if(time_step == 34){
+      std::cout << state_next.children.hc2_art_pop(0,0,0,0);
+    }
     internal::run_child_art_mortality(time_step, pars, state_curr, state_next, intermediate);
+    if(time_step == 34){
+      std::cout << state_next.children.hc2_art_pop(0,0,0,0);
+    }
     internal::fill_model_outputs(time_step, pars, state_curr, state_next, intermediate);
   }
 
