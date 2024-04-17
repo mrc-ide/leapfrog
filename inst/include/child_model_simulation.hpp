@@ -980,6 +980,56 @@ void hc_initiate_art_by_cd4(int time_step,
 }
 
 template<typename ModelVariant, typename real_type>
+void onART_mortality(int time_step,
+                            const Parameters<ModelVariant, real_type> &pars,
+                            const State<ModelVariant, real_type> &state_curr,
+                            State<ModelVariant, real_type> &state_next,
+                            IntermediateData<ModelVariant, real_type> &intermediate,
+                            int time_art_idx) {
+  static_assert(ModelVariant::run_child_model,
+                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
+  constexpr auto ss = StateSpace<ModelVariant>().base;
+  constexpr auto hc_ss = StateSpace<ModelVariant>().children;
+  const auto cpars = pars.children.children;
+
+  // !!! TODO: fix order of for loop
+  for (int s = 0; s <ss.NS; ++s) {
+    for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
+      for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
+        intermediate.children.hc_death_rate = 0.0;
+        intermediate.children.hc_art_grad(time_art_idx, hd, a, s) = 0.0;
+        if(time_art_idx == 0){
+          if(a < hc_ss.hc2_agestart){
+            intermediate.children.hc_death_rate =  cpars.hc_art_mort_rr(time_art_idx, a, time_step) * 0.5 * (cpars.hc1_art_mort(hd, 0, a) + cpars.hc1_art_mort(hd, 1, a));
+          }else if (hd < hc_ss.hc2DS && state_next.children.hc2_art_pop(time_art_idx, hd, a-hc_ss.hc2_agestart, s) > 0){
+            intermediate.children.hc_death_rate =  cpars.hc_art_mort_rr(time_art_idx, a, time_step) * 0.5 * (cpars.hc2_art_mort(hd, 0, a-hc_ss.hc2_agestart) + cpars.hc2_art_mort(hd, 1, a-hc_ss.hc2_agestart));
+          }
+        }else{
+          if(a < hc_ss.hc2_agestart){
+            intermediate.children.hc_death_rate =  cpars.hc_art_mort_rr(time_art_idx, a, time_step) * cpars.hc1_art_mort(hd, 2, a);
+          }else if (hd < hc_ss.hc2DS && state_next.children.hc2_art_pop(time_art_idx, hd, a-hc_ss.hc2_agestart, s) > 0){
+            intermediate.children.hc_death_rate =  cpars.hc_art_mort_rr(time_art_idx, a, time_step) * cpars.hc2_art_mort(hd, 2, a-hc_ss.hc2_agestart);
+          }
+        }
+          if (a < hc_ss.hc2_agestart) {
+            state_next.children.hc1_art_aids_deaths(time_art_idx,hd, a, s) =  intermediate.children.hc_death_rate * state_next.children.hc1_art_pop(time_art_idx, hd, a, s);
+            intermediate.children.hc_art_grad(time_art_idx,hd, a, s) -= state_next.children.hc1_art_aids_deaths(time_art_idx,hd, a, s);
+            state_next.children.hc1_art_pop(time_art_idx, hd,  a, s) += intermediate.children.hc_art_grad(time_art_idx, hd, a, s);
+          } else if (hd < hc_ss.hc2DS) {
+            state_next.children.hc2_art_aids_deaths(time_art_idx, hd, a-hc_ss.hc2_agestart, s) =  intermediate.children.hc_death_rate * state_next.children.hc2_art_pop(time_art_idx, hd, a-hc_ss.hc2_agestart, s);
+            intermediate.children.hc_art_grad(time_art_idx, hd, a, s) -= state_next.children.hc2_art_aids_deaths(time_art_idx,hd, a-hc_ss.hc2_agestart, s);
+            state_next.children.hc2_art_pop(time_art_idx, hd,  a-hc_ss.hc2_agestart, s) += intermediate.children.hc_art_grad(time_art_idx, hd, a, s);
+
+
+      }// end a
+    }// end hc_ss.hc1DS
+  }// end ss.NS
+
+
+}
+}
+
+template<typename ModelVariant, typename real_type>
 void hc_adjust_art_initiates_for_mort(int time_step,
                          const Parameters<ModelVariant, real_type> &pars,
                          const State<ModelVariant, real_type> &state_curr,
@@ -991,7 +1041,8 @@ void hc_adjust_art_initiates_for_mort(int time_step,
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
 
-
+  internal::hc_initiate_art_by_age(time_step, pars, state_curr, state_next, intermediate);
+  internal::hc_initiate_art_by_cd4(time_step, pars, state_curr, state_next, intermediate);
 
   //how many should initialize ART
   for (int s = 0; s <ss.NS; ++s) {
@@ -1023,51 +1074,8 @@ void hc_adjust_art_initiates_for_mort(int time_step,
     }// end a
   }// end ss.NS
 
-  // !!! TODO: fix order of for loop
-  for (int s = 0; s <ss.NS; ++s) {
-    for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-      for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
-        intermediate.children.hc_death_rate = 0.0;
-        intermediate.children.hc_art_grad(0, hd, a, s) = 0.0;
-        if (a < hc_ss.hc2_agestart) {
-          if (state_next.children.hc1_art_pop(0, hd, a, s) > 0) {
-            intermediate.children.hc_death_rate =  cpars.hc_art_mort_rr(0, a, time_step) * 0.5 * (cpars.hc1_art_mort(hd, 0, a) + cpars.hc1_art_mort(hd, 1, a));
-            state_next.children.hc1_art_aids_deaths(0,hd, a, s) =  intermediate.children.hc_death_rate * state_next.children.hc1_art_pop(0, hd, a, s);
-            intermediate.children.hc_art_grad(0,hd, a, s) -= state_next.children.hc1_art_aids_deaths(0,hd, a, s);
-            state_next.children.hc1_art_pop(0, hd,  a, s) += intermediate.children.hc_art_grad(0, hd, a, s);
-          }
-        } else if (hd < hc_ss.hc2DS && state_next.children.hc2_art_pop(0, hd, a-hc_ss.hc2_agestart, s) >0) {
-          intermediate.children.hc_death_rate =  cpars.hc_art_mort_rr(0, a, time_step) * 0.5 * (cpars.hc2_art_mort(hd, 0, a-hc_ss.hc2_agestart) + cpars.hc2_art_mort(hd, 1, a-hc_ss.hc2_agestart));
-          state_next.children.hc2_art_aids_deaths(0,hd, a-hc_ss.hc2_agestart, s) =  intermediate.children.hc_death_rate * state_next.children.hc2_art_pop(0, hd, a-hc_ss.hc2_agestart, s);
-          intermediate.children.hc_art_grad(0, hd, a, s) -= state_next.children.hc2_art_aids_deaths(0,hd, a-hc_ss.hc2_agestart, s);
-          state_next.children.hc2_art_pop(0, hd,  a-hc_ss.hc2_agestart, s) += intermediate.children.hc_art_grad(0, hd, a, s);
-        }
-      }// end a
-    }// end hc_ss.hc1DS
-  }// end ss.NS
-
-  for (int s = 0; s <ss.NS; ++s) {
-    for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-      for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
-        intermediate.children.hc_death_rate = 0;
-        intermediate.children.hc_art_grad(2, hd, a, s) = 0.0;
-
-        if (a < hc_ss.hc2_agestart) {
-          if (state_next.children.hc1_art_pop(2, hd, a, s) > 0) {
-          intermediate.children.hc_death_rate = cpars.hc_art_mort_rr(2, a, time_step) * cpars.hc1_art_mort(hd, 2, a);
-          state_next.children.hc1_art_aids_deaths(2,hd, a, s) =  state_next.children.hc1_art_pop(2, hd, a, s) * intermediate.children.hc_death_rate;
-          intermediate.children.hc_art_grad(2,hd, a, s) -= state_next.children.hc1_art_aids_deaths(2,hd, a, s);
-          state_next.children.hc1_art_pop(2, hd,  a, s) += intermediate.children.hc_art_grad(2, hd, a, s);
-          }
-        } else if (hd < (hc_ss.hc2DS) && state_next.children.hc2_art_pop(2, hd, a-hc_ss.hc2_agestart, s) >0) {
-          intermediate.children.hc_death_rate = cpars.hc_art_mort_rr(2, a, time_step) * cpars.hc2_art_mort(hd, 2, a-hc_ss.hc2_agestart);
-          state_next.children.hc2_art_aids_deaths(2,hd, a-hc_ss.hc2_agestart, s) =  state_next.children.hc2_art_pop(2, hd, a-hc_ss.hc2_agestart, s) * intermediate.children.hc_death_rate;
-          intermediate.children.hc_art_grad(2,hd, a, s) -= state_next.children.hc2_art_aids_deaths(2,hd, a-hc_ss.hc2_agestart, s);
-          state_next.children.hc2_art_pop(2, hd,  a-hc_ss.hc2_agestart, s) += intermediate.children.hc_art_grad(2, hd, a, s);
-        }
-      }// end a
-    }// end hc_ss.hc1DS
-  }// end ss.NS
+   internal::onART_mortality(time_step, pars, state_curr, state_next, intermediate, 0);
+   internal::onART_mortality(time_step, pars, state_curr, state_next, intermediate, 2);
 }
 
 template<typename ModelVariant, typename real_type>
@@ -1081,16 +1089,6 @@ void hc_art_num_num(int time_step,
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
-
-  for (int s = 0; s <ss.NS; ++s) {
-    for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
-      for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-        for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
-       //   state_next.children.hc_art_num += intermediate.children.hc_art_need(hd, cat, a, s);
-        } // end hcTT
-      } // end hc_ss.hc1DS
-    } // end a
-  } // end ss.NS
 
   //Remove how many that are already on ART
   state_next.children.hc_art_num =  (cpars.hc_art_val(time_step) + cpars.hc_art_val(time_step-1)) / 2 ;
@@ -1402,8 +1400,6 @@ void run_child_art_initiation(int time_step,
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
 
-  internal::hc_initiate_art_by_age(time_step, pars, state_curr, state_next, intermediate);
-  internal::hc_initiate_art_by_cd4(time_step, pars, state_curr, state_next, intermediate);
   internal::hc_adjust_art_initiates_for_mort(time_step, pars, state_curr, state_next, intermediate);
   //progress art initates from 0-6 months on art to 6 to 12 mo
   internal::progress_time_on_art(time_step, pars, state_curr, state_next, intermediate, 0, 1);
