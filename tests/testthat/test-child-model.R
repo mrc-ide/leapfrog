@@ -193,6 +193,7 @@ y = data.table(dt)
 
 })
 
-a[year == 2003 & sex == 'Male' & age == 0]
-x[year == 2003 & sex == 'Male' & age == 0]
-y[year == 2003 & age == 0 & sex == 'Male']
+year.x = 2004
+# a[year == year.x & sex == 'Male' & age == 0]
+x[year == year.x & sex == 'Male' & age == 1]
+y[year == year.x & age == 1 & sex == 'Male']

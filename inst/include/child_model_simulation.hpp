@@ -918,6 +918,7 @@ void add_child_grad(int time_step,
   }// end s
 }
 
+
 template<typename ModelVariant, typename real_type>
 void hc_initiate_art_by_age(int time_step,
                     const Parameters<ModelVariant, real_type> &pars,
@@ -937,9 +938,9 @@ void hc_initiate_art_by_age(int time_step,
         for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
           for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
             if (a < hc_ss.hc2_agestart) {
-              intermediate.children.hc_art_need(hd, cat, a, s) += state_next.children.hc1_hiv_pop(hd, cat, a, s);
+              intermediate.children.hc_art_need_init(hd, cat, a, s) += state_next.children.hc1_hiv_pop(hd, cat, a, s);
             } else if (hd < hc_ss.hc2DS) {
-              intermediate.children.hc_art_need(hd, cat, a, s) += state_next.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s);
+              intermediate.children.hc_art_need_init(hd, cat, a, s) += state_next.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s);
             }
           }
         } // end hc_ss.hc1DS
@@ -967,16 +968,15 @@ void hc_initiate_art_by_cd4(int time_step,
         for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
           if (hd >= (cpars.hc_art_elig_cd4(a, time_step))) {
             if (a < hc_ss.hc2_agestart) {
-              intermediate.children.hc_art_need(hd, cat, a, s) += state_next.children.hc1_hiv_pop(hd, cat, a, s);
+              intermediate.children.hc_art_need_init(hd, cat, a, s) += state_next.children.hc1_hiv_pop(hd, cat, a, s);
             } else if (hd < hc_ss.hc2DS) {
-              intermediate.children.hc_art_need(hd, cat, a, s) += state_next.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s);
+              intermediate.children.hc_art_need_init(hd, cat, a, s) += state_next.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s);
             }
           }
         } // end hc_ss.hc1DS
       } // end a
     } // end hcTT
   } // end ss.NS
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -1019,14 +1019,11 @@ void onART_mortality(int time_step,
             state_next.children.hc2_art_aids_deaths(time_art_idx, hd, a-hc_ss.hc2_agestart, s) =  intermediate.children.hc_death_rate * state_next.children.hc2_art_pop(time_art_idx, hd, a-hc_ss.hc2_agestart, s);
             intermediate.children.hc_art_grad(time_art_idx, hd, a, s) -= state_next.children.hc2_art_aids_deaths(time_art_idx,hd, a-hc_ss.hc2_agestart, s);
             state_next.children.hc2_art_pop(time_art_idx, hd,  a-hc_ss.hc2_agestart, s) += intermediate.children.hc_art_grad(time_art_idx, hd, a, s);
+      }
+    }// end a
+  }// end hc_ss.hc1DS
+}// end ss.NS
 
-
-      }// end a
-    }// end hc_ss.hc1DS
-  }// end ss.NS
-
-
-}
 }
 
 template<typename ModelVariant, typename real_type>
@@ -1041,34 +1038,15 @@ void hc_adjust_art_initiates_for_mort(int time_step,
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
 
+  //how are eligible for ART but not currently on ART, outputs hc_art_need_init
   internal::hc_initiate_art_by_age(time_step, pars, state_curr, state_next, intermediate);
   internal::hc_initiate_art_by_cd4(time_step, pars, state_curr, state_next, intermediate);
 
-  //how many should initialize ART
   for (int s = 0; s <ss.NS; ++s) {
     for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
       for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
         for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
-          if (cpars.hc_art_val(time_step) > 0) {
-            intermediate.children.hc_art_init(hd, cat, a, s) += intermediate.children.hc_art_need(hd, cat, a, s);
-            for (int dur = 0; dur < ss.hTS; ++dur) {
-              if (intermediate.children.hc_art_init(hd, cat, a, s) < 0) {
-                intermediate.children.hc_art_init(hd, cat, a, s) = 0.0;
-              } else {
-                intermediate.children.hc_art_init(hd, cat, a, s) = intermediate.children.hc_art_init(hd, cat, a, s);
-              }
-            }// end ss.hTS
-          }
-        }// end hcTT
-      }// end hc_ss.hc1DS
-    }// end a
-  }// end ss.NS
-
-  for (int s = 0; s <ss.NS; ++s) {
-    for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
-      for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-        for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
-          intermediate.children.hc_art_init_total += intermediate.children.hc_art_init(hd, cat, a, s);
+          intermediate.children.hc_art_need_init_total += intermediate.children.hc_art_need_init(hd, cat, a, s);
         }// end hcTT
       }// end hc_ss.hc1DS
     }// end a
@@ -1097,20 +1075,23 @@ void hc_art_num_num(int time_step,
       for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
         for (int dur = 0; dur < ss.hTS; ++dur) {
           if (a < hc_ss.hc2_agestart) {
-            state_next.children.hc_art_num -= state_next.children.hc1_art_pop(dur, hd, a, s);
+            state_next.children.hc_art_total += state_next.children.hc1_art_pop(dur, hd, a, s); // change state_next.children.hc_art_num to be left to initiate
           } else if (hd < (hc_ss.hc2DS)) {
-            state_next.children.hc_art_num -= state_next.children.hc2_art_pop(dur, hd, a-hc_ss.hc2_agestart, s);
+            state_next.children.hc_art_total += state_next.children.hc2_art_pop(dur, hd, a-hc_ss.hc2_agestart, s);
           }
         }// end ss.hTS
       }// end hc_ss.hc1DS
     }// end a
   }// end ss.NS
 
-  if (intermediate.children.hc_art_init_total < state_next.children.hc_art_num) {
-    state_next.children.hc_art_num = intermediate.children.hc_art_init_total;
+  state_next.children.hc_art_init = state_next.children.hc_art_num - state_next.children.hc_art_total;
+
+
+  if (intermediate.children.hc_art_need_init_total < state_next.children.hc_art_init) {
+    state_next.children.hc_art_init = intermediate.children.hc_art_need_init_total;
   }
-  if (state_next.children.hc_art_num < 0) {
-    state_next.children.hc_art_num =  0;
+  if (state_next.children.hc_art_init < 0) {
+    state_next.children.hc_art_init =  0;
   }
 
 }
@@ -1127,15 +1108,8 @@ void hc_art_pct_pct(int time_step,
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
 
-  for (int s = 0; s <ss.NS; ++s) {
-    for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
-      for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-        for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
-          state_next.children.hc_art_num += intermediate.children.hc_art_need(hd, cat, a, s);
-        } // end hcTT
-      } // end hc_ss.hc1DS
-    } // end a
-  } // end ss.NS
+  //hc_art_num will be total number on and eligible for ART
+  state_next.children.hc_art_num = intermediate.children.hc_art_need_init_total;
 
   for (int s = 0; s <ss.NS; ++s) {
     for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
@@ -1152,7 +1126,9 @@ void hc_art_pct_pct(int time_step,
       } // end ss.hC1_disease_stages
     } // end a
   } // end ss.NS
-  state_next.children.hc_art_num =  state_next.children.hc_art_num * (cpars.hc_art_val(time_step) + cpars.hc_art_val(time_step-1)) / 2;
+
+  //the number of people on ART at the current coverage level
+  intermediate.children.hc_art_need_init_total =  state_next.children.hc_art_num * (cpars.hc_art_val(time_step) + cpars.hc_art_val(time_step-1)) / 2;
 
   //Remove how many that are already on ART
   for (int s = 0; s <ss.NS; ++s) {
@@ -1160,17 +1136,15 @@ void hc_art_pct_pct(int time_step,
       for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
         for (int dur = 0; dur < ss.hTS; ++dur) {
           if (a < hc_ss.hc2_agestart) {
-            state_next.children.hc_art_num -= state_next.children.hc1_art_pop(dur, hd, a, s);
+            intermediate.children.hc_art_need_init_total -= state_next.children.hc1_art_pop(dur, hd, a, s);
           } else if (hd < (hc_ss.hc2DS)) {
-            state_next.children.hc_art_num -= state_next.children.hc2_art_pop(dur, hd, a-hc_ss.hc2_agestart, s);
+            intermediate.children.hc_art_need_init_total -= state_next.children.hc2_art_pop(dur, hd, a-hc_ss.hc2_agestart, s);
           }
         } // end ss.hTS
       } // end ss.hC1_disease_stages
     } // end a
   } // end ss.NS
-  if (intermediate.children.hc_art_init_total < state_next.children.hc_art_num) {
-    state_next.children.hc_art_num = intermediate.children.hc_art_init_total;
-  }
+
 }
 
 template<typename ModelVariant, typename real_type>
@@ -1185,15 +1159,8 @@ void hc_art_num_pct(int time_step,
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
 
-  for (int s = 0; s <ss.NS; ++s) {
-    for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
-      for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-        for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
-          state_next.children.hc_art_num += intermediate.children.hc_art_need(hd, cat, a, s);
-        } // end hcTT
-      } // end hc_ss.hc1DS
-    } // end a
-  } // end ss.NS
+  //hc_art_num will be total number on and eligible for ART
+  state_next.children.hc_art_num = intermediate.children.hc_art_need_init_total;
 
   //Remove how many that are already on ART
   for (int s = 0; s <ss.NS; ++s) {
@@ -1209,16 +1176,18 @@ void hc_art_num_pct(int time_step,
       } // end hc_ss.hc1DS
     } //end a
   } //end ss.NS
-  state_next.children.hc_art_num = (cpars.hc_art_val(time_step-1) + (state_next.children.hc_art_num * cpars.hc_art_val(time_step))) / 2;
+
+  //the number of people on ART at the current coverage level
+  intermediate.children.hc_art_need_init_total = (cpars.hc_art_val(time_step-1) + (state_next.children.hc_art_num * cpars.hc_art_val(time_step))) / 2;
 
   for (int s = 0; s <ss.NS; ++s) {
     for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
       for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
         for (int dur = 0; dur < ss.hTS; ++dur) {
           if (a < hc_ss.hc2_agestart) {
-            state_next.children.hc_art_num -= state_next.children.hc1_art_pop(dur, hd, a, s);
+            intermediate.children.hc_art_need_init_total -= state_next.children.hc1_art_pop(dur, hd, a, s);
           } else if (hd < (hc_ss.hc2DS )) {
-            state_next.children.hc_art_num -= state_next.children.hc2_art_pop(dur, hd, a-hc_ss.hc2_agestart, s);
+            intermediate.children.hc_art_need_init_total -= state_next.children.hc2_art_pop(dur, hd, a-hc_ss.hc2_agestart, s);
           }
         } // end ss.hTS
       } // end hc_ss.hc1DS
@@ -1228,11 +1197,10 @@ void hc_art_num_pct(int time_step,
   if (state_next.children.hc_art_num < 0) {
     state_next.children.hc_art_num = 0;
   }
-  if (intermediate.children.hc_art_init_total < state_next.children.hc_art_num) {
-    state_next.children.hc_art_num = intermediate.children.hc_art_init_total;
-  }
+
 }
 
+//NOTE MAGGIE: this is not done
 template<typename ModelVariant, typename real_type>
 void hc_art_pct_num(int time_step,
                     const Parameters<ModelVariant, real_type> &pars,
@@ -1244,54 +1212,54 @@ void hc_art_pct_num(int time_step,
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
-
-  for (int s = 0; s <ss.NS; ++s) {
-    for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
-      for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-        for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
-          state_next.children.hc_art_num += intermediate.children.hc_art_need(hd, cat, a, s);
-        } // end hcTT
-      } // end hc_ss.hc1DS
-    } // end a
-  } // end ss.NS
-
-  for (int s = 0; s <ss.NS; ++s) {
-    for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
-      for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-        for (int dur = 0; dur < ss.hTS; ++dur) {
-          if (a < hc_ss.hc2_agestart) {
-            state_next.children.hc_art_num -= state_next.children.hc1_art_pop(dur, hd, a, s);
-          } else if (hd < (hc_ss.hc2DS)) {
-            state_next.children.hc_art_num -= state_next.children.hc2_art_pop(dur, hd, a-hc_ss.hc2_agestart, s);
-          }
-        } // end ss.hTS
-      } //end hc_ss.hc1DS
-    } // end a
-  } //end ss.NS
-
-  state_next.children.hc_art_num = (state_curr.children.hc_art_num + cpars.hc_art_val(time_step)) / 2;
-
-  //Remove how many that are already on ART
-  for (int s = 0; s <ss.NS; ++s) {
-    for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
-      for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-        for (int dur = 0; dur < ss.hTS; ++dur) {
-          if (a < hc_ss.hc2_agestart) {
-            state_next.children.hc_art_num -= state_next.children.hc1_art_pop(dur, hd, a, s);
-          } else if (hd < (hc_ss.hc2DS)) {
-            state_next.children.hc_art_num -= state_next.children.hc2_art_pop(dur, hd, a-hc_ss.hc2_agestart, s);
-          }
-        } //end ss.hTS
-      } //end hc_ss.hc1DS
-    } //end a
-  } //end ss.NS
-
-  if (state_next.children.hc_art_num < 0) {
-    state_next.children.hc_art_num = 0;
-  }
-  if (intermediate.children.hc_art_init_total < state_next.children.hc_art_num) {
-    state_next.children.hc_art_num = intermediate.children.hc_art_init_total;
-  }
+//
+//   for (int s = 0; s <ss.NS; ++s) {
+//     for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
+//       for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
+//         for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+//           state_next.children.hc_art_num += intermediate.children.hc_art_need(hd, cat, a, s);
+//         } // end hcTT
+//       } // end hc_ss.hc1DS
+//     } // end a
+//   } // end ss.NS
+//
+//   for (int s = 0; s <ss.NS; ++s) {
+//     for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
+//       for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
+//         for (int dur = 0; dur < ss.hTS; ++dur) {
+//           if (a < hc_ss.hc2_agestart) {
+//             state_next.children.hc_art_num -= state_next.children.hc1_art_pop(dur, hd, a, s);
+//           } else if (hd < (hc_ss.hc2DS)) {
+//             state_next.children.hc_art_num -= state_next.children.hc2_art_pop(dur, hd, a-hc_ss.hc2_agestart, s);
+//           }
+//         } // end ss.hTS
+//       } //end hc_ss.hc1DS
+//     } // end a
+//   } //end ss.NS
+//
+//   state_next.children.hc_art_num = (state_curr.children.hc_art_num + cpars.hc_art_val(time_step)) / 2;
+//
+//   //Remove how many that are already on ART
+//   for (int s = 0; s <ss.NS; ++s) {
+//     for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
+//       for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
+//         for (int dur = 0; dur < ss.hTS; ++dur) {
+//           if (a < hc_ss.hc2_agestart) {
+//             state_next.children.hc_art_num -= state_next.children.hc1_art_pop(dur, hd, a, s);
+//           } else if (hd < (hc_ss.hc2DS)) {
+//             state_next.children.hc_art_num -= state_next.children.hc2_art_pop(dur, hd, a-hc_ss.hc2_agestart, s);
+//           }
+//         } //end ss.hTS
+//       } //end hc_ss.hc1DS
+//     } //end a
+//   } //end ss.NS
+//
+//   if (state_next.children.hc_art_num < 0) {
+//     state_next.children.hc_art_num = 0;
+//   }
+//   if (intermediate.children.hc_art_init_total < state_next.children.hc_art_num) {
+//     state_next.children.hc_art_num = intermediate.children.hc_art_init_total;
+//   }
 }
 
 template<typename ModelVariant, typename real_type>
@@ -1310,17 +1278,16 @@ void hc_art_initiation_by_age(int time_step,
     for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
       for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
         for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
-          intermediate.children.hc_initByAge += intermediate.children.hc_art_init(hd, cat, a, s) * cpars.hc_art_init_dist(a, time_step);
+          intermediate.children.hc_initByAge += intermediate.children.hc_art_need_init(hd, cat, a, s) * cpars.hc_art_init_dist(a, time_step);
         } //end hcTT
       } // end hc_ss.hc1DS
     } //end a
   } // end ss.NS
 
-
   if (intermediate.children.hc_initByAge == 0.0) {
     intermediate.children.hc_adj = 1.0 ;
   } else {
-    intermediate.children.hc_adj = state_next.children.hc_art_num / intermediate.children.hc_initByAge;
+    intermediate.children.hc_adj = intermediate.children.hc_art_need_init_total / intermediate.children.hc_initByAge;
   }
   for (int s = 0; s <ss.NS; ++s) {
     for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
@@ -1337,21 +1304,22 @@ void hc_art_initiation_by_age(int time_step,
             intermediate.children.hc_art_scalar = 0.0;
           }
           if (a < hc_ss.hc2_agestart) {
-            state_next.children.hc1_art_pop(0, hd, a, s) += intermediate.children.hc_art_scalar * intermediate.children.hc_art_init(hd, cat, a, s);
+            state_next.children.hc1_art_pop(0, hd, a, s) += intermediate.children.hc_art_scalar * intermediate.children.hc_art_need_init(hd, cat, a, s);
           } else if (hd < (hc_ss.hc2DS)) {
-            state_next.children.hc2_art_pop(0, hd, a - hc_ss.hc2_agestart, s) += intermediate.children.hc_art_scalar * intermediate.children.hc_art_init(hd, cat, a, s);
+            state_next.children.hc2_art_pop(0, hd, a - hc_ss.hc2_agestart, s) += intermediate.children.hc_art_scalar * intermediate.children.hc_art_need_init(hd, cat, a, s);
           }
           if (a < hc_ss.hc2_agestart) {
-            state_next.children.hc1_hiv_pop(hd, cat, a, s) -= intermediate.children.hc_art_scalar * intermediate.children.hc_art_init(hd, cat, a, s);
+            state_next.children.hc1_hiv_pop(hd, cat, a, s) -= intermediate.children.hc_art_scalar * intermediate.children.hc_art_need_init(hd, cat, a, s);
           } else if (hd < (hc_ss.hc2DS )) {
-            state_next.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s) -=  intermediate.children.hc_art_scalar * intermediate.children.hc_art_init(hd, cat, a, s);
+            state_next.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s) -=  intermediate.children.hc_art_scalar * intermediate.children.hc_art_need_init(hd, cat, a, s);
           }
 
         } //end hc_ss.hc1DS
-
       } // end a
     } // end hcTT
   } // end ss.NS
+
+
 }
 
 template<typename ModelVariant, typename real_type>

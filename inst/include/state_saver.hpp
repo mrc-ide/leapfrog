@@ -87,6 +87,8 @@ struct ChildModelOutputState<ChildModel, real_type> {
   Tensor1<real_type> hiv_births;
   Tensor1<real_type> ctx_need;
   Tensor1<real_type> ctx_mean;
+  Tensor1<real_type> hc_art_total;
+  Tensor1<real_type> hc_art_init;
 
 
   ChildModelOutputState(int no_output_years)

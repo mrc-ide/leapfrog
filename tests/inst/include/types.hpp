@@ -478,8 +478,8 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_posthivmort;
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_grad;
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_art_need;
-  TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_art_init;
-  real_type hc_art_init_total;
+  TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_art_need_init;
+  real_type hc_art_need_init_total;
   real_type hc_death_rate;
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_art_grad;
   real_type hc_art_scalar;
@@ -540,8 +540,8 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
     hc_posthivmort.setZero();
     hc_grad.setZero();
     hc_art_need.setZero();
-    hc_art_init.setZero();
-    hc_art_init_total = 0.0;
+    hc_art_need_init.setZero();
+    hc_art_need_init_total = 0.0;
     hc_death_rate = 0.0;
     hc_art_grad.setZero();
     hc_art_scalar = 0.0;
