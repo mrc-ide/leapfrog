@@ -933,8 +933,7 @@ void hc_initiate_art_by_age(int time_step,
 
   //all children under a certain age eligible for ART
   for (int s = 0; s <ss.NS; ++s) {
-    for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
-      if (a < cpars.hc_art_elig_age(time_step)) {
+    for (int a = 0; a < cpars.hc_art_elig_age(time_step); ++a) {
         for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
           for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
             if (a < hc_ss.hc2_agestart) {
@@ -942,7 +941,6 @@ void hc_initiate_art_by_age(int time_step,
             } else if (hd < hc_ss.hc2DS) {
               intermediate.children.hc_art_need_init(hd, cat, a, s) += state_next.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s);
             }
-          }
         } // end hc_ss.hc1DS
       } // end a
     } // end hcTT
@@ -966,7 +964,7 @@ void hc_initiate_art_by_cd4(int time_step,
     for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
       for (int a = cpars.hc_art_elig_age(time_step); a < pars.base.options.p_idx_fertility_first; ++a) {
         for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-          if (hd >= (cpars.hc_art_elig_cd4(a, time_step))) {
+          if (hd > (cpars.hc_art_elig_cd4(a, time_step))) {
             if (a < hc_ss.hc2_agestart) {
               intermediate.children.hc_art_need_init(hd, cat, a, s) += state_next.children.hc1_hiv_pop(hd, cat, a, s);
             } else if (hd < hc_ss.hc2DS) {
@@ -1638,9 +1636,6 @@ void run_child_model_simulation(int time_step,
     internal::fill_model_outputs(time_step, pars, state_curr, state_next, intermediate);
   }
 
-  if(time_step == 34){
-    std::cout << intermediate.children.hc_art_grad(0, 0, 1, 0) + intermediate.children.hc_art_grad(2, 0, 1, 0);
-  }
   }
 
 
