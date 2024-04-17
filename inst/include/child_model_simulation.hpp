@@ -991,15 +991,7 @@ void hc_adjust_art_initiates_for_mort(int time_step,
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
 
-  for (int s = 0; s <ss.NS; ++s) {
-    for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
-      for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-        for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
-          state_next.children.hc_art_num += intermediate.children.hc_art_need(hd, cat, a, s);
-        } // end hcTT
-      } // end hc_ss.hc1DS
-    } // end a
-  } // end ss.NS
+
 
   //how many should initialize ART
   for (int s = 0; s <ss.NS; ++s) {
@@ -1090,6 +1082,16 @@ void hc_art_num_num(int time_step,
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
 
+  for (int s = 0; s <ss.NS; ++s) {
+    for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
+      for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
+        for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+       //   state_next.children.hc_art_num += intermediate.children.hc_art_need(hd, cat, a, s);
+        } // end hcTT
+      } // end hc_ss.hc1DS
+    } // end a
+  } // end ss.NS
+
   //Remove how many that are already on ART
   state_next.children.hc_art_num =  (cpars.hc_art_val(time_step) + cpars.hc_art_val(time_step-1)) / 2 ;
   for (int s = 0; s <ss.NS; ++s) {
@@ -1126,6 +1128,16 @@ void hc_art_pct_pct(int time_step,
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
+
+  for (int s = 0; s <ss.NS; ++s) {
+    for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
+      for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
+        for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+          state_next.children.hc_art_num += intermediate.children.hc_art_need(hd, cat, a, s);
+        } // end hcTT
+      } // end hc_ss.hc1DS
+    } // end a
+  } // end ss.NS
 
   for (int s = 0; s <ss.NS; ++s) {
     for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
@@ -1174,6 +1186,16 @@ void hc_art_num_pct(int time_step,
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
+
+  for (int s = 0; s <ss.NS; ++s) {
+    for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
+      for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
+        for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+          state_next.children.hc_art_num += intermediate.children.hc_art_need(hd, cat, a, s);
+        } // end hcTT
+      } // end hc_ss.hc1DS
+    } // end a
+  } // end ss.NS
 
   //Remove how many that are already on ART
   for (int s = 0; s <ss.NS; ++s) {
@@ -1224,6 +1246,16 @@ void hc_art_pct_num(int time_step,
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
+
+  for (int s = 0; s <ss.NS; ++s) {
+    for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
+      for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
+        for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+          state_next.children.hc_art_num += intermediate.children.hc_art_need(hd, cat, a, s);
+        } // end hcTT
+      } // end hc_ss.hc1DS
+    } // end a
+  } // end ss.NS
 
   for (int s = 0; s <ss.NS; ++s) {
     for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
