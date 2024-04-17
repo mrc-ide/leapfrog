@@ -2,7 +2,7 @@
 library(leapfrog)
 library(data.table)
 library(dplyr)
-
+devtools::load_all('C:/Users/mwalters/leapfrog')
 setwd('C:/Users/mwalters/frogger/')
 
 ## Create demographic and projection parameters for adults
@@ -37,8 +37,8 @@ if(any(!proj$ctx_val_ispercent)){
 #proj$paed_cd4_dist <- c(0.60016463, 0.12003293, 0.10002740, 0.09002469, 0.05001375, 0.03000823, 0.01000271)
 #lmod <- leapfrogR(demp, proj)
 
-demp$netmigr <- read_netmigr(pjnz1, adjust_u5mig = FALSE)
-demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
+demp$netmigr <- leapfrog:::read_netmigr(pjnz1, adjust_u5mig = FALSE)
+demp$netmigr_adj <- leapfrog:::adjust_spectrum_netmigr(demp$netmigr)
 
 dpfile <- grep(".DP$", utils::unzip(pjnz1, list=TRUE)$Name, value=TRUE)
 dp <- utils::read.csv(unz(pjnz1, dpfile), as.is=TRUE)
@@ -91,7 +91,7 @@ df <- spectrum_output(pop1, ages = 0:14, 'country', years_in = 1970:2030)
 x = data.table(df$total)
 
 saveRDS(list(proj = proj, demp = demp, dp = dp, timedat.idx = timedat.idx, pjnz = pjnz1,
-             pop1_outputs = x, on_treatment = df$on_treatment),
+             pop1_outputs = x, on_treatment = df$on_treatment, off_trt = df$off_treatment),
         "C:/Users/mwalters/frogger/tests/testthat/testdata/child_parms.rds")
 
 
