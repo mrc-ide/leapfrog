@@ -1429,28 +1429,8 @@ void run_child_art_mortality(int time_step,
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
 
-  for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-    for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
-      for (int s = 0; s <ss.NS; ++s) {
-        intermediate.children.hc_death_rate = 0.0;
-        intermediate.children.hc_art_grad(0, hd, a, s) = 0.0;
-        if (a < hc_ss.hc2_agestart) {
-          if (state_next.children.hc1_art_pop(0, hd, a, s) > 0) {
-            intermediate.children.hc_death_rate = cpars.hc_art_mort_rr(0, a, time_step) * 0.5 * (cpars.hc1_art_mort(hd, 0, a) + cpars.hc1_art_mort(hd, 1, a));
-            state_next.children.hc1_art_aids_deaths(0, hd, a, s) = intermediate.children.hc_death_rate * state_next.children.hc1_art_pop(0, hd, a, s);
-            intermediate.children.hc_art_grad(0, hd, a, s) -= state_next.children.hc1_art_aids_deaths(0, hd, a, s);
-            state_next.children.hc1_art_pop(0, hd, a, s) += intermediate.children.hc_art_grad(0, hd, a, s);
-          }
-        } else if (hd < hc_ss.hc2DS) {
-          intermediate.children.hc_death_rate = cpars.hc_art_mort_rr(0, a, time_step) * 0.5 * (cpars.hc2_art_mort(hd, 0, a-hc_ss.hc2_agestart) + cpars.hc2_art_mort(hd, 1, a-hc_ss.hc2_agestart));
-          state_next.children.hc2_art_aids_deaths(0, hd, a-hc_ss.hc2_agestart, s)  = intermediate.children.hc_death_rate * state_next.children.hc2_art_pop(0, hd, a-hc_ss.hc2_agestart, s);
-          intermediate.children.hc_art_grad(0, hd, a, s) -= state_next.children.hc2_art_aids_deaths(0, hd, a-hc_ss.hc2_agestart, s);
-          state_next.children.hc2_art_pop(0, hd, a-hc_ss.hc2_agestart, s) += intermediate.children.hc_art_grad(0, hd, a, s);
-        }
-      }//end ss.NS
-    }// end a
-  }// end hc_ss.hc1DS
-
+  //mortality among those on ART less than one year
+  internal::onART_mortality(time_step, pars, state_curr, state_next, intermediate, 0);
 
   //progress 6 to 12 mo to 12 plus months
   internal::progress_time_on_art(time_step, pars, state_curr, state_next, intermediate, 1, 2);
