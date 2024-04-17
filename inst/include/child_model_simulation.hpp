@@ -134,15 +134,6 @@ void convert_PMTCT_num_to_perc(int time_step,
     intermediate.children.PMTCT_coverage(4) = intermediate.children.PMTCT_coverage(4) * cpars.PMTCT_dropout(0,time_step);
     intermediate.children.PMTCT_coverage(5) = intermediate.children.PMTCT_coverage(5) * cpars.PMTCT_dropout(1,time_step);
 
-    // if(time_step == 37){
-    //   std::cout << intermediate.children.sumARV; //12177
-    //   std::cout << intermediate.children.OnPMTCT; //12177
-    //   std::cout << (cpars.PMTCT(5,time_step) / intermediate.children.sumARV); //0.1694178
-    //   std::cout << intermediate.children.OnPMTCT ; //12177
-    //   std::cout << intermediate.children.need_PMTCT; //12177
-    //
-    // }
-
 }
 
 
@@ -157,10 +148,7 @@ void convert_PMTCT_pre_bf(int time_step,
                 "convert_PMTCT_num_to_perc can only be called for model variants where run_child_model is true");
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
 
-  if(time_step == 37){
-    std::cout <<  intermediate.children.PMTCT_coverage(5);
 
-  }
   //replace all instances of coverage input as numbers with percentage covered
   if(cpars.PMTCT_input_is_percent(time_step)){
     for (int hp = 0; hp < hc_ss.hPS; ++hp) {
@@ -171,19 +159,18 @@ void convert_PMTCT_pre_bf(int time_step,
     //total number of people that were on ARVs
     intermediate.children.sumARV = 0.0;
     for (int hp = 0; hp < hc_ss.hPS; ++hp) {
-      // if(hp == 4){
-      //   intermediate.children.sumARV += cpars.PMTCT(hp,time_step) * cpars.PMTCT_dropout(0,time_step) * (1 - cpars.PMTCT_transmission_rate(4,hp,0));
-      // }else if(hp == 5){
-      //   intermediate.children.sumARV += cpars.PMTCT(hp,time_step) * cpars.PMTCT_dropout(1,time_step) * (1 - cpars.PMTCT_transmission_rate(4,hp,0));
-      // }else{
+      if(hp == 0){
+        intermediate.children.sumARV += cpars.PMTCT(hp,time_step) * (1 - intermediate.children.optA_transmission_rate);
+      }else if(hp == 1){
+        intermediate.children.sumARV += cpars.PMTCT(hp,time_step) * (1 - intermediate.children.optB_transmission_rate);
+      }else {
         intermediate.children.sumARV += cpars.PMTCT(hp,time_step) * (1 - cpars.PMTCT_transmission_rate(4,hp,0));
-      // }
-
+      }
     }
 
     //people on ARVs that haven't already transmitted
-    if(intermediate.children.sumARV > (state_next.children.hiv_births * (1 - intermediate.children.perinatal_transmission_rate))){
-      intermediate.children.need_PMTCT = intermediate.children.sumARV ;
+    if((intermediate.children.sumARV * (1 - intermediate.children.perinatal_transmission_rate)) > (state_next.children.hiv_births * (1 - intermediate.children.perinatal_transmission_rate))){
+      intermediate.children.need_PMTCT = intermediate.children.sumARV * (1 - intermediate.children.perinatal_transmission_rate);
     }else{
       intermediate.children.need_PMTCT = state_next.children.hiv_births * (1 - intermediate.children.perinatal_transmission_rate);
     }
@@ -193,21 +180,24 @@ void convert_PMTCT_pre_bf(int time_step,
       if (intermediate.children.sumARV == 0) {
         intermediate.children.PMTCT_coverage(hp) = 0.0;
       } else {
-        if(hp == 4){
-          intermediate.children.PMTCT_coverage(hp) = ((1 - cpars.PMTCT_transmission_rate(4,hp,0)) * cpars.PMTCT_dropout(0,time_step) * cpars.PMTCT(hp,time_step) / intermediate.children.sumARV) * (intermediate.children.OnPMTCT / intermediate.children.need_PMTCT);
-        }else if(hp == 5){
-          intermediate.children.PMTCT_coverage(hp) = ((1 - cpars.PMTCT_transmission_rate(4,hp,0)) * cpars.PMTCT_dropout(1,time_step) * cpars.PMTCT(hp,time_step) / intermediate.children.sumARV) * (intermediate.children.OnPMTCT / intermediate.children.need_PMTCT);
-        }else{
-          intermediate.children.PMTCT_coverage(hp) = ((1 - cpars.PMTCT_transmission_rate(4,hp,0)) * cpars.PMTCT(hp,time_step) / intermediate.children.sumARV) * (intermediate.children.OnPMTCT / intermediate.children.need_PMTCT);
-        }
+        // if(hp == 0){
+        //   intermediate.children.PMTCT_coverage(hp) = ((1 - intermediate.children.optA_transmission_rate) * cpars.PMTCT(hp,time_step) / intermediate.children.sumARV) * (intermediate.children.OnPMTCT / intermediate.children.need_PMTCT);
+        // }else if(hp == 1){
+        //   intermediate.children.PMTCT_coverage(hp) = ((1 - intermediate.children.optB_transmission_rate) * cpars.PMTCT(hp,time_step) / intermediate.children.sumARV) * (intermediate.children.OnPMTCT / intermediate.children.need_PMTCT);
+        // }else
+          if(hp == 4){
+            intermediate.children.PMTCT_coverage(hp) = ((1 - cpars.PMTCT_transmission_rate(4,hp,0)) * cpars.PMTCT_dropout(0,time_step) * cpars.PMTCT(hp,time_step) / intermediate.children.sumARV) * (intermediate.children.OnPMTCT / intermediate.children.need_PMTCT);
+          }else if(hp == 5){
+            intermediate.children.PMTCT_coverage(hp) = ((1 - cpars.PMTCT_transmission_rate(4,hp,0)) * cpars.PMTCT_dropout(1,time_step) * cpars.PMTCT(hp,time_step) / intermediate.children.sumARV) * (intermediate.children.OnPMTCT / intermediate.children.need_PMTCT);
+          }else{
+            intermediate.children.PMTCT_coverage(hp) = ((1 - cpars.PMTCT_transmission_rate(4,hp,0)) * cpars.PMTCT(hp,time_step) / intermediate.children.sumARV) * (intermediate.children.OnPMTCT / intermediate.children.need_PMTCT);
+          }
+
       }
     } //end hPS
-  }
-
-  if(time_step == 37){
-    std::cout <<  intermediate.children.PMTCT_coverage(5);
 
   }
+
 }
 
 template<typename ModelVariant, typename real_type>
@@ -315,22 +305,20 @@ void adjust_optAB_bf_transmission_rate(int time_step,
   //Option A and B were only authorized for women with greater than 350 CD4, so if the percentage of women
   //on option A/B > the proportion of women in this cd4 category, we assume that some must have a cd4 less than 350
   //option AB will be less effective for these women so we adjust for that
-//
-//   if(intermediate.children.prop_wlhiv_gte350 > 0){
-//     //CHECK: defined in previous function
-//     //CHECK: avenir: will PMTCT coverage for pregnatn and bf women always be the same?
-//     if((intermediate.children.PMTCT_coverage(0) + intermediate.children.PMTCT_coverage(1)) > intermediate.children.prop_wlhiv_gte350){
-//       intermediate.children.excessratio_bf = intermediate.children.PMTCT_coverage(0) + intermediate.children.PMTCT_coverage(1) - intermediate.children.prop_wlhiv_gte350;
-//       intermediate.children.optA_bf_transmission_rate = (intermediate.children.prop_wlhiv_gte350 * cpars.PMTCT_transmission_rate(4,0,1)) + intermediate.children.excessratio_bf * (1.45 / 0.46) * cpars.PMTCT_transmission_rate(4,0,1) / (intermediate.children.prop_wlhiv_gte350 + intermediate.children.excessratio_bf);
-//       intermediate.children.optB_bf_transmission_rate = (intermediate.children.prop_wlhiv_gte350 * cpars.PMTCT_transmission_rate(4,1,1)) + intermediate.children.excessratio_bf * (1.45 / 0.46) * cpars.PMTCT_transmission_rate(4,1,1) / (intermediate.children.prop_wlhiv_gte350 + intermediate.children.excessratio_bf);
-//     }else{
-//       intermediate.children.optA_bf_transmission_rate = cpars.PMTCT_transmission_rate(4,0,1);
-//       intermediate.children.optB_bf_transmission_rate = cpars.PMTCT_transmission_rate(4,1,1);
-//     }
-//   }else{
-//     intermediate.children.optA_bf_transmission_rate = cpars.PMTCT_transmission_rate(4,0,1);
-//     intermediate.children.optB_bf_transmission_rate = cpars.PMTCT_transmission_rate(4,1,1);
-//   }
+
+  if(intermediate.children.prop_wlhiv_gte350 > 0){
+    if((intermediate.children.PMTCT_coverage(0) + intermediate.children.PMTCT_coverage(1)) > intermediate.children.prop_wlhiv_gte350){
+      intermediate.children.excessratio_bf = intermediate.children.PMTCT_coverage(0) + intermediate.children.PMTCT_coverage(1) - intermediate.children.prop_wlhiv_gte350;
+      intermediate.children.optA_bf_transmission_rate = (intermediate.children.prop_wlhiv_gte350 * cpars.PMTCT_transmission_rate(4,0,1)) + intermediate.children.excessratio_bf * (1.45 / 0.46) * cpars.PMTCT_transmission_rate(4,0,1) / (intermediate.children.prop_wlhiv_gte350 + intermediate.children.excessratio_bf);
+      intermediate.children.optB_bf_transmission_rate = (intermediate.children.prop_wlhiv_gte350 * cpars.PMTCT_transmission_rate(4,1,1)) + intermediate.children.excessratio_bf * (1.45 / 0.46) * cpars.PMTCT_transmission_rate(4,1,1) / (intermediate.children.prop_wlhiv_gte350 + intermediate.children.excessratio_bf);
+    }else{
+      intermediate.children.optA_bf_transmission_rate = cpars.PMTCT_transmission_rate(4,0,1);
+      intermediate.children.optB_bf_transmission_rate = cpars.PMTCT_transmission_rate(4,1,1);
+    }
+  }else{
+    intermediate.children.optA_bf_transmission_rate = cpars.PMTCT_transmission_rate(4,0,1);
+    intermediate.children.optB_bf_transmission_rate = cpars.PMTCT_transmission_rate(4,1,1);
+  }
 
 
 }
@@ -420,11 +408,7 @@ void run_calculate_transmission_from_incidence_during_breastfeeding(int time_ste
                 "run_hiv_child_infections can only be called for model variants where run_child_model is true");
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
 
-
-  //bf_duration is % of women no longer breast feeding
   for (int bf = 0; bf < hc_ss.hBF; ++bf) {
-    //CHECK: intermediate.children.incidence_rate_wlhiv is coming from perinatal transmission, are there
-    // any checks I should do to ensure that this is reading in properly from the previous function?
     intermediate.children.bf_at_risk += intermediate.children.incidence_rate_wlhiv / 12 * 2 * (1 - cpars.breastfeeding_duration_no_art(bf, time_step));
   }
   // intermediate.children.bf_incident_hiv_transmission_rate = bf_at_risk * 0.269;
@@ -446,59 +430,50 @@ void run_bf_transmission_rate(int time_step,
 
  // internal::adjust_optAB_bf_transmission_rate(time_step, pars, state_curr, state_next, intermediate);
 
-
   for(int bf = bf_start; bf < bf_end; bf++){
     //intermediate.children.perinatal_transmission_rate_bf_calc is the transmission that has already occurred due to perinatal transmission
     //intermediate.children.percent_no_treatment is the percentage of women who are still vulnerable to HIV transmission to their babies
     intermediate.children.percent_no_treatment = 1 - intermediate.children.perinatal_transmission_rate_bf_calc - intermediate.children.bf_transmission_rate(index);
-
-
       for(int hp = 0; hp < hc_ss.hPS; hp++){
         //hp = 0 is option A
-        //Dropout not used for option A
         if(hp == 0){
-           intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp);// *(pow(1 - cpars.PMTCT_dropout(hp + 2,time_step) * 2, bf));
+           intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp);
           // intermediate.children.bf_transmission_rate(index) += intermediate.children.percent_on_treatment *
           //   2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) * intermediate.children.optA_bf_transmission_rate;
            intermediate.children.percent_no_treatment -=  intermediate.children.percent_on_treatment;
         }
 
         //hp = 1 is option B
-        //Dropout not used for option B
         if(hp == 1){
-          intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp);// *(pow(1 - cpars.PMTCT_dropout(hp + 2,time_step) * 2, bf));
+          intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp);
           // intermediate.children.bf_transmission_rate(index) += intermediate.children.percent_on_treatment *
           //   2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) * intermediate.children.optB_bf_transmission_rate;
           intermediate.children.percent_no_treatment -=  intermediate.children.percent_on_treatment;
-
-
         }
 
         //sdnvp
         if(hp == 2){
-
-          intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp) * cpars.PMTCT_transmission_rate(0,hp,1) ;
-          intermediate.children.bf_transmission_rate(index) +=  intermediate.children.percent_on_treatment * 2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) ;
-          intermediate.children.percent_no_treatment -=  intermediate.children.PMTCT_coverage(hp) ;
-
+          intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp)  ;
+          intermediate.children.bf_transmission_rate(index) +=  intermediate.children.percent_on_treatment *
+            cpars.PMTCT_transmission_rate(0,hp,1) *
+            2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) ;
+          intermediate.children.percent_no_treatment -=  intermediate.children.percent_on_treatment ;
         }
-
 
         //dual arv
         if(hp == 3){
           intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp);
-
           intermediate.children.bf_transmission_rate(index) +=  intermediate.children.percent_on_treatment *
             cpars.PMTCT_transmission_rate(4,hp,1) *
             2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) ;
-
-          intermediate.children.percent_no_treatment -=  intermediate.children.PMTCT_coverage(hp) ;
+          intermediate.children.percent_no_treatment -=  intermediate.children.percent_on_treatment;
 
         }
 
         //on art pre preg
         if(hp > 3){
             if(bf < 6){
+              //different dropout rates for on ART less than and over one year
               if(cpars.PMTCT_dropout(4,time_step) > 0){
                 intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp) *
                   (pow(1 - cpars.PMTCT_dropout(4,time_step) * 2, bf))  ;
@@ -514,22 +489,13 @@ void run_bf_transmission_rate(int time_step,
                   }
                 }
 
-                if(hp == 4){
-                  intermediate.children.bf_transmission_rate(index) += intermediate.children.percent_on_treatment *
+          intermediate.children.bf_transmission_rate(index) += intermediate.children.percent_on_treatment *
                   2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) * cpars.PMTCT_transmission_rate(4,hp,1);
-                }
-                if(hp == 5){
-                  intermediate.children.bf_transmission_rate(index) += intermediate.children.percent_on_treatment *
-                     2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) * cpars.PMTCT_transmission_rate(4,hp,1);
-                }
-                if(hp == 6){
-                  intermediate.children.bf_transmission_rate(index) += intermediate.children.percent_on_treatment *
-                    2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) * cpars.PMTCT_transmission_rate(4,hp,1);
-                }
+
+
           intermediate.children.percent_no_treatment -= intermediate.children.percent_on_treatment;
 
         }
-
       }
 
 
@@ -663,55 +629,7 @@ void run_child_hiv_infections(int time_step,
 }
 
 template<typename ModelVariant, typename real_type>
-void ctx_need_cov_old(int time_step,
-                  const Parameters<ModelVariant, real_type> &pars,
-                  const State<ModelVariant, real_type> &state_curr,
-                  State<ModelVariant, real_type> &state_next,
-                  IntermediateData<ModelVariant, real_type> &intermediate) {
-  static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
-  const auto demog = pars.base.demography;
-  constexpr auto ss = StateSpace<ModelVariant>().base;
-  constexpr auto hc_ss = StateSpace<ModelVariant>().children;
-  const auto cpars = pars.children.children;
-
-  for (int s = 0; s < ss.NS; ++s) {
-    for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
-      for (int a = 0; a < hc_ss.hc2_agestart; ++a) {
-        for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-          state_next.children.ctx_need += state_next.children.hc1_hiv_pop(hd, cat, a, s);
-          for (int dur = 0; dur < ss.hTS; ++dur) {
-            state_next.children.ctx_need += state_next.children.hc1_art_pop(dur, hd, a, s);
-          } // end hTS
-        } // end hc1DS
-      } //end a
-    } // end hcTT
-  } // end NS
-
-  for (int s = 0; s < ss.NS; ++s) {
-    for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
-      for (int a = hc_ss.hc2_agestart; a < hc_ss.hc2DS; ++a) {
-        for (int hd = 0; hd < hc_ss.hc2DS; ++hd) {
-          state_next.children.ctx_need += state_next.children.hc2_hiv_pop(hd, cat, a, s);
-          for (int dur = 0; dur < ss.hTS; ++dur) {
-            state_next.children.ctx_need += state_next.children.hc1_art_pop(dur, hd, a, s);
-          } // end hTS
-        } // end hc1DS
-      } //end a
-    } // end hcTT
-  } // end NS
-
-  if(state_next.children.ctx_need > 0){
-   // state_next.children.ctx_mean = cpars.ctx_val(time_step-1) /  state_next.children.ctx_need;
-   state_next.children.ctx_mean = cpars.ctx_val(time_step-1) ; // this is for input as a percent
-    state_next.children.ctx_mean = (1-cpars.ctx_effect) * state_next.children.ctx_mean + (1 - state_next.children.ctx_mean);
-  }
-
-}
-
-
-template<typename ModelVariant, typename real_type>
-void ctx_need_cov_new(int time_step,
+void ctx_need_cov(int time_step,
                       const Parameters<ModelVariant, real_type> &pars,
                       const State<ModelVariant, real_type> &state_curr,
                       State<ModelVariant, real_type> &state_next,
@@ -750,7 +668,7 @@ void ctx_need_cov_new(int time_step,
           for (int hd = 0; hd < hc_ss.hc2DS; ++hd) {
             //state_next.children.ctx_need += state_next.children.hc2_hiv_pop(hd, cat, a, s);
             for (int dur = 0; dur < ss.hTS; ++dur) {
-            //  state_next.children.ctx_need += state_next.children.hc1_art_pop(dur, hd, a, s);
+            //  state_next.children.ctx_need += state_next.children.hc2_art_pop(dur, hd, a, s);
             } // end hTS
           } // end hc1DS
         } //end a
@@ -762,7 +680,6 @@ void ctx_need_cov_new(int time_step,
     if(state_next.children.ctx_need > 0){
        state_next.children.ctx_mean = cpars.ctx_val(time_step-1) /  state_next.children.ctx_need;
        state_next.children.ctx_mean = (1-cpars.ctx_effect) * state_next.children.ctx_mean + (1 - state_next.children.ctx_mean);
-      // state_next.children.ctx_mean = 1.0;
     }
   }
 
@@ -781,7 +698,7 @@ void run_child_natural_history(int time_step,
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
 
-  internal::ctx_need_cov_new(time_step, pars, state_curr, state_next, intermediate);
+  internal::ctx_need_cov(time_step, pars, state_curr, state_next, intermediate);
 
   for (int s = 0; s < ss.NS; ++s) {
     for (int a = 0; a < hc_ss.hc2_agestart; ++a) {
@@ -847,42 +764,15 @@ void run_child_hiv_mort(int time_step,
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
 
-  // if(cpars.ctx_coverage_is_number){
-  //   for (int s = 0; s < ss.NS; ++s) {
-  //     for (int a = 0; a < hc_ss.hc2_agestart; ++a) {
-  //       for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
-  //         for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-  //           intermediate.children.need_cotrim += state_next.children.hc1_hiv_pop(hd, cat, a, s);
-  //         }
-  //       }
-  //     }
-  //   }
-  //
-  //   for (int s = 0; s < ss.NS; ++s) {
-  //     for (int a = hc_ss.hc2_agestart; a < pars.base.options.p_idx_fertility_first; ++a) {
-  //       for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
-  //         for (int hd = 0; hd < hc_ss.hc2DS; ++hd) {
-  //           intermediate.children.need_cotrim += state_next.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s);
-  //         }
-  //       }
-  //     }
-  //   }
-  //
-  //   intermediate.children.ctx_coverage =  cpars.ctx_coverage(time_step) / intermediate.children.need_cotrim;
-  //
-  // }else{
-  //   intermediate.children.ctx_coverage = cpars.ctx_coverage(time_step);
-  // }
-
 
   for (int s = 0; s < ss.NS; ++s) {
     for (int a = 0; a < hc_ss.hc2_agestart; ++a) {
       for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
         for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
           intermediate.children.hc_grad(hd, cat, a, s) -=  state_next.children.ctx_mean *
-             state_next.children.hc1_hiv_pop(hd, cat, a, s) * cpars.hc1_cd4_mort(hd, cat, a); //* cpars.ctx_effect * intermediate.ctx_coverage;
+             state_next.children.hc1_hiv_pop(hd, cat, a, s) * cpars.hc1_cd4_mort(hd, cat, a);
           state_next.children.hc1_noart_aids_deaths(hd, cat, a, s) +=  state_next.children.ctx_mean *
-            state_next.children.hc1_hiv_pop(hd, cat, a, s) * cpars.hc1_cd4_mort(hd, cat, a); //* cpars.ctx_effect * intermediate.ctx_coverage;
+            state_next.children.hc1_hiv_pop(hd, cat, a, s) * cpars.hc1_cd4_mort(hd, cat, a);
         }
       }
     }
@@ -1049,48 +939,6 @@ void onART_mortality(int time_step,
 }
 
 template<typename ModelVariant, typename real_type>
-void onART_mortality12plus(int time_step,
-                     const Parameters<ModelVariant, real_type> &pars,
-                     const State<ModelVariant, real_type> &state_curr,
-                     State<ModelVariant, real_type> &state_next,
-                     IntermediateData<ModelVariant, real_type> &intermediate) {
-  static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
-  constexpr auto ss = StateSpace<ModelVariant>().base;
-  constexpr auto hc_ss = StateSpace<ModelVariant>().children;
-  const auto cpars = pars.children.children;
-
-  // !!! TODO: fix order of for loop
-  for (int s = 0; s <ss.NS; ++s) {
-    for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-      for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
-        intermediate.children.hc_death_rate = 0.0;
-        intermediate.children.hc_art_grad(2, hd, a, s) = 0.0;
-          if(a < hc_ss.hc2_agestart){
-            intermediate.children.hc_death_rate =  cpars.hc_art_mort_rr(2, a, time_step) * cpars.hc1_art_mort(hd, 2, a);
-          }else if (hd < hc_ss.hc2DS){
-            intermediate.children.hc_death_rate =  cpars.hc_art_mort_rr(2, a, time_step) * cpars.hc2_art_mort(hd, 2, a-hc_ss.hc2_agestart);
-          }
-        if (a < hc_ss.hc2_agestart) {
-          if((intermediate.children.hc_death_rate * state_next.children.hc1_art_pop(2, hd, a, s)) >= 0){
-            state_next.children.hc1_art_aids_deaths(2,hd, a, s) =  intermediate.children.hc_death_rate * state_next.children.hc1_art_pop(2, hd, a, s);
-            // intermediate.children.hc_art_grad(2,hd, a, s) -= state_next.children.hc1_art_aids_deaths(2,hd, a, s);
-            // state_next.children.hc1_art_pop(2, hd,  a, s) += intermediate.children.hc_art_grad(2, hd, a, s);
-          }
-        } else if (hd < hc_ss.hc2DS) {
-          if((intermediate.children.hc_death_rate * state_next.children.hc2_art_pop(2, hd, a-hc_ss.hc2_agestart, s)) >= 0){
-            state_next.children.hc2_art_aids_deaths(2, hd, a-hc_ss.hc2_agestart, s) =  intermediate.children.hc_death_rate * state_next.children.hc2_art_pop(2, hd, a-hc_ss.hc2_agestart, s);
-            // intermediate.children.hc_art_grad(2, hd, a, s) -= state_next.children.hc2_art_aids_deaths(2,hd, a-hc_ss.hc2_agestart, s);
-            // state_next.children.hc2_art_pop(2, hd,  a-hc_ss.hc2_agestart, s) += intermediate.children.hc_art_grad(2, hd, a, s);
-          }
-        }
-      }// end a
-    }// end hc_ss.hc1DS
-  }// end ss.NS
-
-}
-
-template<typename ModelVariant, typename real_type>
 void hc_adjust_art_initiates_for_mort(int time_step,
                          const Parameters<ModelVariant, real_type> &pars,
                          const State<ModelVariant, real_type> &state_curr,
@@ -1102,7 +950,7 @@ void hc_adjust_art_initiates_for_mort(int time_step,
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
 
-  //how are eligible for ART but not currently on ART, outputs hc_art_need_init
+  //who are eligible for ART but not currently on ART, outputs hc_art_need_init
   internal::hc_initiate_art_by_age(time_step, pars, state_curr, state_next, intermediate);
   internal::hc_initiate_art_by_cd4(time_step, pars, state_curr, state_next, intermediate);
 
@@ -1140,7 +988,7 @@ void hc_art_num_num(int time_step,
       for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
         for (int dur = 0; dur < ss.hTS; ++dur) {
           if (a < hc_ss.hc2_agestart) {
-            state_next.children.hc_art_total += state_next.children.hc1_art_pop(dur, hd, a, s); // change state_next.children.hc_art_num to be left to initiate
+            state_next.children.hc_art_total += state_next.children.hc1_art_pop(dur, hd, a, s);
           } else if (hd < (hc_ss.hc2DS)) {
             state_next.children.hc_art_total += state_next.children.hc2_art_pop(dur, hd, a-hc_ss.hc2_agestart, s);
           }
@@ -1478,11 +1326,6 @@ void run_child_art_mortality(int time_step,
   //progress 6 to 12 mo to 12 plus months
   internal::progress_time_on_art(time_step, pars, state_curr, state_next, intermediate, 1, 2);
 
-  //mortality among those who started ART last year but now have been on for more than a year
-  internal::onART_mortality12plus(time_step, pars, state_curr, state_next, intermediate);
-
-
-
 }
 
 
@@ -1646,11 +1489,6 @@ void run_child_model_simulation(int time_step,
     internal::run_child_natural_history(time_step, pars, state_curr, state_next, intermediate);
     internal::run_child_hiv_mort(time_step, pars, state_curr, state_next, intermediate);
     internal::add_child_grad(time_step, pars, state_curr, state_next, intermediate);
-    //This is only the order for nosocomial infections
-    //order from mkw_bf_trans: run_child_ageing, run_wlhiv_births, run_child_hiv_infections, run_child_natural_history,
-    //run_child_hiv_mort, add_child_trad, run_child_art_initiation, run_child_art_mortality
-    // !!!TODO: also need to fix the looping order for some loops
-    // !!!TODO: put this in an if statement to only run if the first year of ART has passed
     internal::run_child_art_initiation(time_step, pars, state_curr, state_next, intermediate);
     internal::run_child_art_mortality(time_step, pars, state_curr, state_next, intermediate);
     internal::fill_model_outputs(time_step, pars, state_curr, state_next, intermediate);

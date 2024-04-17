@@ -123,6 +123,8 @@ test_that("CLHIV align", {
   dt <- dt %>%
     mutate(diff = pop - fr)
   x = data.table(dt)
+  year.x = 2005;  x[year== year.x & age == 0 ] ; x[year== year.x & age == 1 & transmission == 'bf12+'];
+  year.x = 2006;  x[year== year.x & age == 0 ] ; x[year== year.x & age == 1 & transmission == 'bf12+'];
   year.x = 2007;  x[year== year.x & age == 0 ] ; x[year== year.x & age == 1 & transmission == 'bf12+'];
 
   expect_true(all(abs(dt$diff) < 1e-1))
