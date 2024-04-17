@@ -102,7 +102,7 @@ void convert_PMTCT_num_to_perc(int time_step,
                 "convert_PMTCT_num_to_perc can only be called for model variants where run_child_model is true");
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
 
-
+  intermediate.children.sumARV = 0.0;
   for (int hp = 0; hp < hc_ss.hPS; ++hp) {
     intermediate.children.sumARV += cpars.PMTCT(hp,time_step);
   }
@@ -131,6 +131,18 @@ void convert_PMTCT_num_to_perc(int time_step,
     } //end hPS
   }
 
+    intermediate.children.PMTCT_coverage(4) = intermediate.children.PMTCT_coverage(4) * cpars.PMTCT_dropout(0,time_step);
+    intermediate.children.PMTCT_coverage(5) = intermediate.children.PMTCT_coverage(5) * cpars.PMTCT_dropout(1,time_step);
+
+    // if(time_step == 37){
+    //   std::cout << intermediate.children.sumARV; //12177
+    //   std::cout << intermediate.children.OnPMTCT; //12177
+    //   std::cout << (cpars.PMTCT(5,time_step) / intermediate.children.sumARV); //0.1694178
+    //   std::cout << intermediate.children.OnPMTCT ; //12177
+    //   std::cout << intermediate.children.need_PMTCT; //12177
+    //
+    // }
+
 }
 
 
@@ -145,34 +157,33 @@ void convert_PMTCT_pre_bf(int time_step,
                 "convert_PMTCT_num_to_perc can only be called for model variants where run_child_model is true");
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
 
-  // for (int hp = 0; hp < hc_ss.hPS; ++hp) {
-  //   intermediate.children.sumARV += cpars.PMTCT(hp,time_step);
-  // }
-  //
-  // intermediate.children.need_PMTCT = state_next.children.hiv_births;
+  if(time_step == 37){
+    std::cout <<  intermediate.children.PMTCT_coverage(5);
 
+  }
   //replace all instances of coverage input as numbers with percentage covered
   if(cpars.PMTCT_input_is_percent(time_step)){
     for (int hp = 0; hp < hc_ss.hPS; ++hp) {
-      // if(hp == 0){
-      //   intermediate.children.PMTCT_coverage(hp) = (1 - intermediate.children.optA_transmission_rate) * cpars.PMTCT(hp,time_step) / 100;
-      // }
-      // if(hp == 1){
-      //   intermediate.children.PMTCT_coverage(hp) = (1 - intermediate.children.optB_transmission_rate) * cpars.PMTCT(hp,time_step) / 100;
-      // }
-      // if(hp > 1){
-      //intermediate.children.PMTCT_coverage(hp) = (1 - cpars.PMTCT_transmission_rate(4,hp,0)) * cpars.PMTCT(hp,time_step) / 100;
       intermediate.children.PMTCT_coverage(hp) = (1 - cpars.PMTCT_transmission_rate(4,hp,0)) * intermediate.children.PMTCT_coverage(hp);
+    } //end hPS
+
+  }else{
+    //total number of people that were on ARVs
+    intermediate.children.sumARV = 0.0;
+    for (int hp = 0; hp < hc_ss.hPS; ++hp) {
+      // if(hp == 4){
+      //   intermediate.children.sumARV += cpars.PMTCT(hp,time_step) * cpars.PMTCT_dropout(0,time_step) * (1 - cpars.PMTCT_transmission_rate(4,hp,0));
+      // }else if(hp == 5){
+      //   intermediate.children.sumARV += cpars.PMTCT(hp,time_step) * cpars.PMTCT_dropout(1,time_step) * (1 - cpars.PMTCT_transmission_rate(4,hp,0));
+      // }else{
+        intermediate.children.sumARV += cpars.PMTCT(hp,time_step) * (1 - cpars.PMTCT_transmission_rate(4,hp,0));
       // }
 
-    } //end hPS
-  }else{
-    for (int hp = 0; hp < hc_ss.hPS; ++hp) {
-      intermediate.children.sumARV += cpars.PMTCT(hp,time_step) * (1 - cpars.PMTCT_transmission_rate(4,hp,0));
     }
 
-    if(intermediate.children.sumARV > state_next.children.hiv_births){
-      intermediate.children.need_PMTCT = intermediate.children.sumARV * (1 - intermediate.children.perinatal_transmission_rate);
+    //people on ARVs that haven't already transmitted
+    if(intermediate.children.sumARV > (state_next.children.hiv_births * (1 - intermediate.children.perinatal_transmission_rate))){
+      intermediate.children.need_PMTCT = intermediate.children.sumARV ;
     }else{
       intermediate.children.need_PMTCT = state_next.children.hiv_births * (1 - intermediate.children.perinatal_transmission_rate);
     }
@@ -182,12 +193,21 @@ void convert_PMTCT_pre_bf(int time_step,
       if (intermediate.children.sumARV == 0) {
         intermediate.children.PMTCT_coverage(hp) = 0.0;
       } else {
-        intermediate.children.PMTCT_coverage(hp) = (1 - cpars.PMTCT_transmission_rate(4,hp,0)) * (cpars.PMTCT(hp,time_step) / intermediate.children.sumARV) * (intermediate.children.OnPMTCT / intermediate.children.need_PMTCT);
-
+        if(hp == 4){
+          intermediate.children.PMTCT_coverage(hp) = ((1 - cpars.PMTCT_transmission_rate(4,hp,0)) * cpars.PMTCT_dropout(0,time_step) * cpars.PMTCT(hp,time_step) / intermediate.children.sumARV) * (intermediate.children.OnPMTCT / intermediate.children.need_PMTCT);
+        }else if(hp == 5){
+          intermediate.children.PMTCT_coverage(hp) = ((1 - cpars.PMTCT_transmission_rate(4,hp,0)) * cpars.PMTCT_dropout(1,time_step) * cpars.PMTCT(hp,time_step) / intermediate.children.sumARV) * (intermediate.children.OnPMTCT / intermediate.children.need_PMTCT);
+        }else{
+          intermediate.children.PMTCT_coverage(hp) = ((1 - cpars.PMTCT_transmission_rate(4,hp,0)) * cpars.PMTCT(hp,time_step) / intermediate.children.sumARV) * (intermediate.children.OnPMTCT / intermediate.children.need_PMTCT);
+        }
       }
     } //end hPS
   }
 
+  if(time_step == 37){
+    std::cout <<  intermediate.children.PMTCT_coverage(5);
+
+  }
 }
 
 template<typename ModelVariant, typename real_type>
@@ -336,8 +356,8 @@ void run_calculate_perinatal_transmission_rate(int time_step,
   // ///////////////////////////////////
   // //Calculate transmission rate
   // ///////////////////////////////////
-  intermediate.children.retained_on_ART = intermediate.children.PMTCT_coverage(4) * cpars.PMTCT_dropout(0,time_step);
-  intermediate.children.retained_started_ART = intermediate.children.PMTCT_coverage(5) * cpars.PMTCT_dropout(1,time_step);
+  intermediate.children.retained_on_ART = intermediate.children.PMTCT_coverage(4) ;
+  intermediate.children.retained_started_ART = intermediate.children.PMTCT_coverage(5) ;
 
   //Transmission among women on treatment
   intermediate.children.perinatal_transmission_rate = intermediate.children.PMTCT_coverage(2) * cpars.PMTCT_transmission_rate(0,2,0) + //SDNVP

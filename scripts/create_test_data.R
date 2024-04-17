@@ -6,9 +6,10 @@ devtools::load_all('C:/Users/mwalters/leapfrog')
 setwd('C:/Users/mwalters/frogger/')
 
 ## Create demographic and projection parameters for adults
-#pjnz1 <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct.PJNZ")
+pjnz1 <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct.PJNZ")
 # pjnz1 <- testthat::test_path("testdata/bwa_aim-no-special-elig_ctx.PJNZ")
-pjnz1 <- testthat::test_path("testdata/bwa_aim-no-special-elig.PJNZ")
+#pjnz1 <- testthat::test_path("testdata/bwa_aim-no-special-elig.PJNZ")
+#pjnz1 = 'C:/Users/mwalters/Desktop/NW_TEST_MTCT_BF_PERI_pmtct.PJNZ'
 
 demp <- prepare_leapfrog_demp(pjnz1)
 saveRDS(demp, testthat::test_path("testdata/demographic_projection_object_adult.rds"))
@@ -51,6 +52,8 @@ proj.years <- yr_start:yr_end
 timedat.idx <- 4+1:length(proj.years)-1
 
 pop1 = paste0(getwd(), '/', gsub(x = pjnz1, pattern = '.PJNZ', replacement = '_pop1.xlsx'))
+#pop1 = paste0( gsub(x = pjnz1, pattern = '.PJNZ', replacement = '_pop1.xlsx'))
+
 spectrum_output <- function(file = "../testdata/spectrum/v6.13/bwa_aim-adult-child-input-art-elig_spectrum-v6.13_2022-02-12_pop1.xlsx", ages = 0:14, country = 'Botswana', years_in = 1970:2030){
   ##pull out stratified population from the .xlsx file, This function doesn't take out the paediatric output, so going to just compare to the Spectrum software itself
   df <- file
