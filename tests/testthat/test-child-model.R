@@ -123,7 +123,7 @@ test_that("CLHIV align", {
   dt <- right_join(hc, spec_prev, by = c('sex', 'age', 'cd4_cat', 'year', 'transmission'))
   dt <- dt %>%
     mutate(diff = pop - fr)
-  # x = data.table(dt)
+  x = data.table(dt)
   # year.x = 2005;  x[year== year.x & age == 0 ] ; x[year== year.x & age == 1 & transmission == 'bf12+'];
   # year.x = 2006;  x[year== year.x & age == 0 ] ; x[year== year.x & age == 1 & transmission == 'bf12+'];
   # year.x = 2007;  x[year== year.x & age == 0 ] ; x[year== year.x & age == 1 & transmission == 'bf12+'];
@@ -175,48 +175,45 @@ test_that("CLHIV on ART align", {
 })
 
 #Not working
-# test_that("HIV related deaths among CLHIV on ART align", {
-#   input <- setup_childmodel(testinput = "testdata/child_parms.rds")
-#   demp = input$demp
-#   parameters = input$parameters
-#   dp = input$dp
-#   pjnz = input$pjnz
-#
-#   out <- run_model(demp, parameters, NULL, NULL, 0:60, run_child_model = TRUE)
-#   tag.x ="<AIDSDeathsARTSingleAge MV>"
-#   start.id = 20608
-#   end.id = 20858
-#   timedat.idx = input$timedat.idx
-#   aids_deathsart <- array(as.numeric(unlist(dpsub(tag.x, 3:(end.id - start.id - 2), timedat.idx))), dim = c(length(3:(end.id - start.id - 2)),length(timedat.idx)))
-#   m = aids_deathsart[84:98,]
-#   f = aids_deathsart[166:180,]
-#   aids_deathsart <- array(0, dim = c(15,2,61))
-#   aids_deathsart[,1,] <- m
-#   aids_deathsart[,2,] <- f
-#
-#   ##right now this is only working for the first year of ART, assuming its something with the timing on art
-#   hc1 <- apply(out$hc1_art_aids_deaths, c(3:5), sum)
-#   hc2 <- apply(out$hc2_art_aids_deaths, c(3:5), sum)
-#   hc <- array(0, dim = c(15,2,61))
-#   hc[1:5,,] <- hc1
-#   hc[6:15,,] <- hc2
-#   dt <- right_join(reshape2::melt(hc), reshape2::melt(aids_deathsart), by = c('Var1', 'Var2', 'Var3'))
-#   dt <- dt %>%
-#     mutate(age = Var1 - 1,
-#            sex = if_else(Var2 == 1, 'Male', 'Female'),
-#            year = Var3 + 1969,
-#            fr = value.x,
-#            spec = value.y) %>%
-#     select(age, sex, year, fr, spec)
-#   dt <- dt %>%
-#     mutate(diff = spec - fr)
-#
-#   out$hc1_art_aids_deaths[,,,,35]
-#   data.table(dt)[year == 2004 & age < 5]
-#
-#   expect_true(all(abs(dt$diff) < 1))
-#
-#
-# })
+test_that("HIV related deaths among CLHIV on ART align", {
+  input <- setup_childmodel(testinput = "testdata/child_parms.rds")
+  demp = input$demp
+  parameters = input$parameters
+  dp = input$dp
+  pjnz = input$pjnz
+
+  out <- run_model(demp, parameters, NULL, NULL, 0:60, run_child_model = TRUE)
+  tag.x ="<AIDSDeathsARTSingleAge MV>"
+  start.id = 20608
+  end.id = 20858
+  timedat.idx = input$timedat.idx
+  aids_deathsart <- array(as.numeric(unlist(dpsub(tag.x, 3:(end.id - start.id - 2), timedat.idx))), dim = c(length(3:(end.id - start.id - 2)),length(timedat.idx)))
+  m = aids_deathsart[84:98,]
+  f = aids_deathsart[166:180,]
+  aids_deathsart <- array(0, dim = c(15,2,61))
+  aids_deathsart[,1,] <- m
+  aids_deathsart[,2,] <- f
+
+  ##right now this is only working for the first year of ART, assuming its something with the timing on art
+  hc1 <- apply(out$hc1_art_aids_deaths, c(3:5), sum)
+  hc2 <- apply(out$hc2_art_aids_deaths, c(3:5), sum)
+  hc <- array(0, dim = c(15,2,61))
+  hc[1:5,,] <- hc1
+  hc[6:15,,] <- hc2
+  dt <- right_join(reshape2::melt(hc), reshape2::melt(aids_deathsart), by = c('Var1', 'Var2', 'Var3'))
+  dt <- dt %>%
+    mutate(age = Var1 - 1,
+           sex = if_else(Var2 == 1, 'Male', 'Female'),
+           year = Var3 + 1969,
+           fr = value.x,
+           spec = value.y) %>%
+    select(age, sex, year, fr, spec)
+  dt <- dt %>%
+    mutate(diff = spec - fr)
+
+  expect_true(all(abs(dt$diff) < 1))
+
+
+})
 
 

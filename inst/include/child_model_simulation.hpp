@@ -749,17 +749,24 @@ void ctx_need_cov(int time_step,
   internal::calc_need_for_ctx(time_step, pars, state_curr, state_next, intermediate);
 
   if(cpars.ctx_val_is_percent(time_step)){
-    if(cpars.ctx_val(time_step-1) > 0){
-      state_next.children.ctx_mean = cpars.ctx_val(time_step-1) * (1-cpars.ctx_effect/5);
-    }else{
-      state_next.children.ctx_mean = 1;
+    // state_next.children.ctx_need = 0.0;
+    // if(state_next.children.ctx_need > 0){
+      state_next.children.ctx_mean = cpars.ctx_val(time_step-1) ;// /  state_next.children.ctx_need;
+      state_next.children.ctx_mean = (1-cpars.ctx_effect) * state_next.children.ctx_mean + (1 - state_next.children.ctx_mean);
+    // }
+    if(time_step == 31){
+      std::cout << state_next.children.ctx_mean;
     }
+
   }else{
     if(state_next.children.ctx_need > 0){
        state_next.children.ctx_mean = cpars.ctx_val(time_step-1) /  state_next.children.ctx_need;
-       state_next.children.ctx_mean = (1-cpars.ctx_effect/5) * state_next.children.ctx_mean + (1 - state_next.children.ctx_mean);
+       state_next.children.ctx_mean = (1-cpars.ctx_effect) * state_next.children.ctx_mean + (1 - state_next.children.ctx_mean);
     }
   }
+
+
+//  state_next.children.ctx_mean = 1.0;
 
 }
 
@@ -842,6 +849,9 @@ void run_child_hiv_mort(int time_step,
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
 
+  if(time_step == 31){
+    std::cout<< state_next.children.ctx_mean;
+  }
 
   for (int s = 0; s < ss.NS; ++s) {
     for (int a = 0; a < hc_ss.hc2_agestart; ++a) {
