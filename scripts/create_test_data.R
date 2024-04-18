@@ -16,27 +16,22 @@ saveRDS(demp, testthat::test_path("testdata/demographic_projection_object_adult.
 proj <- prepare_leapfrog_projp(pjnz1)
 saveRDS(proj, testthat::test_path("testdata/projection_parameters_adult.rds"))
 
-## Used as reference data (Run from leapfrog/master)
-# lmod <- leapfrogR(demp, proj)
-# saveRDS(lmod, testthat::test_path("testdata/leapfrog_fit.rds"))
-#
-# lmod <- leapfrogR(demp, proj, hiv_strat = "coarse")
-# saveRDS(lmod, testthat::test_path("testdata/leapfrog_fit_coarse.rds"))
-#
-# mod <- leapfrogR(demp, proj, hiv_steps_per_year = 0L)
-# saveRDS(lmod, testthat::test_path("testdata/fit_demography.rds"))
+# Used as reference data (Run from leapfrog/master)
+lmod <- leapfrogR(demp, proj)
+saveRDS(lmod, testthat::test_path("testdata/leapfrog_fit.rds"))
+
+lmod <- leapfrogR(demp, proj, hiv_strat = "coarse")
+saveRDS(lmod, testthat::test_path("testdata/leapfrog_fit_coarse.rds"))
+
+mod <- leapfrogR(demp, proj, hiv_steps_per_year = 0L)
+saveRDS(lmod, testthat::test_path("testdata/fit_demography.rds"))
 
 
 #Create paeds parameters (Run from leapfrog/uncertainrt_analysis_working)
 demp <- prepare_leapfrog_demp(pjnz1)
 proj <- prepare_leapfrog_projp(pjnz1)
 proj <- leapfrog:::prepare_hc_leapfrog_projp(pjnz1, proj)
-proj$ctx_val_ispercent <- rep(T, 61)
-if(any(!proj$ctx_val_ispercent)){
-  proj$ctx_val[!proj$ctx_val_ispercent] <-  proj$ctx_val[!proj$ctx_val_ispercent] * 100
-}
-#proj$paed_cd4_dist <- c(0.60016463, 0.12003293, 0.10002740, 0.09002469, 0.05001375, 0.03000823, 0.01000271)
-#lmod <- leapfrogR(demp, proj)
+
 
 demp$netmigr <- leapfrog:::read_netmigr(pjnz1, adjust_u5mig = FALSE)
 demp$netmigr_adj <- leapfrog:::adjust_spectrum_netmigr(demp$netmigr)
