@@ -316,7 +316,7 @@ dp_read_childart <- function(dp) {
     stop("Child ART input tag not recognized. Function probably needs update for this .DP file.")
   }
 
-  childart_ispercent <- sapply(childart_ispercent, as.logical)
+  childart_ispercent <- sapply(childart_ispercent, as.numeric) == 1
   dimnames(childart_ispercent) <- list(indicator = indicator_names, year = dpy$proj_years)
 
   list(childart = childart,
