@@ -22,7 +22,7 @@ mod <- leapfrogR(demp, proj, hiv_steps_per_year = 0L)
 saveRDS(lmod, testthat::test_path("testdata/fit_demography.rds"))
 
 
-# ## TODO: Add details about child model input data
+# TODO: Add details about child model input data
 #
 # Test data coming from the same file but on the 'clean' branch of leapfrog.
 #
