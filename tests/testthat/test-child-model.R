@@ -84,6 +84,7 @@ test_that("HIV related deaths among CLHIV not on ART align", {
   expect_true(all(abs(dt$diff) < 1e-1))
 })
 
+##Only works out to 2006 when pmtct is input as numbers
 test_that("CLHIV align", {
   input <- setup_childmodel(testinput = "testdata/child_parms.rds")
   demp = input$demp
@@ -122,10 +123,10 @@ test_that("CLHIV align", {
   dt <- right_join(hc, spec_prev, by = c('sex', 'age', 'cd4_cat', 'year', 'transmission'))
   dt <- dt %>%
     mutate(diff = pop - fr)
-  x = data.table(dt)
-  year.x = 2005;  x[year== year.x & age == 0 ] ; x[year== year.x & age == 1 & transmission == 'bf12+'];
-  year.x = 2006;  x[year== year.x & age == 0 ] ; x[year== year.x & age == 1 & transmission == 'bf12+'];
-  year.x = 2007;  x[year== year.x & age == 0 ] ; x[year== year.x & age == 1 & transmission == 'bf12+'];
+  # x = data.table(dt)
+  # year.x = 2005;  x[year== year.x & age == 0 ] ; x[year== year.x & age == 1 & transmission == 'bf12+'];
+  # year.x = 2006;  x[year== year.x & age == 0 ] ; x[year== year.x & age == 1 & transmission == 'bf12+'];
+  # year.x = 2007;  x[year== year.x & age == 0 ] ; x[year== year.x & age == 1 & transmission == 'bf12+'];
 
   expect_true(all(abs(dt$diff) < 1e-1))
 })

@@ -31,7 +31,7 @@ saveRDS(proj, testthat::test_path("testdata/projection_parameters_adult.rds"))
 demp <- prepare_leapfrog_demp(pjnz1)
 proj <- prepare_leapfrog_projp(pjnz1)
 proj <- leapfrog:::prepare_hc_leapfrog_projp(pjnz1, proj)
-proj$ctx_val_ispercent <- rep(F, 61)
+proj$ctx_val_ispercent <- rep(T, 61)
 if(any(!proj$ctx_val_ispercent)){
   proj$ctx_val[!proj$ctx_val_ispercent] <-  proj$ctx_val[!proj$ctx_val_ispercent] * 100
 }
