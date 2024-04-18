@@ -6,19 +6,23 @@
 #include "state_space.hpp"
 #include "model_input.hpp"
 #include "model_output.hpp"
+#include "r_utils.hpp"
 
-int transform_simulation_years(const Rcpp::List demp, SEXP r_sim_years) {
+int transform_simulation_years(
+    const Rcpp::List demp,
+    Rcpp::Nullable<Rcpp::NumericVector> r_sim_years) {
+
   Rcpp::NumericVector Sx = demp["Sx"];
   Rcpp::Dimension d = Sx.attr("dim");
   // Simulation initialises state from first years input data (index 0)
   // then runs for each year simulating this years (i) data using previous years
-  // state (i - 1) and this years input data (i). So -1 off index for max years
-  // to simulate as index 0 used for initial state
-  const int max_sim_years = d[2] - 1;
-  if (r_sim_years == R_NilValue) {
+  // state (i - 1) and this years input data (i).
+  const int max_sim_years = d[2];
+  if (r_sim_years.isNull()) {
     return max_sim_years;
   }
-  auto sim_years = INTEGER(r_sim_years)[0];
+  Rcpp::NumericVector years(r_sim_years);
+  auto sim_years = years.length();
   if (sim_years > max_sim_years) {
     Rcpp::stop("No of years > max years of " + std::to_string(max_sim_years));
   }
@@ -36,7 +40,9 @@ int transform_hts_per_year(SEXP r_hts_per_year) {
 }
 
 std::vector<int> transform_output_steps(Rcpp::NumericVector output_steps) {
-  return Rcpp::as<std::vector<int>>(output_steps);
+  auto out = Rcpp::as<std::vector<int>>(output_steps);
+  convert_base(out);
+  return out;
 }
 
 template<typename ModelVariant>
@@ -62,14 +68,13 @@ Rcpp::List simulate_model(const leapfrog::StateSpace<ModelVariant> ss,
 
 // [[Rcpp::export]]
 Rcpp::List run_base_model(const Rcpp::List data,
-                          SEXP sim_years,
+                          Rcpp::Nullable<Rcpp::NumericVector> sim_years,
                           SEXP hts_per_year,
                           Rcpp::NumericVector output_steps,
                           std::string model_variant) {
   const int proj_years = transform_simulation_years(data, sim_years);
   const std::vector<int> save_steps = transform_output_steps(output_steps);
   const int hiv_steps = transform_hts_per_year(hts_per_year);
-
 
   Rcpp::List ret;
   if (model_variant == "ChildModel") {

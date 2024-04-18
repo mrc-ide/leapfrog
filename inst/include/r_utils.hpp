@@ -43,6 +43,12 @@ auto convert_base(const Eigen::TensorMap<Eigen::Tensor<int, rank>> map) {
   return new_tensor;
 }
 
+auto convert_base(std::vector<int>& input) {
+  for (auto& num: input) {
+    num -= 1;
+  }
+}
+
 template<typename T, typename... Args>
 auto parse_data(const Rcpp::List data, const std::string& key, Args... dims) {
   constexpr std::size_t rank = sizeof...(dims);

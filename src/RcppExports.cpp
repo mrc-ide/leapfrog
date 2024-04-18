@@ -12,13 +12,13 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // run_base_model
-Rcpp::List run_base_model(const Rcpp::List data, SEXP sim_years, SEXP hts_per_year, Rcpp::NumericVector output_steps, std::string model_variant);
+Rcpp::List run_base_model(const Rcpp::List data, Rcpp::Nullable<Rcpp::NumericVector> sim_years, SEXP hts_per_year, Rcpp::NumericVector output_steps, std::string model_variant);
 RcppExport SEXP _frogger_run_base_model(SEXP dataSEXP, SEXP sim_yearsSEXP, SEXP hts_per_yearSEXP, SEXP output_stepsSEXP, SEXP model_variantSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::List >::type data(dataSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type sim_years(sim_yearsSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::NumericVector> >::type sim_years(sim_yearsSEXP);
     Rcpp::traits::input_parameter< SEXP >::type hts_per_year(hts_per_yearSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type output_steps(output_stepsSEXP);
     Rcpp::traits::input_parameter< std::string >::type model_variant(model_variantSEXP);
