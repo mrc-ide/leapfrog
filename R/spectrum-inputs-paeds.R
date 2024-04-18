@@ -127,7 +127,8 @@ input_childart <- function(pjnz){
   list(ctx = cotrim,
        ctx_percent = cotrim_pct,
        age_spec = age_specific,
-       child_art = out)
+       child_art = out,
+       art_ispercent = art$childart_ispercent)
 
 }
 

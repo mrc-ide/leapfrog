@@ -1019,7 +1019,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    birthsHE = mat_hiv_births(t);
 
 
-  // birthsHE = std::round(birthsHE * 100000.0) / 100000.0;
    hiv_births(t) = birthsHE;
    //ROB: births to HIV+ women (end)
 
@@ -1071,7 +1070,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
        }
      }
    }
-
 
 
    //ROB: PMTCT need  (end)
@@ -1150,6 +1148,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
      optA_tr = pmtct_mtct(0,0,0) * (1 + excessratio);
      optB_tr = pmtct_mtct(0,1,0) * (1 + excessratio);
    }
+
 
 
    //Calculate transmission rate
@@ -1317,11 +1316,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
          if(hp == 0){
            trt_pct = pmtct_cov(0);// * (1 - (pmtct_dropout(2,t) / 100) * 2);
            NoPMTCT_bf -= trt_pct  *  (pow(1 - pmtct_dropout(hp + 2,t) * 2, bf));
-           if(bf == 2 & t == 31){
-             std::cout << pmtct(hp, t, 1);
-             std::cout << pmtct_dropout(hp + 2,t);
-             std::cout << NoPMTCT_bf;
-           }
+
          }
 
          //hp = 1 is option B
@@ -1663,6 +1658,10 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
      ctx_mean = 1;
    }
    tracking(1,0,t) = ctx_mean;
+
+   if(t == 26){
+     std::cout << ctx_mean;
+   }
 
    //ROB: paediatric natural history (start)
    for(int g = 0; g < NG; g++){
