@@ -1,4 +1,5 @@
 #!/usr/bin/env Rscript
+# nolint start
 library(leapfrog)
 library(data.table)
 library(dplyr)
@@ -64,3 +65,5 @@ saveRDS(lmod, testthat::test_path("testdata/fit_demography.rds"))
 # saveRDS(demp, "demographic_projection_object_child.rds")
 #
 # ```
+
+# nolint end
