@@ -216,7 +216,7 @@ test_that("error thrown if trying to run model for more than max years", {
 
   expect_error(
     run_model(demp, parameters, 1970:2050, 10L, 1970:2050),
-    "No of years > max years of 60"
+    "No of years > max years of 61"
   )
 })
 
@@ -247,10 +247,11 @@ test_that("error thrown if trying to save output from invalid steps", {
   demp <- readRDS(test_path("testdata/demographic_projection_object_child.rds"))
   parameters <- readRDS(test_path("testdata/projection_parameters_child.rds"))
 
-  expect_error(run_model(demp, parameters, NULL, NULL, -1L),
-               "Output step must be at least 0, got '-1'.")
+  expect_error(
+    run_model(demp, parameters, NULL, NULL, -1L),
+    "Invalid output step '-1'. Can only output one of the simulation years.")
 
-  expect_error(run_model(demp, parameters, 1970:1980, NULL, 1981L),
-               paste("Output step can be at most number of time steps",
-                     "run which is '10', got step '11'."))
+  expect_error(run_model(demp, parameters, 1970:1980, NULL, 1981:1982),
+               paste("Invalid output steps '1981', '1982'.",
+                     "Can only output one of the simulation years."))
 })

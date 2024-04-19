@@ -25,7 +25,14 @@ run_model <- function(data, parameters, sim_years,
     ## We want users to think in terms of years, so interface has years
     ## But for running the C++ loop we want to report out based on what
     ## iteration step we're at so convert from years to index
-    output_steps <- which(output_steps %in% sim_years)
+    invalid_steps <- output_steps[!(output_steps %in% sim_years)]
+    if (any(invalid_steps)) {
+      out_str <- paste(paste0("'", invalid_steps, "'"), collapse = ", ")
+      stop(sprintf(
+        "Invalid output %s %s. Can only output one of the simulation years.",
+        ngettext(length(invalid_steps), "step", "steps"), out_str))
+    }
+    output_steps <- which(sim_years %in% output_steps)
   }
 
   assert_enum(hiv_age_stratification, c("full", "coarse"))

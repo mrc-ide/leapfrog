@@ -9,7 +9,7 @@ incrr_age,age_rate_ratio,real_type,,,FALSE,3,base.pAG - options.p_idx_hiv_first_
 incrr_sex,sex_rate_ratio,real_type,,,FALSE,1,proj_years,,,
 cd4_mort,cd4_mortality,real_type,,,FALSE,3,base.hDS,base.hAG,base.NS,
 cd4_prog,cd4_progression,real_type,,,FALSE,3,base.hDS - 1,base.hAG,base.NS,
-artcd4elig_idx,idx_hm_elig,int,,,TRUE,1,proj_years + 1,,,
+artcd4elig_idx,idx_hm_elig,int,,,TRUE,1,proj_years,,,
 cd4_initdist,cd4_initial_distribution,real_type,,,FALSE,3,base.hDS,base.hAG,base.NS,
 art_mort,mortality,real_type,,,FALSE,4,base.hTS,base.hDS,base.hAG,base.NS
 artmx_timerr,mortaility_time_rate_ratio,real_type,,,FALSE,2,base.hTS,proj_years,,

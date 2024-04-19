@@ -58,7 +58,7 @@ auto parse_data(const Rcpp::List data, const std::string& key, Args... dims) {
   SEXP array_data = data[key];
   // In cases where the input data has project years we might not use all of it model fit
   // So we can take create a Map over a smaller slice of the data
-  // As long as this is true we can be confident we're not referencing invalid memory
+  // As long as this is true we can be confident we're not referencing invalid memory#
   if (LENGTH(array_data) < length) {
     Rcpp::stop("Invalid size of data for '%s', expected %d got %d",
                key,
