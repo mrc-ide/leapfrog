@@ -44,7 +44,7 @@ test_that("Infections among children align", {
   expect_true(all(abs(as.numeric(u1_inf_spec) - colSums(out$p_infections[1,,])) < 1e-3))
 })
 
-##Only works out to 2006 when pmtct is input as numbers
+##diverges in 2030 all ages after the highest cd4 category
 test_that("CLHIV align", {
   input <- setup_childmodel(testinput = "testdata/child_parms.rds")
   demp = input$demp
@@ -83,16 +83,12 @@ test_that("CLHIV align", {
   dt <- right_join(hc, spec_prev, by = c('sex', 'age', 'cd4_cat', 'year', 'transmission'))
   dt <- dt %>%
     mutate(diff = pop - fr)
-  x = data.table(dt)
-  year.x = 2005;  x[year== year.x & age == 0 ] ; x[year== year.x & age == 1 & transmission == 'bf12+'];
-  year.x = 2006;  x[year== year.x & age == 0 ] ; x[year== year.x & age == 1 & transmission == 'bf12+'];
-  year.x = 2007;  x[year== year.x & age == 0 ] ; x[year== year.x & age == 1 & transmission == 'bf12+'];
-  year.x = 2008;  x[year== year.x & age == 0 ] ; x[year== year.x & age == 1 & transmission == 'bf12+'];
-  year.x = 2009;  x[year== year.x & age == 0 ] ; x[year== year.x & age == 1 & transmission == 'bf12+'];
+  y <- data.table(dt)
 
   expect_true(all(abs(dt$diff) < 1e-1))
 })
 
+#diverages in 2030 after age 0 in ART lte5mo
 test_that("CLHIV on ART align", {
   input <- setup_childmodel(testinput = "testdata/child_parms.rds")
   demp = input$demp
@@ -132,6 +128,8 @@ test_that("CLHIV on ART align", {
   dt <- right_join(hc, spec_prev, by = c('sex', 'age', 'cd4_cat', 'year', 'time_art'))
   dt <- dt %>%
     mutate(diff = pop - fr)
+  x <- data.table(dt)
+
 
   expect_true(all(abs(dt$diff) < 1e-1))
 })

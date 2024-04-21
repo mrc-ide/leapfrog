@@ -947,7 +947,7 @@ void hc_adjust_art_initiates_for_mort(int time_step,
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
 
-  //Those eligible for ARVs (intermediate.children.hc_art_need_init) are calculated in the ctx_need_cov function
+  //Those eligible for ARVs (state_next.children.hc_art_need_init) are calculated in the ctx_need_cov function
   internal::hc_initiate_art_by_age(time_step, pars, state_curr, state_next, intermediate);
   internal::hc_initiate_art_by_cd4(time_step, pars, state_curr, state_next, intermediate);
 
@@ -1040,6 +1040,7 @@ void hc_art_pct_pct(int time_step,
   //the number of people on ART at the current coverage level
   state_next.children.hc_art_init =  state_next.children.hc_art_num * (cpars.hc_art_val(time_step) + cpars.hc_art_val(time_step-1)) / 2;
 
+
   //Remove how many that are already on ART
   for (int s = 0; s <ss.NS; ++s) {
     for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
@@ -1061,6 +1062,8 @@ void hc_art_pct_pct(int time_step,
   if (state_next.children.hc_art_init < 0) {
     state_next.children.hc_art_init =  0;
   }
+
+
 }
 
 template<typename ModelVariant, typename real_type>
@@ -1207,6 +1210,7 @@ void hc_art_initiation_by_age(int time_step,
     intermediate.children.hc_adj =  state_next.children.hc_art_init / intermediate.children.hc_initByAge;
   }
 
+
   for (int s = 0; s <ss.NS; ++s) {
     for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
       for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
@@ -1221,6 +1225,7 @@ void hc_art_initiation_by_age(int time_step,
           } else {
             intermediate.children.hc_art_scalar = 0.0;
           }
+
 
 
           if (a < hc_ss.hc2_agestart) {
@@ -1289,8 +1294,7 @@ void run_child_art_initiation(int time_step,
   const auto cpars = pars.children.children;
 
   internal::hc_adjust_art_initiates_for_mort(time_step, pars, state_curr, state_next, intermediate);
-  //progress art initates from 0-6 months on art to 6 to 12 mo
-  internal::progress_time_on_art(time_step, pars, state_curr, state_next, intermediate, 0, 1);
+
 
   if (!cpars.hc_art_isperc(time_step) && !cpars.hc_art_isperc(time_step-1)) { // both numbers
    internal::hc_art_num_num(time_step, pars, state_curr, state_next, intermediate);
@@ -1302,29 +1306,14 @@ void run_child_art_initiation(int time_step,
     internal::hc_art_pct_num(time_step, pars, state_curr, state_next, intermediate);
   }
 
+
+  if(state_next.children.hc_art_init < 0){
+    state_next.children.hc_art_init = 0.0;
+  }
+
   internal::hc_art_initiation_by_age(time_step, pars, state_curr, state_next, intermediate);
-}
-
-template<typename ModelVariant, typename real_type>
-void run_child_art_mortality(int time_step,
-                             const Parameters<ModelVariant, real_type> &pars,
-                             const State<ModelVariant, real_type> &state_curr,
-                             State<ModelVariant, real_type> &state_next,
-                             IntermediateData<ModelVariant, real_type> &intermediate) {
-  static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
-  constexpr auto ss = StateSpace<ModelVariant>().base;
-  constexpr auto hc_ss = StateSpace<ModelVariant>().children;
-  const auto cpars = pars.children.children;
-
-  //mortality among those on ART less than one year
-  internal::onART_mortality(time_step, pars, state_curr, state_next, intermediate, 0);
-
-  //progress 6 to 12 mo to 12 plus months
-  internal::progress_time_on_art(time_step, pars, state_curr, state_next, intermediate, 1, 2);
 
 }
-
 
 template<typename ModelVariant, typename real_type>
 void run_wlhiv_births(int time_step,
@@ -1484,13 +1473,19 @@ void run_child_model_simulation(int time_step,
   if(state_next.children.hiv_births > 0){
     internal::run_child_hiv_infections(time_step, pars, state_curr, state_next, intermediate);
     internal::run_child_natural_history(time_step, pars, state_curr, state_next, intermediate);
-   // if(time_step < 31){
       internal::run_child_hiv_mort(time_step, pars, state_curr, state_next, intermediate);
       internal::add_child_grad(time_step, pars, state_curr, state_next, intermediate);
-      internal::run_child_art_initiation(time_step, pars, state_curr, state_next, intermediate);
-      internal::run_child_art_mortality(time_step, pars, state_curr, state_next, intermediate);
+      //progress art initates from 0-6 months on art to 6 to 12 mo
+      internal::progress_time_on_art(time_step, pars, state_curr, state_next, intermediate, 0, 1);
+     // if(time_step < 60){
+        internal::run_child_art_initiation(time_step, pars, state_curr, state_next, intermediate);
+        //mortality among those on ART less than one year
+        internal::onART_mortality(time_step, pars, state_curr, state_next, intermediate, 0);
+     // }
+      //progress 6 to 12 mo to 12 plus months
+      internal::progress_time_on_art(time_step, pars, state_curr, state_next, intermediate, 1, 2);
       internal::fill_model_outputs(time_step, pars, state_curr, state_next, intermediate);
-   // }
+
   }
 
   }
