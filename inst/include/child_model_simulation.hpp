@@ -967,6 +967,47 @@ void hc_adjust_art_initiates_for_mort(int time_step,
 }
 
 template<typename ModelVariant, typename real_type>
+void hc_art_num_agespec(int time_step,
+                    const Parameters<ModelVariant, real_type> &pars,
+                    const State<ModelVariant, real_type> &state_curr,
+                    State<ModelVariant, real_type> &state_next,
+                    IntermediateData<ModelVariant, real_type> &intermediate) {
+  static_assert(ModelVariant::run_child_model,
+                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
+  constexpr auto ss = StateSpace<ModelVariant>().base;
+  constexpr auto hc_ss = StateSpace<ModelVariant>().children;
+  const auto cpars = pars.children.children;
+
+  //Remove how many that are already on ART
+  state_next.children.hc_art_num = (cpars.hc_art_val(0,time_step) + cpars.hc_art_val(0,time_step-1)) / 2 ;
+  for (int s = 0; s <ss.NS; ++s) {
+    for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
+      for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
+        for (int dur = 0; dur < ss.hTS; ++dur) {
+          if (a < hc_ss.hc2_agestart) {
+            state_next.children.hc_art_total += state_next.children.hc1_art_pop(dur, hd, a, s);
+          } else if (hd < (hc_ss.hc2DS)) {
+            state_next.children.hc_art_total += state_next.children.hc2_art_pop(dur, hd, a-hc_ss.hc2_agestart, s);
+          }
+        }// end ss.hTS
+      }// end hc_ss.hc1DS
+    }// end a
+  }// end ss.NS
+
+  state_next.children.hc_art_init = state_next.children.hc_art_num - state_next.children.hc_art_total;
+
+
+  if (intermediate.children.hc_art_need_init_total < state_next.children.hc_art_init) {
+    state_next.children.hc_art_init = intermediate.children.hc_art_need_init_total;
+  }
+  if (state_next.children.hc_art_init < 0) {
+    state_next.children.hc_art_init =  0;
+  }
+
+}
+
+
+template<typename ModelVariant, typename real_type>
 void hc_art_num_num(int time_step,
                     const Parameters<ModelVariant, real_type> &pars,
                     const State<ModelVariant, real_type> &state_curr,
@@ -979,7 +1020,7 @@ void hc_art_num_num(int time_step,
   const auto cpars = pars.children.children;
 
   //Remove how many that are already on ART
-  state_next.children.hc_art_num =  (cpars.hc_art_val(time_step) + cpars.hc_art_val(time_step-1)) / 2 ;
+  state_next.children.hc_art_num =  (cpars.hc_art_val(0,time_step) + cpars.hc_art_val(0,time_step-1)) / 2 ;
   for (int s = 0; s <ss.NS; ++s) {
     for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
       for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
@@ -1038,7 +1079,7 @@ void hc_art_pct_pct(int time_step,
   } // end ss.NS
 
   //the number of people on ART at the current coverage level
-  state_next.children.hc_art_init =  state_next.children.hc_art_num * (cpars.hc_art_val(time_step) + cpars.hc_art_val(time_step-1)) / 2;
+  state_next.children.hc_art_init =  state_next.children.hc_art_num * (cpars.hc_art_val(0, time_step) + cpars.hc_art_val(0, time_step-1)) / 2;
 
 
   //Remove how many that are already on ART
@@ -1097,7 +1138,7 @@ void hc_art_num_pct(int time_step,
   } //end ss.NS
 
   //the number of people on ART at the current coverage level
-  state_next.children.hc_art_init = 0.5 * cpars.hc_art_val(time_step-1) + 0.5 * cpars.hc_art_val(time_step) * state_next.children.hc_art_num;
+  state_next.children.hc_art_init = 0.5 * cpars.hc_art_val(0, time_step-1) + 0.5 * cpars.hc_art_val(0, time_step) * state_next.children.hc_art_num;
 
   for (int s = 0; s <ss.NS; ++s) {
     for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
@@ -1157,7 +1198,7 @@ void hc_art_pct_num(int time_step,
 //     } // end a
 //   } //end ss.NS
 //
-//   state_next.children.hc_art_num = (state_curr.children.hc_art_num + cpars.hc_art_val(time_step)) / 2;
+//   state_next.children.hc_art_num = (state_curr.children.hc_art_num + cpars.hc_art_val(0, time_step)) / 2;
 //
 //   //Remove how many that are already on ART
 //   for (int s = 0; s <ss.NS; ++s) {

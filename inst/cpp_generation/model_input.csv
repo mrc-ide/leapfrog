@@ -34,7 +34,7 @@ mort_art_rr,hc_art_mort_rr,real_type,ModelVariant::run_child_model,,FALSE,3,base
 paed_art_mort,hc1_art_mort,real_type,ModelVariant::run_child_model,,FALSE,3,children.hc1DS,base.hTS,children.hc1AG,
 adol_art_mort,hc2_art_mort,real_type,ModelVariant::run_child_model,,FALSE,3,children.hc2DS,base.hTS,children.hc2AG,
 artpaeds_isperc,hc_art_isperc,int,ModelVariant::run_child_model,,FALSE,1,proj_years,,,
-paed_art_val,hc_art_val,real_type,ModelVariant::run_child_model,,FALSE,1,proj_years,,,
+paed_art_val,hc_art_val,real_type,ModelVariant::run_child_model,,FALSE,2,4,proj_years,,
 init_art_dist,hc_art_init_dist,real_type,ModelVariant::run_child_model,,FALSE,2,options.p_idx_hiv_first_adult,proj_years,,
 adult_cd4_dist,adult_cd4_dist,real_type,ModelVariant::run_child_model,,FALSE,2,base.hDS,children.hc2DS,,
 fert_mult_by_age,fert_mult_by_age,real_type,ModelVariant::run_child_model,,FALSE,1,options.p_fertility_age_groups,,,
@@ -55,3 +55,4 @@ prop_lt200,prop_lt200,real_type,ModelVariant::run_child_model,,FALSE,1,proj_year
 prop_gte350,prop_gte350,real_type,ModelVariant::run_child_model,,FALSE,1,proj_years,,,
 incrate,incrate,real_type,ModelVariant::run_child_model,,FALSE,1,proj_years,,,
 ctx_val_ispercent,ctx_val_is_percent,int,ModelVariant::run_child_model,,FALSE,1,proj_years,,,
+paed_art_age_spec,hc_art_is_age_spec,int,ModelVariant::run_child_model,,FALSE,1,proj_years,,,

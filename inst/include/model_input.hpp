@@ -98,7 +98,7 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
     const leapfrog::TensorMap3<real_type> hc1_art_mort = parse_data<real_type>(data, "paed_art_mort", children.hc1DS, base.hTS, children.hc1AG);
     const leapfrog::TensorMap3<real_type> hc2_art_mort = parse_data<real_type>(data, "adol_art_mort", children.hc2DS, base.hTS, children.hc2AG);
     const leapfrog::TensorMap1<int> hc_art_isperc = parse_data<int>(data, "artpaeds_isperc", proj_years);
-    const leapfrog::TensorMap1<real_type> hc_art_val = parse_data<real_type>(data, "paed_art_val", proj_years);
+    const leapfrog::TensorMap2<real_type> hc_art_val = parse_data<real_type>(data, "paed_art_val", 4, proj_years);
     const leapfrog::TensorMap2<real_type> hc_art_init_dist = parse_data<real_type>(data, "init_art_dist", options.p_idx_hiv_first_adult, proj_years);
     const leapfrog::TensorMap2<real_type> adult_cd4_dist = parse_data<real_type>(data, "adult_cd4_dist", base.hDS, children.hc2DS);
     const leapfrog::TensorMap1<real_type> fert_mult_by_age = parse_data<real_type>(data, "fert_mult_by_age", options.p_fertility_age_groups);
@@ -119,6 +119,7 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
     const leapfrog::TensorMap1<real_type> prop_gte350 = parse_data<real_type>(data, "prop_gte350", proj_years);
     const leapfrog::TensorMap1<real_type> incrate = parse_data<real_type>(data, "incrate", proj_years);
     const leapfrog::TensorMap1<int> ctx_val_is_percent = parse_data<int>(data, "ctx_val_ispercent", proj_years);
+    const leapfrog::TensorMap1<int> hc_art_is_age_spec = parse_data<int>(data, "paed_art_age_spec", proj_years);
     const leapfrog::Children<real_type> child = {
         hc_nosocomial,
         hc1_cd4_dist,
@@ -155,7 +156,8 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
         prop_lt200,
         prop_gte350,
         incrate,
-        ctx_val_is_percent
+        ctx_val_is_percent,
+        hc_art_is_age_spec
     };
     const leapfrog::ChildModelParameters<ModelVariant, real_type> child_model_params = {
         child
