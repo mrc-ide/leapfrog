@@ -44,46 +44,6 @@ test_that("Infections among children align", {
   expect_true(all(abs(as.numeric(u1_inf_spec) - colSums(out$p_infections[1,,])) < 1e-3))
 })
 
-test_that("HIV related deaths among CLHIV not on ART align", {
-  input <- setup_childmodel(testinput = "testdata/child_parms.rds")
-  demp = input$demp
-  parameters = input$parameters
-  dp = input$dp
-  pjnz = input$pjnz
-
-  out <- run_model(demp, parameters, NULL, NULL, 0:60, run_child_model = TRUE)
-  tag.x ="<AIDSDeathsNoARTSingleAge MV>"
-  start.id = 20898
-  end.id = 21148
-  timedat.idx = input$timedat.idx
-  aids_deathsnoart <- array(as.numeric(unlist(dpsub(tag.x, 3:(end.id - start.id - 2), timedat.idx))), dim = c(length(3:(end.id - start.id - 2)),length(timedat.idx)))
-  m = aids_deathsnoart[84:98,]
-  f = aids_deathsnoart[166:180,]
-  aids_deathsnoart <- array(0, dim = c(15,2,61))
-  aids_deathsnoart[,1,] <- m
-  aids_deathsnoart[,2,] <- f
-
-  ##right now this is only working for the first year of ART, assuming its something with the timing on art
-  hc1 <- apply(out$hc1_noart_aids_deaths, c(3:5), sum)
-  hc2 <- apply(out$hc2_noart_aids_deaths, c(3:5), sum)
-  hc <- array(0, dim = c(15,2,61))
-  hc[1:5,,] <- hc1
-  hc[6:15,,] <- hc2
-  dt <- right_join(reshape2::melt(hc), reshape2::melt(aids_deathsnoart), by = c('Var1', 'Var2', 'Var3'))
-  dt <- dt %>%
-    mutate(age = Var1 - 1,
-           sex = if_else(Var2 == 1, 'Male', 'Female'),
-           year = Var3 + 1969,
-           fr = value.x,
-           spec = value.y) %>%
-    select(age, sex, year, fr, spec)
-  dt <- dt %>%
-    mutate(diff = spec - fr)
-
-  z = data.table(dt)
-  expect_true(all(abs(dt$diff) < 1e-1))
-})
-
 ##Only works out to 2006 when pmtct is input as numbers
 test_that("CLHIV align", {
   input <- setup_childmodel(testinput = "testdata/child_parms.rds")
@@ -124,9 +84,11 @@ test_that("CLHIV align", {
   dt <- dt %>%
     mutate(diff = pop - fr)
   x = data.table(dt)
-  # year.x = 2005;  x[year== year.x & age == 0 ] ; x[year== year.x & age == 1 & transmission == 'bf12+'];
-  # year.x = 2006;  x[year== year.x & age == 0 ] ; x[year== year.x & age == 1 & transmission == 'bf12+'];
-  # year.x = 2007;  x[year== year.x & age == 0 ] ; x[year== year.x & age == 1 & transmission == 'bf12+'];
+  year.x = 2005;  x[year== year.x & age == 0 ] ; x[year== year.x & age == 1 & transmission == 'bf12+'];
+  year.x = 2006;  x[year== year.x & age == 0 ] ; x[year== year.x & age == 1 & transmission == 'bf12+'];
+  year.x = 2007;  x[year== year.x & age == 0 ] ; x[year== year.x & age == 1 & transmission == 'bf12+'];
+  year.x = 2008;  x[year== year.x & age == 0 ] ; x[year== year.x & age == 1 & transmission == 'bf12+'];
+  year.x = 2009;  x[year== year.x & age == 0 ] ; x[year== year.x & age == 1 & transmission == 'bf12+'];
 
   expect_true(all(abs(dt$diff) < 1e-1))
 })
@@ -171,6 +133,46 @@ test_that("CLHIV on ART align", {
   dt <- dt %>%
     mutate(diff = pop - fr)
 
+  expect_true(all(abs(dt$diff) < 1e-1))
+})
+
+test_that("HIV related deaths among CLHIV not on ART align", {
+  input <- setup_childmodel(testinput = "testdata/child_parms.rds")
+  demp = input$demp
+  parameters = input$parameters
+  dp = input$dp
+  pjnz = input$pjnz
+
+  out <- run_model(demp, parameters, NULL, NULL, 0:60, run_child_model = TRUE)
+  tag.x ="<AIDSDeathsNoARTSingleAge MV>"
+  start.id = 20898
+  end.id = 21148
+  timedat.idx = input$timedat.idx
+  aids_deathsnoart <- array(as.numeric(unlist(dpsub(tag.x, 3:(end.id - start.id - 2), timedat.idx))), dim = c(length(3:(end.id - start.id - 2)),length(timedat.idx)))
+  m = aids_deathsnoart[84:98,]
+  f = aids_deathsnoart[166:180,]
+  aids_deathsnoart <- array(0, dim = c(15,2,61))
+  aids_deathsnoart[,1,] <- m
+  aids_deathsnoart[,2,] <- f
+
+  ##right now this is only working for the first year of ART, assuming its something with the timing on art
+  hc1 <- apply(out$hc1_noart_aids_deaths, c(3:5), sum)
+  hc2 <- apply(out$hc2_noart_aids_deaths, c(3:5), sum)
+  hc <- array(0, dim = c(15,2,61))
+  hc[1:5,,] <- hc1
+  hc[6:15,,] <- hc2
+  dt <- right_join(reshape2::melt(hc), reshape2::melt(aids_deathsnoart), by = c('Var1', 'Var2', 'Var3'))
+  dt <- dt %>%
+    mutate(age = Var1 - 1,
+           sex = if_else(Var2 == 1, 'Male', 'Female'),
+           year = Var3 + 1969,
+           fr = value.x,
+           spec = value.y) %>%
+    select(age, sex, year, fr, spec)
+  dt <- dt %>%
+    mutate(diff = spec - fr)
+
+  z = data.table(dt)
   expect_true(all(abs(dt$diff) < 1e-1))
 })
 

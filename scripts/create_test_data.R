@@ -11,20 +11,20 @@ pjnz1 <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct.PJNZ")
 #pjnz1 <- testthat::test_path("testdata/bwa_aim-no-special-elig.PJNZ")
 #pjnz1 = 'C:/Users/mwalters/Desktop/NW_TEST_MTCT_BF_PERI_pmtct.PJNZ'
 
-demp <- prepare_leapfrog_demp(pjnz1)
-saveRDS(demp, testthat::test_path("testdata/demographic_projection_object_adult.rds"))
-proj <- prepare_leapfrog_projp(pjnz1)
-saveRDS(proj, testthat::test_path("testdata/projection_parameters_adult.rds"))
-
-# Used as reference data (Run from leapfrog/master)
-lmod <- leapfrogR(demp, proj)
-saveRDS(lmod, testthat::test_path("testdata/leapfrog_fit.rds"))
-
-lmod <- leapfrogR(demp, proj, hiv_strat = "coarse")
-saveRDS(lmod, testthat::test_path("testdata/leapfrog_fit_coarse.rds"))
-
-mod <- leapfrogR(demp, proj, hiv_steps_per_year = 0L)
-saveRDS(lmod, testthat::test_path("testdata/fit_demography.rds"))
+# demp <- prepare_leapfrog_demp(pjnz1)
+# saveRDS(demp, testthat::test_path("testdata/demographic_projection_object_adult.rds"))
+# proj <- prepare_leapfrog_projp(pjnz1)
+# saveRDS(proj, testthat::test_path("testdata/projection_parameters_adult.rds"))
+#
+# # Used as reference data (Run from leapfrog/master)
+# lmod <- leapfrogR(demp, proj)
+# saveRDS(lmod, testthat::test_path("testdata/leapfrog_fit.rds"))
+#
+# lmod <- leapfrogR(demp, proj, hiv_strat = "coarse")
+# saveRDS(lmod, testthat::test_path("testdata/leapfrog_fit_coarse.rds"))
+#
+# mod <- leapfrogR(demp, proj, hiv_steps_per_year = 0L)
+# saveRDS(lmod, testthat::test_path("testdata/fit_demography.rds"))
 
 
 #Create paeds parameters (Run from leapfrog/uncertainrt_analysis_working)
