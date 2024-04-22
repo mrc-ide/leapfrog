@@ -955,12 +955,18 @@ void hc_adjust_art_initiates_for_mort(int time_step,
     for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
       for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
         for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
-          intermediate.children.hc_art_need_init_total += intermediate.children.hc_art_need_init(hd, cat, a, s);
+          if(a < hc_ss.hc2_agestart){
+            intermediate.children.hc_art_need_init_total(1) += intermediate.children.hc_art_need_init(hd, cat, a, s);
+          } else if(a < 10){
+            intermediate.children.hc_art_need_init_total(2) += intermediate.children.hc_art_need_init(hd, cat, a, s);
+          }else{
+            intermediate.children.hc_art_need_init_total(3) += intermediate.children.hc_art_need_init(hd, cat, a, s);
+          }
         }// end hcTT
       }// end hc_ss.hc1DS
     }// end a
   }// end ss.NS
-
+  intermediate.children.hc_art_need_init_total(0) = intermediate.children.hc_art_need_init_total(1) + intermediate.children.hc_art_need_init_total(2) + intermediate.children.hc_art_need_init_total(3);
 
    internal::onART_mortality(time_step, pars, state_curr, state_next, intermediate, 0);
    internal::onART_mortality(time_step, pars, state_curr, state_next, intermediate, 2);
@@ -997,8 +1003,8 @@ void hc_art_num_agespec(int time_step,
   state_next.children.hc_art_init(0) = state_next.children.hc_art_num(0) - state_next.children.hc_art_total(0);
 
 
-  if (intermediate.children.hc_art_need_init_total < state_next.children.hc_art_init(0)) {
-    state_next.children.hc_art_init(0) = intermediate.children.hc_art_need_init_total;
+  if (intermediate.children.hc_art_need_init_total(0) < state_next.children.hc_art_init(0)) {
+    state_next.children.hc_art_init(0) = intermediate.children.hc_art_need_init_total(0);
   }
   if (state_next.children.hc_art_init(0) < 0) {
     state_next.children.hc_art_init(0) =  0;
@@ -1068,14 +1074,18 @@ void hc_art_num_num(int time_step,
 
  state_next.children.hc_art_total(0) = state_next.children.hc_art_total(1) + state_next.children.hc_art_total(2) + state_next.children.hc_art_total(3);
 
-  state_next.children.hc_art_init(0) = state_next.children.hc_art_num(0) - state_next.children.hc_art_total(0);
+  for(int ag = 0; ag < 3; ++ag){
+    state_next.children.hc_art_init(ag) = state_next.children.hc_art_num(ag) - state_next.children.hc_art_total(ag);
 
-  if (intermediate.children.hc_art_need_init_total < state_next.children.hc_art_init(0)) {
-    state_next.children.hc_art_init(0) = intermediate.children.hc_art_need_init_total;
+    if (intermediate.children.hc_art_need_init_total(0) < state_next.children.hc_art_init(ag)) {
+      state_next.children.hc_art_init(ag) = intermediate.children.hc_art_need_init_total(0);
+    }
+    if (state_next.children.hc_art_init(ag) < 0) {
+      state_next.children.hc_art_init(ag) =  0;
+    }
   }
-  if (state_next.children.hc_art_init(0) < 0) {
-    state_next.children.hc_art_init(0) =  0;
-  }
+
+
 
 }
 
@@ -1092,7 +1102,7 @@ void hc_art_pct_pct(int time_step,
   const auto cpars = pars.children.children;
 
   //hc_art_num will be total number on and eligible for ART
-  state_next.children.hc_art_num(0) = intermediate.children.hc_art_need_init_total;
+  state_next.children.hc_art_num(0) = intermediate.children.hc_art_need_init_total(0);
 
   for (int s = 0; s <ss.NS; ++s) {
     for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
@@ -1129,8 +1139,8 @@ void hc_art_pct_pct(int time_step,
     } // end a
   } // end ss.NS
 
-  if (intermediate.children.hc_art_need_init_total < state_next.children.hc_art_init(0)) {
-    state_next.children.hc_art_init(0) = intermediate.children.hc_art_need_init_total;
+  if (intermediate.children.hc_art_need_init_total(0) < state_next.children.hc_art_init(0)) {
+    state_next.children.hc_art_init(0) = intermediate.children.hc_art_need_init_total(0);
   }
   if (state_next.children.hc_art_init(0) < 0) {
     state_next.children.hc_art_init(0) =  0;
@@ -1152,7 +1162,7 @@ void hc_art_num_pct(int time_step,
   const auto cpars = pars.children.children;
 
   //hc_art_num will be total number on and eligible for ART
-  state_next.children.hc_art_num(0) = intermediate.children.hc_art_need_init_total;
+  state_next.children.hc_art_num(0) = intermediate.children.hc_art_need_init_total(0);
 
   //Remove how many that are already on ART
   for (int s = 0; s <ss.NS; ++s) {
@@ -1187,7 +1197,7 @@ void hc_art_num_pct(int time_step,
   } // end ss.NS
 
 
-  if (state_next.children.hc_art_num(0) < intermediate.children.hc_art_need_init_total) {
+  if (state_next.children.hc_art_num(0) < intermediate.children.hc_art_need_init_total(0)) {
     state_next.children.hc_art_init(0) = state_next.children.hc_art_num(0);
   }
 
