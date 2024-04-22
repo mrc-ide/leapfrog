@@ -56,3 +56,4 @@ prop_gte350,prop_gte350,real_type,ModelVariant::run_child_model,,FALSE,1,proj_ye
 incrate,incrate,real_type,ModelVariant::run_child_model,,FALSE,1,proj_years,,,
 ctx_val_ispercent,ctx_val_is_percent,int,ModelVariant::run_child_model,,FALSE,1,proj_years,,,
 paed_art_age_spec,hc_art_is_age_spec,int,ModelVariant::run_child_model,,FALSE,1,proj_years,,,
+hc_age_coarse,hc_age_coarse,real_type,ModelVariant::run_child_model,,FALSE,1,15,,,

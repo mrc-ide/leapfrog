@@ -199,8 +199,7 @@ struct Children {
 
   TensorMap1<int> ctx_val_is_percent;
   TensorMap1<int> hc_art_is_age_spec;
-
-
+  TensorMap1<real_type> hc_age_coarse;
 
 };
 

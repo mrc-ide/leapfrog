@@ -973,47 +973,6 @@ void hc_adjust_art_initiates_for_mort(int time_step,
 }
 
 template<typename ModelVariant, typename real_type>
-void hc_art_num_agespec(int time_step,
-                    const Parameters<ModelVariant, real_type> &pars,
-                    const State<ModelVariant, real_type> &state_curr,
-                    State<ModelVariant, real_type> &state_next,
-                    IntermediateData<ModelVariant, real_type> &intermediate) {
-  static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
-  constexpr auto ss = StateSpace<ModelVariant>().base;
-  constexpr auto hc_ss = StateSpace<ModelVariant>().children;
-  const auto cpars = pars.children.children;
-
-  //Remove how many that are already on ART
-  state_next.children.hc_art_num(0) = (cpars.hc_art_val(0,time_step) + cpars.hc_art_val(0,time_step-1)) / 2 ;
-  for (int s = 0; s <ss.NS; ++s) {
-    for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
-      for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-        for (int dur = 0; dur < ss.hTS; ++dur) {
-          if (a < hc_ss.hc2_agestart) {
-            state_next.children.hc_art_total(0) += state_next.children.hc1_art_pop(dur, hd, a, s);
-          } else if (hd < (hc_ss.hc2DS)) {
-            state_next.children.hc_art_total(0) += state_next.children.hc2_art_pop(dur, hd, a-hc_ss.hc2_agestart, s);
-          }
-        }// end ss.hTS
-      }// end hc_ss.hc1DS
-    }// end a
-  }// end ss.NS
-
-  state_next.children.hc_art_init(0) = state_next.children.hc_art_num(0) - state_next.children.hc_art_total(0);
-
-
-  if (intermediate.children.hc_art_need_init_total(0) < state_next.children.hc_art_init(0)) {
-    state_next.children.hc_art_init(0) = intermediate.children.hc_art_need_init_total(0);
-  }
-  if (state_next.children.hc_art_init(0) < 0) {
-    state_next.children.hc_art_init(0) =  0;
-  }
-
-}
-
-
-template<typename ModelVariant, typename real_type>
 void hc_art_num_num(int time_step,
                     const Parameters<ModelVariant, real_type> &pars,
                     const State<ModelVariant, real_type> &state_curr,
@@ -1024,9 +983,6 @@ void hc_art_num_num(int time_step,
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
-
-  // TODO: make hc_art_num and hc_art_total and hc_art_init stratified by three
-
 
   //Remove how many that are already on ART
   if(cpars.hc_art_is_age_spec(time_step)){
@@ -1077,7 +1033,7 @@ void hc_art_num_num(int time_step,
   for(int ag = 0; ag < 3; ++ag){
     state_next.children.hc_art_init(ag) = state_next.children.hc_art_num(ag) - state_next.children.hc_art_total(ag);
 
-    if (intermediate.children.hc_art_need_init_total(0) < state_next.children.hc_art_init(ag)) {
+    if (intermediate.children.hc_art_need_init_total(ag) < state_next.children.hc_art_init(ag)) {
       state_next.children.hc_art_init(ag) = intermediate.children.hc_art_need_init_total(0);
     }
     if (state_next.children.hc_art_init(ag) < 0) {

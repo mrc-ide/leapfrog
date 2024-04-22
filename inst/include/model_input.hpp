@@ -120,6 +120,7 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
     const leapfrog::TensorMap1<real_type> incrate = parse_data<real_type>(data, "incrate", proj_years);
     const leapfrog::TensorMap1<int> ctx_val_is_percent = parse_data<int>(data, "ctx_val_ispercent", proj_years);
     const leapfrog::TensorMap1<int> hc_art_is_age_spec = parse_data<int>(data, "paed_art_age_spec", proj_years);
+    const leapfrog::TensorMap1<real_type> hc_age_coarse = parse_data<real_type>(data, "hc_age_coarse", 15);
     const leapfrog::Children<real_type> child = {
         hc_nosocomial,
         hc1_cd4_dist,
@@ -157,7 +158,8 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
         prop_gte350,
         incrate,
         ctx_val_is_percent,
-        hc_art_is_age_spec
+        hc_art_is_age_spec,
+        hc_age_coarse
     };
     const leapfrog::ChildModelParameters<ModelVariant, real_type> child_model_params = {
         child
