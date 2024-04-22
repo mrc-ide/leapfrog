@@ -487,9 +487,9 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
   TensorFixedSize <real_type, Sizes<4>> hc_art_need_init_total;
   real_type hc_death_rate;
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_art_grad;
-  real_type hc_art_scalar;
-  real_type hc_initByAge;
-  real_type hc_adj;
+  TensorFixedSize <real_type, Sizes<4>> hc_art_scalar;
+  TensorFixedSize <real_type, Sizes<4>> hc_initByAge;
+  TensorFixedSize <real_type, Sizes<4>> hc_adj;
   real_type asfr_sum;
   real_type births_sum;
   real_type nHIVcurr;
@@ -549,9 +549,9 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
     hc_art_need_init_total.setZero();
     hc_death_rate = 0.0;
     hc_art_grad.setZero();
-    hc_art_scalar = 0.0;
-    hc_initByAge = 0.0;
-    hc_adj = 0.0;
+    hc_art_scalar.setZero();
+    hc_initByAge.setZero();
+    hc_adj.setZero();
     asfr_sum = 0.0;
     births_sum = 0.0;
     nHIVcurr = 0.0;
