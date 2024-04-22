@@ -985,23 +985,23 @@ void hc_art_num_agespec(int time_step,
       for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
         for (int dur = 0; dur < ss.hTS; ++dur) {
           if (a < hc_ss.hc2_agestart) {
-            state_next.children.hc_art_total += state_next.children.hc1_art_pop(dur, hd, a, s);
+            state_next.children.hc_art_total(0) += state_next.children.hc1_art_pop(dur, hd, a, s);
           } else if (hd < (hc_ss.hc2DS)) {
-            state_next.children.hc_art_total += state_next.children.hc2_art_pop(dur, hd, a-hc_ss.hc2_agestart, s);
+            state_next.children.hc_art_total(0) += state_next.children.hc2_art_pop(dur, hd, a-hc_ss.hc2_agestart, s);
           }
         }// end ss.hTS
       }// end hc_ss.hc1DS
     }// end a
   }// end ss.NS
 
-  state_next.children.hc_art_init = state_next.children.hc_art_num - state_next.children.hc_art_total;
+  state_next.children.hc_art_init(0) = state_next.children.hc_art_num - state_next.children.hc_art_total(0);
 
 
-  if (intermediate.children.hc_art_need_init_total < state_next.children.hc_art_init) {
-    state_next.children.hc_art_init = intermediate.children.hc_art_need_init_total;
+  if (intermediate.children.hc_art_need_init_total < state_next.children.hc_art_init(0)) {
+    state_next.children.hc_art_init(0) = intermediate.children.hc_art_need_init_total;
   }
-  if (state_next.children.hc_art_init < 0) {
-    state_next.children.hc_art_init =  0;
+  if (state_next.children.hc_art_init(0) < 0) {
+    state_next.children.hc_art_init(0) =  0;
   }
 
 }
@@ -1019,30 +1019,38 @@ void hc_art_num_num(int time_step,
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
 
+  // TODO: make hc_art_num and hc_art_total and hc_art_init stratified by three
+
+
   //Remove how many that are already on ART
-  state_next.children.hc_art_num =  (cpars.hc_art_val(0,time_step) + cpars.hc_art_val(0,time_step-1)) / 2 ;
+  if(cpars.hc_art_is_age_spec(time_step)){
+    state_next.children.hc_art_num =  (cpars.hc_art_val(1,time_step) + cpars.hc_art_val(2,time_step) +cpars.hc_art_val(2,time_step) +
+      cpars.hc_art_val(0,time_step-1)) / 2 ;
+  }else{
+    state_next.children.hc_art_num =  (cpars.hc_art_val(0,time_step) + cpars.hc_art_val(0,time_step-1)) / 2 ;
+  }
+
   for (int s = 0; s <ss.NS; ++s) {
     for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
       for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
         for (int dur = 0; dur < ss.hTS; ++dur) {
           if (a < hc_ss.hc2_agestart) {
-            state_next.children.hc_art_total += state_next.children.hc1_art_pop(dur, hd, a, s);
+            state_next.children.hc_art_total(0) += state_next.children.hc1_art_pop(dur, hd, a, s);
           } else if (hd < (hc_ss.hc2DS)) {
-            state_next.children.hc_art_total += state_next.children.hc2_art_pop(dur, hd, a-hc_ss.hc2_agestart, s);
+            state_next.children.hc_art_total(0) += state_next.children.hc2_art_pop(dur, hd, a-hc_ss.hc2_agestart, s);
           }
         }// end ss.hTS
       }// end hc_ss.hc1DS
     }// end a
   }// end ss.NS
 
-  state_next.children.hc_art_init = state_next.children.hc_art_num - state_next.children.hc_art_total;
+  state_next.children.hc_art_init(0) = state_next.children.hc_art_num - state_next.children.hc_art_total(0);
 
-
-  if (intermediate.children.hc_art_need_init_total < state_next.children.hc_art_init) {
-    state_next.children.hc_art_init = intermediate.children.hc_art_need_init_total;
+  if (intermediate.children.hc_art_need_init_total < state_next.children.hc_art_init(0)) {
+    state_next.children.hc_art_init(0) = intermediate.children.hc_art_need_init_total;
   }
-  if (state_next.children.hc_art_init < 0) {
-    state_next.children.hc_art_init =  0;
+  if (state_next.children.hc_art_init(0) < 0) {
+    state_next.children.hc_art_init(0) =  0;
   }
 
 }
@@ -1079,7 +1087,7 @@ void hc_art_pct_pct(int time_step,
   } // end ss.NS
 
   //the number of people on ART at the current coverage level
-  state_next.children.hc_art_init =  state_next.children.hc_art_num * (cpars.hc_art_val(0, time_step) + cpars.hc_art_val(0, time_step-1)) / 2;
+  state_next.children.hc_art_init(0) =  state_next.children.hc_art_num * (cpars.hc_art_val(0, time_step) + cpars.hc_art_val(0, time_step-1)) / 2;
 
 
   //Remove how many that are already on ART
@@ -1088,20 +1096,20 @@ void hc_art_pct_pct(int time_step,
       for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
         for (int dur = 0; dur < ss.hTS; ++dur) {
           if (a < hc_ss.hc2_agestart) {
-            state_next.children.hc_art_init -= state_next.children.hc1_art_pop(dur, hd, a, s);
+            state_next.children.hc_art_init(0) -= state_next.children.hc1_art_pop(dur, hd, a, s);
           } else if (hd < (hc_ss.hc2DS)) {
-            state_next.children.hc_art_init -= state_next.children.hc2_art_pop(dur, hd, a-hc_ss.hc2_agestart, s);
+            state_next.children.hc_art_init(0) -= state_next.children.hc2_art_pop(dur, hd, a-hc_ss.hc2_agestart, s);
           }
         } // end ss.hTS
       } // end ss.hC1_disease_stages
     } // end a
   } // end ss.NS
 
-  if (intermediate.children.hc_art_need_init_total < state_next.children.hc_art_init) {
-    state_next.children.hc_art_init = intermediate.children.hc_art_need_init_total;
+  if (intermediate.children.hc_art_need_init_total < state_next.children.hc_art_init(0)) {
+    state_next.children.hc_art_init(0) = intermediate.children.hc_art_need_init_total;
   }
-  if (state_next.children.hc_art_init < 0) {
-    state_next.children.hc_art_init =  0;
+  if (state_next.children.hc_art_init(0) < 0) {
+    state_next.children.hc_art_init(0) =  0;
   }
 
 
@@ -1138,16 +1146,16 @@ void hc_art_num_pct(int time_step,
   } //end ss.NS
 
   //the number of people on ART at the current coverage level
-  state_next.children.hc_art_init = 0.5 * cpars.hc_art_val(0, time_step-1) + 0.5 * cpars.hc_art_val(0, time_step) * state_next.children.hc_art_num;
+  state_next.children.hc_art_init(0) = 0.5 * cpars.hc_art_val(0, time_step-1) + 0.5 * cpars.hc_art_val(0, time_step) * state_next.children.hc_art_num;
 
   for (int s = 0; s <ss.NS; ++s) {
     for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
       for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
         for (int dur = 0; dur < ss.hTS; ++dur) {
           if (a < hc_ss.hc2_agestart) {
-            state_next.children.hc_art_init -= state_next.children.hc1_art_pop(dur, hd, a, s);
+            state_next.children.hc_art_init(0) -= state_next.children.hc1_art_pop(dur, hd, a, s);
           } else if (hd < (hc_ss.hc2DS )) {
-            state_next.children.hc_art_init -= state_next.children.hc2_art_pop(dur, hd, a-hc_ss.hc2_agestart, s);
+            state_next.children.hc_art_init(0) -= state_next.children.hc2_art_pop(dur, hd, a-hc_ss.hc2_agestart, s);
           }
         } // end ss.hTS
       } // end hc_ss.hc1DS
@@ -1156,7 +1164,7 @@ void hc_art_num_pct(int time_step,
 
 
   if (state_next.children.hc_art_num < intermediate.children.hc_art_need_init_total) {
-    state_next.children.hc_art_init = state_next.children.hc_art_num;
+    state_next.children.hc_art_init(0) = state_next.children.hc_art_num;
   }
 
 }
@@ -1248,7 +1256,7 @@ void hc_art_initiation_by_age(int time_step,
   if (intermediate.children.hc_initByAge == 0.0) {
     intermediate.children.hc_adj = 1.0 ;
   } else {
-    intermediate.children.hc_adj =  state_next.children.hc_art_init / intermediate.children.hc_initByAge;
+    intermediate.children.hc_adj =  state_next.children.hc_art_init(0) / intermediate.children.hc_initByAge;
   }
 
 
@@ -1348,8 +1356,8 @@ void run_child_art_initiation(int time_step,
   }
 
 
-  if(state_next.children.hc_art_init < 0){
-    state_next.children.hc_art_init = 0.0;
+  if(state_next.children.hc_art_init(0) < 0){
+    state_next.children.hc_art_init(0) = 0.0;
   }
 
   internal::hc_art_initiation_by_age(time_step, pars, state_curr, state_next, intermediate);

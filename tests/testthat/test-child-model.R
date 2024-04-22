@@ -44,7 +44,7 @@ test_that("Infections among children align", {
   expect_true(all(abs(as.numeric(u1_inf_spec) - colSums(out$p_infections[1,,])) < 1e-3))
 })
 
-##diverges in 2030 all ages after the highest cd4 category
+##working out until 2019 when age stratified art is initiated
 test_that("CLHIV align", {
   input <- setup_childmodel(testinput = "testdata/child_parms.rds")
   demp = input$demp

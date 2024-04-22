@@ -87,8 +87,8 @@ struct ChildModelOutputState<ChildModel, real_type> {
   Tensor1<real_type> hiv_births;
   Tensor1<real_type> ctx_need;
   Tensor1<real_type> ctx_mean;
-  Tensor1<real_type> hc_art_total;
-  Tensor1<real_type> hc_art_init;
+  Tensor2<real_type> hc_art_total;
+  Tensor2<real_type> hc_art_init;
 
 
   ChildModelOutputState(int no_output_years)
@@ -125,7 +125,9 @@ struct ChildModelOutputState<ChildModel, real_type> {
                             StateSpace<ChildModel>().children.hc2AG,
                             StateSpace<ChildModel>().base.NS, no_output_years),
         hc_art_num(no_output_years),
-        hiv_births(no_output_years){
+        hiv_births(no_output_years),
+        hc_art_total(4, no_output_years),
+        hc_art_init(4, no_output_years){
     hc1_hiv_pop.setZero();
     hc2_hiv_pop.setZero();
     hc1_art_pop.setZero();
@@ -136,6 +138,9 @@ struct ChildModelOutputState<ChildModel, real_type> {
     hc2_art_aids_deaths.setZero();
     hc_art_num.setZero();
     hiv_births.setZero();
+    hc_art_total.setZero();
+    hc_art_init.setZero();
+
   }
 };
 

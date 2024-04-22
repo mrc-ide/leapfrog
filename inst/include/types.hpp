@@ -321,8 +321,8 @@ struct ChildModelState<ChildModel, real_type> {
   real_type hiv_births;
   real_type ctx_need;
   real_type ctx_mean;
-  real_type hc_art_total;
-  real_type hc_art_init;
+  TensorFixedSize <real_type, Sizes<4>> hc_art_total;
+  TensorFixedSize <real_type, Sizes<4>> hc_art_init;
 
 
   ChildModelState(const Parameters<ChildModel, real_type> &pars) {
@@ -346,8 +346,8 @@ struct ChildModelState<ChildModel, real_type> {
     hiv_births = 0.0;
     ctx_need = 0.0;
     ctx_mean = 1.0;
-    hc_art_total = 0.0;
-    hc_art_init = 0.0;
+    hc_art_total.setZero();
+    hc_art_init.setZero();
   }
 };
 
