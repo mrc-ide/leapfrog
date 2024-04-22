@@ -84,7 +84,6 @@ test_that("CLHIV align", {
   dt <- dt %>%
     mutate(diff = pop - fr)
   y <- data.table(dt)
-  y[year == 2019]
 
   expect_true(all(abs(dt$diff) < 1e-1))
 })
@@ -130,7 +129,8 @@ test_that("CLHIV on ART align", {
   dt <- dt %>%
     mutate(diff = pop - fr)
   x <- data.table(dt)
-
+  y[year == 2019 & sex == 'Male' & age == 0]
+  x[year == 2020 & time_art == 'ARTlte5mo' & sex == 'Male' & age == 1]
 
   expect_true(all(abs(dt$diff) < 1e-1))
 })

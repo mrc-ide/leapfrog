@@ -980,13 +980,33 @@ void hc_art_num_num(int time_step,
 
   //Remove how many that are already on ART
   if(cpars.hc_art_is_age_spec(time_step)){
-    for (int ag = 0; ag < 3; ++ag) {
-      if(cpars.hc_art_is_age_spec(time_step)){
+    for (int s = 0; s < ss.NS; ++s) {
+      for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
+        for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
+          for (int dur = 0; dur < ss.hTS; ++dur) {
+            if (a < hc_ss.hc2_agestart) {
+              intermediate.children.total_art_last_year(cpars.hc_age_coarse(a)) += state_curr.children.hc1_art_pop(dur, hd, a, s);
+            } else if (hd < (hc_ss.hc2DS)) {
+              intermediate.children.total_art_last_year(cpars.hc_age_coarse(a)) += state_curr.children.hc2_art_pop(dur, hd, a-hc_ss.hc2_agestart, s);
+            }
+          }
+        }
+      }
+    }
+
+    intermediate.children.total_art_last_year(0) = intermediate.children.total_art_last_year(1) + intermediate.children.total_art_last_year(2) + intermediate.children.total_art_last_year(3);
+
+    for (int ag = 1; ag < 4; ++ag) {
+      if(cpars.hc_art_is_age_spec(time_step-1)){
         state_next.children.hc_art_num(ag) = (cpars.hc_art_val(ag,time_step) + cpars.hc_art_val(ag,time_step-1)) / 2 ;
       }else{
-        state_next.children.hc_art_num(ag) = (cpars.hc_art_val(ag,time_step) + cpars.hc_art_val(0,time_step-1)/3) / 2 ;
+        state_next.children.hc_art_num(ag) = (cpars.hc_art_val(ag,time_step) + cpars.hc_art_val(0,time_step-1) * (intermediate.children.total_art_last_year(ag) / intermediate.children.total_art_last_year(0))) / 2 ;
       }
     }// end ag
+    if(time_step == 50){
+      std::cout << state_next.children.hc_art_num(1);
+
+    }
   }else{
     state_next.children.hc_art_num(0) =  (cpars.hc_art_val(0,time_step) + cpars.hc_art_val(0,time_step-1)) / 2 ;
   }
@@ -1007,7 +1027,7 @@ void hc_art_num_num(int time_step,
 
  state_next.children.hc_art_total(0) = state_next.children.hc_art_total(1) + state_next.children.hc_art_total(2) + state_next.children.hc_art_total(3);
 
-  for(int ag = 0; ag < 3; ++ag){
+  for(int ag = 0; ag < 4; ++ag){
     state_next.children.hc_art_init(ag) = state_next.children.hc_art_num(ag) - state_next.children.hc_art_total(ag);
 
     if (intermediate.children.hc_art_need_init_total(ag) < state_next.children.hc_art_init(ag)) {
@@ -1212,9 +1232,54 @@ void hc_art_initiation_by_age(int time_step,
 
   //to do: make hc_initByAge, hc_adju, and hc_art_scalar dim 4
   if(cpars.hc_art_is_age_spec(time_step)){
-    for(int ag = 0; ag < 3; ++ag){
+    for (int s = 0; s <ss.NS; ++s) {
+      for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
+        for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
+          for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+            intermediate.children.hc_initByAge(cpars.hc_age_coarse(a)) += intermediate.children.hc_art_need_init(hd, cat, a, s) * cpars.hc_art_init_dist(a, time_step);
+          } //end hcTT
+        } // end hc_ss.hc1DS
+      } //end a
+    } // end ss.NS
 
+    for(int ag = 1; ag < 4; ++ag){
+    if (intermediate.children.hc_initByAge(ag) == 0.0) {
+      intermediate.children.hc_adj(ag) = 1.0 ;
+    } else {
+      intermediate.children.hc_adj(ag) =  state_next.children.hc_art_init(ag) / intermediate.children.hc_initByAge(ag);
     }
+    }
+
+    for (int s = 0; s <ss.NS; ++s) {
+      for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+        for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
+          for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
+            if ((intermediate.children.hc_adj(cpars.hc_age_coarse(a)) * cpars.hc_art_init_dist(a, time_step)) > 1.0) {
+              intermediate.children.hc_art_scalar(cpars.hc_age_coarse(a)) = 1.0;
+            } else {
+              intermediate.children.hc_art_scalar(cpars.hc_age_coarse(a)) = intermediate.children.hc_adj(cpars.hc_age_coarse(a)) * cpars.hc_art_init_dist(a, time_step);
+            }
+            if (state_next.children.hc_art_num(cpars.hc_age_coarse(a)) > 0.0) {
+              intermediate.children.hc_art_scalar(cpars.hc_age_coarse(a)) = intermediate.children.hc_art_scalar(cpars.hc_age_coarse(a));
+            } else {
+              intermediate.children.hc_art_scalar(cpars.hc_age_coarse(a)) = 0.0;
+            }
+
+            if (a < hc_ss.hc2_agestart) {
+              state_next.children.hc1_art_pop(0, hd, a, s) += intermediate.children.hc_art_scalar(cpars.hc_age_coarse(a)) * intermediate.children.hc_art_need_init(hd, cat, a, s);
+            } else if (hd < (hc_ss.hc2DS)) {
+              state_next.children.hc2_art_pop(0, hd, a - hc_ss.hc2_agestart, s) += intermediate.children.hc_art_scalar(cpars.hc_age_coarse(a)) * intermediate.children.hc_art_need_init(hd, cat, a, s);
+            }
+            if (a < hc_ss.hc2_agestart) {
+              state_next.children.hc1_hiv_pop(hd, cat, a, s) -= intermediate.children.hc_art_scalar(cpars.hc_age_coarse(a)) * intermediate.children.hc_art_need_init(hd, cat, a, s);
+            } else if (hd < (hc_ss.hc2DS )) {
+              state_next.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s) -=  intermediate.children.hc_art_scalar(cpars.hc_age_coarse(a)) * intermediate.children.hc_art_need_init(hd, cat, a, s);
+            }
+
+          } //end hc_ss.hc1DS
+        } // end a
+      } // end hcTT
+    } // end ss.NS
 
   }else{
     for (int s = 0; s <ss.NS; ++s) {
