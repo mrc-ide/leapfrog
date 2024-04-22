@@ -92,7 +92,7 @@ Rcpp::List build_r_output(const leapfrog::OutputState<ModelVariant, real_type> &
     Rcpp::NumericVector r_hc2_noart_aids_deaths(children.hc2DS * children.hcTT * children.hc2AG * base.NS * output_years);
     Rcpp::NumericVector r_hc1_art_aids_deaths(base.hTS * children.hc1DS * children.hc1AG * base.NS * output_years);
     Rcpp::NumericVector r_hc2_art_aids_deaths(base.hTS * children.hc2DS * children.hc2AG * base.NS * output_years);
-    Rcpp::NumericVector r_hc_art_num(output_years);
+    Rcpp::NumericVector r_hc_art_num(4 * output_years);
     Rcpp::NumericVector r_hiv_births(output_years);
     Rcpp::NumericVector r_hc_art_total(4 * output_years);
     Rcpp::NumericVector r_hc_art_init(4 * output_years);
@@ -104,7 +104,7 @@ Rcpp::List build_r_output(const leapfrog::OutputState<ModelVariant, real_type> &
     r_hc2_noart_aids_deaths.attr("dim") = Rcpp::NumericVector::create(children.hc2DS, children.hcTT, children.hc2AG, base.NS, output_years);
     r_hc1_art_aids_deaths.attr("dim") = Rcpp::NumericVector::create(base.hTS, children.hc1DS, children.hc1AG, base.NS, output_years);
     r_hc2_art_aids_deaths.attr("dim") = Rcpp::NumericVector::create(base.hTS, children.hc2DS, children.hc2AG, base.NS, output_years);
-    r_hc_art_num.attr("dim") = Rcpp::NumericVector::create(output_years);
+    r_hc_art_num.attr("dim") = Rcpp::NumericVector::create(4, output_years);
     r_hiv_births.attr("dim") = Rcpp::NumericVector::create(output_years);
     r_hc_art_total.attr("dim") = Rcpp::NumericVector::create(4, output_years);
     r_hc_art_init.attr("dim") = Rcpp::NumericVector::create(4, output_years);
