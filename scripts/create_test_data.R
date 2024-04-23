@@ -2,8 +2,10 @@
 library(leapfrog)
 library(data.table)
 library(dplyr)
-devtools::load_all('C:/Users/mwalters/leapfrog')
+# devtools::load_all('C:/Users/mwalters/leapfrog')
 setwd('C:/Users/mwalters/frogger/')
+source('C:/Users/mwalters/frogger/scripts/spectrum-inputs.R')
+source('C:/Users/mwalters/frogger/scripts/spectrum-inputs-paeds.R')
 
 ## Create demographic and projection parameters for adults
 pjnz1 <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct.PJNZ")
@@ -30,7 +32,7 @@ pjnz1 <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct.PJNZ")
 #Create paeds parameters (Run from leapfrog/uncertainrt_analysis_working)
 demp <- prepare_leapfrog_demp(pjnz1)
 proj <- prepare_leapfrog_projp(pjnz1)
-proj <- leapfrog:::prepare_hc_leapfrog_projp(pjnz1, proj)
+proj <- prepare_hc_leapfrog_projp(pjnz1, proj)
 
 
 demp$netmigr <- leapfrog:::read_netmigr(pjnz1, adjust_u5mig = FALSE)

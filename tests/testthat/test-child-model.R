@@ -39,19 +39,19 @@ test_that("Infections among children align", {
   pjnz = input$pjnz
 
   out <- run_model(demp, parameters, NULL, NULL, 0:60, run_child_model = TRUE)
-  inf_spec <- dp.output.incident.hiv(dp.raw = dp)
+  inf_spec <- SpectrumUtils::dp.output.incident.hiv(dp.raw = dp)
   inf_spec <- inf_spec %>%
     filter(Sex == 'Male+Female') %>%
     mutate(Age = as.numeric(Age)) %>%
     filter(Age < 15) %>% reshape2::melt(id.vars = c('Sex', 'Age')) %>%
-    setnames(old = c('variable', 'value'), new = c('Year', 'Spec')) %>%
+    rename(Year = variable, Spec = value) %>%
     mutate(Year = as.numeric(as.character(Year))) %>%
     select(Age, Year, Spec) %>%
     as_tibble()
 
   lfrog <- out$p_infections[1:15,,] %>%
     reshape2::melt() %>%
-    setnames(old = c('Var1', 'Var2', 'Var3', 'value'), new = c('Age', 'Sex', 'Year', 'lfrog')) %>%
+    rename(Age = Var1, Sex = Var2, Year = Var3, lfrog = value) %>%
     mutate(Age = Age - 1, Year = Year + 1969) %>%
     group_by(Age, Year) %>%
     summarise(lfrog = sum(lfrog))
@@ -59,7 +59,8 @@ test_that("Infections among children align", {
   dt <- right_join(inf_spec, lfrog, by = c('Age', 'Year'))
   dt <- dt %>%
     mutate(diff = Spec - lfrog)
-  ##something wrong with Age 1, seems like its half what it should be?
+inf <- data.table(dt)
+
   expect_true(all(abs(dt$diff) < 1e-1))
 })
 
