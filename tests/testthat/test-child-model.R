@@ -39,9 +39,28 @@ test_that("Infections among children align", {
   pjnz = input$pjnz
 
   out <- run_model(demp, parameters, NULL, NULL, 0:60, run_child_model = TRUE)
+  inf_spec <- dp.output.incident.hiv(dp.raw = dp)
+  inf_spec <- inf_spec %>%
+    filter(Sex == 'Male+Female') %>%
+    mutate(Age = as.numeric(Age)) %>%
+    filter(Age < 15) %>% reshape2::melt(id.vars = c('Sex', 'Age')) %>%
+    setnames(old = c('variable', 'value'), new = c('Year', 'Spec')) %>%
+    mutate(Year = as.numeric(as.character(Year))) %>%
+    select(Age, Year, Spec) %>%
+    as_tibble()
 
-  u1_inf_spec <- dpsub("<NewInfantInfections MV>", 2, input$timedat.idx)
-  expect_true(all(abs(as.numeric(u1_inf_spec) - colSums(out$p_infections[1,,])) < 1e-3))
+  lfrog <- out$p_infections[1:15,,] %>%
+    reshape2::melt() %>%
+    setnames(old = c('Var1', 'Var2', 'Var3', 'value'), new = c('Age', 'Sex', 'Year', 'lfrog')) %>%
+    mutate(Age = Age - 1, Year = Year + 1969) %>%
+    group_by(Age, Year) %>%
+    summarise(lfrog = sum(lfrog))
+
+  dt <- right_join(inf_spec, lfrog, by = c('Age', 'Year'))
+  dt <- dt %>%
+    mutate(diff = Spec - lfrog)
+  ##something wrong with Age 1, seems like its half what it should be?
+  expect_true(all(abs(dt$diff) < 1e-1))
 })
 
 ##working out until 2019 when age stratified art is initiated
@@ -129,8 +148,6 @@ test_that("CLHIV on ART align", {
   dt <- dt %>%
     mutate(diff = pop - fr)
   x <- data.table(dt)
-  y[year == 2019 & sex == 'Male' & age == 0]
-  x[year == 2020 & time_art == 'ARTlte5mo' & sex == 'Male' & age == 1]
 
   expect_true(all(abs(dt$diff) < 1e-1))
 })

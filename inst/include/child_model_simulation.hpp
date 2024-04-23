@@ -596,6 +596,7 @@ void hc_initiate_art_by_age(int time_step,
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
 
+  double out = 0.0;
   //all children under a certain age eligible for ART
   for (int s = 0; s <ss.NS; ++s) {
     for (int a = 0; a < cpars.hc_art_elig_age(time_step); ++a) {
@@ -610,6 +611,7 @@ void hc_initiate_art_by_age(int time_step,
       } // end a
     } // end hcTT
   } // end ss.NS
+
 }
 
 template<typename ModelVariant, typename real_type>
@@ -624,22 +626,27 @@ void hc_initiate_art_by_cd4(int time_step,
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
 
+  double out = 0.0;
   //all children under a certain CD4 eligible for ART
   for (int s = 0; s <ss.NS; ++s) {
     for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
       for (int a = cpars.hc_art_elig_age(time_step); a < pars.base.options.p_idx_fertility_first; ++a) {
-        for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-          if (hd > (cpars.hc_art_elig_cd4(a, time_step))) {
+        for (int hd = (cpars.hc_art_elig_cd4(a, time_step)); hd < hc_ss.hc1DS; ++hd) {
             if (a < hc_ss.hc2_agestart) {
               intermediate.children.hc_art_need_init(hd, cat, a, s) += state_next.children.hc1_hiv_pop(hd, cat, a, s);
+              out += state_next.children.hc1_hiv_pop(hd, cat, a, s);
             } else if (hd < hc_ss.hc2DS) {
               intermediate.children.hc_art_need_init(hd, cat, a, s) += state_next.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s);
             }
-          }
         } // end hc_ss.hc1DS
       } // end a
     } // end hcTT
   } // end ss.NS
+
+  if(time_step == 60){
+    std::cout << out;
+  }
+
 }
 
 template<typename ModelVariant, typename real_type>
@@ -1003,10 +1010,7 @@ void hc_art_num_num(int time_step,
         state_next.children.hc_art_num(ag) = (cpars.hc_art_val(ag,time_step) + cpars.hc_art_val(0,time_step-1) * (intermediate.children.total_art_last_year(ag) / intermediate.children.total_art_last_year(0))) / 2 ;
       }
     }// end ag
-    if(time_step == 50){
-      std::cout << state_next.children.hc_art_num(1);
 
-    }
   }else{
     state_next.children.hc_art_num(0) =  (cpars.hc_art_val(0,time_step) + cpars.hc_art_val(0,time_step-1)) / 2 ;
   }
@@ -1073,6 +1077,8 @@ void hc_art_pct_pct(int time_step,
     } // end a
   } // end ss.NS
 
+
+
   //the number of people on ART at the current coverage level
   state_next.children.hc_art_init(0) =  state_next.children.hc_art_num(0) * (cpars.hc_art_val(0, time_step) + cpars.hc_art_val(0, time_step-1)) / 2;
 
@@ -1098,6 +1104,7 @@ void hc_art_pct_pct(int time_step,
   if (state_next.children.hc_art_init(0) < 0) {
     state_next.children.hc_art_init(0) =  0;
   }
+
 
 
 }
@@ -1566,11 +1573,11 @@ void run_child_model_simulation(int time_step,
       internal::add_child_grad(time_step, pars, state_curr, state_next, intermediate);
       //progress art initates from 0-6 months on art to 6 to 12 mo
       internal::progress_time_on_art(time_step, pars, state_curr, state_next, intermediate, 0, 1);
-     // if(time_step < 60){
+        // if(time_step < 60){
         internal::run_child_art_initiation(time_step, pars, state_curr, state_next, intermediate);
         //mortality among those on ART less than one year
         internal::onART_mortality(time_step, pars, state_curr, state_next, intermediate, 0);
-     // }
+       // }
       //progress 6 to 12 mo to 12 plus months
       internal::progress_time_on_art(time_step, pars, state_curr, state_next, intermediate, 1, 2);
       internal::fill_model_outputs(time_step, pars, state_curr, state_next, intermediate);
