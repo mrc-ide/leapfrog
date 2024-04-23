@@ -59,12 +59,11 @@ test_that("Infections among children align", {
   dt <- right_join(inf_spec, lfrog, by = c('Age', 'Year'))
   dt <- dt %>%
     mutate(diff = Spec - lfrog)
-inf <- data.table(dt)
 
   expect_true(all(abs(dt$diff) < 1e-1))
 })
 
-##working out until 2019 when age stratified art is initiated
+##diverging in 2003
 test_that("CLHIV align", {
   input <- setup_childmodel(testinput = "testdata/child_parms.rds")
   demp = input$demp

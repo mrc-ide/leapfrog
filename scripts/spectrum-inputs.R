@@ -283,10 +283,10 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
 
   v = params
   ## paed input
-  v$paed_incid_input <- dp_read_nosocom_infections(pjnz)
-  v$paed_cd4_dist <- dp_read_paed_cd4_dist(pjnz) / 100
+  v$paed_incid_input <- leapfrog:::dp_read_nosocom_infections(pjnz)
+  v$paed_cd4_dist <- leapfrog:::dp_read_paed_cd4_dist(pjnz) / 100
 
-  prog = dp_read_paed_cd4_prog(pjnz)
+  prog = leapfrog:::dp_read_paed_cd4_prog(pjnz)
   paed_cd4_prog <- array(c(prog[1,1:6],0), dim = 7, dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5')))
 
   adol_cd4_prog <- array(c(prog[1,14:18],0), dim = 6, dimnames = list(cd4 = c('>1000', '750-999', '500-749', '350-499', '200-349', 'lte200')))
@@ -294,7 +294,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   v$paed_cd4_prog <- paed_cd4_prog
   v$adol_cd4_prog <- adol_cd4_prog
 
-  mort <- dp_read_paed_cd4_mort(pjnz)
+  mort <- leapfrog:::dp_read_paed_cd4_mort(pjnz)
   paed_cd4_mort <- array(data = 0, dim = c(7, 4, 5), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'),
                                                                      transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'),
                                                                      age = c(0:4)))
@@ -320,7 +320,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   adol_cd4_mort[,4,] <- mort[12,2:7]
 
 
-  mort <- dp_read_paed_art_mort(pjnz)
+  mort <- leapfrog:::dp_read_paed_art_mort(pjnz)
   paed_art_mort <- array(data = 0, dim = c(7, 3, 5), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'),
                                                                      transmission = c('0to6mo', '7to12mo', '12+mo'),
                                                                      age = c(0:4)))
@@ -360,7 +360,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   v$paed_art_mort <- paed_art_mort
   v$adol_art_mort <- adol_art_mort
 
-  mtct_rates_input <- dp_read_mtct_rates(pjnz)
+  mtct_rates_input <- leapfrog:::dp_read_mtct_rates(pjnz)
   art_mtct <- array(0, dim = c(7,3,2), dimnames = list(cd4 = c('>500', '350-500', '250-349', '200-249', '100-199', '50-99', '<50'),
                                                        time = c('ART <4 weeks before delivery', 'ART >4 weeks before delivery', 'ART before pregnancy'), trans_type = c('perinatal', 'bf')))
   art_mtct[,1,1] <- mtct_rates_input[11,1] / 100
@@ -371,7 +371,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   art_mtct[5:7,3,2] <- mtct_rates_input[9,2] / 100
   v$art_mtct <- art_mtct
 
-  art_dist_paed <- dp_read_art_dist(pjnz)
+  art_dist_paed <- leapfrog:::dp_read_art_dist(pjnz)
   v$art_dist_paed <- art_dist_paed
 
   ## pull in cotrim coverage numbers
@@ -387,7 +387,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   v$ctx_effect <- as.array(ctx_effect)
 
   ## pull in ART coverage numbers
-  art = leapfrog:::input_childart(pjnz)
+  art = input_childart(pjnz)
   v$artpaeds_isperc <- art$art_ispercent[2,]
   v$artpaeds_isperc[] <- as.integer(ifelse(art$art_ispercent[2,] == FALSE, 0, 1))
   art$child_art[1,which(art$art_ispercent[2,])] <- art$child_art[1,which(art$art_ispercent[2,])] / 100
@@ -439,7 +439,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   mtct[,2] <- c(rep(mtct_rates_input[3,3],2), rep(mtct_rates_input[2,2],2), rep(mtct_rates_input[1,2],3)) / 100
   v$mtct <- mtct
 
-  mort_rr_art <- dp_read_child_mort_mult(pjnz)
+  mort_rr_art <- leapfrog:::dp_read_child_mort_mult(pjnz)
   mort_rr_art_target <- array(NA, dim = c(3, 15, 61), dimnames = list(transmission = c('0to6mo', '7to12mo', '12+mo'), age = 0:14, year = 1970:2030))
   mort_rr_art_target[1:2, 1:5,] <- rep(unlist(mort_rr_art[1,]), each = 10)
   mort_rr_art_target[3, 1:5,] <- rep(unlist(mort_rr_art[2,]), each = 5)
@@ -447,7 +447,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   mort_rr_art_target[3, 6:15,] <- rep(unlist(mort_rr_art[4,]), each = 10)
   v$mort_art_rr <- mort_rr_art_target
 
-  art_dist_paed <- dp_read_art_dist(pjnz)
+  art_dist_paed <- leapfrog:::dp_read_art_dist(pjnz)
   v$init_art_dist <- art_dist_paed
 
   ##BF duration
@@ -457,7 +457,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   ##only keeping this for leapfrog
   v$bf_duration = bf_duration
 
-  art_elig = dp_read_paed_art_eligibility(pjnz)
+  art_elig = leapfrog:::dp_read_paed_art_eligibility(pjnz)
   v$paed_art_elig_age <- art_elig$age_elig / 12 ##converts from months to years
 
   ##MKW: stopped here
