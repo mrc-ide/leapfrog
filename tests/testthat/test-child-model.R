@@ -63,7 +63,8 @@ test_that("Infections among children align", {
   expect_true(all(abs(dt$diff) < 1e-1))
 })
 
-##diverging in 2003
+#diverging in 2030
+##ordering is off for paed art
 test_that("CLHIV align", {
   input <- setup_childmodel(testinput = "testdata/child_parms.rds")
   demp = input$demp
@@ -107,7 +108,10 @@ test_that("CLHIV align", {
   expect_true(all(abs(dt$diff) < 1e-1))
 })
 
-#diverages in 2030 after age 0 in ART lte5mo
+#2023 diverging in art lte 5 mo
+##x[year == 2023 & age == 1 & time_art == 'ARTlte5mo']
+##x[year == 2020 & time_art == 'ARTlte5mo' & sex == 'Male' & age == 1]
+##number to percent
 test_that("CLHIV on ART align", {
   input <- setup_childmodel(testinput = "testdata/child_parms.rds")
   demp = input$demp
@@ -148,7 +152,7 @@ test_that("CLHIV on ART align", {
   dt <- dt %>%
     mutate(diff = pop - fr)
   x <- data.table(dt)
-
+  x[year == 2003 & sex == 'Male']
   expect_true(all(abs(dt$diff) < 1e-1))
 })
 
@@ -192,7 +196,7 @@ test_that("HIV related deaths among CLHIV not on ART align", {
   expect_true(all(abs(dt$diff) < 1e-1))
 })
 
-#Not working
+#Issue when input goes from numbers to percents (year 2023)
 test_that("HIV related deaths among CLHIV on ART align", {
   input <- setup_childmodel(testinput = "testdata/child_parms.rds")
   demp = input$demp
@@ -228,6 +232,10 @@ test_that("HIV related deaths among CLHIV on ART align", {
     select(age, sex, year, fr, spec)
   dt <- dt %>%
     mutate(diff = spec - fr)
+
+  deaths = data.table(dt)
+  deaths[sex == 'Male' & year == 2003]
+  deaths[sex == 'Male' & year == 2004]
 
   expect_true(all(abs(dt$diff) < 1))
 
