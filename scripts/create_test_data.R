@@ -1,4 +1,10 @@
 #!/usr/bin/env Rscript
+
+## This script creates test data required for the frogger tests.
+## We read some input data and prepare a set of demographic projection
+## and HIV parameters for both the adult and the child model.
+## We also run leapfrog and save out the result for use in reference tests
+
 # nolint start
 library(leapfrog)
 library(data.table)
@@ -28,11 +34,18 @@ saveRDS(lmod, testthat::test_path("testdata/fit_demography.rds"))
 
 hivp <- readRDS(testthat::test_path("testdata/projection_parameters_child.rds"))
 
-##Change things to length 61
-hivp$artpaeds_isperc <- c(hivp$artpaeds_isperc, FALSE)
-hivp$paed_art_elig_age <- c(hivp$paed_art_elig_age, 2)
-hivp$paed_art_elig_age <- as.integer(hivp$paed_art_elig_age)
-hivp$paed_art_elig_cd4 <- cbind(hivp$paed_art_elig_cd4, hivp$paed_art_elig_cd4[,ncol(hivp$paed_art_elig_cd4)])
+## We need 61 entries for 1970 to 2030 inclusive. If the input data
+## has fewer entries than this, then add an additional value
+if (length(hivp$artpaeds_isperc) < 61) {
+  hivp$artpaeds_isperc <- c(hivp$artpaeds_isperc, FALSE)
+}
+if (length(hivp$paed_art_elig_age) < 61) {
+  hivp$paed_art_elig_age <- c(hivp$paed_art_elig_age, 2)
+  hivp$paed_art_elig_age <- as.integer(hivp$paed_art_elig_age)
+}
+if (ncol(hivp$paed_art_elig_cd4) < 61) {
+  hivp$paed_art_elig_cd4 <- cbind(hivp$paed_art_elig_cd4, hivp$paed_art_elig_cd4[,ncol(hivp$paed_art_elig_cd4)])
+}
 
 hivp$laf = 1
 
