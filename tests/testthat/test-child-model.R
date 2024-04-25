@@ -152,7 +152,9 @@ test_that("CLHIV on ART align", {
   dt <- dt %>%
     mutate(diff = pop - fr)
   x <- data.table(dt)
-  x[year == 2003 & sex == 'Male']
+  x[,pct_diff := (pop - fr) / pop]
+  dx <- x[year == 2020 & sex == 'Male' & time_art == 'ARTlte5mo' & abs(pct_diff) > 1e-3]
+  dx
   expect_true(all(abs(dt$diff) < 1e-1))
 })
 
@@ -203,6 +205,7 @@ test_that("HIV related deaths among CLHIV on ART align", {
   parameters = input$parameters
   dp = input$dp
   pjnz = input$pjnz
+  # saveRDS(list(hivp = parameters, demp = demp, ontrt = input$ontrt), 'C:/Users/mwalters/Desktop/parms.RDS')
 
   out <- run_model(demp, parameters, NULL, NULL, 0:60, run_child_model = TRUE)
   tag.x ="<AIDSDeathsARTSingleAge MV>"
@@ -234,8 +237,7 @@ test_that("HIV related deaths among CLHIV on ART align", {
     mutate(diff = spec - fr)
 
   deaths = data.table(dt)
-  deaths[sex == 'Male' & year == 2003]
-  deaths[sex == 'Male' & year == 2004]
+  deaths[sex == 'Male' & year == 2020]
 
   expect_true(all(abs(dt$diff) < 1))
 
