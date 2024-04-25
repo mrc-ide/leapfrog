@@ -41,7 +41,7 @@ int transform_hts_per_year(SEXP r_hts_per_year) {
 
 std::vector<int> transform_output_steps(Rcpp::NumericVector output_steps) {
   auto out = Rcpp::as<std::vector<int>>(output_steps);
-  convert_base(out);
+  convert_0_based(out);
   return out;
 }
 

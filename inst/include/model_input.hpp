@@ -27,7 +27,7 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
   const leapfrog::TensorMap1<real_type> sex_rate_ratio = parse_data<real_type>(data, "incrr_sex", proj_years);
   const leapfrog::TensorMap3<real_type> cd4_mortality = parse_data<real_type>(data, "cd4_mort", base.hDS, base.hAG, base.NS);
   const leapfrog::TensorMap3<real_type> cd4_progression = parse_data<real_type>(data, "cd4_prog", base.hDS - 1, base.hAG, base.NS);
-  const leapfrog::Tensor1<int> idx_hm_elig = convert_base<1>(parse_data<int>(data, "artcd4elig_idx", proj_years));
+  const leapfrog::Tensor1<int> idx_hm_elig = convert_0_based<1>(parse_data<int>(data, "artcd4elig_idx", proj_years));
   const leapfrog::TensorMap3<real_type> cd4_initial_distribution = parse_data<real_type>(data, "cd4_initdist", base.hDS, base.hAG, base.NS);
   const leapfrog::TensorMap4<real_type> mortality = parse_data<real_type>(data, "art_mort", base.hTS, base.hDS, base.hAG, base.NS);
   const leapfrog::TensorMap2<real_type> mortaility_time_rate_ratio = parse_data<real_type>(data, "artmx_timerr", base.hTS, proj_years);
@@ -92,7 +92,7 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
     const real_type ctx_effect = Rcpp::as<real_type>(data["ctx_effect"]);
     const leapfrog::TensorMap1<real_type> ctx_val = parse_data<real_type>(data, "ctx_val", proj_years);
     const leapfrog::TensorMap1<int> hc_art_elig_age = parse_data<int>(data, "paed_art_elig_age", proj_years);
-    const leapfrog::Tensor2<real_type> hc_art_elig_cd4 = convert_base<2>(parse_data<real_type>(data, "paed_art_elig_cd4", options.p_idx_hiv_first_adult, proj_years));
+    const leapfrog::Tensor2<real_type> hc_art_elig_cd4 = convert_0_based<2>(parse_data<real_type>(data, "paed_art_elig_cd4", options.p_idx_hiv_first_adult, proj_years));
     const leapfrog::TensorMap3<real_type> hc_art_mort_rr = parse_data<real_type>(data, "mort_art_rr", base.hTS, options.p_idx_hiv_first_adult, proj_years);
     const leapfrog::TensorMap3<real_type> hc1_art_mort = parse_data<real_type>(data, "paed_art_mort", children.hc1DS, base.hTS, children.hc1AG);
     const leapfrog::TensorMap3<real_type> hc2_art_mort = parse_data<real_type>(data, "adol_art_mort", children.hc2DS, base.hTS, children.hc2AG);

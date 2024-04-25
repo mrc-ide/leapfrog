@@ -194,9 +194,9 @@ generate_input_from_r <- function(inputs) {
     rhs <- sprintf("parse_data<%s>(data, \"%s\", %s)",
                    input$type, input$r_name, dimensions)
     tensor_type <- "leapfrog::TensorMap"
-    if (!is.null(input$convert_base) && input$convert_base) {
-      rhs <- sprintf("convert_base<%s>(%s)", input$dims, rhs)
-      ## Must be a tensor otherwise the convert_base will
+    if (!is.null(input$convert_0_based) && input$convert_0_based) {
+      rhs <- sprintf("convert_0_based<%s>(%s)", input$dims, rhs)
+      ## Must be a tensor otherwise the convert_0_based will
       ## modify the underlying R data which we do not want to do
       tensor_type <- "leapfrog::Tensor"
     }

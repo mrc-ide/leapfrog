@@ -5,9 +5,9 @@ validate_and_parse_input <- function(input, filename, row_num) {
   assert_set(input$cpp_name, paste(row_text, "and col: cpp_name"))
   assert_enum(input$type, c("real_type", "int"),
               name = paste(row_text, "and col: type"))
-  assert_enum(input$convert_base, c("FALSE", "TRUE", ""),
-              name = paste(row_text, "and col: convert_base"))
-  input$convert_base <- identical(input$convert_base, "TRUE")
+  assert_enum(input$convert_0_based, c("FALSE", "TRUE", ""),
+              name = paste(row_text, "and col: convert_0_based"))
+  input$convert_0_based <- identical(input$convert_0_based, "TRUE")
   assert_set(input$dims)
   input$parsed_dims <- validate_and_parse_dims(input, filename, row_num)
   input

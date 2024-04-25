@@ -1,4 +1,4 @@
-r_name,cpp_name,type,input_when,value,convert_base,dims,dim1,dim2,dim3,dim4
+r_name,cpp_name,type,input_when,value,convert_0_based,dims,dim1,dim2,dim3,dim4
 basepop,base_pop,real_type,,,FALSE,2,base.pAG,base.NS,,
 Sx,survival_probability,real_type,,,FALSE,3,base.pAG + 1,base.NS,proj_years,
 netmigr_adj,net_migration,real_type,,,FALSE,3,base.pAG,base.NS,proj_years,
