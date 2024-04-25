@@ -74,17 +74,11 @@ In `StateSpace` struct
 | hDS      | hDS      | Number of disease stages in adult HIV population               |
 | hTS      | hTS      | Number of treatment stages in adult HIV population             |
 | hAG_SPAN | hAG_span | Array of HIV age group sizes                                   |
-|                                                                                      |
 | hDS_paed | hc1DS    | Number of disease stages in the 0-4 population                 |
-|                                                                                      |
-| hDS_adol | hc2DS    | Number of disease stages in the 5-14 population                | 
-|                                                                                      |
+| hDS_adol | hc2DS    | Number of disease stages in the 5-14 population                |
 | hTM      | hcTT     | Number of transmission types for the paediatric population     |
-|                                                                                      |
 | NA       | hc1AG    | Number of age groups in the 0-4 population                     |
-|                                                                                      |
 | NA       | hc2AG    | Number of age groups in the 5-14 population                    |
-|                                                                                      |
 | hBF       | hBF      | Number of 2 month breastfeeding durations                     |
 
 #### Loop variable convention

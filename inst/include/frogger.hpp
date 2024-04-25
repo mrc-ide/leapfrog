@@ -24,7 +24,7 @@ OutputState<ModelVariant, real_type> run_model(int time_steps,
   state_output.save_state(state, 0);
 
   // Each time step is mid-point of the year
-  for (int step = 1; step <= time_steps; ++step) {
+  for (int step = 1; step < time_steps; ++step) {
     state_next.reset();
     run_general_pop_demographic_projection<ModelVariant>(step, pars, state, state_next,
                                                          intermediate);

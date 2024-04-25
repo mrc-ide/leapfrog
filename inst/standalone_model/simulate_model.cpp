@@ -73,7 +73,6 @@ void save_output(leapfrog::StateSaver<ModelVariant, double> &state_saver,
 int main(int argc, char *argv[]) {
   if (argc < 4) {
     std::cout <<
-
               "Usage: simulate_model <sim_years> <hts_per_year> <intput_dir> <output_dir>"
               <<
               std::endl;
