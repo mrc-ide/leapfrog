@@ -1,0 +1,57 @@
+---
+title: "Integration Workflow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{integration_workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Leapfrog will be used by both Imperial and Avenir Health. There will be changes the two teams want to make to the code base in parallel independently of the other organisation. This document covers how we will manage this workflow with git.
+
+With Leapfrog we want to be able to
+1. Have Imperial and Avenir able make independent changes which they can deploy and use downstream
+1. Be able to make hotfixes on main
+1. Integrate Imperial's or Avenir's changes into the others in a way that minimises integration headache.
+
+## Setup
+
+We have 3 long-lived branches,
+1. `main` - the default branch and where any changes required by both Imperial and Avenir can be made
+2. `imperial` - the default branch for Imperial, any work they do should be a feature branch off this
+3. `avenir` - the default branch for Avenir, any work added should be a feature branch off this
+
+## Making changes
+
+If the change you want to make is required by both Avenir and Imperial, then create a feature branch off `main`, e.g. `my-feature`. Make any changes there, then when ready create a pull request into `main`. Get it reviewed and merged.
+
+If the change you want to make it for a specific organisation, do the same as above but creating your feature branch off the `imperial` or `avenir` branches.
+
+We will end up with a graph something like
+
+![branches setup](../images/workflow.svg)
+
+## Integration
+
+We want to merge the `avenir` and `imperial` branches with `main` as regularly as possible. Having diverging branches will quickly lead to a difficult integration so we should update as frequently as possible. There are a couple of things we can do to mitigate the integration pain.
+
+1. After a commit on main, immediately rebase `imperial` and `avenir` branches onto this. Using a rebase will keep a cleaner to understand history and mean we can `cherry-pick` more easily.
+1. Set 
+
+## Get one commit from the other organisation into my code
+
+If you are working on the `imperial` branch and there is a change in the `avenir` branch you want to include, but you don't want to make a full merge into `main` and back into `imperial` you can `cherry-pick` it.
+
+## Things to note
+* No force push on `main`, `avenir`, or `imperial`? or maybe that is ok...
+* Use rebase merging
+* git worktree if you want to work over `avenir` and `imperial` branches
+* be proactive with merging in main
+* git rerere to avoid having to resolve the same conflict over and over again
