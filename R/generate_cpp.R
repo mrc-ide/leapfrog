@@ -206,9 +206,9 @@ generate_input_from_r <- function(inputs) {
     rhs <- sprintf("parse_data<%s>(data, \"%s\", %s)",
                    input$type, input$r_name, dimensions)
     tensor_type <- "leapfrog::TensorMap"
-    if (!is.null(input$convert_base) && input$convert_base) {
-      rhs <- sprintf("convert_base<%s>(%s)", input$dims, rhs)
-      ## Must be a tensor otherwise the convert_base will
+    if (!is.null(input$convert_0_based) && input$convert_0_based) {
+      rhs <- sprintf("convert_0_based<%s>(%s)", input$dims, rhs)
+      ## Must be a tensor otherwise the convert_0_based will
       ## modify the underlying R data which we do not want to do
       tensor_type <- "leapfrog::Tensor"
     }
@@ -317,7 +317,7 @@ generate_struct_def <- function(inputs) {
   input_text <- vcapply(inputs, function(input) {
     if (input$dims == 1 && input$dim1 == 1) {
       type <- input$type
-    } else if (input$convert_base || nzchar(input$value)) {
+    } else if (input$convert_0_based || nzchar(input$value)) {
       type <- sprintf("Tensor%s<%s>", input$dims, input$type)
     } else {
       type <- sprintf("TensorMap%s<%s>", input$dims, input$type)
