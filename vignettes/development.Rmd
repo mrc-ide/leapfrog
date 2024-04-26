@@ -1,0 +1,71 @@
+---
+title: "Developing leapfrog"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{development}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Leapfrog has the ability to generate the wiring for input and output data. This is to reduce the number of locations you need to make changes when you want to add new input data or return some new data from the model. In short it amounts to:
+
+* Add new input data - modify `inst/cpp_generation/model_input.csv` and run `scripts/generate`
+* Add new model output - modify `inst/cpp_generation/model_output.csv` and run `scripts/generate`
+
+## General structure of leapfrog
+
+* Model variants & static switching & managing extensions
+* State saver
+* Each time iteration tick-tocking and resetting state and intermediate data
+* As a researcher you should just be able to write code without fannying about
+
+## Input data
+
+Input data is generated from csv file in `inst/cpp_generation/model_input.csv`, the columns in this file are
+1. `r_name` - The name of the data in R, from either `data` or `parameters` struct passed to `run_model`
+1. `cpp_name` - The name of the data in C++, the label you will use to refer to the data within the leapfrog model. Use a name which adheres to the naming convention rules in the README.
+1. `type` - The type of data, `real_type` or `int`. `real_type` is a templated type. Under normal usage it will be a `double` but is used by TMB for model fitting.
+1. `input_when` - An expression which evaluates to a boolean to control when this input data is used. For example `ModelVariant::run_child_model` to include only in the child model. If blank, this is always input.
+1. `value` - If you want to initialise this data as a constant value array, enter the value here. Note that if using this column then no value should be in the `r_name` column.
+1. `convert_base` - Set to `TRUE` for any array of indexes, these will be converted from 1-based numbering (for R) to 0-based numbering (for C++).
+1. `dims` - The number of dimensions for this input (max 4)
+1. `dim1` - The size of the first dimension
+1. `dim2` - The size of the second dimension, can by blank
+1. `dim3` - The size of the third dimension, can be blank
+1. `dim4` - The size of the fourth dimension, can be blank
+
+Note that the dims can be any of the state space sizes or `proj_years` for the number of years in the projection. See the README (link) for valid state space sizes.
+
+After making changes to the `model_input.csv`, run the generate script in `scripts/generate`. This update file `inst/include/model_input.hpp`. Note that this file should never be changed manually as the generate script will completely rewrite it.
+
+After regenerating the code, rebuild the project and you are ready to use it in C++.
+
+## Model outputs
+
+Model outputs are generated in a similar way to inputs. To modify an existing or add new output update the file `inst/cpp_generation/model_output.csv`. The columns in this file are:
+
+1. `r_name` - The name of the output in the list output from `run_model`
+1. `cpp_name` - The name of the output as it is referred to in C++
+1. `r_type` - The `R` type mapping function to use to convert this to an R-type number e.g. `REAL` to create a real typed number
+1. `output_when` - Conditional expression for when to output this from the model. For example `ModelVariant::run_child_model` to return only from the child model. If blank, this is always returned.
+1. `dims` - The number of dimensions of this output (max 5)
+1. `dim1` - The size of the first dimension
+1. `dim2` - The size of the second dimension
+1. `dim3` - The size of the third dimension
+1. `dim4` - The size of the fourth dimension
+1. `dim5` - The size of the fifth dimension
+
+Note that the dims can be any of the state space sizes or `proj_years` for the number of years in the projection. See the README (link) for valid state space sizes.
+
+## Intermediate data
+
+Intermediate data is used as a place to store 
+The intermediate data is not handled by code generation as it only requires changes in one place. You can make modifications.
+
