@@ -375,18 +375,15 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   v$art_dist_paed <- art_dist_paed
 
   ## pull in cotrim coverage numbers
-  ctx_pct <- leapfrog:::input_childart(pjnz)$ctx_percent
-  v$ctx_val_ispercent <- ctx_pct
+  ctx_pct <- T
   ## ctx_effect_notrt <- c(rep(0.33, 5), rep(0,5))
   ctx_effect <- rep(0.33,61)
   v$ctx_val <- leapfrog:::input_childart(pjnz)$ctx / 100
   v$ctx_effect <- as.array(ctx_effect)
 
   ## pull in ART coverage numbers
-  art = leapfrog:::input_childart(pjnz)
-  v$artpaeds_isperc <- art$art_ispercent[2,]
-  art$child_art[which(art$art_ispercent[2,])] <- art$child_art[which(art$art_ispercent[2,])] / 100
-  v$paed_art_val <- art$child_art
+  v$artpaeds_isperc <- rep(T,  length(1970:2029))
+  v$paed_art_val <- leapfrog:::input_childart(pjnz)$child_art
 
   ##PMTCT
   pmtct_list <- leapfrog:::input_pmtct(pjnz)
@@ -455,24 +452,24 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   v$paed_art_elig_age <- art_elig$age_elig / 12 ##converts from months to years
 
   ##MKW: stopped here
-  cd4_elig <- art_elig$cd4_elig[c(5:7,4),]
+  cd4_elig <- art_elig$cd4_elig[c(1:3,8),]
   ##Changing the input from CD4 count or percentages to ordinal categories
   ###Easier to do it here than in the leapfrog code
   get_ordinal <- function(vec){
     out <- c()
     for (i in 1:length(vec)) {
       if(vec[i] >= 1000){
-        val = 1
+        val = 0
       }else if( vec[i] >= 750){
-        val = 2
+        val = 1
       }else if(vec[i] >= 500 ){
-        val = 3
+        val = 2
       }else if(vec[i] >= 350 ){
-        val = 4
+        val = 3
       }else if(vec[i] >= 200 ){
-        val = 5
+        val = 4
       }else if(vec[i] >= 50 ){
-        val = 6
+        val = 5
       }else if(vec[i] > 30 ){
         val = 0
       }else if(vec[i] >= 26 ){
@@ -493,11 +490,11 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
     out
   }
 
-  paed_art_elig_cd4 <- array(data = NA, dim = c(15, 61), dimnames = list(age = c(0:14), year = c(1970:2030)))
+  paed_art_elig_cd4 <- array(data = NA, dim = c(length(0:14), length(1970:2030)), dimnames = list(age = c(0:14), year = c(1970:2030)))
   paed_art_elig_cd4[1,] <- get_ordinal(unname(cd4_elig[1,]))
   paed_art_elig_cd4[2:3,] <- get_ordinal(unname(cd4_elig[2,]))
   paed_art_elig_cd4[4:5,] <- get_ordinal(unname(cd4_elig[3,]))
-  paed_art_elig_cd4[6:15,] <- rep(get_ordinal(cd4_elig[4,]), each = length(6:15))
+  paed_art_elig_cd4[6:15,] <- get_ordinal(cd4_elig[4,])
   v$paed_art_elig_cd4 <- paed_art_elig_cd4
 
 

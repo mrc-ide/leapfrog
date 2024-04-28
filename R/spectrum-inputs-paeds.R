@@ -106,11 +106,11 @@ input_childart <- function(pjnz){
   ######################
   ##Sort whether ART is being input by age or aggregate
   ######################
-  if(all(is.na(art$childart[3:5,]))){
+  # if(all(is.na(art$childart[3:5,]))){
     age_specific = F
-  }else{
-    age_specific = T
-  }
+  # }else{
+  #   age_specific = T
+  # }
 
   if(age_specific){
     out <- array(data = NA, dim = c(3,ncol(art$childart)), dimnames = list(age = row.names(art$childart)[3:5], year = colnames(art$childart)))
@@ -127,8 +127,7 @@ input_childart <- function(pjnz){
   list(ctx = cotrim,
        ctx_percent = cotrim_pct,
        age_spec = age_specific,
-       child_art = out,
-       art_ispercent = art$childart_ispercent)
+       child_art = out)
 
 }
 
