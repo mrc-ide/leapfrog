@@ -1045,9 +1045,7 @@ void calc_total_and_unmet_need(int time_step,
   }// end ag
 
   intermediate.children.total_need(0) = intermediate.children.on_art(0) + intermediate.children.unmet_need(0);
-  if(time_step == 54){
-    std::cout << intermediate.children.unmet_need(0);
-  }
+
 
 }
 
@@ -1256,10 +1254,12 @@ void calc_art_initiates(int time_step,
 
 
   for (int ag = 0; ag < 4; ++ag) {
-    if(state_next.children.hc_art_init(ag) > (intermediate.children.unmet_need(ag) + intermediate.children.on_art(ag) * intermediate.children.retained))
-      state_next.children.hc_art_init(ag) = (intermediate.children.unmet_need(ag) + intermediate.children.on_art(ag) * intermediate.children.retained);
+    if(state_next.children.hc_art_init(ag) > (intermediate.children.unmet_need(ag) ))
+      state_next.children.hc_art_init(ag) = (intermediate.children.unmet_need(ag));
   }// end ag
-
+  if(time_step == 38){
+    std::cout <<  state_next.children.hc_art_init(0);
+  }
 }
 
 template<typename ModelVariant, typename real_type>

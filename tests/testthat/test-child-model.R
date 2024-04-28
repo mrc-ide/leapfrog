@@ -64,8 +64,6 @@ test_that("Infections among children align", {
   expect_true(all(abs(dt$diff) < 1e-3))
 })
 
-#diverging in 2030
-##ordering is off for paed art
 test_that("CLHIV align", {
   input <- setup_childmodel(testinput = "testdata/child_parms.rds")
   demp = input$demp
@@ -156,6 +154,7 @@ test_that("CLHIV on ART align", {
   dt <- dt %>%
     mutate(diff = pop - fr)
   x <- data.table(dt)
+  # ggplot(x, aes(year, diff, col = as.factor(cd4_cat))) + geom_line() + facet_grid(time_art~age)
   x[,pct_diff := (pop - fr) / pop]
   dx <- x[year == 2004 & sex == 'Male' & time_art == 'ARTlte5mo' ]
   dx
