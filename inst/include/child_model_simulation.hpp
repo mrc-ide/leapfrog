@@ -1015,13 +1015,11 @@ void calc_total_and_unmet_need(int time_step,
   internal::eligible_for_treatment(time_step, pars, state_curr, state_next, intermediate);
 
   for (int s = 0; s <ss.NS; ++s) {
-    for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
       for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
         for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
           intermediate.children.unmet_need(cpars.hc_age_coarse(a)) += intermediate.children.eligible(hd, a, s) ;
         } // end hc_ss.hc1DS
       } // end a
-    } // end hcTT
   } // end ss.NS
 
   for (int s = 0; s < ss.NS; ++s) {
@@ -1047,7 +1045,9 @@ void calc_total_and_unmet_need(int time_step,
   }// end ag
 
   intermediate.children.total_need(0) = intermediate.children.on_art(0) + intermediate.children.unmet_need(0);
-
+  if(time_step == 54){
+    std::cout << intermediate.children.unmet_need(0);
+  }
 
 }
 
@@ -1096,7 +1096,7 @@ void calc_art_last_year(int time_step,
         }// end ag
       }
     }else{
-      intermediate.children.total_art_last_year(0) = cpars.hc_art_val(0,time_step-1) * intermediate.children.total_need(0) ;
+      intermediate.children.total_art_last_year(0) = cpars.hc_art_val(0,time_step-1) * intermediate.children.total_need(0);
     }
 
   }else{ // ART entered as number last year
@@ -1243,6 +1243,9 @@ void calc_art_initiates(int time_step,
 
   intermediate.children.retained = 1 ;// - cpars.paed_art_ltfu(time_step);
 
+  if(time_step == 53){
+    intermediate.children.total_art_last_year(0) = 0.0;
+  }
 
   for (int ag = 0; ag < 4; ++ag) {
     state_next.children.hc_art_init(ag) = 0.5 * (intermediate.children.total_art_last_year(ag) + intermediate.children.total_art_this_year(ag)) - intermediate.children.on_art(ag) * intermediate.children.retained + intermediate.children.hc_art_deaths(ag);
@@ -1251,11 +1254,11 @@ void calc_art_initiates(int time_step,
     }
   }// end ag
 
+
   for (int ag = 0; ag < 4; ++ag) {
     if(state_next.children.hc_art_init(ag) > (intermediate.children.unmet_need(ag) + intermediate.children.on_art(ag) * intermediate.children.retained))
       state_next.children.hc_art_init(ag) = (intermediate.children.unmet_need(ag) + intermediate.children.on_art(ag) * intermediate.children.retained);
   }// end ag
-
 
 }
 
@@ -1328,6 +1331,7 @@ void hc_art_initiation_by_age(int time_step,
       }
     }
 
+
     for (int s = 0; s <ss.NS; ++s) {
       for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
         for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
@@ -1369,8 +1373,6 @@ void hc_art_initiation_by_age(int time_step,
         } // end hc_ss.hc1DS
       } //end a
     } // end ss.NS
-
-
 
     if (intermediate.children.hc_initByAge(0) == 0.0) {
       intermediate.children.hc_adj(0) = 1.0 ;
