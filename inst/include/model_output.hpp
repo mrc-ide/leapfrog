@@ -96,6 +96,7 @@ Rcpp::List build_r_output(const leapfrog::OutputState<ModelVariant, real_type> &
     Rcpp::NumericVector r_hiv_births(output_years);
     Rcpp::NumericVector r_hc_art_total(4 * output_years);
     Rcpp::NumericVector r_hc_art_init(4 * output_years);
+    Rcpp::NumericVector r_hc_art_need_init(children.hc1DS * children.hcTT * 15 * base.NS * output_years);
     r_hc1_hiv_pop.attr("dim") = Rcpp::NumericVector::create(children.hc1DS, children.hcTT, children.hc1AG, base.NS, output_years);
     r_hc2_hiv_pop.attr("dim") = Rcpp::NumericVector::create(children.hc2DS, children.hcTT, children.hc2AG, base.NS, output_years);
     r_hc1_art_pop.attr("dim") = Rcpp::NumericVector::create(base.hTS, children.hc1DS, children.hc1AG, base.NS, output_years);
@@ -108,6 +109,7 @@ Rcpp::List build_r_output(const leapfrog::OutputState<ModelVariant, real_type> &
     r_hiv_births.attr("dim") = Rcpp::NumericVector::create(output_years);
     r_hc_art_total.attr("dim") = Rcpp::NumericVector::create(4, output_years);
     r_hc_art_init.attr("dim") = Rcpp::NumericVector::create(4, output_years);
+    r_hc_art_need_init.attr("dim") = Rcpp::NumericVector::create(children.hc1DS, children.hcTT, 15, base.NS, output_years);
     std::copy_n(state.children.hc1_hiv_pop.data(), state.children.hc1_hiv_pop.size(), REAL(r_hc1_hiv_pop));
     std::copy_n(state.children.hc2_hiv_pop.data(), state.children.hc2_hiv_pop.size(), REAL(r_hc2_hiv_pop));
     std::copy_n(state.children.hc1_art_pop.data(), state.children.hc1_art_pop.size(), REAL(r_hc1_art_pop));
@@ -120,6 +122,7 @@ Rcpp::List build_r_output(const leapfrog::OutputState<ModelVariant, real_type> &
     std::copy_n(state.children.hiv_births.data(), state.children.hiv_births.size(), REAL(r_hiv_births));
     std::copy_n(state.children.hc_art_total.data(), state.children.hc_art_total.size(), REAL(r_hc_art_total));
     std::copy_n(state.children.hc_art_init.data(), state.children.hc_art_init.size(), REAL(r_hc_art_init));
+    std::copy_n(state.children.hc_art_need_init.data(), state.children.hc_art_need_init.size(), REAL(r_hc_art_need_init));
     ret.push_back(r_hc1_hiv_pop, "hc1_hiv_pop");
     ret.push_back(r_hc2_hiv_pop, "hc2_hiv_pop");
     ret.push_back(r_hc1_art_pop, "hc1_art_pop");
@@ -132,6 +135,7 @@ Rcpp::List build_r_output(const leapfrog::OutputState<ModelVariant, real_type> &
     ret.push_back(r_hiv_births, "hiv_births");
     ret.push_back(r_hc_art_total, "hc_art_total");
     ret.push_back(r_hc_art_init, "hc_art_init");
+    ret.push_back(r_hc_art_need_init, "hc_art_need_init");
   }
 
   return ret;

@@ -322,6 +322,7 @@ struct ChildModelState<ChildModel, real_type> {
   real_type ctx_mean;
   TensorFixedSize <real_type, Sizes<4>> hc_art_total;
   TensorFixedSize <real_type, Sizes<4>> hc_art_init;
+  TensorFixedSize <real_type, Sizes<hc1DS<ChildModel>, hcTT<ChildModel>, 15, NS<ChildModel>>> hc_art_need_init;
 
 
   ChildModelState(const Parameters<ChildModel, real_type> &pars) {
@@ -347,6 +348,7 @@ struct ChildModelState<ChildModel, real_type> {
     ctx_mean = 1.0;
     hc_art_total.setZero();
     hc_art_init.setZero();
+    hc_art_need_init.setZero();
   }
 };
 
@@ -487,7 +489,7 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_posthivmort;
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_grad;
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_art_need;
-  TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_art_need_init;
+  // TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_art_need_init;
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_ctx_need;
   TensorFixedSize <real_type, Sizes<4>> hc_art_need_init_total;
   TensorFixedSize <real_type, Sizes<4>> total_art_last_year;
@@ -553,7 +555,7 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
     hc_posthivmort.setZero();
     hc_grad.setZero();
     hc_art_need.setZero();
-    hc_art_need_init.setZero();
+    // hc_art_need_init.setZero();
     hc_ctx_need.setZero();
     hc_art_need_init_total.setZero();
     total_art_last_year.setZero();

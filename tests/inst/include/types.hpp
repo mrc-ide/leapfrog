@@ -320,7 +320,7 @@ struct ChildModelState<ChildModel, real_type> {
   TensorFixedSize <real_type, Sizes<hTS<ChildModel>, hc2DS<ChildModel>, hc2AG<ChildModel>, NS<ChildModel>>> hc2_art_aids_deaths;
   real_type hc_art_num;
   real_type hiv_births;
-  TensorFixedSize <real_type, Sizes<hc1DS<ChildModel>, hcTT<ChildModel>, hc1AG<ChildModel>, NS<ChildModel>>> hc_art_need_init;
+  TensorFixedSize <real_type, Sizes<hc1DS<ChildModel>, hcTT<ChildModel>, 15, NS<ChildModel>>> hc_art_need_init;
 
 
   ChildModelState(const Parameters<ChildModel, real_type> &pars) {

@@ -89,6 +89,7 @@ struct ChildModelOutputState<ChildModel, real_type> {
   Tensor1<real_type> ctx_mean;
   Tensor2<real_type> hc_art_total;
   Tensor2<real_type> hc_art_init;
+  Tensor5<real_type> hc_art_need_init;
 
 
   ChildModelOutputState(int no_output_years)
@@ -127,7 +128,11 @@ struct ChildModelOutputState<ChildModel, real_type> {
         hc_art_num(4, no_output_years),
         hiv_births(no_output_years),
         hc_art_total(4, no_output_years),
-        hc_art_init(4, no_output_years){
+        hc_art_init(4, no_output_years),
+        hc_art_need_init(StateSpace<ChildModel>().children.hc1DS,
+                            StateSpace<ChildModel>().children.hcTT,
+                            15,
+                            StateSpace<ChildModel>().base.NS, no_output_years){
     hc1_hiv_pop.setZero();
     hc2_hiv_pop.setZero();
     hc1_art_pop.setZero();
@@ -140,6 +145,7 @@ struct ChildModelOutputState<ChildModel, real_type> {
     hiv_births.setZero();
     hc_art_total.setZero();
     hc_art_init.setZero();
+    hc_art_need_init.setZero();
 
   }
 };
@@ -216,8 +222,9 @@ public:
     children_state.hiv_births(i) = state.children.hiv_births;
     // children_state.hc_art_num(i, children_state.hc_art_num.NumDimensions - 1) = state.children.hc_art_num;
     // children_state.hc_art_total(i, children_state.hc_art_total.NumDimensions - 1) = state.children.hc_art_num;
-    // children_state.hc_art_init(i, children_state.hc_art_init.NumDimensions - 1) = state.children.hc_art_num;
-
+    children_state.hc_art_init.chip(i, children_state.hc_art_init.NumDimensions - 1)  = state.children.hc_art_init;
+    children_state.hc_art_need_init.chip(i, children_state.hc_art_need_init.NumDimensions - 1) =
+      state.children.hc_art_need_init;
   }
 };
 

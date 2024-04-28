@@ -104,6 +104,9 @@ test_that("CLHIV align", {
   dt <- dt %>%
     mutate(diff = pop - fr)
   y <- data.table(dt)
+  y[year == 2004 & sex == 'Male' & age == 0 & !cd4_cat %in% c('gte30', '26-30')]
+  y[year == 2030 & sex == 'Male' & age == 0 ]
+
 
   expect_true(all(abs(dt$diff) < 1e-1))
 })
@@ -153,7 +156,7 @@ test_that("CLHIV on ART align", {
     mutate(diff = pop - fr)
   x <- data.table(dt)
   x[,pct_diff := (pop - fr) / pop]
-  dx <- x[year == 2020 & sex == 'Male' & time_art == 'ARTlte5mo' & abs(pct_diff) > 1e-3]
+  dx <- x[year == 2004 & sex == 'Male' & time_art == 'ARTlte5mo' ]
   dx
   expect_true(all(abs(dt$diff) < 1e-1))
 })
@@ -237,7 +240,7 @@ test_that("HIV related deaths among CLHIV on ART align", {
     mutate(diff = spec - fr)
 
   deaths = data.table(dt)
-  deaths[sex == 'Male' & year == 2020]
+  deaths[sex == 'Male' & year == 2004]
 
   expect_true(all(abs(dt$diff) < 1))
 
