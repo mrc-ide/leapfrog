@@ -14,7 +14,7 @@ test_that("Child model can be run for all years", {
       "hc1_art_pop", "hc2_art_pop",
       "hc1_noart_aids_deaths", "hc2_noart_aids_deaths",
       "hc1_art_aids_deaths", "hc2_art_aids_deaths", "hc_art_num", "hiv_births",
-      "hc_art_total", "hc_art_init"
+      "hc_art_total", "hc_art_init", 'hc_art_need_init'
     )
   )
 
@@ -42,6 +42,7 @@ test_that("Infections among children align", {
   inf_spec <- SpectrumUtils::dp.output.incident.hiv(dp.raw = dp)
   inf_spec <- inf_spec %>%
     filter(Sex == 'Male+Female') %>%
+    filter(Age != '80+') %>%
     mutate(Age = as.numeric(Age)) %>%
     filter(Age < 15) %>% reshape2::melt(id.vars = c('Sex', 'Age')) %>%
     rename(Year = variable, Spec = value) %>%
@@ -60,7 +61,7 @@ test_that("Infections among children align", {
   dt <- dt %>%
     mutate(diff = Spec - lfrog)
 
-  expect_true(all(abs(dt$diff) < 1e-1))
+  expect_true(all(abs(dt$diff) < 1e-3))
 })
 
 #diverging in 2030
