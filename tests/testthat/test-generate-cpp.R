@@ -35,7 +35,7 @@ test_that("can generate input parsing", {
     "(data, \"basepop\", base.pAG, base.NS);"),
     result)
   expect_contains(paste0(
-    "const leapfrog::Tensor1<int> idx_hm_elig = convert_base<1>(",
+    "const leapfrog::Tensor1<int> idx_hm_elig = convert_0_based<1>(",
     "parse_data<int>(data, \"artcd4elig_idx\", proj_years + 1));"),
     result)
   expect_contains(
@@ -115,7 +115,7 @@ test_that("can generate length 1 inputs", {
   length_1_input <- data.frame(r_name = "len1", cpp_name = "Demography.len_1",
                                type = "real_type", input_when = "",
                                value = NA_character_,
-                               convert_base = FALSE, dims = 1, dim1 = 1,
+                               convert_0_based = FALSE, dims = 1, dim1 = 1,
                                dim2 = "", dim3 = "", dim4 = "")
   input <- rbind.data.frame(input, length_1_input)
   t_input <- tempfile()
@@ -202,7 +202,7 @@ test_that("error raised if cpp_name malformed", {
   input <- data.frame(r_name = "r_name", cpp_name = "name",
                       type = "real_type", input_when = "",
                       value = NA_character_,
-                      convert_base = FALSE, dims = 1, dim1 = 1,
+                      convert_0_based = FALSE, dims = 1, dim1 = 1,
                       dim2 = "", dim3 = "", dim4 = "")
   t_input <- tempfile()
   write.csv(input, t_input)
@@ -247,4 +247,3 @@ test_that("can generate state types", {
     "hc1AG<ChildModel>, NS<ChildModel>>> hc1_hiv_pop;"), result)
   expect_contains("hc1_hiv_pop.setZero();", result)
 })
-

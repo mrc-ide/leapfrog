@@ -1,4 +1,4 @@
-r_name,cpp_name,type,input_when,value,convert_base,dims,dim1,dim2,dim3,dim4
+r_name,cpp_name,type,input_when,value,convert_0_based,dims,dim1,dim2,dim3,dim4
 basepop,Demography.base_pop,real_type,,,FALSE,2,base.pAG,base.NS,,
 Sx,Demography.survival_probability,real_type,,,FALSE,3,base.pAG + 1,base.NS,proj_years,
 netmigr_adj,Demography.net_migration,real_type,,,FALSE,3,base.pAG,base.NS,proj_years,
@@ -9,7 +9,7 @@ incrr_age,Incidence.relative_risk_age,real_type,,,FALSE,3,base.pAG - options.p_i
 incrr_sex,Incidence.relative_risk_sex,real_type,,,FALSE,1,proj_years,,,
 cd4_mort,NaturalHistory.cd4_mortality,real_type,,,FALSE,3,base.hDS,base.hAG,base.NS,
 cd4_prog,NaturalHistory.cd4_progression,real_type,,,FALSE,3,base.hDS - 1,base.hAG,base.NS,
-artcd4elig_idx,Art.idx_hm_elig,int,,,TRUE,1,proj_years + 1,,,
+artcd4elig_idx,Art.idx_hm_elig,int,,,TRUE,1,proj_years,,,
 cd4_initdist,NaturalHistory.cd4_initial_distribution,real_type,,,FALSE,3,base.hDS,base.hAG,base.NS,
 art_mort,Art.mortality,real_type,,,FALSE,4,base.hTS,base.hDS,base.hAG,base.NS
 artmx_timerr,Art.mortaility_time_rate_ratio,real_type,,,FALSE,2,base.hTS,proj_years,,
@@ -28,7 +28,7 @@ paed_cd4_prog,Children.hc1_cd4_prog,real_type,ModelVariant::run_child_model,,FAL
 adol_cd4_prog,Children.hc2_cd4_prog,real_type,ModelVariant::run_child_model,,FALSE,1,children.hc2DS,,,
 ctx_effect,Children.ctx_effect,real_type,ModelVariant::run_child_model,,FALSE,1,1,,,
 ctx_val,Children.ctx_val,real_type,ModelVariant::run_child_model,,FALSE,1,proj_years,,,
-paed_art_elig_age,Children.hc_art_elig_age,real_type,ModelVariant::run_child_model,,FALSE,1,proj_years,,,
+paed_art_elig_age,Children.hc_art_elig_age,int,ModelVariant::run_child_model,,FALSE,1,proj_years,,,
 paed_art_elig_cd4,Children.hc_art_elig_cd4,real_type,ModelVariant::run_child_model,,TRUE,2,options.p_idx_hiv_first_adult,proj_years,,
 mort_art_rr,Children.hc_art_mort_rr,real_type,ModelVariant::run_child_model,,FALSE,3,base.hTS,options.p_idx_hiv_first_adult,proj_years,
 paed_art_mort,Children.hc1_art_mort,real_type,ModelVariant::run_child_model,,FALSE,3,children.hc1DS,base.hTS,children.hc1AG,

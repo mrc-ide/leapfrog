@@ -2,9 +2,9 @@
 #'
 #' @param data Input data
 #' @param parameters Projection parameters
-#' @param sim_years Simulation years to run model for
-#' @param hts_per_year Number of HIV time steps per year
-#' @param output_steps Which sim years to output for
+#' @param sim_years Simulation years to run model for default 1970:2030
+#' @param hts_per_year Number of HIV time steps per year, default 10
+#' @param output_steps Which sim years to output for default same as sim_years
 #' @param hiv_age_stratification The age stratification for HIV population,
 #'  "coarse" or "full"
 #' @param run_child_model If TRUE then run the child model
@@ -12,9 +12,29 @@
 #' @return List of model outputs
 #' @export
 run_model <- function(data, parameters, sim_years,
-                      hts_per_year, output_steps,
+                      hts_per_year,
+                      output_steps = NULL,
                       hiv_age_stratification = "full",
                       run_child_model = TRUE) {
+  if (is.null(sim_years)) {
+    sim_years <- 1970:2030
+  }
+  if (is.null(output_steps)) {
+    output_steps <- seq_along(sim_years)
+  } else {
+    ## We want users to think in terms of years, so interface has years
+    ## But for running the C++ loop we want to report out based on what
+    ## iteration step we're at so convert from years to index
+    invalid_steps <- output_steps[!(output_steps %in% sim_years)]
+    if (any(invalid_steps)) {
+      out_str <- paste(paste0("'", invalid_steps, "'"), collapse = ", ")
+      stop(sprintf(
+        "Invalid output %s %s. Can only output one of the simulation years.",
+        ngettext(length(invalid_steps), "step", "steps"), out_str))
+    }
+    output_steps <- which(sim_years %in% output_steps)
+  }
+
   assert_enum(hiv_age_stratification, c("full", "coarse"))
   if (hiv_age_stratification == "full" && !run_child_model) {
     model_variant <- "BaseModelFullAgeStratification"
@@ -40,6 +60,5 @@ run_model <- function(data, parameters, sim_years,
   }
   data <- c(data, parameters)
 
-  run_base_model(data, sim_years, hts_per_year, output_steps,
-                 model_variant)
+  run_base_model(data, sim_years, hts_per_year, output_steps, model_variant)
 }

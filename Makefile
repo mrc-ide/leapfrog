@@ -23,7 +23,7 @@ README.md: README.Rmd
 	rm -f $@.bak
 
 test_leaks:
-	R -d 'valgrind --leak-check=full' -e 'testthat::test_local(".")'
+	R -d 'valgrind --leak-check=full --error-exitcode=1' -e 'testthat::test_local(".")'
 
 check:
 	_R_CHECK_CRAN_INCOMING_=FALSE make check_all

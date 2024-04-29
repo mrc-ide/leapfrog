@@ -29,14 +29,14 @@ generate_output_interface <- function(dest) {
   ## we are generating out struct types and we know which output
   ## belongs to which struct
   default_data <- generate_output_section(default_section, "base")
-  default_data <- paste(default_data, collapse = "\n")
+  default_data <- paste_lines(default_data)
   build_list <- generate_build_list(default_section)
-  build_list <- paste(build_list, collapse = "\n")
+  build_list <- paste_lines(build_list)
 
   remaining_sections <- output_sections[names(output_sections) != ""]
   optional_data <- Map(generate_optional_output_section,
                        remaining_sections, names(remaining_sections))
-  optional_data <- paste(unlist(optional_data), collapse = "\n")
+  optional_data <- paste_lines(unlist(optional_data))
 
   header <- generate_header(basename(template_path))
 
@@ -143,15 +143,15 @@ generate_input_interface <- function(
 
   default_section <- input_sections[names(input_sections) == ""][[1]]
   default_data <- generate_input_section(default_section)
-  default_data <- paste(default_data, collapse = "\n")
+  default_data <- paste_lines(default_data)
 
   structs <- generate_struct_instantiation(default_section)
-  structs <- paste(structs, collapse = "\n")
+  structs <- paste_lines(structs)
 
   remaining_sections <- input_sections[names(input_sections) != ""]
   optional_data <- Map(generate_optional_input_section,
                        remaining_sections, names(remaining_sections))
-  optional_data <- paste(unlist(optional_data), collapse = "\n")
+  optional_data <- paste_lines(unlist(optional_data))
 
   header <- generate_header(basename(template_path))
 
@@ -207,9 +207,9 @@ generate_input_from_r <- function(inputs) {
     rhs <- sprintf("parse_data<%s>(data, \"%s\", %s)",
                    input$type, input$r_name, dimensions)
     tensor_type <- "leapfrog::TensorMap"
-    if (!is.null(input$convert_base) && input$convert_base) {
-      rhs <- sprintf("convert_base<%s>(%s)", input$dims, rhs)
-      ## Must be a tensor otherwise the convert_base will
+    if (!is.null(input$convert_0_based) && input$convert_0_based) {
+      rhs <- sprintf("convert_0_based<%s>(%s)", input$dims, rhs)
+      ## Must be a tensor otherwise the convert_0_based will
       ## modify the underlying R data which we do not want to do
       tensor_type <- "leapfrog::Tensor"
     }
@@ -286,7 +286,7 @@ generate_parameter_types <- function(dest) {
   inputs_by_struct <- get_data_by_struct(parsed_inputs)
 
   struct_defs <- vcapply(inputs_by_struct, generate_struct_def)
-  struct_defs <- paste(struct_defs, collapse = "\n")
+  struct_defs <- paste_lines(struct_defs)
 
   header <- generate_header(basename(template_path))
 
@@ -319,7 +319,7 @@ generate_struct_def <- function(inputs) {
   input_text <- vcapply(inputs, function(input) {
     if (input$dims == 1 && input$dim1 == 1) {
       type <- input$type
-    } else if (input$convert_base || nzchar(input$value)) {
+    } else if (input$convert_0_based || nzchar(input$value)) {
       type <- sprintf("Tensor%s<%s>", input$dims, input$type)
     } else {
       type <- sprintf("TensorMap%s<%s>", input$dims, input$type)
@@ -329,7 +329,7 @@ generate_struct_def <- function(inputs) {
   paste0(
     "template<typename real_type>\n",
     sprintf("struct %s {\n", inputs[[1]]$struct),
-    paste(input_text, collapse = "\n"),
+    paste_lines(input_text),
     "\n};\n"
   )
 }
@@ -339,8 +339,7 @@ generate_struct_instance <- function(inputs) {
     sprintf("  const leapfrog::%s<real_type> %s_params = {\n",
             inputs[[1]]$struct,
             to_lower_camel(inputs[[1]]$struct)),
-    paste(sprintf("    %s", vcapply(inputs, "[[", "cpp_name")),
-          collapse = "\n"),
+    paste_lines(sprintf("    %s", vcapply(inputs, "[[", "cpp_name"))),
     "  \n};\n"
   )
 }
@@ -452,7 +451,7 @@ generate_state_reset_function <- function(outputs) {
 }
 
 generate_cpp <- function(template) {
-  glue::glue(paste(template, collapse = "\n"),
+  glue::glue(paste_lines(template),
              .open = "{{", .close = "}}",
              .envir = parent.frame())
 }

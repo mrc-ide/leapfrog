@@ -98,3 +98,7 @@ group_list_of_lists <- function(list, on) {
   names(out) <- types
   out
 }
+
+paste_lines <- function(...) {
+  paste(..., collapse = "\n")
+}
