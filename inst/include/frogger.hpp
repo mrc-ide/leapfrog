@@ -9,12 +9,28 @@
 
 namespace leapfrog {
 
+// If we want to set any state for first iteration to something
+// other than 0 do it here.
+template<typename ModelVariant, typename real_type>
+void set_initial_state(State<ModelVariant, real_type> &state,
+                       const Parameters<ModelVariant, real_type> &pars) {
+  constexpr auto ss = StateSpace<ModelVariant>().base;
+  for (int g = 0; g < ss.NS; ++g) {
+    for (int a = 0; a < ss.pAG; ++a) {
+      state.base.p_total_pop(a, g) = pars.base.demography.base_pop(a, g);
+    }
+  }
+}
+
+
 template<typename ModelVariant, typename real_type>
 OutputState<ModelVariant, real_type> run_model(int time_steps,
                                                std::vector<int> save_steps,
                                                const Parameters<ModelVariant, real_type> &pars) {
   auto state = State<ModelVariant, real_type>(pars);
   auto state_next = state;
+  set_initial_state<ModelVariant, real_type>(state, pars);
+
   internal::IntermediateData<ModelVariant, real_type> intermediate(pars.base.options.hAG_15plus);
 
   intermediate.reset();
@@ -25,7 +41,6 @@ OutputState<ModelVariant, real_type> run_model(int time_steps,
 
   // Each time step is mid-point of the year
   for (int step = 1; step < time_steps; ++step) {
-    state_next.reset();
     run_general_pop_demographic_projection<ModelVariant>(step, pars, state, state_next,
                                                          intermediate);
     run_hiv_pop_demographic_projection<ModelVariant>(step, pars, state, state_next,
@@ -36,6 +51,7 @@ OutputState<ModelVariant, real_type> run_model(int time_steps,
     }
     state_output.save_state(state_next, step);
     std::swap(state, state_next);
+    state_next.reset();
     intermediate.reset();
   }
   return state_output.get_full_state();

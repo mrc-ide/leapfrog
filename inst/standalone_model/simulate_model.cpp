@@ -231,10 +231,10 @@ int main(int argc, char *argv[]) {
       idx_hm_elig,
       art_mortality_rate,
       art_mortality_time_rate_ratio,
-      h_art_stage_dur,
       art_dropout,
       adults_on_art,
       adults_on_art_is_percent,
+      h_art_stage_dur,
       0.2  // initiation_mortality_weight
   };
 
@@ -247,8 +247,6 @@ int main(int argc, char *argv[]) {
 
   leapfrog::internal::IntermediateData<leapfrog::BaseModelFullAgeStratification, double> intermediate(
       options.hAG_15plus);
-  auto state_current = leapfrog::State<leapfrog::BaseModelFullAgeStratification, double>(
-      params);
 
   std::vector<int> save_steps(61);
   std::iota(save_steps.begin(), save_steps.end(), 0);
@@ -268,14 +266,16 @@ int main(int argc, char *argv[]) {
   }
 
   for (size_t i = 0; i < n_runs; ++i) {
+    auto state_current = leapfrog::State<leapfrog::BaseModelFullAgeStratification, double>(
+        params);
     auto state_next = state_current;
+    leapfrog::set_initial_state<leapfrog::BaseModelFullAgeStratification, double>(state_current, params);
 
     // Save initial state
     state_output.save_state(state_current, 0);
 
     // Each time step is mid-point of the year
     for (int step = 1; step <= sim_years; ++step) {
-      state_next.reset();
       leapfrog::run_general_pop_demographic_projection<leapfrog::BaseModelFullAgeStratification, double>(
           step, params,
           state_current,
@@ -292,6 +292,7 @@ int main(int argc, char *argv[]) {
       state_output.save_state(state_next, step);
       std::swap(state_current, state_next);
       intermediate.reset();
+      state_next.reset();
     }
   }
   std::cout << "Fit complete" << std::endl;
