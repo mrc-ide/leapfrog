@@ -13,7 +13,7 @@ test_that("Child model can be run for all years", {
       "h_art_initiation", "p_hiv_deaths", "hc1_hiv_pop", "hc2_hiv_pop",
       "hc1_art_pop", "hc2_art_pop",
       "hc1_noart_aids_deaths", "hc2_noart_aids_deaths",
-      "hc1_art_aids_deaths", "hc2_art_aids_deaths", "hc_art_num", "hiv_births",
+      "hc1_art_aids_deaths", "hc2_art_aids_deaths",  "hiv_births",
       "hc_art_total", "hc_art_init", 'hc_art_need_init', 'ctx_need'
     )
   )

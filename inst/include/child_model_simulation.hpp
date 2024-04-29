@@ -5,7 +5,7 @@
 namespace leapfrog {
 
 
- namespace internal {
+namespace internal {
 
 template<typename ModelVariant, typename real_type>
 void run_child_ageing(int time_step,
@@ -120,7 +120,6 @@ void run_wlhiv_births(int time_step,
       intermediate.children.df = 1;
     }
 
-
     for (int hd = 0; hd < ss.hDS; ++hd) {
       intermediate.children.df += cpars.local_adj_factor * cpars.fert_mult_by_age(a) * cpars.fert_mult_offart(hd) * ((state_next.base.h_hiv_adult(hd, a, 1) + state_curr.base.h_hiv_adult(hd, a, 1)) / 2);
       //women on ART less than 6 months use the off art fertility multiplier
@@ -150,10 +149,8 @@ void run_wlhiv_births_input_mat_prev(int time_step,
                                      State<ModelVariant, real_type> &state_next,
                                      IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "run_wlhiv_births can only be called for model variants where run_child_model is true");
-  constexpr auto ss = StateSpace<ModelVariant>().base;
+                "run_wlhiv_births_input_mat_prev can only be called for model variants where run_child_model is true");
   const auto cpars = pars.children.children;
-  const auto demog = pars.base.demography;
 
   state_next.children.hiv_births = cpars.mat_hiv_births(time_step);
 
@@ -170,8 +167,6 @@ void calc_hiv_negative_pop(int time_step,
   static_assert(ModelVariant::run_child_model,
                 "calc_hiv_negative_pop can only be called for model variants where run_child_model is true");
   constexpr auto ss = StateSpace<ModelVariant>().base;
-  constexpr auto hc_ss = StateSpace<ModelVariant>().children;
-
 
   for(int s = 0; s < ss.NS; ++s){
     for(int a = 0; a < ss.hAG; ++a){
@@ -206,12 +201,12 @@ void convert_PMTCT_num_to_perc(int time_step,
   //replace all instances of coverage input as numbers with percentage covered
   if(cpars.PMTCT_input_is_percent(time_step)){
     for (int hp = 0; hp < hc_ss.hPS; ++hp) {
-        intermediate.children.PMTCT_coverage(hp) =  cpars.PMTCT(hp,time_step) / 100;
+      intermediate.children.PMTCT_coverage(hp) =  cpars.PMTCT(hp,time_step) / 100;
 
     } //end hPS
   }else{
     for (int hp = 0; hp < hc_ss.hPS; ++hp) {
-        intermediate.children.OnPMTCT = intermediate.children.sumARV ;
+      intermediate.children.OnPMTCT = intermediate.children.sumARV ;
       if (intermediate.children.sumARV == 0) {
         intermediate.children.PMTCT_coverage(hp) = 0.0;
       } else {
@@ -221,8 +216,8 @@ void convert_PMTCT_num_to_perc(int time_step,
     } //end hPS
   }
 
-    intermediate.children.PMTCT_coverage(4) = intermediate.children.PMTCT_coverage(4) * cpars.PMTCT_dropout(0,time_step);
-    intermediate.children.PMTCT_coverage(5) = intermediate.children.PMTCT_coverage(5) * cpars.PMTCT_dropout(1,time_step);
+  intermediate.children.PMTCT_coverage(4) = intermediate.children.PMTCT_coverage(4) * cpars.PMTCT_dropout(0,time_step);
+  intermediate.children.PMTCT_coverage(5) = intermediate.children.PMTCT_coverage(5) * cpars.PMTCT_dropout(1,time_step);
 
 }
 
@@ -236,24 +231,23 @@ void convert_PMTCT_pre_bf(int time_step,
   static_assert(ModelVariant::run_child_model,
                 "convert_PMTCT_num_to_perc can only be called for model variants where run_child_model is true");
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
-//Adjust postnatal ART coverage for perinatal transmission
-///TODO: Maggie to confirm why Option A/B alt tr aren't used
+  ///TODO: Maggie to confirm why Option A/B alt tr aren't used
 
-    for (int hp = 0; hp < hc_ss.hPS; ++hp) {
-      intermediate.children.PMTCT_coverage(hp) = (1 - cpars.PMTCT_transmission_rate(4,hp,0)) * intermediate.children.PMTCT_coverage(hp);
-    } //end hPS
+  for (int hp = 0; hp < hc_ss.hPS; ++hp) {
+    intermediate.children.PMTCT_coverage(hp) = (1 - cpars.PMTCT_transmission_rate(4,hp,0)) * intermediate.children.PMTCT_coverage(hp);
+  } //end hPS
 
 }
 
 template<typename ModelVariant, typename real_type>
 void calc_wlhiv_cd4_proportion(int time_step,
-                                    const Parameters<ModelVariant, real_type> &pars,
-                                    const State<ModelVariant, real_type> &state_curr,
-                                    State<ModelVariant, real_type> &state_next,
-                                    IntermediateData<ModelVariant, real_type> &intermediate) {
+                               const Parameters<ModelVariant, real_type> &pars,
+                               const State<ModelVariant, real_type> &state_curr,
+                               State<ModelVariant, real_type> &state_next,
+                               IntermediateData<ModelVariant, real_type> &intermediate) {
   const auto cpars = pars.children.children;
   static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
+                "calc_wlhiv_cd4_proportion can only be called for model variants where run_child_model is true");
 
   //Option A and B were only authorized for women with greater than 350 CD4, so if the percentage of women
   //on option A/B > the proportion of women in this cd4 category, we assume that some must have a cd4 less than 350
@@ -309,7 +303,7 @@ void adjust_optAB_transmission_rate(int time_step,
                                     IntermediateData<ModelVariant, real_type> &intermediate) {
   const auto cpars = pars.children.children;
   static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
+                "adjust_optAB_transmission_rate can only be called for model variants where run_child_model is true");
 
   //Option A and B were only authorized for women with greater than 350 CD4, so if the percentage of women
   //on option A/B > the proportion of women in this cd4 category, we assume that some must have a cd4 less than 350
@@ -342,7 +336,7 @@ void adjust_optAB_bf_transmission_rate(int time_step,
                                        IntermediateData<ModelVariant, real_type> &intermediate) {
   const auto cpars = pars.children.children;
   static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
+                "adjust_optAB_bf_transmission_rate can only be called for model variants where run_child_model is true");
 
   internal::calc_wlhiv_cd4_proportion(time_step, pars, state_curr, state_next, intermediate);
 
@@ -376,7 +370,7 @@ void run_calculate_perinatal_transmission_rate(int time_step,
   const auto demog = pars.base.demography;
   const auto cpars = pars.children.children;
   static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
+                "run_calculate_perinatal_transmission_rate can only be called for model variants where run_child_model is true");
 
   //TODO: add in patients reallocated
   //TODO: pull incidence infection mtct into the input object
@@ -423,13 +417,13 @@ void run_calculate_perinatal_transmission_rate(int time_step,
     intermediate.children.age_weighted_infections +=  demog.age_specific_fertility_rate(a, time_step) / intermediate.children.asfr_sum  * state_curr.base.p_infections(a + 15,1) ; //newly infected 15-49 women, weighted for ASFR
   }//end
 
-if(intermediate.children.age_weighted_hivneg > 0.0){
-  intermediate.children.incidence_rate_wlhiv = intermediate.children.age_weighted_infections / intermediate.children.age_weighted_hivneg;
-  intermediate.children.perinatal_transmission_from_incidence = intermediate.children.incidence_rate_wlhiv * (9/12) * (intermediate.children.births_sum - intermediate.children.need_PMTCT) * 0;  //.181;
-}else{
-  intermediate.children.incidence_rate_wlhiv = 0.0;
-  intermediate.children.perinatal_transmission_from_incidence = 0.0;
-}
+  if(intermediate.children.age_weighted_hivneg > 0.0){
+    intermediate.children.incidence_rate_wlhiv = intermediate.children.age_weighted_infections / intermediate.children.age_weighted_hivneg;
+    intermediate.children.perinatal_transmission_from_incidence = intermediate.children.incidence_rate_wlhiv * (9/12) * (intermediate.children.births_sum - intermediate.children.need_PMTCT) * 0;  //.181;
+  }else{
+    intermediate.children.incidence_rate_wlhiv = 0.0;
+    intermediate.children.perinatal_transmission_from_incidence = 0.0;
+  }
 
   if (intermediate.children.need_PMTCT > 0.0) {
     intermediate.children.perinatal_transmission_rate = intermediate.children.perinatal_transmission_rate + intermediate.children.perinatal_transmission_from_incidence / intermediate.children.need_PMTCT;
@@ -448,7 +442,7 @@ void run_calculate_transmission_from_incidence_during_breastfeeding(int time_ste
                                                                     IntermediateData<ModelVariant, real_type> &intermediate) {
   const auto cpars = pars.children.children;
   static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
+                "run_calculate_transmission_from_incidence_during_breastfeeding can only be called for model variants where run_child_model is true");
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
 
   for (int bf = 0; bf < hc_ss.hBF; ++bf) {
@@ -469,76 +463,75 @@ void run_bf_transmission_rate(int time_step,
   const auto cpars = pars.children.children;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
-
+                "run_bf_transmission_rate can only be called for model variants where run_child_model is true");
 
   for(int bf = bf_start; bf < bf_end; bf++){
     //intermediate.children.perinatal_transmission_rate_bf_calc is the transmission that has already occurred due to perinatal transmission
     //intermediate.children.percent_no_treatment is the percentage of women who are still vulnerable to HIV transmission to their babies
     intermediate.children.percent_no_treatment = 1 - intermediate.children.perinatal_transmission_rate_bf_calc - intermediate.children.bf_transmission_rate(index);
-      for(int hp = 0; hp < hc_ss.hPS; hp++){
-        //hp = 0 is option A
-        if(hp == 0){
-           intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp);
-          // intermediate.children.bf_transmission_rate(index) += intermediate.children.percent_on_treatment *
-          //   2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) * intermediate.children.optA_bf_transmission_rate;
-           intermediate.children.percent_no_treatment -=  intermediate.children.percent_on_treatment;
-        }
-
-        //hp = 1 is option B
-        if(hp == 1){
-          intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp);
-          // intermediate.children.bf_transmission_rate(index) += intermediate.children.percent_on_treatment *
-          //   2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) * intermediate.children.optB_bf_transmission_rate;
-          intermediate.children.percent_no_treatment -=  intermediate.children.percent_on_treatment;
-        }
-
-        //sdnvp
-        if(hp == 2){
-          intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp)  ;
-          intermediate.children.bf_transmission_rate(index) +=  intermediate.children.percent_on_treatment *
-            cpars.PMTCT_transmission_rate(0,hp,1) *
-            2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) ;
-          intermediate.children.percent_no_treatment -=  intermediate.children.percent_on_treatment ;
-        }
-
-        //dual arv
-        if(hp == 3){
-          intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp);
-          intermediate.children.bf_transmission_rate(index) +=  intermediate.children.percent_on_treatment *
-            cpars.PMTCT_transmission_rate(4,hp,1) *
-            2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) ;
-          intermediate.children.percent_no_treatment -=  intermediate.children.percent_on_treatment;
-
-        }
-
-        //on art pre preg
-        if(hp > 3){
-            if(bf < 6){
-              //different dropout rates for on ART less than and over one year
-              if(cpars.PMTCT_dropout(4,time_step) > 0){
-                intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp) *
-                  (pow(1 - cpars.PMTCT_dropout(4,time_step) * 2, bf))  ;
-              }else{
-                intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp)  ;
-              }
-                }else{
-                  if(cpars.PMTCT_dropout(5,time_step) > 0){
-                    intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp) *
-                      (pow(1 - cpars.PMTCT_dropout(5,time_step) * 2, bf))  ;
-                  }else{
-                    intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp)  ;
-                  }
-                }
-
-          intermediate.children.bf_transmission_rate(index) += intermediate.children.percent_on_treatment *
-                  2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) * cpars.PMTCT_transmission_rate(4,hp,1);
-
-
-          intermediate.children.percent_no_treatment -= intermediate.children.percent_on_treatment;
-
-        }
+    for(int hp = 0; hp < hc_ss.hPS; hp++){
+      //hp = 0 is option A
+      if(hp == 0){
+        intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp);
+        // intermediate.children.bf_transmission_rate(index) += intermediate.children.percent_on_treatment *
+        //   2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) * intermediate.children.optA_bf_transmission_rate;
+        intermediate.children.percent_no_treatment -=  intermediate.children.percent_on_treatment;
       }
+
+      //hp = 1 is option B
+      if(hp == 1){
+        intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp);
+        // intermediate.children.bf_transmission_rate(index) += intermediate.children.percent_on_treatment *
+        //   2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) * intermediate.children.optB_bf_transmission_rate;
+        intermediate.children.percent_no_treatment -=  intermediate.children.percent_on_treatment;
+      }
+
+      //sdnvp
+      if(hp == 2){
+        intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp)  ;
+        intermediate.children.bf_transmission_rate(index) +=  intermediate.children.percent_on_treatment *
+          cpars.PMTCT_transmission_rate(0,hp,1) *
+          2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) ;
+        intermediate.children.percent_no_treatment -=  intermediate.children.percent_on_treatment ;
+      }
+
+      //dual arv
+      if(hp == 3){
+        intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp);
+        intermediate.children.bf_transmission_rate(index) +=  intermediate.children.percent_on_treatment *
+          cpars.PMTCT_transmission_rate(4,hp,1) *
+          2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) ;
+        intermediate.children.percent_no_treatment -=  intermediate.children.percent_on_treatment;
+
+      }
+
+      //on art pre preg
+      if(hp > 3){
+        if(bf < 6){
+          //different dropout rates for on ART less than and over one year
+          if(cpars.PMTCT_dropout(4,time_step) > 0){
+            intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp) *
+              (pow(1 - cpars.PMTCT_dropout(4,time_step) * 2, bf))  ;
+          }else{
+            intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp)  ;
+          }
+        }else{
+          if(cpars.PMTCT_dropout(5,time_step) > 0){
+            intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp) *
+              (pow(1 - cpars.PMTCT_dropout(5,time_step) * 2, bf))  ;
+          }else{
+            intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp)  ;
+          }
+        }
+
+        intermediate.children.bf_transmission_rate(index) += intermediate.children.percent_on_treatment *
+          2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) * cpars.PMTCT_transmission_rate(4,hp,1);
+
+
+        intermediate.children.percent_no_treatment -= intermediate.children.percent_on_treatment;
+
+      }
+    }
 
 
     if(intermediate.children.percent_no_treatment < 0){
@@ -549,10 +542,10 @@ void run_bf_transmission_rate(int time_step,
     //No treatment
     if(cpars.breastfeeding_duration_no_art(bf, time_step) < 1){
 
-        intermediate.children.bf_transmission_rate(index) +=
-          intermediate.children.percent_no_treatment * (1 - cpars.breastfeeding_duration_no_art(bf, time_step)) *
-          (2 * (1 - intermediate.children.prop_wlhiv_gte350) * cpars.vertical_transmission_rate(4,1) +
-          2 * intermediate.children.prop_wlhiv_gte350 * cpars.vertical_transmission_rate(0,1));
+      intermediate.children.bf_transmission_rate(index) +=
+        intermediate.children.percent_no_treatment * (1 - cpars.breastfeeding_duration_no_art(bf, time_step)) *
+        (2 * (1 - intermediate.children.prop_wlhiv_gte350) * cpars.vertical_transmission_rate(4,1) +
+        2 * intermediate.children.prop_wlhiv_gte350 * cpars.vertical_transmission_rate(0,1));
 
     }
 
@@ -568,16 +561,15 @@ void run_bf_transmission_rate(int time_step,
 
 template<typename ModelVariant, typename real_type>
 void run_nosocomial_infections(int time_step,
-                              const Parameters<ModelVariant, real_type> &pars,
-                              const State<ModelVariant, real_type> &state_curr,
-                              State<ModelVariant, real_type> &state_next,
-                              IntermediateData<ModelVariant, real_type> &intermediate) {
-  const auto demog = pars.base.demography;
+                               const Parameters<ModelVariant, real_type> &pars,
+                               const State<ModelVariant, real_type> &state_curr,
+                               State<ModelVariant, real_type> &state_next,
+                               IntermediateData<ModelVariant, real_type> &intermediate) {
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
   static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
+                "run_nosocomial_infections can only be called for model variants where run_child_model is true");
   for (int s = 0; s < ss.NS; ++s) {
     // Run only first 5 age groups in total population 0, 1, 2, 3, 4
     for (int a = 0; a < hc_ss.hc2_agestart; ++a) {
@@ -683,13 +675,12 @@ void run_child_hiv_infections(int time_step,
 
 template<typename ModelVariant, typename real_type>
 void calc_need_for_ctx(int time_step,
-                  const Parameters<ModelVariant, real_type> &pars,
-                  const State<ModelVariant, real_type> &state_curr,
-                  State<ModelVariant, real_type> &state_next,
-                  IntermediateData<ModelVariant, real_type> &intermediate) {
+                       const Parameters<ModelVariant, real_type> &pars,
+                       const State<ModelVariant, real_type> &state_curr,
+                       State<ModelVariant, real_type> &state_next,
+                       IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
-  const auto demog = pars.base.demography;
+                "calc_need_for_ctx can only be called for model variants where run_child_model is true");
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
@@ -725,23 +716,23 @@ void calc_need_for_ctx(int time_step,
     } // end hcTT
   } // end ss.NS
 
-    //Births from the last 18 months are eligible
-    state_next.children.ctx_need =  state_next.children.hiv_births * 1.5;
-    for (int s = 0; s < ss.NS; ++s) {
-      for (int a = 1; a < pars.base.options.p_idx_fertility_first; ++a) {
-        for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
-          for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-            if(a == 1){
-              state_next.children.ctx_need +=  state_next.children.hc1_hiv_pop(hd, cat, a, s) * 0.5;
-            }else if(a  <  hc_ss.hc2_agestart){
-              state_next.children.ctx_need +=  state_next.children.hc1_hiv_pop(hd, cat, a, s);
-            } else if(hd < hc_ss.hc2DS){
-              state_next.children.ctx_need += intermediate.children.hc_ctx_need(hd, cat, a, s);
-            }
+  //Births from the last 18 months are eligible
+  state_next.children.ctx_need =  state_next.children.hiv_births * 1.5;
+  for (int s = 0; s < ss.NS; ++s) {
+    for (int a = 1; a < pars.base.options.p_idx_fertility_first; ++a) {
+      for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+        for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
+          if(a == 1){
+            state_next.children.ctx_need +=  state_next.children.hc1_hiv_pop(hd, cat, a, s) * 0.5;
+          }else if(a  <  hc_ss.hc2_agestart){
+            state_next.children.ctx_need +=  state_next.children.hc1_hiv_pop(hd, cat, a, s);
+          } else if(hd < hc_ss.hc2DS){
+            state_next.children.ctx_need += intermediate.children.hc_ctx_need(hd, cat, a, s);
           }
         }
       }
     }
+  }
 
 
 
@@ -749,15 +740,12 @@ void calc_need_for_ctx(int time_step,
 
 template<typename ModelVariant, typename real_type>
 void ctx_need_cov(int time_step,
-                      const Parameters<ModelVariant, real_type> &pars,
-                      const State<ModelVariant, real_type> &state_curr,
-                      State<ModelVariant, real_type> &state_next,
-                      IntermediateData<ModelVariant, real_type> &intermediate) {
+                  const Parameters<ModelVariant, real_type> &pars,
+                  const State<ModelVariant, real_type> &state_curr,
+                  State<ModelVariant, real_type> &state_next,
+                  IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
-  const auto demog = pars.base.demography;
-  constexpr auto ss = StateSpace<ModelVariant>().base;
-  constexpr auto hc_ss = StateSpace<ModelVariant>().children;
+                "ctx_need_cov can only be called for model variants where run_child_model is true");
   const auto cpars = pars.children.children;
 
   internal::calc_need_for_ctx(time_step, pars, state_curr, state_next, intermediate);
@@ -765,14 +753,14 @@ void ctx_need_cov(int time_step,
 
   if(cpars.ctx_val_is_percent(time_step)){
 
-      state_next.children.ctx_mean = cpars.ctx_val(time_step-1) ;// /  state_next.children.ctx_need;
-      state_next.children.ctx_mean = (1-cpars.ctx_effect) * state_next.children.ctx_mean + (1 - state_next.children.ctx_mean);
+    state_next.children.ctx_mean = cpars.ctx_val(time_step-1) ;// /  state_next.children.ctx_need;
+    state_next.children.ctx_mean = (1-cpars.ctx_effect) * state_next.children.ctx_mean + (1 - state_next.children.ctx_mean);
 
 
   }else{
     if(state_next.children.ctx_need > 0){
-       state_next.children.ctx_mean = cpars.ctx_val(time_step-1) /  state_next.children.ctx_need;
-       state_next.children.ctx_mean = (1-cpars.ctx_effect) * state_next.children.ctx_mean + (1 - state_next.children.ctx_mean);
+      state_next.children.ctx_mean = cpars.ctx_val(time_step-1) /  state_next.children.ctx_need;
+      state_next.children.ctx_mean = (1-cpars.ctx_effect) * state_next.children.ctx_mean + (1 - state_next.children.ctx_mean);
     }
   }
 
@@ -785,11 +773,10 @@ void run_child_natural_history(int time_step,
                                State<ModelVariant, real_type> &state_next,
                                IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
+                "run_child_natural_history can only be called for model variants where run_child_model is true");
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
-
 
   for (int s = 0; s < ss.NS; ++s) {
     for (int a = 0; a < hc_ss.hc2_agestart; ++a) {
@@ -848,18 +835,17 @@ void run_child_hiv_mort(int time_step,
                         State<ModelVariant, real_type> &state_next,
                         IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
+                "run_child_hiv_mort can only be called for model variants where run_child_model is true");
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
-
 
   for (int s = 0; s < ss.NS; ++s) {
     for (int a = 0; a < hc_ss.hc2_agestart; ++a) {
       for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
         for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
           intermediate.children.hc_grad(hd, cat, a, s) -=  state_next.children.ctx_mean *
-             state_next.children.hc1_hiv_pop(hd, cat, a, s) * cpars.hc1_cd4_mort(hd, cat, a);
+            state_next.children.hc1_hiv_pop(hd, cat, a, s) * cpars.hc1_cd4_mort(hd, cat, a);
           state_next.children.hc1_noart_aids_deaths(hd, cat, a, s) +=  state_next.children.ctx_mean *
             state_next.children.hc1_hiv_pop(hd, cat, a, s) * cpars.hc1_cd4_mort(hd, cat, a);
         }
@@ -881,9 +867,6 @@ void run_child_hiv_mort(int time_step,
     }
   }
 
-
-
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -893,7 +876,7 @@ void add_child_grad(int time_step,
                     State<ModelVariant, real_type> &state_next,
                     IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
+                "add_child_grad can only be called for model variants where run_child_model is true");
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
 
@@ -926,7 +909,7 @@ void hc_initiate_art_by_age(int time_step,
                             State<ModelVariant, real_type> &state_next,
                             IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
+                "hc_initiate_art_by_age can only be called for model variants where run_child_model is true");
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
@@ -956,7 +939,7 @@ void hc_initiate_art_by_cd4(int time_step,
                             State<ModelVariant, real_type> &state_next,
                             IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
+                "hc_initiate_art_by_cd4 can only be called for model variants where run_child_model is true");
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
@@ -978,7 +961,6 @@ void hc_initiate_art_by_cd4(int time_step,
     } // end hcTT
   } // end ss.NS
 
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -988,16 +970,14 @@ void eligible_for_treatment(int time_step,
                             State<ModelVariant, real_type> &state_next,
                             IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
+                "eligible_for_treatment can only be called for model variants where run_child_model is true");
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
-  const auto cpars = pars.children.children;
 
   internal::hc_initiate_art_by_age(time_step, pars, state_curr, state_next, intermediate);
   internal::hc_initiate_art_by_cd4(time_step, pars, state_curr, state_next, intermediate);
 
-
-  for (int s = 0; s <ss.NS; ++s) {
+  for (int s = 0; s < ss.NS; ++s) {
     for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
       for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
         for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
@@ -1006,8 +986,6 @@ void eligible_for_treatment(int time_step,
       } // end a
     } // end hcTT
   } // end ss.NS
-
-
 
 }
 
@@ -1019,7 +997,7 @@ void onART_mortality(int time_step,
                      IntermediateData<ModelVariant, real_type> &intermediate,
                      int time_art_idx) {
   static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
+                "onART_mortality can only be called for model variants where run_child_model is true");
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
@@ -1072,36 +1050,28 @@ void deaths_this_year(int time_step,
                       State<ModelVariant, real_type> &state_next,
                       IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
+                "deaths_this_year can only be called for model variants where run_child_model is true");
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
-  intermediate.children.hc_art_deaths(0) = 0.0;
-  intermediate.children.hc_art_deaths(1) = 0.0;
-  intermediate.children.hc_art_deaths(2) = 0.0;
-  intermediate.children.hc_art_deaths(3) = 0.0;
 
-    for (int dur = 0; dur < ss.hTS; ++dur) {
-      // !!! TODO: fix order of for loop
-      for (int s = 0; s <ss.NS; ++s) {
-        for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-          for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
-            if(a < hc_ss.hc2_agestart){
-              intermediate.children.hc_art_deaths(cpars.hc_age_coarse(a)) += state_next.children.hc1_art_aids_deaths(dur,hd, a, s);
-            }else{
-              if(hd < hc_ss.hc2DS){
-                intermediate.children.hc_art_deaths(cpars.hc_age_coarse(a)) += state_next.children.hc2_art_aids_deaths(dur,hd, a-hc_ss.hc2_agestart, s);
-              }
+  for (int dur = 0; dur < ss.hTS; ++dur) {
+    for (int s = 0; s <ss.NS; ++s) {
+      for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
+        for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
+          if(a < hc_ss.hc2_agestart){
+            intermediate.children.hc_art_deaths(cpars.hc_age_coarse(a)) += state_next.children.hc1_art_aids_deaths(dur,hd, a, s);
+          }else{
+            if(hd < hc_ss.hc2DS){
+              intermediate.children.hc_art_deaths(cpars.hc_age_coarse(a)) += state_next.children.hc2_art_aids_deaths(dur,hd, a-hc_ss.hc2_agestart, s);
             }
-          }// end a
-        }// end hc_ss.hc1DS
-      }// end ss.NS
-    }// end dur
-
-
+          }
+        }// end a
+      }// end hc_ss.hc1DS
+    }// end ss.NS
+  }// end dur
 
   intermediate.children.hc_art_deaths(0) =  intermediate.children.hc_art_deaths(1) +  intermediate.children.hc_art_deaths(2) + intermediate.children.hc_art_deaths(3);
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -1112,16 +1082,14 @@ void progress_time_on_art(int time_step,
                           IntermediateData<ModelVariant, real_type> &intermediate,
                           int current_time_idx, int end_time_idx) {
   static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
+                "progress_time_on_art can only be called for model variants where run_child_model is true");
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
-  const auto cpars = pars.children.children;
-
 
   //Progress ART to the correct time on ART
   for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
     for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
-      for (int s = 0; s <ss.NS; ++s) {
+      for (int s = 0; s < ss.NS; ++s) {
         if (a < hc_ss.hc2_agestart) {
           if (state_next.children.hc1_art_pop(current_time_idx, hd, a, s) > 0) {
             state_next.children.hc1_art_pop(end_time_idx, hd, a, s) += state_next.children.hc1_art_pop(current_time_idx, hd, a, s);
@@ -1135,7 +1103,6 @@ void progress_time_on_art(int time_step,
     }// end a
   }// end hc_ss.hc1DS
 
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -1145,14 +1112,14 @@ void calc_total_and_unmet_need(int time_step,
                                State<ModelVariant, real_type> &state_next,
                                IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
+                "calc_total_and_unmet_need can only be called for model variants where run_child_model is true");
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
 
   internal::eligible_for_treatment(time_step, pars, state_curr, state_next, intermediate);
 
-  for (int s = 0; s <ss.NS; ++s) {
+  for (int s = 0; s < ss.NS; ++s) {
     for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
       for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
         intermediate.children.unmet_need(cpars.hc_age_coarse(a)) += intermediate.children.eligible(hd, a, s) ;
@@ -1195,7 +1162,7 @@ void calc_art_last_year(int time_step,
                         State<ModelVariant, real_type> &state_next,
                         IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
+                "calc_art_last_year can only be called for model variants where run_child_model is true");
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
@@ -1291,9 +1258,7 @@ void calc_art_this_year(int time_step,
                         State<ModelVariant, real_type> &state_next,
                         IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
-  constexpr auto ss = StateSpace<ModelVariant>().base;
-  constexpr auto hc_ss = StateSpace<ModelVariant>().children;
+                "calc_art_this_year can only be called for model variants where run_child_model is true");
   const auto cpars = pars.children.children;
 
   if(cpars.hc_art_isperc(time_step)){
@@ -1316,10 +1281,9 @@ void calc_art_initiates(int time_step,
                         State<ModelVariant, real_type> &state_next,
                         IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
-  constexpr auto ss = StateSpace<ModelVariant>().base;
-  constexpr auto hc_ss = StateSpace<ModelVariant>().children;
+                "calc_art_initiates can only be called for model variants where run_child_model is true");
   const auto cpars = pars.children.children;
+
   internal::onART_mortality(time_step, pars, state_curr, state_next, intermediate, 0);
   //progress art initates from 0-6 months on art to 6 to 12 mo
   internal::progress_time_on_art(time_step, pars, state_curr, state_next, intermediate, 0, 1);
@@ -1331,19 +1295,12 @@ void calc_art_initiates(int time_step,
 
   intermediate.children.retained = 1 ;// - cpars.paed_art_ltfu(time_step);
 
-  if(time_step == 53){
-    // intermediate.children.total_art_last_year(0) = 0.0;
-  }
-
   for (int ag = 0; ag < 4; ++ag) {
     state_next.children.hc_art_init(ag) = 0.5 * (intermediate.children.total_art_last_year(ag) + intermediate.children.total_art_this_year(ag)) - intermediate.children.on_art(ag) * intermediate.children.retained ;
     if(state_next.children.hc_art_init(ag) < 0){
       state_next.children.hc_art_init(ag) = 0.0;
     }
   }// end ag
-
-
-
 
   for (int ag = 0; ag < 4; ++ag) {
     if(state_next.children.hc_art_init(ag) > (intermediate.children.unmet_need(ag) ))
@@ -1360,7 +1317,7 @@ void hc_art_initiation_by_age(int time_step,
                               State<ModelVariant, real_type> &state_next,
                               IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
+                "hc_art_initiation_by_age can only be called for model variants where run_child_model is true");
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
@@ -1368,7 +1325,7 @@ void hc_art_initiation_by_age(int time_step,
   internal::calc_art_initiates(time_step, pars, state_curr, state_next, intermediate);
 
   if(cpars.hc_art_is_age_spec(time_step)){
-    for (int s = 0; s <ss.NS; ++s) {
+    for (int s = 0; s < ss.NS; ++s) {
       for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
         for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
           for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
@@ -1478,52 +1435,16 @@ void hc_art_initiation_by_age(int time_step,
 
 }
 
-
-
-template<typename ModelVariant, typename real_type>
-void run_child_art_initiation(int time_step,
-                              const Parameters<ModelVariant, real_type> &pars,
-                              const State<ModelVariant, real_type> &state_curr,
-                              State<ModelVariant, real_type> &state_next,
-                              IntermediateData<ModelVariant, real_type> &intermediate) {
-  static_assert(ModelVariant::run_child_model,
-                "run_hiv_child_infections can only be called for model variants where run_child_model is true");
-  constexpr auto ss = StateSpace<ModelVariant>().base;
-  constexpr auto hc_ss = StateSpace<ModelVariant>().children;
-  const auto cpars = pars.children.children;
-
-
-  // internal::onART_mortality(time_step, pars, state_curr, state_next, intermediate, 0);
-  // internal::onART_mortality(time_step, pars, state_curr, state_next, intermediate, 2);
-  // //progress art initates from 0-6 months on art to 6 to 12 mo
-  // internal::progress_time_on_art(time_step, pars, state_curr, state_next, intermediate, 0, 1);
-
-
-
-    if(state_next.children.hc_art_init(0) < 0){
-      state_next.children.hc_art_init(0) = 0.0;
-    }
-
-    internal::hc_art_initiation_by_age(time_step, pars, state_curr, state_next, intermediate);
-
-
-
-
-}
-
 template<typename ModelVariant, typename real_type>
 void fill_model_outputs(int time_step,
-                                     const Parameters<ModelVariant, real_type> &pars,
-                                     const State<ModelVariant, real_type> &state_curr,
-                                     State<ModelVariant, real_type> &state_next,
-                                     IntermediateData<ModelVariant, real_type> &intermediate) {
+                        const Parameters<ModelVariant, real_type> &pars,
+                        const State<ModelVariant, real_type> &state_curr,
+                        State<ModelVariant, real_type> &state_next,
+                        IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "run_wlhiv_births can only be called for model variants where run_child_model is true");
+                "fill_model_outputs can only be called for model variants where run_child_model is true");
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
-  const auto cpars = pars.children.children;
-  const auto demog = pars.base.demography;
-
 
   for (int hd = 0; hd < ss.hDS; ++hd) {
     for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
@@ -1540,7 +1461,7 @@ void fill_model_outputs(int time_step,
         for (int dur = 0; dur < ss.hTS; ++dur) {
           if(state_next.children.hc1_art_pop(0, hd, a, s) > 0){
             if (a < hc_ss.hc2_agestart) {
-                state_next.base.p_hiv_deaths(a,s) += state_next.children.hc1_art_aids_deaths(dur, hd, a, s);
+              state_next.base.p_hiv_deaths(a,s) += state_next.children.hc1_art_aids_deaths(dur, hd, a, s);
             } else if (hd < (hc_ss.hc2DS)) {
               state_next.base.p_hiv_deaths(a,s) += state_next.children.hc2_art_aids_deaths(dur, hd, a-hc_ss.hc2_agestart, s);
             }
@@ -1550,9 +1471,6 @@ void fill_model_outputs(int time_step,
       }//end ss.NS
     }// end a
   }// end hDS
-
-
-
 }
 
 }// namespace internal
@@ -1564,8 +1482,6 @@ void run_child_model_simulation(int time_step,
                                 State<ModelVariant, real_type> &state_next,
                                 internal::IntermediateData<ModelVariant, real_type> &intermediate) {
   const auto cpars = pars.children.children;
-  constexpr auto ss = StateSpace<ModelVariant>().base;
-  constexpr auto hc_ss = StateSpace<ModelVariant>().children;
 
   internal::run_child_ageing(time_step, pars, state_curr, state_next, intermediate);
 
@@ -1575,34 +1491,26 @@ void run_child_model_simulation(int time_step,
     internal::run_wlhiv_births(time_step, pars, state_curr, state_next, intermediate);
   }
 
-
-
   if(state_next.children.hiv_births > 0){
     internal::run_child_hiv_infections(time_step, pars, state_curr, state_next, intermediate);
-  }
-  internal::ctx_need_cov(time_step, pars, state_curr, state_next, intermediate);
-
+    internal::ctx_need_cov(time_step, pars, state_curr, state_next, intermediate);
     internal::run_child_natural_history(time_step, pars, state_curr, state_next, intermediate);
     internal::run_child_hiv_mort(time_step, pars, state_curr, state_next, intermediate);
     internal::add_child_grad(time_step, pars, state_curr, state_next, intermediate);
 
     //assume paed art doesn't start before adult
     if(time_step > pars.base.options.ts_art_start){
-      internal::run_child_art_initiation(time_step, pars, state_curr, state_next, intermediate);
+      internal::hc_art_initiation_by_age(time_step, pars, state_curr, state_next, intermediate);
       //mortality among those on ART less than one year
       internal::onART_mortality(time_step, pars, state_curr, state_next, intermediate, 0);
       internal::progress_time_on_art(time_step, pars, state_curr, state_next, intermediate, 1, 2);
-
-
-
-
+      //progress 6 to 12 mo to 12 plus months
+      internal::fill_model_outputs(time_step, pars, state_curr, state_next, intermediate);
+      internal::run_nosocomial_infections(time_step, pars, state_curr, state_next, intermediate);
     }
-    //progress 6 to 12 mo to 12 plus months
-    internal::fill_model_outputs(time_step, pars, state_curr, state_next, intermediate);
-    internal::run_nosocomial_infections(time_step, pars, state_curr, state_next, intermediate);
-
-
   }
+
+}
 
 
 

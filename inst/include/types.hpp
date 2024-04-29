@@ -316,7 +316,6 @@ struct ChildModelState<ChildModel, real_type> {
   TensorFixedSize <real_type, Sizes<hc2DS<ChildModel>, hcTT<ChildModel>, hc2AG<ChildModel>, NS<ChildModel>>> hc2_noart_aids_deaths;
   TensorFixedSize <real_type, Sizes<hTS<ChildModel>, hc1DS<ChildModel>, hc1AG<ChildModel>, NS<ChildModel>>> hc1_art_aids_deaths;
   TensorFixedSize <real_type, Sizes<hTS<ChildModel>, hc2DS<ChildModel>, hc2AG<ChildModel>, NS<ChildModel>>> hc2_art_aids_deaths;
-  TensorFixedSize <real_type, Sizes<4>> hc_art_num;
   real_type hiv_births;
   real_type ctx_need;
   real_type ctx_mean;
@@ -341,7 +340,6 @@ struct ChildModelState<ChildModel, real_type> {
     hc2_noart_aids_deaths.setZero();
     hc1_art_aids_deaths.setZero();
     hc2_art_aids_deaths.setZero();
-    hc_art_num.setZero();
     hiv_births = 0.0;
     ctx_need = 0.0;
     ctx_mean = 1.0;
@@ -487,15 +485,12 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
   TensorFixedSize <real_type, Sizes<hTS<ChildModel>, hDS<ChildModel>, NS<ChildModel>>> age15_art_pop;
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_posthivmort;
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_grad;
-  TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_art_need;
-  // TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_art_need_init;
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_ctx_need;
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> eligible;
   TensorFixedSize <real_type, Sizes<4>> unmet_need;
   TensorFixedSize <real_type, Sizes<4>> total_need;
   TensorFixedSize <real_type, Sizes<4>> on_art;
   real_type retained;
-  TensorFixedSize <real_type, Sizes<4>> hc_art_need_init_total;
   TensorFixedSize <real_type, Sizes<4>> total_art_last_year;
   TensorFixedSize <real_type, Sizes<4>> total_art_this_year;
   real_type hc_death_rate;
@@ -559,15 +554,12 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
     age15_art_pop.setZero();
     hc_posthivmort.setZero();
     hc_grad.setZero();
-    hc_art_need.setZero();
-    // hc_art_need_init.setZero();
     hc_ctx_need.setZero();
     eligible.setZero();
     unmet_need.setZero();
     total_need.setZero();
     on_art.setZero();
     retained = 0.0;
-    hc_art_need_init_total.setZero();
     total_art_last_year.setZero();
     total_art_this_year.setZero();
     hc_death_rate = 0.0;

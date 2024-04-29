@@ -201,8 +201,9 @@ Discussion: naming conventions
 |                  | hc2_noart_aids_deaths      | Projected deaths among PLHIV 5-14y not on ART by CD4, transmission type, age, sex, and year|
 |                  | hc1_art_aids_deaths        | Projected deaths among PLHIV 0-4y on ART by time on treatment, CD4, age, sex, and year     |
 |                  | hc2_art_aids_deaths        | Projected deaths among PLHIV 5-14y on ART by time on treatment, CD4, age, sex, and year    |
-|                  | hc_art_num                 | Number of children on ART by year                                                          |
 |                  | hiv_births                 | Number of births to WLHIV by year                                                          |
+|                  | hc_art_need_init           | Children who are eligible for ART by CD4, transmsission, age, sex, and year                |
+|                  | hc_art_init                | Number of new ART initiates by five year age group.                                        |
 
 ### Internal
 
@@ -257,8 +258,30 @@ Discussion: naming conventions
 |                           |                                 | HIV related mortality                                                     |
 | grad_paeds                | hc_grad                         | Difference in PLHIV 0-14 stratified by age, sex, transmission type,       |
 |                           |                                 | and CD4 between the current and next timestep                             |
-
-
+|                           | eligible                        | Children eligilbe for ART by CD4, age, and sex. Summed hc_art_need_init by|
+|                           |                                 | transmission category.                                                    |
+|                           | hc_death_rate                   | Death rate for children receiving treatment from the risk ratios and      |
+|                           |                                 | combined death rates. By age.                                             |
+|                           | hc_art_grad                     | Difference in CLHIV on ART in a given timestep by time on art, CD4, age,  |
+|                           |                                 | and sex. Just used for on ART mortality.                                  |
+|                           | hc_art_deaths                   | Number of deaths occuring among CLHIV on ART before initation. Needed to  |
+|                           |                                 | calculate the number of children in need of tx. By five year age group.   |
+|                           | unmet_need                      | Total number of children in need of ART initiation summed across all      |
+|                           |                                 | categories by five year age group.                                        |
+|                           | on_art                          | Children on ART by five year age group. Needed to calculate total need    |
+|                           |                                 | for ART.                                                                  |
+|                           | total_need                      | Children in need of ART in the current timestep by five year age group.   |
+|                           |                                 | Sum of children on ART, those that need to initiate, and deaths in year t.|
+|                           | total_art_last_year             | Number of CLHIV receiving ART in t-1.                                     |
+|                           | total_art_this_year             | Number of CLHIV receiving ART in t.                                       |
+|                           | total_art_last_year             | Number of CLHIV receiving ART in t-1.                                     |
+|                           | retained                        | Proportion of CLHIV on ART after dropout.                                 |
+|                           | hc_initByAge                    | Total number of children by five year age group that will initiate when   |
+|                           |                                 | correcting for the probability of initiation from IeDEA data.             |
+|                           | hc_adj                          | Proportion of all initiates that will intiatiate once corrected for prob  |
+|                           |                                 | of initiation.                                                            |
+|                           | hc_art_scalar                   |                                                                           |
+|                           |                                 |                                                                           |
 ## License
 
 MIT © Imperial College of Science, Technology and Medicine
