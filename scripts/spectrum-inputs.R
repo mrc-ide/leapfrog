@@ -432,11 +432,12 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   mtct_trt[5:7,7,2] <- mtct_rates_input[11,2]/100
   v$pmtct_mtct <- mtct_trt
 
-  mtct <- array(data = NA, dim = c(7,2), dimnames = list(cd4 = c('>500', '350-500', '250-349', '200-249', '100-199', '50-99', '<50'), trans_type = c('perinatal', 'bf')))
-  mtct[,1] <- c(mtct_rates_input[3,1], mtct_rates_input[3,1],
+  mtct <- array(data = NA, dim = c(8,2), dimnames = list(cd4 = c('>500', '350-500', '250-349', '200-249', '100-199', '50-99', '<50', 'INFECTION'), trans_type = c('perinatal', 'bf')))
+  mtct[1:7,1] <- c(mtct_rates_input[3,1], mtct_rates_input[3,1],
                 mtct_rates_input[2,1], mtct_rates_input[2,1],
                 rep(mtct_rates_input[1,1],3)) /100
-  mtct[,2] <- c(rep(mtct_rates_input[3,3],2), rep(mtct_rates_input[2,2],2), rep(mtct_rates_input[1,2],3)) / 100
+  mtct[1:7,2] <- c(rep(mtct_rates_input[3,3],2), rep(mtct_rates_input[2,2],2), rep(mtct_rates_input[1,2],3)) / 100
+  mtct[8,] <- c(mtct_rates_input[4,1], mtct_rates_input[4,2])
   v$mtct <- mtct
 
   mort_rr_art <- leapfrog:::dp_read_child_mort_mult(pjnz)

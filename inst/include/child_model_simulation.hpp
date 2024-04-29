@@ -373,8 +373,6 @@ void run_calculate_perinatal_transmission_rate(int time_step,
                 "run_calculate_perinatal_transmission_rate can only be called for model variants where run_child_model is true");
 
   //TODO: add in patients reallocated
-  //TODO: pull incidence infection mtct into the input object
-
   internal::convert_PMTCT_num_to_perc(time_step, pars, state_curr, state_next, intermediate);
   internal::adjust_optAB_transmission_rate(time_step, pars, state_curr, state_next, intermediate);
 
@@ -419,7 +417,7 @@ void run_calculate_perinatal_transmission_rate(int time_step,
 
   if(intermediate.children.age_weighted_hivneg > 0.0){
     intermediate.children.incidence_rate_wlhiv = intermediate.children.age_weighted_infections / intermediate.children.age_weighted_hivneg;
-    intermediate.children.perinatal_transmission_from_incidence = intermediate.children.incidence_rate_wlhiv * (9/12) * (intermediate.children.births_sum - intermediate.children.need_PMTCT) * 0;  //.181;
+    intermediate.children.perinatal_transmission_from_incidence = intermediate.children.incidence_rate_wlhiv * (9/12) * (intermediate.children.births_sum - intermediate.children.need_PMTCT) * cpars.vertical_transmission_rate(7,0);
   }else{
     intermediate.children.incidence_rate_wlhiv = 0.0;
     intermediate.children.perinatal_transmission_from_incidence = 0.0;
@@ -448,8 +446,7 @@ void run_calculate_transmission_from_incidence_during_breastfeeding(int time_ste
   for (int bf = 0; bf < hc_ss.hBF; ++bf) {
     intermediate.children.bf_at_risk += intermediate.children.incidence_rate_wlhiv / 12 * 2 * (1 - cpars.breastfeeding_duration_no_art(bf, time_step));
   }
-  // intermediate.children.bf_incident_hiv_transmission_rate = bf_at_risk * 0.269;
-  intermediate.children.bf_incident_hiv_transmission_rate = 0.0;
+   intermediate.children.bf_incident_hiv_transmission_rate = intermediate.children.bf_at_risk * cpars.vertical_transmission_rate(7,1);
 
 }
 
