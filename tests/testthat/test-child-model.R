@@ -71,6 +71,9 @@ test_that("CLHIV align", {
   dp = input$dp
   pjnz = input$pjnz
 
+  parameters$paed_cd4_dist <- c(1,rep(0,6))
+  parameters$t_ART_start <- 30
+  parameters$mat_hiv_births[] = 0
   out <- run_model(demp, parameters, NULL, NULL, 0:60, run_child_model = TRUE)
 
   spec_prev <- input$offtrt
@@ -103,8 +106,7 @@ test_that("CLHIV align", {
   dt <- dt %>%
     mutate(diff = pop - fr)
   y <- data.table(dt)
-  y[year == 2004 & sex == 'Male' & age == 0 & !cd4_cat %in% c('gte30', '26-30')]
-  y[year == 2030 & sex == 'Male' & age == 0 ]
+  y[year == 2003]
 
 
   expect_true(all(abs(dt$diff) < 1e-1))
@@ -121,6 +123,9 @@ test_that("CLHIV on ART align", {
   dp = input$dp
   pjnz = input$pjnz
 
+  parameters$paed_cd4_dist <- c(1,rep(0,6))
+  parameters$t_ART_start <- 30
+  parameters$mat_hiv_births[] = 0
   out <- run_model(demp, parameters, NULL, NULL, 0:60, run_child_model = TRUE)
 
   spec_prev <- input$ontrt
@@ -154,10 +159,8 @@ test_that("CLHIV on ART align", {
   dt <- dt %>%
     mutate(diff = pop - fr)
   x <- data.table(dt)
-  # ggplot(x, aes(year, diff, col = as.factor(cd4_cat))) + geom_line() + facet_grid(time_art~age)
-  x[,pct_diff := (pop - fr) / pop]
-  dx <- x[year == 2004 & sex == 'Male' & time_art == 'ARTlte5mo' ]
-  dx
+  x[year == 2003]
+
   expect_true(all(abs(dt$diff) < 1e-1))
 })
 
@@ -209,7 +212,9 @@ test_that("HIV related deaths among CLHIV on ART align", {
   dp = input$dp
   pjnz = input$pjnz
   # saveRDS(list(hivp = parameters, demp = demp, ontrt = input$ontrt), 'C:/Users/mwalters/Desktop/parms.RDS')
-
+  parameters$paed_cd4_dist <- c(1,rep(0,6))
+  parameters$t_ART_start <- 30
+  parameters$mat_hiv_births[] = 0
   out <- run_model(demp, parameters, NULL, NULL, 0:60, run_child_model = TRUE)
   tag.x ="<AIDSDeathsARTSingleAge MV>"
   start.id = 20608

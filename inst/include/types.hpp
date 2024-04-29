@@ -324,7 +324,6 @@ struct ChildModelState<ChildModel, real_type> {
   TensorFixedSize <real_type, Sizes<4>> hc_art_init;
   TensorFixedSize <real_type, Sizes<hc1DS<ChildModel>, hcTT<ChildModel>, 15, NS<ChildModel>>> hc_art_need_init;
 
-
   ChildModelState(const Parameters<ChildModel, real_type> &pars) {
     reset();
   }
