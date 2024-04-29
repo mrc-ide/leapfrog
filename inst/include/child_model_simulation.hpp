@@ -49,8 +49,6 @@ void run_child_ageing(int time_step,
     }
   }
 
-
-
   for (int s = 0; s < ss.NS; ++s) {
     for (int a = (hc_ss.hc2_agestart + 1); a < pars.base.options.p_idx_fertility_first; ++a) {
       for (int hd = 0; hd < hc_ss.hc2DS; ++hd) {
@@ -137,8 +135,6 @@ void run_wlhiv_births(int time_step,
     }
 
   } // end a
-
-
   state_next.children.hiv_births = intermediate.children.birthsHE;
 }
 
@@ -153,7 +149,6 @@ void run_wlhiv_births_input_mat_prev(int time_step,
   const auto cpars = pars.children.children;
 
   state_next.children.hiv_births = cpars.mat_hiv_births(time_step);
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -173,7 +168,6 @@ void calc_hiv_negative_pop(int time_step,
       intermediate.children.p_hiv_neg_pop(a, s) = demog.base_pop(a, s) - state_next.base.p_hiv_pop(a, s);
     }// end a
   }//end s
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -215,10 +209,8 @@ void convert_PMTCT_num_to_perc(int time_step,
       }
     } //end hPS
   }
-
   intermediate.children.PMTCT_coverage(4) = intermediate.children.PMTCT_coverage(4) * cpars.PMTCT_dropout(0,time_step);
   intermediate.children.PMTCT_coverage(5) = intermediate.children.PMTCT_coverage(5) * cpars.PMTCT_dropout(1,time_step);
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -236,7 +228,6 @@ void convert_PMTCT_pre_bf(int time_step,
   for (int hp = 0; hp < hc_ss.hPS; ++hp) {
     intermediate.children.PMTCT_coverage(hp) = (1 - cpars.PMTCT_transmission_rate(4,hp,0)) * intermediate.children.PMTCT_coverage(hp);
   } //end hPS
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -292,7 +283,6 @@ void calc_wlhiv_cd4_proportion(int time_step,
     intermediate.children.prop_wlhiv_lt350 = intermediate.children.prop_wlhiv_lt200 + intermediate.children.prop_wlhiv_200to350;
 
   }
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -325,7 +315,6 @@ void adjust_optAB_transmission_rate(int time_step,
     intermediate.children.optA_transmission_rate = cpars.PMTCT_transmission_rate(0,0,0) * (1 + intermediate.children.excessratio);
     intermediate.children.optB_transmission_rate = cpars.PMTCT_transmission_rate(0,1,0) * (1 + intermediate.children.excessratio);
   }
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -428,8 +417,6 @@ void run_calculate_perinatal_transmission_rate(int time_step,
   }else{
     intermediate.children.perinatal_transmission_rate = intermediate.children.perinatal_transmission_rate;
   }
-
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -447,7 +434,6 @@ void run_calculate_transmission_from_incidence_during_breastfeeding(int time_ste
     intermediate.children.bf_at_risk += intermediate.children.incidence_rate_wlhiv / 12 * 2 * (1 - cpars.breastfeeding_duration_no_art(bf, time_step));
   }
    intermediate.children.bf_incident_hiv_transmission_rate = intermediate.children.bf_at_risk * cpars.vertical_transmission_rate(7,1);
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -474,7 +460,6 @@ void run_bf_transmission_rate(int time_step,
         //   2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) * intermediate.children.optA_bf_transmission_rate;
         intermediate.children.percent_no_treatment -=  intermediate.children.percent_on_treatment;
       }
-
       //hp = 1 is option B
       if(hp == 1){
         intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp);
@@ -482,7 +467,6 @@ void run_bf_transmission_rate(int time_step,
         //   2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) * intermediate.children.optB_bf_transmission_rate;
         intermediate.children.percent_no_treatment -=  intermediate.children.percent_on_treatment;
       }
-
       //sdnvp
       if(hp == 2){
         intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp)  ;
@@ -491,7 +475,6 @@ void run_bf_transmission_rate(int time_step,
           2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) ;
         intermediate.children.percent_no_treatment -=  intermediate.children.percent_on_treatment ;
       }
-
       //dual arv
       if(hp == 3){
         intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp);
@@ -501,7 +484,6 @@ void run_bf_transmission_rate(int time_step,
         intermediate.children.percent_no_treatment -=  intermediate.children.percent_on_treatment;
 
       }
-
       //on art pre preg
       if(hp > 3){
         if(bf < 6){
@@ -523,19 +505,12 @@ void run_bf_transmission_rate(int time_step,
 
         intermediate.children.bf_transmission_rate(index) += intermediate.children.percent_on_treatment *
           2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) * cpars.PMTCT_transmission_rate(4,hp,1);
-
-
         intermediate.children.percent_no_treatment -= intermediate.children.percent_on_treatment;
-
       }
     }
-
-
     if(intermediate.children.percent_no_treatment < 0){
       intermediate.children.percent_no_treatment = 0;
     }
-
-
     //No treatment
     if(cpars.breastfeeding_duration_no_art(bf, time_step) < 1){
 
@@ -545,14 +520,9 @@ void run_bf_transmission_rate(int time_step,
         2 * intermediate.children.prop_wlhiv_gte350 * cpars.vertical_transmission_rate(0,1));
 
     }
-
-
     if(bf < 1){
       intermediate.children.bf_transmission_rate(index) = intermediate.children.bf_transmission_rate(index)/ 4;
     }
-
-
-
   }
 }
 
@@ -584,7 +554,6 @@ void run_nosocomial_infections(int time_step,
       }
     } //end a
   } // end NS
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -667,7 +636,6 @@ void run_child_hiv_infections(int time_step,
         (state_next.base.p_total_pop(2,s) - state_next.base.p_hiv_pop(2,s)) / ((state_next.base.p_total_pop(2,0) + state_next.base.p_total_pop(2,1)) - (state_next.base.p_hiv_pop(2,0) + state_next.base.p_hiv_pop(2,1)));
     }// end NS
   }
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -730,9 +698,6 @@ void calc_need_for_ctx(int time_step,
       }
     }
   }
-
-
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -760,7 +725,6 @@ void ctx_need_cov(int time_step,
       state_next.children.ctx_mean = (1-cpars.ctx_effect) * state_next.children.ctx_mean + (1 - state_next.children.ctx_mean);
     }
   }
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -821,8 +785,6 @@ void run_child_natural_history(int time_step,
       }
     }
   }
-
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -863,7 +825,6 @@ void run_child_hiv_mort(int time_step,
       }
     }
   }
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -925,8 +886,6 @@ void hc_initiate_art_by_age(int time_step,
       } // end a
     } // end hcTT
   } // end ss.NS
-
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -957,7 +916,6 @@ void hc_initiate_art_by_cd4(int time_step,
       } // end a
     } // end hcTT
   } // end ss.NS
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -983,7 +941,6 @@ void eligible_for_treatment(int time_step,
       } // end a
     } // end hcTT
   } // end ss.NS
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -1037,7 +994,6 @@ void onART_mortality(int time_step,
       }// end a
     }// end hc_ss.hc1DS
   }// end ss.NS
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -1067,7 +1023,6 @@ void deaths_this_year(int time_step,
       }// end hc_ss.hc1DS
     }// end ss.NS
   }// end dur
-
   intermediate.children.hc_art_deaths(0) =  intermediate.children.hc_art_deaths(1) +  intermediate.children.hc_art_deaths(2) + intermediate.children.hc_art_deaths(3);
 }
 
@@ -1099,7 +1054,6 @@ void progress_time_on_art(int time_step,
       }//end ss.NS
     }// end a
   }// end hc_ss.hc1DS
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -1139,7 +1093,6 @@ void calc_total_and_unmet_need(int time_step,
     }
   }
 
-
   for (int ag = 1; ag < 4; ++ag) {
     intermediate.children.on_art(0) += intermediate.children.on_art(ag);
     intermediate.children.unmet_need(0) += intermediate.children.unmet_need(ag);
@@ -1148,8 +1101,6 @@ void calc_total_and_unmet_need(int time_step,
   }// end ag
 
   intermediate.children.total_need(0) = intermediate.children.on_art(0) + intermediate.children.unmet_need(0) + intermediate.children.hc_art_deaths(0);
-
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -1243,9 +1194,6 @@ void calc_art_last_year(int time_step,
       }
     }
   }
-
-
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -1268,7 +1216,6 @@ void calc_art_this_year(int time_step,
       intermediate.children.total_art_this_year(ag) =  cpars.hc_art_val(ag,time_step);
     }// end ag
   }
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -1303,7 +1250,6 @@ void calc_art_initiates(int time_step,
     if(state_next.children.hc_art_init(ag) > (intermediate.children.unmet_need(ag) ))
       state_next.children.hc_art_init(ag) = (intermediate.children.unmet_need(ag));
   }// end ag
-
 }
 
 
@@ -1428,8 +1374,6 @@ void hc_art_initiation_by_age(int time_step,
     } // end ss.NS
 
   }// end if
-
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -1506,7 +1450,6 @@ void run_child_model_simulation(int time_step,
       internal::run_nosocomial_infections(time_step, pars, state_curr, state_next, intermediate);
     }
   }
-
 }
 
 
