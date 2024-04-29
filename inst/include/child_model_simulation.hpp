@@ -1048,15 +1048,15 @@ void onART_mortality(int time_step,
         if (a < hc_ss.hc2_agestart) {
           if((intermediate.children.hc_death_rate * state_next.children.hc1_art_pop(time_art_idx, hd, a, s)) >= 0){
             intermediate.children.hc_art_grad(time_art_idx,hd, a, s) -= intermediate.children.hc_death_rate * state_next.children.hc1_art_pop(time_art_idx, hd, a, s);
-            state_next.children.hc1_art_aids_deaths(time_art_idx,hd, a, s) = intermediate.children.hc_death_rate * state_next.children.hc1_art_pop(time_art_idx, hd, a, s);
             state_next.children.hc1_art_pop(time_art_idx, hd,  a, s) += intermediate.children.hc_art_grad(time_art_idx, hd, a, s);
+            state_next.children.hc1_art_aids_deaths(time_art_idx,hd, a, s) -= intermediate.children.hc_art_grad(time_art_idx,hd, a, s);
 
           }
         } else if (hd < hc_ss.hc2DS) {
           if((intermediate.children.hc_death_rate * state_next.children.hc2_art_pop(time_art_idx, hd, a-hc_ss.hc2_agestart, s)) >= 0){
             intermediate.children.hc_art_grad(time_art_idx, hd, a, s) -= intermediate.children.hc_death_rate * state_next.children.hc2_art_pop(time_art_idx, hd, a-hc_ss.hc2_agestart, s);
-            state_next.children.hc2_art_aids_deaths(time_art_idx, hd, a-hc_ss.hc2_agestart, s) = intermediate.children.hc_death_rate * state_next.children.hc2_art_pop(time_art_idx, hd, a-hc_ss.hc2_agestart, s);
             state_next.children.hc2_art_pop(time_art_idx, hd,  a-hc_ss.hc2_agestart, s) += intermediate.children.hc_art_grad(time_art_idx, hd, a, s);
+            state_next.children.hc2_art_aids_deaths(time_art_idx, hd, a-hc_ss.hc2_agestart, s) -= intermediate.children.hc_art_grad(time_art_idx, hd, a, s);
 
           }
         }
@@ -1102,9 +1102,7 @@ void deaths_this_year(int time_step,
 
 
   intermediate.children.hc_art_deaths(0) =  intermediate.children.hc_art_deaths(1) +  intermediate.children.hc_art_deaths(2) + intermediate.children.hc_art_deaths(3);
-  if(time_step == 33){
-    std::cout << intermediate.children.hc_art_deaths(0) ;
-  }
+
 }
 
 template<typename ModelVariant, typename real_type>
@@ -1335,7 +1333,7 @@ void calc_art_initiates(int time_step,
   intermediate.children.retained = 1 ;// - cpars.paed_art_ltfu(time_step);
 
   if(time_step == 53){
-    intermediate.children.total_art_last_year(0) = 0.0;
+    // intermediate.children.total_art_last_year(0) = 0.0;
   }
 
   for (int ag = 0; ag < 4; ++ag) {
@@ -1591,8 +1589,8 @@ void run_child_model_simulation(int time_step,
     if(time_step > pars.base.options.ts_art_start){
       internal::run_child_art_initiation(time_step, pars, state_curr, state_next, intermediate);
       //mortality among those on ART less than one year
-        internal::onART_mortality(time_step, pars, state_curr, state_next, intermediate, 0);
-        internal::progress_time_on_art(time_step, pars, state_curr, state_next, intermediate, 1, 2);
+      internal::onART_mortality(time_step, pars, state_curr, state_next, intermediate, 0);
+      internal::progress_time_on_art(time_step, pars, state_curr, state_next, intermediate, 1, 2);
 
 
 

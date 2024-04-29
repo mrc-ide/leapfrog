@@ -71,9 +71,6 @@ test_that("CLHIV align", {
   dp = input$dp
   pjnz = input$pjnz
 
-  parameters$paed_cd4_dist <- c(1,rep(0,6))
-  parameters$t_ART_start <- 30
-  parameters$mat_hiv_births[] = 0
   out <- run_model(demp, parameters, NULL, NULL, 0:60, run_child_model = TRUE)
 
   spec_prev <- input$offtrt
@@ -104,18 +101,14 @@ test_that("CLHIV align", {
     summarise(fr = sum(fr))
   dt <- right_join(hc, spec_prev, by = c('sex', 'age', 'cd4_cat', 'year', 'transmission'))
   dt <- dt %>%
-    mutate(diff = pop - fr)
-  y <- data.table(dt)
-  y[year == 2003]
+    mutate(diff = pop - fr) %>%
+    filter(year < 2030)
+ y = data.table(dt)
 
-
-  expect_true(all(abs(dt$diff) < 1e-1))
+  expect_true(all(abs(dt$diff) < 1e-3))
 })
 
-#2023 diverging in art lte 5 mo
-##x[year == 2023 & age == 1 & time_art == 'ARTlte5mo']
-##x[year == 2020 & time_art == 'ARTlte5mo' & sex == 'Male' & age == 1]
-##number to percent
+
 test_that("CLHIV on ART align", {
   input <- setup_childmodel(testinput = "testdata/child_parms.rds")
   demp = input$demp
@@ -123,9 +116,9 @@ test_that("CLHIV on ART align", {
   dp = input$dp
   pjnz = input$pjnz
 
-  parameters$paed_cd4_dist <- c(1,rep(0,6))
-  parameters$t_ART_start <- 30
-  parameters$mat_hiv_births[] = 0
+  # parameters$paed_cd4_dist <- c(1,rep(0,6))
+  # parameters$t_ART_start <- 30
+  # parameters$mat_hiv_births[] = 0
   out <- run_model(demp, parameters, NULL, NULL, 0:60, run_child_model = TRUE)
 
   spec_prev <- input$ontrt
@@ -157,11 +150,11 @@ test_that("CLHIV on ART align", {
     group_by(age, cd4_cat, time_art, sex, year)
   dt <- right_join(hc, spec_prev, by = c('sex', 'age', 'cd4_cat', 'year', 'time_art'))
   dt <- dt %>%
-    mutate(diff = pop - fr)
-  x <- data.table(dt)
-  x[year == 2003]
+    mutate(diff = pop - fr) %>%
+    filter(year < 2030)
+x <- data.table(dt)
 
-  expect_true(all(abs(dt$diff) < 1e-1))
+  expect_true(all(abs(dt$diff) < 1e-3))
 })
 
 test_that("HIV related deaths among CLHIV not on ART align", {
@@ -204,17 +197,13 @@ test_that("HIV related deaths among CLHIV not on ART align", {
   expect_true(all(abs(dt$diff) < 1e-1))
 })
 
-#Issue when input goes from numbers to percents (year 2023)
 test_that("HIV related deaths among CLHIV on ART align", {
   input <- setup_childmodel(testinput = "testdata/child_parms.rds")
   demp = input$demp
   parameters = input$parameters
   dp = input$dp
   pjnz = input$pjnz
-  # saveRDS(list(hivp = parameters, demp = demp, ontrt = input$ontrt), 'C:/Users/mwalters/Desktop/parms.RDS')
-  parameters$paed_cd4_dist <- c(1,rep(0,6))
-  parameters$t_ART_start <- 30
-  parameters$mat_hiv_births[] = 0
+
   out <- run_model(demp, parameters, NULL, NULL, 0:60, run_child_model = TRUE)
   tag.x ="<AIDSDeathsARTSingleAge MV>"
   start.id = 20608
@@ -242,13 +231,10 @@ test_that("HIV related deaths among CLHIV on ART align", {
            spec = value.y) %>%
     select(age, sex, year, fr, spec)
   dt <- dt %>%
-    mutate(diff = spec - fr)
-
-  deaths = data.table(dt)
-  deaths[sex == 'Male' & year == 2004]
-
-  expect_true(all(abs(dt$diff) < 1))
-
+    mutate(diff = spec - fr) %>%
+    filter(year < 2030)
+deaths <- data.table(dt)
+  expect_true(all(abs(dt$diff) < 1e-1))
 
 })
 
