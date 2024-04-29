@@ -437,7 +437,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
                 mtct_rates_input[2,1], mtct_rates_input[2,1],
                 rep(mtct_rates_input[1,1],3)) /100
   mtct[1:7,2] <- c(rep(mtct_rates_input[3,3],2), rep(mtct_rates_input[2,2],2), rep(mtct_rates_input[1,2],3)) / 100
-  mtct[8,] <- c(mtct_rates_input[4,1], mtct_rates_input[4,2])
+  mtct[8,] <- c(mtct_rates_input[4,1], mtct_rates_input[4,2]) / 100
   v$mtct <- mtct
 
   mort_rr_art <- leapfrog:::dp_read_child_mort_mult(pjnz)
