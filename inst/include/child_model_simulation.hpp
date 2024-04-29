@@ -762,6 +762,7 @@ void ctx_need_cov(int time_step,
 
   internal::calc_need_for_ctx(time_step, pars, state_curr, state_next, intermediate);
 
+
   if(cpars.ctx_val_is_percent(time_step)){
 
       state_next.children.ctx_mean = cpars.ctx_val(time_step-1) ;// /  state_next.children.ctx_need;
@@ -789,7 +790,6 @@ void run_child_natural_history(int time_step,
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
 
-  internal::ctx_need_cov(time_step, pars, state_curr, state_next, intermediate);
 
   for (int s = 0; s < ss.NS; ++s) {
     for (int a = 0; a < hc_ss.hc2_agestart; ++a) {
@@ -993,7 +993,6 @@ void eligible_for_treatment(int time_step,
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
 
-  //Those eligible for ARVs (state_next.children.hc_art_need_init) are calculated in the ctx_need_cov function
   internal::hc_initiate_art_by_age(time_step, pars, state_curr, state_next, intermediate);
   internal::hc_initiate_art_by_cd4(time_step, pars, state_curr, state_next, intermediate);
 
@@ -1569,6 +1568,7 @@ void run_child_model_simulation(int time_step,
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
 
   internal::run_child_ageing(time_step, pars, state_curr, state_next, intermediate);
+
   if(cpars.mat_prev_input(time_step)){
     internal::run_wlhiv_births_input_mat_prev(time_step, pars, state_curr, state_next, intermediate);
   }else{
@@ -1580,6 +1580,7 @@ void run_child_model_simulation(int time_step,
   if(state_next.children.hiv_births > 0){
     internal::run_child_hiv_infections(time_step, pars, state_curr, state_next, intermediate);
   }
+  internal::ctx_need_cov(time_step, pars, state_curr, state_next, intermediate);
 
     internal::run_child_natural_history(time_step, pars, state_curr, state_next, intermediate);
     internal::run_child_hiv_mort(time_step, pars, state_curr, state_next, intermediate);

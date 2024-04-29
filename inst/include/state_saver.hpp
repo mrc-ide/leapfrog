@@ -126,6 +126,7 @@ struct ChildModelOutputState<ChildModel, real_type> {
                             StateSpace<ChildModel>().base.NS, no_output_years),
         hc_art_num(4, no_output_years),
         hiv_births(no_output_years),
+        ctx_need(no_output_years),
         hc_art_total(4, no_output_years),
         hc_art_init(4, no_output_years),
         hc_art_need_init(StateSpace<ChildModel>().children.hc1DS,
@@ -142,6 +143,7 @@ struct ChildModelOutputState<ChildModel, real_type> {
     hc2_art_aids_deaths.setZero();
     hc_art_num.setZero();
     hiv_births.setZero();
+    ctx_need.setZero();
     hc_art_total.setZero();
     hc_art_init.setZero();
     hc_art_need_init.setZero();
@@ -219,6 +221,7 @@ public:
     // children_state.hc_art_num(i) = state.children.hc_art_num;
     children_state.hc_art_num.chip(i, children_state.hc_art_num.NumDimensions - 1)  = state.children.hc_art_num;
     children_state.hiv_births(i) = state.children.hiv_births;
+    children_state.ctx_need(i) = state.children.ctx_need;
     // children_state.hc_art_num(i, children_state.hc_art_num.NumDimensions - 1) = state.children.hc_art_num;
     // children_state.hc_art_total(i, children_state.hc_art_total.NumDimensions - 1) = state.children.hc_art_num;
     children_state.hc_art_init.chip(i, children_state.hc_art_init.NumDimensions - 1)  = state.children.hc_art_init;

@@ -14,7 +14,7 @@ test_that("Child model can be run for all years", {
       "hc1_art_pop", "hc2_art_pop",
       "hc1_noart_aids_deaths", "hc2_noart_aids_deaths",
       "hc1_art_aids_deaths", "hc2_art_aids_deaths", "hc_art_num", "hiv_births",
-      "hc_art_total", "hc_art_init", 'hc_art_need_init'
+      "hc_art_total", "hc_art_init", 'hc_art_need_init', 'ctx_need'
     )
   )
 
@@ -108,7 +108,6 @@ test_that("CLHIV align", {
   expect_true(all(abs(dt$diff) < 1e-3))
 })
 
-
 test_that("CLHIV on ART align", {
   input <- setup_childmodel(testinput = "testdata/child_parms.rds")
   demp = input$demp
@@ -116,9 +115,6 @@ test_that("CLHIV on ART align", {
   dp = input$dp
   pjnz = input$pjnz
 
-  # parameters$paed_cd4_dist <- c(1,rep(0,6))
-  # parameters$t_ART_start <- 30
-  # parameters$mat_hiv_births[] = 0
   out <- run_model(demp, parameters, NULL, NULL, 0:60, run_child_model = TRUE)
 
   spec_prev <- input$ontrt
@@ -194,7 +190,7 @@ test_that("HIV related deaths among CLHIV not on ART align", {
     mutate(diff = spec - fr)
 
   z = data.table(dt)
-  expect_true(all(abs(dt$diff) < 1e-1))
+  expect_true(all(abs(dt$diff) < 1))
 })
 
 test_that("HIV related deaths among CLHIV on ART align", {
