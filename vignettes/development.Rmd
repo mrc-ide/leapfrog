@@ -119,13 +119,27 @@ The intermediate data is not handled by code generation as it only requires chan
 
 ## Adding a new model variant
 
-To add a new variant:
+To add a new variant, requires work over a few areas. There are two types of model variants at the moment:
+1. A flag which turns a section of code on or off, this will come with additional model inputs and outputs
+1. A flag which changes the dimensions of some model input or outputs
+
+The required changes will be different depending on if your new variant is one of the first types, which brings additional input/output or the second type which does not bring additional data.
+
+To add a new variant. Firstly, in the code generation:
+
+1. Add any new input or output data in [`inst/include/model_input.csv`](https://github.com/mrc-ide/frogger/blob/main/inst/cpp_generation/model_input.csv) or [`inst/include/model_output.csv`](https://github.com/mrc-ide/frogger/blob/main/inst/cpp_generation/model_output.csv)
+1. If you have new input data, add a specialism for the new variant into the state_types template in [`inst/cpp_generation/state_types.hpp.in`](https://github.com/mrc-ide/frogger/blob/main/inst/cpp_generation/state_types.hpp.in)
+1. Run the generate script
+
+In the C++ code:
 
 1. Add your new variant in [`inst/include/model_variants.hpp`](https://github.com/mrc-ide/frogger/blob/main/inst/include/model_variants.hpp)
-1. Add the new variant into the state_types template in [`inst/cpp_generation/state_types.hpp.in`](https://github.com/mrc-ide/frogger/blob/main/inst/cpp_generation/state_types.hpp.in)
-1. Add any new input or output data in [`inst/include/model_input.csv`](https://github.com/mrc-ide/frogger/blob/main/inst/cpp_generation/model_input.csv) or [`inst/include/model_output.csv`](https://github.com/mrc-ide/frogger/blob/main/inst/cpp_generation/model_output.csv) and regenerate.
-1. Add parameters for this variant in [`inst/include/parameters.hpp`](https://github.com/mrc-ide/frogger/blob/main/inst/include/parameters.hpp)
 1. Add a struct for the new state space in [`inst/include/state_space.hpp`](https://github.com/mrc-ide/frogger/blob/main/inst/include/state_space.hpp)
-1. Add a new top level function for this part of the model
-1. Add a new conditional into the runner `frogger.cpp`
-1. Reflect that in the R calling function
+1. If your model has new input data, add parameters for this variant in [`inst/include/parameters.hpp`](https://github.com/mrc-ide/frogger/blob/main/inst/include/parameters.hpp). Parameter types will be generated, you need to add those types to the appropriate template specialisation
+1. If your model has new output data, add a new specialisation in [`inst/include/state_saver.hpp`](https://github.com/mrc-ide/frogger/blob/main/inst/include/state_saver.hpp)
+
+You now need to update the R wrapper to be able to call this new variant:
+
+1. In [`R/run_model.R`](https://github.com/mrc-ide/frogger/blob/main/R/run_model.R) add a new flag to the `run_model` interface for using your new variant
+1. Update the conditionals to build the `model_variant` string based upon your new flag
+1. Add mapping from the string to the model variant struct in Rcpp wrapper code in [`src/frogger.cpp`](https://github.com/mrc-ide/frogger/blob/main/src/frogger.cpp). Note use a `constexpr` for the state space to ensure it is evaluated at compile time.
