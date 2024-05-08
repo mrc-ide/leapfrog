@@ -373,7 +373,7 @@ generate_state_types <- function(
   outputs_by_struct <- get_data_by_struct(parsed_outputs)
 
   state_defs <- vcapply(outputs_by_struct, generate_state_def)
-  state_defs <- paste(state_defs, collapse = "\n")
+  state_defs <- paste_lines(state_defs)
 
   header <- generate_header(basename(template_path))
 
@@ -414,13 +414,13 @@ generate_state_def <- function(outputs) {
 
   paste0(
     struct_def,
-    paste(struct_members, collapse = "\n"),
+    paste_lines(struct_members),
     "\n\n",
     sprintf("  %sState(const Parameters<%s, real_type> &pars) {\n",
             struct_name, model_variant),
     "    reset();\n",
     "  }\n\n",
-    paste(reset_text, collapse = "\n"),
+    paste_lines(reset_text),
     "\n};\n"
   )
 }
