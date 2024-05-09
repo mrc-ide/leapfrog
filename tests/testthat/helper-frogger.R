@@ -10,3 +10,7 @@ copy_directory <- function(src, as) {
     stop("Error copying files")
   }
 }
+
+expect_contains <- function(expected, full_text) {
+  expect_true(any(grepl(expected, full_text, fixed = TRUE)))
+}

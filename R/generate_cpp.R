@@ -7,8 +7,8 @@
 #' @return Nothing, called to generate code in src dir
 #' @keywords internal
 generate_output_interface <- function(dest) {
-
-  template <- readLines(frogger_file("cpp_generation/model_output.hpp.in"))
+  template_path <- frogger_file("cpp_generation/model_output.hpp.in")
+  template <- readLines(template_path)
   output_file <- "model_output.csv"
   outputs <- utils::read.csv(frogger_file("cpp_generation", output_file),
                              colClasses = "character")
@@ -38,7 +38,7 @@ generate_output_interface <- function(dest) {
                        remaining_sections, names(remaining_sections))
   optional_data <- paste_lines(unlist(optional_data))
 
-  header <- generate_header("model_output.hpp.in")
+  header <- generate_header(basename(template_path))
 
   generated_code <- generate_cpp(template)
   writeLines(generated_code, dest)
@@ -125,7 +125,8 @@ generate_push_to_list <- function(outputs) {
 generate_input_interface <- function(
     dest, input_csv = frogger_file("cpp_generation/model_input.csv")) {
 
-  template <- readLines(frogger_file("cpp_generation/model_input.hpp.in"))
+  template_path <- frogger_file("cpp_generation/model_input.hpp.in")
+  template <- readLines(template_path)
   input_file <- basename(input_csv)
   inputs <- utils::read.csv(input_csv, colClasses = "character")
 
@@ -152,7 +153,7 @@ generate_input_interface <- function(
                        remaining_sections, names(remaining_sections))
   optional_data <- paste_lines(unlist(optional_data))
 
-  header <- generate_header("model_input.hpp.in")
+  header <- generate_header(basename(template_path))
 
   generated_code <- generate_cpp(template)
   writeLines(generated_code, dest)
@@ -182,7 +183,7 @@ generate_optional_input_section <- function(section, input_when) {
 }
 
 generate_struct_instantiation <- function(inputs) {
-  inputs_by_struct <- get_inputs_by_struct(inputs)
+  inputs_by_struct <- get_data_by_struct(inputs)
   struct_text <- lapply(inputs_by_struct, generate_struct)
   unlist(struct_text)
 }
@@ -267,7 +268,8 @@ generate_return <- function() {
 #' @return Nothing, called to generate code in src dir
 #' @keywords internal
 generate_parameter_types <- function(dest) {
-  template <- readLines(frogger_file("cpp_generation/parameter_types.hpp.in"))
+  template_path <- frogger_file("cpp_generation/parameter_types.hpp.in")
+  template <- readLines(template_path)
   input_file <- "model_input.csv"
   inputs <- utils::read.csv(frogger_file("cpp_generation", input_file),
                             colClasses = "character")
@@ -281,36 +283,36 @@ generate_parameter_types <- function(dest) {
     validate_and_parse_input(as.list(row), input_file, csv_row_num)
   })
 
-  inputs_by_struct <- get_inputs_by_struct(parsed_inputs)
+  inputs_by_struct <- get_data_by_struct(parsed_inputs)
 
   struct_defs <- vcapply(inputs_by_struct, generate_struct_def)
   struct_defs <- paste_lines(struct_defs)
 
-  header <- generate_header("model_input.hpp.in")
+  header <- generate_header(basename(template_path))
 
   generated_code <- generate_cpp(template)
   writeLines(generated_code, dest)
   invisible(dest)
 }
 
-#' Organise the input data into separate struct
+#' Organise the data into separate structs
 #'
-#' This takes a list of inputs and splits them by struct returning the result
-#' as a named list of lists where names are the struct name and list is the
-#' inputs which belong on that struct
+#' This takes a list of inputs or outputs and splits them by struct returning
+#' the result as a named list of lists where names are the struct name and
+#' list is the inputs/outputs which belong on that struct
 #'
-#' @param inputs Data related to model inputs
+#' @param data Data related to model inputs or outputs
 #'
 #' @return
 #' @keywords internal
-get_inputs_by_struct <- function(inputs) {
-  struct <- vcapply(inputs, "[[", "struct")
-  structs <- unique(vcapply(inputs, "[[", "struct"))
-  inputs_by_struct <- lapply(structs, function(struct_name) {
-    inputs[struct == struct_name]
+get_data_by_struct <- function(data) {
+  struct <- vcapply(data, "[[", "struct")
+  structs <- unique(vcapply(data, "[[", "struct"))
+  data_by_struct <- lapply(structs, function(struct_name) {
+    data[struct == struct_name]
   })
-  names(inputs_by_struct) <- structs
-  inputs_by_struct
+  names(data_by_struct) <- structs
+  data_by_struct
 }
 
 generate_struct_def <- function(inputs) {
@@ -340,6 +342,112 @@ generate_struct_instance <- function(inputs) {
     paste_lines(sprintf("    %s", vcapply(inputs, "[[", "cpp_name"))),
     "  \n};\n"
   )
+}
+
+#' Generate C++ for state types
+#'
+#' @param dest The destination to write generated code to.
+#' @param output_csv Path to csv file with output specification in it
+#'
+#' @return Nothing, called to generate code in src dir
+#' @keywords internal
+generate_state_types <- function(
+    dest,
+    output_csv = frogger_file("cpp_generation/model_output.csv")) {
+  template_path <- frogger_file("cpp_generation/state_types.hpp.in")
+  template <- readLines(template_path)
+  output_file <- "model_output.csv"
+  outputs <- utils::read.csv(output_csv, colClasses = "character")
+
+  validate_dimensions_columns(colnames(outputs), output_file)
+
+  parsed_outputs <- lapply(seq_len(nrow(outputs)), function(row_num) {
+    row <- outputs[row_num, ]
+    ## When reading csv in excel the header column is included in count
+    csv_row_num <- row_num + 1
+    output <- validate_and_parse_output(as.list(row), output_file, csv_row_num)
+    output$parsed_dims <- parse_state_dims(output$parsed_dims)
+    output
+  })
+
+  outputs_by_struct <- get_data_by_struct(parsed_outputs)
+
+  state_defs <- vcapply(outputs_by_struct, generate_state_def)
+  state_defs <- paste_lines(state_defs)
+
+  header <- generate_header(basename(template_path))
+
+  generated_code <- generate_cpp(template)
+  writeLines(generated_code, dest)
+  invisible(dest)
+}
+
+parse_state_dims <- function(dims) {
+  ## For output types the last dimension should always be output_years
+  ## the state stores the state for a single year so to get the dimensions
+  ## for generating state types we need to drop this last dimension
+  ## We also don't need the qualifying name i.e. the `base` part of `base.hTS`
+  ## We've alread validated that the last dimension is output_years
+  dims <- dims[-length(dims)]
+  vcapply(dims, function(dim) {
+    strsplit(dim, "\\.")[[1]][[2]]
+  }, USE.NAMES = FALSE)
+}
+
+generate_state_def <- function(outputs) {
+  struct_members <- vcapply(outputs, generate_state_struct_member)
+  reset_text <- generate_state_reset_function(outputs)
+  struct_name <- outputs[[1]]$struct
+  model_variant <- outputs[[1]]$model_variant
+
+  if (model_variant == "ModelVariant") {
+    struct_def <- paste0(
+      sprintf("template<typename %s, typename real_type>\n", model_variant),
+      sprintf("struct %sState {\n", struct_name)
+    )
+  } else {
+    struct_def <- paste0(
+      "template<typename real_type>\n",
+      sprintf("struct %sState<%s, real_type> {\n", struct_name, model_variant)
+    )
+  }
+
+  paste0(
+    struct_def,
+    paste_lines(struct_members),
+    "\n\n",
+    sprintf("  %sState(const Parameters<%s, real_type> &pars) {\n",
+            struct_name, model_variant),
+    "    reset();\n",
+    "  }\n\n",
+    paste_lines(reset_text),
+    "\n};\n"
+  )
+}
+
+generate_state_struct_member <- function(output) {
+  if (output$dims == "1") {
+    type <- "real_type"
+  } else {
+    sizes <- sprintf("%s<%s>", output$parsed_dims, output$model_variant)
+    sizes <- paste(sizes, collapse = ", ")
+    type <- sprintf("TensorFixedSize<real_type, Sizes<%s>>", sizes)
+  }
+  sprintf("  %s %s;", type, output$cpp_name)
+}
+
+generate_state_reset_function <- function(outputs) {
+  reset_lines <- vcapply(outputs, function(output) {
+    if (output$dims == 1) {
+      sprintf("    %s = 0;", output$cpp_name)
+    } else {
+      sprintf("    %s.setZero();", output$cpp_name)
+    }
+  })
+  c(
+    "  void reset() {",
+    reset_lines,
+    "  }")
 }
 
 generate_cpp <- function(template) {
