@@ -448,11 +448,11 @@ void run_bf_transmission_rate(int time_step,
   static_assert(ModelVariant::run_child_model,
                 "run_bf_transmission_rate can only be called for model variants where run_child_model is true");
 
-  for(int bf = bf_start; bf < bf_end; bf++){
+  for (int bf = bf_start; bf < bf_end; bf++) {
     //intermediate.children.perinatal_transmission_rate_bf_calc is the transmission that has already occurred due to perinatal transmission
     //intermediate.children.percent_no_treatment is the percentage of women who are still vulnerable to HIV transmission to their babies
     intermediate.children.percent_no_treatment = 1 - intermediate.children.perinatal_transmission_rate_bf_calc - intermediate.children.bf_transmission_rate(index);
-    for(int hp = 0; hp < hc_ss.hPS; hp++){
+    for (int hp = 0; hp < hc_ss.hPS; hp++) {
       //hp = 0 is option A
       if(hp == 0){
         intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp);
@@ -471,7 +471,7 @@ void run_bf_transmission_rate(int time_step,
       if(hp == 2){
         intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp)  ;
         intermediate.children.bf_transmission_rate(index) +=  intermediate.children.percent_on_treatment *
-          cpars.PMTCT_transmission_rate(0,hp,1) *
+          cpars.PMTCT_transmission_rate(0, hp, 1) *
           2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) ;
         intermediate.children.percent_no_treatment -=  intermediate.children.percent_on_treatment ;
       }
@@ -1115,15 +1115,15 @@ void calc_art_last_year(int time_step,
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
 
+  //TODO: mkw take out the chunk of code to make everything age specific so that it doesn't need to be copied twice
+
 
   if(cpars.hc_art_isperc(time_step-1)){ // ART entered as percent last year
     if(cpars.hc_art_is_age_spec(time_step)){
       if(cpars.hc_art_is_age_spec(time_step-1)){
-
         for (int ag = 1; ag < 4; ++ag) {
           intermediate.children.total_art_last_year(ag) =  cpars.hc_art_val(ag,time_step-1) * (intermediate.children.total_need(0));
         }// end ag
-
       }else{
         for (int s = 0; s < ss.NS; ++s) {
           for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
@@ -1432,7 +1432,11 @@ void run_child_model_simulation(int time_step,
     internal::run_wlhiv_births(time_step, pars, state_curr, state_next, intermediate);
   }
 
-  if(state_next.children.hiv_births > 0){
+  if(time_step == 30){
+ //   std::cout << state_next.children.hiv_births;
+  }
+
+  // if(state_next.children.hiv_births > 0){
     internal::run_child_hiv_infections(time_step, pars, state_curr, state_next, intermediate);
     internal::ctx_need_cov(time_step, pars, state_curr, state_next, intermediate);
     internal::run_child_natural_history(time_step, pars, state_curr, state_next, intermediate);
@@ -1449,7 +1453,7 @@ void run_child_model_simulation(int time_step,
       internal::fill_model_outputs(time_step, pars, state_curr, state_next, intermediate);
       internal::run_nosocomial_infections(time_step, pars, state_curr, state_next, intermediate);
     }
-  }
+  // }
 }
 
 
