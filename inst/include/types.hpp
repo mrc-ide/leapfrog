@@ -174,8 +174,8 @@ struct Children {
 
   //WLHIV fert
   TensorMap1<real_type> fert_mult_by_age;
-  TensorMap1<real_type> fert_mult_offart;
-  TensorMap1<real_type> fert_mult_onart;
+  TensorMap1<real_type> fert_mult_off_art;
+  TensorMap1<real_type> fert_mult_on_art;
   TensorMap1<real_type> total_fertility_rate;
   real_type local_adj_factor;
 

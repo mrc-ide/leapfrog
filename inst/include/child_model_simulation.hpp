@@ -103,11 +103,11 @@ void run_wlhiv_births(int time_step,
     intermediate.children.prev = intermediate.children.nHIVcurr / state_next.base.p_total_pop(a + 15,1);
 
     for (int hd = 0; hd < ss.hDS; ++hd) {
-      intermediate.children.df += cpars.local_adj_factor * cpars.fert_mult_by_age(a) * cpars.fert_mult_offart(hd) * ((state_next.base.h_hiv_adult(hd, a, 1) + state_curr.base.h_hiv_adult(hd, a, 1)) / 2);
+      intermediate.children.df += cpars.local_adj_factor * cpars.fert_mult_by_age(a) * cpars.fert_mult_off_art(hd) * ((state_next.base.h_hiv_adult(hd, a, 1) + state_curr.base.h_hiv_adult(hd, a, 1)) / 2);
       //women on ART less than 6 months use the off art fertility multiplier
-      intermediate.children.df += cpars.local_adj_factor * cpars.fert_mult_by_age(a) * cpars.fert_mult_offart(hd) * ((state_next.base.h_art_adult(0, hd, a, 1) + state_curr.base.h_art_adult(0, hd, a, 1)) / 2);
+      intermediate.children.df += cpars.local_adj_factor * cpars.fert_mult_by_age(a) * cpars.fert_mult_off_art(hd) * ((state_next.base.h_art_adult(0, hd, a, 1) + state_curr.base.h_art_adult(0, hd, a, 1)) / 2);
       for (int ht = 1; ht < ss.hTS; ++ht) {
-        intermediate.children.df += cpars.local_adj_factor * cpars.fert_mult_onart(a) * ((state_next.base.h_art_adult(ht, hd, a, 1) + state_curr.base.h_art_adult(ht, hd, a, 1)) / 2);
+        intermediate.children.df += cpars.local_adj_factor * cpars.fert_mult_on_art(a) * ((state_next.base.h_art_adult(ht, hd, a, 1) + state_curr.base.h_art_adult(ht, hd, a, 1)) / 2);
       } //end hTS
     } // end hDS
 
@@ -119,11 +119,11 @@ void run_wlhiv_births(int time_step,
     }
 
     for (int hd = 0; hd < ss.hDS; ++hd) {
-      intermediate.children.df += cpars.local_adj_factor * cpars.fert_mult_by_age(a) * cpars.fert_mult_offart(hd) * ((state_next.base.h_hiv_adult(hd, a, 1) + state_curr.base.h_hiv_adult(hd, a, 1)) / 2);
+      intermediate.children.df += cpars.local_adj_factor * cpars.fert_mult_by_age(a) * cpars.fert_mult_off_art(hd) * ((state_next.base.h_hiv_adult(hd, a, 1) + state_curr.base.h_hiv_adult(hd, a, 1)) / 2);
       //women on ART less than 6 months use the off art fertility multiplier
-      intermediate.children.df += cpars.local_adj_factor * cpars.fert_mult_by_age(a) * cpars.fert_mult_offart(hd) * ((state_next.base.h_art_adult(0, hd, a, 1) + state_curr.base.h_art_adult(0, hd, a, 1)) / 2);
+      intermediate.children.df += cpars.local_adj_factor * cpars.fert_mult_by_age(a) * cpars.fert_mult_off_art(hd) * ((state_next.base.h_art_adult(0, hd, a, 1) + state_curr.base.h_art_adult(0, hd, a, 1)) / 2);
       for (int ht = 1; ht < ss.hTS; ++ht) {
-        intermediate.children.df += cpars.local_adj_factor * cpars.fert_mult_onart(a) * ((state_next.base.h_art_adult(ht, hd, a, 1) + state_curr.base.h_art_adult(ht, hd, a, 1)) / 2);
+        intermediate.children.df += cpars.local_adj_factor * cpars.fert_mult_on_art(a) * ((state_next.base.h_art_adult(ht, hd, a, 1) + state_curr.base.h_art_adult(ht, hd, a, 1)) / 2);
       } //end hTS
     } // end hDS
 
@@ -944,14 +944,14 @@ void eligible_for_treatment(int time_step,
 }
 
 template<typename ModelVariant, typename real_type>
-void onART_mortality(int time_step,
+void on_art_mortality(int time_step,
                      const Parameters<ModelVariant, real_type> &pars,
                      const State<ModelVariant, real_type> &state_curr,
                      State<ModelVariant, real_type> &state_next,
                      IntermediateData<ModelVariant, real_type> &intermediate,
                      int time_art_idx) {
   static_assert(ModelVariant::run_child_model,
-                "onART_mortality can only be called for model variants where run_child_model is true");
+                "on_art_mortality can only be called for model variants where run_child_model is true");
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
@@ -1213,10 +1213,10 @@ void calc_art_initiates(int time_step,
                 "calc_art_initiates can only be called for model variants where run_child_model is true");
   const auto cpars = pars.children.children;
 
-  internal::onART_mortality(time_step, pars, state_curr, state_next, intermediate, 0);
+  internal::on_art_mortality(time_step, pars, state_curr, state_next, intermediate, 0);
   //progress art initates from 0-6 months on art to 6 to 12 mo
   internal::progress_time_on_art(time_step, pars, state_curr, state_next, intermediate, 0, 1);
-  internal::onART_mortality(time_step, pars, state_curr, state_next, intermediate, 2);
+  internal::on_art_mortality(time_step, pars, state_curr, state_next, intermediate, 2);
   internal::deaths_this_year(time_step, pars, state_curr, state_next, intermediate);
   internal::calc_total_and_unmet_need(time_step, pars, state_curr, state_next, intermediate);
   internal::calc_art_last_year(time_step, pars, state_curr, state_next, intermediate);
@@ -1432,7 +1432,7 @@ void run_child_model_simulation(int time_step,
     if (time_step > pars.base.options.ts_art_start) {
       internal::hc_art_initiation_by_age(time_step, pars, state_curr, state_next, intermediate);
       //mortality among those on ART less than one year
-      internal::onART_mortality(time_step, pars, state_curr, state_next, intermediate, 0);
+      internal::on_art_mortality(time_step, pars, state_curr, state_next, intermediate, 0);
       internal::progress_time_on_art(time_step, pars, state_curr, state_next, intermediate, 1, 2);
       //progress 6 to 12 mo to 12 plus months
       internal::fill_model_outputs(time_step, pars, state_curr, state_next, intermediate);
