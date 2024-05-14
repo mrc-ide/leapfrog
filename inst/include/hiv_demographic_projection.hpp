@@ -110,8 +110,6 @@ void run_hiv_and_art_stratified_ageing(int time_step,
     }
   }
 
-
-  // TODO: add HIV+ 15 year old entrants see https://github.com/mrc-ide/leapfrog/issues/8
   if constexpr (ModelVariant::run_child_model) {
     for (int g = 0; g < ss.NS; ++g) {
       for (int hm = 0; hm < ss.hDS; ++hm) {
