@@ -1624,6 +1624,13 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    }
    //ROB: distribute MTCT infections (end)
 
+
+   tracking(0, 0, t) = temp_inf(0,0) + temp_inf(0,1);
+   tracking(1, 0, t) =temp_inf(1,0) + temp_inf(1,1) ;
+   tracking(2, 0, t) =temp_inf(2,0) + temp_inf(2,1) ;
+   tracking(3, 1, t) = temp_inf(3,0) + temp_inf(3,1);
+   tracking(3, 2, t) = temp_inf(4,0) + temp_inf(4,1) ;
+
    double ctx_need ;
    ctx_need = 0.0;
    for(int g = 0; g < NG; g++){
@@ -1646,7 +1653,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
      }
    }
 
-   tracking(0,0,t) = ctx_need;
 
 
    double ctx_mean;
@@ -1657,11 +1663,8 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
    }else{
      ctx_mean = 1;
    }
-   tracking(1,0,t) = ctx_mean;
 
-   if(t == 26){
-     std::cout << ctx_mean;
-   }
+
 
    //ROB: paediatric natural history (start)
    for(int g = 0; g < NG; g++){
