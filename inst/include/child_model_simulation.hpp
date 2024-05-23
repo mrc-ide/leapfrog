@@ -516,7 +516,8 @@ void run_bf_transmission_rate(int time_step,
 
       intermediate.children.bf_transmission_rate(index) +=
         intermediate.children.percent_no_treatment * (1 - cpars.breastfeeding_duration_no_art(bf, time_step)) *
-        (2 * (1 - intermediate.children.prop_wlhiv_gte350) * cpars.vertical_transmission_rate(4,1) +
+        (2 * intermediate.children.prop_wlhiv_lt200 * cpars.vertical_transmission_rate(4,1) +
+        2 * intermediate.children.prop_wlhiv_200to35 * cpars.vertical_transmission_rate(2,1) +
         2 * intermediate.children.prop_wlhiv_gte350 * cpars.vertical_transmission_rate(0,1));
 
     }
