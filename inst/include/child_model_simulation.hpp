@@ -451,7 +451,10 @@ void run_bf_transmission_rate(int time_step,
   for (int bf = bf_start; bf < bf_end; bf++) {
     //intermediate.children.perinatal_transmission_rate_bf_calc is the transmission that has already occurred due to perinatal transmission
     //intermediate.children.percent_no_treatment is the percentage of women who are still vulnerable to HIV transmission to their babies
-    intermediate.children.percent_no_treatment = 1 - intermediate.children.perinatal_transmission_rate_bf_calc - intermediate.children.bf_transmission_rate(index);
+    intermediate.children.percent_no_treatment = 1 - intermediate.children.perinatal_transmission_rate_bf_calc - intermediate.children.bf_transmission_rate(index) ;
+    for(int bf = 0; bf < index; ++bf){
+      intermediate.children.percent_no_treatment -= intermediate.children.bf_transmission_rate(bf);
+    }
     for (int hp = 0; hp < hc_ss.hPS; hp++) {
       //hp = 0 is option A
       if (hp == 0) {
