@@ -356,7 +356,7 @@ generate_state_types <- function(
     output_csv = frogger_file("cpp_generation/model_output.csv")) {
   template_path <- frogger_file("cpp_generation/state_types.hpp.in")
   template <- readLines(template_path)
-  output_file <- "model_output.csv"
+  output_file <- basename(output_csv)
   outputs <- utils::read.csv(output_csv, colClasses = "character")
 
   validate_dimensions_columns(colnames(outputs), output_file)
@@ -374,6 +374,44 @@ generate_state_types <- function(
 
   state_defs <- vcapply(outputs_by_struct, generate_state_def)
   state_defs <- paste_lines(state_defs)
+
+  header <- generate_header(basename(template_path))
+
+  generated_code <- generate_cpp(template)
+  writeLines(generated_code, dest)
+  invisible(dest)
+}
+
+#' Generate C++ for state saver types
+#'
+#' @param dest The destination to write generated code to.
+#' @param output_csv Path to csv file with output specification in it
+#'
+#' @return Nothing, called to generate code in src dir
+#' @keywords internal
+generate_state_saver_types <- function(
+    dest,
+    output_csv = frogger_file("cpp_generation/model_output.csv")) {
+  template_path <- frogger_file("cpp_generation/state_saver_types.hpp.in")
+  template <- readLines(template_path)
+  output_file <- "model_output.csv"
+  outputs <- utils::read.csv(output_csv, colClasses = "character")
+
+  validate_dimensions_columns(colnames(outputs), output_file)
+
+  parsed_outputs <- lapply(seq_len(nrow(outputs)), function(row_num) {
+    row <- outputs[row_num, ]
+    ## When reading csv in excel the header column is included in count
+    csv_row_num <- row_num + 1
+    output <- validate_and_parse_output(as.list(row), output_file, csv_row_num)
+    output$parsed_dims <- parse_state_dims(output$parsed_dims)
+    output
+  })
+
+  outputs_by_struct <- get_data_by_struct(parsed_outputs)
+
+  # state_saver_defs <- vcapply(outputs_by_struct, generate_state_saver_defs)
+  # state_saver_def <- paste_lines(state_saver_def)
 
   header <- generate_header(basename(template_path))
 
@@ -448,6 +486,49 @@ generate_state_reset_function <- function(outputs) {
     "  void reset() {",
     reset_lines,
     "  }")
+}
+
+generate_state_saver_defs <- function(outputs) {
+  struct_members <- vcapply(outputs, generate_state_saver_struct_member)
+  initialiser_list <- vcapply(outputs, generate_state_saver_initialiser_list)
+  reset_text <- generate_state_reset_function(outputs)
+  struct_name <- outputs[[1]]$struct
+  model_variant <- outputs[[1]]$model_variant
+
+  if (model_variant == "ModelVariant") {
+    struct_def <- paste0(
+      sprintf("template<typename %s, typename real_type>\n", model_variant),
+      sprintf("struct %sOutputState {\n", struct_name)
+    )
+  } else {
+    struct_def <- paste0(
+      "template<typename real_type>\n",
+      sprintf("struct %sOutputState<%s, real_type> {\n", struct_name, model_variant)
+    )
+  }
+
+  paste0(
+    struct_def,
+    paste_lines(struct_members),
+    "\n\n",
+    sprintf("  %sOutputState(int output_years): \n", struct_name),
+    sprintf(initialiser_list, collapse = ",\n"),
+    "  {",
+    sprintf("    %s.setZero();\n", output$cpp_name),
+    "  }\n\n",
+    "};\n"
+  )
+}
+
+generate_state_saver_struct_member <- function(output) {
+  type <- sprintf("Tensor%s<real_type>", output$parsed_dims)
+  sprintf("  %s %s;", type, output$cpp_name)
+}
+
+generate_state_saver_initialiser_list <- function(output) {
+  browser()
+  dims <- sprintf("StateSpace<%s>().%s", output$model_variant, output$parsed_dims)
+  sprintf("    %s(%s)", output$cpp_name, output$cpp_name)
 }
 
 generate_cpp <- function(template) {
