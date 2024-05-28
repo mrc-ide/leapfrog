@@ -53,23 +53,25 @@ test_that("can generate input parsing", {
 })
 
 test_that("generated files are up to date", {
-  target_input_file <- frogger_file("include/model_input.hpp")
-  t_input <- tempfile()
-  generate_input_interface(t_input)
-  expect_identical(
-    readLines(t_input), readLines(target_input_file),
-    info = paste0("Your interface is out of date, regenerate by running ",
-                  "./scripts/generate")
+  generation_funcs <- list(
+    "model_input.hpp" = generate_input_interface,
+    "model_output.hpp" = generate_output_interface,
+    "parameter_types.hpp" = generate_parameter_types,
+    "state_types.hpp" = generate_state_types
   )
+  generated_files <- list.files(frogger_file("include/generated"))
+  expect_setequal(names(generation_funcs), generated_files)
 
-  target_output_file <- frogger_file("include/model_output.hpp")
-  t_output <- tempfile()
-  generate_output_interface(t_output)
-  expect_identical(
-    readLines(t_output), readLines(target_output_file),
-    info = paste0("Your interface is out of date, regenerate by running ",
-                  "./scripts/generate")
-  )
+  for (file_name in names(generation_funcs)) {
+    target_generated_file <- frogger_file("include/generated", file_name)
+    t <- tempfile()
+    generation_funcs[[file_name]](t)
+    expect_identical(
+      readLines(t), readLines(target_generated_file),
+      info = paste0("Your interface is out of date, regenerate by running ",
+                    "./scripts/generate")
+    )
+  }
 })
 
 test_that("validate_and_parse_dims", {

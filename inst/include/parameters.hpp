@@ -1,9 +1,9 @@
 #pragma once
 
-#include "types.hpp"
+#include "intermediate_data.hpp"
 #include "state_space.hpp"
 #include "model_variants.hpp"
-#include "parameter_types.hpp"
+#include "generated/parameter_types.hpp"
 
 namespace leapfrog {
 

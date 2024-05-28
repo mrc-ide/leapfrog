@@ -7,8 +7,8 @@
 #include <Rcpp.h>
 #include <unsupported/Eigen/CXX11/Tensor>
 
-#include "types.hpp"
-#include "r_utils.hpp"
+#include "../intermediate_data.hpp"
+#include "../r_utils.hpp"
 
 /**
  * @brief Translate R data structures into C++ eigen tensors for use in model simulation
