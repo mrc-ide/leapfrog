@@ -412,6 +412,9 @@ generate_state_saver_types <- function(
   output_state_defs <- vcapply(outputs_by_struct, generate_output_state_defs)
   output_state_def <- paste_lines(output_state_defs)
 
+  state_saver_defs <- vcapply(outputs_by_struct, generate_state_saver_defs)
+  state_saver_def <- paste_lines(state_saver_defs)
+
   header <- generate_header(basename(template_path))
 
   generated_code <- generate_cpp(template)
@@ -539,6 +542,67 @@ generate_output_state_initialiser_list <- function(output) {
   })
   dims <- paste(dims, collapse = ",\n")
   sprintf("    %s(\n%s\n    )", output$cpp_name, dims)
+}
+
+generate_state_saver_defs <- function(outputs) {
+  func_body <- vcapply(outputs, generate_state_saver_func_body)
+  reset_text <- generate_state_reset_function(outputs)
+  struct_name <- outputs[[1]]$struct
+  model_variant <- outputs[[1]]$model_variant
+
+  if (model_variant == "ModelVariant") {
+    struct_def <- paste0(
+      sprintf("template<typename %s, typename real_type>\n", model_variant),
+      sprintf("struct %sStateSaver {\n", struct_name)
+    )
+  } else {
+    struct_def <- paste0(
+      "template<typename real_type>\n",
+      sprintf("struct %sStateSaver<%s, real_type> {\n",
+              struct_name, model_variant)
+    )
+  }
+
+  function_def <- paste0(
+    "public:\n",
+    sprintf("  void save_state(%sOutputState<%s, real_type> &output_state,\n",
+            struct_name, model_variant),
+    "                  const size_t i,\n",
+    sprintf("                  const State<%s, real_type> &state) {\n",
+            model_variant)
+  )
+
+  paste0(
+    struct_def,
+    function_def,
+    paste_lines(paste0("    ", func_body)),
+    "\n    return;\n",
+    "  }\n",
+    "};\n"
+  )
+}
+
+generate_state_saver_func_body <- function(output) {
+  state_name <- model_variant_to_name(output$model_variant)
+  if (output$dims == 1) {
+    sprintf("output_state.%s(i) = state.%s.%s;",
+            output$cpp_name, state_name, output$cpp_name)
+  } else {
+    sprintf(
+      "output_state.%s.chip(i, output_state.%s.NumDimensions - 1) = state.%s.%s;",
+      output$cpp_name, output$cpp_name, state_name, output$cpp_name)
+  }
+}
+
+model_variant_to_name <- function(model_variant) {
+  if (model_variant == "ModelVariant") {
+    "base"
+  } else if (model_variant == "ChildModel") {
+    "children"
+  } else {
+    stop(sprintf("Unknown model variant %s, fix typo or add to mapping",
+                 model_variant))
+  }
 }
 
 generate_cpp <- function(template) {

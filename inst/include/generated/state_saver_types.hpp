@@ -196,33 +196,6 @@ struct ChildModelOutputState<ChildModel, real_type> {
 
 
 template<typename ModelVariant, typename real_type>
-struct BaseModelStateSaver {
-public:
-  void save_state(BaseModelOutputState<ModelVariant, real_type> &base_state,
-                  const size_t i,
-                  const State<ModelVariant, real_type> &state) {
-    base_state.p_total_pop.chip(i, base_state.p_total_pop.NumDimensions - 1) = state.base.p_total_pop;
-    base_state.p_total_pop_natural_deaths.chip(i, base_state.p_total_pop_natural_deaths.NumDimensions -
-                                                  1) = state.base.p_total_pop_natural_deaths;
-    base_state.p_hiv_pop.chip(i, base_state.p_hiv_pop.NumDimensions - 1) = state.base.p_hiv_pop;
-    base_state.p_hiv_pop_natural_deaths.chip(i, base_state.p_hiv_pop_natural_deaths.NumDimensions -
-                                                1) = state.base.p_hiv_pop_natural_deaths;
-    base_state.h_hiv_adult.chip(i, base_state.h_hiv_adult.NumDimensions - 1) = state.base.h_hiv_adult;
-    base_state.h_art_adult.chip(i, base_state.h_art_adult.NumDimensions - 1) = state.base.h_art_adult;
-    base_state.births(i) = state.base.births;
-    base_state.h_hiv_deaths_no_art.chip(i, base_state.h_hiv_deaths_no_art.NumDimensions -
-                                           1) = state.base.h_hiv_deaths_no_art;
-    base_state.p_infections.chip(i, base_state.p_infections.NumDimensions - 1) = state.base.p_infections;
-    base_state.h_hiv_deaths_art.chip(i, base_state.h_hiv_deaths_art.NumDimensions -
-                                        1) = state.base.h_hiv_deaths_art;
-    base_state.h_art_initiation.chip(i, base_state.h_art_initiation.NumDimensions -
-                                        1) = state.base.h_art_initiation;
-    base_state.p_hiv_deaths.chip(i, base_state.p_hiv_deaths.NumDimensions - 1) = state.base.p_hiv_deaths;
-    return;
-  }
-};
-
-template<typename ModelVariant, typename real_type>
 struct ChildModelStateSaver {
 public:
   void save_state(ChildModelOutputState<ModelVariant, real_type> &full_state,
@@ -230,28 +203,44 @@ public:
                   const State<ModelVariant, real_type> &state) {}
 };
 
+template<typename ModelVariant, typename real_type>
+struct BaseModelStateSaver {
+public:
+  void save_state(BaseModelOutputState<ModelVariant, real_type> &output_state,
+                  const size_t i,
+                  const State<ModelVariant, real_type> &state) {
+    output_state.p_total_pop.chip(i, output_state.p_total_pop.NumDimensions - 1) = state.base.p_total_pop;
+    output_state.births(i) = state.base.births;
+    output_state.p_total_pop_natural_deaths.chip(i, output_state.p_total_pop_natural_deaths.NumDimensions - 1) = state.base.p_total_pop_natural_deaths;
+    output_state.p_hiv_pop.chip(i, output_state.p_hiv_pop.NumDimensions - 1) = state.base.p_hiv_pop;
+    output_state.p_hiv_pop_natural_deaths.chip(i, output_state.p_hiv_pop_natural_deaths.NumDimensions - 1) = state.base.p_hiv_pop_natural_deaths;
+    output_state.h_hiv_adult.chip(i, output_state.h_hiv_adult.NumDimensions - 1) = state.base.h_hiv_adult;
+    output_state.h_art_adult.chip(i, output_state.h_art_adult.NumDimensions - 1) = state.base.h_art_adult;
+    output_state.h_hiv_deaths_no_art.chip(i, output_state.h_hiv_deaths_no_art.NumDimensions - 1) = state.base.h_hiv_deaths_no_art;
+    output_state.p_infections.chip(i, output_state.p_infections.NumDimensions - 1) = state.base.p_infections;
+    output_state.h_hiv_deaths_art.chip(i, output_state.h_hiv_deaths_art.NumDimensions - 1) = state.base.h_hiv_deaths_art;
+    output_state.h_art_initiation.chip(i, output_state.h_art_initiation.NumDimensions - 1) = state.base.h_art_initiation;
+    output_state.p_hiv_deaths.chip(i, output_state.p_hiv_deaths.NumDimensions - 1) = state.base.p_hiv_deaths;
+    return;
+  }
+};
+
 template<typename real_type>
 struct ChildModelStateSaver<ChildModel, real_type> {
 public:
-  void save_state(ChildModelOutputState<ChildModel, real_type> &children_state,
+  void save_state(ChildModelOutputState<ChildModel, real_type> &output_state,
                   const size_t i,
                   const State<ChildModel, real_type> &state) {
-    children_state.hc1_hiv_pop.chip(i, children_state.hc1_hiv_pop.NumDimensions - 1) =
-        state.children.hc1_hiv_pop;
-    children_state.hc2_hiv_pop.chip(i, children_state.hc2_hiv_pop.NumDimensions - 1) =
-        state.children.hc2_hiv_pop;
-    children_state.hc1_art_pop.chip(i, children_state.hc1_art_pop.NumDimensions - 1) =
-        state.children.hc1_art_pop;
-    children_state.hc2_art_pop.chip(i, children_state.hc2_art_pop.NumDimensions - 1) =
-        state.children.hc2_art_pop;
-    children_state.hc1_noart_aids_deaths.chip(i, children_state.hc1_noart_aids_deaths.NumDimensions - 1) =
-      state.children.hc1_noart_aids_deaths;
-    children_state.hc2_noart_aids_deaths.chip(i, children_state.hc2_noart_aids_deaths.NumDimensions - 1) =
-      state.children.hc2_noart_aids_deaths;
-    children_state.hc1_art_aids_deaths.chip(i, children_state.hc1_art_aids_deaths.NumDimensions - 1) =
-      state.children.hc1_art_aids_deaths;
-    children_state.hc2_art_aids_deaths.chip(i, children_state.hc2_art_aids_deaths.NumDimensions - 1) =
-      state.children.hc2_art_aids_deaths;
+    output_state.hc1_hiv_pop.chip(i, output_state.hc1_hiv_pop.NumDimensions - 1) = state.children.hc1_hiv_pop;
+    output_state.hc2_hiv_pop.chip(i, output_state.hc2_hiv_pop.NumDimensions - 1) = state.children.hc2_hiv_pop;
+    output_state.hc1_art_pop.chip(i, output_state.hc1_art_pop.NumDimensions - 1) = state.children.hc1_art_pop;
+    output_state.hc2_art_pop.chip(i, output_state.hc2_art_pop.NumDimensions - 1) = state.children.hc2_art_pop;
+    output_state.hc1_noart_aids_deaths.chip(i, output_state.hc1_noart_aids_deaths.NumDimensions - 1) = state.children.hc1_noart_aids_deaths;
+    output_state.hc2_noart_aids_deaths.chip(i, output_state.hc2_noart_aids_deaths.NumDimensions - 1) = state.children.hc2_noart_aids_deaths;
+    output_state.hc1_art_aids_deaths.chip(i, output_state.hc1_art_aids_deaths.NumDimensions - 1) = state.children.hc1_art_aids_deaths;
+    output_state.hc2_art_aids_deaths.chip(i, output_state.hc2_art_aids_deaths.NumDimensions - 1) = state.children.hc2_art_aids_deaths;
+    output_state.hc_art_num(i) = state.children.hc_art_num;
+    return;
   }
 };
 

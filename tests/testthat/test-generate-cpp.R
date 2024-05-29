@@ -270,7 +270,7 @@ test_that("can generate state saver types", {
 
   expect_contains("struct BaseModelStateSaver {", result)
   expect_contains(paste0("void save_state(BaseModelOutputState<ModelVariant, ",
-                         "real_type> &base_state,"), result)
+                         "real_type> &output_state,"), result)
   expect_contains("struct ChildModelStateSaver {", result)
   expect_contains("struct ChildModelStateSaver<ChildModel, real_type> {", result)
 })
