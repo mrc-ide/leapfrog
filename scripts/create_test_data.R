@@ -4,6 +4,8 @@ library(data.table)
 library(dplyr)
 source('./scripts/spectrum-inputs.R')
 source('./scripts/spectrum-inputs-paeds.R')
+source('./scripts/read-spectrum.R')
+
 
 ## Create demographic and projection parameters for adults
 pjnz1 <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct.PJNZ")
@@ -38,11 +40,11 @@ demp$netmigr_adj <- leapfrog:::adjust_spectrum_netmigr(demp$netmigr)
 
 dpfile <- grep(".DP$", utils::unzip(pjnz1, list=TRUE)$Name, value=TRUE)
 dp <- utils::read.csv(unz(pjnz1, dpfile), as.is=TRUE)
-dpsub <- function(tag, rows, cols, tagcol=1){
+dpsub <- function(dp, tag, rows, cols, tagcol=1){
   dp[which(dp[,tagcol]==tag)+rows, cols]
 }
-yr_start <- as.integer(dpsub("<FirstYear MV2>",2,4))
-yr_end <- as.integer(dpsub("<FinalYear MV2>",2,4))
+yr_start <- as.integer(dpsub(dp,"<FirstYear MV2>",2,4))
+yr_end <- as.integer(dpsub(dp, "<FinalYear MV2>",2,4))
 proj.years <- yr_start:yr_end
 timedat.idx <- 4+1:length(proj.years)-1
 
@@ -88,9 +90,33 @@ spectrum_output <- function(file = "../testdata/spectrum/v6.13/bwa_aim-adult-chi
 df <- spectrum_output(pop1, ages = 0:14, 'country', years_in = 1970:2030)
 x = data.table(df$total)
 
+tag.x ="<AIDSDeathsNoARTSingleAge MV>"
+start.id = 20898
+end.id = 21148
+timedat.idx = input$timedat.idx
+aids_deathsnoart <- array(as.numeric(unlist(dpsub(dp, tag.x, 3:(end.id - start.id - 2), timedat.idx))), dim = c(length(3:(end.id - start.id - 2)),length(timedat.idx)))
+m = aids_deathsnoart[84:98,]
+f = aids_deathsnoart[166:180,]
+aids_deathsnoart <- array(0, dim = c(15,2,61))
+aids_deathsnoart[,1,] <- m
+aids_deathsnoart[,2,] <- f
+
+tag.x ="<AIDSDeathsARTSingleAge MV>"
+start.id = 20608
+end.id = 20858
+timedat.idx = input$timedat.idx
+aids_deathsart <- array(as.numeric(unlist(dpsub(dp, tag.x, 3:(end.id - start.id - 2), timedat.idx))), dim = c(length(3:(end.id - start.id - 2)),length(timedat.idx)))
+m = aids_deathsart[84:98,]
+f = aids_deathsart[166:180,]
+aids_deathsart <- array(0, dim = c(15,2,61))
+aids_deathsart[,1,] <- m
+aids_deathsart[,2,] <- f
+
 saveRDS(list(proj = proj, demp = demp, dp = dp, timedat.idx = timedat.idx, pjnz = pjnz1,
-             pop1_outputs = x, on_treatment = df$on_treatment, off_trt = df$off_treatment),
-        "C:/Users/mwalters/frogger/tests/testthat/testdata/child_parms.rds")
+             pop1_outputs = x, on_treatment = df$on_treatment, off_trt = df$off_treatment,
+             deaths_noart = aids_deathsnoart,
+             deaths_art = aids_deathsart),
+        "./tests/testthat/testdata/child_parms.rds")
 
 
 

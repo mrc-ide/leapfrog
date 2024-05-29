@@ -19,7 +19,9 @@ setup_childmodel <- function(testinput = "testdata/child_parms.rds"){
               pjnz = input$pjnz, timedat.idx = input$timedat.idx,
               pop1 = input$pop1_outputs,
               ontrt = input$on_treatment,
-              offtrt = input$off_trt))
+              offtrt = input$off_trt,
+              deaths_noart = input$deaths_noart,
+              deaths_art = input$deaths_art))
 }
 
 dpsub <- function(tag, rows, cols, tagcol = 1){
