@@ -283,10 +283,10 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
 
   v = params
   ## paed input
-  v$paed_incid_input <- leapfrog:::dp_read_nosocom_infections(pjnz)
-  v$paed_cd4_dist <- leapfrog:::dp_read_paed_cd4_dist(pjnz) / 100
+  v$paed_incid_input <- dp_read_nosocom_infections(pjnz)
+  v$paed_cd4_dist <- dp_read_paed_cd4_dist(pjnz) / 100
 
-  prog = leapfrog:::dp_read_paed_cd4_prog(pjnz)
+  prog = dp_read_paed_cd4_prog(pjnz)
   paed_cd4_prog <- array(c(prog[1,1:6],0), dim = 7, dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5')))
 
   adol_cd4_prog <- array(c(prog[1,14:18],0), dim = 6, dimnames = list(cd4 = c('>1000', '750-999', '500-749', '350-499', '200-349', 'lte200')))
@@ -294,7 +294,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   v$paed_cd4_prog <- paed_cd4_prog
   v$adol_cd4_prog <- adol_cd4_prog
 
-  mort <- leapfrog:::dp_read_paed_cd4_mort(pjnz)
+  mort <- dp_read_paed_cd4_mort(pjnz)
   paed_cd4_mort <- array(data = 0, dim = c(7, 4, 5), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'),
                                                                      transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'),
                                                                      age = c(0:4)))
@@ -320,7 +320,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   adol_cd4_mort[,4,] <- mort[12,2:7]
 
 
-  mort <- leapfrog:::dp_read_paed_art_mort(pjnz)
+  mort <- dp_read_paed_art_mort(pjnz)
   paed_art_mort <- array(data = 0, dim = c(7, 3, 5), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'),
                                                                      transmission = c('0to6mo', '7to12mo', '12+mo'),
                                                                      age = c(0:4)))
@@ -360,7 +360,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   v$paed_art_mort <- paed_art_mort
   v$adol_art_mort <- adol_art_mort
 
-  mtct_rates_input <- leapfrog:::dp_read_mtct_rates(pjnz)
+  mtct_rates_input <- dp_read_mtct_rates(pjnz)
   art_mtct <- array(0, dim = c(7,3,2), dimnames = list(cd4 = c('>500', '350-500', '250-349', '200-249', '100-199', '50-99', '<50'),
                                                        time = c('ART <4 weeks before delivery', 'ART >4 weeks before delivery', 'ART before pregnancy'), trans_type = c('perinatal', 'bf')))
   art_mtct[,1,1] <- mtct_rates_input[11,1] / 100
@@ -371,16 +371,16 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   art_mtct[5:7,3,2] <- mtct_rates_input[9,2] / 100
   v$art_mtct <- art_mtct
 
-  art_dist_paed <- leapfrog:::dp_read_art_dist(pjnz)
+  art_dist_paed <- dp_read_art_dist(pjnz)
   v$art_dist_paed <- art_dist_paed
 
   ## pull in cotrim coverage numbers
-  ctx_pct <- leapfrog:::input_childart(pjnz)$ctx_percent
+  ctx_pct <- input_childart(pjnz)$ctx_percent
   ctx_pct[is.na(ctx_pct)] <- FALSE
   v$ctx_val_ispercent <- ctx_pct
   ## ctx_effect_notrt <- c(rep(0.33, 5), rep(0,5))
   ctx_effect <- rep(0.33,61)
-  v$ctx_val <- leapfrog:::input_childart(pjnz)$ctx
+  v$ctx_val <- input_childart(pjnz)$ctx
   if(any(v$ctx_val_ispercent)){
     v$ctx_val[v$ctx_val_ispercent] <- v$ctx_val[v$ctx_val_ispercent] / 100
   }
@@ -395,7 +395,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   v$paed_art_age_spec <- art$age_spec
 
   ##PMTCT
-  pmtct_list <- leapfrog:::input_pmtct(pjnz)
+  pmtct_list <- input_pmtct(pjnz)
   pmtct_list <- pmtct_list[c(3,4,1,2,5:7),,]
   v$pmtct <- pmtct_list
 
@@ -405,10 +405,10 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
     v$pmtct_input_isperc = rep(T, length(1970:2030))
   }
 
-  v$pmtct_input_isperc <- !(apply(leapfrog:::input_pmtct_ispercent(pjnz), 2, any))
+  v$pmtct_input_isperc <- !(apply(input_pmtct_ispercent(pjnz), 2, any))
 
   ##PMTCT dropout
-  v$pmtct_dropout <- leapfrog:::input_pmtct_retained(pjnz)
+  v$pmtct_dropout <- input_pmtct_retained(pjnz)
 
   ##rates of MTCT
   mtct_trt <- array(data = 0, dim = c(7,7,2), dimnames = list(cd4 = c('>500', '350-500', '250-349', '200-249', '100-199', '50-99', '<50'),
@@ -440,7 +440,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   mtct[8,] <- c(mtct_rates_input[4,1], mtct_rates_input[4,2]) / 100
   v$mtct <- mtct
 
-  mort_rr_art <- leapfrog:::dp_read_child_mort_mult(pjnz)
+  mort_rr_art <- dp_read_child_mort_mult(pjnz)
   mort_rr_art_target <- array(NA, dim = c(3, 15, 61), dimnames = list(transmission = c('0to6mo', '7to12mo', '12+mo'), age = 0:14, year = 1970:2030))
   mort_rr_art_target[1:2, 1:5,] <- rep(unlist(mort_rr_art[1,]), each = 10)
   mort_rr_art_target[3, 1:5,] <- rep(unlist(mort_rr_art[2,]), each = 5)
@@ -448,17 +448,17 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   mort_rr_art_target[3, 6:15,] <- rep(unlist(mort_rr_art[4,]), each = 10)
   v$mort_art_rr <- mort_rr_art_target
 
-  art_dist_paed <- leapfrog:::dp_read_art_dist(pjnz)
+  art_dist_paed <- dp_read_art_dist(pjnz)
   v$init_art_dist <- art_dist_paed
 
   ##BF duration
-  bf_duration <- leapfrog:::input_breastfeeding_dur(pjnz)
+  bf_duration <- input_breastfeeding_dur(pjnz)
   v$bf_duration_art <- bf_duration[,,2]
   v$bf_duration_no_art <- bf_duration[,,1]
   ##only keeping this for leapfrog
   v$bf_duration = bf_duration
 
-  art_elig = leapfrog:::dp_read_paed_art_eligibility(pjnz)
+  art_elig = dp_read_paed_art_eligibility(pjnz)
   v$paed_art_elig_age <- art_elig$age_elig / 12 ##converts from months to years
 
   ##MKW: stopped here
@@ -508,7 +508,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   v$paed_art_elig_cd4 <- paed_art_elig_cd4
 
 
-  v$paed_art_ltfu <- leapfrog:::input_childart_ltfu(pjnz) / 100
+  v$paed_art_ltfu <- input_childart_ltfu(pjnz) / 100
 
   paed_cd4_transition <- array(0, dim = c(6,7), dimnames = list(cd4_count = c('gte1000', '750-1000', '500-749', '350-499', '200-349', 'lte200'), cd4_pct = c('gte30', '26-30', '21-25', '16-20', '11-15', '5-10', 'lte5')))
   paed_cd4_transition[1:6,1] <- c(0.608439, 0.185181, 0.105789, 0.055594, 0.018498, 0.026497)

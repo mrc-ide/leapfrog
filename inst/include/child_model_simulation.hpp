@@ -473,6 +473,7 @@ void run_bf_transmission_rate(int time_step,
       //sdnvp
       if (hp == 2) {
         intermediate.children.percent_on_treatment = intermediate.children.PMTCT_coverage(hp)  ;
+        //this is the bit that is changing in item two
         intermediate.children.bf_transmission_rate(index) +=  intermediate.children.percent_on_treatment *
           cpars.PMTCT_transmission_rate(0, hp, 1) *
           2 * (1 - cpars.breastfeeding_duration_art(bf, time_step)) ;
