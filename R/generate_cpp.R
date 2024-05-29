@@ -404,14 +404,13 @@ generate_state_saver_types <- function(
     ## When reading csv in excel the header column is included in count
     csv_row_num <- row_num + 1
     output <- validate_and_parse_output(as.list(row), output_file, csv_row_num)
-    output$parsed_dims <- parse_state_dims(output$parsed_dims)
     output
   })
 
   outputs_by_struct <- get_data_by_struct(parsed_outputs)
 
-  # state_saver_defs <- vcapply(outputs_by_struct, generate_state_saver_defs)
-  # state_saver_def <- paste_lines(state_saver_def)
+  output_state_defs <- vcapply(outputs_by_struct, generate_output_state_defs)
+  output_state_def <- paste_lines(output_state_defs)
 
   header <- generate_header(basename(template_path))
 
@@ -425,7 +424,7 @@ parse_state_dims <- function(dims) {
   ## the state stores the state for a single year so to get the dimensions
   ## for generating state types we need to drop this last dimension
   ## We also don't need the qualifying name i.e. the `base` part of `base.hTS`
-  ## We've alread validated that the last dimension is output_years
+  ## We've already validated that the last dimension is output_years
   dims <- dims[-length(dims)]
   vcapply(dims, function(dim) {
     strsplit(dim, "\\.")[[1]][[2]]
@@ -488,9 +487,12 @@ generate_state_reset_function <- function(outputs) {
     "  }")
 }
 
-generate_state_saver_defs <- function(outputs) {
-  struct_members <- vcapply(outputs, generate_state_saver_struct_member)
-  initialiser_list <- vcapply(outputs, generate_state_saver_initialiser_list)
+generate_output_state_defs <- function(outputs) {
+  struct_members <- vcapply(outputs, generate_output_state_struct_member)
+  initialiser_list <- vcapply(outputs, generate_output_state_initialiser_list)
+  ctor_body <- vcapply(outputs, function(output) {
+    sprintf("    %s.setZero();", output$cpp_name)
+  })
   reset_text <- generate_state_reset_function(outputs)
   struct_name <- outputs[[1]]$struct
   model_variant <- outputs[[1]]$model_variant
@@ -512,23 +514,31 @@ generate_state_saver_defs <- function(outputs) {
     paste_lines(struct_members),
     "\n\n",
     sprintf("  %sOutputState(int output_years): \n", struct_name),
-    sprintf(initialiser_list, collapse = ",\n"),
-    "  {",
-    sprintf("    %s.setZero();\n", output$cpp_name),
-    "  }\n\n",
+    paste(initialiser_list, collapse = ",\n"),
+    " {\n",
+    paste_lines(ctor_body),
+    "\n  }\n",
     "};\n"
   )
 }
 
-generate_state_saver_struct_member <- function(output) {
-  type <- sprintf("Tensor%s<real_type>", output$parsed_dims)
+generate_output_state_struct_member <- function(output) {
+  type <- sprintf("Tensor%s<real_type>", output$dims)
   sprintf("  %s %s;", type, output$cpp_name)
 }
 
-generate_state_saver_initialiser_list <- function(output) {
-  browser()
-  dims <- sprintf("StateSpace<%s>().%s", output$model_variant, output$parsed_dims)
-  sprintf("    %s(%s)", output$cpp_name, output$cpp_name)
+generate_output_state_initialiser_list <- function(output) {
+  dim_indentation <- "      "
+  dims <- vcapply(output$parsed_dims, function(dim) {
+    if (dim == "output_years") {
+      paste0(dim_indentation, dim)
+    } else {
+      sprintf("%sStateSpace<%s>().%s",
+              dim_indentation, output$model_variant, dim)
+    }
+  })
+  dims <- paste(dims, collapse = ",\n")
+  sprintf("    %s(\n%s\n    )", output$cpp_name, dims)
 }
 
 generate_cpp <- function(template) {
