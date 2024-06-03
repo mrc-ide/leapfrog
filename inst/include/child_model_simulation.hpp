@@ -1183,20 +1183,18 @@ void calc_art_last_year(int time_step,
                         IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "calc_art_last_year can only be called for model variants where run_child_model is true");
-  constexpr auto ss = StateSpace<ModelVariant>().base;
-  constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
 
   if (cpars.hc_art_isperc(time_step-1)) { // ART entered as percent last year
     if (cpars.hc_art_is_age_spec(time_step)) { //If the present time step is age specific, we need to calculate what last years age spec breakdown would have been
-     internal::calc_age_specific_last_year(time_step, pars, state_curr, state_next, intermediate);
+      internal::calc_age_specific_last_year(time_step, pars, state_curr, state_next, intermediate);
     } else {
-    intermediate.children.total_art_last_year(0) = cpars.hc_art_val(0,time_step-1) * (intermediate.children.total_need(0));
+      intermediate.children.total_art_last_year(0) = cpars.hc_art_val(0,time_step-1) * (intermediate.children.total_need(0));
     }
 
   } else { // ART entered as number last year
     if (cpars.hc_art_is_age_spec(time_step)) { //If the present time step is age specific, we need to calculate what last years age spec breakdown would have been
-     internal::calc_age_specific_last_year(time_step, pars, state_curr, state_next, intermediate);
+      internal::calc_age_specific_last_year(time_step, pars, state_curr, state_next, intermediate);
     } else {
       if (cpars.hc_art_is_age_spec(time_step-1)) {
         intermediate.children.total_art_last_year(0) = cpars.hc_art_val(1,time_step-1) +
@@ -1474,8 +1472,5 @@ void run_child_model_simulation(int time_step,
     }
   // }
 }
-
-
-
 
 } // namespace leapfrog

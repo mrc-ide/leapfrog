@@ -1,0 +1,40 @@
+{{header}}
+
+#pragma once
+
+#include "types.hpp"
+#include "parameters.hpp"
+#include "state_space.hpp"
+#include "model_variants.hpp"
+
+namespace leapfrog {
+
+namespace {
+using Eigen::Sizes;
+using Eigen::TensorFixedSize;
+}
+
+template<typename ModelVariant, typename real_type>
+struct ChildModelState {
+  ChildModelState(const Parameters<ModelVariant, real_type> &pars) {}
+
+  void reset() {}
+};
+
+{{state_defs}}
+template<typename ModelVariant, typename real_type>
+struct State {
+  BaseModelState<ModelVariant, real_type> base;
+  ChildModelState<ModelVariant, real_type> children;
+
+  State(const Parameters<ModelVariant, real_type> &pars) :
+      base(pars),
+      children(pars) {}
+
+  void reset() {
+    base.reset();
+    children.reset();
+  }
+};
+
+}

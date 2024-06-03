@@ -3,7 +3,8 @@ test_that("Child model can be run for all years", {
   demp = input$demp
   parameters = input$parameters
 
-  expect_silent(out <- run_model(demp, parameters, NULL, NULL, 0:60, run_child_model = TRUE))
+  expect_silent(out <- run_model(demp, parameters, 1970:2030, NULL, run_child_model = TRUE))
+
   expect_setequal(
     names(out),
     c(
@@ -14,7 +15,8 @@ test_that("Child model can be run for all years", {
       "hc1_art_pop", "hc2_art_pop",
       "hc1_noart_aids_deaths", "hc2_noart_aids_deaths",
       "hc1_art_aids_deaths", "hc2_art_aids_deaths",  "hiv_births",
-      "hc_art_total", "hc_art_init", 'hc_art_need_init', 'ctx_need'
+      "hc_art_total", "hc_art_init", 'hc_art_need_init', 'ctx_need',
+      "ctx_mean"
     )
   )
 
@@ -38,7 +40,7 @@ test_that("Infections among children align", {
   dp = input$dp
   pjnz = input$pjnz
 
-  out <- run_model(demp, parameters, NULL, NULL, 0:60, run_child_model = TRUE)
+  out <- run_model(demp, parameters, 1970:2030, NULL, run_child_model = TRUE)
   inf_spec <- SpectrumUtils::dp.output.incident.hiv(dp.raw = dp)
   inf_spec <- inf_spec %>%
     dplyr::filter(Sex == 'Male+Female') %>%
@@ -71,7 +73,7 @@ test_that("CLHIV align", {
   dp = input$dp
   pjnz = input$pjnz
 
-  out <- run_model(demp, parameters, NULL, NULL, 0:60, run_child_model = TRUE)
+  out <- run_model(demp, parameters, 1970:2030, NULL, run_child_model = TRUE)
 
   spec_prev <- input$offtrt
   hc1 = dplyr::right_join(data.frame(reshape2::melt(out$hc1_hiv_pop)), data.frame(Var1 = 1:7, cd4_cat = c('gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5')), by = 'Var1')
@@ -116,7 +118,7 @@ test_that("CLHIV on ART align", {
   dp = input$dp
   pjnz = input$pjnz
 
-  out <- run_model(demp, parameters, NULL, NULL, 0:60, run_child_model = TRUE)
+  out <- run_model(demp, parameters, 1970:2030, NULL, run_child_model = TRUE)
 
   spec_prev <- input$ontrt
   spec_prev <- spec_prev %>%
@@ -163,7 +165,7 @@ test_that("HIV related deaths among CLHIV not on ART align", {
   pjnz = input$pjnz
   aids_deathsnoart = input$deaths_noart
 
-  out <- run_model(demp, parameters, NULL, NULL, 0:60, run_child_model = TRUE)
+  out <- run_model(demp, parameters, 1970:2030, NULL, run_child_model = TRUE)
 
 
   hc1 <- apply(out$hc1_noart_aids_deaths, c(3:5), sum)
@@ -194,7 +196,7 @@ test_that("HIV related deaths among CLHIV on ART align", {
   pjnz = input$pjnz
   aids_deathsart = input$deaths_art
 
-  out <- run_model(demp, parameters, NULL, NULL, 0:60, run_child_model = TRUE)
+  out <- run_model(demp, parameters, 1970:2030, NULL, run_child_model = TRUE)
 
 
   ##right now this is only working for the first year of ART, assuming its something with the timing on art
@@ -220,5 +222,3 @@ test_that("HIV related deaths among CLHIV on ART align", {
   #expect_true(all(abs(dt$diff) < 1e-1))
 
 })
-
-

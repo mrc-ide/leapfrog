@@ -1,4 +1,11 @@
 #!/usr/bin/env Rscript
+
+## This script creates test data required for the frogger tests.
+## We read some input data and prepare a set of demographic projection
+## and HIV parameters for both the adult and the child model.
+## We also run leapfrog and save out the result for use in reference tests
+
+# nolint start
 library(leapfrog)
 library(data.table)
 library(dplyr)
@@ -10,8 +17,7 @@ source('./scripts/read-spectrum.R')
 ## Create demographic and projection parameters for adults
 pjnz1 <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct.PJNZ")
 # pjnz1 <- testthat::test_path("testdata/bwa_aim-no-special-elig_ctx.PJNZ")
-#pjnz1 <- testthat::test_path("testdata/bwa_aim-no-special-elig.PJNZ")
-#pjnz1 = 'C:/Users/mwalters/Desktop/NW_TEST_MTCT_BF_PERI_pmtct.PJNZ'
+# pjnz1 <- testthat::test_path("testdata/bwa_aim-no-special-elig.PJNZ")
 
 demp <- prepare_leapfrog_demp(pjnz1)
 saveRDS(demp, testthat::test_path("testdata/demographic_projection_object_adult.rds"))
@@ -116,7 +122,4 @@ saveRDS(list(proj = proj, demp = demp, dp = dp, timedat.idx = timedat.idx, pjnz 
              pop1_outputs = x, on_treatment = df$on_treatment, off_trt = df$off_treatment,
              deaths_noart = aids_deathsnoart,
              deaths_art = aids_deathsart),
-        "./tests/testthat/testdata/child_parms.rds")
-
-
-
+        testthat::test_path("testdata/projection_parameters_child.rds"))

@@ -2,7 +2,7 @@ test_that("initial state set up works as expected", {
   demp <- readRDS(test_path("testdata/demographic_projection_object_adult.rds"))
   parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
 
-  out <- run_model(demp, parameters, 0L, 0L, 0, run_child_model = FALSE)
+  out <- run_model(demp, parameters, 1970L, 0L, run_child_model = FALSE)
 
   expect_setequal(
     names(out),
@@ -51,7 +51,7 @@ test_that("initial state set up with coarse stratified HIV works as expected", {
   demp <- readRDS(test_path("testdata/demographic_projection_object_adult.rds"))
   parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
 
-  out <- run_model(demp, parameters, 0L, 0L, 0,
+  out <- run_model(demp, parameters, 1970L, 0L,
                    hiv_age_stratification = "coarse",
                    run_child_model = FALSE)
 
@@ -101,7 +101,7 @@ test_that("model for 1 time step has looped", {
   demp <- readRDS(test_path("testdata/demographic_projection_object_adult.rds"))
   parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
 
-  out <- run_model(demp, parameters, 1L, 10L, 1,
+  out <- run_model(demp, parameters, 1970:1971, 10L, 1971L,
                    run_child_model = FALSE)
 
   expect_setequal(
@@ -134,7 +134,7 @@ test_that("model can be run for all years", {
   demp <- readRDS(test_path("testdata/demographic_projection_object_adult.rds"))
   parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
 
-  out <- run_model(demp, parameters, NULL, NULL, 0:60,
+  out <- run_model(demp, parameters, NULL, NULL,
                    run_child_model = FALSE)
 
   ## No HIV population < age 15
@@ -178,7 +178,7 @@ test_that("model can be run with ART initiation", {
   ## Set time ART start to some value lower than no of years in projection
   parameters[["t_ART_start"]] <- 20L
 
-  expect_silent(run_model(demp, parameters, NULL, NULL, 0:60,
+  expect_silent(run_model(demp, parameters, NULL, NULL,
                           run_child_model = FALSE))
 })
 
@@ -189,9 +189,9 @@ test_that("model can be run twice on the same data", {
   demp <- readRDS(test_path("testdata/demographic_projection_object_adult.rds"))
   parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
 
-  out <- run_model(demp, parameters, NULL, NULL, 0:60,
+  out <- run_model(demp, parameters, NULL, NULL,
                    run_child_model = FALSE)
-  out2 <- run_model(demp, parameters, NULL, NULL, 0:60,
+  out2 <- run_model(demp, parameters, NULL, NULL,
                     run_child_model = FALSE)
   expect_identical(out, out2)
 })
@@ -200,12 +200,11 @@ test_that("child model can be run twice on the same data", {
   ## Regression test as we saw the 2nd run failing as the first fit
   ## was modifying the R stored data causing the 2nd run on the same
   ## data to read from an index of -1
-  demp <- readRDS(test_path("testdata/demographic_projection_object_child.rds"))
-  parameters <- readRDS(test_path("testdata/projection_parameters_child.rds"))
+  input <- setup_childmodel(testinput = "testdata/child_parms.rds")
 
-  out <- run_model(demp, parameters, NULL, NULL, 0:60,
+  out <- run_model(input$demp, input$parameters, NULL, NULL,
                    run_child_model = TRUE)
-  out2 <- run_model(demp, parameters, NULL, NULL, 0:60,
+  out2 <- run_model(input$demp, input$parameters, NULL, NULL,
                     run_child_model = TRUE)
   expect_identical(out, out2)
 })
@@ -215,8 +214,8 @@ test_that("error thrown if trying to run model for more than max years", {
   parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
 
   expect_error(
-    run_model(demp, parameters, 100L, 10L, 100),
-    "No of years > max years of 60"
+    run_model(demp, parameters, 1970:2050, 10L, 1970:2050),
+    "No of years > max years of 61"
   )
 })
 
@@ -225,7 +224,7 @@ test_that("error thrown if model run with invalid HIV stratification", {
   parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
 
   expect_error(
-    run_model(demp, parameters, NULL, NULL, 60,
+    run_model(demp, parameters, NULL, NULL, 2030L,
               hiv_age_stratification = "fine"),
     "hiv_age_stratification must be one of 'full', 'coarse', got 'fine'"
   )
@@ -237,7 +236,7 @@ test_that("error thrown if size of stratified data does not match expected", {
   parameters[["cd4_mort_full"]] <- rep(1, 3)
 
   expect_error(
-    run_model(demp, parameters, NULL, NULL, 60,
+    run_model(demp, parameters, NULL, NULL, 2030L,
               hiv_age_stratification = "full"),
     "Invalid size of data for 'cd4_mort', expected 924 got 3"
   )
@@ -247,10 +246,11 @@ test_that("error thrown if trying to save output from invalid steps", {
   demp <- readRDS(test_path("testdata/demographic_projection_object_child.rds"))
   parameters <- readRDS(test_path("testdata/projection_parameters_child.rds"))
 
-  expect_error(run_model(demp, parameters, NULL, NULL, -1),
-               "Output step must be at least 0, got '-1'.")
+  expect_error(
+    run_model(demp, parameters, NULL, NULL, -1L),
+    "Invalid output step '-1'. Can only output one of the simulation years.")
 
-  expect_error(run_model(demp, parameters, 10L, NULL, 11),
-               paste("Output step can be at most number of time steps",
-                     "run which is '10', got step '11'."))
+  expect_error(run_model(demp, parameters, 1970:1980, NULL, 1981:1982),
+               paste("Invalid output steps '1981', '1982'.",
+                     "Can only output one of the simulation years."))
 })
