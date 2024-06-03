@@ -24,7 +24,9 @@ Suggests:
     dplyr,
     knitr,
     RcppEigen,
+    reshape2,
     rmarkdown,
+    SpectrumUtils,
     testthat (>= 3.0.0),
     withr,
     xml2
