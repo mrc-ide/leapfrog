@@ -34,8 +34,6 @@ void run_hiv_ageing_and_mortality(int time_step,
     state_next.base.p_hiv_pop(ss.pAG - 1, g) +=
         state_curr.base.p_hiv_pop(ss.pAG - 1, g);
   }
-
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -140,7 +138,6 @@ void run_hiv_and_art_stratified_ageing(int time_step,
       }
     }
   }
-
 }
 
 
@@ -219,7 +216,6 @@ void run_hiv_pop_demographic_projection(int time_step,
 
   internal::run_hiv_and_art_stratified_deaths_and_migration<ModelVariant>(time_step, pars, state_curr,
                                                                           state_next, intermediate);
-
 }
 
 }

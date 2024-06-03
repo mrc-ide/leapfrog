@@ -144,7 +144,6 @@ struct ChildModelOutputState<ChildModel, real_type> {
     hc_art_total.setZero();
     hc_art_init.setZero();
     hc_art_need_init.setZero();
-
   }
 };
 

@@ -15,14 +15,17 @@ test_that("initial state set up works as expected", {
   )
   expect_equal(dim(out$p_total_pop), c(81, 2, 1))
   expect_equal(out$p_total_pop[, , 1], demp$basepop[, , 1],
-               ignore_attr = TRUE)
+    ignore_attr = TRUE
+  )
 
   expect_equal(out$births[1], 0)
   expect_equal(out$p_total_pop_natural_deaths, array(rep(0, 81 * 2),
-                                                     dim = c(81, 2, 1)))
+    dim = c(81, 2, 1)
+  ))
   expect_equal(out$p_hiv_pop, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
   expect_equal(out$p_hiv_pop_natural_deaths, array(rep(0, 81 * 2),
-                                                   dim = c(81, 2, 1)))
+    dim = c(81, 2, 1)
+  ))
   expect_equal(
     out$h_hiv_adult,
     array(rep(0, 7 * 66 * 2), dim = c(7, 66, 2, 1))
@@ -52,8 +55,9 @@ test_that("initial state set up with coarse stratified HIV works as expected", {
   parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
 
   out <- run_model(demp, parameters, 1970L, 0L,
-                   hiv_age_stratification = "coarse",
-                   run_child_model = FALSE)
+    hiv_age_stratification = "coarse",
+    run_child_model = FALSE
+  )
 
   expect_setequal(
     names(out),
@@ -69,10 +73,12 @@ test_that("initial state set up with coarse stratified HIV works as expected", {
 
   expect_equal(out$births[1], 0)
   expect_equal(out$p_total_pop_natural_deaths, array(rep(0, 81 * 2),
-                                                     dim = c(81, 2, 1)))
+    dim = c(81, 2, 1)
+  ))
   expect_equal(out$p_hiv_pop, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
   expect_equal(out$p_hiv_pop_natural_deaths, array(rep(0, 81 * 2),
-                                                   dim = c(81, 2, 1)))
+    dim = c(81, 2, 1)
+  ))
   expect_equal(
     out$h_hiv_adult,
     array(rep(0, 7 * 9 * 2), dim = c(7, 9, 2, 1))
@@ -102,7 +108,8 @@ test_that("model for 1 time step has looped", {
   parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
 
   out <- run_model(demp, parameters, 1970:1971, 10L, 1971L,
-                   run_child_model = FALSE)
+    run_child_model = FALSE
+  )
 
   expect_setequal(
     names(out),
@@ -135,7 +142,8 @@ test_that("model can be run for all years", {
   parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
 
   out <- run_model(demp, parameters, NULL, NULL,
-                   run_child_model = FALSE)
+    run_child_model = FALSE
+  )
 
   ## No HIV population < age 15
   expect_true(all(out$p_hiv_pop[1:15, , ] < 1e-20))
@@ -149,7 +157,8 @@ test_that("model can be run for all years", {
   ## projection as they are calculated from
   ## the no of HIV +ve in previous year - is this right?
   expect_true(
-    all(out$p_hiv_pop_natural_deaths[17:nrow(out$p_hiv_pop), , 61] != 0))
+    all(out$p_hiv_pop_natural_deaths[17:nrow(out$p_hiv_pop), , 61] != 0)
+  )
   ## Some of older ages can be 0 p_infections, so check the middle chunk
   expect_true(all(out$p_infections[16:70, , 61] > 0))
 
@@ -179,7 +188,8 @@ test_that("model can be run with ART initiation", {
   parameters[["t_ART_start"]] <- 20L
 
   expect_silent(run_model(demp, parameters, NULL, NULL,
-                          run_child_model = FALSE))
+    run_child_model = FALSE
+  ))
 })
 
 test_that("model can be run twice on the same data", {
@@ -190,9 +200,11 @@ test_that("model can be run twice on the same data", {
   parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
 
   out <- run_model(demp, parameters, NULL, NULL,
-                   run_child_model = FALSE)
+    run_child_model = FALSE
+  )
   out2 <- run_model(demp, parameters, NULL, NULL,
-                    run_child_model = FALSE)
+    run_child_model = FALSE
+  )
   expect_identical(out, out2)
 })
 
@@ -203,9 +215,11 @@ test_that("child model can be run twice on the same data", {
   input <- setup_childmodel(testinput = "testdata/child_parms.rds")
 
   out <- run_model(input$demp, input$parameters, NULL, NULL,
-                   run_child_model = TRUE)
+    run_child_model = TRUE
+  )
   out2 <- run_model(input$demp, input$parameters, NULL, NULL,
-                    run_child_model = TRUE)
+    run_child_model = TRUE
+  )
   expect_identical(out, out2)
 })
 
@@ -225,7 +239,8 @@ test_that("error thrown if model run with invalid HIV stratification", {
 
   expect_error(
     run_model(demp, parameters, NULL, NULL, 2030L,
-              hiv_age_stratification = "fine"),
+      hiv_age_stratification = "fine"
+    ),
     "hiv_age_stratification must be one of 'full', 'coarse', got 'fine'"
   )
 })
@@ -237,7 +252,8 @@ test_that("error thrown if size of stratified data does not match expected", {
 
   expect_error(
     run_model(demp, parameters, NULL, NULL, 2030L,
-              hiv_age_stratification = "full"),
+      hiv_age_stratification = "full"
+    ),
     "Invalid size of data for 'cd4_mort', expected 924 got 3"
   )
 })
@@ -248,9 +264,14 @@ test_that("error thrown if trying to save output from invalid steps", {
 
   expect_error(
     run_model(demp, parameters, NULL, NULL, -1L),
-    "Invalid output step '-1'. Can only output one of the simulation years.")
+    "Invalid output step '-1'. Can only output one of the simulation years."
+  )
 
-  expect_error(run_model(demp, parameters, 1970:1980, NULL, 1981:1982),
-               paste("Invalid output steps '1981', '1982'.",
-                     "Can only output one of the simulation years."))
+  expect_error(
+    run_model(demp, parameters, 1970:1980, NULL, 1981:1982),
+    paste(
+      "Invalid output steps '1981', '1982'.",
+      "Can only output one of the simulation years."
+    )
+  )
 })

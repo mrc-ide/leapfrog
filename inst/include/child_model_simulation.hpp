@@ -127,7 +127,6 @@ void run_wlhiv_births(int time_step,
       } //end hTS
     } // end hDS
 
-
     intermediate.children.birthsCurrAge = (intermediate.children.nHIVcurr + intermediate.children.nHIVlast) / 2 * cpars.total_fertility_rate(time_step) * intermediate.children.df / (intermediate.children.df * intermediate.children.prev + 1 - intermediate.children.prev) *  demog.age_specific_fertility_rate(a, time_step) / intermediate.children.asfr_sum ;
     intermediate.children.birthsHE += intermediate.children.birthsCurrAge;
     if (a < 9) {
@@ -196,7 +195,6 @@ void convert_PMTCT_num_to_perc(int time_step,
   if (cpars.PMTCT_input_is_percent(time_step)) {
     for (int hp = 0; hp < hc_ss.hPS; ++hp) {
       intermediate.children.PMTCT_coverage(hp) =  cpars.PMTCT(hp,time_step) / 100;
-
     } //end hPS
   } else {
     for (int hp = 0; hp < hc_ss.hPS; ++hp) {
@@ -205,7 +203,6 @@ void convert_PMTCT_num_to_perc(int time_step,
         intermediate.children.PMTCT_coverage(hp) = 0.0;
       } else {
         intermediate.children.PMTCT_coverage(hp) = (cpars.PMTCT(hp,time_step) / intermediate.children.sumARV) * (intermediate.children.OnPMTCT / intermediate.children.need_PMTCT);
-
       }
     } //end hPS
   }
@@ -250,7 +247,6 @@ void calc_wlhiv_cd4_proportion(int time_step,
     intermediate.children.prop_wlhiv_gte350 = cpars.prop_gte350(time_step);
     intermediate.children.prop_wlhiv_lt350 = 1 - cpars.prop_gte350(time_step);
     intermediate.children.num_wlhiv = cpars.mat_hiv_births(time_step);
-
   } else {
     intermediate.children.num_wlhiv_lt200 = 0.0;
     intermediate.children.num_wlhiv_200to350 = 0.0;
@@ -266,9 +262,7 @@ void calc_wlhiv_cd4_proportion(int time_step,
       intermediate.children.num_wlhiv_200to350 += state_next.base.h_hiv_adult(3,a,1) + state_next.base.h_hiv_adult(2,a,1) ;
       intermediate.children.num_wlhiv_gte350 += state_next.base.h_hiv_adult(0,a,1) + state_next.base.h_hiv_adult(1,a,1) ;
     }
-
     intermediate.children.num_wlhiv = intermediate.children.num_wlhiv_200to350 + intermediate.children.num_wlhiv_gte350 + intermediate.children.num_wlhiv_lt200;
-
 
     if (intermediate.children.num_wlhiv >0) {
       intermediate.children.prop_wlhiv_lt200 = intermediate.children.num_wlhiv_lt200/ intermediate.children.num_wlhiv;
@@ -279,9 +273,7 @@ void calc_wlhiv_cd4_proportion(int time_step,
       intermediate.children.prop_wlhiv_200to350 = 1;
       intermediate.children.prop_wlhiv_gte350 = 0;
     }
-
     intermediate.children.prop_wlhiv_lt350 = intermediate.children.prop_wlhiv_lt200 + intermediate.children.prop_wlhiv_200to350;
-
   }
 }
 
@@ -299,7 +291,6 @@ void adjust_optAB_transmission_rate(int time_step,
   //on option A/B > the proportion of women in this cd4 category, we assume that some must have a cd4 less than 350
   //option AB will be less effective for these women so we adjust for that
   internal::calc_wlhiv_cd4_proportion(time_step, pars, state_curr, state_next, intermediate);
-
 
   if ((intermediate.children.PMTCT_coverage(0) + intermediate.children.PMTCT_coverage(1)) > intermediate.children.prop_wlhiv_gte350) {
     if (intermediate.children.prop_wlhiv_gte350 > 0) {
@@ -346,8 +337,6 @@ void adjust_optAB_bf_transmission_rate(int time_step,
     intermediate.children.optA_bf_transmission_rate = cpars.PMTCT_transmission_rate(4,0,1);
     intermediate.children.optB_bf_transmission_rate = cpars.PMTCT_transmission_rate(4,1,1);
   }
-
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -535,13 +524,11 @@ void run_bf_transmission_rate(int time_step,
     }
     //No treatment
     if (cpars.breastfeeding_duration_no_art(bf, time_step) < 1) {
-
       intermediate.children.bf_transmission_rate(index) +=
         intermediate.children.percent_no_treatment * (1 - cpars.breastfeeding_duration_no_art(bf, time_step)) *
         (2 * intermediate.children.prop_wlhiv_lt200 * cpars.vertical_transmission_rate(4,1) +
         2 * intermediate.children.prop_wlhiv_200to350 * cpars.vertical_transmission_rate(2,1) +
         2 * intermediate.children.prop_wlhiv_gte350 * cpars.vertical_transmission_rate(0,1));
-
     }
     if (bf < 1) {
       intermediate.children.bf_transmission_rate(index) = intermediate.children.bf_transmission_rate(index)/ 4;
@@ -567,7 +554,6 @@ void run_nosocomial_infections(int time_step,
         //5.0 is used because we want to evenly distribute across the 5 age groups in 0-4
         state_next.base.p_infections(a, s) = cpars.hc_nosocomial(time_step) / (5.0 * ss.NS);
         state_next.base.p_hiv_pop(a, s) += state_next.base.p_infections(a, s);
-
         for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
           // putting them all in perinatal hcTT to match spec nosocomial
           if (cpars.hc1_cd4_dist(hd) > 0) {
@@ -601,13 +587,10 @@ void run_child_hiv_infections(int time_step,
           state_next.children.hc1_hiv_pop(hd, 0, 0, s) +=  state_next.children.hiv_births * intermediate.children.perinatal_transmission_rate * demog.births_sex_prop(s,time_step) * cpars.hc1_cd4_dist(hd);
         } else {
           state_next.children.hc1_hiv_pop(hd, 0, 0, s) +=  state_next.children.hiv_births * intermediate.children.perinatal_transmission_rate *(1 -  demog.births_sex_prop(0,time_step)) * cpars.hc1_cd4_dist(hd);
-
         }
       }// end hc1DS
-
       state_next.base.p_hiv_pop(0, s) +=  state_next.children.hiv_births * intermediate.children.perinatal_transmission_rate * demog.births_sex_prop(s,time_step);
       state_next.base.p_infections(0, s) += state_next.children.hiv_births * intermediate.children.perinatal_transmission_rate * demog.births_sex_prop(s,time_step);
-
     }// end NS
 
     //Breastfeeding transmission
@@ -1160,16 +1143,15 @@ void calc_age_specific_last_year(int time_step,
 
     intermediate.children.total_art_last_year(0) = intermediate.children.total_art_last_year(1) + intermediate.children.total_art_last_year(2) + intermediate.children.total_art_last_year(3);
 
-    if(cpars.hc_art_isperc(time_step-1)){
+    if (cpars.hc_art_isperc(time_step-1)){
       for (int ag = 1; ag < 4; ++ag) {
         intermediate.children.total_art_last_year(ag) =  (cpars.hc_art_val(0,time_step-1) * (intermediate.children.total_need(0) + intermediate.children.hc_art_deaths(ag)) * intermediate.children.total_art_last_year(ag) / intermediate.children.total_art_last_year(0)) ;
       }// end ag
-    }else{
+    } else {
       for (int ag = 1; ag < 4; ++ag) {
         intermediate.children.total_art_last_year(ag) =  cpars.hc_art_val(0,time_step-1) * (intermediate.children.total_art_last_year(ag) / intermediate.children.total_art_last_year(0)) ;
       }// end ag
     }
-
   }
 
 }
@@ -1191,7 +1173,6 @@ void calc_art_last_year(int time_step,
     } else {
       intermediate.children.total_art_last_year(0) = cpars.hc_art_val(0,time_step-1) * (intermediate.children.total_need(0));
     }
-
   } else { // ART entered as number last year
     if (cpars.hc_art_is_age_spec(time_step)) { //If the present time step is age specific, we need to calculate what last years age spec breakdown would have been
       internal::calc_age_specific_last_year(time_step, pars, state_curr, state_next, intermediate);
@@ -1200,10 +1181,8 @@ void calc_art_last_year(int time_step,
         intermediate.children.total_art_last_year(0) = cpars.hc_art_val(1,time_step-1) +
           cpars.hc_art_val(2,time_step-1) +
           cpars.hc_art_val(3,time_step-1);
-
       } else {
         intermediate.children.total_art_last_year(0) = cpars.hc_art_val(0,time_step-1)  ;
-
       }
     }
   }
@@ -1223,7 +1202,6 @@ void calc_art_this_year(int time_step,
     for (int ag = 0; ag < 4; ++ag) {
       intermediate.children.total_art_this_year(ag) =  cpars.hc_art_val(ag,time_step) * (intermediate.children.total_need(ag));
     }// end ag
-
   } else {
     for (int ag = 0; ag < 4; ++ag) {
       intermediate.children.total_art_this_year(ag) =  cpars.hc_art_val(ag,time_step);
@@ -1282,8 +1260,6 @@ void hc_art_initiation_by_age(int time_step,
   internal::calc_art_initiates(time_step, pars, state_curr, state_next, intermediate);
 
   if (cpars.hc_art_is_age_spec(time_step)) {
-
-
     for (int s = 0; s < ss.NS; ++s) {
       for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
         for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
@@ -1294,7 +1270,6 @@ void hc_art_initiation_by_age(int time_step,
       } //end a
     } // end ss.NS
 
-
     for (int ag = 1; ag < 4; ++ag) {
       if (intermediate.children.hc_initByAge(ag) == 0.0) {
         intermediate.children.hc_adj(ag) = 1.0 ;
@@ -1302,9 +1277,6 @@ void hc_art_initiation_by_age(int time_step,
         intermediate.children.hc_adj(ag) =  state_next.children.hc_art_init(ag) / intermediate.children.hc_initByAge(ag);
       }
     }
-
-
-
 
     for (int s = 0; s <ss.NS; ++s) {
       for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
@@ -1336,20 +1308,16 @@ void hc_art_initiation_by_age(int time_step,
         } // end a
       } // end hcTT
     } // end ss.NS
-
-
   } else {
     for (int s = 0; s <ss.NS; ++s) {
       for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
         for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
           for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
-            intermediate.children.hc_initByAge(0) += state_next.children.hc_art_need_init(hd, cat, a, s) * cpars.hc_art_init_dist(a, time_step);
+            intermediate.children.hc_initByAge(0 )  += state_next.children.hc_art_need_init(hd, cat, a, s) * cpars.hc_art_init_dist(a, time_step);
           } //end hcTT
         } // end hc_ss.hc1DS
       } //end a
     } // end ss.NS
-
-
 
     if (intermediate.children.hc_initByAge(0) == 0.0) {
       intermediate.children.hc_adj(0) = 1.0 ;
@@ -1357,7 +1325,6 @@ void hc_art_initiation_by_age(int time_step,
       intermediate.children.hc_adj(0) =  state_next.children.hc_art_init(0) / intermediate.children.hc_initByAge(0);
     }
     //divergence is coming from this hc_art_init
-
 
     for (int s = 0; s <ss.NS; ++s) {
       for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
@@ -1367,7 +1334,6 @@ void hc_art_initiation_by_age(int time_step,
               intermediate.children.hc_art_scalar(0) = 1.0;
               //issue is that in 2030 this is being activated when it shouldn't be for age one
               //TLDR is that too many people are initiating who shouldn't bev
-
             } else {
               intermediate.children.hc_art_scalar(0) = intermediate.children.hc_adj(0) * cpars.hc_art_init_dist(a, time_step);
             }
@@ -1386,7 +1352,6 @@ void hc_art_initiation_by_age(int time_step,
             } else if (hd < (hc_ss.hc2DS )) {
               state_next.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s) -=  intermediate.children.hc_art_scalar(0) * state_next.children.hc_art_need_init(hd, cat, a, s);
             }
-
           } //end hc_ss.hc1DS
         } // end a
       } // end hcTT
@@ -1409,7 +1374,6 @@ void fill_model_outputs(int time_step,
   for (int hd = 0; hd < ss.hDS; ++hd) {
     for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
       for (int s = 0; s < ss.NS; ++s) {
-
         for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
           if (a < hc_ss.hc2_agestart) {
             state_next.base.p_hiv_deaths(a,s) += state_next.children.hc1_noart_aids_deaths(hd, cat, a, s);
@@ -1427,7 +1391,6 @@ void fill_model_outputs(int time_step,
             }
           }
         }//end dur
-
       }//end ss.NS
     }// end a
   }// end hDS

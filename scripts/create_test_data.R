@@ -9,9 +9,9 @@
 library(leapfrog)
 library(data.table)
 library(dplyr)
-source('./scripts/spectrum-inputs.R')
-source('./scripts/spectrum-inputs-paeds.R')
-source('./scripts/read-spectrum.R')
+source('./scripts/spectrum_inputs.R')
+source('./scripts/spectrum_inputs_paeds.R')
+source('./scripts/read_spectrum.R')
 
 
 ## Create demographic and projection parameters for adults

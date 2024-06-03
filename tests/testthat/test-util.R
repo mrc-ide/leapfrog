@@ -19,15 +19,17 @@ test_that("can group list of lists", {
     list(id = 3, type = "foo"),
     list(id = 4, type = "bar")
   )
-  expect_equal(group_list_of_lists(input_list, "type"),
-               list(
-                 "foo" = list(
-                   list(id = 1, type = "foo"),
-                   list(id = 3, type = "foo")
-                 ),
-                 "bar" = list(
-                   list(id = 2, type = "bar"),
-                   list(id = 4, type = "bar")
-                 )
-               ))
+  expect_equal(
+    group_list_of_lists(input_list, "type"),
+    list(
+      "foo" = list(
+        list(id = 1, type = "foo"),
+        list(id = 3, type = "foo")
+      ),
+      "bar" = list(
+        list(id = 2, type = "bar"),
+        list(id = 4, type = "bar")
+      )
+    )
+  )
 })

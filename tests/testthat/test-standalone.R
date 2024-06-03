@@ -10,21 +10,26 @@ test_that("We can compile the standalone program", {
 
   code <- withr::with_dir(
     tmp,
-    system2("./configure", args, stdout = FALSE, stderr = FALSE))
+    system2("./configure", args, stdout = FALSE, stderr = FALSE)
+  )
   expect_equal(code, 0)
   code <- withr::with_dir(
     tmp,
-    system2("make", stdout = FALSE, stderr = FALSE))
+    system2("make", stdout = FALSE, stderr = FALSE)
+  )
   expect_equal(code, 0)
 
   output <- tempfile()
   input <- frogger_file("standalone_model/data")
 
   res <- system2(file.path(tmp, "simulate_model"),
-                 c(60, 10, input, output),
-                 stdout = TRUE)
-  expect_equal(res, c(paste0("Created output directory '", output, "'"),
-                      "Fit complete"))
+    c(60, 10, input, output),
+    stdout = TRUE
+  )
+  expect_equal(res, c(
+    paste0("Created output directory '", output, "'"),
+    "Fit complete"
+  ))
 
   expect_true(file.exists(file.path(output, "p_total_pop")))
   expect_true(file.exists(file.path(output, "births")))
@@ -45,42 +50,54 @@ test_that("We can compile the standalone program", {
   ## We're also expecting some precision loss due to serialization so check
   ## up to some tolerance
   expect_equal(deserialize_tensor_to_r(file.path(output, "p_total_pop")),
-               expected$totpop1,
-               tolerance = 1e-5)
+    expected$totpop1,
+    tolerance = 1e-5
+  )
   expect_equal(as.numeric(deserialize_tensor_to_r(file.path(output, "births"))),
-               expected$births,
-               tolerance = 1e-5)
+    expected$births,
+    tolerance = 1e-5
+  )
   expect_equal(
     deserialize_tensor_to_r(file.path(output, "p_total_pop_natural_deaths")),
     expected$natdeaths,
-    tolerance = 1e-5)
+    tolerance = 1e-5
+  )
   expect_equal(deserialize_tensor_to_r(file.path(output, "p_hiv_pop")),
-               expected$hivpop1,
-               tolerance = 1e-5)
+    expected$hivpop1,
+    tolerance = 1e-5
+  )
   expect_equal(
     deserialize_tensor_to_r(file.path(output, "p_hiv_pop_natural_deaths")),
     expected$natdeaths_hivpop,
-    tolerance = 1e-5)
+    tolerance = 1e-5
+  )
   expect_equal(deserialize_tensor_to_r(file.path(output, "h_hiv_adult")),
-               expected$hivstrat_adult,
-               tolerance = 1e-5)
+    expected$hivstrat_adult,
+    tolerance = 1e-5
+  )
   expect_equal(deserialize_tensor_to_r(file.path(output, "h_art_adult")),
-               expected$artstrat_adult,
-               tolerance = 1e-5)
+    expected$artstrat_adult,
+    tolerance = 1e-5
+  )
   expect_equal(
     deserialize_tensor_to_r(file.path(output, "h_hiv_deaths_no_art")),
     expected$aidsdeaths_noart,
-    tolerance = 1e-5)
+    tolerance = 1e-5
+  )
   expect_equal(deserialize_tensor_to_r(file.path(output, "p_infections")),
-               expected$infections,
-               tolerance = 1e-5)
+    expected$infections,
+    tolerance = 1e-5
+  )
   expect_equal(deserialize_tensor_to_r(file.path(output, "h_hiv_deaths_art")),
-               expected$aidsdeaths_art,
-               tolerance = 1e-5)
+    expected$aidsdeaths_art,
+    tolerance = 1e-5
+  )
   expect_equal(deserialize_tensor_to_r(file.path(output, "h_art_initiation")),
-               expected$artinit,
-               tolerance = 1e-5)
+    expected$artinit,
+    tolerance = 1e-5
+  )
   expect_equal(deserialize_tensor_to_r(file.path(output, "p_hiv_deaths")),
-               expected$hivdeaths,
-               tolerance = 1e-5)
+    expected$hivdeaths,
+    tolerance = 1e-5
+  )
 })

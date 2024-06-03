@@ -73,7 +73,6 @@ struct ChildModelStateSpace<true> {
   static constexpr int hBF = 18;
   // Number of coarse breastfeeding categories
   static constexpr int hBF_coarse = 4;
-
 };
 
 template<>
