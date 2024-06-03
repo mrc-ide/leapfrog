@@ -27,4 +27,6 @@ Suggests:
     testthat (>= 3.0.0),
     withr,
     xml2
+Remotes:
+    rlglaubius/SpectrumUtils
 VignetteBuilder: knitr
