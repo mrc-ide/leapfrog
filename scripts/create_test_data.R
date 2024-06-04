@@ -99,7 +99,6 @@ x = data.table(df$total)
 tag.x ="<AIDSDeathsNoARTSingleAge MV>"
 start.id = 20898
 end.id = 21148
-timedat.idx = input$timedat.idx
 aids_deathsnoart <- array(as.numeric(unlist(dpsub(dp, tag.x, 3:(end.id - start.id - 2), timedat.idx))), dim = c(length(3:(end.id - start.id - 2)),length(timedat.idx)))
 m = aids_deathsnoart[84:98,]
 f = aids_deathsnoart[166:180,]
@@ -110,7 +109,6 @@ aids_deathsnoart[,2,] <- f
 tag.x ="<AIDSDeathsARTSingleAge MV>"
 start.id = 20608
 end.id = 20858
-timedat.idx = input$timedat.idx
 aids_deathsart <- array(as.numeric(unlist(dpsub(dp, tag.x, 3:(end.id - start.id - 2), timedat.idx))), dim = c(length(3:(end.id - start.id - 2)),length(timedat.idx)))
 m = aids_deathsart[84:98,]
 f = aids_deathsart[166:180,]
@@ -122,4 +120,4 @@ saveRDS(list(proj = proj, demp = demp, dp = dp, timedat.idx = timedat.idx, pjnz 
              pop1_outputs = x, on_treatment = df$on_treatment, off_trt = df$off_treatment,
              deaths_noart = aids_deathsnoart,
              deaths_art = aids_deathsart),
-        testthat::test_path("testdata/child_params.rds"))
+        testthat::test_path("testdata/child_parms.rds"))
