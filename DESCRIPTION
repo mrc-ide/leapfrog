@@ -21,6 +21,7 @@ Imports:
     glue,
     Rcpp
 Suggests:
+    data.table,
     dplyr,
     knitr,
     RcppEigen,
