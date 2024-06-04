@@ -49,6 +49,7 @@ jobs:
           extra-packages: |
             any::pkgbuild
             any::withr
+          cache: false
 
       - name: compile package
         run: |

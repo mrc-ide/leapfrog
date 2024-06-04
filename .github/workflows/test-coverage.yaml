@@ -26,6 +26,7 @@ jobs:
         with:
           extra-packages: covr
           needs: coverage
+          cache: false
 
       - name: Test coverage
         run: |
