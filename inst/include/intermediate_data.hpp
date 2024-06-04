@@ -75,6 +75,9 @@ constexpr int hPS = StateSpace<ModelVariant>().children.hPS;
 template<typename ModelVariant>
 constexpr int hBF = StateSpace<ModelVariant>().children.hBF;
 
+template<typename ModelVariant>
+constexpr int hBF_coarse = StateSpace<ModelVariant>().children.hBF_coarse;
+
 namespace {
 using Eigen::Sizes;
 using Eigen::TensorFixedSize;
@@ -101,6 +104,7 @@ struct BaseModelIntermediateData {
   TensorFixedSize <real_type, Sizes<hTS<ModelVariant>, hDS<ModelVariant>, hAG<ModelVariant>, NS<ModelVariant>>> gradART;
   Tensor2<real_type> artelig_hahm;
   TensorFixedSize <real_type, Sizes<hAG<ModelVariant>>> hivpop_ha;
+
   real_type cd4mx_scale;
   real_type artpop_hahm;
   real_type deaths;
@@ -192,31 +196,137 @@ struct ChildModelIntermediateData {
 template<typename real_type>
 struct ChildModelIntermediateData<ChildModel, real_type> {
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, NS<ChildModel>>> age15_hiv_pop;
+  TensorFixedSize <real_type, Sizes<hTS<ChildModel>, hDS<ChildModel>, NS<ChildModel>>> age15_art_pop;
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_posthivmort;
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_grad;
-  TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_art_need;
-  TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_art_init;
-  real_type hc_art_init_total;
+  TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_ctx_need;
+  TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> eligible;
+  TensorFixedSize <real_type, Sizes<4>> unmet_need;
+  TensorFixedSize <real_type, Sizes<4>> total_need;
+  TensorFixedSize <real_type, Sizes<4>> on_art;
+  real_type retained;
+  TensorFixedSize <real_type, Sizes<4>> total_art_last_year;
+  TensorFixedSize <real_type, Sizes<4>> total_art_this_year;
   real_type hc_death_rate;
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_art_grad;
-  real_type hc_art_scalar;
-  real_type hc_initByAge;
-  real_type hc_adj;
+  TensorFixedSize <real_type, Sizes<4>> hc_art_scalar;
+  TensorFixedSize <real_type, Sizes<4>> hc_initByAge;
+  TensorFixedSize <real_type, Sizes<4>> hc_adj;
+  TensorFixedSize <real_type, Sizes<4>> hc_art_deaths;
+  real_type asfr_sum;
+  real_type births_sum;
+  real_type nHIVcurr;
+  real_type nHIVlast;
+  real_type df;
+  real_type prev;
+  real_type birthsCurrAge;
+  real_type birthsHE;
+  real_type births_HE_15_24;
+  //started here
+  TensorFixedSize <real_type, Sizes<hAG<ChildModel>, NS<ChildModel>>> p_hiv_neg_pop;
+  real_type sumARV;
+  real_type need_PMTCT;
+  TensorFixedSize <real_type, Sizes<hPS<ChildModel>>> PMTCT_coverage;
+  real_type OnPMTCT;
+  real_type num_wlhiv_lt200;
+  real_type num_wlhiv_200to350;
+  real_type num_wlhiv_gte350;
+  real_type num_wlhiv;
+  real_type prop_wlhiv_lt200;
+  real_type prop_wlhiv_200to350;
+  real_type prop_wlhiv_gte350;
+  real_type prop_wlhiv_lt350;
+  real_type excessratio;
+  real_type excessratio_bf;
+  real_type optA_transmission_rate;
+  real_type optB_transmission_rate;
+  real_type optA_bf_transmission_rate;
+  real_type optB_bf_transmission_rate;
+  real_type retained_on_ART;
+  real_type retained_started_ART;
+  real_type perinatal_transmission_rate;
+  real_type receiving_PMTCT;
+  real_type no_PMTCT;
+  real_type perinatal_transmission_rate_bf_calc;
+  real_type age_weighted_hivneg;
+  real_type age_weighted_infections;
+  real_type incidence_rate_wlhiv;
+  real_type perinatal_transmission_from_incidence;
+  real_type bf_at_risk;
+  real_type bf_incident_hiv_transmission_rate;
+  real_type percent_no_treatment;
+  real_type percent_on_treatment;
+  TensorFixedSize <real_type, Sizes<hBF_coarse<ChildModel>>> bf_transmission_rate;
+  real_type ctx_coverage;
+  real_type need_cotrim;
+
 
   ChildModelIntermediateData() {};
 
   void reset() {
     age15_hiv_pop.setZero();
+    age15_art_pop.setZero();
     hc_posthivmort.setZero();
     hc_grad.setZero();
-    hc_art_need.setZero();
-    hc_art_init.setZero();
-    hc_art_init_total = 0.0;
+    hc_ctx_need.setZero();
+    eligible.setZero();
+    unmet_need.setZero();
+    total_need.setZero();
+    on_art.setZero();
+    retained = 0.0;
+    total_art_last_year.setZero();
+    total_art_this_year.setZero();
     hc_death_rate = 0.0;
     hc_art_grad.setZero();
-    hc_art_scalar = 0.0;
-    hc_initByAge = 0.0;
-    hc_adj = 0.0;
+    hc_art_scalar.setZero();
+    hc_initByAge.setZero();
+    hc_adj.setZero();
+    hc_art_deaths.setZero();
+    asfr_sum = 0.0;
+    births_sum = 0.0;
+    nHIVcurr = 0.0;
+    nHIVlast = 0.0;
+    df = 0.0;
+    prev = 0.0;
+    birthsCurrAge = 0.0;
+    birthsHE = 0.0;
+    births_HE_15_24 = 0.0;
+    p_hiv_neg_pop.setZero();
+    sumARV = 0.0;
+    need_PMTCT = 0.0;
+    PMTCT_coverage.setZero();
+    OnPMTCT = 0.0;
+    num_wlhiv_lt200 = 0.0;
+    num_wlhiv_200to350 = 0.0;
+    num_wlhiv_gte350 = 0.0;
+    num_wlhiv = 0.0;
+    prop_wlhiv_lt200 = 0.0;
+    prop_wlhiv_200to350 = 0.0;
+    prop_wlhiv_gte350 = 0.0;
+    prop_wlhiv_lt350 = 0.0;
+    excessratio = 0.0;
+    excessratio_bf = 0.0;
+    optA_transmission_rate = 0.0;
+    optB_transmission_rate = 0.0;
+    optA_bf_transmission_rate = 0.0;
+    optB_bf_transmission_rate = 0.0;
+    retained_on_ART = 0.0;
+    retained_started_ART = 0.0;
+    perinatal_transmission_rate = 0.0;
+    receiving_PMTCT = 0.0;
+    no_PMTCT = 0.0;
+    perinatal_transmission_rate_bf_calc = 0.0;
+    age_weighted_hivneg = 0.0;
+    age_weighted_infections = 0.0;
+    incidence_rate_wlhiv = 0.0;
+    perinatal_transmission_from_incidence = 0.0;
+    bf_at_risk = 0.0;
+    bf_incident_hiv_transmission_rate = 0.0;
+    percent_no_treatment = 0.0;
+    percent_on_treatment = 0.0;
+    bf_transmission_rate.setZero();
+    ctx_coverage = 0.0;
+    need_cotrim = 0.0;
   };
 };
 

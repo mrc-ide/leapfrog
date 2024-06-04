@@ -21,10 +21,16 @@ Imports:
     glue,
     Rcpp
 Suggests:
+    data.table,
+    dplyr,
     knitr,
     RcppEigen,
+    reshape2,
     rmarkdown,
+    SpectrumUtils,
     testthat (>= 3.0.0),
     withr,
     xml2
+Remotes:
+    rlglaubius/SpectrumUtils
 VignetteBuilder: knitr

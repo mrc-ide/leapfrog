@@ -11,7 +11,8 @@ generate_output_interface <- function(dest) {
   template <- readLines(template_path)
   output_file <- "model_output.csv"
   outputs <- utils::read.csv(frogger_file("cpp_generation", output_file),
-                             colClasses = "character")
+    colClasses = "character"
+  )
 
   validate_dimensions_columns(colnames(outputs), output_file)
 
@@ -34,8 +35,10 @@ generate_output_interface <- function(dest) {
   build_list <- paste_lines(build_list)
 
   remaining_sections <- output_sections[names(output_sections) != ""]
-  optional_data <- Map(generate_optional_output_section,
-                       remaining_sections, names(remaining_sections))
+  optional_data <- Map(
+    generate_optional_output_section,
+    remaining_sections, names(remaining_sections)
+  )
   optional_data <- paste_lines(unlist(optional_data))
 
   header <- generate_header(basename(template_path))
@@ -66,7 +69,8 @@ generate_unpack_state_space <- function(outputs) {
   state_space_groups <- unique(vcapply(strsplit(ss, "\\."), "[[", 1))
   non_ss_names <- c("ss", "data", "options")
   state_space_groups <- state_space_groups[
-    !(state_space_groups %in% non_ss_names)]
+    !(state_space_groups %in% non_ss_names)
+  ]
   vcapply(state_space_groups, function(group) {
     sprintf("  constexpr auto %s = ss.%s;", group, group)
   })
@@ -82,26 +86,33 @@ generate_initialise_r_memory <- function(outputs) {
 generate_set_r_dimensions <- function(outputs) {
   vcapply(outputs, function(output) {
     dimensions <- paste(output$parsed_dims, collapse = ", ")
-    sprintf("  r_%s.attr(\"dim\") = Rcpp::NumericVector::create(%s);",
-            output$r_name, dimensions)
+    sprintf(
+      "  r_%s.attr(\"dim\") = Rcpp::NumericVector::create(%s);",
+      output$r_name, dimensions
+    )
   })
 }
 
 generate_copy_data <- function(outputs, struct_name) {
   vcapply(outputs, function(output) {
-    sprintf("  std::copy_n(state.%s.%s.data(), state.%s.%s.size(), %s(r_%s));",
-            struct_name, output$cpp_name, struct_name, output$cpp_name,
-            output$r_type, output$r_name)
+    sprintf(
+      "  std::copy_n(state.%s.%s.data(), state.%s.%s.size(), %s(r_%s));",
+      struct_name, output$cpp_name, struct_name, output$cpp_name,
+      output$r_type, output$r_name
+    )
   })
 }
 
 generate_build_list <- function(outputs) {
   initialise_list <- c(
     sprintf("  Rcpp::List ret(%s);", length(outputs)),
-    sprintf("  Rcpp::CharacterVector names(%s);", length(outputs)))
+    sprintf("  Rcpp::CharacterVector names(%s);", length(outputs))
+  )
   items <- vcapply(seq_along(outputs), function(i) {
-    sprintf("  names[%s] = \"%s\";\n  ret[%s] = r_%s;",
-            i - 1, outputs[[i]]$r_name, i - 1, outputs[[i]]$r_name)
+    sprintf(
+      "  names[%s] = \"%s\";\n  ret[%s] = r_%s;",
+      i - 1, outputs[[i]]$r_name, i - 1, outputs[[i]]$r_name
+    )
   })
   set_names <- "  ret.attr(\"names\") = names;"
   c(initialise_list, items, set_names)
@@ -124,7 +135,6 @@ generate_push_to_list <- function(outputs) {
 #' @keywords internal
 generate_input_interface <- function(
     dest, input_csv = frogger_file("cpp_generation/model_input.csv")) {
-
   template_path <- frogger_file("cpp_generation/model_input.hpp.in")
   template <- readLines(template_path)
   input_file <- basename(input_csv)
@@ -149,8 +159,10 @@ generate_input_interface <- function(
   structs <- paste_lines(structs)
 
   remaining_sections <- input_sections[names(input_sections) != ""]
-  optional_data <- Map(generate_optional_input_section,
-                       remaining_sections, names(remaining_sections))
+  optional_data <- Map(
+    generate_optional_input_section,
+    remaining_sections, names(remaining_sections)
+  )
   optional_data <- paste_lines(unlist(optional_data))
 
   header <- generate_header(basename(template_path))
@@ -190,9 +202,11 @@ generate_struct_instantiation <- function(inputs) {
 
 generate_struct <- function(struct_inputs) {
   c(
-    sprintf("  const leapfrog::%s<real_type> %s_params = {",
-            struct_inputs[[1]]$struct,
-            camel_to_snake(struct_inputs[[1]]$struct)),
+    sprintf(
+      "  const leapfrog::%s<real_type> %s_params = {",
+      struct_inputs[[1]]$struct,
+      camel_to_snake(struct_inputs[[1]]$struct)
+    ),
     sprintf("      %s,", vcapply(struct_inputs, "[[", "cpp_name")),
     "  };"
   )
@@ -204,8 +218,10 @@ generate_input_from_r <- function(inputs) {
     if (input$dims == 1 && dimensions[1] == 1) {
       return(generate_length1_input(input))
     }
-    rhs <- sprintf("parse_data<%s>(data, \"%s\", %s)",
-                   input$type, input$r_name, dimensions)
+    rhs <- sprintf(
+      "parse_data<%s>(data, \"%s\", %s)",
+      input$type, input$r_name, dimensions
+    )
     tensor_type <- "leapfrog::TensorMap"
     if (!is.null(input$convert_0_based) && input$convert_0_based) {
       rhs <- sprintf("convert_0_based<%s>(%s)", input$dims, rhs)
@@ -213,25 +229,33 @@ generate_input_from_r <- function(inputs) {
       ## modify the underlying R data which we do not want to do
       tensor_type <- "leapfrog::Tensor"
     }
-    lhs <- sprintf("  const %s%s<%s> %s",
-                   tensor_type, input$dims, input$type, input$cpp_name)
+    lhs <- sprintf(
+      "  const %s%s<%s> %s",
+      tensor_type, input$dims, input$type, input$cpp_name
+    )
     paste0(lhs, " = ", rhs, ";")
   })
 }
 
 generate_length1_input <- function(input) {
-  sprintf("  const %s %s = Rcpp::as<%s>(data[\"%s\"]);",
-          input$type, input$cpp_name, input$type, input$r_name)
+  sprintf(
+    "  const %s %s = Rcpp::as<%s>(data[\"%s\"]);",
+    input$type, input$cpp_name, input$type, input$r_name
+  )
 }
 
 generate_input_from_value <- function(inputs) {
   vcapply(inputs, function(input) {
     dimensions <- paste(input$parsed_dims, collapse = ", ")
-    declaration <- sprintf("  leapfrog::Tensor%s<%s> %s(%s);",
-                           input$dims, input$type, input$cpp_name,
-                           input$parsed_dims)
-    set_value <- sprintf("  %s.setConstant(%s);",
-                         input$cpp_name, input$value)
+    declaration <- sprintf(
+      "  leapfrog::Tensor%s<%s> %s(%s);",
+      input$dims, input$type, input$cpp_name,
+      input$parsed_dims
+    )
+    set_value <- sprintf(
+      "  %s.setConstant(%s);",
+      input$cpp_name, input$value
+    )
     paste0(declaration, "\n", set_value)
   })
 }
@@ -241,12 +265,14 @@ generate_header <- function(source_file) {
     "// Generated by frogger: do not edit by hand\n",
     "// This file is automatically generated. Do not edit this file. If you ",
     sprintf("want to make changes\n// edit `%s` and run ", source_file),
-    "`./scripts/generate` to regenerate.")
+    "`./scripts/generate` to regenerate."
+  )
 }
 
 generate_return <- function() {
   ## TODO: Generate this when we have type definitions being generated
-  c("  const leapfrog::ChildModelParameters<ModelVariant, real_type> child_model_params = {",
+  c(
+    "  const leapfrog::ChildModelParameters<ModelVariant, real_type> child_model_params = {",
     "      children_params",
     "  };",
     "  return leapfrog::Parameters<ModelVariant, real_type> {",
@@ -256,7 +282,8 @@ generate_return <- function() {
     "} else {",
     "  return leapfrog::Parameters<ModelVariant, real_type> {",
     "      base_model_params",
-    "  };")
+    "  };"
+  )
 }
 
 #' Generate C++ for input parameter types
@@ -272,7 +299,8 @@ generate_parameter_types <- function(dest) {
   template <- readLines(template_path)
   input_file <- "model_input.csv"
   inputs <- utils::read.csv(frogger_file("cpp_generation", input_file),
-                            colClasses = "character")
+    colClasses = "character"
+  )
 
   validate_dimensions_columns(colnames(inputs), input_file)
 
@@ -336,9 +364,11 @@ generate_struct_def <- function(inputs) {
 
 generate_struct_instance <- function(inputs) {
   paste0(
-    sprintf("  const leapfrog::%s<real_type> %s_params = {\n",
-            inputs[[1]]$struct,
-            to_lower_camel(inputs[[1]]$struct)),
+    sprintf(
+      "  const leapfrog::%s<real_type> %s_params = {\n",
+      inputs[[1]]$struct,
+      to_lower_camel(inputs[[1]]$struct)
+    ),
     paste_lines(sprintf("    %s", vcapply(inputs, "[[", "cpp_name"))),
     "  \n};\n"
   )
@@ -430,7 +460,12 @@ parse_state_dims <- function(dims) {
   ## We've already validated that the last dimension is output_years
   dims <- dims[-length(dims)]
   vcapply(dims, function(dim) {
-    strsplit(dim, "\\.")[[1]][[2]]
+    ## Dim should be a number, or namespaced name e.g. base.hTS
+    if (grepl("^\\d+$", dim)) {
+      dim
+    } else {
+      strsplit(dim, "\\.")[[1]][[2]]
+    }
   }, USE.NAMES = FALSE)
 }
 
@@ -456,8 +491,10 @@ generate_state_def <- function(outputs) {
     struct_def,
     paste_lines(struct_members),
     "\n\n",
-    sprintf("  %sState(const Parameters<%s, real_type> &pars) {\n",
-            struct_name, model_variant),
+    sprintf(
+      "  %sState(const Parameters<%s, real_type> &pars) {\n",
+      struct_name, model_variant
+    ),
     "    reset();\n",
     "  }\n\n",
     paste_lines(reset_text),
@@ -469,7 +506,13 @@ generate_state_struct_member <- function(output) {
   if (output$dims == "1") {
     type <- "real_type"
   } else {
-    sizes <- sprintf("%s<%s>", output$parsed_dims, output$model_variant)
+    sizes <- vcapply(output$parsed_dims, function(dim) {
+      if (grepl("^\\d+$", dim)) {
+        dim
+      } else {
+        sprintf("%s<%s>", dim, output$model_variant)
+      }
+    })
     sizes <- paste(sizes, collapse = ", ")
     type <- sprintf("TensorFixedSize<real_type, Sizes<%s>>", sizes)
   }
@@ -487,7 +530,8 @@ generate_state_reset_function <- function(outputs) {
   c(
     "  void reset() {",
     reset_lines,
-    "  }")
+    "  }"
+  )
 }
 
 generate_output_state_defs <- function(outputs) {
@@ -533,7 +577,8 @@ generate_output_state_struct_member <- function(output) {
 generate_output_state_initialiser_list <- function(output) {
   dim_indentation <- "      "
   dims <- vcapply(output$parsed_dims, function(dim) {
-    if (dim == "output_years") {
+    ## Dim output_years or a number
+    if (dim == "output_years" || grepl("^\\d+$", dim)) {
       paste0(dim_indentation, dim)
     } else {
       sprintf("%sStateSpace<%s>().%s",
@@ -607,8 +652,9 @@ model_variant_to_name <- function(model_variant) {
 
 generate_cpp <- function(template) {
   glue::glue(paste_lines(template),
-             .open = "{{", .close = "}}",
-             .envir = parent.frame())
+    .open = "{{", .close = "}}",
+    .envir = parent.frame()
+  )
 }
 
 camel_to_snake <- function(x) {

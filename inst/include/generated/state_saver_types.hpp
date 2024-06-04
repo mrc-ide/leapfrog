@@ -120,7 +120,12 @@ struct ChildModelOutputState<ChildModel, real_type> {
   Tensor5<real_type> hc2_noart_aids_deaths;
   Tensor5<real_type> hc1_art_aids_deaths;
   Tensor5<real_type> hc2_art_aids_deaths;
-  Tensor1<real_type> hc_art_num;
+  Tensor1<real_type> hiv_births;
+  Tensor2<real_type> hc_art_total;
+  Tensor2<real_type> hc_art_init;
+  Tensor5<real_type> hc_art_need_init;
+  Tensor1<real_type> ctx_need;
+  Tensor1<real_type> ctx_mean;
 
   ChildModelOutputState(int output_years): 
     hc1_hiv_pop(
@@ -179,7 +184,28 @@ struct ChildModelOutputState<ChildModel, real_type> {
       StateSpace<ChildModel>().base.NS,
       output_years
     ),
-    hc_art_num(
+    hiv_births(
+      output_years
+    ),
+    hc_art_total(
+      4,
+      output_years
+    ),
+    hc_art_init(
+      4,
+      output_years
+    ),
+    hc_art_need_init(
+      StateSpace<ChildModel>().children.hc1DS,
+      StateSpace<ChildModel>().children.hcTT,
+      15,
+      StateSpace<ChildModel>().base.NS,
+      output_years
+    ),
+    ctx_need(
+      output_years
+    ),
+    ctx_mean(
       output_years
     ) {
     hc1_hiv_pop.setZero();
@@ -190,7 +216,12 @@ struct ChildModelOutputState<ChildModel, real_type> {
     hc2_noart_aids_deaths.setZero();
     hc1_art_aids_deaths.setZero();
     hc2_art_aids_deaths.setZero();
-    hc_art_num.setZero();
+    hiv_births.setZero();
+    hc_art_total.setZero();
+    hc_art_init.setZero();
+    hc_art_need_init.setZero();
+    ctx_need.setZero();
+    ctx_mean.setZero();
   }
 };
 
@@ -239,7 +270,12 @@ public:
     output_state.hc2_noart_aids_deaths.chip(i, output_state.hc2_noart_aids_deaths.NumDimensions - 1) = state.children.hc2_noart_aids_deaths;
     output_state.hc1_art_aids_deaths.chip(i, output_state.hc1_art_aids_deaths.NumDimensions - 1) = state.children.hc1_art_aids_deaths;
     output_state.hc2_art_aids_deaths.chip(i, output_state.hc2_art_aids_deaths.NumDimensions - 1) = state.children.hc2_art_aids_deaths;
-    output_state.hc_art_num(i) = state.children.hc_art_num;
+    output_state.hiv_births(i) = state.children.hiv_births;
+    output_state.hc_art_total.chip(i, output_state.hc_art_total.NumDimensions - 1) = state.children.hc_art_total;
+    output_state.hc_art_init.chip(i, output_state.hc_art_init.NumDimensions - 1) = state.children.hc_art_init;
+    output_state.hc_art_need_init.chip(i, output_state.hc_art_need_init.NumDimensions - 1) = state.children.hc_art_need_init;
+    output_state.ctx_need(i) = state.children.ctx_need;
+    output_state.ctx_mean(i) = state.children.ctx_mean;
     return;
   }
 };

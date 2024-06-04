@@ -21,12 +21,12 @@ bench::mark(
   check = FALSE
 )
 
-demp <- readRDS(file.path(root_dir, "tests/testthat/testdata/demographic_projection_object_child.rds"))
-parameters <- readRDS(file.path(root_dir, "tests/testthat/testdata/projection_parameters_child.rds"))
+source(testthat::test_path("helper-child-model.R"))
+input <- setup_childmodel(testinput = "testdata/child_parms.rds")
 
 message("Benchmarking child model")
 bench::mark(
-  frogger = frogger::run_model(demp, parameters, NULL, NULL, NULL, hiv_age_stratification = "full", run_child_model = TRUE),
+  frogger = frogger::run_model(input$demp, input$parameters, NULL, NULL, NULL, hiv_age_stratification = "full", run_child_model = TRUE),
   iterations = 10,
   check = FALSE
 )

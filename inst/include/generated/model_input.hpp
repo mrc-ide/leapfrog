@@ -78,6 +78,7 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
       initiation_mortality_weight,
   };
 
+
   const leapfrog::BaseModelParameters<real_type> base_model_params = {
         options,
         demography_params,
@@ -104,8 +105,29 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
     const leapfrog::TensorMap3<real_type> hc1_art_mort = parse_data<real_type>(data, "paed_art_mort", children.hc1DS, base.hTS, children.hc1AG);
     const leapfrog::TensorMap3<real_type> hc2_art_mort = parse_data<real_type>(data, "adol_art_mort", children.hc2DS, base.hTS, children.hc2AG);
     const leapfrog::TensorMap1<int> hc_art_isperc = parse_data<int>(data, "artpaeds_isperc", proj_years);
-    const leapfrog::TensorMap1<real_type> hc_art_val = parse_data<real_type>(data, "paed_art_val", proj_years);
+    const leapfrog::TensorMap2<real_type> hc_art_val = parse_data<real_type>(data, "paed_art_val", 4, proj_years);
     const leapfrog::TensorMap2<real_type> hc_art_init_dist = parse_data<real_type>(data, "init_art_dist", options.p_idx_hiv_first_adult, proj_years);
+    const leapfrog::TensorMap2<real_type> adult_cd4_dist = parse_data<real_type>(data, "adult_cd4_dist", base.hDS, children.hc2DS);
+    const leapfrog::TensorMap1<real_type> fert_mult_by_age = parse_data<real_type>(data, "fert_mult_by_age", options.p_fertility_age_groups);
+    const leapfrog::TensorMap1<real_type> fert_mult_off_art = parse_data<real_type>(data, "fert_mult_offart", base.hDS);
+    const leapfrog::TensorMap1<real_type> fert_mult_on_art = parse_data<real_type>(data, "fert_mult_onart", options.p_fertility_age_groups);
+    const leapfrog::TensorMap1<real_type> total_fertility_rate = parse_data<real_type>(data, "tfr", proj_years);
+    const real_type local_adj_factor = Rcpp::as<real_type>(data["laf"]);
+    const leapfrog::TensorMap2<real_type> PMTCT = parse_data<real_type>(data, "pmtct", children.hPS, proj_years);
+    const leapfrog::TensorMap2<real_type> vertical_transmission_rate = parse_data<real_type>(data, "mtct", 8, 2);
+    const leapfrog::TensorMap3<real_type> PMTCT_transmission_rate = parse_data<real_type>(data, "pmtct_mtct", base.hDS, 7, 2);
+    const leapfrog::TensorMap2<real_type> PMTCT_dropout = parse_data<real_type>(data, "pmtct_dropout", 6, proj_years);
+    const leapfrog::TensorMap1<int> PMTCT_input_is_percent = parse_data<int>(data, "pmtct_input_isperc", proj_years);
+    const leapfrog::TensorMap2<real_type> breastfeeding_duration_art = parse_data<real_type>(data, "bf_duration_art", children.hBF, proj_years);
+    const leapfrog::TensorMap2<real_type> breastfeeding_duration_no_art = parse_data<real_type>(data, "bf_duration_no_art", children.hBF, proj_years);
+    const leapfrog::TensorMap1<real_type> mat_hiv_births = parse_data<real_type>(data, "mat_hiv_births", proj_years);
+    const leapfrog::TensorMap1<int> mat_prev_input = parse_data<int>(data, "mat_prev_input", proj_years);
+    const leapfrog::TensorMap1<real_type> prop_lt200 = parse_data<real_type>(data, "prop_lt200", proj_years);
+    const leapfrog::TensorMap1<real_type> prop_gte350 = parse_data<real_type>(data, "prop_gte350", proj_years);
+    const leapfrog::TensorMap1<real_type> incrate = parse_data<real_type>(data, "incrate", proj_years);
+    const leapfrog::TensorMap1<int> ctx_val_is_percent = parse_data<int>(data, "ctx_val_ispercent", proj_years);
+    const leapfrog::TensorMap1<int> hc_art_is_age_spec = parse_data<int>(data, "paed_art_age_spec", proj_years);
+    const leapfrog::TensorMap1<real_type> hc_age_coarse = parse_data<real_type>(data, "hc_age_coarse", 15);
     const leapfrog::Children<real_type> children_params = {
         hc_nosocomial,
         hc1_cd4_dist,
@@ -124,6 +146,27 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
         hc_art_isperc,
         hc_art_val,
         hc_art_init_dist,
+        adult_cd4_dist,
+        fert_mult_by_age,
+        fert_mult_off_art,
+        fert_mult_on_art,
+        total_fertility_rate,
+        local_adj_factor,
+        PMTCT,
+        vertical_transmission_rate,
+        PMTCT_transmission_rate,
+        PMTCT_dropout,
+        PMTCT_input_is_percent,
+        breastfeeding_duration_art,
+        breastfeeding_duration_no_art,
+        mat_hiv_births,
+        mat_prev_input,
+        prop_lt200,
+        prop_gte350,
+        incrate,
+        ctx_val_is_percent,
+        hc_art_is_age_spec,
+        hc_age_coarse,
     };
     const leapfrog::ChildModelParameters<ModelVariant, real_type> child_model_params = {
         children_params

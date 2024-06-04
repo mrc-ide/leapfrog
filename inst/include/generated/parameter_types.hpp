@@ -63,8 +63,29 @@ struct Children {
   TensorMap3<real_type> hc1_art_mort;
   TensorMap3<real_type> hc2_art_mort;
   TensorMap1<int> hc_art_isperc;
-  TensorMap1<real_type> hc_art_val;
+  TensorMap2<real_type> hc_art_val;
   TensorMap2<real_type> hc_art_init_dist;
+  TensorMap2<real_type> adult_cd4_dist;
+  TensorMap1<real_type> fert_mult_by_age;
+  TensorMap1<real_type> fert_mult_off_art;
+  TensorMap1<real_type> fert_mult_on_art;
+  TensorMap1<real_type> total_fertility_rate;
+  real_type local_adj_factor;
+  TensorMap2<real_type> PMTCT;
+  TensorMap2<real_type> vertical_transmission_rate;
+  TensorMap3<real_type> PMTCT_transmission_rate;
+  TensorMap2<real_type> PMTCT_dropout;
+  TensorMap1<int> PMTCT_input_is_percent;
+  TensorMap2<real_type> breastfeeding_duration_art;
+  TensorMap2<real_type> breastfeeding_duration_no_art;
+  TensorMap1<real_type> mat_hiv_births;
+  TensorMap1<int> mat_prev_input;
+  TensorMap1<real_type> prop_lt200;
+  TensorMap1<real_type> prop_gte350;
+  TensorMap1<real_type> incrate;
+  TensorMap1<int> ctx_val_is_percent;
+  TensorMap1<int> hc_art_is_age_spec;
+  TensorMap1<real_type> hc_age_coarse;
 };
 
 }

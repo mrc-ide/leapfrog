@@ -30,7 +30,8 @@ run_model <- function(data, parameters, sim_years,
       out_str <- paste(paste0("'", invalid_steps, "'"), collapse = ", ")
       stop(sprintf(
         "Invalid output %s %s. Can only output one of the simulation years.",
-        ngettext(length(invalid_steps), "step", "steps"), out_str))
+        ngettext(length(invalid_steps), "step", "steps"), out_str
+      ))
     }
     output_steps <- which(sim_years %in% output_steps)
   }
