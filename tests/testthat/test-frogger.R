@@ -259,16 +259,15 @@ test_that("error thrown if size of stratified data does not match expected", {
 })
 
 test_that("error thrown if trying to save output from invalid steps", {
-  demp <- readRDS(test_path("testdata/demographic_projection_object_child.rds"))
-  parameters <- readRDS(test_path("testdata/projection_parameters_child.rds"))
+  input <- setup_childmodel(testinput = "testdata/child_parms.rds")
 
   expect_error(
-    run_model(demp, parameters, NULL, NULL, -1L),
+    run_model(input$demp, input$parameters, NULL, NULL, -1L),
     "Invalid output step '-1'. Can only output one of the simulation years."
   )
 
   expect_error(
-    run_model(demp, parameters, 1970:1980, NULL, 1981:1982),
+    run_model(input$demp, input$parameters, 1970:1980, NULL, 1981:1982),
     paste(
       "Invalid output steps '1981', '1982'.",
       "Can only output one of the simulation years."

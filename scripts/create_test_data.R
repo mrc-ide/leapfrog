@@ -122,4 +122,4 @@ saveRDS(list(proj = proj, demp = demp, dp = dp, timedat.idx = timedat.idx, pjnz 
              pop1_outputs = x, on_treatment = df$on_treatment, off_trt = df$off_treatment,
              deaths_noart = aids_deathsnoart,
              deaths_art = aids_deathsart),
-        testthat::test_path("testdata/projection_parameters_child.rds"))
+        testthat::test_path("testdata/child_params.rds"))
