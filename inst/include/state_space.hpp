@@ -69,8 +69,10 @@ struct ChildModelStateSpace<true> {
   static constexpr int hcTT = 4;
   // Number of PMTCT types
   static constexpr int hPS = 7;
-  // Number of breast feeting age categories
+  // Number of breastfeeding age categories
   static constexpr int hBF = 18;
+  // Number of coarse breastfeeding categories
+  static constexpr int hBF_coarse = 4;
 };
 
 template<>

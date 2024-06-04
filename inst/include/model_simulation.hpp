@@ -135,6 +135,7 @@ void run_new_p_infections(int hiv_step,
                                       time_step) *
           intermediate.base.hiv_neg_aggregate(g) /
           intermediate.base.Xhivn_incagerr;
+
     }
   }
 }
@@ -148,6 +149,7 @@ void run_new_hiv_p_infections(int hiv_step,
                               IntermediateData<ModelVariant, real_type> &intermediate) {
   constexpr auto ss = StateSpace<ModelVariant>().base;
   const auto natural_history = pars.base.natural_history;
+
   for (int g = 0; g < ss.NS; g++) {
     int a = pars.base.options.p_idx_hiv_first_adult;
     for (int ha = 0; ha < ss.hAG; ++ha) {
@@ -161,6 +163,7 @@ void run_new_hiv_p_infections(int hiv_step,
         state_next.base.p_hiv_pop(a, g) +=
             pars.base.options.dt * intermediate.base.p_infections_a;
       }
+
 
       // add p_infections to grad hivpop
       for (int hm = 0; hm < ss.hDS; ++hm) {
@@ -394,6 +397,7 @@ void run_update_hiv_stratification(int hiv_step,
                                    State<ModelVariant, real_type> &state_next,
                                    IntermediateData<ModelVariant, real_type> &intermediate) {
   constexpr auto ss = StateSpace<ModelVariant>().base;
+
   for (int g = 0; g < ss.NS; ++g) {
     for (int ha = 0; ha < ss.hAG; ++ha) {
       for (int hm = 0; hm < ss.hDS; ++hm) {
@@ -462,45 +466,55 @@ void run_hiv_model_simulation(int time_step,
                                                        state_curr, state_next,
                                                        intermediate);
 
+
   for (int hiv_step = 0;
        hiv_step < pars.base.options.hts_per_year; ++hiv_step) {
     intermediate.base.grad.setZero();
     intermediate.base.gradART.setZero();
     intermediate.base.p_hiv_deaths_age_sex.setZero();
-
     internal::run_disease_progression_and_mortality<ModelVariant>(hiv_step,
                                                                   time_step,
                                                                   pars,
                                                                   state_curr,
                                                                   state_next,
                                                                   intermediate);
+
     internal::run_new_p_infections<ModelVariant>(hiv_step, time_step, pars,
                                                  state_curr, state_next,
                                                  intermediate);
+
+
     internal::run_new_hiv_p_infections<ModelVariant>(hiv_step, time_step, pars,
                                                      state_curr, state_next,
                                                      intermediate);
+
     if (time_step >= pars.base.options.ts_art_start) {
       internal::run_art_progression_and_mortality<ModelVariant>(hiv_step,
                                                                 time_step, pars,
                                                                 state_curr,
                                                                 state_next,
                                                                 intermediate);
+
       internal::run_h_art_initiation<ModelVariant>(hiv_step, time_step, pars,
                                                    state_curr, state_next,
                                                    intermediate);
+
       internal::run_update_art_stratification<ModelVariant>(hiv_step, time_step,
                                                             pars, state_curr,
                                                             state_next,
                                                             intermediate);
+
     }
+
     internal::run_update_hiv_stratification<ModelVariant>(hiv_step, time_step,
                                                           pars, state_curr,
                                                           state_next,
                                                           intermediate);
+
     internal::run_remove_p_hiv_deaths<ModelVariant>(hiv_step, time_step, pars,
                                                     state_curr, state_next,
                                                     intermediate);
+
   }
 }
 

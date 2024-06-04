@@ -28,6 +28,7 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
 
 {{structs}}
 
+
   const leapfrog::BaseModelParameters<real_type> base_model_params = {
         options,
         demography_params,

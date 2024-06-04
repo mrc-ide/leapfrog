@@ -43,6 +43,20 @@ ret = leapfrog::run_model<leapfrog::ChildModel>(proj_years, save_steps, params);
 
 Other model variants are `leapfrog::BaseModelFullAgeStratification` and `leapfrog::BaseModelCoarseAgeStratification` see `inst/include/model_variants.hpp`
 
+## lint
+
+Lint R code with `lintr`
+
+```R
+lintr::lint_package()
+```
+
+Lint C++ code with [cpplint](https://github.com/cpplint/cpplint)
+
+```console
+cpplint inst/include/*
+```
+
 ## TODO
 
 * Restructuring the model code to identify more common code
