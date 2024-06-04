@@ -15,13 +15,11 @@ source('./scripts/read_spectrum.R')
 
 
 ## Create demographic and projection parameters for adults
-pjnz1 <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct.PJNZ")
-# pjnz1 <- testthat::test_path("testdata/bwa_aim-no-special-elig_ctx.PJNZ")
-# pjnz1 <- testthat::test_path("testdata/bwa_aim-no-special-elig.PJNZ")
+pjnz_adult <- testthat::test_path("testdata/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ")
 
-demp <- prepare_leapfrog_demp(pjnz1)
+demp <- prepare_leapfrog_demp(pjnz_adult)
 saveRDS(demp, testthat::test_path("testdata/demographic_projection_object_adult.rds"))
-proj <- prepare_leapfrog_projp(pjnz1)
+proj <- prepare_leapfrog_projp(pjnz_adult)
 saveRDS(proj, testthat::test_path("testdata/projection_parameters_adult.rds"))
 
 # Used as reference data (Run from leapfrog/master)
@@ -36,16 +34,17 @@ saveRDS(lmod, testthat::test_path("testdata/fit_demography.rds"))
 
 
 #Create paeds parameters (Run from leapfrog/uncertainrt_analysis_working)
-demp <- prepare_leapfrog_demp(pjnz1)
-proj <- prepare_leapfrog_projp(pjnz1)
-proj <- prepare_hc_leapfrog_projp(pjnz1, proj)
+pjnz_child <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct.PJNZ")
+demp <- prepare_leapfrog_demp(pjnz_child)
+proj <- prepare_leapfrog_projp(pjnz_child)
+proj <- prepare_hc_leapfrog_projp(pjnz_child, proj)
 
 
-demp$netmigr <- leapfrog:::read_netmigr(pjnz1, adjust_u5mig = FALSE)
+demp$netmigr <- leapfrog:::read_netmigr(pjnz_child, adjust_u5mig = FALSE)
 demp$netmigr_adj <- leapfrog:::adjust_spectrum_netmigr(demp$netmigr)
 
-dpfile <- grep(".DP$", utils::unzip(pjnz1, list=TRUE)$Name, value=TRUE)
-dp <- utils::read.csv(unz(pjnz1, dpfile), as.is=TRUE)
+dpfile <- grep(".DP$", utils::unzip(pjnz_child, list=TRUE)$Name, value=TRUE)
+dp <- utils::read.csv(unz(pjnz_child, dpfile), as.is=TRUE)
 dpsub <- function(dp, tag, rows, cols, tagcol=1){
   dp[which(dp[,tagcol]==tag)+rows, cols]
 }
@@ -54,8 +53,8 @@ yr_end <- as.integer(dpsub(dp, "<FinalYear MV2>",2,4))
 proj.years <- yr_start:yr_end
 timedat.idx <- 4+1:length(proj.years)-1
 
-pop1 = paste0(getwd(), '/', gsub(x = pjnz1, pattern = '.PJNZ', replacement = '_pop1.xlsx'))
-#pop1 = paste0( gsub(x = pjnz1, pattern = '.PJNZ', replacement = '_pop1.xlsx'))
+pop1 = paste0(getwd(), '/', gsub(x = pjnz_child, pattern = '.PJNZ', replacement = '_pop1.xlsx'))
+#pop1 = paste0( gsub(x = pjnz_child, pattern = '.PJNZ', replacement = '_pop1.xlsx'))
 
 spectrum_output <- function(file = "../testdata/spectrum/v6.13/bwa_aim-adult-child-input-art-elig_spectrum-v6.13_2022-02-12_pop1.xlsx", ages = 0:14, country = 'Botswana', years_in = 1970:2030){
   ##pull out stratified population from the .xlsx file, This function doesn't take out the paediatric output, so going to just compare to the Spectrum software itself
@@ -116,7 +115,7 @@ aids_deathsart <- array(0, dim = c(15,2,61))
 aids_deathsart[,1,] <- m
 aids_deathsart[,2,] <- f
 
-saveRDS(list(proj = proj, demp = demp, dp = dp, timedat.idx = timedat.idx, pjnz = pjnz1,
+saveRDS(list(proj = proj, demp = demp, dp = dp, timedat.idx = timedat.idx, pjnz = pjnz_child,
              pop1_outputs = x, on_treatment = df$on_treatment, off_trt = df$off_treatment,
              deaths_noart = aids_deathsnoart,
              deaths_art = aids_deathsart),
