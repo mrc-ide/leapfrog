@@ -31,8 +31,15 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::pkgdown, any::here, local::.
+          extra-packages: any::pkgdown, any::here
           needs: website
+
+      # This as a separate step as we need dependencies to be resolved
+      # otherwise this is erroring when running the configure script
+      - name: Install frogger
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: local::.
 
       - name: Build site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
