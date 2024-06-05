@@ -6,16 +6,14 @@
 ## We also run leapfrog and save out the result for use in reference tests
 
 # nolint start
-library(leapfrog)
+library(frogger)
 library(data.table)
 library(dplyr)
-source('./scripts/spectrum_inputs.R')
 source('./scripts/spectrum_inputs_paeds.R')
 source('./scripts/read_spectrum.R')
 
-
 ## Create demographic and projection parameters for adults
-pjnz_adult <- testthat::test_path("testdata/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ")
+pjnz_adult <- system.file("pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ", package = "frogger", mustWork = TRUE)
 
 demp <- prepare_leapfrog_demp(pjnz_adult)
 saveRDS(demp, testthat::test_path("testdata/demographic_projection_object_adult.rds"))
@@ -23,13 +21,13 @@ proj <- prepare_leapfrog_projp(pjnz_adult)
 saveRDS(proj, testthat::test_path("testdata/projection_parameters_adult.rds"))
 
 # Used as reference data (Run from leapfrog/master)
-lmod <- leapfrogR(demp, proj)
+lmod <- leapfrog::leapfrogR(demp, proj)
 saveRDS(lmod, testthat::test_path("testdata/leapfrog_fit.rds"))
 
-lmod <- leapfrogR(demp, proj, hiv_strat = "coarse")
+lmod <- leapfrog::leapfrogR(demp, proj, hiv_strat = "coarse")
 saveRDS(lmod, testthat::test_path("testdata/leapfrog_fit_coarse.rds"))
 
-mod <- leapfrogR(demp, proj, hiv_steps_per_year = 0L)
+mod <- leapfrog::leapfrogR(demp, proj, hiv_steps_per_year = 0L)
 saveRDS(lmod, testthat::test_path("testdata/fit_demography.rds"))
 
 

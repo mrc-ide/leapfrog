@@ -10,3 +10,5 @@ docker
 ^inst/standalone_model/simulate_model$
 ^inst/standalone_model/model_gprofile$
 ^tmp$
+^README\.Rmd$
+^CPPLINT\.cfg$

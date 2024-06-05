@@ -2,7 +2,7 @@
 title: "Variable naming conventions"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{development}
+  %\VignetteIndexEntry{variables}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

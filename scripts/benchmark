@@ -7,7 +7,6 @@ parameters <- readRDS(file.path(root_dir, "tests/testthat/testdata/projection_pa
 
 message("Benchmarking coarse stratified model")
 bench::mark(
-  leapfrog = leapfrog::leapfrogR(demp, parameters, hiv_strat = "coarse"),
   frogger = frogger::run_model(demp, parameters, NULL, NULL, NULL, hiv_age_stratification = "coarse", run_child_model = FALSE),
   iterations = 10,
   check = FALSE
@@ -15,7 +14,6 @@ bench::mark(
 
 message("Benchmarking full model")
 bench::mark(
-  leapfrog = leapfrog::leapfrogR(demp, parameters, hiv_strat = "full"),
   frogger = frogger::run_model(demp, parameters, NULL, NULL, NULL, hiv_age_stratification = "full", run_child_model = FALSE),
   iterations = 10,
   check = FALSE

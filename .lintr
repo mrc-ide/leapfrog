@@ -7,6 +7,5 @@ exclusions: list(
     "tests/testthat.R",
     "scripts/create_test_data.R",
     "scripts/read_spectrum.R",
-    "scripts/spectrum_inputs.R",
     "scripts/spectrum_inputs_paeds.R")
 encoding: "UTF-8"

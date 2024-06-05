@@ -278,6 +278,26 @@ generate_parameter_types <- function(
   invisible(dest)
 }
 
+#' Organise the data into separate structs
+#'
+#' This takes a list of inputs or outputs and splits them by struct returning
+#' the result as a named list of lists where names are the struct name and
+#' list is the inputs/outputs which belong on that struct
+#'
+#' @param data Data related to model inputs or outputs
+#'
+#' @return Nothing, called to generate code in src dir
+#' @keywords internal
+get_data_by_struct <- function(data) {
+  struct <- vcapply(data, "[[", "struct")
+  structs <- unique(vcapply(data, "[[", "struct"))
+  data_by_struct <- lapply(structs, function(struct_name) {
+    data[struct == struct_name]
+  })
+  names(data_by_struct) <- structs
+  data_by_struct
+}
+
 generate_struct_def <- function(inputs) {
   input_text <- vcapply(inputs, function(input) {
     if (input$dims == 1 && input$dim1 == 1) {
@@ -294,18 +314,6 @@ generate_struct_def <- function(inputs) {
     sprintf("struct %s {\n", inputs[[1]]$struct),
     paste_lines(input_text),
     "\n};\n"
-  )
-}
-
-generate_struct_instance <- function(inputs) {
-  paste0(
-    sprintf(
-      "  const leapfrog::%s<real_type> %s_params = {\n",
-      inputs[[1]]$struct,
-      to_lower_camel(inputs[[1]]$struct)
-    ),
-    paste_lines(sprintf("    %s", vcapply(inputs, "[[", "cpp_name"))),
-    "  \n};\n"
   )
 }
 

@@ -1,11 +1,25 @@
 Package: frogger
 Title: Multistate Population Projection Model for Demographic and HIV Estimation
 Version: 0.1.0
-Authors@R: c(person("Robert", "Ashton", role = c("aut", "cre"),
-                    email = "r.ashton@imperial.ac.uk"),
-             person("Imperial College of Science, Technology and Medicine",
-                    role = "cph"))
-Description: Frogger is a multistate population projection model for estimating population, demographic indicators, and HIV epidemic. The model combines a standard cohort component model of population projection (CCMPP) with a multistate model for HIV infection, disease progression, and treatment. Statistical tools are implemented for joint inference from multiple demographic and epidemiologic data sources.
+Authors@R: c(
+    person(given = "Jeffrey",
+           family = "Eaton",
+           role = c("aut"),
+           email = "jeffrey.eaton@imperial.ac.uk",
+           comment = c(ORCID = "0000-0001-7728-728X")),
+    person(given = "Maggie", 
+           family = "Walters", 
+           role = c("aut"),
+           email = "m.walters@imperial.ac.uk"),
+    person(given = "Robert", 
+           family = "Ashton", 
+           role = c("aut", "cre"),
+           email = "robertashton94@gmail.com"),
+    person(given = "Mantra", 
+           family = "Kusumgar", 
+           role = c("aut"),
+           email = "m.kusumgar@imperial.ac.uk"))
+Description: Leapfrog is a multistate population projection model for estimating population, demographic indicators, and HIV epidemic. The model combines a standard cohort component model of population projection (CCMPP) with a multistate model for HIV infection, disease progression, and treatment. Statistical tools are implemented for joint inference from multiple demographic and epidemiologic data sources.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -14,10 +28,13 @@ URL: https://github.com/mrc-ide/frogger
 BugReports: https://github.com/mrc-ide/frogger/issues
 Depends: R (>= 4.3.0)
 Config/testthat/edition: 3
+Additional_repositories: https://mrc-ide.r-universe.dev
 LinkingTo:
     Rcpp,
     RcppEigen
 Imports:
+    beers,
+    eppasm (>= 0.5.12),
     glue,
     Rcpp
 Suggests:
