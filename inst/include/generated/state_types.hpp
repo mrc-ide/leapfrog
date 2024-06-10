@@ -64,6 +64,33 @@ struct HivSimulationState<ModelVariant, real_type,
     reset();
   }
 
+  BaseModelState(
+    const TensorFixedSize<real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>>& p_total_pop,
+    real_type births,
+    const TensorFixedSize<real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>>& p_total_pop_natural_deaths,
+    const TensorFixedSize<real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>>& p_hiv_pop,
+    const TensorFixedSize<real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>>& p_hiv_pop_natural_deaths,
+    const TensorFixedSize<real_type, Sizes<hDS<ModelVariant>, hAG<ModelVariant>, NS<ModelVariant>>>& h_hiv_adult,
+    const TensorFixedSize<real_type, Sizes<hTS<ModelVariant>, hDS<ModelVariant>, hAG<ModelVariant>, NS<ModelVariant>>>& h_art_adult,
+    const TensorFixedSize<real_type, Sizes<hDS<ModelVariant>, hAG<ModelVariant>, NS<ModelVariant>>>& h_hiv_deaths_no_art,
+    const TensorFixedSize<real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>>& p_infections,
+    const TensorFixedSize<real_type, Sizes<hTS<ModelVariant>, hDS<ModelVariant>, hAG<ModelVariant>, NS<ModelVariant>>>& h_hiv_deaths_art,
+    const TensorFixedSize<real_type, Sizes<hDS<ModelVariant>, hAG<ModelVariant>, NS<ModelVariant>>>& h_art_initiation,
+    const TensorFixedSize<real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>>& p_hiv_deaths
+  ) :
+    p_total_pop(p_total_pop),
+    births(births),
+    p_total_pop_natural_deaths(p_total_pop_natural_deaths),
+    p_hiv_pop(p_hiv_pop),
+    p_hiv_pop_natural_deaths(p_hiv_pop_natural_deaths),
+    h_hiv_adult(h_hiv_adult),
+    h_art_adult(h_art_adult),
+    h_hiv_deaths_no_art(h_hiv_deaths_no_art),
+    p_infections(p_infections),
+    h_hiv_deaths_art(h_hiv_deaths_art),
+    h_art_initiation(h_art_initiation),
+    p_hiv_deaths(p_hiv_deaths) {}
+
   void reset() {
     p_hiv_pop.setZero();
     p_hiv_pop_natural_deaths.setZero();
@@ -124,6 +151,11 @@ struct State {
       dp(pars),
       hiv(pars),
       children(pars) {}
+
+  State(const BaseModelState<ModelVariant, real_type> &base,
+        const ChildModelState<ModelVariant, real_type> &children)
+    : base(base),
+      children(children) {}
 
   void reset() {
     dp.reset();

@@ -6,6 +6,7 @@
 #include "child_model_simulation.hpp"
 #include "state_saver.hpp"
 #include "state_space.hpp"
+#include "project_year.hpp"
 
 namespace leapfrog {
 
@@ -54,24 +55,7 @@ OutputState<ModelVariant, real_type> run_model(int time_steps,
 
   // Each time step is mid-point of the year
   for (int step = 1; step < time_steps; ++step) {
-    run_general_pop_demographic_projection<ModelVariant>(step, pars, state, state_next,
-                                                         intermediate);
-    if constexpr (ModelVariant::run_hiv_simulation) {
-      run_hiv_pop_demographic_projection<ModelVariant>(step, pars, state, state_next,
-                                                       intermediate);
-      run_hiv_model_simulation<ModelVariant>(step, pars, state, state_next, intermediate);
-    }
-    if constexpr (ModelVariant::run_child_model) {
-      run_child_model_simulation<ModelVariant>(step, pars, state, state_next, intermediate);
-    }
-
-    if (p_op.proj_period_int == internal::PROJPERIOD_CALENDAR) {
-      run_end_year_migration<ModelVariant>(step, pars, state, state_next, intermediate);
-      if constexpr (ModelVariant::run_hiv_simulation) {
-        run_hiv_pop_end_year_migration<ModelVariant>(step, pars, state, state_next, intermediate);
-      }
-    }
-
+    internal::project_year(step, pars, state, state_next, intermediate);
     state_output.save_state(state_next, step);
     std::swap(state, state_next);
     state_next.reset();
