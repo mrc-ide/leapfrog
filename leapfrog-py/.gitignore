@@ -1,0 +1,9 @@
+*.pyc
+__pycache__
+.coverage*
+.idea
+.direnv
+/dist
+docs/_build
+.mypy_cache
+.pytest_cache

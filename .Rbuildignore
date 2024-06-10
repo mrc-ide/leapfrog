@@ -12,3 +12,4 @@ docker
 ^tmp$
 ^README\.Rmd$
 ^CPPLINT\.cfg$
+^leapfrog-py$
