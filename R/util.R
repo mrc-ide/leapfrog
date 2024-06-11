@@ -72,7 +72,6 @@ format_vector <- function(vector) {
   paste(paste0("'", vector, "'"), collapse = ", ")
 }
 
-
 #' Take a list of lists and split into groups based on some property
 #'
 #' Every list must have this property otherwise this will fail
