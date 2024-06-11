@@ -1,4 +1,5 @@
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 #include <pybind11/eigen/tensor.h>
 #include "../../inst/include/types.hpp"
 #include "../../inst/include/state_types.hpp"
@@ -63,7 +64,7 @@ PYBIND11_MODULE(leapfrog, m) {
         .def_readonly("h_art_stage_dur", &leapfrog::Art<double>::h_art_stage_dur)
         .def_readonly("initiation_mortality_weight", &leapfrog::Art<double>::initiation_mortality_weight);
 
-
+//    TODO: Add child model support
 //    py::class_<Children<double>>(leapfrog, "Children")
 //            .def(py::init<const TensorMap1<double>&,
 //                      const TensorMap1<double>&,
@@ -180,6 +181,7 @@ PYBIND11_MODULE(leapfrog, m) {
         .def_readonly("children", &leapfrog::Parameters<leapfrog::BaseModelFullAgeStratification, double>::children);
 
     py::class_<leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double>>(m, "BaseModelState")
+        .def(py::init<const leapfrog::Parameters<leapfrog::BaseModelFullAgeStratification, double>&>())
         .def(py::init<const TensorFixedSize<double, Sizes<leapfrog::pAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>>&,
                       double,
                       TensorFixedSize<double, Sizes<leapfrog::pAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>>&,
@@ -231,18 +233,29 @@ PYBIND11_MODULE(leapfrog, m) {
         .def_readonly("children", &leapfrog::State<leapfrog::BaseModelFullAgeStratification, double>::children);
 
     m.def(
-        "project_single_year",
+        "project_single_year_cpp",
         &leapfrog::project_single_year<leapfrog::BaseModelFullAgeStratification, double>,
         py::arg("time_step"),
         py::arg("pars"),
         py::arg("state_curr"),
         py::arg("state_next"),
-        "Project a single year of the model");
+        "Project a single year of the model"
+    );
 
     m.def(
-        "set_initial_state",
+        "set_initial_state_cpp",
         &leapfrog::set_initial_state<leapfrog::BaseModelFullAgeStratification, double>,
         py::arg("state"),
         py::arg("pars"),
-        "Set initial state from the parameters");
+        "Set initial state from the parameters"
+    );
+
+    m.def(
+        "run_model_cpp",
+        &leapfrog::simulate_model<leapfrog::BaseModelFullAgeStratification, double>,
+        py::arg("params"),
+        py::arg("proj_years"),
+        py::arg("save_steps"),
+        "Run a simulation model over a specified number of time steps"
+    );
 }

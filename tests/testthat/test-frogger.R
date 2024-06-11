@@ -141,7 +141,7 @@ test_that("model can be run for all years", {
   demp <- readRDS(test_path("testdata/demographic_projection_object_adult.rds"))
   parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
 
-  out <- run_model(demp, parameters, NULL, NULL,
+  out <- run_model(demp, parameters, NULL, NULL, NULL,
     run_child_model = FALSE
   )
 
@@ -177,8 +177,8 @@ test_that("model can be run for all years", {
   expect_true(all(out$h_hiv_deaths_no_art >= 0))
   expect_true(all(out$p_infections >= 0))
   expect_true(all(out$h_art_initiation >= 0))
-  expect_true(all(out$p_infections >= 0))
-  expect_true(all(out$p_infections >= 0))
+  expect_true(all(out$h_hiv_deaths_art >= 0))
+  expect_true(all(out$p_hiv_deaths >= 0))
 })
 
 test_that("model can be run with ART initiation", {
