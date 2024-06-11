@@ -3,11 +3,11 @@ Title: Multistate Population Projection Model for Demographic and HIV Estimation
 Version: 0.1.0
 Authors@R: c(
     person(given = "Jeffrey",
-           family = "Eaton",
+           family = "Imai-Eaton",
            role = c("aut"),
            email = "jeffrey.eaton@imperial.ac.uk",
            comment = c(ORCID = "0000-0001-7728-728X")),
-    person(given = "Maggie", 
+    person(given = "Magdalene", 
            family = "Walters", 
            role = c("aut"),
            email = "m.walters@imperial.ac.uk"),
