@@ -70,7 +70,7 @@ dependencies = [
 ]
 
 [tool.hatch.envs.default.scripts]
-install = "pip install ."
+install = "pip install -e ."
 test = "pytest {args:tests}"
 install_and_test = "hatch run install && hatch run test"
 
@@ -78,3 +78,4 @@ install_and_test = "hatch run install && hatch run test"
 addopts = [
     "--import-mode=importlib",
 ]
+testpaths = ["tests"]
