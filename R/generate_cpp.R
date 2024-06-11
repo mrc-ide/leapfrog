@@ -614,7 +614,7 @@ read_types_csv <- function(path, validation_function, group_by_col) {
     row <- types[row_num, ]
     ## When reading csv in excel the header column is included in count
     csv_row_num <- row_num + 1
-    parsed <- validation_function(as.list(row), input_file, csv_row_num)
+    parsed <- validation_function(as.list(row), file_name, csv_row_num)
     parsed$dims_state <- parse_state_dims(parsed$parsed_dims)
     parsed
   })
