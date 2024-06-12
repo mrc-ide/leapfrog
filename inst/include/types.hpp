@@ -19,6 +19,9 @@ template<typename real_type>
 using TensorMap4 = Eigen::TensorMap <Eigen::Tensor<real_type, 4>>;
 
 template<typename real_type>
+using TensorMap5 = Eigen::TensorMap <Eigen::Tensor<real_type, 5>>;
+
+template<typename real_type>
 using Tensor1 = Eigen::Tensor<real_type, 1>;
 
 template<typename real_type>
