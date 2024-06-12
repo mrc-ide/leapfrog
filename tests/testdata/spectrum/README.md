@@ -1,13 +1,40 @@
 # Spectrum test files
 
-These are a series of test files constructed to 
+These are a series of test files constructed to ensure that development of leapfrog follows the already established EPP-ASM and Spectrum models. 
+
+Files were constructed using default data for Botswana in Spectrum v6.13 on 12 February 2022.
+
+## `v6.13/bwa_demproj-only_spectrum-v6.13_2022-02-12.PJNZ`
+This file only has the demographic projection component of Spectrum. These inputs are run through Leapfrog and EPP-ASM to ensure that population projections matches at the coarse age group level. It is not compared to Spectrum as previous testing shows that Spectrum and EPP-ASM are approximately equal at the coarse age structure.
+
+## `v6.13/bwa_demproj-only-no-mig_spectrum-v6.13_2022-02-12.PJNZ`
+This file only has the demographic projection component of Spectrum, and migration is set to zero. The resulting Spectrum projection's births, deaths, and total population were compared to those estimated in leapfrog.
+
+## `v6.13/bwa_aim-adult-no-art-no-hiv-deaths_spectrum-v6.13_2022-02-12.pjnz`
+This file has the demographic and AIM modules included, with the following constraints placed on the AIM model:
+
+* Adult ART coverage set to zero
+* No MTCT
+* FRR for HIV+ women set to one
+* Child treatment (cotrim, PMTCT, and ART) set to zero
+* HIV-related mortality set to zero.
+
+Purpose: Ensure that incidence and disease progression between Spectrum and leapfrog align.
+
+## `v6.13/bwa_aim-adult-no-art-spectrum-v6.13_2022-02-12.pjnz`
+This file has the demographic and AIM modules included, with the following constraints placed on the AIM model:
+
+* Adult ART coverage set to zero
+* No MTCT
+* FRR for HIV+ women set to one
+* Child treatment (cotrim, PMTCT, and ART) set to zero
+
+Purpose: Ensure that incidence, disease progression, and HIV related mortality between Spectrum and leapfrog align. Also confirm that the introduction of HIV-related mortality doesn't change functionality of the demographic projection model.
 
 
 
 
-Files were constructed using default data for Botswana
-in Spectrum v5.13 on 12 February 2022.
-
+## Jeff's drafts below
 
 ## `bwa_aim-adult-no
 
@@ -22,6 +49,8 @@ Paediatric HIV is removed by setting mother-to-child transmission probabilities 
 * Change all Child ART percentages to zero.
 * Change child Percent receiving cotrimoxazole to zero.
 * Set [Advanced Options] -> [MTCT transition probabilities] all equal zero.
+
+
 
 
 ## `v6.13/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ`
@@ -60,3 +89,5 @@ The default file had no 'special population' ART eligibility. This is retained.
   with distribution 15%, 30%, 55%, and percentage for 2021 onwards
 
 * Convert adult ART input to number through year 2020, percentage for 2021 onwards
+
+

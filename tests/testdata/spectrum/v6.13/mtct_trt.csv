@@ -1,0 +1,43 @@
+pmtct,cd4,type,perinatal
+ART before pregnancy,<50,perinatal,0.0026
+ART before pregnancy,50-99,perinatal,0.0026
+ART before pregnancy,100-199,perinatal,0.0026
+ART before pregnancy,250-349,perinatal,0.0026
+ART before pregnancy,200-249,perinatal,0.0026
+ART before pregnancy,350-500,perinatal,0.0026
+ART before pregnancy,>500,perinatal,0.0026
+ART before pregnancy,<50,bf,0.00023
+ART before pregnancy,50-99,bf,0.00023
+ART before pregnancy,100-199,bf,0.00023
+ART before pregnancy,250-349,bf,0
+ART before pregnancy,200-249,bf,0
+ART before pregnancy,350-500,bf,0
+ART before pregnancy,>500,bf,0
+ART >4 weeks before delivery,<50,perinatal,0.014
+ART >4 weeks before delivery,50-99,perinatal,0.014
+ART >4 weeks before delivery,100-199,perinatal,0.014
+ART >4 weeks before delivery,250-349,perinatal,0.014
+ART >4 weeks before delivery,200-249,perinatal,0.014
+ART >4 weeks before delivery,350-500,perinatal,0.014
+ART >4 weeks before delivery,>500,perinatal,0.014
+ART >4 weeks before delivery,<50,bf,0.0011
+ART >4 weeks before delivery,50-99,bf,0.0011
+ART >4 weeks before delivery,100-199,bf,0.0011
+ART >4 weeks before delivery,250-349,bf,0
+ART >4 weeks before delivery,200-249,bf,0
+ART >4 weeks before delivery,350-500,bf,0
+ART >4 weeks before delivery,>500,bf,0
+ART <4 weeks before delivery,<50,perinatal,0.082
+ART <4 weeks before delivery,50-99,perinatal,0.082
+ART <4 weeks before delivery,100-199,perinatal,0.082
+ART <4 weeks before delivery,250-349,perinatal,0.082
+ART <4 weeks before delivery,200-249,perinatal,0.082
+ART <4 weeks before delivery,350-500,perinatal,0.082
+ART <4 weeks before delivery,>500,perinatal,0.082
+ART <4 weeks before delivery,<50,bf,0.002
+ART <4 weeks before delivery,50-99,bf,0.002
+ART <4 weeks before delivery,100-199,bf,0.002
+ART <4 weeks before delivery,250-349,bf,0
+ART <4 weeks before delivery,200-249,bf,0
+ART <4 weeks before delivery,350-500,bf,0
+ART <4 weeks before delivery,>500,bf,0

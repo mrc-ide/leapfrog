@@ -17,14 +17,14 @@ LinkingTo:
     RcppEigen
 Imports:
     beers,
-    eppasm (>= 0.5.12),
+    eppasm (>= 0.7.2),
     methods,
     Matrix,
-    Rcpp
+    Rcpp,
+    testthat (>= 2.1.0)
 Suggests:
     bench,
     covr,
-    testthat (>= 2.1.0)
 Remotes:
     mrc-ide/beers,
     mrc-ide/eppasm
