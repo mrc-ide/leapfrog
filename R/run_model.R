@@ -70,6 +70,8 @@ run_model <- function(data, parameters, sim_years,
 #' @param parameters Projection parameters
 #' @param sim_years Simulation years to run model for default 1970:2030
 #' @param hts_per_year Number of HIV time steps per year, default 10
+#' @param data_from_adult_model This is a list with parameters h_hiv_adult,
+#'   h_art_adult, births, p_total_pop from a previous full model run.
 #' @param output_steps Which sim years to output for default same as sim_years
 #'
 #' @return List of model outputs

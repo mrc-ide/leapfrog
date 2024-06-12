@@ -22,6 +22,9 @@ run_wlhiv_births(
 
 \item{hts_per_year}{Number of HIV time steps per year, default 10}
 
+\item{data_from_adult_model}{This is a list with parameters h_hiv_adult,
+h_art_adult, births, p_total_pop from a previous full model run.}
+
 \item{output_steps}{Which sim years to output for default same as sim_years}
 }
 \value{
