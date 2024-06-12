@@ -93,3 +93,84 @@ Rcpp::List run_base_model(const Rcpp::List data,
 
   return ret;
 }
+
+// [[Rcpp::export]]
+Rcpp::List run_wlhiv_births_r(const Rcpp::List data,
+                              const Rcpp::Nullable<Rcpp::NumericVector> sim_years,
+                              const SEXP hts_per_year,
+                              const Rcpp::NumericVector output_steps,
+                              const Rcpp::List data_from_adult_model) {
+
+    constexpr auto ss = leapfrog::StateSpace<leapfrog::ChildModel>();
+    const int proj_years = transform_simulation_years(data, sim_years);
+    const std::vector<int> save_steps= transform_output_steps(output_steps);
+    const int hiv_steps = transform_hts_per_year(hts_per_year);
+    
+    const leapfrog::Options<double> opts = {
+        hiv_steps,
+        Rcpp::as<int>(data["t_ART_start"]) - 1,
+        ss.base.hAG
+    };
+
+    const auto pars = setup_model_params<leapfrog::ChildModel, double>(data, opts, proj_years);
+
+    size_t output_years = save_steps.size();
+    auto state = leapfrog::State<leapfrog::ChildModel, double>(pars);
+
+    const leapfrog::TensorMap4<double> h_hiv_adult = parse_data<double>(data_from_adult_model, "h_hiv_adult", ss.base.hDS, ss.base.hAG, ss.base.NS, output_years);
+    const leapfrog::TensorMap5<double> h_art_adult = parse_data<double>(data_from_adult_model, "h_art_adult", ss.base.hTS, ss.base.hDS, ss.base.hAG, ss.base.NS, output_years);
+    const leapfrog::TensorMap3<double> p_total_pop = parse_data<double>(data_from_adult_model, "p_total_pop", ss.base.pAG, ss.base.NS, output_years);
+    const leapfrog::TensorMap1<double> births = parse_data<double>(data_from_adult_model, "births", output_years);
+
+    auto state_next = state;
+    leapfrog::set_initial_state<leapfrog::ChildModel, double>(state, pars);
+    leapfrog::internal::IntermediateData<leapfrog::ChildModel, double> intermediate(pars.base.options.hAG_15plus);
+    intermediate.reset();
+
+    leapfrog::StateSaver<leapfrog::ChildModel, double> state_output(proj_years, save_steps);
+    // Save initial state
+    state_output.save_state(state, 0);
+
+    // Each time step is mid-point of the year
+    for (int step = 1; step < proj_years; ++step) {
+
+      // sub in values from our previous adult run
+      for (int hd = 0; hd < ss.base.hDS; ++hd) {
+        for (int a = 0; a < ss.base.hAG; ++a) {
+          for (int s = 0; s < ss.base.NS; ++s) {
+            state_next.base.h_hiv_adult(hd, a, s) = h_hiv_adult(hd, a, s, step);
+            state.base.h_hiv_adult(hd, a, s) = h_hiv_adult(hd, a, s, step - 1);
+          }
+        }
+      }
+      for (int hu = 0; hu < ss.base.hTS; ++hu) {
+        for (int hd = 0; hd < ss.base.hDS; ++hd) {
+          for (int a = 0; a < ss.base.hAG; ++a) {
+            for (int s = 0; s < ss.base.NS; ++s) {
+              state_next.base.h_art_adult(hu, hd, a, s) = h_art_adult(hu, hd, a, s, step);
+              state.base.h_art_adult(hu, hd, a, s) = h_art_adult(hu, hd, a, s, step - 1);
+            }
+          }
+        }
+      }
+      for (int p = 0; p < ss.base.pAG; ++p) {
+        for (int s = 0; s < ss.base.NS; ++s) {
+          state_next.base.p_total_pop(p, s) = p_total_pop(p, s, step);
+          state.base.p_total_pop(p, s) = p_total_pop(p, s, step - 1);
+        }
+      }
+      state_next.base.births = births(step);
+      state.base.births = births(step - 1);
+
+      run_wlhiv_births(step, pars, state, state_next, intermediate);
+
+      state_output.save_state(state_next, step);
+      std::swap(state, state_next);
+      state_next.reset();
+      intermediate.reset();
+    }
+
+    auto full_state_output = state_output.get_full_state();
+    auto ret = build_r_output<leapfrog::ChildModel, double>(full_state_output, save_steps);
+    return ret;
+}
