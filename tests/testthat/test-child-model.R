@@ -32,6 +32,27 @@ test_that("Child model can be run for all years", {
   expect_true(all(out$hiv_births >= 0))
 })
 
+test_that("Can run run_wlhiv_births without running the full adult model", {
+  input <- setup_childmodel(testinput = "testdata/child_parms.rds")
+  demp <- input$demp
+  parameters <- input$parameters
+  # actually runs the full model through run_wlhiv_births branch
+  parameters$mat_prev_input <- !parameters$mat_prev_input
+
+  out <- run_model(demp, parameters, 1970:2030, NULL, run_child_model = TRUE)
+
+  data_from_adult_model <- list(
+    h_hiv_adult = out$h_hiv_adult,
+    h_art_adult = out$h_art_adult,
+    births = out$births,
+    p_total_pop = out$p_total_pop
+  )
+
+  out_only_child <- run_wlhiv_births(demp, parameters, 1970:2030, NULL, data_from_adult_model)
+
+  expect_equal(all(abs(out$hiv_births - out_only_child$hiv_births) < 10e-9), TRUE)
+})
+
 test_that("Infections among children align", {
   input <- setup_childmodel(testinput = "testdata/child_parms.rds")
   demp <- input$demp
