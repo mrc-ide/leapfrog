@@ -13,6 +13,6 @@ generate_output_interface(dest)
 Nothing, called to generate code in src dir
 }
 \description{
-This generates using metadata from \code{src/model_output.yml}
+This generates using metadata from \code{inst/cpp_generation/model_output.csv}
 }
 \keyword{internal}
