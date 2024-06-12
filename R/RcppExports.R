@@ -5,6 +5,10 @@ run_base_model <- function(data, sim_years, hts_per_year, output_steps, model_va
     .Call(`_frogger_run_base_model`, data, sim_years, hts_per_year, output_steps, model_variant)
 }
 
+run_wlhiv_births_r <- function(data, sim_years, hts_per_year, output_steps, data_from_adult_model) {
+    .Call(`_frogger_run_wlhiv_births_r`, data, sim_years, hts_per_year, output_steps, data_from_adult_model)
+}
+
 serialize_vector <- function(data, path1, path2) {
     .Call(`_frogger_serialize_vector`, data, path1, path2)
 }
