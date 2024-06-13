@@ -41,7 +41,7 @@ extra-dependencies = [
 check = "mypy --install-types --non-interactive {args:src/leapfrog_py tests}"
 
 [tool.coverage.run]
-source_pkgs = ["leapfrog_py", "tests"]
+source_pkgs = ["leapfrog_py"]
 branch = true
 parallel = true
 omit = [
