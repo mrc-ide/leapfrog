@@ -73,9 +73,124 @@ dependencies = [
 install = "pip install -e ."
 test = "pytest {args:tests}"
 install_and_test = "hatch run install && hatch run test"
+test-cov = "pytest --cov --cov-report= --cov-config=pyproject.toml {args:tests}"
+cov-report = "coverage report --show-missing"
+cov = [
+  "test-cov",
+  "cov-report",
+]
 
 [tool.pytest.ini_options]
 addopts = [
     "--import-mode=importlib",
 ]
 testpaths = ["tests"]
+
+[tool.hatch.envs.lint]
+extra-dependencies = [
+  "black>=23.1.0",
+  "mypy>=1.0.0",
+  "ruff>=0.0.243",
+]
+[tool.hatch.envs.lint.scripts]
+typing = "mypy --install-types --non-interactive {args:src tests}"
+style = [
+  "ruff check {args:.}",
+  "black --check --diff {args:.}",
+]
+fmt = [
+  "black {args:.}",
+  "ruff check --fix {args:.}",
+  "style",
+]
+all = [
+  "style",
+  "typing",
+]
+
+[tool.black]
+target-version = ["py37"]
+line-length = 80
+skip-string-normalization = true
+
+[tool.ruff]
+target-version = "py37"
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+  "A",
+  "ARG",
+  "B",
+  "C",
+  "D",
+  "DTZ",
+  "E",
+  "EM",
+  "F",
+  "FBT",
+  "I",
+  "ICN",
+  "ISC",
+  "N",
+  "PLC",
+  "PLE",
+  "PLR",
+  "PLW",
+  "Q",
+  "RUF",
+  "S",
+  "T",
+  "TID",
+  "UP",
+  "W",
+  "YTT",
+]
+ignore = [
+  # Allow non-abstract empty methods in abstract base classes
+  "B027",
+  # Allow boolean positional values in function calls, like `dict.get(... True)`
+  "FBT003",
+  # Ignore checks for possible passwords
+  "S105", "S106", "S107",
+  # Ignore complexity
+  "C901", "PLR0911", "PLR0912", "PLR0913", "PLR0915",
+  # Don't require docstrings everywhere for now
+  "D100", "D101", "D102", "D103", "D104", "D105",
+  # Ignore shadowing
+  "A001", "A002", "A003",
+  # Allow print until we find the alternative to R's cli
+  "T201",
+  # Allow use of non-cryptographic `random` module.
+  "S311"
+]
+unfixable = [
+  # Don't touch unused imports
+  "F401",
+]
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.lint.per-file-ignores]
+# Tests can use magic values, assertions, and relative imports
+"tests/**/*" = ["PLR2004", "S101", "TID252"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.mypy]
+allow_redefinition = true
+
+# https://github.com/libgit2/pygit2/issues/709
+[[tool.mypy.overrides]]
+module = "pygit2"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "outpack_query_parser"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "tblib"
+ignore_missing_imports = true

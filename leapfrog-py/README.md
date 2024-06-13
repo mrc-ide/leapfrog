@@ -34,6 +34,21 @@ cmake ..
 cmake --build . --target install
 ```
 
+## Development
+
+Use hatch
+
+```console
+hatch shell
+hatch run install
+hatch run test
+hatch run cov
+hatch run install_and_test
+hatch run lint:fmt
+hatch run lint:style
+hatch run lint:typing
+hatch run lint:all
+```
 
 ## Building, installing and running tests
 
