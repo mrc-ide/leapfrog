@@ -228,3 +228,9 @@ def test_can_run_full_model(parameters):
     assert np.all(out["h_art_initiation"] >= 0)
     assert np.all(out["h_hiv_deaths_art"] >= 0)
     assert np.all(out["p_hiv_deaths"] >= 0)
+
+
+def test_can_run_full_model_for_specified_years(parameters):
+    out = run_leapfrog(parameters, sim_years=np.arange(1970, 1976))
+
+    assert out["p_hiv_pop"].shape == (81, 2, 6)
