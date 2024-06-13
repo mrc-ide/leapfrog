@@ -297,18 +297,6 @@ generate_struct_def <- function(inputs) {
   )
 }
 
-generate_struct_instance <- function(inputs) {
-  paste0(
-    sprintf(
-      "  const leapfrog::%s<real_type> %s_params = {\n",
-      inputs[[1]]$struct,
-      to_lower_camel(inputs[[1]]$struct)
-    ),
-    paste_lines(sprintf("    %s", vcapply(inputs, "[[", "cpp_name"))),
-    "  \n};\n"
-  )
-}
-
 #' Generate C++ for state types
 #'
 #' @param dest The destination to write generated code to.
