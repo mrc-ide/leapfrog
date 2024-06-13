@@ -7,13 +7,58 @@
 
 ## Table of Contents
 
-- [Installation](#installation)
+- [Prerequisites](#prerequisites)
+- [Building and installing](#buildingandinstalling)
 - [License](#license)
 
-## Installation
+## Prerequisites
+
+This project uses [scikit-build-core](https://github.com/scikit-build/scikit-build-core) to build the C++ project. You'll need a recent version of CMake (>3.15) and Python (>3.7).
+
+I use [hatch](https://hatch.pypa.io/1.9/) to manage the project, but this should work without it if you prefer.
+
+If you're using an IDE you might need to set the Python interpreter to the one in the hatch virtual environment. See instructions for [VSCode here](https://hatch.pypa.io/latest/how-to/integrate/vscode/).
+
+We use `Eigen` for linear algebra library, install this on linux
 
 ```console
-pip install leapfrog-py
+sudo apt-get install libeigen3-dev
+```
+
+on windows download from https://eigen.tuxfamily.org/index.php?title=Main_Page, extract the archive and build and install it using cmake. From the extracted dir:
+
+```console
+mkdir build
+cd build
+cmake ..
+cmake --build . --target install
+```
+
+
+## Building, installing and running tests
+
+With `hatch`
+
+```console
+hatch run install
+hatch run test
+```
+
+or 
+```console
+hatch run install_and_test
+```
+
+With `pipx`
+
+```console
+pipx run build
+```
+
+Or simply (in a virtualenv, ideally)
+
+```console
+pip install .
 ```
 
 ## License
