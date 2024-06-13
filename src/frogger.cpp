@@ -1,11 +1,11 @@
 #include <Rcpp.h>
 
 #include "frogger.hpp"
-#include "types.hpp"
+#include "intermediate_data.hpp"
 #include "model_variants.hpp"
 #include "state_space.hpp"
-#include "model_input.hpp"
-#include "model_output.hpp"
+#include "generated/model_input.hpp"
+#include "generated/model_output.hpp"
 #include "r_utils.hpp"
 
 int transform_simulation_years(

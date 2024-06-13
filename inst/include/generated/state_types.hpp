@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include "types.hpp"
-#include "parameters.hpp"
-#include "state_space.hpp"
-#include "model_variants.hpp"
+#include "../intermediate_data.hpp"
+#include "../parameters.hpp"
+#include "../state_space.hpp"
+#include "../model_variants.hpp"
 
 namespace leapfrog {
 

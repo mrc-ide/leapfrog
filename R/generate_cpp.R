@@ -6,24 +6,12 @@
 #'
 #' @return Nothing, called to generate code in src dir
 #' @keywords internal
-generate_output_interface <- function(dest) {
+generate_output_interface <- function(
+    dest,
+    output_csv = frogger_file("cpp_generation/model_output.csv")) {
   template_path <- frogger_file("cpp_generation/model_output.hpp.in")
   template <- readLines(template_path)
-  output_file <- "model_output.csv"
-  outputs <- utils::read.csv(frogger_file("cpp_generation", output_file),
-    colClasses = "character"
-  )
-
-  validate_dimensions_columns(colnames(outputs), output_file)
-
-  parsed_outputs <- lapply(seq_len(nrow(outputs)), function(row_num) {
-    row <- outputs[row_num, ]
-    ## When reading csv in excel the header column is included in count
-    csv_row_num <- row_num + 1
-    validate_and_parse_output(as.list(row), output_file, csv_row_num)
-  })
-
-  output_sections <- group_list_of_lists(parsed_outputs, "output_when")
+  output_sections <- read_output_csv(output_csv)
 
   default_section <- output_sections[names(output_sections) == ""][[1]]
   ## TODO: don't hardcode the struct section here, remove this after
@@ -41,10 +29,7 @@ generate_output_interface <- function(dest) {
   )
   optional_data <- paste_lines(unlist(optional_data))
 
-  header <- generate_header(basename(template_path))
-
-  generated_code <- generate_cpp(template)
-  writeLines(generated_code, dest)
+  generate_cpp(template, dest, basename(template_path))
   invisible(dest)
 }
 
@@ -137,19 +122,7 @@ generate_input_interface <- function(
     dest, input_csv = frogger_file("cpp_generation/model_input.csv")) {
   template_path <- frogger_file("cpp_generation/model_input.hpp.in")
   template <- readLines(template_path)
-  input_file <- basename(input_csv)
-  inputs <- utils::read.csv(input_csv, colClasses = "character")
-
-  validate_dimensions_columns(colnames(inputs), input_file)
-
-  parsed_inputs <- lapply(seq_len(nrow(inputs)), function(row_num) {
-    row <- inputs[row_num, ]
-    ## When reading csv in excel the header column is included in count
-    csv_row_num <- row_num + 1
-    validate_and_parse_input(as.list(row), input_file, csv_row_num)
-  })
-
-  input_sections <- group_list_of_lists(parsed_inputs, "input_when")
+  input_sections <- read_input_csv(input_csv)
 
   default_section <- input_sections[names(input_sections) == ""][[1]]
   default_data <- generate_input_section(default_section)
@@ -165,10 +138,7 @@ generate_input_interface <- function(
   )
   optional_data <- paste_lines(unlist(optional_data))
 
-  header <- generate_header(basename(template_path))
-
-  generated_code <- generate_cpp(template)
-  writeLines(generated_code, dest)
+  generate_cpp(template, dest, basename(template_path))
   invisible(dest)
 }
 
@@ -195,7 +165,7 @@ generate_optional_input_section <- function(section, input_when) {
 }
 
 generate_struct_instantiation <- function(inputs) {
-  inputs_by_struct <- get_data_by_struct(inputs)
+  inputs_by_struct <- group_list_of_lists(inputs, "struct")
   struct_text <- lapply(inputs_by_struct, generate_struct)
   unlist(struct_text)
 }
@@ -294,53 +264,18 @@ generate_return <- function() {
 #'
 #' @return Nothing, called to generate code in src dir
 #' @keywords internal
-generate_parameter_types <- function(dest) {
+generate_parameter_types <- function(
+    dest,
+    input_csv = frogger_file("cpp_generation/model_input.csv")) {
   template_path <- frogger_file("cpp_generation/parameter_types.hpp.in")
   template <- readLines(template_path)
-  input_file <- "model_input.csv"
-  inputs <- utils::read.csv(frogger_file("cpp_generation", input_file),
-    colClasses = "character"
-  )
-
-  validate_dimensions_columns(colnames(inputs), input_file)
-
-  parsed_inputs <- lapply(seq_len(nrow(inputs)), function(row_num) {
-    row <- inputs[row_num, ]
-    ## When reading csv in excel the header column is included in count
-    csv_row_num <- row_num + 1
-    validate_and_parse_input(as.list(row), input_file, csv_row_num)
-  })
-
-  inputs_by_struct <- get_data_by_struct(parsed_inputs)
+  inputs_by_struct <- read_input_csv(input_csv, "struct")
 
   struct_defs <- vcapply(inputs_by_struct, generate_struct_def)
   struct_defs <- paste_lines(struct_defs)
 
-  header <- generate_header(basename(template_path))
-
-  generated_code <- generate_cpp(template)
-  writeLines(generated_code, dest)
+  generate_cpp(template, dest, basename(template_path))
   invisible(dest)
-}
-
-#' Organise the data into separate structs
-#'
-#' This takes a list of inputs or outputs and splits them by struct returning
-#' the result as a named list of lists where names are the struct name and
-#' list is the inputs/outputs which belong on that struct
-#'
-#' @param data Data related to model inputs or outputs
-#'
-#' @return
-#' @keywords internal
-get_data_by_struct <- function(data) {
-  struct <- vcapply(data, "[[", "struct")
-  structs <- unique(vcapply(data, "[[", "struct"))
-  data_by_struct <- lapply(structs, function(struct_name) {
-    data[struct == struct_name]
-  })
-  names(data_by_struct) <- structs
-  data_by_struct
 }
 
 generate_struct_def <- function(inputs) {
@@ -386,29 +321,36 @@ generate_state_types <- function(
     output_csv = frogger_file("cpp_generation/model_output.csv")) {
   template_path <- frogger_file("cpp_generation/state_types.hpp.in")
   template <- readLines(template_path)
-  output_file <- "model_output.csv"
-  outputs <- utils::read.csv(output_csv, colClasses = "character")
-
-  validate_dimensions_columns(colnames(outputs), output_file)
-
-  parsed_outputs <- lapply(seq_len(nrow(outputs)), function(row_num) {
-    row <- outputs[row_num, ]
-    ## When reading csv in excel the header column is included in count
-    csv_row_num <- row_num + 1
-    output <- validate_and_parse_output(as.list(row), output_file, csv_row_num)
-    output$parsed_dims <- parse_state_dims(output$parsed_dims)
-    output
-  })
-
-  outputs_by_struct <- get_data_by_struct(parsed_outputs)
+  outputs_by_struct <- read_output_csv(output_csv, "struct")
 
   state_defs <- vcapply(outputs_by_struct, generate_state_def)
   state_defs <- paste_lines(state_defs)
 
-  header <- generate_header(basename(template_path))
+  generate_cpp(template, dest, basename(template_path))
+  invisible(dest)
+}
 
-  generated_code <- generate_cpp(template)
-  writeLines(generated_code, dest)
+#' Generate C++ for state saver types
+#'
+#' @param dest The destination to write generated code to.
+#' @param output_csv Path to csv file with output specification in it
+#'
+#' @return Nothing, called to generate code in src dir
+#' @keywords internal
+generate_state_saver_types <- function(
+    dest,
+    output_csv = frogger_file("cpp_generation/model_output.csv")) {
+  template_path <- frogger_file("cpp_generation/state_saver_types.hpp.in")
+  template <- readLines(template_path)
+  outputs_by_struct <- read_output_csv(output_csv)
+
+  output_state_defs <- vcapply(outputs_by_struct, generate_output_state_defs)
+  output_state_def <- paste_lines(output_state_defs)
+
+  state_saver_defs <- vcapply(outputs_by_struct, generate_state_saver_defs)
+  state_saver_def <- paste_lines(state_saver_defs)
+
+  generate_cpp(template, dest, basename(template_path))
   invisible(dest)
 }
 
@@ -466,7 +408,7 @@ generate_state_struct_member <- function(output) {
   if (output$dims == "1") {
     type <- "real_type"
   } else {
-    sizes <- vcapply(output$parsed_dims, function(dim) {
+    sizes <- vcapply(output$dims_state, function(dim) {
       if (grepl("^\\d+$", dim)) {
         dim
       } else {
@@ -494,11 +436,132 @@ generate_state_reset_function <- function(outputs) {
   )
 }
 
-generate_cpp <- function(template) {
-  glue::glue(paste_lines(template),
-    .open = "{{", .close = "}}",
-    .envir = parent.frame()
+generate_output_state_defs <- function(outputs) {
+  struct_members <- vcapply(outputs, generate_output_state_struct_member)
+  initialiser_list <- vcapply(outputs, generate_output_state_initialiser_list)
+  ctor_body <- vcapply(outputs, function(output) {
+    sprintf("    %s.setZero();", output$cpp_name)
+  })
+  reset_text <- generate_state_reset_function(outputs)
+  struct_name <- outputs[[1]]$struct
+  model_variant <- outputs[[1]]$model_variant
+
+  if (model_variant == "ModelVariant") {
+    struct_def <- paste0(
+      sprintf("template<typename %s, typename real_type>\n", model_variant),
+      sprintf("struct %sOutputState {\n", struct_name)
+    )
+  } else {
+    struct_def <- paste0(
+      "template<typename real_type>\n",
+      sprintf("struct %sOutputState<%s, real_type> {\n", struct_name, model_variant)
+    )
+  }
+
+  paste0(
+    struct_def,
+    paste_lines(struct_members),
+    "\n\n",
+    sprintf("  %sOutputState(int output_years): \n", struct_name),
+    paste(initialiser_list, collapse = ",\n"),
+    " {\n",
+    paste_lines(ctor_body),
+    "\n  }\n",
+    "};\n"
   )
+}
+
+generate_output_state_struct_member <- function(output) {
+  type <- sprintf("Tensor%s<real_type>", output$dims)
+  sprintf("  %s %s;", type, output$cpp_name)
+}
+
+generate_output_state_initialiser_list <- function(output) {
+  dim_indentation <- "      "
+  dims <- vcapply(output$parsed_dims, function(dim) {
+    ## Dim output_years or a number
+    if (dim == "output_years" || grepl("^\\d+$", dim)) {
+      paste0(dim_indentation, dim)
+    } else {
+      sprintf("%sStateSpace<%s>().%s",
+              dim_indentation, output$model_variant, dim)
+    }
+  })
+  dims <- paste(dims, collapse = ",\n")
+  sprintf("    %s(\n%s\n    )", output$cpp_name, dims)
+}
+
+generate_state_saver_defs <- function(outputs) {
+  func_body <- vcapply(outputs, generate_state_saver_func_body)
+  reset_text <- generate_state_reset_function(outputs)
+  struct_name <- outputs[[1]]$struct
+  model_variant <- outputs[[1]]$model_variant
+
+  if (model_variant == "ModelVariant") {
+    struct_def <- paste0(
+      sprintf("template<typename %s, typename real_type>\n", model_variant),
+      sprintf("struct %sStateSaver {\n", struct_name)
+    )
+  } else {
+    struct_def <- paste0(
+      "template<typename real_type>\n",
+      sprintf("struct %sStateSaver<%s, real_type> {\n",
+              struct_name, model_variant)
+    )
+  }
+
+  function_def <- paste0(
+    "public:\n",
+    sprintf("  void save_state(%sOutputState<%s, real_type> &output_state,\n",
+            struct_name, model_variant),
+    "                  const size_t i,\n",
+    sprintf("                  const State<%s, real_type> &state) {\n",
+            model_variant)
+  )
+
+  paste0(
+    struct_def,
+    function_def,
+    paste_lines(paste0("    ", func_body)),
+    "\n    return;\n",
+    "  }\n",
+    "};\n"
+  )
+}
+
+generate_state_saver_func_body <- function(output) {
+  state_name <- model_variant_to_name(output$model_variant)
+  if (output$dims == 1) {
+    sprintf("output_state.%s(i) = state.%s.%s;",
+            output$cpp_name, state_name, output$cpp_name)
+  } else {
+    sprintf(
+      "output_state.%s.chip(i, output_state.%s.NumDimensions - 1) = state.%s.%s;",
+      output$cpp_name, output$cpp_name, state_name, output$cpp_name)
+  }
+}
+
+model_variant_to_name <- function(model_variant) {
+  if (model_variant == "ModelVariant") {
+    "base"
+  } else if (model_variant == "ChildModel") {
+    "children"
+  } else {
+    stop(sprintf("Unknown model variant %s, fix typo or add to mapping",
+                 model_variant))
+  }
+}
+
+generate_cpp <- function(template, dest, template_filename) {
+  envir <- parent.frame()
+  envir$header <- generate_header(template_filename)
+
+  generated_code <- glue::glue(paste_lines(template),
+    .open = "{{", .close = "}}",
+    .envir = envir
+  )
+
+  writeLines(generated_code, dest)
 }
 
 camel_to_snake <- function(x) {
@@ -514,4 +577,47 @@ camel_to_snake <- function(x) {
   }
 
   tolower(output_string)
+}
+
+
+#' Read input csv, parse it and return in sections
+#'
+#' @param input_csv_path Path to model input types csv
+#' @param group_by_col What csv column to group the returned parsed lists by
+#'
+#' @return A list of lists, grouped by the group by col
+#' @noRd
+read_input_csv <- function(input_csv_path, group_by_col = "input_when") {
+  read_types_csv(input_csv_path, validate_and_parse_input, group_by_col)
+}
+
+#' Read output csv, parse it and return in sections
+#'
+#' @param output_csv_path Path to model output types csv
+#' @param group_by_col What csv column to group the returned parsed lists by
+#'
+#' @return A list of lists, grouped by the group by col
+#' @noRd
+read_output_csv <- function(output_csv_path, group_by_col = "output_when") {
+  read_types_csv(output_csv_path,
+                 validate_and_parse_output,
+                 group_by_col)
+}
+
+read_types_csv <- function(path, validation_function, group_by_col) {
+  file_name <- basename(path)
+  types <- utils::read.csv(path, colClasses = "character")
+
+  validate_dimensions_columns(colnames(types), file_name)
+
+  parsed_types <- lapply(seq_len(nrow(types)), function(row_num) {
+    row <- types[row_num, ]
+    ## When reading csv in excel the header column is included in count
+    csv_row_num <- row_num + 1
+    parsed <- validation_function(as.list(row), file_name, csv_row_num)
+    parsed$dims_state <- parse_state_dims(parsed$parsed_dims)
+    parsed
+  })
+
+  group_list_of_lists(parsed_types, group_by_col)
 }

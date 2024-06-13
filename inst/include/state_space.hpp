@@ -1,6 +1,6 @@
 #pragma once
 
-#include "types.hpp"
+#include "intermediate_data.hpp"
 #include "model_variants.hpp"
 
 #include <array>
