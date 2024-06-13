@@ -2,6 +2,7 @@
 __pycache__
 .coverage*
 .idea
+.vscode
 .direnv
 /dist
 docs/_build
