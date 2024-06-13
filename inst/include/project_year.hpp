@@ -1,7 +1,7 @@
 #pragma once
 
-#include "types.hpp"
-#include "state_types.hpp"
+#include "generated/parameter_types.hpp"
+#include "generated/state_types.hpp"
 #include "general_demographic_projection.hpp"
 #include "hiv_demographic_projection.hpp"
 #include "model_simulation.hpp"
