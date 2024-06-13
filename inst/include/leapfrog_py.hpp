@@ -1,7 +1,7 @@
 #pragma once
 
-#include "types.hpp"
-#include "state_types.hpp"
+#include "generated/parameter_types.hpp"
+#include "generated/state_types.hpp"
 #include "project_year.hpp"
 #include "state_saver.hpp"
 #include "frogger.hpp"

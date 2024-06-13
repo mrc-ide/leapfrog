@@ -1,9 +1,9 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/eigen/tensor.h>
-#include "../../inst/include/types.hpp"
-#include "../../inst/include/state_types.hpp"
-#include "../../inst/include/leapfrog-py.hpp"
+#include "../../inst/include/generated/parameter_types.hpp"
+#include "../../inst/include/generated/state_types.hpp"
+#include "../../inst/include/leapfrog_py.hpp"
 #include "../../inst/include/frogger.hpp"
 
 namespace py = pybind11;
