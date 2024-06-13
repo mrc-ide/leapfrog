@@ -20,11 +20,11 @@ Imports:
     eppasm (>= 0.5.12),
     methods,
     Matrix,
-    Rcpp
+    Rcpp,
+    testthat (>= 2.1.0)
 Suggests:
     bench,
     covr,
-    testthat (>= 2.1.0)
 Remotes:
     mrc-ide/beers,
     mrc-ide/eppasm
