@@ -186,16 +186,3 @@ convention = "numpy"
 
 [tool.mypy]
 allow_redefinition = true
-
-# https://github.com/libgit2/pygit2/issues/709
-[[tool.mypy.overrides]]
-module = "pygit2"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "outpack_query_parser"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "tblib"
-ignore_missing_imports = true
