@@ -1,0 +1,64 @@
+name: Test
+
+on:
+  pull_request:
+    branches:
+      - main
+      - python-interface-poc
+  push:
+    branches:
+      - main
+      - python-interface-poc
+
+jobs:
+  run:
+
+    runs-on: ${{ matrix.config.os }}
+
+    name: ${{matrix.config.os }} (${{ matrix.config.py }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - {os: macos-latest,   py: '3.12'}
+          - {os: ubuntu-latest,  py: '3.8'}
+          - {os: ubuntu-latest,  py: '3.10'}
+          - {os: ubuntu-latest,  py: '3.11'}
+          - {os: ubuntu-latest,  py: '3.12'}
+          - {os: windows-latest, py: '3.12'}
+
+    defaults:
+      run:
+        working-directory: leapfrog-py
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.config.py }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.config.py }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install hatch
+      - name: Test
+        run: |
+          hatch run cov-ci
+      - name: Lint
+        run: |
+          # https://github.com/python/mypy/issues/10863
+          mkdir -p .mypy_cache
+          hatch run lint:all
+      - name: Test install
+        run: |
+          pip install .
+          python -c "import leapfrog-py;"
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          # This can be useful, but the false positive rate is
+          # annoyingly high.
+          fail_ci_if_error: false
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
