@@ -8,6 +8,7 @@ find_package(pybind11 CONFIG REQUIRED)
 find_package(Eigen3 3.4 REQUIRED NO_MODULE)
 
 pybind11_add_module(leapfrog src/leapfrog/interface.cpp)
+target_compile_features(leapfrog PRIVATE cxx_std_17)
 target_include_directories(leapfrog PRIVATE ../inst/include)
 target_link_libraries (leapfrog PRIVATE Eigen3::Eigen)
 
