@@ -79,6 +79,11 @@ cov = [
   "test-cov",
   "cov-report",
 ]
+cov-report-xml = "coverage xml"
+cov-ci = [
+  "test-cov",
+  "cov-report-xml",
+]
 
 [tool.pytest.ini_options]
 addopts = [
