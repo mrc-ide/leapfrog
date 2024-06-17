@@ -31,11 +31,11 @@ All model functions are templated on the model variant, and any conditional beha
 All model functions should have the same signature e.g.
 
 ```
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void my_model_function(int time_step,
                        const Parameters<ModelVariant, real_type> &pars,
-                       const State<ModelVariant, real_type> &state_curr,
-                       State<ModelVariant, real_type> &state_next,
+                       const State<ModelVariant, real_type, OwnedData> &state_curr,
+                       State<ModelVariant, real_type, OwnedData> &state_next,
                        IntermediateData<ModelVariant, real_type> &intermediate) {
 ```
 

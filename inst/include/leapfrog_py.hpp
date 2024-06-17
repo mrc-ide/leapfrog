@@ -22,11 +22,11 @@ namespace leapfrog {
  * @param state_next The next state of the model.
  * @return None, updates state_next in place
  */
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void project_single_year(int time_step,
                          const Parameters<ModelVariant, real_type> &pars,
-                         const State<ModelVariant, real_type> &state_curr,
-                         State<ModelVariant, real_type> &state_next) {
+                         const State<ModelVariant, real_type, OwnedData> &state_curr,
+                         State<ModelVariant, real_type, OwnedData> &state_next) {
 
   internal::IntermediateData<ModelVariant, real_type> intermediate(pars.base.options.hAG_15plus);
   intermediate.reset();

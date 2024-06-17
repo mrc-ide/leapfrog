@@ -266,10 +266,10 @@ int main(int argc, char *argv[]) {
   }
 
   for (size_t i = 0; i < n_runs; ++i) {
-    auto state_current = leapfrog::State<leapfrog::BaseModelFullAgeStratification, double>(
+    auto state_current = leapfrog::State<leapfrog::BaseModelFullAgeStratification, double, true>(
         params);
     auto state_next = state_current;
-    leapfrog::set_initial_state<leapfrog::BaseModelFullAgeStratification, double>(state_current, params);
+    leapfrog::set_initial_state<leapfrog::BaseModelFullAgeStratification, double, true>(state_current, params);
 
     // Save initial state
     state_output.save_state(state_current, 0);

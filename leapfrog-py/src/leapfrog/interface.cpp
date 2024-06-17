@@ -10,7 +10,6 @@ namespace py = pybind11;
 
 namespace {
 using Eigen::Sizes;
-using Eigen::TensorFixedSize;
 }
 
 PYBIND11_MODULE(leapfrog, m) {
@@ -180,20 +179,19 @@ PYBIND11_MODULE(leapfrog, m) {
         .def_readonly("base", &leapfrog::Parameters<leapfrog::BaseModelFullAgeStratification, double>::base)
         .def_readonly("children", &leapfrog::Parameters<leapfrog::BaseModelFullAgeStratification, double>::children);
 
-    py::class_<leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double>>(m, "BaseModelState")
-        .def(py::init<const leapfrog::Parameters<leapfrog::BaseModelFullAgeStratification, double>&>())
-        .def(py::init<const TensorFixedSize<double, Sizes<leapfrog::pAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>>&,
-                      double,
-                      TensorFixedSize<double, Sizes<leapfrog::pAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>>&,
-                      TensorFixedSize<double, Sizes<leapfrog::pAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>>&,
-                      TensorFixedSize<double, Sizes<leapfrog::pAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>>&,
-                      TensorFixedSize<double, Sizes<leapfrog::hDS<leapfrog::BaseModelFullAgeStratification>, leapfrog::hAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>>&,
-                      TensorFixedSize<double, Sizes<leapfrog::hTS<leapfrog::BaseModelFullAgeStratification>, leapfrog::hDS<leapfrog::BaseModelFullAgeStratification>, leapfrog::hAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>>&,
-                      TensorFixedSize<double, Sizes<leapfrog::hDS<leapfrog::BaseModelFullAgeStratification>, leapfrog::hAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>>&,
-                      TensorFixedSize<double, Sizes<leapfrog::pAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>>&,
-                      TensorFixedSize<double, Sizes<leapfrog::hTS<leapfrog::BaseModelFullAgeStratification>, leapfrog::hDS<leapfrog::BaseModelFullAgeStratification>, leapfrog::hAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>>&,
-                      TensorFixedSize<double, Sizes<leapfrog::hDS<leapfrog::BaseModelFullAgeStratification>, leapfrog::hAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>>&,
-                      TensorFixedSize<double, Sizes<leapfrog::pAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>>&>(),
+    py::class_<leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double, false>>(m, "BaseModelState")
+        .def(py::init<const leapfrog::TensorType<double, Sizes<leapfrog::pAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>, false>&,
+                      const leapfrog::TensorType<double, Sizes<1>, false>&,
+                      const leapfrog::TensorType<double, Sizes<leapfrog::pAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>, false>&,
+                      const leapfrog::TensorType<double, Sizes<leapfrog::pAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>, false>&,
+                      const leapfrog::TensorType<double, Sizes<leapfrog::pAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>, false>&,
+                      const leapfrog::TensorType<double, Sizes<leapfrog::hDS<leapfrog::BaseModelFullAgeStratification>, leapfrog::hAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>, false>&,
+                      const leapfrog::TensorType<double, Sizes<leapfrog::hTS<leapfrog::BaseModelFullAgeStratification>, leapfrog::hDS<leapfrog::BaseModelFullAgeStratification>, leapfrog::hAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>, false>&,
+                      const leapfrog::TensorType<double, Sizes<leapfrog::hDS<leapfrog::BaseModelFullAgeStratification>, leapfrog::hAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>, false>&,
+                      const leapfrog::TensorType<double, Sizes<leapfrog::pAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>, false>&,
+                      const leapfrog::TensorType<double, Sizes<leapfrog::hTS<leapfrog::BaseModelFullAgeStratification>, leapfrog::hDS<leapfrog::BaseModelFullAgeStratification>, leapfrog::hAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>, false>&,
+                      const leapfrog::TensorType<double, Sizes<leapfrog::hDS<leapfrog::BaseModelFullAgeStratification>, leapfrog::hAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>, false>&,
+                      const leapfrog::TensorType<double, Sizes<leapfrog::pAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>, false>&>(),
                       py::arg("p_total_pop"),
                       py::arg("births"),
                       py::arg("p_total_pop_natural_deaths"),
@@ -206,35 +204,34 @@ PYBIND11_MODULE(leapfrog, m) {
                       py::arg("h_hiv_deaths_art"),
                       py::arg("h_art_initiation"),
                       py::arg("p_hiv_deaths"))
-        .def("reset", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double>::reset)
-        .def_readonly("p_total_pop", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double>::p_total_pop)
-        .def_readonly("births", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double>::births)
-        .def_readonly("p_total_pop_natural_deaths", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double>::p_total_pop_natural_deaths)
-        .def_readonly("p_hiv_pop", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double>::p_hiv_pop)
-        .def_readonly("p_hiv_pop_natural_deaths", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double>::p_hiv_pop_natural_deaths)
-        .def_readonly("h_hiv_adult", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double>::h_hiv_adult)
-        .def_readonly("h_art_adult", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double>::h_art_adult)
-        .def_readonly("h_hiv_deaths_no_art", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double>::h_hiv_deaths_no_art)
-        .def_readonly("p_infections", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double>::p_infections)
-        .def_readonly("h_hiv_deaths_art", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double>::h_hiv_deaths_art)
-        .def_readonly("h_art_initiation", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double>::h_art_initiation)
-        .def_readonly("p_hiv_deaths", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double>::p_hiv_deaths);
+        .def("reset", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double, false>::reset)
+        .def_readonly("p_total_pop", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double, false>::p_total_pop)
+        .def_readonly("births", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double, false>::births)
+        .def_readonly("p_total_pop_natural_deaths", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double, false>::p_total_pop_natural_deaths)
+        .def_readonly("p_hiv_pop", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double, false>::p_hiv_pop)
+        .def_readonly("p_hiv_pop_natural_deaths", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double, false>::p_hiv_pop_natural_deaths)
+        .def_readonly("h_hiv_adult", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double, false>::h_hiv_adult)
+        .def_readonly("h_art_adult", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double, false>::h_art_adult)
+        .def_readonly("h_hiv_deaths_no_art", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double, false>::h_hiv_deaths_no_art)
+        .def_readonly("p_infections", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double, false>::p_infections)
+        .def_readonly("h_hiv_deaths_art", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double, false>::h_hiv_deaths_art)
+        .def_readonly("h_art_initiation", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double, false>::h_art_initiation)
+        .def_readonly("p_hiv_deaths", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double, false>::p_hiv_deaths);
 
-    py::class_<leapfrog::ChildModelState<leapfrog::BaseModelFullAgeStratification, double>>(m, "ChildModelState")
+    py::class_<leapfrog::ChildModelState<leapfrog::BaseModelFullAgeStratification, double, false>>(m, "ChildModelState")
         .def(py::init<const leapfrog::Parameters<leapfrog::BaseModelFullAgeStratification, double>&>())
-        .def("reset", &leapfrog::ChildModelState<leapfrog::BaseModelFullAgeStratification, double>::reset);
+        .def("reset", &leapfrog::ChildModelState<leapfrog::BaseModelFullAgeStratification, double, false>::reset);
 
-    py::class_<leapfrog::State<leapfrog::BaseModelFullAgeStratification, double>>(m, "State")
-        .def(py::init<const leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double>&,
-                      const leapfrog::ChildModelState<leapfrog::BaseModelFullAgeStratification, double>&>())
-        .def(py::init<const leapfrog::Parameters<leapfrog::BaseModelFullAgeStratification, double>&>())
-        .def("reset", &leapfrog::State<leapfrog::BaseModelFullAgeStratification, double>::reset)
-        .def_readonly("base", &leapfrog::State<leapfrog::BaseModelFullAgeStratification, double>::base)
-        .def_readonly("children", &leapfrog::State<leapfrog::BaseModelFullAgeStratification, double>::children);
+    py::class_<leapfrog::State<leapfrog::BaseModelFullAgeStratification, double, false>>(m, "State")
+        .def(py::init<const leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double, false>&,
+                      const leapfrog::ChildModelState<leapfrog::BaseModelFullAgeStratification, double, false>&>())
+        .def("reset", &leapfrog::State<leapfrog::BaseModelFullAgeStratification, double, false>::reset)
+        .def_readonly("base", &leapfrog::State<leapfrog::BaseModelFullAgeStratification, double, false>::base)
+        .def_readonly("children", &leapfrog::State<leapfrog::BaseModelFullAgeStratification, double, false>::children);
 
     m.def(
         "project_single_year_cpp",
-        &leapfrog::project_single_year<leapfrog::BaseModelFullAgeStratification, double>,
+        &leapfrog::project_single_year<leapfrog::BaseModelFullAgeStratification, double, false>,
         py::arg("time_step"),
         py::arg("pars"),
         py::arg("state_curr"),
@@ -244,18 +241,18 @@ PYBIND11_MODULE(leapfrog, m) {
 
     m.def(
         "set_initial_state_cpp",
-        &leapfrog::set_initial_state<leapfrog::BaseModelFullAgeStratification, double>,
+        &leapfrog::set_initial_state<leapfrog::BaseModelFullAgeStratification, double, false>,
         py::arg("state"),
         py::arg("pars"),
         "Set initial state from the parameters"
     );
 
-    m.def(
-        "run_model_cpp",
-        &leapfrog::simulate_model<leapfrog::BaseModelFullAgeStratification, double>,
-        py::arg("params"),
-        py::arg("proj_years"),
-        py::arg("save_steps"),
-        "Run a simulation model over a specified number of time steps"
-    );
+     m.def(
+         "run_model_cpp",
+         &leapfrog::simulate_model<leapfrog::BaseModelFullAgeStratification, double>,
+         py::arg("params"),
+         py::arg("proj_years"),
+         py::arg("save_steps"),
+         "Run a simulation model over a specified number of time steps"
+     );
 }

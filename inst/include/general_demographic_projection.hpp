@@ -7,11 +7,11 @@ namespace leapfrog {
 
 namespace internal {
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void run_ageing_and_mortality(int time_step,
                               const Parameters<ModelVariant, real_type> &pars,
-                              const State<ModelVariant, real_type> &state_curr,
-                              State<ModelVariant, real_type> &state_next,
+                              const State<ModelVariant, real_type, OwnedData> &state_curr,
+                              State<ModelVariant, real_type, OwnedData> &state_next,
                               IntermediateData<ModelVariant, real_type> &intermediate) {
   constexpr auto ss = StateSpace<ModelVariant>().base;
   const auto demog = pars.base.demography;
@@ -37,11 +37,11 @@ void run_ageing_and_mortality(int time_step,
   }
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void run_migration(int time_step,
                    const Parameters<ModelVariant, real_type> &pars,
-                   const State<ModelVariant, real_type> &state_curr,
-                   State<ModelVariant, real_type> &state_next,
+                   const State<ModelVariant, real_type, OwnedData> &state_curr,
+                   State<ModelVariant, real_type, OwnedData> &state_next,
                    IntermediateData<ModelVariant, real_type> &intermediate) {
   constexpr auto ss = StateSpace<ModelVariant>().base;
   const auto demog = pars.base.demography;
@@ -76,17 +76,18 @@ void run_migration(int time_step,
   }
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void run_fertility_and_infant_migration(int time_step,
                                         const Parameters<ModelVariant, real_type> &pars,
-                                        const State<ModelVariant, real_type> &state_curr,
-                                        State<ModelVariant, real_type> &state_next,
+                                        const State<ModelVariant, real_type, OwnedData> &state_curr,
+                                        State<ModelVariant, real_type, OwnedData> &state_next,
                                         IntermediateData<ModelVariant, real_type> &intermediate) {
   constexpr auto ss = StateSpace<ModelVariant>().base;
   const auto demog = pars.base.demography;
-  state_next.base.births = 0.0;
+  // Births always length 1
+  state_next.base.births(0) = 0.0;
   for (int af = 0; af < pars.base.options.p_fertility_age_groups; ++af) {
-    state_next.base.births += (state_curr.base.p_total_pop(
+    state_next.base.births(0) += (state_curr.base.p_total_pop(
         pars.base.options.p_idx_fertility_first + af, FEMALE) +
                                state_next.base.p_total_pop(
                                    pars.base.options.p_idx_fertility_first + af, FEMALE)) *
@@ -95,8 +96,9 @@ void run_fertility_and_infant_migration(int time_step,
 
   // add births & infant migration
   for (int g = 0; g < ss.NS; ++g) {
+    // Births always length 1
     real_type births_sex =
-        state_next.base.births * demog.births_sex_prop(g, time_step);
+        state_next.base.births(0) * demog.births_sex_prop(g, time_step);
     state_next.base.p_total_pop_natural_deaths(0, g) =
         births_sex * (1.0 - demog.survival_probability(0, g, time_step));
     state_next.base.p_total_pop(0, g) =
@@ -114,11 +116,11 @@ void run_fertility_and_infant_migration(int time_step,
 }
 
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void run_general_pop_demographic_projection(int time_step,
                                             const Parameters<ModelVariant, real_type> &pars,
-                                            const State<ModelVariant, real_type> &state_curr,
-                                            State<ModelVariant, real_type> &state_next,
+                                            const State<ModelVariant, real_type, OwnedData> &state_curr,
+                                            State<ModelVariant, real_type, OwnedData> &state_next,
                                             internal::IntermediateData<ModelVariant, real_type> &intermediate) {
   internal::run_ageing_and_mortality<ModelVariant>(time_step, pars, state_curr, state_next, intermediate);
   internal::run_migration<ModelVariant>(time_step, pars, state_curr, state_next, intermediate);
