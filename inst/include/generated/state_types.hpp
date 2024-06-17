@@ -25,6 +25,7 @@ using TensorType = std::conditional_t<OwnedData,
 template<typename ModelVariant, typename real_type, bool OwnedData>
 struct ChildModelState {
   ChildModelState(const Parameters<ModelVariant, real_type> &pars) {}
+  ChildModelState() {}
 
   void reset() {}
 };

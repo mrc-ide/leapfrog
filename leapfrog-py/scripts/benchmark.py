@@ -38,24 +38,27 @@ def input_file_path(file_name):
 
 def parameters():
     return {
-        "adult_on_art": read_standalone_data(input_file_path("adults_on_art")),
-        "adults_on_art_is_percent": read_standalone_data(input_file_path("adults_on_art_is_percent")),
-        "age_specific_fertility_rate": read_standalone_data(input_file_path("age_specific_fertility_rate")),
+        "art15plus_num": read_standalone_data(input_file_path("adults_on_art")),
+        "art15plus_isperc": read_standalone_data(input_file_path("adults_on_art_is_percent")),
+        "asfr": read_standalone_data(input_file_path("age_specific_fertility_rate")),
         "art_dropout": read_standalone_data(input_file_path("art_dropout")),
-        "art_mortality_rate_full": read_standalone_data(input_file_path("art_mortality_rate_full")),
-        "art_mortality_time_rate_ratio": read_standalone_data(input_file_path("art_mortality_time_rate_ratio")),
+        "art_mort": read_standalone_data(input_file_path("art_mortality_rate_full")),
+        "artmx_timerr": read_standalone_data(input_file_path("art_mortality_time_rate_ratio")),
         "basepop": read_standalone_data(input_file_path("basepop")),
         "births_sex_prop": read_standalone_data(input_file_path("births_sex_prop")),
-        "cd4_initial_distribution_full": read_standalone_data(input_file_path("cd4_initial_distribution_full")),
-        "cd4_mortality_full": read_standalone_data(input_file_path("cd4_mortality_full")),
-        "cd4_progression_full": read_standalone_data(input_file_path("cd4_progression_full")),
-        "idx_hm_elig": read_standalone_data(input_file_path("idx_hm_elig")),
-        "relative_risk_age": read_standalone_data(input_file_path("incidence_age_rate_ratio")),
-        "incidence_rate": read_standalone_data(input_file_path("incidence_rate")),
-        "relative_risk_sex": read_standalone_data(input_file_path("incidence_sex_rate_ratio")),
-        "net_migration": read_standalone_data(input_file_path("net_migration")),
-        "survival_probability": read_standalone_data(input_file_path("survival_probability")),
-        "h_art_stage_dur": np.array([0.5, 0.5], order="F")
+        "cd4_initdist": read_standalone_data(input_file_path("cd4_initial_distribution_full")),
+        "cd4_mort": read_standalone_data(input_file_path("cd4_mortality_full")),
+        "cd4_prog": read_standalone_data(input_file_path("cd4_progression_full")),
+        "artcd4elig_idx": read_standalone_data(input_file_path("idx_hm_elig")),
+        "incrr_age": read_standalone_data(input_file_path("incidence_age_rate_ratio")),
+        "incidinput": read_standalone_data(input_file_path("incidence_rate")),
+        "incrr_sex": read_standalone_data(input_file_path("incidence_sex_rate_ratio")),
+        "netmigr_adj": read_standalone_data(input_file_path("net_migration")),
+        "Sx": read_standalone_data(input_file_path("survival_probability")),
+        "h_art_stage_dur": np.array([0.5, 0.5], order="F"),
+        "t_ART_start": np.array(20, order="F"),
+        "scale_cd4_mort": np.array(1, order="F"),
+        "art_alloc_mxweight": np.array(0.2, order="F"),
     }
 
 

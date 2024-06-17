@@ -9,6 +9,7 @@
 
 #include "../intermediate_data.hpp"
 #include "../r_utils.hpp"
+#include "../utils.hpp"
 
 /**
  * @brief Translate R data structures into C++ eigen tensors for use in model simulation
