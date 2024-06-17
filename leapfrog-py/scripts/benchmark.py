@@ -1,18 +1,21 @@
 #!/usr/bin/env python
 
 import os
-import numpy as np
-import timeit
 import statistics
+import timeit
+
+import numpy as np
 from leapfrog_py.leapfrog_py import (
     project_single_year,
-    run_leapfrog,
+    run_leapfrog,  # noqa F401
     set_initial_state,
 )
 
 
-def pretty_timeit(stmt, globals, setup='pass', repeat=5, number=1000):
-    times = timeit.repeat(stmt=stmt, setup=setup, globals=globals, repeat=repeat, number=number)
+def pretty_timeit(stmt, globals, setup="pass", repeat=5, number=1000):
+    times = timeit.repeat(
+        stmt=stmt, setup=setup, globals=globals, repeat=repeat, number=number
+    )
 
     times_ms = [time * 1000 for time in times]
 
@@ -39,23 +42,47 @@ def input_file_path(file_name):
 def parameters():
     return {
         "adult_on_art": read_standalone_data(input_file_path("adults_on_art")),
-        "adults_on_art_is_percent": read_standalone_data(input_file_path("adults_on_art_is_percent")),
-        "age_specific_fertility_rate": read_standalone_data(input_file_path("age_specific_fertility_rate")),
+        "adults_on_art_is_percent": read_standalone_data(
+            input_file_path("adults_on_art_is_percent")
+        ),
+        "age_specific_fertility_rate": read_standalone_data(
+            input_file_path("age_specific_fertility_rate")
+        ),
         "art_dropout": read_standalone_data(input_file_path("art_dropout")),
-        "art_mortality_rate_full": read_standalone_data(input_file_path("art_mortality_rate_full")),
-        "art_mortality_time_rate_ratio": read_standalone_data(input_file_path("art_mortality_time_rate_ratio")),
+        "art_mortality_rate_full": read_standalone_data(
+            input_file_path("art_mortality_rate_full")
+        ),
+        "art_mortality_time_rate_ratio": read_standalone_data(
+            input_file_path("art_mortality_time_rate_ratio")
+        ),
         "basepop": read_standalone_data(input_file_path("basepop")),
-        "births_sex_prop": read_standalone_data(input_file_path("births_sex_prop")),
-        "cd4_initial_distribution_full": read_standalone_data(input_file_path("cd4_initial_distribution_full")),
-        "cd4_mortality_full": read_standalone_data(input_file_path("cd4_mortality_full")),
-        "cd4_progression_full": read_standalone_data(input_file_path("cd4_progression_full")),
+        "births_sex_prop": read_standalone_data(
+            input_file_path("births_sex_prop")
+        ),
+        "cd4_initial_distribution_full": read_standalone_data(
+            input_file_path("cd4_initial_distribution_full")
+        ),
+        "cd4_mortality_full": read_standalone_data(
+            input_file_path("cd4_mortality_full")
+        ),
+        "cd4_progression_full": read_standalone_data(
+            input_file_path("cd4_progression_full")
+        ),
         "idx_hm_elig": read_standalone_data(input_file_path("idx_hm_elig")),
-        "relative_risk_age": read_standalone_data(input_file_path("incidence_age_rate_ratio")),
-        "incidence_rate": read_standalone_data(input_file_path("incidence_rate")),
-        "relative_risk_sex": read_standalone_data(input_file_path("incidence_sex_rate_ratio")),
+        "relative_risk_age": read_standalone_data(
+            input_file_path("incidence_age_rate_ratio")
+        ),
+        "incidence_rate": read_standalone_data(
+            input_file_path("incidence_rate")
+        ),
+        "relative_risk_sex": read_standalone_data(
+            input_file_path("incidence_sex_rate_ratio")
+        ),
         "net_migration": read_standalone_data(input_file_path("net_migration")),
-        "survival_probability": read_standalone_data(input_file_path("survival_probability")),
-        "h_art_stage_dur": np.array([0.5, 0.5], order="F")
+        "survival_probability": read_standalone_data(
+            input_file_path("survival_probability")
+        ),
+        "h_art_stage_dur": np.array([0.5, 0.5], order="F"),
     }
 
 
@@ -121,6 +148,16 @@ def fit_by_single(parameters, state):
 
 params = parameters()
 print("Full model benchmark")
-print(pretty_timeit("run_leapfrog(params)", globals=locals(), number=1, repeat=50))
+print(
+    pretty_timeit("run_leapfrog(params)", globals=locals(), number=1, repeat=50)
+)
 print("Year by year benchmark")
-print(pretty_timeit("fit_by_single(params, s)", globals=locals(), setup="s = state()", number=1, repeat=50))
+print(
+    pretty_timeit(
+        "fit_by_single(params, s)",
+        globals=locals(),
+        setup="s = state()",
+        number=1,
+        repeat=50,
+    )
+)
