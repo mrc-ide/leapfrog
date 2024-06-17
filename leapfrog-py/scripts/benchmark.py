@@ -10,11 +10,6 @@ from leapfrog_py.leapfrog_py import (
     set_initial_state,
 )
 
-import leapfrog_py.leapfrog_py
-print(leapfrog_py.__file__)
-import leapfrog
-print(leapfrog.__file__)
-
 
 def pretty_timeit(stmt, globals, setup='pass', repeat=5, number=1000):
     times = timeit.repeat(stmt=stmt, setup=setup, globals=globals, repeat=repeat, number=number)
@@ -126,6 +121,6 @@ def fit_by_single(parameters, state):
 
 params = parameters()
 print("Full model benchmark")
-print(pretty_timeit("run_leapfrog(params)", globals=locals(), number=1, repeat=25))
+print(pretty_timeit("run_leapfrog(params)", globals=locals(), number=1, repeat=50))
 print("Year by year benchmark")
-print(pretty_timeit("fit_by_single(params, s)", globals=locals(), setup="s = state()", number=1, repeat=25))
+print(pretty_timeit("fit_by_single(params, s)", globals=locals(), setup="s = state()", number=1, repeat=50))
