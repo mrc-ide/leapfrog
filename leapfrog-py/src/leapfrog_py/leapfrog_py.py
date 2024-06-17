@@ -144,28 +144,3 @@ def _initialise_state(
     )
     # TODO: Initialise child model state from the data, and remove params from the function signature
     return State(base_model_state, ChildModelState(params))
-
-
-def _write_state(
-    time_step: int, state: State, full_state: dict[str, np.ndarray]
-):
-    # TODO: Code generate this, possibly on the C++ side. But hopefully it will be obsolete if we can
-    # pass in a numpy view of the state by reference, to make this copying unnecessary.
-    full_state["p_total_pop"][..., time_step] = state.base.p_total_pop
-    full_state["births"][..., time_step] = state.base.births
-    full_state["p_total_pop_natural_deaths"][
-        ..., time_step
-    ] = state.base.p_total_pop_natural_deaths
-    full_state["p_hiv_pop"][..., time_step] = state.base.p_hiv_pop
-    full_state["p_hiv_pop_natural_deaths"][
-        ..., time_step
-    ] = state.base.p_hiv_pop_natural_deaths
-    full_state["h_hiv_adult"][..., time_step] = state.base.h_hiv_adult
-    full_state["h_art_adult"][..., time_step] = state.base.h_art_adult
-    full_state["h_hiv_deaths_no_art"][
-        ..., time_step
-    ] = state.base.h_hiv_deaths_no_art
-    full_state["p_infections"][..., time_step] = state.base.p_infections
-    full_state["h_hiv_deaths_art"][..., time_step] = state.base.h_hiv_deaths_art
-    full_state["h_art_initiation"][..., time_step] = state.base.h_art_initiation
-    full_state["p_hiv_deaths"][..., time_step] = state.base.p_hiv_deaths
