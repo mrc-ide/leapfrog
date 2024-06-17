@@ -26,7 +26,6 @@ def set_initial_state(
     params = _initialise_params(parameters, 10)
     initial_state = _initialise_state(0, state, params)
     set_initial_state_cpp(initial_state, params)
-    _write_state(0, initial_state, state)
 
 
 def project_single_year(
@@ -46,8 +45,6 @@ def project_single_year(
     state_now = _initialise_state(i, state, params)
 
     project_single_year_cpp(i, params, state_prev, state_now)
-
-    _write_state(i, state_now, state)
 
 
 def run_leapfrog(
@@ -130,20 +127,20 @@ def _initialise_params(
 def _initialise_state(
     time_step: int, state: dict[str, np.ndarray], params
 ) -> State:
-    state = {k: v[..., time_step] for k, v in state.items()}
+    year_state = {k: np.atleast_1d(v[..., time_step]) for k, v in state.items()}
     base_model_state = BaseModelState(
-        p_total_pop=state["p_total_pop"],
-        births=state["births"].item(),
-        p_total_pop_natural_deaths=state["p_total_pop_natural_deaths"],
-        p_hiv_pop=state["p_hiv_pop"],
-        p_hiv_pop_natural_deaths=state["p_hiv_pop_natural_deaths"],
-        h_hiv_adult=state["h_hiv_adult"],
-        h_art_adult=state["h_art_adult"],
-        h_hiv_deaths_no_art=state["h_hiv_deaths_no_art"],
-        p_infections=state["p_infections"],
-        h_hiv_deaths_art=state["h_hiv_deaths_art"],
-        h_art_initiation=state["h_art_initiation"],
-        p_hiv_deaths=state["p_hiv_deaths"],
+        p_total_pop=year_state["p_total_pop"],
+        births=year_state["births"],
+        p_total_pop_natural_deaths=year_state["p_total_pop_natural_deaths"],
+        p_hiv_pop=year_state["p_hiv_pop"],
+        p_hiv_pop_natural_deaths=year_state["p_hiv_pop_natural_deaths"],
+        h_hiv_adult=year_state["h_hiv_adult"],
+        h_art_adult=year_state["h_art_adult"],
+        h_hiv_deaths_no_art=year_state["h_hiv_deaths_no_art"],
+        p_infections=year_state["p_infections"],
+        h_hiv_deaths_art=year_state["h_hiv_deaths_art"],
+        h_art_initiation=year_state["h_art_initiation"],
+        p_hiv_deaths=year_state["p_hiv_deaths"],
     )
     # TODO: Initialise child model state from the data, and remove params from the function signature
     return State(base_model_state, ChildModelState(params))

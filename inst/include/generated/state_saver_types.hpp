@@ -237,7 +237,7 @@ struct ChildModelStateSaver {
 public:
   void save_state(ChildModelOutputState<ModelVariant, real_type> &full_state,
                   const size_t i,
-                  const State<ModelVariant, real_type> &state) {}
+                  const State<ModelVariant, real_type, true> &state) {}
 };
 
 template<typename ModelVariant, typename real_type>
@@ -245,9 +245,9 @@ struct DemographicProjectionStateSaver {
 public:
   void save_state(DemographicProjectionOutputState<ModelVariant, real_type> &output_state,
                   const size_t i,
-                  const State<ModelVariant, real_type> &state) {
+                  const State<ModelVariant, real_type, true> &state) {
     output_state.p_total_pop.chip(i, output_state.p_total_pop.NumDimensions - 1) = state.dp.p_total_pop;
-    output_state.births(i) = state.dp.births;
+    output_state.births(i) = state.base.births(0);
     output_state.p_total_pop_natural_deaths.chip(i, output_state.p_total_pop_natural_deaths.NumDimensions - 1) = state.dp.p_total_pop_natural_deaths;
     return;
   }
@@ -258,7 +258,7 @@ struct HivSimulationStateSaver {
 public:
   void save_state(HivSimulationOutputState<ModelVariant, real_type> &full_state,
                   const size_t i,
-                  const State<ModelVariant, real_type> &state) {}
+                  const State<ModelVariant, real_type, true> &state) {}
 };
 
 template<typename ModelVariant, typename real_type>
@@ -266,7 +266,7 @@ struct HivSimulationStateSaver<ModelVariant, real_type, std::enable_if_t<ModelVa
 public:
   void save_state(HivSimulationOutputState<ModelVariant, real_type> &output_state,
                   const size_t i,
-                  const State<ModelVariant, real_type> &state) {
+                  const State<ModelVariant, real_type, true> &state) {
     output_state.p_hiv_pop.chip(i, output_state.p_hiv_pop.NumDimensions - 1) = state.hiv.p_hiv_pop;
     output_state.p_hiv_pop_natural_deaths.chip(i, output_state.p_hiv_pop_natural_deaths.NumDimensions - 1) = state.hiv.p_hiv_pop_natural_deaths;
     output_state.h_hiv_adult.chip(i, output_state.h_hiv_adult.NumDimensions - 1) = state.hiv.h_hiv_adult;
@@ -285,7 +285,7 @@ struct ChildModelStateSaver<ChildModel, real_type> {
 public:
   void save_state(ChildModelOutputState<ChildModel, real_type> &output_state,
                   const size_t i,
-                  const State<ChildModel, real_type> &state) {
+                  const State<ChildModel, real_type, true> &state) {
     output_state.hc1_hiv_pop.chip(i, output_state.hc1_hiv_pop.NumDimensions - 1) = state.children.hc1_hiv_pop;
     output_state.hc2_hiv_pop.chip(i, output_state.hc2_hiv_pop.NumDimensions - 1) = state.children.hc2_hiv_pop;
     output_state.hc1_art_pop.chip(i, output_state.hc1_art_pop.NumDimensions - 1) = state.children.hc1_art_pop;

@@ -6,11 +6,11 @@ namespace leapfrog {
 
 namespace internal {
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void run_child_ageing(int t,
                       const Parameters<ModelVariant, real_type> &pars,
-                      const State<ModelVariant, real_type> &state_curr,
-                      State<ModelVariant, real_type> &state_next,
+                      const State<ModelVariant, real_type, OwnedData> &state_curr,
+                      State<ModelVariant, real_type, OwnedData> &state_next,
                       IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "run_hiv_child_infections can only be called for model variants where run_child_model is true");
@@ -71,11 +71,11 @@ void run_child_ageing(int t,
 
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void run_wlhiv_births(int t,
                       const Parameters<ModelVariant, real_type> &pars,
-                      const State<ModelVariant, real_type> &state_curr,
-                      State<ModelVariant, real_type> &state_next,
+                      const State<ModelVariant, real_type, OwnedData> &state_curr,
+                      State<ModelVariant, real_type, OwnedData> &state_next,
                       IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "run_wlhiv_births can only be called for model variants where run_child_model is true");
@@ -154,11 +154,11 @@ void run_wlhiv_births(int t,
   n_hc.hiv_births = i_hc.birthsHE;
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void run_wlhiv_births_input_mat_prev(int t,
                                      const Parameters<ModelVariant, real_type> &pars,
-                                     const State<ModelVariant, real_type> &state_curr,
-                                     State<ModelVariant, real_type> &state_next,
+                                     const State<ModelVariant, real_type, OwnedData> &state_curr,
+                                     State<ModelVariant, real_type, OwnedData> &state_next,
                                      IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "run_wlhiv_births_input_mat_prev can only be called for model variants where run_child_model is true");
@@ -168,11 +168,11 @@ void run_wlhiv_births_input_mat_prev(int t,
   n_hc.hiv_births = p_hc.mat_hiv_births(t);
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void calc_hiv_negative_pop(int t,
                            const Parameters<ModelVariant, real_type> &pars,
-                           const State<ModelVariant, real_type> &state_curr,
-                           State<ModelVariant, real_type> &state_next,
+                           const State<ModelVariant, real_type, OwnedData> &state_curr,
+                           State<ModelVariant, real_type, OwnedData> &state_next,
                            IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "calc_hiv_negative_pop can only be called for model variants where run_child_model is true");
@@ -189,11 +189,11 @@ void calc_hiv_negative_pop(int t,
   }// end s
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void adjust_hiv_births(int t,
                        const Parameters<ModelVariant, real_type> &pars,
-                       const State<ModelVariant, real_type> &state_curr,
-                       State<ModelVariant, real_type> &state_next,
+                       const State<ModelVariant, real_type, OwnedData> &state_curr,
+                       State<ModelVariant, real_type, OwnedData> &state_next,
                        IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "adjust_hiv_births can only be called for model variants where run_child_model is true");
@@ -251,11 +251,11 @@ void convert_PMTCT_num_to_perc(int t,
   i_hc.PMTCT_coverage(5) = i_hc.PMTCT_coverage(5) * p_hc.PMTCT_dropout(1, t);
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void convert_PMTCT_pre_bf(int t,
                           const Parameters<ModelVariant, real_type> &pars,
-                          const State<ModelVariant, real_type> &state_curr,
-                          State<ModelVariant, real_type> &state_next,
+                          const State<ModelVariant, real_type, OwnedData> &state_curr,
+                          State<ModelVariant, real_type, OwnedData> &state_next,
                           IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "convert_PMTCT_num_to_perc can only be called for model variants where run_child_model is true");
@@ -269,11 +269,11 @@ void convert_PMTCT_pre_bf(int t,
   } // end hPS
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void calc_wlhiv_cd4_proportion(int t,
                                const Parameters<ModelVariant, real_type> &pars,
-                               const State<ModelVariant, real_type> &state_curr,
-                               State<ModelVariant, real_type> &state_next,
+                               const State<ModelVariant, real_type, OwnedData> &state_curr,
+                               State<ModelVariant, real_type, OwnedData> &state_next,
                                IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "calc_wlhiv_cd4_proportion can only be called for model variants where run_child_model is true");
@@ -321,11 +321,11 @@ void calc_wlhiv_cd4_proportion(int t,
   }
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void adjust_option_A_B_tr(int t,
                           const Parameters<ModelVariant, real_type> &pars,
-                          const State<ModelVariant, real_type> &state_curr,
-                          State<ModelVariant, real_type> &state_next,
+                          const State<ModelVariant, real_type, OwnedData> &state_curr,
+                          State<ModelVariant, real_type, OwnedData> &state_next,
                           IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "adjust_option_A_B_tr can only be called for model variants where run_child_model is true");
@@ -353,11 +353,11 @@ void adjust_option_A_B_tr(int t,
   }
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void adjust_option_A_B_bf_tr(int t,
                              const Parameters<ModelVariant, real_type> &pars,
-                             const State<ModelVariant, real_type> &state_curr,
-                             State<ModelVariant, real_type> &state_next,
+                             const State<ModelVariant, real_type, OwnedData> &state_curr,
+                             State<ModelVariant, real_type, OwnedData> &state_next,
                              IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "adjust_option_A_B_bf_tr can only be called for model variants where run_child_model is true");
@@ -388,11 +388,11 @@ void adjust_option_A_B_bf_tr(int t,
   }
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void maternal_incidence_in_pregnancy_tr(int t,
                                         const Parameters<ModelVariant, real_type> &pars,
-                                        const State<ModelVariant, real_type> &state_curr,
-                                        State<ModelVariant, real_type> &state_next,
+                                        const State<ModelVariant, real_type, OwnedData> &state_curr,
+                                        State<ModelVariant, real_type, OwnedData> &state_next,
                                         IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "maternal_incidence_in_pregnancy_tr can only be called for model variants where run_child_model is true");
@@ -503,11 +503,11 @@ void perinatal_tr(int t,
   }
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void maternal_incidence_in_bf_tr(int t,
                                  const Parameters<ModelVariant, real_type> &pars,
-                                 const State<ModelVariant, real_type> &state_curr,
-                                 State<ModelVariant, real_type> &state_next,
+                                 const State<ModelVariant, real_type, OwnedData> &state_curr,
+                                 State<ModelVariant, real_type, OwnedData> &state_next,
                                  IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "maternal_incidence_in_bf_tr can only be called for model variants where run_child_model is true");
@@ -522,11 +522,11 @@ void maternal_incidence_in_bf_tr(int t,
    i_hc.bf_incident_hiv_transmission_rate = i_hc.bf_at_risk * p_hc.vertical_transmission_rate(7, 1);
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void run_bf_transmission_rate(int t,
                               const Parameters<ModelVariant, real_type> &pars,
-                              const State<ModelVariant, real_type> &state_curr,
-                              State<ModelVariant, real_type> &state_next,
+                              const State<ModelVariant, real_type, OwnedData> &state_curr,
+                              State<ModelVariant, real_type, OwnedData> &state_next,
                               IntermediateData<ModelVariant, real_type> &intermediate,
                               int bf_start, int bf_end, int index) {
   static_assert(ModelVariant::run_child_model,
@@ -638,11 +638,11 @@ void run_bf_transmission_rate(int t,
   }
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void nosocomial_infections(int t,
                            const Parameters<ModelVariant, real_type> &pars,
-                           const State<ModelVariant, real_type> &state_curr,
-                           State<ModelVariant, real_type> &state_next,
+                           const State<ModelVariant, real_type, OwnedData> &state_curr,
+                           State<ModelVariant, real_type, OwnedData> &state_next,
                            IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "nosocomial_infections can only be called for model variants where run_child_model is true");
@@ -666,11 +666,11 @@ void nosocomial_infections(int t,
   } // end NS
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void add_infections(int t,
                     const Parameters<ModelVariant, real_type> &pars,
-                    const State<ModelVariant, real_type> &state_curr,
-                    State<ModelVariant, real_type> &state_next,
+                    const State<ModelVariant, real_type, OwnedData> &state_curr,
+                    State<ModelVariant, real_type, OwnedData> &state_next,
                     IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "add_infections can only be called for model variants where run_child_model is true");
@@ -772,11 +772,11 @@ void add_infections(int t,
   }
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void need_for_cotrim(int t,
                      const Parameters<ModelVariant, real_type> &pars,
-                     const State<ModelVariant, real_type> &state_curr,
-                     State<ModelVariant, real_type> &state_next,
+                     const State<ModelVariant, real_type, OwnedData> &state_curr,
+                     State<ModelVariant, real_type, OwnedData> &state_next,
                      IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "need_for_cotrim can only be called for model variants where run_child_model is true");
@@ -838,11 +838,11 @@ void need_for_cotrim(int t,
   }
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void cotrim_need_coverage(int t,
                           const Parameters<ModelVariant, real_type> &pars,
-                          const State<ModelVariant, real_type> &state_curr,
-                          State<ModelVariant, real_type> &state_next,
+                          const State<ModelVariant, real_type, OwnedData> &state_curr,
+                          State<ModelVariant, real_type, OwnedData> &state_next,
                           IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "cotrim_need_coverage can only be called for model variants where run_child_model is true");
@@ -862,11 +862,11 @@ void cotrim_need_coverage(int t,
   }
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void cd4_mortality(int t,
                    const Parameters<ModelVariant, real_type> &pars,
-                   const State<ModelVariant, real_type> &state_curr,
-                   State<ModelVariant, real_type> &state_next,
+                   const State<ModelVariant, real_type, OwnedData> &state_curr,
+                   State<ModelVariant, real_type, OwnedData> &state_next,
                    IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "cd4_mortality can only be called for model variants where run_child_model is true");
@@ -934,11 +934,11 @@ void cd4_mortality(int t,
   }
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void run_child_hiv_mort(int t,
                         const Parameters<ModelVariant, real_type> &pars,
-                        const State<ModelVariant, real_type> &state_curr,
-                        State<ModelVariant, real_type> &state_next,
+                        const State<ModelVariant, real_type, OwnedData> &state_curr,
+                        State<ModelVariant, real_type, OwnedData> &state_next,
                         IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "run_child_hiv_mort can only be called for model variants where run_child_model is true");
@@ -977,11 +977,11 @@ void run_child_hiv_mort(int t,
   }
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void add_child_grad(int t,
                     const Parameters<ModelVariant, real_type> &pars,
-                    const State<ModelVariant, real_type> &state_curr,
-                    State<ModelVariant, real_type> &state_next,
+                    const State<ModelVariant, real_type, OwnedData> &state_curr,
+                    State<ModelVariant, real_type, OwnedData> &state_next,
                     IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "add_child_grad can only be called for model variants where run_child_model is true");
@@ -1012,11 +1012,11 @@ void add_child_grad(int t,
   } // end s
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void art_eligibility_by_age(int t,
                             const Parameters<ModelVariant, real_type> &pars,
-                            const State<ModelVariant, real_type> &state_curr,
-                            State<ModelVariant, real_type> &state_next,
+                            const State<ModelVariant, real_type, OwnedData> &state_curr,
+                            State<ModelVariant, real_type, OwnedData> &state_next,
                             IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "art_eligibility_by_age can only be called for model variants where run_child_model is true");
@@ -1041,11 +1041,11 @@ void art_eligibility_by_age(int t,
   } // end ss_d.NS
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void art_eligibility_by_cd4(int t,
                             const Parameters<ModelVariant, real_type> &pars,
-                            const State<ModelVariant, real_type> &state_curr,
-                            State<ModelVariant, real_type> &state_next,
+                            const State<ModelVariant, real_type, OwnedData> &state_curr,
+                            State<ModelVariant, real_type, OwnedData> &state_next,
                             IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "art_eligibility_by_cd4 can only be called for model variants where run_child_model is true");
@@ -1072,11 +1072,11 @@ void art_eligibility_by_cd4(int t,
   } // end ss.NS
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void eligible_for_treatment(int t,
                             const Parameters<ModelVariant, real_type> &pars,
-                            const State<ModelVariant, real_type> &state_curr,
-                            State<ModelVariant, real_type> &state_next,
+                            const State<ModelVariant, real_type, OwnedData> &state_curr,
+                            State<ModelVariant, real_type, OwnedData> &state_next,
                             IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "eligible_for_treatment can only be called for model variants where run_child_model is true");
@@ -1100,11 +1100,11 @@ void eligible_for_treatment(int t,
   } // end ss_d.NS
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void on_art_mortality(int t,
                      const Parameters<ModelVariant, real_type> &pars,
-                     const State<ModelVariant, real_type> &state_curr,
-                     State<ModelVariant, real_type> &state_next,
+                     const State<ModelVariant, real_type, OwnedData> &state_curr,
+                     State<ModelVariant, real_type, OwnedData> &state_next,
                      IntermediateData<ModelVariant, real_type> &intermediate,
                      int t_art_idx) {
   static_assert(ModelVariant::run_child_model,
@@ -1157,11 +1157,11 @@ void on_art_mortality(int t,
   } // end ss_d.NS
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void deaths_this_year(int t,
                       const Parameters<ModelVariant, real_type> &pars,
-                      const State<ModelVariant, real_type> &state_curr,
-                      State<ModelVariant, real_type> &state_next,
+                      const State<ModelVariant, real_type, OwnedData> &state_curr,
+                      State<ModelVariant, real_type, OwnedData> &state_next,
                       IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "deaths_this_year can only be called for model variants where run_child_model is true");
@@ -1189,11 +1189,11 @@ void deaths_this_year(int t,
   i_hc.hc_art_deaths(0) = i_hc.hc_art_deaths(1) + i_hc.hc_art_deaths(2) + i_hc.hc_art_deaths(3);
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void progress_time_on_art(int t,
                           const Parameters<ModelVariant, real_type> &pars,
-                          const State<ModelVariant, real_type> &state_curr,
-                          State<ModelVariant, real_type> &state_next,
+                          const State<ModelVariant, real_type, OwnedData> &state_curr,
+                          State<ModelVariant, real_type, OwnedData> &state_next,
                           IntermediateData<ModelVariant, real_type> &intermediate,
                           int curr_t_idx, int end_t_idx) {
   static_assert(ModelVariant::run_child_model,
@@ -1221,11 +1221,11 @@ void progress_time_on_art(int t,
   } // end ss_c.hc1DS
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void calc_total_and_unmet_art_need(int t,
                                    const Parameters<ModelVariant, real_type> &pars,
-                                   const State<ModelVariant, real_type> &state_curr,
-                                   State<ModelVariant, real_type> &state_next,
+                                   const State<ModelVariant, real_type, OwnedData> &state_curr,
+                                   State<ModelVariant, real_type, OwnedData> &state_next,
                                    IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "calc_total_and_unmet_art_need can only be called for model variants where run_child_model is true");
@@ -1269,11 +1269,11 @@ void calc_total_and_unmet_art_need(int t,
   i_hc.total_need(0) = i_hc.on_art(0) + i_hc.unmet_need(0) + i_hc.hc_art_deaths(0);
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void age_specific_art_last_year(int t,
                                  const Parameters<ModelVariant, real_type> &pars,
-                                 const State<ModelVariant, real_type> &state_curr,
-                                 State<ModelVariant, real_type> &state_next,
+                                 const State<ModelVariant, real_type, OwnedData> &state_curr,
+                                 State<ModelVariant, real_type, OwnedData> &state_next,
                                  IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "age_specific_art_last_year can only be called for model variants where run_child_model is true");
@@ -1317,11 +1317,11 @@ void age_specific_art_last_year(int t,
   }
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void art_last_year(int t,
                    const Parameters<ModelVariant, real_type> &pars,
-                   const State<ModelVariant, real_type> &state_curr,
-                   State<ModelVariant, real_type> &state_next,
+                   const State<ModelVariant, real_type, OwnedData> &state_curr,
+                   State<ModelVariant, real_type, OwnedData> &state_next,
                    IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "art_last_year can only be called for model variants where run_child_model is true");
@@ -1351,11 +1351,11 @@ void art_last_year(int t,
   }
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void art_this_year(int t,
                    const Parameters<ModelVariant, real_type> &pars,
-                   const State<ModelVariant, real_type> &state_curr,
-                   State<ModelVariant, real_type> &state_next,
+                   const State<ModelVariant, real_type, OwnedData> &state_curr,
+                   State<ModelVariant, real_type, OwnedData> &state_next,
                    IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "art_this_year can only be called for model variants where run_child_model is true");
@@ -1370,11 +1370,11 @@ void art_this_year(int t,
   } // end ag
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void calc_art_initiates(int t,
                         const Parameters<ModelVariant, real_type> &pars,
-                        const State<ModelVariant, real_type> &state_curr,
-                        State<ModelVariant, real_type> &state_next,
+                        const State<ModelVariant, real_type, OwnedData> &state_curr,
+                        State<ModelVariant, real_type, OwnedData> &state_next,
                         IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "calc_art_initiates can only be called for model variants where run_child_model is true");
@@ -1471,11 +1471,11 @@ void art_ltfu(int t,
   } // end ss_d.NS
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void apply_ltfu_to_hivpop(int t,
                           const Parameters<ModelVariant, real_type> &pars,
-                          const State<ModelVariant, real_type> &state_curr,
-                          State<ModelVariant, real_type> &state_next,
+                          const State<ModelVariant, real_type, OwnedData> &state_curr,
+                          State<ModelVariant, real_type, OwnedData> &state_next,
                           IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "apply_ltfu_to_hivpop can only be called for model variants where run_child_model is true");
@@ -1638,11 +1638,11 @@ void art_initiation_by_age(int t,
   } // end if
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void fill_total_pop_outputs(int t,
                             const Parameters<ModelVariant, real_type> &pars,
-                            const State<ModelVariant, real_type> &state_curr,
-                            State<ModelVariant, real_type> &state_next,
+                            const State<ModelVariant, real_type, OwnedData> &state_curr,
+                            State<ModelVariant, real_type, OwnedData> &state_next,
                             IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "fill_total_pop_outputs can only be called for model variants where run_child_model is true");
@@ -1680,11 +1680,11 @@ void fill_total_pop_outputs(int t,
 
 } // namespace internal
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void run_child_model_simulation(int t,
                                 const Parameters<ModelVariant, real_type> &pars,
-                                const State<ModelVariant, real_type> &state_curr,
-                                State<ModelVariant, real_type> &state_next,
+                                const State<ModelVariant, real_type, OwnedData> &state_curr,
+                                State<ModelVariant, real_type, OwnedData> &state_next,
                                 internal::IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "run_child_model_simulation can only be called for model variants where run_child_model is true");
