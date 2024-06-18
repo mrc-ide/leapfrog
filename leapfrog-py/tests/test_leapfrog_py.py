@@ -14,7 +14,9 @@ def parameters():
     def input_file_path(file_name):
         current_dir = os.path.dirname(__file__)
         return os.path.join(
-            current_dir, "../../inst/standalone_model/data/adult_data", file_name
+            current_dir,
+            "../../inst/standalone_model/data/adult_data",
+            file_name,
         )
 
     return {
