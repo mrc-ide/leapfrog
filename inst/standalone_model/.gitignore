@@ -5,3 +5,5 @@ output
 callgrind.out.*
 myprof.log
 perf.data*
+data/adult_data
+data/child_data

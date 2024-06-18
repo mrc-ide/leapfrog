@@ -30,7 +30,7 @@ serialize_r_to_tensor <- function(data, path) {
   data <- paste0(data, collapse = ",")
   lines <- c(type, dims, data)
   writeLines(lines, path)
-  path
+  invisible(path)
 }
 
 #' Deseralize an Eigen::Tensor into an R array

@@ -19,8 +19,8 @@ bench::mark(
   check = FALSE
 )
 
-source(testthat::test_path("helper-child-model.R"))
-input <- setup_childmodel(testinput = "testdata/child_parms.rds")
+source(file.path("R", "spectrum_inputs.R"))
+input <- setup_childmodel(testthat::test_path("testdata/child_parms.rds"))
 
 message("Benchmarking child model")
 bench::mark(
