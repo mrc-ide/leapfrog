@@ -70,8 +70,8 @@ def _initialise_params(
         "age_specific_fertility_rate",
         "births_sex_prop",
         "incidence_rate",
-        "relative_risk_age",
-        "relative_risk_sex",
+        "incidence_age_rate_ratio",
+        "incidence_sex_rate_ratio",
         "cd4_mortality_full",
         "cd4_progression_full",
         "cd4_initial_distribution_full",
@@ -79,7 +79,7 @@ def _initialise_params(
         "art_mortality_rate_full",
         "art_mortality_time_rate_ratio",
         "art_dropout",
-        "adult_on_art",
+        "adults_on_art",
         "adults_on_art_is_percent",
         "h_art_stage_dur",
     ]
@@ -95,8 +95,8 @@ def _initialise_params(
     )
     incidence = Incidence(
         params["incidence_rate"],
-        params["relative_risk_age"],
-        params["relative_risk_sex"],
+        params["incidence_age_rate_ratio"],
+        params["incidence_sex_rate_ratio"],
     )
     nat_history = NaturalHistory(
         params["cd4_mortality_full"],
@@ -109,7 +109,7 @@ def _initialise_params(
         params["art_mortality_rate_full"],
         params["art_mortality_time_rate_ratio"],
         params["art_dropout"],
-        params["adult_on_art"],
+        params["adults_on_art"],
         params["adults_on_art_is_percent"],
         params["h_art_stage_dur"],
         1,
