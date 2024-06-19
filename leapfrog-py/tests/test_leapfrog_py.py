@@ -11,58 +11,13 @@ from leapfrog_py.leapfrog_py import (
 
 @pytest.fixture
 def parameters():
-    def input_file_path(file_name):
-        current_dir = os.path.dirname(__file__)
-        return os.path.join(
-            current_dir,
-            "../../inst/standalone_model/data/adult_data",
-            file_name,
-        )
+    current_dir = os.path.dirname(__file__)
+    test_data_dir = os.path.join(current_dir, "../../inst/standalone_model/data/adult_data")
+    test_data_files = [f for f in os.listdir(test_data_dir) if os.path.isfile(os.path.join(test_data_dir, f))]
 
-    return {
-        "adult_on_art": read_standalone_data(input_file_path("adults_on_art")),
-        "adults_on_art_is_percent": read_standalone_data(
-            input_file_path("adults_on_art_is_percent")
-        ),
-        "age_specific_fertility_rate": read_standalone_data(
-            input_file_path("age_specific_fertility_rate")
-        ),
-        "art_dropout": read_standalone_data(input_file_path("art_dropout")),
-        "art_mortality_rate_full": read_standalone_data(
-            input_file_path("art_mortality_rate_full")
-        ),
-        "art_mortality_time_rate_ratio": read_standalone_data(
-            input_file_path("art_mortality_time_rate_ratio")
-        ),
-        "basepop": read_standalone_data(input_file_path("basepop")),
-        "births_sex_prop": read_standalone_data(
-            input_file_path("births_sex_prop")
-        ),
-        "cd4_initial_distribution_full": read_standalone_data(
-            input_file_path("cd4_initial_distribution_full")
-        ),
-        "cd4_mortality_full": read_standalone_data(
-            input_file_path("cd4_mortality_full")
-        ),
-        "cd4_progression_full": read_standalone_data(
-            input_file_path("cd4_progression_full")
-        ),
-        "idx_hm_elig": read_standalone_data(input_file_path("idx_hm_elig")),
-        "relative_risk_age": read_standalone_data(
-            input_file_path("incidence_age_rate_ratio")
-        ),
-        "incidence_rate": read_standalone_data(
-            input_file_path("incidence_rate")
-        ),
-        "relative_risk_sex": read_standalone_data(
-            input_file_path("incidence_sex_rate_ratio")
-        ),
-        "net_migration": read_standalone_data(input_file_path("net_migration")),
-        "survival_probability": read_standalone_data(
-            input_file_path("survival_probability")
-        ),
-        "h_art_stage_dur": np.array([0.5, 0.5], order="F"),
-    }
+    parameters = {f: read_standalone_data(os.path.join(test_data_dir, f)) for f in test_data_files}
+    parameters["h_art_stage_dur"] = np.array([0.5, 0.5], order="F")
+    return parameters
 
 
 @pytest.fixture
