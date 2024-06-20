@@ -38,6 +38,7 @@ leapfrogR(const Rcpp::List& demp,
   const int hAG_FULL = 66;
   const int hDS = 7;
   const int hTS = 3;
+  const int ctx_effect = 0.33;
 
   int hAG;
   if (hiv_strat == "full") {
@@ -47,6 +48,7 @@ leapfrogR(const Rcpp::List& demp,
   } else {
     Rf_error("hiv_strat \"%s\" not found. Please select \"full\" or \"coarse\".\n", hiv_strat.get_cstring());
   }
+
     
   // allocate memory for return object
   NumericVector totpop1(pAG * NG * proj_years);
@@ -54,6 +56,9 @@ leapfrogR(const Rcpp::List& demp,
 
   NumericVector hivpop1(pAG * NG * proj_years);
   hivpop1.attr("dim") = NumericVector::create(pAG, NG, proj_years);
+
+  NumericVector hivnpop1(pAG * NG * proj_years);
+  hivnpop1.attr("dim") = NumericVector::create(pAG, NG, proj_years);
 
   NumericVector infections(pAG * NG * proj_years);
   infections.attr("dim") = NumericVector::create(pAG, NG, proj_years);
@@ -63,8 +68,17 @@ leapfrogR(const Rcpp::List& demp,
 
   NumericVector artstrat_adult(hTS * hDS * hAG * NG * proj_years);
   artstrat_adult.attr("dim") = NumericVector::create(hTS, hDS, hAG, NG, proj_years);
+  
+  NumericVector hivstrat_paeds(4 * hDS * pIDX_HIVADULT * NG * proj_years);
+  hivstrat_paeds.attr("dim") = NumericVector::create(hDS, 4, pIDX_HIVADULT, NG, proj_years);
+  
+  NumericVector coarse_totpop1(hAG * NG * proj_years);
+  coarse_totpop1.attr("dim") = NumericVector::create(hAG, NG, proj_years);
 
   NumericVector births(proj_years);
+  
+  NumericVector hiv_births(proj_years);
+  
 
   NumericVector natdeaths(pAG * NG * proj_years);
   natdeaths.attr("dim") = NumericVector::create(pAG, NG, proj_years);
@@ -83,6 +97,13 @@ leapfrogR(const Rcpp::List& demp,
 
   NumericVector artinit(hDS * hAG * NG * proj_years);
   artinit.attr("dim") = NumericVector::create(hDS, hAG, NG, proj_years);
+  
+  NumericVector deaths_paeds(6 * 4 * 15 * proj_years * NG);
+  deaths_paeds.attr("dim") = NumericVector::create(6, 4, 15, NG, proj_years);
+  
+  NumericVector grad_paeds(6 * 4 * 15 * proj_years * NG);
+  grad_paeds.attr("dim") = NumericVector::create(6, 4, 15, NG, proj_years);
+  
  
   if (hAG == hAG_FULL) {
     leapfrog_sim<double, NG, pAG, pIDX_FERT, pAG_FERT,
@@ -94,6 +115,7 @@ leapfrogR(const Rcpp::List& demp,
        REAL(demp["births_sex_prop"]),
        REAL(projp["incidinput"]),
        REAL(projp["incrr_sex"]),
+       REAL(projp["fert_rat"]),
        REAL(projp["incrr_age"]),
        REAL(projp["cd4_initdist_full"]),
        REAL(projp["cd4_prog_full"]),
@@ -107,22 +129,37 @@ leapfrogR(const Rcpp::List& demp,
        *REAL(projp["art_alloc_mxweight"]),
        *INTEGER(projp["scale_cd4_mort"]),
        REAL(projp["art_dropout"]),
+       REAL(projp["age15hivpop"]),
+       REAL(projp["paed_incid_input"]),
+       REAL(projp["paed_cd4_dist"]),
+       REAL(projp["paed_cd4_prog"]),
+       REAL(projp["adol_cd4_prog"]),
+       REAL(projp["paed_cd4_mort"]),
+       REAL(projp["adol_cd4_mort"]),
+       REAL(projp["ctx_val"]),
+       ctx_effect,
        proj_years,
        hiv_steps_per_year,
        *INTEGER(projp["t_ART_start"]) - 1, // 0-based indexing vs. R 1-based
        INTEGER(projp["hAG_SPAN_full"]),
        REAL(totpop1),
        REAL(hivpop1),
+       REAL(hivnpop1),
        REAL(infections),
        REAL(hivstrat_adult),
        REAL(artstrat_adult),
+       REAL(hivstrat_paeds),
        REAL(births),
+       REAL(hiv_births),
        REAL(natdeaths),
        REAL(natdeaths_hivpop),
        REAL(hivdeaths),
        REAL(aidsdeaths_noart),
        REAL(aidsdeaths_art),
-       REAL(artinit));
+       REAL(artinit),
+       REAL(coarse_totpop1),
+       REAL(deaths_paeds),
+       REAL(grad_paeds));
   } else if (hAG == hAG_COARSE) {
     leapfrog_sim<double, NG, pAG, pIDX_FERT, pAG_FERT,
 		 pIDX_HIVADULT, hAG_COARSE, hDS, hTS>
@@ -133,6 +170,7 @@ leapfrogR(const Rcpp::List& demp,
        REAL(demp["births_sex_prop"]),
        REAL(projp["incidinput"]),
        REAL(projp["incrr_sex"]),
+       REAL(projp["fert_rat"]),
        REAL(projp["incrr_age"]),
        REAL(projp["cd4_initdist_coarse"]),
        REAL(projp["cd4_prog_coarse"]),
@@ -145,39 +183,60 @@ leapfrogR(const Rcpp::List& demp,
        *INTEGER(projp["art_alloc_method"]),
        *REAL(projp["art_alloc_mxweight"]),
        *INTEGER(projp["scale_cd4_mort"]),
-       REAL(projp["art_dropout"]),       
+       REAL(projp["art_dropout"]), 
+       REAL(projp["age15hivpop"]),
+       REAL(projp["paed_incid_input"]),
+       REAL(projp["paed_cd4_dist"]),
+       REAL(projp["paed_cd4_prog"]),
+       REAL(projp["adol_cd4_prog"]),
+       REAL(projp["paed_cd4_mort"]),
+       REAL(projp["adol_cd4_mort"]),
+       REAL(projp["ctx_val"]),
+       ctx_effect,
        proj_years,
        hiv_steps_per_year,
        *INTEGER(projp["t_ART_start"]) - 1,  // 0-based indexing vs. R 1-based
        INTEGER(projp["hAG_SPAN_coarse"]),
        REAL(totpop1),
        REAL(hivpop1),
+       REAL(hivnpop1),
        REAL(infections),
        REAL(hivstrat_adult),
        REAL(artstrat_adult),
-       REAL(births),       
+       REAL(hivstrat_paeds),
+       REAL(births),
+       REAL(hiv_births),
        REAL(natdeaths),
        REAL(natdeaths_hivpop),
        REAL(hivdeaths),
        REAL(aidsdeaths_noart),
        REAL(aidsdeaths_art),
-       REAL(artinit));
+       REAL(artinit),
+       REAL(coarse_totpop1),
+       REAL(deaths_paeds),
+       REAL(grad_paeds));
   } else {
     Rf_error("Invalid HIV stratification age groups (hAG)");
   }
 
   List ret = List::create(_("totpop1") = totpop1,
 			  _("hivpop1") = hivpop1,
+			  _("hivnpop1") = hivnpop1,
 			  _("hivstrat_adult") = hivstrat_adult,
 			  _("artstrat_adult") = artstrat_adult,
+			  _("hivstrat_paeds") = hivstrat_paeds,
 			  _("infections") = infections,
-			  _("births") = births,			  
+			  _("births") = births,	
+			  _("hiv_births") = hiv_births,			  
 			  _("natdeaths") = natdeaths,
 			  _("natdeaths_hivpop") = natdeaths_hivpop,
 			  _("hivdeaths") = hivdeaths,
 			  _("aidsdeaths_noart") = aidsdeaths_noart,
 			  _("aidsdeaths_art") = aidsdeaths_art,
-			  _("artinit") = artinit);
+			  _("artinit") = artinit,
+			  _("coarse_totpop1") = coarse_totpop1,
+			  _("deaths_paeds") = deaths_paeds,
+			  _("grad_paeds") = grad_paeds);
 				      
   return ret;
 }
