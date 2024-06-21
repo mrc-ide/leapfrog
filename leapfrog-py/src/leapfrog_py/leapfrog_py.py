@@ -1,5 +1,5 @@
 import numpy as np
-from leapfrog import (
+from leapfrog import (  # type: ignore[attr-defined]
     Art,
     BaseModelChildParameters,
     BaseModelParameters,
