@@ -35,55 +35,20 @@ def pretty_timeit(stmt, globals, setup="pass", repeat=5, number=1000):
     return output
 
 
-def input_file_path(file_name):
-    return os.path.join("../inst/standalone_model/data/", file_name)
-
-
 def parameters():
-    return {
-        "adult_on_art": read_standalone_data(input_file_path("adults_on_art")),
-        "adults_on_art_is_percent": read_standalone_data(
-            input_file_path("adults_on_art_is_percent")
-        ),
-        "age_specific_fertility_rate": read_standalone_data(
-            input_file_path("age_specific_fertility_rate")
-        ),
-        "art_dropout": read_standalone_data(input_file_path("art_dropout")),
-        "art_mortality_rate_full": read_standalone_data(
-            input_file_path("art_mortality_rate_full")
-        ),
-        "art_mortality_time_rate_ratio": read_standalone_data(
-            input_file_path("art_mortality_time_rate_ratio")
-        ),
-        "basepop": read_standalone_data(input_file_path("basepop")),
-        "births_sex_prop": read_standalone_data(
-            input_file_path("births_sex_prop")
-        ),
-        "cd4_initial_distribution_full": read_standalone_data(
-            input_file_path("cd4_initial_distribution_full")
-        ),
-        "cd4_mortality_full": read_standalone_data(
-            input_file_path("cd4_mortality_full")
-        ),
-        "cd4_progression_full": read_standalone_data(
-            input_file_path("cd4_progression_full")
-        ),
-        "idx_hm_elig": read_standalone_data(input_file_path("idx_hm_elig")),
-        "relative_risk_age": read_standalone_data(
-            input_file_path("incidence_age_rate_ratio")
-        ),
-        "incidence_rate": read_standalone_data(
-            input_file_path("incidence_rate")
-        ),
-        "relative_risk_sex": read_standalone_data(
-            input_file_path("incidence_sex_rate_ratio")
-        ),
-        "net_migration": read_standalone_data(input_file_path("net_migration")),
-        "survival_probability": read_standalone_data(
-            input_file_path("survival_probability")
-        ),
-        "h_art_stage_dur": np.array([0.5, 0.5], order="F"),
+    test_data_dir = "../inst/standalone_model/data/child_data"
+    test_data_files = [
+        f
+        for f in os.listdir(test_data_dir)
+        if os.path.isfile(os.path.join(test_data_dir, f))
+    ]
+
+    parameters = {
+        f: read_standalone_data(os.path.join(test_data_dir, f))
+        for f in test_data_files
     }
+    parameters["h_art_stage_dur"] = np.array([0.5, 0.5], order="F")
+    return parameters
 
 
 def state():
@@ -92,6 +57,11 @@ def state():
     hAG = 66  # noqa: N806
     hDS = 7  # noqa: N806
     hTS = 3  # noqa: N806
+    hc1DS = 7  # noqa: N806
+    hc2DS = 6  # noqa: N806
+    hc1AG = 5  # noqa: N806
+    hc2AG = 10  # noqa: N806
+    hcTT = 4  # noqa: N806
     no_output_years = 61
     return {
         "p_total_pop": np.zeros((pAG, NS, no_output_years), order="F"),
@@ -118,6 +88,38 @@ def state():
             (hDS, hAG, NS, no_output_years), order="F"
         ),
         "p_hiv_deaths": np.zeros((pAG, NS, no_output_years), order="F"),
+        "hc1_hiv_pop": np.zeros(
+            (hc1DS, hcTT, hc1AG, NS, no_output_years), order="F"
+        ),
+        "hc2_hiv_pop": np.zeros(
+            (hc2DS, hcTT, hc2AG, NS, no_output_years), order="F"
+        ),
+        "hc1_art_pop": np.zeros(
+            (hTS, hc1DS, hc1AG, NS, no_output_years), order="F"
+        ),
+        "hc2_art_pop": np.zeros(
+            (hTS, hc2DS, hc2AG, NS, no_output_years), order="F"
+        ),
+        "hc1_noart_aids_deaths": np.zeros(
+            (hc1DS, hcTT, hc1AG, NS, no_output_years), order="F"
+        ),
+        "hc2_noart_aids_deaths": np.zeros(
+            (hc2DS, hcTT, hc2AG, NS, no_output_years), order="F"
+        ),
+        "hc1_art_aids_deaths": np.zeros(
+            (hTS, hc1DS, hc1AG, NS, no_output_years), order="F"
+        ),
+        "hc2_art_aids_deaths": np.zeros(
+            (hTS, hc2DS, hc2AG, NS, no_output_years), order="F"
+        ),
+        "hiv_births": np.zeros(no_output_years, order="F"),
+        "hc_art_total": np.zeros((4, no_output_years), order="F"),
+        "hc_art_init": np.zeros((4, no_output_years), order="F"),
+        "hc_art_need_init": np.zeros(
+            (hc1DS, hcTT, 15, NS, no_output_years), order="F"
+        ),
+        "ctx_need": np.zeros(no_output_years, order="F"),
+        "ctx_mean": np.zeros(no_output_years, order="F"),
     }
 
 
