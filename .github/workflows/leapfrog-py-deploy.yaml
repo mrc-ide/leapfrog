@@ -26,27 +26,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Eigen3 Linux
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install libeigen3-dev
-
-      - name: Install Eigen3 macOS
-        if: runner.os == 'macOS'
-        run: |
-          brew update
-          brew install eigen
-
-      - name: Setup Eigen3 Windows
-        if: runner.os == 'Windows'
-        run: |
-          choco install eigen
-
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.19.1
         with:
           package-dir: leapfrog-py
+        env:
+          # Issue with compiling pybind11 eigen header as it has an invalid
+          # conversion from size_t to int
+          CIBW_SKIP: "pp38-manylinux_i686"
 
       - uses: actions/upload-artifact@v4
         with:

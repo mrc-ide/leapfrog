@@ -34,23 +34,6 @@ jobs:
         with:
           python-version: ${{ matrix.config.py }}
 
-      - name: Install Eigen3 Linux
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install libeigen3-dev
-
-      - name: Install Eigen3 macOS
-        if: runner.os == 'macOS'
-        run: |
-          brew update
-          brew install eigen
-
-      - name: Setup Eigen3 Windows
-        if: runner.os == 'Windows'
-        run: |
-          choco install eigen
-
       - name: Extract test data
         shell: bash
         run: ../inst/standalone_model/extract_data
