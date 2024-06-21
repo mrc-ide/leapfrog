@@ -24,11 +24,11 @@ void distribute_rate_over_sexes(
       (total_neg) / denominator;
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void run_calculate_incidence_rate(int time_step,
                                   const Parameters<ModelVariant, real_type> &pars,
-                                  const State<ModelVariant, real_type> &state_curr,
-                                  State<ModelVariant, real_type> &state_next,
+                                  const State<ModelVariant, real_type, OwnedData> &state_curr,
+                                  State<ModelVariant, real_type, OwnedData> &state_next,
                                   IntermediateData<ModelVariant, real_type> &intermediate) {
   const auto adult_incidence_first_age_group = pars.base.options.adult_incidence_first_age_group;
   constexpr auto ss = StateSpace<ModelVariant>().base;
@@ -46,12 +46,12 @@ void run_calculate_incidence_rate(int time_step,
 }
 
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void run_disease_progression_and_mortality(int hiv_step,
                                            int time_step,
                                            const Parameters<ModelVariant, real_type> &pars,
-                                           const State<ModelVariant, real_type> &state_curr,
-                                           State<ModelVariant, real_type> &state_next,
+                                           const State<ModelVariant, real_type, OwnedData> &state_curr,
+                                           State<ModelVariant, real_type, OwnedData> &state_next,
                                            IntermediateData<ModelVariant, real_type> &intermediate) {
   constexpr auto ss = StateSpace<ModelVariant>().base;
   const auto natural_history = pars.base.natural_history;
@@ -98,12 +98,12 @@ void run_disease_progression_and_mortality(int hiv_step,
   }
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void run_new_p_infections(int hiv_step,
                           int time_step,
                           const Parameters<ModelVariant, real_type> &pars,
-                          const State<ModelVariant, real_type> &state_curr,
-                          State<ModelVariant, real_type> &state_next,
+                          const State<ModelVariant, real_type, OwnedData> &state_curr,
+                          State<ModelVariant, real_type, OwnedData> &state_next,
                           IntermediateData<ModelVariant, real_type> &intermediate) {
   constexpr auto ss = StateSpace<ModelVariant>().base;
   const auto incidence = pars.base.incidence;
@@ -140,12 +140,12 @@ void run_new_p_infections(int hiv_step,
   }
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void run_new_hiv_p_infections(int hiv_step,
                               int time_step,
                               const Parameters<ModelVariant, real_type> &pars,
-                              const State<ModelVariant, real_type> &state_curr,
-                              State<ModelVariant, real_type> &state_next,
+                              const State<ModelVariant, real_type, OwnedData> &state_curr,
+                              State<ModelVariant, real_type, OwnedData> &state_next,
                               IntermediateData<ModelVariant, real_type> &intermediate) {
   constexpr auto ss = StateSpace<ModelVariant>().base;
   const auto natural_history = pars.base.natural_history;
@@ -175,12 +175,12 @@ void run_new_hiv_p_infections(int hiv_step,
   }
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void run_art_progression_and_mortality(int hiv_step,
                                        int time_step,
                                        const Parameters<ModelVariant, real_type> &pars,
-                                       const State<ModelVariant, real_type> &state_curr,
-                                       State<ModelVariant, real_type> &state_next,
+                                       const State<ModelVariant, real_type, OwnedData> &state_curr,
+                                       State<ModelVariant, real_type, OwnedData> &state_next,
                                        IntermediateData<ModelVariant, real_type> &intermediate) {
   constexpr auto ss = StateSpace<ModelVariant>().base;
   const auto art = pars.base.art;
@@ -227,12 +227,12 @@ void run_art_progression_and_mortality(int hiv_step,
   }
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void run_h_art_initiation(int hiv_step,
                           int time_step,
                           const Parameters<ModelVariant, real_type> &pars,
-                          const State<ModelVariant, real_type> &state_curr,
-                          State<ModelVariant, real_type> &state_next,
+                          const State<ModelVariant, real_type, OwnedData> &state_curr,
+                          State<ModelVariant, real_type, OwnedData> &state_next,
                           IntermediateData<ModelVariant, real_type> &intermediate) {
   constexpr auto ss = StateSpace<ModelVariant>().base;
   const auto natural_history = pars.base.natural_history;
@@ -369,12 +369,12 @@ void run_h_art_initiation(int hiv_step,
   }
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void run_update_art_stratification(int hiv_step,
                                    int time_step,
                                    const Parameters<ModelVariant, real_type> &pars,
-                                   const State<ModelVariant, real_type> &state_curr,
-                                   State<ModelVariant, real_type> &state_next,
+                                   const State<ModelVariant, real_type, OwnedData> &state_curr,
+                                   State<ModelVariant, real_type, OwnedData> &state_next,
                                    IntermediateData<ModelVariant, real_type> &intermediate) {
   constexpr auto ss = StateSpace<ModelVariant>().base;
   for (int g = 0; g < ss.NS; ++g) {
@@ -389,12 +389,12 @@ void run_update_art_stratification(int hiv_step,
   }
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void run_update_hiv_stratification(int hiv_step,
                                    int time_step,
                                    const Parameters<ModelVariant, real_type> &pars,
-                                   const State<ModelVariant, real_type> &state_curr,
-                                   State<ModelVariant, real_type> &state_next,
+                                   const State<ModelVariant, real_type, OwnedData> &state_curr,
+                                   State<ModelVariant, real_type, OwnedData> &state_next,
                                    IntermediateData<ModelVariant, real_type> &intermediate) {
   constexpr auto ss = StateSpace<ModelVariant>().base;
 
@@ -408,12 +408,12 @@ void run_update_hiv_stratification(int hiv_step,
   }
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void run_remove_p_hiv_deaths(int hiv_step,
                              int time_step,
                              const Parameters<ModelVariant, real_type> &pars,
-                             const State<ModelVariant, real_type> &state_curr,
-                             State<ModelVariant, real_type> &state_next,
+                             const State<ModelVariant, real_type, OwnedData> &state_curr,
+                             State<ModelVariant, real_type, OwnedData> &state_next,
                              IntermediateData<ModelVariant, real_type> &intermediate) {
   constexpr auto ss = StateSpace<ModelVariant>().base;
   for (int g = 0; g < ss.NS; ++g) {
@@ -449,11 +449,11 @@ void run_remove_p_hiv_deaths(int hiv_step,
 
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void run_hiv_model_simulation(int time_step,
                               const Parameters<ModelVariant, real_type> &pars,
-                              const State<ModelVariant, real_type> &state_curr,
-                              State<ModelVariant, real_type> &state_next,
+                              const State<ModelVariant, real_type, OwnedData> &state_curr,
+                              State<ModelVariant, real_type, OwnedData> &state_next,
                               internal::IntermediateData<ModelVariant, real_type> &intermediate) {
   constexpr auto ss = StateSpace<ModelVariant>().base;
   const auto art = pars.base.art;

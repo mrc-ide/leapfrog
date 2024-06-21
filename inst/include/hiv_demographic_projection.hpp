@@ -8,11 +8,11 @@ namespace leapfrog {
 
 namespace internal {
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void run_hiv_ageing_and_mortality(int time_step,
                                   const Parameters<ModelVariant, real_type> &pars,
-                                  const State<ModelVariant, real_type> &state_curr,
-                                  State<ModelVariant, real_type> &state_next,
+                                  const State<ModelVariant, real_type, OwnedData> &state_curr,
+                                  State<ModelVariant, real_type, OwnedData> &state_next,
                                   IntermediateData<ModelVariant, real_type> &intermediate) {
   const auto demog = pars.base.demography;
   constexpr auto ss = StateSpace<ModelVariant>().base;
@@ -36,11 +36,11 @@ void run_hiv_ageing_and_mortality(int time_step,
   }
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void run_age_15_entrants(int time_step,
                          const Parameters<ModelVariant, real_type> &pars,
-                         const State<ModelVariant, real_type> &state_curr,
-                         State<ModelVariant, real_type> &state_next,
+                         const State<ModelVariant, real_type, OwnedData> &state_curr,
+                         State<ModelVariant, real_type, OwnedData> &state_next,
                          IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
                 "run_hiv_child_infections can only be called for model variants where run_child_model is true");
@@ -63,11 +63,11 @@ void run_age_15_entrants(int time_step,
   }
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void run_hiv_and_art_stratified_ageing(int time_step,
                                        const Parameters<ModelVariant, real_type> &pars,
-                                       const State<ModelVariant, real_type> &state_curr,
-                                       State<ModelVariant, real_type> &state_next,
+                                       const State<ModelVariant, real_type, OwnedData> &state_curr,
+                                       State<ModelVariant, real_type, OwnedData> &state_next,
                                        IntermediateData<ModelVariant, real_type> &intermediate) {
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
@@ -141,12 +141,12 @@ void run_hiv_and_art_stratified_ageing(int time_step,
 }
 
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void run_hiv_and_art_stratified_deaths_and_migration(
     int time_step,
     const Parameters<ModelVariant, real_type> &pars,
-    const State<ModelVariant, real_type> &state_curr,
-    State<ModelVariant, real_type> &state_next,
+    const State<ModelVariant, real_type, OwnedData> &state_curr,
+    State<ModelVariant, real_type, OwnedData> &state_next,
     IntermediateData<ModelVariant, real_type> &intermediate) {
   constexpr auto ss = StateSpace<ModelVariant>().base;
   for (int g = 0; g < ss.NS; ++g) {
@@ -197,11 +197,11 @@ void run_hiv_and_art_stratified_deaths_and_migration(
 
 }
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void run_hiv_pop_demographic_projection(int time_step,
                                         const Parameters<ModelVariant, real_type> &pars,
-                                        const State<ModelVariant, real_type> &state_curr,
-                                        State<ModelVariant, real_type> &state_next,
+                                        const State<ModelVariant, real_type, OwnedData> &state_curr,
+                                        State<ModelVariant, real_type, OwnedData> &state_next,
                                         internal::IntermediateData<ModelVariant, real_type> &intermediate) {
 
   internal::run_hiv_ageing_and_mortality<ModelVariant>(time_step, pars, state_curr, state_next,

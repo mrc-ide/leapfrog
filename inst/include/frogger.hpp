@@ -12,8 +12,8 @@ namespace leapfrog {
 
 // If we want to set any state for first iteration to something
 // other than 0 do it here.
-template<typename ModelVariant, typename real_type>
-void set_initial_state(State<ModelVariant, real_type> &state,
+template<typename ModelVariant, typename real_type, bool OwnedData>
+void set_initial_state(State<ModelVariant, real_type, OwnedData> &state,
                        const Parameters<ModelVariant, real_type> &pars) {
   constexpr auto ss = StateSpace<ModelVariant>().base;
   for (int g = 0; g < ss.NS; ++g) {
@@ -37,9 +37,9 @@ template<typename ModelVariant, typename real_type>
 OutputState<ModelVariant, real_type> run_model(int time_steps,
                                                std::vector<int> save_steps,
                                                const Parameters<ModelVariant, real_type> &pars) {
-  auto state = State<ModelVariant, real_type>(pars);
+  auto state = State<ModelVariant, real_type, true>(pars);
   auto state_next = state;
-  set_initial_state<ModelVariant, real_type>(state, pars);
+  set_initial_state<ModelVariant, real_type, true>(state, pars);
 
   internal::IntermediateData<ModelVariant, real_type> intermediate(pars.base.options.hAG_15plus);
 
