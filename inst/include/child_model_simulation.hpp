@@ -1383,12 +1383,10 @@ void fill_model_outputs(int time_step,
         }// end hcTT
 
         for (int dur = 0; dur < ss.hTS; ++dur) {
-          if (state_next.children.hc1_art_pop(0, hd, a, s) > 0) {
-            if (a < hc_ss.hc2_agestart) {
-              state_next.base.p_hiv_deaths(a,s) += state_next.children.hc1_art_aids_deaths(dur, hd, a, s);
-            } else if (hd < (hc_ss.hc2DS)) {
-              state_next.base.p_hiv_deaths(a,s) += state_next.children.hc2_art_aids_deaths(dur, hd, a-hc_ss.hc2_agestart, s);
-            }
+          if (a < hc_ss.hc2_agestart && state_next.children.hc1_art_pop(0, hd, a, s) > 0) {
+            state_next.base.p_hiv_deaths(a,s) += state_next.children.hc1_art_aids_deaths(dur, hd, a, s);
+          } else if (hd < (hc_ss.hc2DS) && a >= hc_ss.hc2_agestart) {
+            state_next.base.p_hiv_deaths(a,s) += state_next.children.hc2_art_aids_deaths(dur, hd, a-hc_ss.hc2_agestart, s);
           }
         }//end dur
       }//end ss.NS
