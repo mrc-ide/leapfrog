@@ -60,7 +60,8 @@ jobs:
             "-Wno-cast-function-type",
             "-Wno-missing-field-initializers",
             "-Wno-ignored-attributes",
-            "-Wno-deprecated-copy"
+            "-Wno-deprecated-copy",
+            "-g"
           )
           withr::with_makevars(c(CXXFLAGS = makevars),
             pkgbuild::compile_dll(quiet = TRUE)
