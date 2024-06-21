@@ -112,8 +112,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
 
   ## pull in ART coverage numbers
   art = input_childart(pjnz)
-  v$artpaeds_isperc <- art$art_ispercent[2,]
-  v$artpaeds_isperc[] <- as.integer(ifelse(art$art_ispercent[2,] == FALSE, 0, 1))
+  v$artpaeds_isperc <- as.integer(vapply(art$art_ispercent[2,], isTRUE, logical(1)))
   art$child_art[1,which(art$art_ispercent[2,])] <- art$child_art[1,which(art$art_ispercent[2,])] / 100
   v$paed_art_val <- art$child_art
   v$paed_art_age_spec <- art$age_spec

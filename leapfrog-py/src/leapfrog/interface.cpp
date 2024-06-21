@@ -63,83 +63,83 @@ PYBIND11_MODULE(leapfrog, m) {
         .def_readonly("h_art_stage_dur", &leapfrog::Art<double>::h_art_stage_dur)
         .def_readonly("initiation_mortality_weight", &leapfrog::Art<double>::initiation_mortality_weight);
 
-//    TODO: Add child model support
-//    py::class_<Children<double>>(leapfrog, "Children")
-//            .def(py::init<const TensorMap1<double>&,
-//                      const TensorMap1<double>&,
-//                      const TensorMap2<double>&,
-//                      const TensorMap3<double>&,
-//                      const TensorMap3<double>&,
-//                      const TensorMap1<double>&,
-//                      const TensorMap1<double>&,
-//                      double,
-//                      const TensorMap1<double>&,
-//                      const TensorMap1<int>&,
-//                      const Tensor2<double>&,
-//                      const TensorMap3<double>&,
-//                      const TensorMap3<double>&,
-//                      const TensorMap3<double>&,
-//                      const TensorMap1<int>&,
-//                      const TensorMap2<double>&,
-//                      const TensorMap2<double>&,
-//                      const TensorMap2<double>&,
-//                      const TensorMap1<double>&,
-//                      const TensorMap1<double>&,
-//                      const TensorMap1<double>&,
-//                      const TensorMap1<double>&,
-//                      double,
-//                      const TensorMap2<double>&,
-//                      const TensorMap2<double>&,
-//                      const TensorMap3<double>&,
-//                      const TensorMap2<double>&,
-//                      const TensorMap1<int>&,
-//                      const TensorMap2<double>&,
-//                      const TensorMap2<double>&,
-//                      const TensorMap1<double>&,
-//                      const TensorMap1<int>&,
-//                      const TensorMap1<double>&,
-//                      const TensorMap1<double>&,
-//                      const TensorMap1<int>&,
-//                      const TensorMap1<int>&,
-//                      const TensorMap1<double>&>())
-//        .def_readonly("hc_nosocomial", &Children<double>::hc_nosocomial)
-//        .def_readonly("hc1_cd4_dist", &Children<double>::hc1_cd4_dist)
-//        .def_readonly("hc_cd4_transition", &Children<double>::hc_cd4_transition)
-//        .def_readonly("hc1_cd4_mort", &Children<double>::hc1_cd4_mort)
-//        .def_readonly("hc2_cd4_mort", &Children<double>::hc2_cd4_mort)
-//        .def_readonly("hc1_cd4_prog", &Children<double>::hc1_cd4_prog)
-//        .def_readonly("hc2_cd4_prog", &Children<double>::hc2_cd4_prog)
-//        .def_readonly("ctx_effect", &Children<double>::ctx_effect)
-//        .def_readonly("ctx_val", &Children<double>::ctx_val)
-//        .def_readonly("hc_art_elig_age", &Children<double>::hc_art_elig_age)
-//        .def_readonly("hc_art_elig_cd4", &Children<double>::hc_art_elig_cd4)
-//        .def_readonly("hc_art_mort_rr", &Children<double>::hc_art_mort_rr)
-//        .def_readonly("hc1_art_mort", &Children<double>::hc1_art_mort)
-//        .def_readonly("hc2_art_mort", &Children<double>::hc2_art_mort)
-//        .def_readonly("hc_art_isperc", &Children<double>::hc_art_isperc)
-//        .def_readonly("hc_art_val", &Children<double>::hc_art_val)
-//        .def_readonly("hc_art_init_dist", &Children<double>::hc_art_init_dist)
-//        .def_readonly("adult_cd4_dist", &Children<double>::adult_cd4_dist)
-//        .def_readonly("fert_mult_by_age", &Children<double>::fert_mult_by_age)
-//        .def_readonly("fert_mult_off_art", &Children<double>::fert_mult_off_art)
-//        .def_readonly("fert_mult_on_art", &Children<double>::fert_mult_on_art)
-//        .def_readonly("total_fertility_rate", &Children<double>::total_fertility_rate)
-//        .def_readonly("local_adj_factor", &Children<double>::local_adj_factor)
-//        .def_readonly("PMTCT", &Children<double>::PMTCT)
-//        .def_readonly("vertical_transmission_rate", &Children<double>::vertical_transmission_rate)
-//        .def_readonly("PMTCT_transmission_rate", &Children<double>::PMTCT_transmission_rate)
-//        .def_readonly("PMTCT_dropout", &Children<double>::PMTCT_dropout)
-//        .def_readonly("PMTCT_input_is_percent", &Children<double>::PMTCT_input_is_percent)
-//        .def_readonly("breastfeeding_duration_art", &Children<double>::breastfeeding_duration_art)
-//        .def_readonly("breastfeeding_duration_no_art", &Children<double>::breastfeeding_duration_no_art)
-//        .def_readonly("mat_hiv_births", &Children<double>::mat_hiv_births)
-//        .def_readonly("mat_prev_input", &Children<double>::mat_prev_input)
-//        .def_readonly("prop_lt200", &Children<double>::prop_lt200)
-//        .def_readonly("prop_gte350", &Children<double>::prop_gte350)
-//        .def_readonly("incrate", &Children<double>::incrate)
-//        .def_readonly("ctx_val_is_percent", &Children<double>::ctx_val_is_percent)
-//        .def_readonly("hc_art_is_age_spec", &Children<double>::hc_art_is_age_spec)
-//        .def_readonly("hc_age_coarse", &Children<double>::hc_age_coarse);
+    py::class_<leapfrog::Children<double>>(m, "Children")
+            .def(py::init<const leapfrog::TensorMap1<double>&,
+                      const leapfrog::TensorMap1<double>&,
+                      const leapfrog::TensorMap2<double>&,
+                      const leapfrog::TensorMap3<double>&,
+                      const leapfrog::TensorMap3<double>&,
+                      const leapfrog::TensorMap1<double>&,
+                      const leapfrog::TensorMap1<double>&,
+                      const double&,
+                      const leapfrog::TensorMap1<double>&,
+                      const leapfrog::TensorMap1<int>&,
+                      const leapfrog::Tensor2<double>&,
+                      const leapfrog::TensorMap3<double>&,
+                      const leapfrog::TensorMap3<double>&,
+                      const leapfrog::TensorMap3<double>&,
+                      const leapfrog::TensorMap1<int>&,
+                      const leapfrog::TensorMap2<double>&,
+                      const leapfrog::TensorMap2<double>&,
+                      const leapfrog::TensorMap2<double>&,
+                      const leapfrog::TensorMap1<double>&,
+                      const leapfrog::TensorMap1<double>&,
+                      const leapfrog::TensorMap1<double>&,
+                      const leapfrog::TensorMap1<double>&,
+                      const double&,
+                      const leapfrog::TensorMap2<double>&,
+                      const leapfrog::TensorMap2<double>&,
+                      const leapfrog::TensorMap3<double>&,
+                      const leapfrog::TensorMap2<double>&,
+                      const leapfrog::TensorMap1<int>&,
+                      const leapfrog::TensorMap2<double>&,
+                      const leapfrog::TensorMap2<double>&,
+                      const leapfrog::TensorMap1<double>&,
+                      const leapfrog::TensorMap1<int>&,
+                      const leapfrog::TensorMap1<double>&,
+                      const leapfrog::TensorMap1<double>&,
+                      const leapfrog::TensorMap1<double>&,
+                      const leapfrog::TensorMap1<int>&,
+                      const leapfrog::TensorMap1<int>&,
+                      const leapfrog::TensorMap1<double>&>())
+        .def_readonly("hc_nosocomial", &leapfrog::Children<double>::hc_nosocomial)
+        .def_readonly("hc1_cd4_dist", &leapfrog::Children<double>::hc1_cd4_dist)
+        .def_readonly("hc_cd4_transition", &leapfrog::Children<double>::hc_cd4_transition)
+        .def_readonly("hc1_cd4_mort", &leapfrog::Children<double>::hc1_cd4_mort)
+        .def_readonly("hc2_cd4_mort", &leapfrog::Children<double>::hc2_cd4_mort)
+        .def_readonly("hc1_cd4_prog", &leapfrog::Children<double>::hc1_cd4_prog)
+        .def_readonly("hc2_cd4_prog", &leapfrog::Children<double>::hc2_cd4_prog)
+        .def_readonly("ctx_effect", &leapfrog::Children<double>::ctx_effect)
+        .def_readonly("ctx_val", &leapfrog::Children<double>::ctx_val)
+        .def_readonly("hc_art_elig_age", &leapfrog::Children<double>::hc_art_elig_age)
+        .def_readonly("hc_art_elig_cd4", &leapfrog::Children<double>::hc_art_elig_cd4)
+        .def_readonly("hc_art_mort_rr", &leapfrog::Children<double>::hc_art_mort_rr)
+        .def_readonly("hc1_art_mort", &leapfrog::Children<double>::hc1_art_mort)
+        .def_readonly("hc2_art_mort", &leapfrog::Children<double>::hc2_art_mort)
+        .def_readonly("hc_art_isperc", &leapfrog::Children<double>::hc_art_isperc)
+        .def_readonly("hc_art_val", &leapfrog::Children<double>::hc_art_val)
+        .def_readonly("hc_art_init_dist", &leapfrog::Children<double>::hc_art_init_dist)
+        .def_readonly("adult_cd4_dist", &leapfrog::Children<double>::adult_cd4_dist)
+        .def_readonly("fert_mult_by_age", &leapfrog::Children<double>::fert_mult_by_age)
+        .def_readonly("fert_mult_off_art", &leapfrog::Children<double>::fert_mult_off_art)
+        .def_readonly("fert_mult_on_art", &leapfrog::Children<double>::fert_mult_on_art)
+        .def_readonly("total_fertility_rate", &leapfrog::Children<double>::total_fertility_rate)
+        .def_readonly("local_adj_factor", &leapfrog::Children<double>::local_adj_factor)
+        .def_readonly("PMTCT", &leapfrog::Children<double>::PMTCT)
+        .def_readonly("vertical_transmission_rate", &leapfrog::Children<double>::vertical_transmission_rate)
+        .def_readonly("PMTCT_transmission_rate", &leapfrog::Children<double>::PMTCT_transmission_rate)
+        .def_readonly("PMTCT_dropout", &leapfrog::Children<double>::PMTCT_dropout)
+        .def_readonly("PMTCT_input_is_percent", &leapfrog::Children<double>::PMTCT_input_is_percent)
+        .def_readonly("breastfeeding_duration_art", &leapfrog::Children<double>::breastfeeding_duration_art)
+        .def_readonly("breastfeeding_duration_no_art", &leapfrog::Children<double>::breastfeeding_duration_no_art)
+        .def_readonly("mat_hiv_births", &leapfrog::Children<double>::mat_hiv_births)
+        .def_readonly("mat_prev_input", &leapfrog::Children<double>::mat_prev_input)
+        .def_readonly("prop_lt200", &leapfrog::Children<double>::prop_lt200)
+        .def_readonly("prop_gte350", &leapfrog::Children<double>::prop_gte350)
+        .def_readonly("incrate", &leapfrog::Children<double>::incrate)
+        .def_readonly("ctx_val_is_percent", &leapfrog::Children<double>::ctx_val_is_percent)
+        .def_readonly("hc_art_is_age_spec", &leapfrog::Children<double>::hc_art_is_age_spec)
+        .def_readonly("hc_age_coarse", &leapfrog::Children<double>::hc_age_coarse);
 
     py::class_<leapfrog::Options<double>>(m, "Options")
         .def(py::init<int, int, int>())
@@ -166,32 +166,29 @@ PYBIND11_MODULE(leapfrog, m) {
         .def_readonly("natural_history", &leapfrog::BaseModelParameters<double>::natural_history)
         .def_readonly("art", &leapfrog::BaseModelParameters<double>::art);
 
+    py::class_<leapfrog::ChildModelParameters<leapfrog::ChildModel, double>>(m, "ChildModelParameters")
+        .def(py::init<const leapfrog::Children<double>&>())
+        .def_readonly("children", &leapfrog::ChildModelParameters<leapfrog::ChildModel, double>::children);
 
-//    py::class_<ChildModelParameters<ChildModel, double>>(m, "ChildModelParameters")
-//        .def_readonly("children", &ChildModelParameters<ChildModel, double>::children);
-
-    py::class_<leapfrog::ChildModelParameters<leapfrog::BaseModelFullAgeStratification, double>>(m, "BaseModelChildParameters")
-        .def(py::init<>());
-
-    py::class_<leapfrog::Parameters<leapfrog::BaseModelFullAgeStratification, double>>(m, "Parameters")
+    py::class_<leapfrog::Parameters<leapfrog::ChildModel, double>>(m, "Parameters")
         .def(py::init<const leapfrog::BaseModelParameters<double>&,
-                      const leapfrog::ChildModelParameters<leapfrog::BaseModelFullAgeStratification, double>&>())
-        .def_readonly("base", &leapfrog::Parameters<leapfrog::BaseModelFullAgeStratification, double>::base)
-        .def_readonly("children", &leapfrog::Parameters<leapfrog::BaseModelFullAgeStratification, double>::children);
+                      const leapfrog::ChildModelParameters<leapfrog::ChildModel, double>&>())
+        .def_readonly("base", &leapfrog::Parameters<leapfrog::ChildModel, double>::base)
+        .def_readonly("children", &leapfrog::Parameters<leapfrog::ChildModel, double>::children);
 
-    py::class_<leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double, false>>(m, "BaseModelState")
-        .def(py::init<const leapfrog::TensorType<double, Sizes<leapfrog::pAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>, false>&,
+    py::class_<leapfrog::BaseModelState<leapfrog::ChildModel, double, false>>(m, "BaseModelState")
+        .def(py::init<const leapfrog::TensorType<double, Sizes<leapfrog::pAG<leapfrog::ChildModel>, leapfrog::NS<leapfrog::ChildModel>>, false>&,
                       const leapfrog::TensorType<double, Sizes<1>, false>&,
-                      const leapfrog::TensorType<double, Sizes<leapfrog::pAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>, false>&,
-                      const leapfrog::TensorType<double, Sizes<leapfrog::pAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>, false>&,
-                      const leapfrog::TensorType<double, Sizes<leapfrog::pAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>, false>&,
-                      const leapfrog::TensorType<double, Sizes<leapfrog::hDS<leapfrog::BaseModelFullAgeStratification>, leapfrog::hAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>, false>&,
-                      const leapfrog::TensorType<double, Sizes<leapfrog::hTS<leapfrog::BaseModelFullAgeStratification>, leapfrog::hDS<leapfrog::BaseModelFullAgeStratification>, leapfrog::hAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>, false>&,
-                      const leapfrog::TensorType<double, Sizes<leapfrog::hDS<leapfrog::BaseModelFullAgeStratification>, leapfrog::hAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>, false>&,
-                      const leapfrog::TensorType<double, Sizes<leapfrog::pAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>, false>&,
-                      const leapfrog::TensorType<double, Sizes<leapfrog::hTS<leapfrog::BaseModelFullAgeStratification>, leapfrog::hDS<leapfrog::BaseModelFullAgeStratification>, leapfrog::hAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>, false>&,
-                      const leapfrog::TensorType<double, Sizes<leapfrog::hDS<leapfrog::BaseModelFullAgeStratification>, leapfrog::hAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>, false>&,
-                      const leapfrog::TensorType<double, Sizes<leapfrog::pAG<leapfrog::BaseModelFullAgeStratification>, leapfrog::NS<leapfrog::BaseModelFullAgeStratification>>, false>&>(),
+                      const leapfrog::TensorType<double, Sizes<leapfrog::pAG<leapfrog::ChildModel>, leapfrog::NS<leapfrog::ChildModel>>, false>&,
+                      const leapfrog::TensorType<double, Sizes<leapfrog::pAG<leapfrog::ChildModel>, leapfrog::NS<leapfrog::ChildModel>>, false>&,
+                      const leapfrog::TensorType<double, Sizes<leapfrog::pAG<leapfrog::ChildModel>, leapfrog::NS<leapfrog::ChildModel>>, false>&,
+                      const leapfrog::TensorType<double, Sizes<leapfrog::hDS<leapfrog::ChildModel>, leapfrog::hAG<leapfrog::ChildModel>, leapfrog::NS<leapfrog::ChildModel>>, false>&,
+                      const leapfrog::TensorType<double, Sizes<leapfrog::hTS<leapfrog::ChildModel>, leapfrog::hDS<leapfrog::ChildModel>, leapfrog::hAG<leapfrog::ChildModel>, leapfrog::NS<leapfrog::ChildModel>>, false>&,
+                      const leapfrog::TensorType<double, Sizes<leapfrog::hDS<leapfrog::ChildModel>, leapfrog::hAG<leapfrog::ChildModel>, leapfrog::NS<leapfrog::ChildModel>>, false>&,
+                      const leapfrog::TensorType<double, Sizes<leapfrog::pAG<leapfrog::ChildModel>, leapfrog::NS<leapfrog::ChildModel>>, false>&,
+                      const leapfrog::TensorType<double, Sizes<leapfrog::hTS<leapfrog::ChildModel>, leapfrog::hDS<leapfrog::ChildModel>, leapfrog::hAG<leapfrog::ChildModel>, leapfrog::NS<leapfrog::ChildModel>>, false>&,
+                      const leapfrog::TensorType<double, Sizes<leapfrog::hDS<leapfrog::ChildModel>, leapfrog::hAG<leapfrog::ChildModel>, leapfrog::NS<leapfrog::ChildModel>>, false>&,
+                      const leapfrog::TensorType<double, Sizes<leapfrog::pAG<leapfrog::ChildModel>, leapfrog::NS<leapfrog::ChildModel>>, false>&>(),
                       py::arg("p_total_pop"),
                       py::arg("births"),
                       py::arg("p_total_pop_natural_deaths"),
@@ -204,34 +201,72 @@ PYBIND11_MODULE(leapfrog, m) {
                       py::arg("h_hiv_deaths_art"),
                       py::arg("h_art_initiation"),
                       py::arg("p_hiv_deaths"))
-        .def("reset", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double, false>::reset)
-        .def_readonly("p_total_pop", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double, false>::p_total_pop)
-        .def_readonly("births", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double, false>::births)
-        .def_readonly("p_total_pop_natural_deaths", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double, false>::p_total_pop_natural_deaths)
-        .def_readonly("p_hiv_pop", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double, false>::p_hiv_pop)
-        .def_readonly("p_hiv_pop_natural_deaths", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double, false>::p_hiv_pop_natural_deaths)
-        .def_readonly("h_hiv_adult", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double, false>::h_hiv_adult)
-        .def_readonly("h_art_adult", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double, false>::h_art_adult)
-        .def_readonly("h_hiv_deaths_no_art", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double, false>::h_hiv_deaths_no_art)
-        .def_readonly("p_infections", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double, false>::p_infections)
-        .def_readonly("h_hiv_deaths_art", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double, false>::h_hiv_deaths_art)
-        .def_readonly("h_art_initiation", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double, false>::h_art_initiation)
-        .def_readonly("p_hiv_deaths", &leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double, false>::p_hiv_deaths);
+        .def_readonly("p_total_pop", &leapfrog::BaseModelState<leapfrog::ChildModel, double, false>::p_total_pop)
+        .def_readonly("births", &leapfrog::BaseModelState<leapfrog::ChildModel, double, false>::births)
+        .def_readonly("p_total_pop_natural_deaths", &leapfrog::BaseModelState<leapfrog::ChildModel, double, false>::p_total_pop_natural_deaths)
+        .def_readonly("p_hiv_pop", &leapfrog::BaseModelState<leapfrog::ChildModel, double, false>::p_hiv_pop)
+        .def_readonly("p_hiv_pop_natural_deaths", &leapfrog::BaseModelState<leapfrog::ChildModel, double, false>::p_hiv_pop_natural_deaths)
+        .def_readonly("h_hiv_adult", &leapfrog::BaseModelState<leapfrog::ChildModel, double, false>::h_hiv_adult)
+        .def_readonly("h_art_adult", &leapfrog::BaseModelState<leapfrog::ChildModel, double, false>::h_art_adult)
+        .def_readonly("h_hiv_deaths_no_art", &leapfrog::BaseModelState<leapfrog::ChildModel, double, false>::h_hiv_deaths_no_art)
+        .def_readonly("p_infections", &leapfrog::BaseModelState<leapfrog::ChildModel, double, false>::p_infections)
+        .def_readonly("h_hiv_deaths_art", &leapfrog::BaseModelState<leapfrog::ChildModel, double, false>::h_hiv_deaths_art)
+        .def_readonly("h_art_initiation", &leapfrog::BaseModelState<leapfrog::ChildModel, double, false>::h_art_initiation)
+        .def_readonly("p_hiv_deaths", &leapfrog::BaseModelState<leapfrog::ChildModel, double, false>::p_hiv_deaths);
 
-    py::class_<leapfrog::ChildModelState<leapfrog::BaseModelFullAgeStratification, double, false>>(m, "ChildModelState")
-        .def(py::init<const leapfrog::Parameters<leapfrog::BaseModelFullAgeStratification, double>&>())
-        .def("reset", &leapfrog::ChildModelState<leapfrog::BaseModelFullAgeStratification, double, false>::reset);
+    py::class_<leapfrog::ChildModelState<leapfrog::ChildModel, double, false>>(m, "ChildModelState")
+        .def(py::init<const leapfrog::TensorType<double, Sizes<leapfrog::hc1DS<leapfrog::ChildModel>, leapfrog::hcTT<leapfrog::ChildModel>, leapfrog::hc1AG<leapfrog::ChildModel>, leapfrog::NS<leapfrog::ChildModel>>, false>&,
+                      const leapfrog::TensorType<double, Sizes<leapfrog::hc2DS<leapfrog::ChildModel>, leapfrog::hcTT<leapfrog::ChildModel>, leapfrog::hc2AG<leapfrog::ChildModel>, leapfrog::NS<leapfrog::ChildModel>>, false>&,
+                      const leapfrog::TensorType<double, Sizes<leapfrog::hTS<leapfrog::ChildModel>, leapfrog::hc1DS<leapfrog::ChildModel>, leapfrog::hc1AG<leapfrog::ChildModel>, leapfrog::NS<leapfrog::ChildModel>>, false>&,
+                      const leapfrog::TensorType<double, Sizes<leapfrog::hTS<leapfrog::ChildModel>, leapfrog::hc2DS<leapfrog::ChildModel>, leapfrog::hc2AG<leapfrog::ChildModel>, leapfrog::NS<leapfrog::ChildModel>>, false>&,
+                      const leapfrog::TensorType<double, Sizes<leapfrog::hc1DS<leapfrog::ChildModel>, leapfrog::hcTT<leapfrog::ChildModel>, leapfrog::hc1AG<leapfrog::ChildModel>, leapfrog::NS<leapfrog::ChildModel>>, false>&,
+                      const leapfrog::TensorType<double, Sizes<leapfrog::hc2DS<leapfrog::ChildModel>, leapfrog::hcTT<leapfrog::ChildModel>, leapfrog::hc2AG<leapfrog::ChildModel>, leapfrog::NS<leapfrog::ChildModel>>, false>&,
+                      const leapfrog::TensorType<double, Sizes<leapfrog::hTS<leapfrog::ChildModel>, leapfrog::hc1DS<leapfrog::ChildModel>, leapfrog::hc1AG<leapfrog::ChildModel>, leapfrog::NS<leapfrog::ChildModel>>, false>&,
+                      const leapfrog::TensorType<double, Sizes<leapfrog::hTS<leapfrog::ChildModel>, leapfrog::hc2DS<leapfrog::ChildModel>, leapfrog::hc2AG<leapfrog::ChildModel>, leapfrog::NS<leapfrog::ChildModel>>, false>&,
+                      const leapfrog::TensorType<double, Sizes<1>, false>&,
+                      const leapfrog::TensorType<double, Sizes<4>, false>&,
+                      const leapfrog::TensorType<double, Sizes<4>, false>&,
+                      const leapfrog::TensorType<double, Sizes<leapfrog::hc1DS<leapfrog::ChildModel>, leapfrog::hcTT<leapfrog::ChildModel>, 15, leapfrog::NS<leapfrog::ChildModel>>, false>&,
+                      const leapfrog::TensorType<double, Sizes<1>, false>&,
+                      const leapfrog::TensorType<double, Sizes<1>, false>&>(),
+                      py::arg("hc1_hiv_pop"),
+                      py::arg("hc2_hiv_pop"),
+                      py::arg("hc1_art_pop"),
+                      py::arg("hc2_art_pop"),
+                      py::arg("hc1_noart_aids_deaths"),
+                      py::arg("hc2_noart_aids_deaths"),
+                      py::arg("hc1_art_aids_deaths"),
+                      py::arg("hc2_art_aids_deaths"),
+                      py::arg("hiv_births"),
+                      py::arg("hc_art_total"),
+                      py::arg("hc_art_init"),
+                      py::arg("hc_art_need_init"),
+                      py::arg("ctx_need"),
+                      py::arg("ctx_mean"))
+        .def_readonly("hc1_hiv_pop", &leapfrog::ChildModelState<leapfrog::ChildModel, double, false>::hc1_hiv_pop)
+        .def_readonly("hc2_hiv_pop", &leapfrog::ChildModelState<leapfrog::ChildModel, double, false>::hc2_hiv_pop)
+        .def_readonly("hc1_art_pop", &leapfrog::ChildModelState<leapfrog::ChildModel, double, false>::hc1_art_pop)
+        .def_readonly("hc2_art_pop", &leapfrog::ChildModelState<leapfrog::ChildModel, double, false>::hc2_art_pop)
+        .def_readonly("hc1_noart_aids_deaths", &leapfrog::ChildModelState<leapfrog::ChildModel, double, false>::hc1_noart_aids_deaths)
+        .def_readonly("hc2_noart_aids_deaths", &leapfrog::ChildModelState<leapfrog::ChildModel, double, false>::hc2_noart_aids_deaths)
+        .def_readonly("hc1_art_aids_deaths", &leapfrog::ChildModelState<leapfrog::ChildModel, double, false>::hc1_art_aids_deaths)
+        .def_readonly("hc2_art_aids_deaths", &leapfrog::ChildModelState<leapfrog::ChildModel, double, false>::hc2_art_aids_deaths)
+        .def_readonly("hiv_births", &leapfrog::ChildModelState<leapfrog::ChildModel, double, false>::hiv_births)
+        .def_readonly("hc_art_total", &leapfrog::ChildModelState<leapfrog::ChildModel, double, false>::hc_art_total)
+        .def_readonly("hc_art_init", &leapfrog::ChildModelState<leapfrog::ChildModel, double, false>::hc_art_init)
+        .def_readonly("hc_art_need_init", &leapfrog::ChildModelState<leapfrog::ChildModel, double, false>::hc_art_need_init)
+        .def_readonly("ctx_need", &leapfrog::ChildModelState<leapfrog::ChildModel, double, false>::ctx_need)
+        .def_readonly("ctx_mean", &leapfrog::ChildModelState<leapfrog::ChildModel, double, false>::ctx_mean);
 
-    py::class_<leapfrog::State<leapfrog::BaseModelFullAgeStratification, double, false>>(m, "State")
-        .def(py::init<const leapfrog::BaseModelState<leapfrog::BaseModelFullAgeStratification, double, false>&,
-                      const leapfrog::ChildModelState<leapfrog::BaseModelFullAgeStratification, double, false>&>())
-        .def("reset", &leapfrog::State<leapfrog::BaseModelFullAgeStratification, double, false>::reset)
-        .def_readonly("base", &leapfrog::State<leapfrog::BaseModelFullAgeStratification, double, false>::base)
-        .def_readonly("children", &leapfrog::State<leapfrog::BaseModelFullAgeStratification, double, false>::children);
+    py::class_<leapfrog::State<leapfrog::ChildModel, double, false>>(m, "State")
+        .def(py::init<const leapfrog::BaseModelState<leapfrog::ChildModel, double, false>&,
+                      const leapfrog::ChildModelState<leapfrog::ChildModel, double, false>&>())
+        .def_readonly("base", &leapfrog::State<leapfrog::ChildModel, double, false>::base)
+        .def_readonly("children", &leapfrog::State<leapfrog::ChildModel, double, false>::children);
 
     m.def(
         "project_single_year_cpp",
-        &leapfrog::project_single_year<leapfrog::BaseModelFullAgeStratification, double, false>,
+        &leapfrog::project_single_year<leapfrog::ChildModel, double, false>,
         py::arg("time_step"),
         py::arg("pars"),
         py::arg("state_curr"),
@@ -241,7 +276,7 @@ PYBIND11_MODULE(leapfrog, m) {
 
     m.def(
         "set_initial_state_cpp",
-        &leapfrog::set_initial_state<leapfrog::BaseModelFullAgeStratification, double, false>,
+        &leapfrog::set_initial_state<leapfrog::ChildModel, double, false>,
         py::arg("state"),
         py::arg("pars"),
         "Set initial state from the parameters"
@@ -249,7 +284,7 @@ PYBIND11_MODULE(leapfrog, m) {
 
      m.def(
          "run_model_cpp",
-         &leapfrog::simulate_model<leapfrog::BaseModelFullAgeStratification, double>,
+         &leapfrog::simulate_model<leapfrog::ChildModel, double>,
          py::arg("params"),
          py::arg("proj_years"),
          py::arg("save_steps"),

@@ -37,7 +37,6 @@ demp <- prepare_leapfrog_demp(pjnz_child)
 proj <- prepare_leapfrog_projp(pjnz_child)
 proj <- prepare_hc_leapfrog_projp(pjnz_child, proj)
 
-
 demp$netmigr <- leapfrog:::read_netmigr(pjnz_child, adjust_u5mig = FALSE)
 demp$netmigr_adj <- leapfrog:::adjust_spectrum_netmigr(demp$netmigr)
 

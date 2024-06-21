@@ -270,12 +270,12 @@ public:
     output_state.hc2_noart_aids_deaths.chip(i, output_state.hc2_noart_aids_deaths.NumDimensions - 1) = state.children.hc2_noart_aids_deaths;
     output_state.hc1_art_aids_deaths.chip(i, output_state.hc1_art_aids_deaths.NumDimensions - 1) = state.children.hc1_art_aids_deaths;
     output_state.hc2_art_aids_deaths.chip(i, output_state.hc2_art_aids_deaths.NumDimensions - 1) = state.children.hc2_art_aids_deaths;
-    output_state.hiv_births(i) = state.children.hiv_births;
+    output_state.hiv_births(i) = state.children.hiv_births(0);
     output_state.hc_art_total.chip(i, output_state.hc_art_total.NumDimensions - 1) = state.children.hc_art_total;
     output_state.hc_art_init.chip(i, output_state.hc_art_init.NumDimensions - 1) = state.children.hc_art_init;
     output_state.hc_art_need_init.chip(i, output_state.hc_art_need_init.NumDimensions - 1) = state.children.hc_art_need_init;
-    output_state.ctx_need(i) = state.children.ctx_need;
-    output_state.ctx_mean(i) = state.children.ctx_mean;
+    output_state.ctx_need(i) = state.children.ctx_need(0);
+    output_state.ctx_mean(i) = state.children.ctx_mean(0);
     return;
   }
 };
