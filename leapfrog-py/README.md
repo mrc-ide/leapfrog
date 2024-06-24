@@ -7,11 +7,38 @@
 
 ## Table of Contents
 
-- [Prerequisites](#prerequisites)
-- [Building and installing](#buildingandinstalling)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Development](#development)
 - [License](#license)
 
-## Prerequisites
+## Installation
+
+```console
+pip install leapfrog-py
+```
+
+## Usage
+
+You can use `leapfrog-py` to run a leapfrog simulation in two ways. Run for multiple years using:
+
+```python
+run_leapfrog(parameters)
+```
+
+This will run from 1970 to 2030 inclusive by default with 10 HIV time steps per year. You can also run for a single year using:
+
+```python
+set_initial_state(parameters, state)
+for i in range(1, 61):
+    project_single_year(i, parameters, state)
+```
+
+Parameters and state are both dictionaries of numpy arrays.
+
+## Development
+
+### Prerequisites
 
 This project uses [scikit-build-core](https://github.com/scikit-build/scikit-build-core) to build the C++ project. You'll need a recent version of CMake (>3.15) and Python (>3.7).
 
@@ -34,7 +61,7 @@ cmake ..
 cmake --build . --target install
 ```
 
-## Development
+### Building, installing and running tests
 
 Use hatch
 
@@ -50,21 +77,7 @@ hatch run lint:typing
 hatch run lint:all
 ```
 
-## Building, installing and running tests
-
-With `hatch`
-
-```console
-hatch run install
-hatch run test
-```
-
-or 
-```console
-hatch run install_and_test
-```
-
-With `pipx`
+To build with pipx
 
 ```console
 pipx run build
