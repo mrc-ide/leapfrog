@@ -33,7 +33,7 @@ jobs:
         env:
           # Issue with compiling pybind11 eigen header as it has an invalid
           # conversion from size_t to int
-          CIBW_SKIP: "pp38-manylinux_i686"
+          CIBW_SKIP: "pp38-manylinux_i686 pp39-manylinux_i686 pp310-manylinux_i686"
 
       - uses: actions/upload-artifact@v4
         with:
