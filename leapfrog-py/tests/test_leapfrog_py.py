@@ -2,7 +2,7 @@ import os
 
 import numpy as np
 import pytest
-from leapfrog_py.leapfrog_py import (
+from leapfrog_py import (
     project_single_year,
     run_leapfrog,
     set_initial_state,
