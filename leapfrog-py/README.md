@@ -23,12 +23,16 @@ pip install leapfrog-py
 You can use `leapfrog-py` to run a leapfrog simulation in two ways. Run for multiple years using:
 
 ```python
+from leapfrog_py import run_leapfrog
+
 run_leapfrog(parameters)
 ```
 
 This will run from 1970 to 2030 inclusive by default with 10 HIV time steps per year. You can also run for a single year using:
 
 ```python
+from leapfrog_py import set_initial_state, project_single_year
+
 set_initial_state(parameters, state)
 for i in range(1, 61):
     project_single_year(i, parameters, state)
