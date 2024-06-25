@@ -1,6 +1,11 @@
 test_that("We can compile the standalone program", {
   skip_for_compilation()
   skip_on_os("windows")
+  testthat::skip_if_not(
+    file.exists(frogger_file("standalone_model/data/adult_data",
+                             mustWork = FALSE)),
+    paste("Skipping as test data not extracted, run ",
+          "'./inst/standalone_model/extract_data' first."))
 
   path_src <- frogger_file("standalone_model")
   tmp <- tempfile()
@@ -15,15 +20,15 @@ test_that("We can compile the standalone program", {
   expect_equal(code, 0)
   code <- withr::with_dir(
     tmp,
-    system2("make", stdout = FALSE, stderr = FALSE)
+    system2("make", "-B", stdout = FALSE, stderr = FALSE)
   )
   expect_equal(code, 0)
 
   output <- tempfile()
-  input <- frogger_file("standalone_model/data")
+  input <- frogger_file("standalone_model/data/adult_data")
 
   res <- system2(file.path(tmp, "simulate_model"),
-    c(60, 10, input, output),
+    c(61, 10, input, output),
     stdout = TRUE
   )
   expect_equal(res, c(
@@ -46,8 +51,7 @@ test_that("We can compile the standalone program", {
 
   expected <- readRDS(test_path("testdata/leapfrog_fit.rds"))
 
-  ## We're only reporting out last year atm so check final time point agrees
-  ## We're also expecting some precision loss due to serialization so check
+  ## We're expecting some precision loss due to serialization so check
   ## up to some tolerance
   expect_equal(deserialize_tensor_to_r(file.path(output, "p_total_pop")),
     expected$totpop1,

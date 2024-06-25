@@ -1,4 +1,4 @@
-name: Test
+name: leapfrog-py test
 
 on:
   pull_request:
@@ -50,6 +50,10 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           choco install eigen
+
+      - name: Extract test data
+        shell: bash
+        run: ../inst/standalone_model/extract_data
 
       - name: Install dependencies
         run: |

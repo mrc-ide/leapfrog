@@ -290,8 +290,8 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
 
   #cd4
   wlhiv_cd4 <- array(as.numeric(unlist(dpsub("<CD4Distribution15_49 MV2>", 19:25, timedat.idx))), dim = c(7,length(timedat.idx)))
-  v$prop_gte350 <- colSums(wlhiv_cd4[1:2,]) / colSums(wlhiv_cd4)
-  v$prop_lt200 <- colSums(wlhiv_cd4[5:7,]) / colSums(wlhiv_cd4)
+  v$prop_gte350 <- ifelse(colSums(wlhiv_cd4) == 0, 0, colSums(wlhiv_cd4[1:2,]) / colSums(wlhiv_cd4))
+  v$prop_lt200 <- ifelse(colSums(wlhiv_cd4) == 0, 0, colSums(wlhiv_cd4[5:7,]) / colSums(wlhiv_cd4))
 
   v$hc_age_coarse <- rep(c(1,2,3), each = 5)
 

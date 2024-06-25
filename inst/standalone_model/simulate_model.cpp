@@ -104,9 +104,9 @@ int main(int argc, char *argv[]) {
               << std::endl;
   }
 
-  if (sim_years > 60) {
-    std::cout << "Running to max no of sim years: 60\n" << std::endl;
-    sim_years = 60;
+  if (sim_years > 61) {
+    std::cout << "Running to max no of sim years: 61\n" << std::endl;
+    sim_years = 61;
   }
   if (hts_per_year > 10) {
     std::cout << "Running max no of HIV steps per years: 10" << std::endl;
@@ -128,9 +128,9 @@ int main(int argc, char *argv[]) {
 
   leapfrog::Tensor1<int> v = serialize::deserialize_tensor<int, 1>(
       std::string("idx_hm_elig"));
-  for (int i = 0; i <= sim_years; ++i) {
+  for (int i = 0; i < sim_years; ++i) {
     // 0-based indexing in C++ vs 1-based indexing in R
-    v(i) = v[i] - 1;
+    v(i) = v(i) - 1;
   }
   const leapfrog::TensorMap1<int> idx_hm_elig = tensor_to_tensor_map<int, 1>(v);
 
@@ -247,8 +247,9 @@ int main(int argc, char *argv[]) {
 
   leapfrog::internal::IntermediateData<leapfrog::BaseModelFullAgeStratification, double> intermediate(
       options.hAG_15plus);
+  intermediate.reset();
 
-  std::vector<int> save_steps(61);
+  std::vector<int> save_steps(sim_years);
   std::iota(save_steps.begin(), save_steps.end(), 0);
   leapfrog::StateSaver<leapfrog::BaseModelFullAgeStratification, double> state_output(
       sim_years, save_steps);
@@ -275,20 +276,8 @@ int main(int argc, char *argv[]) {
     state_output.save_state(state_current, 0);
 
     // Each time step is mid-point of the year
-    for (int step = 1; step <= sim_years; ++step) {
-      leapfrog::run_general_pop_demographic_projection<leapfrog::BaseModelFullAgeStratification, double>(
-          step, params,
-          state_current,
-          state_next,
-          intermediate);
-      leapfrog::run_hiv_pop_demographic_projection<leapfrog::BaseModelFullAgeStratification, double>(
-          step, params,
-          state_current,
-          state_next,
-          intermediate);
-      leapfrog::run_hiv_model_simulation<leapfrog::BaseModelFullAgeStratification, double>(
-          step, params, state_current,
-          state_next, intermediate);
+    for (int step = 1; step < sim_years; ++step) {
+      leapfrog::internal::project_year<leapfrog::BaseModelFullAgeStratification, double, true>(step, params, state_current, state_next, intermediate);
       state_output.save_state(state_next, step);
       std::swap(state_current, state_next);
       intermediate.reset();
