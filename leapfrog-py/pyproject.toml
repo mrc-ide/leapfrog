@@ -2,6 +2,11 @@
 requires = ["scikit-build-core", "pybind11"]
 build-backend = "scikit_build_core.build"
 
+[tool.scikit-build]
+cmake.verbose = false
+cmake.build-type = "Release"
+install.strip = true
+
 [project]
 name = "leapfrog-py"
 version = "0.0.1"

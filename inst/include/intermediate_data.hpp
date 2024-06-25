@@ -165,6 +165,7 @@ struct BaseModelIntermediateData {
     artelig_hahm.setZero();
     hivpop_ha.setZero();
     cd4mx_scale = 1.0;
+    artpop_hahm = 0.0;
     deaths = 0.0;
     everARTelig_idx = 0;
     cd4elig_idx = 0;
