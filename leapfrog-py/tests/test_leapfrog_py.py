@@ -217,7 +217,7 @@ def test_produces_same_output_as_r(tmp_path, parameters):
     current_dir = os.path.dirname(__file__)
     r_scripts_dir = os.path.join(current_dir, "../../scripts")
     subprocess.run(
-        [  # noqa: S603
+        [  # noqa: S603 S607
             "Rscript",
             os.path.join(r_scripts_dir, "run_model.R"),
             "--output-dir",
