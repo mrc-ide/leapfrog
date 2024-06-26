@@ -40,7 +40,7 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
   const leapfrog::Tensor1<int> idx_hm_elig = convert_0_based<1>(parse_data<int>(data, "artcd4elig_idx", proj_years));
   const leapfrog::TensorMap3<real_type> cd4_initial_distribution = parse_data<real_type>(data, "cd4_initdist", base.hDS, base.hAG, base.NS);
   const leapfrog::TensorMap4<real_type> mortality = parse_data<real_type>(data, "art_mort", base.hTS, base.hDS, base.hAG, base.NS);
-  const leapfrog::TensorMap2<real_type> mortaility_time_rate_ratio = parse_data<real_type>(data, "artmx_timerr", base.hTS, proj_years);
+  const leapfrog::TensorMap2<real_type> mortality_time_rate_ratio = parse_data<real_type>(data, "artmx_timerr", base.hTS, proj_years);
   const leapfrog::TensorMap1<real_type> dropout = parse_data<real_type>(data, "art_dropout", proj_years);
   const leapfrog::TensorMap2<real_type> adults_on_art = parse_data<real_type>(data, "art15plus_num", base.NS, proj_years);
   const leapfrog::TensorMap2<int> adults_on_art_is_percent = parse_data<int>(data, "art15plus_isperc", base.NS, proj_years);
@@ -70,7 +70,7 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
   const leapfrog::Art<real_type> art_params = {
       idx_hm_elig,
       mortality,
-      mortaility_time_rate_ratio,
+      mortality_time_rate_ratio,
       dropout,
       adults_on_art,
       adults_on_art_is_percent,

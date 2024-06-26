@@ -38,7 +38,7 @@ template<typename real_type>
 struct Art {
   Tensor1<int> idx_hm_elig;
   TensorMap4<real_type> mortality;
-  TensorMap2<real_type> mortaility_time_rate_ratio;
+  TensorMap2<real_type> mortality_time_rate_ratio;
   TensorMap1<real_type> dropout;
   TensorMap2<real_type> adults_on_art;
   TensorMap2<int> adults_on_art_is_percent;

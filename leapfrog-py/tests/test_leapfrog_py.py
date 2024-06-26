@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 import numpy as np
 import pytest
@@ -22,10 +23,15 @@ def parameters():
     ]
 
     parameters = {
-        f: read_standalone_data(os.path.join(test_data_dir, f))
-        for f in test_data_files
+        f: read_tensor(os.path.join(test_data_dir, f)) for f in test_data_files
     }
-    parameters["h_art_stage_dur"] = np.array([0.5, 0.5], order="F")
+    parameters["art_h_art_stage_dur"] = np.array([0.5, 0.5], order="F")
+
+    # Serialized data is from R, so if we have any data which references an index it will be off by 1
+    # so we need to convert it here
+    parameters["art_idx_hm_elig"] -= 1
+    parameters["children_hc_art_elig_cd4"] -= 1
+
     return parameters
 
 
@@ -102,7 +108,7 @@ def state():
     }
 
 
-def read_standalone_data(file_path):
+def read_tensor(file_path):
     with open(file_path) as file:
         # Read the type
         data_type = file.readline().strip()
@@ -130,7 +136,9 @@ def read_standalone_data(file_path):
 def test_can_set_initial_state(parameters, state):
     set_initial_state(parameters, state)
 
-    assert np.all(state["p_total_pop"][:, :, 0] == parameters["basepop"])
+    assert np.all(
+        state["p_total_pop"][:, :, 0] == parameters["demography_base_pop"]
+    )
 
 
 def test_can_run_single_year(parameters, state):
@@ -201,3 +209,39 @@ def test_can_run_full_model_for_specified_years(parameters):
     out = run_leapfrog(parameters, sim_years=np.arange(1970, 1976))
 
     assert out["p_hiv_pop"].shape == (81, 2, 6)
+
+
+def test_produces_same_output_as_r(tmp_path, parameters):
+    out = run_leapfrog(parameters)
+
+    current_dir = os.path.dirname(__file__)
+    r_scripts_dir = os.path.join(current_dir, "../../scripts")
+    subprocess.run(
+        [  # noqa: S603
+            os.path.join(r_scripts_dir, "run_model.R"),
+            "--output-dir",
+            tmp_path,
+        ],
+        check=True,
+        capture_output=True,
+    )
+
+    r_output_files = [
+        f
+        for f in os.listdir(tmp_path)
+        if os.path.isfile(os.path.join(tmp_path, f))
+    ]
+    assert len(r_output_files) == len(out)
+
+    r_output = {
+        f: read_tensor(os.path.join(tmp_path, f)) for f in r_output_files
+    }
+
+    assert out.keys() == r_output.keys()
+
+    for key in out:
+        # Check they are close up to some tolerance
+        # precision will be lost when the R script serializes the data
+        assert np.all(
+            np.isclose(out[key], r_output[key], atol=1e-5)
+        ), f"Different result for output {key}"
