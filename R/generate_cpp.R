@@ -611,3 +611,34 @@ read_types_csv <- function(path, validation_function, group_by_col) {
 
   group_list_of_lists(parsed_types, group_by_col)
 }
+
+
+#' Get mapping of R names to C++ names for input data
+#'
+#' @param input_csv Path to input csv which is source of truth for these names
+#'
+#' @return A list with r_name, cpp_name, and C++ struct/namespace this
+#'   belongs to
+#' @export
+frogger_input_name_mapping <- function(
+    input_csv = frogger_file("cpp_generation/model_input.csv")) {
+  input_data <- utils::read.csv(input_csv, colClasses = "character")
+
+  out <- lapply(seq_len(nrow(input_data)), function(row_num) {
+    ## When reading csv in excel the header column is included in count
+    csv_row_num <- row_num + 1
+    parsed <- validate_and_parse_input(as.list(input_data[row_num, ]),
+                                       basename(input_csv), csv_row_num)
+    if (parsed$r_name == "") {
+      ## In this case, data is created as const by C++ so we don't
+      ## need to map the data in
+      return(NULL)
+    }
+    list(
+      r_name = parsed$r_name,
+      cpp_name = parsed$cpp_name,
+      struct = parsed$struct
+    )
+  })
+  out[vlapply(out, function(x) !is.null(x))]
+}

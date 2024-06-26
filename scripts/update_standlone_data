@@ -12,8 +12,9 @@ write_standalone_data <- function(input_data, data_map, dest) {
   dir.create(t)
 
   ## Basepop handled separately as we only save a slice of this out
-  frogger:::serialize_r_to_tensor(demp$basepop[, , 1], file.path(t, "basepop"))
-  for (r_name in names(data_map)) {
+  frogger:::serialize_r_to_tensor(demp$basepop[, , 1],
+                                  file.path(t, "demography_base_pop"))
+  for (r_name in setdiff(names(data_map), "basepop")) {
     frogger:::serialize_r_to_tensor(input_data[[r_name]], file.path(t, data_map[[r_name]]))
   }
   o <- zip::zip(dest,
@@ -24,92 +25,48 @@ write_standalone_data <- function(input_data, data_map, dest) {
   file.path(save_root_dir, o)
 }
 
+build_name_mapping <- function(name_mapping, structs = NULL) {
+  if (!is.null(structs)) {
+    adult_model_data <- vapply(name_mapping, function(map) {
+      map$struct %in% adult_model_structs
+    }, logical(1))
+    name_mapping <- name_mapping[adult_model_data]
+  }
+  data_cpp_name <- vapply(name_mapping, "[[", character(1), "cpp_name")
+  data_struct <- vapply(name_mapping, "[[", character(1), "struct")
+  data_map <- sprintf("%s_%s", tolower(data_struct), data_cpp_name)
+  names(data_map) <- vapply(name_mapping, "[[", character(1), "r_name")
+  data_map
+}
+
 ## Map from name in demp/parameters to name expected in C++ code
-adult_model_data_map <- list(
-  Sx = "survival_probability",
-  netmigr_adj = "net_migration",
-  asfr = "age_specific_fertility_rate",
-  births_sex_prop = "births_sex_prop",
-  incidinput = "incidence_rate",
-  incrr_age = "incidence_age_rate_ratio",
-  incrr_sex = "incidence_sex_rate_ratio",
-  cd4_mort_full = "cd4_mortality_full",
-  cd4_prog_full = "cd4_progression_full",
-  cd4_initdist_full = "cd4_initial_distribution_full",
-  art_mort_full = "art_mortality_rate_full",
-  artmx_timerr = "art_mortality_time_rate_ratio",
-  art_dropout = "art_dropout",
-  art15plus_num = "adults_on_art",
-  art15plus_isperc = "adults_on_art_is_percent",
-  artcd4elig_idx = "idx_hm_elig"
-)
+name_mapping <- frogger::frogger_input_name_mapping()
+adult_model_structs <- c("Demography", "Incidence", "NaturalHistory", "Art")
+
+adult_model_data_map <- build_name_mapping(name_mapping, adult_model_structs)
+
 
 demp <- readRDS(testthat::test_path("testdata/demographic_projection_object_adult.rds"))
 parameters <- readRDS(testthat::test_path("testdata/projection_parameters_adult.rds"))
 input_data <- c(demp, parameters)
+input_data$cd4_initdist <- input_data[["cd4_initdist_full"]]
+input_data$cd4_prog <- input_data[["cd4_prog_full"]]
+input_data$cd4_mort <- input_data[["cd4_mort_full"]]
+input_data$art_mort <- input_data[["art_mort_full"]]
+
 path <- write_standalone_data(input_data, adult_model_data_map, "adult_data.zip")
 message(sprintf("Wrote adult test data to %s", path))
 
 
-child_model_data_map <- list(
-  Sx = "survival_probability",
-  netmigr_adj = "net_migration",
-  asfr = "age_specific_fertility_rate",
-  births_sex_prop = "births_sex_prop",
-  incidinput = "incidence_rate",
-  incrr_age = "incidence_age_rate_ratio",
-  incrr_sex = "incidence_sex_rate_ratio",
-  cd4_mort_full = "cd4_mortality_full",
-  cd4_prog_full = "cd4_progression_full",
-  cd4_initdist_full = "cd4_initial_distribution_full",
-  art_mort_full = "art_mortality_rate_full",
-  artmx_timerr = "art_mortality_time_rate_ratio",
-  art_dropout = "art_dropout",
-  art15plus_num = "adults_on_art",
-  art15plus_isperc = "adults_on_art_is_percent",
-  artcd4elig_idx = "idx_hm_elig",
-  paed_incid_input = "hc_nosocomial",
-  paed_cd4_dist = "hc1_cd4_dist",
-  paed_cd4_transition = "hc_cd4_transition",
-  paed_cd4_mort = "hc1_cd4_mort",
-  adol_cd4_mort = "hc2_cd4_mort",
-  paed_cd4_prog = "hc1_cd4_prog",
-  adol_cd4_prog = "hc2_cd4_prog",
-  ctx_effect = "ctx_effect",
-  ctx_val = "ctx_val",
-  paed_art_elig_age = "hc_art_elig_age",
-  paed_art_elig_cd4 = "hc_art_elig_cd4",
-  mort_art_rr = "hc_art_mort_rr",
-  paed_art_mort = "hc1_art_mort",
-  adol_art_mort = "hc2_art_mort",
-  artpaeds_isperc = "hc_art_isperc",
-  paed_art_val = "hc_art_val",
-  init_art_dist = "hc_art_init_dist",
-  adult_cd4_dist = "adult_cd4_dist",
-  fert_mult_by_age = "fert_mult_by_age",
-  fert_mult_offart = "fert_mult_off_art",
-  fert_mult_onart = "fert_mult_on_art",
-  tfr = "total_fertility_rate",
-  laf = "local_adj_factor",
-  pmtct = "PMTCT",
-  mtct = "vertical_transmission_rate",
-  pmtct_mtct = "PMTCT_transmission_rate",
-  pmtct_dropout = "PMTCT_dropout",
-  pmtct_input_isperc = "PMTCT_input_is_percent",
-  bf_duration_art = "breastfeeding_duration_art",
-  bf_duration_no_art = "breastfeeding_duration_no_art",
-  mat_hiv_births = "mat_hiv_births",
-  mat_prev_input = "mat_prev_input",
-  prop_lt200 = "prop_lt200",
-  prop_gte350 = "prop_gte350",
-  incrate = "incrate",
-  ctx_val_ispercent = "ctx_val_is_percent",
-  paed_art_age_spec = "hc_art_is_age_spec",
-  hc_age_coarse = "hc_age_coarse"
-)
+child_model_data_map <- build_name_mapping(name_mapping)
 
 source(file.path("R", "spectrum_inputs.R"))
 child <- setup_childmodel(testthat::test_path("testdata/child_parms.rds"))
 input_data <- c(child$demp, child$parameters)
+input_data$cd4_initdist <- input_data[["cd4_initdist_full"]]
+input_data$cd4_prog <- input_data[["cd4_prog_full"]]
+input_data$cd4_mort <- input_data[["cd4_mort_full"]]
+input_data$art_mort <- input_data[["art_mort_full"]]
+
 path <- write_standalone_data(input_data, child_model_data_map, "child_data.zip")
 message(sprintf("Wrote child test data to %s", path))

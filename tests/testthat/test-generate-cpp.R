@@ -337,3 +337,13 @@ test_that("can generate state saver types", {
   expect_contains("struct ChildModelStateSaver {", result)
   expect_contains("struct ChildModelStateSaver<ChildModel, real_type> {", result)
 })
+
+test_that("can get mapping of R name to C++ name for input data", {
+  mapping <- frogger_input_name_mapping()
+  for (map in mapping) {
+    expect_setequal(names(map), c("r_name", "cpp_name", "struct"))
+    expect_string(map$r_name)
+    expect_string(map$cpp_name)
+    expect_string(map$struct)
+  }
+})
