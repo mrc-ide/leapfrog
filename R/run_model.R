@@ -61,5 +61,34 @@ run_model <- function(data, parameters, sim_years,
   }
   data <- c(data, parameters)
 
-  run_base_model(data, sim_years, hts_per_year, output_steps, model_variant)
+
+  proj_years <- transform_simulation_years(data, sim_years)
+  save_steps <- transform_output_steps(output_steps)
+  hiv_steps <- transform_hts_per_year(hts_per_year)
+
+  run_base_model(data, proj_years, hiv_steps, save_steps, model_variant)
+}
+
+transform_simulation_years <- function(data, sim_years) {
+  sx <- data$Sx
+  max_sim_years <- dim(sx)[3]
+  if (is.null(sim_years)) {
+    return(max_sim_years)
+  }
+  n_years <- length(sim_years)
+  if (n_years > max_sim_years) {
+    stop(paste0("No of years > max years of ", max_sim_years))
+  }
+  n_years
+}
+
+transform_output_steps <- function(output_steps) {
+  output_steps - 1
+}
+
+transform_hts_per_year <- function(hts_per_year) {
+  if (is.null(hts_per_year)) {
+    return(10)
+  }
+  hts_per_year
 }

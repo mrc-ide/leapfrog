@@ -31,12 +31,14 @@ Config/testthat/edition: 3
 Additional_repositories: https://mrc-ide.r-universe.dev
 LinkingTo:
     Rcpp,
-    RcppEigen
+    RcppEigen,
+    TMB
 Imports:
     beers,
     eppasm (>= 0.5.12),
     glue,
-    Rcpp
+    Rcpp,
+    TMB
 Suggests:
     data.table,
     dplyr,
