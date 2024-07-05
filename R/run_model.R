@@ -92,3 +92,74 @@ transform_hts_per_year <- function(hts_per_year) {
   }
   hts_per_year
 }
+
+test_tmb <- function(data, parameters, sim_years,
+                     hts_per_year,
+                     output_steps = NULL,
+                     hiv_age_stratification = "full",
+                     run_child_model = TRUE) {
+  if (is.null(sim_years)) {
+    sim_years <- 1970:2030
+  }
+  if (is.null(output_steps)) {
+    output_steps <- seq_along(sim_years)
+  } else {
+    ## We want users to think in terms of years, so interface has years
+    ## But for running the C++ loop we want to report out based on what
+    ## iteration step we're at so convert from years to index
+    invalid_steps <- output_steps[!(output_steps %in% sim_years)]
+    if (any(invalid_steps)) {
+      out_str <- paste(paste0("'", invalid_steps, "'"), collapse = ", ")
+      stop(sprintf(
+        "Invalid output %s %s. Can only output one of the simulation years.",
+        ngettext(length(invalid_steps), "step", "steps"), out_str
+      ))
+    }
+    output_steps <- which(sim_years %in% output_steps)
+  }
+
+  assert_enum(hiv_age_stratification, c("full", "coarse"))
+  if (hiv_age_stratification == "full" && !run_child_model) {
+    model_variant <- "BaseModelFullAgeStratification"
+  } else if (hiv_age_stratification == "coarse" && !run_child_model) {
+    model_variant <- "BaseModelCoarseAgeStratification"
+  } else if (hiv_age_stratification == "full" && run_child_model) {
+    model_variant <- "ChildModel"
+  } else if (hiv_age_stratification == "coarse" && run_child_model) {
+    stop("Cannot run child model with coarse age stratification")
+  }
+  if (hiv_age_stratification == "full") {
+    parameters$hAG_SPAN <- parameters[["hAG_SPAN_full"]]
+    parameters$cd4_initdist <- parameters[["cd4_initdist_full"]]
+    parameters$cd4_prog <- parameters[["cd4_prog_full"]]
+    parameters$cd4_mort <- parameters[["cd4_mort_full"]]
+    parameters$art_mort <- parameters[["art_mort_full"]]
+  } else {
+    parameters$hAG_SPAN <- parameters[["hAG_SPAN_coarse"]]
+    parameters$cd4_initdist <- parameters[["cd4_initdist_coarse"]]
+    parameters$cd4_prog <- parameters[["cd4_prog_coarse"]]
+    parameters$cd4_mort <- parameters[["cd4_mort_coarse"]]
+    parameters$art_mort <- parameters[["art_mort_coarse"]]
+  }
+  data <- c(data, parameters)
+
+
+  proj_years <- transform_simulation_years(data, sim_years)
+  save_steps <- transform_output_steps(output_steps)
+  hiv_steps <- transform_hts_per_year(hts_per_year)
+
+
+  # TMB part starts
+  extra_inputs <- list(
+    model_variant = model_variant,
+    proj_years = proj_years,
+    hiv_steps = hiv_steps,
+    save_steps = save_steps
+  )
+  dyn.load(TMB::dynlib("src/frogger_TMB"))
+  data_tmb <- c(data, extra_inputs)
+  parameter_tmb <- list(x = 0)
+  obj <- TMB::MakeADFun(data_tmb, parameter_tmb, DLL = "frogger_TMB")
+  obj$hessian <- TRUE
+  opt <- do.call("optim", obj)
+}
