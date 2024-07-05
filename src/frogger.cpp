@@ -1,5 +1,4 @@
 #include <Rcpp.h>
-#include <TMB.hpp>
 
 #include "frogger.hpp"
 #include "intermediate_data.hpp"
@@ -52,16 +51,4 @@ Rcpp::List run_base_model(const Rcpp::List data,
   }
 
   return ret;
-}
-
-template<class Type>
-Type objective_function<Type>::operator() () {
-
-  // parse data
-
-  // run model like normal
-
-  // calculate likelihood
-
-  return 0;
 }
