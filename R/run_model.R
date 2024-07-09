@@ -97,8 +97,7 @@ test_tmb <- function(data, parameters, sim_years,
                      hts_per_year,
                      output_steps = NULL,
                      hiv_age_stratification = "full",
-                     run_child_model = TRUE,
-                     dll_path = "src/frogger_TMB") {
+                     run_child_model = TRUE) {
   if (is.null(sim_years)) {
     sim_years <- 1970:2030
   }
@@ -157,7 +156,6 @@ test_tmb <- function(data, parameters, sim_years,
     hiv_steps = hiv_steps,
     save_steps = save_steps
   )
-  dyn.load(TMB::dynlib(dll_path))
   data_tmb <- c(data, extra_inputs)
   parameter_tmb <- list(x = 0)
   obj <- TMB::MakeADFun(data_tmb, parameter_tmb, DLL = "frogger_TMB")

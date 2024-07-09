@@ -17,12 +17,12 @@ TMB_FLAGS = -I"../../inst/include" # add include directory inst/include
 
 .PHONY: all tmblib
 
-all: $(SHLIB) $(LAPACK_LIBS) $(BLAS_LIBS)
+all: $(SHLIB)
 $(SHLIB): tmblib
 
-tmblib:
+tmblib: 
 	(cd TMB; $(R_HOME)/bin$(R_ARCH_BIN)/Rscript \
 	--no-save --no-restore compile.R '$(TMB_FLAGS)')
 
 clean:
-	rm -rf *.so *.o TMB/*.so TMB/*.o
+	rm -rf *.dll *.o TMB/*.dll TMB/*.o
