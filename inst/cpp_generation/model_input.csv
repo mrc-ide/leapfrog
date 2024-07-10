@@ -12,7 +12,7 @@ cd4_prog,NaturalHistory.cd4_progression,real_type,,,FALSE,3,base.hDS - 1,base.hA
 artcd4elig_idx,Art.idx_hm_elig,int,,,TRUE,1,proj_years,,,
 cd4_initdist,NaturalHistory.cd4_initial_distribution,real_type,,,FALSE,3,base.hDS,base.hAG,base.NS,
 art_mort,Art.mortality,real_type,,,FALSE,4,base.hTS,base.hDS,base.hAG,base.NS
-artmx_timerr,Art.mortaility_time_rate_ratio,real_type,,,FALSE,2,base.hTS,proj_years,,
+artmx_timerr,Art.mortality_time_rate_ratio,real_type,,,FALSE,2,base.hTS,proj_years,,
 art_dropout,Art.dropout,real_type,,,FALSE,1,proj_years,,,
 art15plus_num,Art.adults_on_art,real_type,,,FALSE,2,base.NS,proj_years,,
 art15plus_isperc,Art.adults_on_art_is_percent,int,,,FALSE,2,base.NS,proj_years,,

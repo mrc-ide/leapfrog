@@ -56,7 +56,7 @@ PYBIND11_MODULE(leapfrog, m) {
                       double>())
         .def_readonly("idx_hm_elig", &leapfrog::Art<double>::idx_hm_elig)
         .def_readonly("mortality", &leapfrog::Art<double>::mortality)
-        .def_readonly("mortaility_time_rate_ratio", &leapfrog::Art<double>::mortaility_time_rate_ratio)
+        .def_readonly("mortality_time_rate_ratio", &leapfrog::Art<double>::mortality_time_rate_ratio)
         .def_readonly("dropout", &leapfrog::Art<double>::dropout)
         .def_readonly("adults_on_art", &leapfrog::Art<double>::adults_on_art)
         .def_readonly("adults_on_art_is_percent", &leapfrog::Art<double>::adults_on_art_is_percent)

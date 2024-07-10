@@ -47,13 +47,11 @@ run_model <- function(data, parameters, sim_years,
     stop("Cannot run child model with coarse age stratification")
   }
   if (hiv_age_stratification == "full") {
-    parameters$hAG_SPAN <- parameters[["hAG_SPAN_full"]]
     parameters$cd4_initdist <- parameters[["cd4_initdist_full"]]
     parameters$cd4_prog <- parameters[["cd4_prog_full"]]
     parameters$cd4_mort <- parameters[["cd4_mort_full"]]
     parameters$art_mort <- parameters[["art_mort_full"]]
   } else {
-    parameters$hAG_SPAN <- parameters[["hAG_SPAN_coarse"]]
     parameters$cd4_initdist <- parameters[["cd4_initdist_coarse"]]
     parameters$cd4_prog <- parameters[["cd4_prog_coarse"]]
     parameters$cd4_mort <- parameters[["cd4_mort_coarse"]]

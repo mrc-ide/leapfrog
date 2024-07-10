@@ -190,7 +190,7 @@ void run_art_progression_and_mortality(int hiv_step,
         for (int hu = 0; hu < ss.hTS; ++hu) {
           intermediate.base.deaths_art =
               art.mortality(hu, hm, ha, g) *
-              art.mortaility_time_rate_ratio(hu, time_step) *
+              art.mortality_time_rate_ratio(hu, time_step) *
               state_next.base.h_art_adult(hu, hm, ha, g);
           intermediate.base.p_hiv_deaths_age_sex(ha, g) +=
               pars.base.options.dt * intermediate.base.deaths_art;

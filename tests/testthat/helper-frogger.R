@@ -14,3 +14,8 @@ copy_directory <- function(src, as) {
 expect_contains <- function(expected, full_text) {
   expect_true(any(grepl(expected, full_text, fixed = TRUE)))
 }
+
+expect_string <- function(x, err_msg = deparse(substitute(x))) {
+  expect_true(!is.na(x) && nzchar(x),
+              sprintf("Expected non empty string: %s", err_msg))
+}

@@ -127,7 +127,7 @@ int main(int argc, char *argv[]) {
   };
 
   leapfrog::Tensor1<int> v = serialize::deserialize_tensor<int, 1>(
-      std::string("idx_hm_elig"));
+      std::string("art_idx_hm_elig"));
   for (int i = 0; i < sim_years; ++i) {
     // 0-based indexing in C++ vs 1-based indexing in R
     v(i) = v(i) - 1;
@@ -142,51 +142,51 @@ int main(int argc, char *argv[]) {
       h);
 
   leapfrog::Tensor2<double> base_pop_data = serialize::deserialize_tensor<double, 2>(
-      std::string("basepop"));
+      std::string("demography_base_pop"));
   const leapfrog::TensorMap2<double> base_pop = tensor_to_tensor_map<double, 2>(
       base_pop_data);
   leapfrog::Tensor3<double> survival_probability_data = serialize::deserialize_tensor<double, 3>(
-      std::string("survival_probability"));
+      std::string("demography_survival_probability"));
   const leapfrog::TensorMap3<double> survival_probability = tensor_to_tensor_map<double, 3>(
       survival_probability_data);
   leapfrog::Tensor3<double> net_migration_data = serialize::deserialize_tensor<double, 3>(
-      std::string("net_migration"));
+      std::string("demography_net_migration"));
   const leapfrog::TensorMap3<double> net_migration = tensor_to_tensor_map<double, 3>(
       net_migration_data);
   leapfrog::Tensor2<double> age_specific_fertility_rate_data = serialize::deserialize_tensor<double, 2>(
-      std::string("age_specific_fertility_rate"));
+      std::string("demography_age_specific_fertility_rate"));
   const leapfrog::TensorMap2<double> age_specific_fertility_rate = tensor_to_tensor_map<double, 2>(
       age_specific_fertility_rate_data);
   leapfrog::Tensor2<double> births_sex_prop_data = serialize::deserialize_tensor<double, 2>(
-      std::string("births_sex_prop"));
+      std::string("demography_births_sex_prop"));
   const leapfrog::TensorMap2<double> births_sex_prop = tensor_to_tensor_map<double, 2>(
       births_sex_prop_data);
   leapfrog::Tensor1<double> incidence_rate_data = serialize::deserialize_tensor<double, 1>(
-      std::string("incidence_rate"));
+      std::string("incidence_total_rate"));
   const leapfrog::TensorMap1<double> incidence_rate = tensor_to_tensor_map<double, 1>(
       incidence_rate_data);
   leapfrog::Tensor3<double> incidence_age_rate_ratio_data = serialize::deserialize_tensor<double, 3>(
-      std::string("incidence_age_rate_ratio"));
+      std::string("incidence_relative_risk_age"));
   const leapfrog::TensorMap3<double> incidence_age_rate_ratio = tensor_to_tensor_map<double, 3>(
       incidence_age_rate_ratio_data);
   leapfrog::Tensor1<double> incidence_sex_rate_ratio_data = serialize::deserialize_tensor<double, 1>(
-      std::string("incidence_sex_rate_ratio"));
+      std::string("incidence_relative_risk_sex"));
   const leapfrog::TensorMap1<double> incidence_sex_rate_ratio = tensor_to_tensor_map<double, 1>(
       incidence_sex_rate_ratio_data);
   leapfrog::Tensor3<double> cd4_mortality_data = serialize::deserialize_tensor<double, 3>(
-      std::string("cd4_mortality_full"));
+      std::string("naturalhistory_cd4_mortality"));
   const leapfrog::TensorMap3<double> cd4_mortality = tensor_to_tensor_map<double, 3>(
       cd4_mortality_data);
   leapfrog::Tensor3<double> cd4_progression_data = serialize::deserialize_tensor<double, 3>(
-      std::string("cd4_progression_full"));
+      std::string("naturalhistory_cd4_progression"));
   const leapfrog::TensorMap3<double> cd4_progression = tensor_to_tensor_map<double, 3>(
       cd4_progression_data);
   leapfrog::Tensor3<double> cd4_initial_distribution_data = serialize::deserialize_tensor<double, 3>(
-      std::string("cd4_initial_distribution_full"));
+      std::string("naturalhistory_cd4_initial_distribution"));
   const leapfrog::TensorMap3<double> cd4_initial_distribution = tensor_to_tensor_map<double, 3>(
       cd4_initial_distribution_data);
   leapfrog::Tensor4<double> art_mortality_rate_data = serialize::deserialize_tensor<double, 4>(
-      std::string("art_mortality_rate_full"));
+      std::string("art_mortality"));
   const leapfrog::TensorMap4<double> art_mortality_rate = tensor_to_tensor_map<double, 4>(
       art_mortality_rate_data);
   leapfrog::Tensor2<double> art_mortality_time_rate_ratio_data = serialize::deserialize_tensor<double, 2>(
@@ -198,11 +198,11 @@ int main(int argc, char *argv[]) {
   const leapfrog::TensorMap1<double> art_dropout = tensor_to_tensor_map<double, 1>(
       art_dropout_data);
   Eigen::Tensor<double, 2> adults_on_art_data = serialize::deserialize_tensor<double, 2>(
-      std::string("adults_on_art"));
+      std::string("art_adults_on_art"));
   const leapfrog::TensorMap2<double> adults_on_art = tensor_to_tensor_map<double, 2>(
       adults_on_art_data);
   leapfrog::Tensor2<int> adults_on_art_is_percent_data = serialize::deserialize_tensor<int, 2>(
-      std::string("adults_on_art_is_percent"));
+      std::string("art_adults_on_art_is_percent"));
   const leapfrog::TensorMap2<int> adults_on_art_is_percent = tensor_to_tensor_map<int, 2>(
       adults_on_art_is_percent_data);
 

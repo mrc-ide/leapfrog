@@ -42,8 +42,12 @@ serialize_r_to_tensor <- function(data, path) {
 #' @keywords internal
 deserialize_tensor_to_r <- function(path) {
   content <- readLines(path)
+  converter <- switch(
+    content[[1]],
+    "int" = as.integer,
+    "double" = as.numeric)
   array(
-    as.numeric(strsplit(content[[3]], ",\\s*")[[1]]),
+    converter(strsplit(content[[3]], ",\\s*")[[1]]),
     as.numeric(strsplit(content[[2]], ",\\s*")[[1]])
   )
 }

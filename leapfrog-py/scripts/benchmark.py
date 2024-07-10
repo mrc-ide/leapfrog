@@ -44,10 +44,15 @@ def parameters():
     ]
 
     parameters = {
-        f: read_standalone_data(os.path.join(test_data_dir, f))
-        for f in test_data_files
+        f: read_tensor(os.path.join(test_data_dir, f)) for f in test_data_files
     }
-    parameters["h_art_stage_dur"] = np.array([0.5, 0.5], order="F")
+    parameters["art_h_art_stage_dur"] = np.array([0.5, 0.5], order="F")
+
+    # Serialized data is from R, so if we have any data which references an index it will be off by 1
+    # so we need to convert it here
+    parameters["art_idx_hm_elig"] -= 1
+    parameters["children_hc_art_elig_cd4"] -= 1
+
     return parameters
 
 
@@ -123,7 +128,7 @@ def state():
     }
 
 
-def read_standalone_data(file_path):
+def read_tensor(file_path):
     with open(file_path) as file:
         # Read the type
         data_type = file.readline().strip()
