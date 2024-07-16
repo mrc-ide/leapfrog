@@ -170,6 +170,26 @@ void calc_hiv_negative_pop(int time_step,
 }
 
 template<typename ModelVariant, typename real_type>
+void adjust_hiv_births(int time_step,
+                           const Parameters<ModelVariant, real_type> &pars,
+                           const State<ModelVariant, real_type> &state_curr,
+                           State<ModelVariant, real_type> &state_next,
+                           IntermediateData<ModelVariant, real_type> &intermediate) {
+  const auto demog = pars.base.demography;
+  const auto cpars = pars.children.children;
+  static_assert(ModelVariant::run_child_model,
+                "adjust_hiv_births can only be called for model variants where run_child_model is true");
+  constexpr auto ss = StateSpace<ModelVariant>().base;
+
+if(cpars.abortion(time_step,1) == 1){
+  state_next.children.hiv_births -= state_next.children.hiv_births * cpars.abortion(time_step,0);
+}else{
+  state_next.children.hiv_births -=  cpars.abortion(time_step,0);
+}
+
+}
+
+template<typename ModelVariant, typename real_type>
 void convert_PMTCT_num_to_perc(int time_step,
                                const Parameters<ModelVariant, real_type> &pars,
                                const State<ModelVariant, real_type> &state_curr,
@@ -191,12 +211,16 @@ void convert_PMTCT_num_to_perc(int time_step,
     intermediate.children.need_PMTCT = state_next.children.hiv_births;
   }
 
+
   //replace all instances of coverage input as numbers with percentage covered
   if (cpars.PMTCT_input_is_percent(time_step)) {
     for (int hp = 0; hp < hc_ss.hPS; ++hp) {
       intermediate.children.PMTCT_coverage(hp) =  cpars.PMTCT(hp,time_step) / 100;
     } //end hPS
   } else {
+
+    intermediate.children.sumARV += cpars.patients_reallocated(time_step);
+
     for (int hp = 0; hp < hc_ss.hPS; ++hp) {
       intermediate.children.OnPMTCT = intermediate.children.sumARV ;
       if (intermediate.children.sumARV == 0) {
@@ -1414,7 +1438,7 @@ void run_child_model_simulation(int time_step,
     internal::run_wlhiv_births(time_step, pars, state_curr, state_next, intermediate);
   }
 
-
+  internal::adjust_hiv_births(time_step, pars, state_curr, state_next, intermediate);
 
   // if (state_next.children.hiv_births > 0) {
     internal::run_child_hiv_infections(time_step, pars, state_curr, state_next, intermediate);

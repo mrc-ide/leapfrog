@@ -266,9 +266,10 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   proj.years <- yr_start:yr_end
   timedat.idx <- 4+1:length(proj.years)-1
 
-  abort <- dpsub(tag = "<PregTermAbortionPerNum MV2>", rows = 2, cols = timedat.idx)
-  abort <- as.numeric(abort) / 100 / 100
-  v$abortions <- abort
+
+  v$abortion <- input_abortion(pjnz)
+
+  v$patients_reallocated <- input_mothers_reallocated(pjnz)
 
 
   ##extract needed outputs to just run paed model
@@ -565,6 +566,25 @@ dp_read_abortion <- function(dp) {
 
   list(pregtermabortion = pregtermabortion,
        pregtermabortion_ispercent = pregtermabortion_ispercent)
+}
+
+#' @rdname dp_read_mothers_reallocated
+#' @export
+dp_read_mothers_reallocated <- function(dp) {
+
+  dp <- get_dp_data(dp)
+  dpy <- get_dp_years(dp)
+
+
+  if (exists_dptag(dp, "<DP_TGX_PatientsReallocated_MV>")) {
+    patients_reallocated <- dpsub(dp, "<DP_TGX_PatientsReallocated_MV>", 2, dpy$time_data_idx)
+  } else {
+    stop("PatientsReallocated tag not found. Function probably needs update for this .DP file.")
+  }
+
+  patients_reallocated <- setNames(as.numeric(patients_reallocated), dpy$proj_years)
+
+  patients_reallocated
 }
 
 

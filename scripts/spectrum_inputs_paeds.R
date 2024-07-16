@@ -86,6 +86,13 @@ input_abortion <- function(pjnz){
   out
 }
 
+input_mothers_reallocated <- function(pjnz){
+  patients_reallocated <- dp_read_mothers_reallocated(pjnz)
+  out <- array(patients_reallocated, dim = length(patients_reallocated), dimnames = list(year = names(patients_reallocated)))
+
+  out
+}
+
 input_breastfeeding_dur <- function(pjnz){
   bf <- dp_read_breastfeeding(pjnz)
   dimnames(bf)
