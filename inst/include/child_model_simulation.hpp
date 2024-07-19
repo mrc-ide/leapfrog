@@ -616,6 +616,9 @@ void run_child_hiv_infections(int time_step,
       state_next.base.p_hiv_pop(0, s) +=  state_next.children.hiv_births * intermediate.children.perinatal_transmission_rate * demog.births_sex_prop(s,time_step);
       state_next.base.p_infections(0, s) += state_next.children.hiv_births * intermediate.children.perinatal_transmission_rate * demog.births_sex_prop(s,time_step);
     }// end NS
+    if(time_step == 30){
+      std::cout << state_next.base.p_infections(0, 0);
+    }
 
     //Breastfeeding transmission
 
@@ -632,7 +635,9 @@ void run_child_hiv_infections(int time_step,
       state_next.base.p_hiv_pop(0, s) +=  state_next.children.hiv_births  * demog.births_sex_prop(s,time_step) * (intermediate.children.bf_incident_hiv_transmission_rate + intermediate.children.bf_transmission_rate(0));
       state_next.base.p_infections(0, s) += state_next.children.hiv_births  * demog.births_sex_prop(s,time_step) * (intermediate.children.bf_incident_hiv_transmission_rate + intermediate.children.bf_transmission_rate(0));
     }// end NS
-
+    if(time_step == 30){
+      std::cout << state_next.base.p_infections(0, 0);
+    }
     //6-12
     internal::run_bf_transmission_rate(time_step, pars,  state_curr, state_next,intermediate, 3, 6, 1);
     for (int s = 0; s < ss.NS; ++s) {
@@ -642,7 +647,9 @@ void run_child_hiv_infections(int time_step,
       state_next.base.p_hiv_pop(0, s) +=  state_next.children.hiv_births  * demog.births_sex_prop(s,time_step) * (intermediate.children.bf_transmission_rate(1));
       state_next.base.p_infections(0, s) += state_next.children.hiv_births  * demog.births_sex_prop(s,time_step) * (intermediate.children.bf_transmission_rate(1));
     }// end NS
-
+    if(time_step == 30){
+      std::cout << state_next.base.p_infections(0, 0);
+    }
     //12plus
     internal::run_bf_transmission_rate(time_step, pars, state_curr, state_next, intermediate, 6, 12, 2);
     internal::run_bf_transmission_rate(time_step, pars, state_curr, state_next, intermediate, 12, hc_ss.hBF, 3);
@@ -665,6 +672,9 @@ void run_child_hiv_infections(int time_step,
       state_next.base.p_hiv_pop(2, s) +=  state_next.children.hiv_births  * (intermediate.children.bf_transmission_rate(3))*
         (state_next.base.p_total_pop(2,s) - state_next.base.p_hiv_pop(2,s)) / ((state_next.base.p_total_pop(2,0) + state_next.base.p_total_pop(2,1)) - (state_next.base.p_hiv_pop(2,0) + state_next.base.p_hiv_pop(2,1)));
     }// end NS
+    if(time_step == 30){
+      std::cout << state_next.base.p_infections(0, 0);
+    }
   }
 }
 
