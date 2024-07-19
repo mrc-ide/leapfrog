@@ -69,9 +69,8 @@ struct ChildModelState<ChildModel, real_type> {
   TensorFixedSize<real_type, Sizes<hTS<ChildModel>, hc1DS<ChildModel>, hc1AG<ChildModel>, NS<ChildModel>>> hc1_art_aids_deaths;
   TensorFixedSize<real_type, Sizes<hTS<ChildModel>, hc2DS<ChildModel>, hc2AG<ChildModel>, NS<ChildModel>>> hc2_art_aids_deaths;
   real_type hiv_births;
-  TensorFixedSize<real_type, Sizes<4>> hc_art_total;
-  TensorFixedSize<real_type, Sizes<4>> hc_art_init;
-  TensorFixedSize<real_type, Sizes<hc1DS<ChildModel>, hcTT<ChildModel>, 15, NS<ChildModel>>> hc_art_need_init;
+  TensorFixedSize<real_type, Sizes<hcAG_coarse<ChildModel>>> hc_art_init;
+  TensorFixedSize<real_type, Sizes<hc1DS<ChildModel>, hcTT<ChildModel>, hcAG_end<ChildModel>, NS<ChildModel>>> hc_art_need_init;
   real_type ctx_need;
   real_type ctx_mean;
 
@@ -89,7 +88,6 @@ struct ChildModelState<ChildModel, real_type> {
     hc1_art_aids_deaths.setZero();
     hc2_art_aids_deaths.setZero();
     hiv_births = 0;
-    hc_art_total.setZero();
     hc_art_init.setZero();
     hc_art_need_init.setZero();
     ctx_need = 0;
