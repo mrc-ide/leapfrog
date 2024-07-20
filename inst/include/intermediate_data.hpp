@@ -89,6 +89,9 @@ const int MALE = 0;
 const int FEMALE = 1;
 const int ART0MOS = 0;
 
+const int PROJPERIOD_MIDYEAR = 0;   // mid-year projection period 
+const int PROJPERIOD_CALENDAR = 1;  // calendar-year projection (Spectrum 6.2 update; December 2022)
+
 template<typename ModelVariant, typename real_type>
 struct BaseModelIntermediateData {
   TensorFixedSize <real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>> migration_rate;
