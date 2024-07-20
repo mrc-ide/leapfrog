@@ -380,7 +380,6 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         }
       }
 
-
       Type incrate_i = incidinput(t);
       incrate_g[MALE] = incrate_i * (Xhivn[MALE]+Xhivn[FEMALE]) / (Xhivn[MALE] + incrr_sex(t)*Xhivn[FEMALE]);
       incrate_g[FEMALE] = incrate_i * incrr_sex(t)*(Xhivn[MALE]+Xhivn[FEMALE]) / (Xhivn[MALE] + incrr_sex(t)*Xhivn[FEMALE]);
@@ -499,25 +498,52 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 
             }
 
-
+	
         // ART initiation
         for(int g = 0; g < NG; g++){
 
+	  // Spectrum ART allocation is 2-step process
+	  // 1. Allocate by CD4 category (weighted by 'eligible' and 'expected mortality')
+	  // 2. Allocate by age groups (weighted only by eligibility)
+	  //
+	  // The first step: allocate initiation by CD4 category (_hm) requires
+	  // tabulating number eligible and expected mortality within each CD4
+	  // category (aggregated over all ages).
+
+	  Type Xart_15plus = 0.0;
+
           TensorFixedSize<Type, Sizes<hDS, hAG_15PLUS>> artelig_hahm;
-	  
-          Type Xart_15plus = 0.0, Xartelig_15plus = 0.0, expect_mort_artelig15plus = 0.0;
+	  TensorFixedSize<Type, Sizes<hDS>> artelig_hm;
+	  Type Xartelig_15plus = 0.0;
+
+	  TensorFixedSize<Type, Sizes<hDS>> expect_mort_artelig_hm;
+	  Type expect_mort_artelig15plus = 0.0;
+
+	  artelig_hm.setZero();
+	  expect_mort_artelig_hm.setZero();
+	    
           for(int ha = hIDX_15PLUS; ha < hAG; ha++) {
             for(int hm = everARTelig_idx; hm < hDS; hm++) {
               if(hm >= anyelig_idx){
+		
                 // Type prop_elig = (hm >= cd4elig_idx) ? 1.0 : specpop_percelig[t];
                 Type prop_elig = 1.0;  // !!! TODO: implement special population ART eligibility
-                Xartelig_15plus += artelig_hahm(hm, ha-hIDX_15PLUS) = prop_elig * hivstrat_adult(hm, ha, g, t);
-                expect_mort_artelig15plus += cd4_mort(hm, ha, g) * artelig_hahm(hm, ha-hIDX_15PLUS);
-              }
-              for(int hu = 0; hu < hTS; hu++)
-                Xart_15plus += artstrat_adult(hu, hm, ha, g, t) + dt * gradART(hu, hm, ha, g);
-            }
 
+		Type tmp_artelig = prop_elig * hivstrat_adult(hm, ha, g, t);
+		artelig_hahm(hm, ha-hIDX_15PLUS) = tmp_artelig;
+		artelig_hm(hm) += tmp_artelig;
+                Xartelig_15plus += tmp_artelig;
+
+		Type tmp_expect_mort = cd4_mort(hm, ha, g) * tmp_artelig;
+		expect_mort_artelig_hm(hm) += tmp_expect_mort;
+                expect_mort_artelig15plus += tmp_expect_mort;
+              }
+	      
+              for(int hu = 0; hu < hTS; hu++) {
+                Xart_15plus += artstrat_adult(hu, hm, ha, g, t) + dt * gradART(hu, hm, ha, g);
+	      }
+            }
+	    
             // // if pw_artelig, add pregnant women to artelig_hahm population
             // if(g == FEMALE & pw_artelig[t] > 0 & ha < hAG_FERT){
             //   Type frr_pop_ha = 0;
@@ -582,11 +608,24 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 
           // Use mixture of eligibility and expected mortality for initiation distribution
 
+	  // Step 1: allocate ART by CD4 stage
+	  TensorFixedSize<Type, Sizes<hDS>> artinit_hm;
+	  for(int hm = anyelig_idx; hm < hDS; hm++) {
+	    artinit_hm(hm) = artinit_hts *
+	      ( (1.0 - art_alloc_mxweight) * artelig_hm(hm) / Xartelig_15plus +
+		art_alloc_mxweight * expect_mort_artelig_hm(hm) / expect_mort_artelig15plus );
+	  }
+
+	  // Step 2: within CD4 category, allocate ART by age proportional to
+	  // eligibility
           for(int ha = hIDX_15PLUS; ha < hAG; ha++) {
 	    for(int hm = anyelig_idx; hm < hDS; hm++) {
 
-              if (Xartelig_15plus > 0.0) {
-                Type artinit_hahm = artinit_hts * artelig_hahm(hm, ha-hIDX_15PLUS) * ((1.0 - art_alloc_mxweight)/Xartelig_15plus + art_alloc_mxweight * cd4_mort(hm, ha, g) / expect_mort_artelig15plus);
+	      if (artelig_hm(hm) > 0.0) {
+		
+		Type artinit_hahm = artinit_hm(hm) *
+		  artelig_hahm(hm, ha-hIDX_15PLUS) / artelig_hm(hm);
+		
                 if (artinit_hahm > artelig_hahm(hm, ha-hIDX_15PLUS)) {
                   artinit_hahm = artelig_hahm(hm, ha-hIDX_15PLUS);
                 }
