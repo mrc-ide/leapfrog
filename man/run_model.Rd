@@ -9,7 +9,7 @@ run_model(
   parameters,
   sim_years,
   hts_per_year,
-  output_steps,
+  output_steps = NULL,
   hiv_age_stratification = "full",
   run_child_model = TRUE
 )
@@ -19,11 +19,11 @@ run_model(
 
 \item{parameters}{Projection parameters}
 
-\item{sim_years}{Simulation years to run model for}
+\item{sim_years}{Simulation years to run model for default 1970:2030}
 
-\item{hts_per_year}{Number of HIV time steps per year}
+\item{hts_per_year}{Number of HIV time steps per year, default 10}
 
-\item{output_steps}{Which sim years to output for}
+\item{output_steps}{Which sim years to output for default same as sim_years}
 
 \item{hiv_age_stratification}{The age stratification for HIV population,
 "coarse" or "full"}

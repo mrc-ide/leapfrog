@@ -22,10 +22,10 @@ test_that("can serialize and deserialize eigen data", {
   expect_equal(content[3], paste0(1:12, collapse = ","))
 
   content <- readLines(out$test_3d_int_path)
-    expect_length(content, 3)
-    expect_equal(content[1], "int")
-    expect_equal(content[2], "2,3,4")
-    expect_equal(content[3], paste0(1:24, collapse = ","))
+  expect_length(content, 3)
+  expect_equal(content[1], "int")
+  expect_equal(content[2], "2,3,4")
+  expect_equal(content[3], paste0(1:24, collapse = ","))
 
   ## Deserializing works
   deserialized <- deserialize_vector(t1, t2)

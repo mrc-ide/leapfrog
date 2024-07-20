@@ -1,6 +1,7 @@
 #pragma once
 
-#include "types.hpp"
+#include "intermediate_data.hpp"
+#include "generated/state_types.hpp"
 
 namespace leapfrog {
 

@@ -4,7 +4,10 @@
 \alias{generate_output_interface}
 \title{Generate C++ for passing output from model fit into R}
 \usage{
-generate_output_interface(dest)
+generate_output_interface(
+  dest,
+  output_csv = frogger_file("cpp_generation/model_output.csv")
+)
 }
 \arguments{
 \item{dest}{The destination to write generated code to.}
@@ -13,6 +16,6 @@ generate_output_interface(dest)
 Nothing, called to generate code in src dir
 }
 \description{
-This generates using metadata from \code{src/model_output.yml}
+This generates using metadata from \code{inst/cpp_generation/model_output.csv}
 }
 \keyword{internal}

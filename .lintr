@@ -1,8 +1,11 @@
-linters: with_defaults(
+linters: linters_with_defaults(
     object_length_linter = NULL,
     object_usage_linter = NULL,
     cyclocomp_linter = NULL,
-    line_length_lintr = NULL,
-    todo_comment_linter = NULL
-    )
-exclusions: list("tests/testthat.R")
+    line_length_linter = NULL)
+exclusions: list(
+    "tests/testthat.R",
+    "scripts/create_test_data.R",
+    "scripts/read_spectrum.R",
+    "scripts/spectrum_inputs_paeds.R")
+encoding: "UTF-8"

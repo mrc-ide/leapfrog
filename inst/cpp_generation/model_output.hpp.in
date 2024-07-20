@@ -5,8 +5,8 @@
 #include <Rcpp.h>
 #include <unsupported/Eigen/CXX11/Tensor>
 
-#include "state_saver.hpp"
-#include "r_utils.hpp"
+#include "../state_saver.hpp"
+#include "../r_utils.hpp"
 
 template<typename ModelVariant, typename real_type>
 Rcpp::List build_r_output(const leapfrog::OutputState<ModelVariant, real_type> &state,

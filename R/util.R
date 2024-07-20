@@ -42,8 +42,10 @@ serialize_r_to_tensor <- function(data, path) {
 #' @keywords internal
 deserialize_tensor_to_r <- function(path) {
   content <- readLines(path)
-  array(as.numeric(strsplit(content[[3]], ",\\s*")[[1]]),
-        as.numeric(strsplit(content[[2]], ",\\s*")[[1]]))
+  array(
+    as.numeric(strsplit(content[[3]], ",\\s*")[[1]]),
+    as.numeric(strsplit(content[[2]], ",\\s*")[[1]])
+  )
 }
 
 vcapply <- function(X, FUN, ...) { # nolint
@@ -54,7 +56,7 @@ vlapply <- function(X, FUN, ...) { # nolint
   vapply(X, FUN, logical(1), ...)
 }
 
-frogger_file <- function(..., mustWork = TRUE) {
+frogger_file <- function(..., mustWork = TRUE) { # nolint
   system.file(..., package = "frogger", mustWork = mustWork)
 }
 
@@ -69,7 +71,6 @@ is_set <- function(x) {
 format_vector <- function(vector) {
   paste(paste0("'", vector, "'"), collapse = ", ")
 }
-
 
 #' Take a list of lists and split into groups based on some property
 #'
@@ -97,4 +98,8 @@ group_list_of_lists <- function(list, on) {
   })
   names(out) <- types
   out
+}
+
+paste_lines <- function(...) {
+  paste(..., collapse = "\n")
 }

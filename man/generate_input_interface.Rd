@@ -18,6 +18,6 @@ generate_input_interface(
 Nothing, called to generate code in src dir
 }
 \description{
-This generates using metadata from \code{src/model_inputs.yml}
+This generates using metadata from \code{inst/cpp_generation/model_input.csv}
 }
 \keyword{internal}

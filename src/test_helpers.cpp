@@ -1,7 +1,7 @@
 #include <Rcpp.h>
 
 #include "frogger.hpp"
-#include "types.hpp"
+#include "intermediate_data.hpp"
 #include "serialize_eigen.hpp"
 
 // [[Rcpp::export]]

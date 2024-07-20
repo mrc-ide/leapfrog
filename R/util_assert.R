@@ -19,7 +19,8 @@ assert_enum <- function(x, values, name = deparse(substitute(x))) {
   if (!(x %in% values)) {
     value_text <- format_vector(values)
     stop(sprintf("%s must be one of %s, got '%s'", name, value_text, x),
-         call. = FALSE)
+      call. = FALSE
+    )
   }
   invisible(TRUE)
 }
@@ -36,7 +37,9 @@ assert_only_one_set <- function(items, names,
   has_a_value <- !vlapply(items[names], is_unset)
   if (sum(has_a_value) > 1) {
     non_null <- format_vector(names(has_a_value))
-    stop(sprintf("Items %s from '%s' all have values, only one should be set",
-                 non_null, name))
+    stop(sprintf(
+      "Items %s from '%s' all have values, only one should be set",
+      non_null, name
+    ))
   }
 }
