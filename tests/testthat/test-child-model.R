@@ -1,4 +1,35 @@
 test_that("Child model can be run for all years", {
+  input <- setup_childmodel(testinput = "testdata/child_parms.rds")
+  demp <- input$demp
+  parameters <- input$parameters
+
+  expect_silent(out <- run_model(demp, parameters, 1970:2030, NULL, run_child_model = TRUE))
+
+  expect_setequal(
+    names(out),
+    c(
+      "p_total_pop", "births", "p_total_pop_natural_deaths", "p_hiv_pop",
+      "p_hiv_pop_natural_deaths", "h_hiv_adult", "h_art_adult",
+      "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art",
+      "h_art_initiation", "p_hiv_deaths", "hc1_hiv_pop", "hc2_hiv_pop",
+      "hc1_art_pop", "hc2_art_pop",
+      "hc1_noart_aids_deaths", "hc2_noart_aids_deaths",
+      "hc1_art_aids_deaths", "hc2_art_aids_deaths", "hiv_births",
+      "hc_art_total", "hc_art_init", "hc_art_need_init", "ctx_need",
+      "ctx_mean"
+    )
+  )
+
+  ## Nothing should ever be negative
+  expect_true(all(out$hc1_hiv_pop[, , , , ] >= 0))
+  expect_true(all(out$hc2_hiv_pop[, , , , ] >= 0))
+  expect_true(all(out$hc1_art_pop[, , , , ] >= 0))
+  expect_true(all(out$hc2_art_pop[, , , , ] >= 0))
+  expect_true(all(out$hc1_noart_aids_deaths[, , , , ] >= 0))
+  expect_true(all(out$hc2_noart_aids_deaths[, , , , ] >= 0))
+  expect_true(all(out$hc1_art_aids_deaths[, , , , ] >= 0))
+  expect_true(all(out$hc2_art_aids_deaths[, , , , ] >= 0))
+  expect_true(all(out$hiv_births >= 0))
 })
 
 test_that("Infections among children align", {
@@ -80,7 +111,6 @@ test_that("CLHIV align", {
   dt <- dt %>%
     dplyr::mutate(diff = pop - fr) %>%
     dplyr::filter(year < 2030)
-  y <- data.table::data.table(dt)
 
   expect_true(all(abs(dt$diff) < 5e-1))
 })

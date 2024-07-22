@@ -799,8 +799,8 @@ void run_child_natural_history(int time_step,
     for (int hd = 1; hd < hc_ss.hc1DS; ++hd) {
       for (int a = 0; a < hc_ss.hc2_agestart; ++a) {
         for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
-          intermediate.children.hc_grad(hd - 1, cat, a, s) -=  (intermediate.children.hc_posthivmort(hd - 1, cat, a, s) * cpars.hc1_cd4_prog(hd - 1, (cpars.hc_age_coarse(a) - 1), s) + state_next.children.hc1_hiv_pop(hd - 1, cat, a, s) * cpars.hc1_cd4_prog(hd - 1, (cpars.hc_age_coarse(a) - 1), s)) / 2; //moving to next cd4 category
-          intermediate.children.hc_grad(hd, cat, a, s) += (intermediate.children.hc_posthivmort(hd - 1, cat, a, s) * cpars.hc1_cd4_prog(hd - 1, (cpars.hc_age_coarse(a) - 1), s) + state_next.children.hc1_hiv_pop(hd - 1, cat, a, s) * cpars.hc1_cd4_prog(hd - 1, (cpars.hc_age_coarse(a) - 1), s)) / 2; //moving into this cd4 category
+          intermediate.children.hc_grad(hd - 1, cat, a, s) -=  (intermediate.children.hc_posthivmort(hd - 1, cat, a, s) * cpars.hc1_cd4_prog(hd - 1, (cpars.hc_age_coarse_cd4(a)), s) + state_next.children.hc1_hiv_pop(hd - 1, cat, a, s) * cpars.hc1_cd4_prog(hd - 1, (cpars.hc_age_coarse_cd4(a)), s)) / 2; //moving to next cd4 category
+          intermediate.children.hc_grad(hd, cat, a, s) += (intermediate.children.hc_posthivmort(hd - 1, cat, a, s) * cpars.hc1_cd4_prog(hd - 1, (cpars.hc_age_coarse_cd4(a)), s) + state_next.children.hc1_hiv_pop(hd - 1, cat, a, s) * cpars.hc1_cd4_prog(hd - 1, (cpars.hc_age_coarse_cd4(a)), s)) / 2; //moving into this cd4 category
         }
       }
     }
