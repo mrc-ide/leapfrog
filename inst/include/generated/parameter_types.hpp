@@ -53,8 +53,8 @@ struct Children {
   TensorMap2<real_type> hc_cd4_transition;
   TensorMap3<real_type> hc1_cd4_mort;
   TensorMap3<real_type> hc2_cd4_mort;
-  TensorMap1<real_type> hc1_cd4_prog;
-  TensorMap1<real_type> hc2_cd4_prog;
+  TensorMap3<real_type> hc1_cd4_prog;
+  TensorMap3<real_type> hc2_cd4_prog;
   real_type ctx_effect;
   TensorMap1<real_type> ctx_val;
   TensorMap1<int> hc_art_elig_age;
