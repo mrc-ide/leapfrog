@@ -209,21 +209,22 @@ void convert_PMTCT_num_to_perc(int time_step,
   } else {
     intermediate.children.need_PMTCT = state_next.children.hiv_births;
   }
-
+  //intermediate.children.need_PMTCT += cpars.patients_reallocated(time_step);
+  intermediate.children.OnPMTCT = intermediate.children.sumARV + cpars.patients_reallocated(time_step);
+  if(intermediate.children.OnPMTCT > intermediate.children.need_PMTCT){
+    intermediate.children.OnPMTCT = intermediate.children.need_PMTCT;
+  }
 
   //replace all instances of coverage input as numbers with percentage covered
   if (cpars.PMTCT_input_is_percent(time_step)) {
     for (int hp = 0; hp < hc_ss.hPS; ++hp) {
       intermediate.children.PMTCT_coverage(hp) =  cpars.PMTCT(hp,time_step) / 100;
     } //end hPS
-    intermediate.children.sumARV = intermediate.children.sumARV * intermediate.children.need_PMTCT + cpars.patients_reallocated(time_step);
+    intermediate.children.sumARV = intermediate.children.sumARV * intermediate.children.need_PMTCT;
 
   } else {
 
-    intermediate.children.sumARV += cpars.patients_reallocated(time_step);
-
     for (int hp = 0; hp < hc_ss.hPS; ++hp) {
-      intermediate.children.OnPMTCT = intermediate.children.sumARV ;
       if (intermediate.children.sumARV == 0) {
         intermediate.children.PMTCT_coverage(hp) = 0.0;
       } else {
@@ -231,6 +232,8 @@ void convert_PMTCT_num_to_perc(int time_step,
       }
     } //end hPS
   }
+
+
   intermediate.children.PMTCT_coverage(4) = intermediate.children.PMTCT_coverage(4) * cpars.PMTCT_dropout(0,time_step);
   intermediate.children.PMTCT_coverage(5) = intermediate.children.PMTCT_coverage(5) * cpars.PMTCT_dropout(1,time_step);
 }
@@ -398,7 +401,10 @@ void run_calculate_perinatal_transmission_rate(int time_step,
     intermediate.children.PMTCT_coverage(6) * cpars.PMTCT_transmission_rate(0,6,0);
 
   intermediate.children.receiving_PMTCT = intermediate.children.PMTCT_coverage(0) + intermediate.children.PMTCT_coverage(1) + intermediate.children.PMTCT_coverage(2) + intermediate.children.PMTCT_coverage(3) + intermediate.children.retained_on_ART + intermediate.children.retained_started_ART + intermediate.children.PMTCT_coverage(6);
-  intermediate.children.no_PMTCT = 1 - intermediate.children.receiving_PMTCT;
+  intermediate.children.no_PMTCT = 1 -  intermediate.children.receiving_PMTCT;
+  if(intermediate.children.no_PMTCT < 0){
+    intermediate.children.no_PMTCT = 0;
+  }
 
   //Transmission among women not on treatment
   if (intermediate.children.num_wlhiv > 0) {
@@ -610,8 +616,11 @@ void run_child_hiv_infections(int time_step,
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
 
+
+
   if (state_next.children.hiv_births > 0 ) {
     internal::run_calculate_perinatal_transmission_rate(time_step, pars, state_curr, state_next, intermediate);
+
     //Perinatal transmission
     for (int s = 0; s < ss.NS; ++s) {
       for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
