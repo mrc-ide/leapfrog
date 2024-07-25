@@ -116,7 +116,7 @@ leapfrogR(const Rcpp::List& demp,
        *INTEGER(projp["art_alloc_method"]),
        *REAL(projp["art_alloc_mxweight"]),
        *INTEGER(projp["scale_cd4_mort"]),
-       REAL(projp["art_dropout"]),
+       REAL(projp["art_dropout_rate"]),
        proj_years,
        hiv_steps_per_year,
        *INTEGER(projp["t_ART_start"]) - 1, // 0-based indexing vs. R 1-based

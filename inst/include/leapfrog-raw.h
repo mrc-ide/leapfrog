@@ -59,7 +59,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                     const int art_alloc_method,
                     const Type art_alloc_mxweight,
                     const int scale_cd4_mort,
-                    const Type *p_art_dropout,
+                    const Type *p_art_dropout_rate,
                     //
                     //settings
                     const int sim_years,
@@ -142,7 +142,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   // adult ART
   const TensorMapX2cT art15plus_num(p_art15plus_num, NG, sim_years);
   const TensorMapX2cI art15plus_isperc(p_art15plus_isperc, NG, sim_years);
-  const TensorMapX1cT art_dropout(p_art_dropout, sim_years);
+  const TensorMapX1cT art_dropout_rate(p_art_dropout_rate, sim_years);
 
   // outputs
   TensorMapX3T totpop1(p_totpop1, pAG, NG, sim_years);
@@ -385,6 +385,30 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       incrate_g[FEMALE] = incrate_i * incrr_sex(t)*(Xhivn[MALE]+Xhivn[FEMALE]) / (Xhivn[MALE] + incrr_sex(t)*Xhivn[FEMALE]);
     }
 
+    /*
+    // ART eligibility and relative initation rate
+
+    // In Spectrum, calculate once per year
+
+    TensorFixedSize<Type, Sizes<hDS, hAG_15PLUS, NG>> artelig_hahm_g;
+	Type Xart_15plus_g[NG] = {0.0, 0.0}, Xartelig_15plus_g[NG] = {0.0, 0.0}, expect_mort_artelig15plus_g[NG] = {0.0, 0.0};
+	for(int g = 0; g < NG; g++) {
+          for(int ha = hIDX_15PLUS; ha < hAG; ha++) {
+            for(int hm = everARTelig_idx; hm < hDS; hm++) {
+              if(hm >= anyelig_idx){
+                // Type prop_elig = (hm >= cd4elig_idx) ? 1.0 : specpop_percelig[t];
+                Type prop_elig = 1.0;  // !!! TODO: implement special population ART eligibility
+                Xartelig_15plus_g[g] += artelig_hahm_g(hm, ha-hIDX_15PLUS, g) = prop_elig * hivstrat_adult(hm, ha, g, t);
+                expect_mort_artelig15plus_g[g] += (1.0 - exp(-cd4_mort(hm, ha, g))) * artelig_hahm_g(hm, ha-hIDX_15PLUS, g);
+              }
+              // for(int hu = 0; hu < hTS; hu++)
+                // Xart_15plus_g[g] += artstrat_adult(hu, hm, ha, g, t) ; // + dt * gradART(hu, hm, ha, g);
+	    }
+	  }
+	}
+    */
+
+
     for(int hts = 0; hts < hiv_steps_per_year; hts++) {
 
       TensorFixedSize<Type, Sizes<hAG, NG>> hivdeaths_ha;
@@ -489,10 +513,10 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
               }
 
               // ART dropout
-              if (art_dropout(t) > 0) {
+              if (art_dropout_rate(t) > 0) {
                 for (int hu = 0; hu < hTS; hu++) {
-                  grad(hm, ha, g) += art_dropout(t) * artstrat_adult(hu, hm, ha, g, t);
-                  gradART(hu, hm, ha, g) -= art_dropout(t) * artstrat_adult(hu, hm, ha, g, t);
+                  grad(hm, ha, g) += art_dropout_rate(t) * artstrat_adult(hu, hm, ha, g, t);
+                  gradART(hu, hm, ha, g) -= art_dropout_rate(t) * artstrat_adult(hu, hm, ha, g, t);
                 }
               }
 
@@ -563,6 +587,28 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
             // }
           } // loop over ha
 
+	  /*
+	  // TensorFixedSize<Type, Sizes<hDS, hAG_15PLUS>> artelig_hahm;
+	  for(int ha = hIDX_15PLUS; ha < hAG; ha++) {
+	    for(int hm = everARTelig_idx; hm < hDS; hm++) {
+	      artelig_hahm(hm, ha-hIDX_15PLUS) = artelig_hahm_g(hm, ha-hIDX_15PLUS, g);
+	    }
+	  }
+	  // Type Xart_15plus = Xart_15plus_g[g];
+	  Type Xartelig_15plus = Xartelig_15plus_g[g];
+	  Type expect_mort_artelig15plus = expect_mort_artelig15plus_g[g];
+
+	  Type Xart_15plus = 0.0;
+	  for(int ha = hIDX_15PLUS; ha < hAG; ha++) {
+            for(int hm = everARTelig_idx; hm < hDS; hm++) {
+              if(hm >= anyelig_idx){
+		for(int hu = 0; hu < hTS; hu++)
+		  Xart_15plus += artstrat_adult(hu, hm, ha, g, t) + dt * gradART(hu, hm, ha, g);
+	      }
+	    }
+	  }
+	  */
+			
           // calculate number on ART at end of ts, based on number or percent
           Type artnum_hts = 0.0;
 	  if (projection_period_int == PROJPERIOD_MIDYEAR && dt*(hts+1) < 0.5) {
@@ -622,7 +668,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 	    for(int hm = anyelig_idx; hm < hDS; hm++) {
 
 	      if (artelig_hm(hm) > 0.0) {
-		
+
 		Type artinit_hahm = artinit_hm(hm) *
 		  artelig_hahm(hm, ha-hIDX_15PLUS) / artelig_hm(hm);
 		
