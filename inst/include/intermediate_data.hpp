@@ -107,7 +107,6 @@ struct BaseModelIntermediateData {
   TensorFixedSize <real_type, Sizes<hTS<ModelVariant>, hDS<ModelVariant>, hAG<ModelVariant>, NS<ModelVariant>>> gradART;
   TensorFixedSize <real_type, Sizes<hAG<ModelVariant>>> hivpop_ha;
 
-
   // ART initiation and allocation calculations
   real_type Xart_15plus;
 
@@ -119,7 +118,6 @@ struct BaseModelIntermediateData {
   real_type expect_mort_artelig15plus;
 
   TensorFixedSize <real_type, Sizes<hDS<ModelVariant>>> artinit_hm;
-  
 
   real_type cd4mx_scale;
   real_type artpop_hahm;
@@ -142,6 +140,9 @@ struct BaseModelIntermediateData {
 
   BaseModelIntermediateData(int hAG_15plus)
       :
+      Xart_15plus(0.0),
+      Xartelig_15plus(0.0),
+      expect_mort_artelig15plus(0.0),
       cd4mx_scale(1.0),
       artpop_hahm(0.0),
       deaths(0.0),
@@ -150,9 +151,6 @@ struct BaseModelIntermediateData {
       p_infections_a(0.0),
       p_infections_ha(0.0),
       deaths_art(0.0),
-      Xart_15plus(0.0),
-      Xartelig_15plus(0.0),
-      expect_mort_artelig15plus(0.0),
       anyelig_idx(0),
       artnum_hts(0.0),
       artcov_hts(0.0),
