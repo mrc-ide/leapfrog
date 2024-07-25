@@ -52,12 +52,12 @@ Rcpp::List simulate_model(const leapfrog::StateSpace<ModelVariant> ss,
                           const int hiv_steps,
                           const std::vector<int> save_steps) {
 
-  int projection_period_int = 0;
-  Rcpp::String projection_period_str  = data["projection_period"];
-  if (projection_period_str  == "midyear") {
-    projection_period_int = 0;
-  } else if (projection_period_str  == "calendar") {
-    projection_period_int = 1;
+  int projection_period_int = leapfrog::internal::PROJPERIOD_CALENDAR;
+  Rcpp::String projection_period_str = data["projection_period"];
+  if (projection_period_str == "calendar") {
+    projection_period_int = leapfrog::internal::PROJPERIOD_CALENDAR;
+  } else if (projection_period_str == "midyear") {
+    projection_period_int = leapfrog::internal::PROJPERIOD_MIDYEAR;
   } else {
     Rf_error("projection_period \"%s\" not found. Please select \"midyear\" or \"calendar\".\n",
 	     projection_period_str.get_cstring());

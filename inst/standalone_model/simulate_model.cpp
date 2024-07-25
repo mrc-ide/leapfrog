@@ -124,7 +124,7 @@ int main(int argc, char *argv[]) {
       hts_per_year,   // HIV steps per year
       30,             // Time ART start
       ss.hAG,         // Age groups HIV 15+
-      0               // Projection period, 0 for mid year, 1 for calendar year
+      PROJPERIOD_CALENDAR  // Projection period, 0 for calendar year, 1 for midyear
   };
 
   leapfrog::Tensor1<int> v = serialize::deserialize_tensor<int, 1>(
