@@ -77,29 +77,6 @@ void run_migration(int time_step,
 }
 
 template<typename ModelVariant, typename real_type>
-void run_end_year_migration(int time_step,
-			    const Parameters<ModelVariant, real_type> &pars,
-			    const State<ModelVariant, real_type> &state_curr,
-			    State<ModelVariant, real_type> &state_next,
-			    IntermediateData<ModelVariant, real_type> &intermediate) {
-
-  constexpr auto ss = StateSpace<ModelVariant>().base;
-  const auto demog = pars.base.demography;
-
-  for (int g = 0; g < ss.NS; ++g) {
-
-    // Migration for ages 0, ..., 80+
-    for (int a = 0; a < ss.pAG; ++a) {
-
-      // Calculate migration rate as number of net migrants divided by total pop.
-      intermediate.base.migration_rate(a, g) = demog.net_migration(a, g, time_step) /
-                                               state_next.base.p_total_pop(a, g);
-      state_next.base.p_total_pop(a, g) *= 1.0 + intermediate.base.migration_rate(a, g);
-    }
-  }
-}
-  
-template<typename ModelVariant, typename real_type>
 void run_fertility_and_infant_migration(int time_step,
                                         const Parameters<ModelVariant, real_type> &pars,
                                         const State<ModelVariant, real_type> &state_curr,
@@ -150,6 +127,30 @@ void run_general_pop_demographic_projection(int time_step,
     internal::run_migration<ModelVariant>(time_step, pars, state_curr, state_next, intermediate);
   }
   internal::run_fertility_and_infant_migration<ModelVariant>(time_step, pars, state_curr, state_next, intermediate);
+}
+
+
+template<typename ModelVariant, typename real_type>
+void run_end_year_migration(int time_step,
+                            const Parameters<ModelVariant, real_type> &pars,
+                            const State<ModelVariant, real_type> &state_curr,
+                            State<ModelVariant, real_type> &state_next,
+                            internal::IntermediateData<ModelVariant, real_type> &intermediate) {
+
+  constexpr auto ss = StateSpace<ModelVariant>().base;
+  const auto demog = pars.base.demography;
+
+  for (int g = 0; g < ss.NS; ++g) {
+
+    // Migration for ages 0, ..., 80+
+    for (int a = 0; a < ss.pAG; ++a) {
+
+      // Calculate migration rate as number of net migrants divided by total pop.
+      intermediate.base.migration_rate(a, g) = demog.net_migration(a, g, time_step) /
+        state_next.base.p_total_pop(a, g);
+      state_next.base.p_total_pop(a, g) *= 1.0 + intermediate.base.migration_rate(a, g);
+    }
+  }
 }
 
 }
