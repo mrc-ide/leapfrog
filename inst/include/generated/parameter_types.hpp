@@ -39,7 +39,7 @@ struct Art {
   Tensor1<int> idx_hm_elig;
   TensorMap4<real_type> mortality;
   TensorMap2<real_type> mortaility_time_rate_ratio;
-  TensorMap1<real_type> dropout;
+  TensorMap1<real_type> dropout_rate;
   TensorMap2<real_type> adults_on_art;
   TensorMap2<int> adults_on_art_is_percent;
   Tensor1<real_type> h_art_stage_dur;
