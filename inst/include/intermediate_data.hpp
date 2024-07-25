@@ -102,8 +102,19 @@ struct BaseModelIntermediateData {
   TensorFixedSize <real_type, Sizes<hAG<ModelVariant>, NS<ModelVariant>>> p_hiv_deaths_age_sex;
   TensorFixedSize <real_type, Sizes<hDS<ModelVariant>, hAG<ModelVariant>, NS<ModelVariant>>> grad;
   TensorFixedSize <real_type, Sizes<hTS<ModelVariant>, hDS<ModelVariant>, hAG<ModelVariant>, NS<ModelVariant>>> gradART;
-  Tensor2<real_type> artelig_hahm;
   TensorFixedSize <real_type, Sizes<hAG<ModelVariant>>> hivpop_ha;
+
+  // ART initiation and allocation calculations
+  real_type Xart_15plus;
+
+  TensorFixedSize <real_type, Sizes<hDS<ModelVariant>, hAG<ModelVariant>>> artelig_hahm;
+  TensorFixedSize <real_type, Sizes<hDS<ModelVariant>>> artelig_hm;
+  real_type Xartelig_15plus;
+
+  TensorFixedSize <real_type, Sizes<hDS<ModelVariant>>> expect_mort_artelig_hm;
+  real_type expect_mort_artelig15plus;
+
+  TensorFixedSize <real_type, Sizes<hDS<ModelVariant>>> artinit_hm;
 
   real_type cd4mx_scale;
   real_type artpop_hahm;
@@ -113,9 +124,7 @@ struct BaseModelIntermediateData {
   real_type p_infections_a;
   real_type p_infections_ha;
   real_type deaths_art;
-  real_type Xart_15plus;
-  real_type Xartelig_15plus;
-  real_type expect_mort_artelig15plus;
+
   int anyelig_idx;
   real_type artnum_hts;
   real_type artcov_hts;
@@ -128,7 +137,9 @@ struct BaseModelIntermediateData {
 
   BaseModelIntermediateData(int hAG_15plus)
       :
-      artelig_hahm(hDS<ModelVariant>, hAG_15plus),
+      Xart_15plus(0.0),
+      Xartelig_15plus(0.0),
+      expect_mort_artelig15plus(0.0),
       cd4mx_scale(1.0),
       artpop_hahm(0.0),
       deaths(0.0),
@@ -137,9 +148,6 @@ struct BaseModelIntermediateData {
       p_infections_a(0.0),
       p_infections_ha(0.0),
       deaths_art(0.0),
-      Xart_15plus(0.0),
-      Xartelig_15plus(0.0),
-      expect_mort_artelig15plus(0.0),
       anyelig_idx(0),
       artnum_hts(0.0),
       artcov_hts(0.0),
@@ -162,7 +170,6 @@ struct BaseModelIntermediateData {
     p_hiv_deaths_age_sex.setZero();
     grad.setZero();
     gradART.setZero();
-    artelig_hahm.setZero();
     hivpop_ha.setZero();
     cd4mx_scale = 1.0;
     deaths = 0.0;
@@ -171,9 +178,16 @@ struct BaseModelIntermediateData {
     p_infections_a = 0.0;
     p_infections_ha = 0.0;
     deaths_art = 0.0;
+    //
+    // ART initiation and allocation
+    artelig_hahm.setZero();
+    artelig_hm.setZero();
     Xart_15plus = 0.0;
     Xartelig_15plus = 0.0;
+    expect_mort_artelig_hm.setZero();
     expect_mort_artelig15plus = 0.0;
+    artinit_hm.setZero();
+    //
     anyelig_idx = 0;
     artnum_hts = 0.0;
     artcov_hts = 0.0;
