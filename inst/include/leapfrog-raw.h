@@ -59,6 +59,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                     const int art_alloc_method,
                     const Type art_alloc_mxweight,
                     const int scale_cd4_mort,
+		    const int art_dropout_recover_cd4,
                     const Type *p_art_dropout_rate,
                     //
                     //settings
@@ -515,7 +516,14 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
               // ART dropout
               if (art_dropout_rate(t) > 0) {
                 for (int hu = 0; hu < hTS; hu++) {
-                  grad(hm, ha, g) += art_dropout_rate(t) * artstrat_adult(hu, hm, ha, g, t);
+
+		  if (art_dropout_recover_cd4 && hu >= 2 && hm >= 1) {
+		    // recover people on ART >1 year to one higher CD4 category
+		    grad(hm-1, ha, g) += art_dropout_rate(t) * artstrat_adult(hu, hm, ha, g, t);
+		  } else {
+		    grad(hm, ha, g) += art_dropout_rate(t) * artstrat_adult(hu, hm, ha, g, t);
+		  }
+		  
                   gradART(hu, hm, ha, g) -= art_dropout_rate(t) * artstrat_adult(hu, hm, ha, g, t);
                 }
               }
