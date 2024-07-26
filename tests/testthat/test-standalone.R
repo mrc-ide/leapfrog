@@ -6,6 +6,11 @@ test_that("We can compile the standalone program", {
   tmp <- tempfile()
   copy_directory(path_src, tmp)
 
+  # Remove files if they have already been compiled to ensure we are always
+  # compiling in tihs test to ensure linking to latest frogger code
+  unlink(file.path(tmp, "Makefile"))
+  unlink(file.path(tmp, "simulate_model"))
+
   args <- c(dirname(frogger_file("include")), find.package("RcppEigen"))
 
   code <- withr::with_dir(
