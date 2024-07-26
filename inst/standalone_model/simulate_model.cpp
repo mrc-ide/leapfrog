@@ -125,7 +125,7 @@ int main(int argc, char *argv[]) {
       30,                  // Time ART start
       ss.hAG,              // Age groups HIV 15+
       // Projection period, 0 for calendar year, 1 for midyear
-      leapfrog::internal::PROJPERIOD_CALENDAR
+      leapfrog::internal::PROJPERIOD_MIDYEAR
   };
 
   leapfrog::Tensor1<int> v = serialize::deserialize_tensor<int, 1>(
