@@ -89,8 +89,8 @@ const int MALE = 0;
 const int FEMALE = 1;
 const int ART0MOS = 0;
 
-const int PROJPERIOD_MIDYEAR = 0;   // mid-year projection period 
-const int PROJPERIOD_CALENDAR = 1;  // calendar-year projection (Spectrum 6.2 update; December 2022)
+const int PROJPERIOD_CALENDAR = 0;  // calendar-year projection (Spectrum 6.2 update; December 2022)
+const int PROJPERIOD_MIDYEAR = 1;   // mid-year projection period
 
 template<typename ModelVariant, typename real_type>
 struct BaseModelIntermediateData {
