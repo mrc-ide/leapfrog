@@ -228,6 +228,8 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   ## ## percentage of those with CD4 <350 who are based on WHO Stage III/IV infection
   ## v$who34percelig <- who34percelig
 
+  v$art_dropout_recover_cd4 <- if (projp$spectrum_version >= "6.14") {TRUE} else {FALSE}
+  
   ## Convert input percent dropout in 12 months to an annual rate (Rob Glaubius email 25 July 2024)
   v$art_dropout_rate <- -log(1.0 - projp$art_dropout/100)
 

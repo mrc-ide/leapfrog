@@ -232,6 +232,7 @@ int main(int argc, char *argv[]) {
       idx_hm_elig,
       art_mortality_rate,
       art_mortality_time_rate_ratio,
+      TRUE, // art_dropout_recover_cd4
       art_dropout_rate,
       adults_on_art,
       adults_on_art_is_percent,
