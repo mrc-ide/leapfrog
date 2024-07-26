@@ -59,13 +59,16 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
                     const int art_alloc_method,
                     const Type art_alloc_mxweight,
                     const int scale_cd4_mort,
-                    const Type *p_art_dropout,
+		    const int art_dropout_recover_cd4,
+                    const Type *p_art_dropout_rate,
                     //
                     //settings
                     const int sim_years,
                     const int hiv_steps_per_year,
                     const int t_ART_start,
                     const int *hAG_SPAN,
+		    const int projection_period_int,  // integer flag for projection
+		                                      // period (0 = midyear, 1 = calendar)
                     //
                     //outputs
                     Type *p_totpop1,
@@ -108,6 +111,10 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   const int hIDX_15PLUS = 0;
   const Type h_art_stage_dur[hTS-1] = {0.5, 0.5};
 
+  const int PROJPERIOD_MIDYEAR = 0;   // mid-year projection period 
+  const int PROJPERIOD_CALENDAR = 1;  // calendar-year projection (Spectrum 6.2 update; December 2022)
+
+
   // // inputs
 
   // state space dimensions
@@ -136,7 +143,7 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
   // adult ART
   const TensorMapX2cT art15plus_num(p_art15plus_num, NG, sim_years);
   const TensorMapX2cI art15plus_isperc(p_art15plus_isperc, NG, sim_years);
-  const TensorMapX1cT art_dropout(p_art_dropout, sim_years);
+  const TensorMapX1cT art_dropout_rate(p_art_dropout_rate, sim_years);
 
   // outputs
   TensorMapX3T totpop1(p_totpop1, pAG, NG, sim_years);
@@ -187,22 +194,24 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       natdeaths(pAG-1, g, t) += natdeaths_open_age;
       totpop1(pAG-1, g, t) += totpop1(pAG-1, g, t-1) - natdeaths_open_age;
 
-      // net migration
-      for(int a = 1; a < pAG - 1; a++) {
-	// Number of net migrants adjusted for survivorship to end of period (qx / 2)
-        migrate_ag(a, g) = netmigr(a, g, t) * (1.0 + sx(a, g, t)) * 0.5 / totpop1(a, g, t);
-        totpop1(a, g, t) *= 1.0 + migrate_ag(a, g);
+      if (projection_period_int == PROJPERIOD_MIDYEAR) {
+	// net migration
+	for(int a = 1; a < pAG - 1; a++) {
+	  // Number of net migrants adjusted for survivorship to end of period (qx / 2)
+	  migrate_ag(a, g) = netmigr(a, g, t) * (1.0 + sx(a, g, t)) * 0.5 / totpop1(a, g, t);
+	  totpop1(a, g, t) *= 1.0 + migrate_ag(a, g);
+	}
+	
+	// For open age group, netmigrant survivor adjustment based on weighted
+	// sx for age 79 and age 80+.
+	// * Numerator: totpop1(a, g, t-1) * (1.0 + sx(a+1, g, t)) + totpop1(a-1, g, t-1) * (1.0 + sx(a, g, t))
+	// * Denominator: totpop1(a, g, t-1) + totpop1(a-1, g, t-1)
+	// Re-expressed current population and deaths to open age group (already calculated):
+	int a = pAG - 1;
+	Type sx_netmig = (totpop1(a, g,t) + 0.5 * natdeaths(pAG-1, g, t)) / (totpop1(a, g,t) + natdeaths(pAG-1, g, t));
+	migrate_ag(a, g) = sx_netmig * netmigr(a, g, t) / totpop1(a, g,t);
+	totpop1(a, g, t) *= 1.0 + migrate_ag(a, g);
       }
-
-      // For open age group, netmigrant survivor adjustment based on weighted
-      // sx for age 79 and age 80+.
-      // * Numerator: totpop1(a, g, t-1) * (1.0 + sx(a+1, g, t)) + totpop1(a-1, g, t-1) * (1.0 + sx(a, g, t))
-      // * Denominator: totpop1(a, g, t-1) + totpop1(a-1, g, t-1)
-      // Re-expressed current population and deaths to open age group (already calculated):
-      int a = pAG - 1;
-      Type sx_netmig = (totpop1(a, g,t) + 0.5 * natdeaths(pAG-1, g, t)) / (totpop1(a, g,t) + natdeaths(pAG-1, g, t));
-      migrate_ag(a, g) = sx_netmig * netmigr(a, g, t) / totpop1(a, g,t);
-      totpop1(a, g, t) *= 1.0 + migrate_ag(a, g);
     }
 
     // fertility
@@ -218,10 +227,13 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
       natdeaths(0, g, t) = births_sex * (1.0 - sx(0, g, t));
       totpop1(0, g, t) =  births_sex * sx(0, g, t);
 
-      // Assume 2/3 survival rate since mortality in first six months higher than
-      // second 6 months (Spectrum manual, section 6.2.7.4)
-      Type migrate_a0 = netmigr(0, g, t) * (1.0 + 2.0 * sx(0, g, t)) / 3.0 / totpop1(0, g, t);
-      totpop1(0, g, t) *= 1.0 + migrate_a0;
+      if (projection_period_int == PROJPERIOD_MIDYEAR) {
+	
+	// Assume 2/3 survival rate since mortality in first six months higher than
+	// second 6 months (Spectrum manual, section 6.2.7.4)
+	Type migrate_a0 = netmigr(0, g, t) * (1.0 + 2.0 * sx(0, g, t)) / 3.0 / totpop1(0, g, t);
+	totpop1(0, g, t) *= 1.0 + migrate_a0;
+      }
     }
 
     // // demographic projection of the adult HIV population
@@ -300,8 +312,10 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
     for(int g = 0; g < NG; g++) {
       for(int a = 1; a < pAG; a++) {
         hivpop1(a, g, t) -= natdeaths_hivpop(a, g, t);
-        netmig_ag(a, g) = hivpop1(a, g, t) * migrate_ag(a, g);
-        hivpop1(a, g, t) += netmig_ag(a, g);
+	if (projection_period_int == PROJPERIOD_MIDYEAR) {
+	  netmig_ag(a, g) = hivpop1(a, g, t) * migrate_ag(a, g);
+	  hivpop1(a, g, t) += netmig_ag(a, g);
+	}
       }
     }
 
@@ -312,7 +326,9 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         Type deathsmig_ha = 0;
         for(int i = 0; i < hAG_SPAN[ha]; i++){
           deathsmig_ha -= natdeaths_hivpop(a, g, t);
-          deathsmig_ha += netmig_ag(a, g);
+	  if (projection_period_int == PROJPERIOD_MIDYEAR) {
+	    deathsmig_ha += netmig_ag(a, g);
+	  }
           a++;
         }
 
@@ -365,11 +381,34 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
         }
       }
 
-
       Type incrate_i = incidinput(t);
       incrate_g[MALE] = incrate_i * (Xhivn[MALE]+Xhivn[FEMALE]) / (Xhivn[MALE] + incrr_sex(t)*Xhivn[FEMALE]);
       incrate_g[FEMALE] = incrate_i * incrr_sex(t)*(Xhivn[MALE]+Xhivn[FEMALE]) / (Xhivn[MALE] + incrr_sex(t)*Xhivn[FEMALE]);
     }
+
+    /*
+    // ART eligibility and relative initation rate
+
+    // In Spectrum, calculate once per year
+
+    TensorFixedSize<Type, Sizes<hDS, hAG_15PLUS, NG>> artelig_hahm_g;
+	Type Xart_15plus_g[NG] = {0.0, 0.0}, Xartelig_15plus_g[NG] = {0.0, 0.0}, expect_mort_artelig15plus_g[NG] = {0.0, 0.0};
+	for(int g = 0; g < NG; g++) {
+          for(int ha = hIDX_15PLUS; ha < hAG; ha++) {
+            for(int hm = everARTelig_idx; hm < hDS; hm++) {
+              if(hm >= anyelig_idx){
+                // Type prop_elig = (hm >= cd4elig_idx) ? 1.0 : specpop_percelig[t];
+                Type prop_elig = 1.0;  // !!! TODO: implement special population ART eligibility
+                Xartelig_15plus_g[g] += artelig_hahm_g(hm, ha-hIDX_15PLUS, g) = prop_elig * hivstrat_adult(hm, ha, g, t);
+                expect_mort_artelig15plus_g[g] += (1.0 - exp(-cd4_mort(hm, ha, g))) * artelig_hahm_g(hm, ha-hIDX_15PLUS, g);
+              }
+              // for(int hu = 0; hu < hTS; hu++)
+                // Xart_15plus_g[g] += artstrat_adult(hu, hm, ha, g, t) ; // + dt * gradART(hu, hm, ha, g);
+	    }
+	  }
+	}
+    */
+
 
     for(int hts = 0; hts < hiv_steps_per_year; hts++) {
 
@@ -475,34 +514,68 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
               }
 
               // ART dropout
-              if (art_dropout(t) > 0) {
+              if (art_dropout_rate(t) > 0) {
                 for (int hu = 0; hu < hTS; hu++) {
-                  grad(hm, ha, g) += art_dropout(t) * artstrat_adult(hu, hm, ha, g, t);
-                  gradART(hu, hm, ha, g) -= art_dropout(t) * artstrat_adult(hu, hm, ha, g, t);
+
+		  if (art_dropout_recover_cd4 && hu >= 2 && hm >= 1) {
+		    // recover people on ART >1 year to one higher CD4 category
+		    grad(hm-1, ha, g) += art_dropout_rate(t) * artstrat_adult(hu, hm, ha, g, t);
+		  } else {
+		    grad(hm, ha, g) += art_dropout_rate(t) * artstrat_adult(hu, hm, ha, g, t);
+		  }
+		  
+                  gradART(hu, hm, ha, g) -= art_dropout_rate(t) * artstrat_adult(hu, hm, ha, g, t);
                 }
               }
 
             }
 
-
+	
         // ART initiation
         for(int g = 0; g < NG; g++){
 
+	  // Spectrum ART allocation is 2-step process
+	  // 1. Allocate by CD4 category (weighted by 'eligible' and 'expected mortality')
+	  // 2. Allocate by age groups (weighted only by eligibility)
+	  //
+	  // The first step: allocate initiation by CD4 category (_hm) requires
+	  // tabulating number eligible and expected mortality within each CD4
+	  // category (aggregated over all ages).
+
+	  Type Xart_15plus = 0.0;
+
           TensorFixedSize<Type, Sizes<hDS, hAG_15PLUS>> artelig_hahm;
-	  
-          Type Xart_15plus = 0.0, Xartelig_15plus = 0.0, expect_mort_artelig15plus = 0.0;
+	  TensorFixedSize<Type, Sizes<hDS>> artelig_hm;
+	  Type Xartelig_15plus = 0.0;
+
+	  TensorFixedSize<Type, Sizes<hDS>> expect_mort_artelig_hm;
+	  Type expect_mort_artelig15plus = 0.0;
+
+	  artelig_hm.setZero();
+	  expect_mort_artelig_hm.setZero();
+	    
           for(int ha = hIDX_15PLUS; ha < hAG; ha++) {
             for(int hm = everARTelig_idx; hm < hDS; hm++) {
               if(hm >= anyelig_idx){
+		
                 // Type prop_elig = (hm >= cd4elig_idx) ? 1.0 : specpop_percelig[t];
                 Type prop_elig = 1.0;  // !!! TODO: implement special population ART eligibility
-                Xartelig_15plus += artelig_hahm(hm, ha-hIDX_15PLUS) = prop_elig * hivstrat_adult(hm, ha, g, t);
-                expect_mort_artelig15plus += cd4_mort(hm, ha, g) * artelig_hahm(hm, ha-hIDX_15PLUS);
-              }
-              for(int hu = 0; hu < hTS; hu++)
-                Xart_15plus += artstrat_adult(hu, hm, ha, g, t) + dt * gradART(hu, hm, ha, g);
-            }
 
+		Type tmp_artelig = prop_elig * hivstrat_adult(hm, ha, g, t);
+		artelig_hahm(hm, ha-hIDX_15PLUS) = tmp_artelig;
+		artelig_hm(hm) += tmp_artelig;
+                Xartelig_15plus += tmp_artelig;
+
+		Type tmp_expect_mort = cd4_mort(hm, ha, g) * tmp_artelig;
+		expect_mort_artelig_hm(hm) += tmp_expect_mort;
+                expect_mort_artelig15plus += tmp_expect_mort;
+              }
+	      
+              for(int hu = 0; hu < hTS; hu++) {
+                Xart_15plus += artstrat_adult(hu, hm, ha, g, t) + dt * gradART(hu, hm, ha, g);
+	      }
+            }
+	    
             // // if pw_artelig, add pregnant women to artelig_hahm population
             // if(g == FEMALE & pw_artelig[t] > 0 & ha < hAG_FERT){
             //   Type frr_pop_ha = 0;
@@ -522,28 +595,64 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
             // }
           } // loop over ha
 
+	  /*
+	  // TensorFixedSize<Type, Sizes<hDS, hAG_15PLUS>> artelig_hahm;
+	  for(int ha = hIDX_15PLUS; ha < hAG; ha++) {
+	    for(int hm = everARTelig_idx; hm < hDS; hm++) {
+	      artelig_hahm(hm, ha-hIDX_15PLUS) = artelig_hahm_g(hm, ha-hIDX_15PLUS, g);
+	    }
+	  }
+	  // Type Xart_15plus = Xart_15plus_g[g];
+	  Type Xartelig_15plus = Xartelig_15plus_g[g];
+	  Type expect_mort_artelig15plus = expect_mort_artelig15plus_g[g];
+
+	  Type Xart_15plus = 0.0;
+	  for(int ha = hIDX_15PLUS; ha < hAG; ha++) {
+            for(int hm = everARTelig_idx; hm < hDS; hm++) {
+              if(hm >= anyelig_idx){
+		for(int hu = 0; hu < hTS; hu++)
+		  Xart_15plus += artstrat_adult(hu, hm, ha, g, t) + dt * gradART(hu, hm, ha, g);
+	      }
+	    }
+	  }
+	  */
+			
           // calculate number on ART at end of ts, based on number or percent
           Type artnum_hts = 0.0;
-          if (dt*(hts+1) < 0.5) {
-            if ( (!art15plus_isperc(g, t-2)) & (!art15plus_isperc(g, t-1)) ){ // both numbers
+	  if (projection_period_int == PROJPERIOD_MIDYEAR && dt*(hts+1) < 0.5) {
+            if ( (!art15plus_isperc(g, t-2)) && (!art15plus_isperc(g, t-1)) ){ // both numbers
               artnum_hts = (0.5-dt*(hts+1))*art15plus_num(g, t-2) + (dt*(hts+1)+0.5)*art15plus_num(g, t-1);
-            } else if (art15plus_isperc(g, t-2) & art15plus_isperc(g, t-1)){ // both percentages
+            } else if (art15plus_isperc(g, t-2) && art15plus_isperc(g, t-1)){ // both percentages
               Type artcov_hts = (0.5-dt*(hts+1))*art15plus_num(g, t-2) + (dt*(hts+1)+0.5)*art15plus_num(g, t-1);
               artnum_hts = artcov_hts * (Xart_15plus + Xartelig_15plus);
-            } else if ( (!art15plus_isperc(g, t-2)) & art15plus_isperc(g, t-1)) { // transition from number to percentage
+            } else if ( (!art15plus_isperc(g, t-2)) && art15plus_isperc(g, t-1)) { // transition from number to percentage
               Type curr_coverage = Xart_15plus / (Xart_15plus + Xartelig_15plus);
               Type artcov_hts = curr_coverage + (art15plus_num(g, t-1) - curr_coverage) * dt / (0.5-dt*hts);
               artnum_hts = artcov_hts * (Xart_15plus + Xartelig_15plus);
             }
           } else {
-            if( (!art15plus_isperc(g, t-1)) & (!art15plus_isperc(g, t)) ){ // both numbers
-              artnum_hts = (1.5-dt*(hts+1))*art15plus_num(g, t-1) + (dt*(hts+1)-0.5)*art15plus_num(g, t);
-            } else if(art15plus_isperc(g, t-1) & art15plus_isperc(g, t)){ // both percentages
-              Type artcov_hts = (1.5-dt*(hts+1))*art15plus_num(g, t-1) + (dt*(hts+1)-0.5)*art15plus_num(g, t);
+
+	    // If the projection period is calendar year (>= Spectrum v6.2), 
+	    // this condition is always followed, and it interpolates between
+	    // end of last year and current year (+ 1.0).
+	    // If projection period was mid-year (<= Spectrum v6.19), the second
+	    // half of the projection year interpolates the first half of the
+	    // calendar year (e.g. hts 7/10 for 2019 interpolates December 2018
+	    // to December 2019)
+
+	    Type art_interp_w = dt * (hts + 1.0);
+	    if (projection_period_int == PROJPERIOD_MIDYEAR) {
+	      art_interp_w -= 0.5;
+	    }
+
+            if( (!art15plus_isperc(g, t-1)) && (!art15plus_isperc(g, t)) ){ // both numbers
+              artnum_hts = (1.0 - art_interp_w) * art15plus_num(g, t-1) + art_interp_w * art15plus_num(g, t);
+            } else if(art15plus_isperc(g, t-1) && art15plus_isperc(g, t)){ // both percentages
+              Type artcov_hts = (1.0 - art_interp_w) * art15plus_num(g, t-1) + art_interp_w * art15plus_num(g, t);
               artnum_hts = artcov_hts * (Xart_15plus + Xartelig_15plus);
             } else if( (!art15plus_isperc(g, t-1)) & art15plus_isperc(g, t)){ // transition from number to percentage
               Type curr_coverage = Xart_15plus / (Xart_15plus + Xartelig_15plus);
-              Type artcov_hts = curr_coverage + (art15plus_num(g, t) - curr_coverage) * dt / (1.5-dt*hts);
+              Type artcov_hts = curr_coverage + (art15plus_num(g, t) - curr_coverage) * dt / (1.0 - art_interp_w + dt);
               artnum_hts = artcov_hts * (Xart_15plus + Xartelig_15plus);
             }
           }
@@ -553,11 +662,24 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 
           // Use mixture of eligibility and expected mortality for initiation distribution
 
+	  // Step 1: allocate ART by CD4 stage
+	  TensorFixedSize<Type, Sizes<hDS>> artinit_hm;
+	  for(int hm = anyelig_idx; hm < hDS; hm++) {
+	    artinit_hm(hm) = artinit_hts *
+	      ( (1.0 - art_alloc_mxweight) * artelig_hm(hm) / Xartelig_15plus +
+		art_alloc_mxweight * expect_mort_artelig_hm(hm) / expect_mort_artelig15plus );
+	  }
+
+	  // Step 2: within CD4 category, allocate ART by age proportional to
+	  // eligibility
           for(int ha = hIDX_15PLUS; ha < hAG; ha++) {
 	    for(int hm = anyelig_idx; hm < hDS; hm++) {
 
-              if (Xartelig_15plus > 0.0) {
-                Type artinit_hahm = artinit_hts * artelig_hahm(hm, ha-hIDX_15PLUS) * ((1.0 - art_alloc_mxweight)/Xartelig_15plus + art_alloc_mxweight * cd4_mort(hm, ha, g) / expect_mort_artelig15plus);
+	      if (artelig_hm(hm) > 0.0) {
+
+		Type artinit_hahm = artinit_hm(hm) *
+		  artelig_hahm(hm, ha-hIDX_15PLUS) / artelig_hm(hm);
+		
                 if (artinit_hahm > artelig_hahm(hm, ha-hIDX_15PLUS)) {
                   artinit_hahm = artelig_hahm(hm, ha-hIDX_15PLUS);
                 }
@@ -627,6 +749,49 @@ template <typename Type, int NG, int pAG, int pIDX_FERT, int pAG_FERT,
 
 
     } // loop hiv_steps_per_year
+
+
+    // Net migration for calendar-year projection option with end-year migration
+    if (projection_period_int == PROJPERIOD_CALENDAR) {
+      
+      for(int g = 0; g < NG; g++){
+
+	for(int a = 0; a < pAG; a++) {
+	  migrate_ag(a, g) = netmigr(a, g, t) / totpop1(a, g, t);
+	  totpop1(a, g, t) *= 1.0 + migrate_ag(a, g);
+	}
+	
+	// remove net migration from hivpop1
+	TensorFixedSize<Type, Sizes<pAG>> netmig_a;
+	for(int a = 0; a < pAG; a++) {
+	  netmig_a(a) = hivpop1(a, g, t) * migrate_ag(a, g);
+	  hivpop1(a, g, t) += netmig_a(a);
+	}
+	
+	// remove net migration from adult stratified population
+	int a = pIDX_HIVADULT;
+	for(int ha = 0; ha < hAG; ha++){
+	  Type mig_ha = 0.0;
+	  Type hivpop_ha_postmig = 0.0;
+	  for(int i = 0; i < hAG_SPAN[ha]; i++){
+	    hivpop_ha_postmig += hivpop1(a, g, t);
+	    mig_ha += netmig_a(a);
+	    a++;
+	  }
+	  
+	  Type migrate_ha = hivpop_ha_postmig > 0 ? mig_ha / (hivpop_ha_postmig - mig_ha) : 0.0;
+	  for(int hm = 0; hm < hDS; hm++){
+	    hivstrat_adult(hm, ha, g, t) *= 1.0 + migrate_ha;
+	    if(t >= t_ART_start) {
+	      for(int hu = 0; hu < hTS; hu++) {
+		artstrat_adult(hu, hm, ha, g, t) *= 1.0 + migrate_ha;
+	      }
+	    }
+	  }
+	}
+      }
+    } // if (projection_period_int == PROJPERIOD_CALENDAR)
+
 
   }
 

@@ -1,6 +1,6 @@
 Package: leapfrog
 Title: Multistate Population Projection Model for Demographic and HIV Estimation
-Version: 0.0.2
+Version: 0.0.3
 Authors@R: 
     person(given = "Jeffrey",
            family = "Eaton",
@@ -17,7 +17,7 @@ LinkingTo:
     RcppEigen
 Imports:
     beers,
-    eppasm (>= 0.5.12),
+    eppasm (>= 0.7.2),
     methods,
     Matrix,
     Rcpp
