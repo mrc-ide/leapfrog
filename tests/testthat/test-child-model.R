@@ -111,7 +111,6 @@ test_that("CLHIV align", {
   dt <- dt %>%
     dplyr::mutate(diff = pop - fr) %>%
     dplyr::filter(year < 2030)
-  y <- data.table::data.table(dt)
 
   expect_true(all(abs(dt$diff) < 5e-1))
 })

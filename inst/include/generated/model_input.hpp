@@ -95,8 +95,8 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
     const leapfrog::TensorMap2<real_type> hc_cd4_transition = parse_data<real_type>(data, "paed_cd4_transition", children.hc2DS, children.hc1DS);
     const leapfrog::TensorMap3<real_type> hc1_cd4_mort = parse_data<real_type>(data, "paed_cd4_mort", children.hc1DS, children.hcTT, children.hc1AG);
     const leapfrog::TensorMap3<real_type> hc2_cd4_mort = parse_data<real_type>(data, "adol_cd4_mort", children.hc2DS, children.hcTT, children.hc2AG);
-    const leapfrog::TensorMap1<real_type> hc1_cd4_prog = parse_data<real_type>(data, "paed_cd4_prog", children.hc1DS);
-    const leapfrog::TensorMap1<real_type> hc2_cd4_prog = parse_data<real_type>(data, "adol_cd4_prog", children.hc2DS);
+    const leapfrog::TensorMap3<real_type> hc1_cd4_prog = parse_data<real_type>(data, "paed_cd4_prog", children.hc1DS, 2, base.NS);
+    const leapfrog::TensorMap3<real_type> hc2_cd4_prog = parse_data<real_type>(data, "adol_cd4_prog", children.hc2DS, 1, base.NS);
     const real_type ctx_effect = Rcpp::as<real_type>(data["ctx_effect"]);
     const leapfrog::TensorMap1<real_type> ctx_val = parse_data<real_type>(data, "ctx_val", proj_years);
     const leapfrog::TensorMap1<int> hc_art_elig_age = parse_data<int>(data, "paed_art_elig_age", proj_years);
@@ -130,6 +130,7 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
     const leapfrog::TensorMap1<real_type> hc_age_coarse = parse_data<real_type>(data, "hc_age_coarse", children.hcAG_end);
     const leapfrog::TensorMap2<real_type> abortion = parse_data<real_type>(data, "abortion", children.hAB_ind, proj_years);
     const leapfrog::TensorMap1<real_type> patients_reallocated = parse_data<real_type>(data, "patients_reallocated", proj_years);
+    const leapfrog::TensorMap1<real_type> hc_age_coarse_cd4 = parse_data<real_type>(data, "hc_age_coarse_cd4", 15);
     const leapfrog::Children<real_type> children_params = {
         hc_nosocomial,
         hc1_cd4_dist,
@@ -171,6 +172,7 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
         hc_age_coarse,
         abortion,
         patients_reallocated,
+        hc_age_coarse_cd4,
     };
     const leapfrog::ChildModelParameters<ModelVariant, real_type> child_model_params = {
         children_params
