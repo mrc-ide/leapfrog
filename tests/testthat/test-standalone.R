@@ -53,54 +53,54 @@ test_that("We can compile the standalone program", {
   ## so check up to appropriate tolerance
   expect_equal(deserialize_tensor_to_r(file.path(output, "p_total_pop")),
     expected$p_total_pop,
-    tolerance = 1e-3
+    tolerance = 1e-5
   )
   expect_equal(as.numeric(deserialize_tensor_to_r(file.path(output, "births"))),
     expected$births,
-    tolerance = 1e-3,
+    tolerance = 1e-5,
     ignore_attr = TRUE
   )
   expect_equal(
     deserialize_tensor_to_r(file.path(output, "p_total_pop_natural_deaths")),
     expected$p_total_pop_natural_deaths,
-    tolerance = 1e-3
+    tolerance = 1e-5
   )
   expect_equal(deserialize_tensor_to_r(file.path(output, "p_hiv_pop")),
     expected$p_hiv_pop,
-    tolerance = 1e-3
+    tolerance = 1e-5
   )
   expect_equal(
     deserialize_tensor_to_r(file.path(output, "p_hiv_pop_natural_deaths")),
     expected$p_hiv_pop_natural_deaths,
-    tolerance = 1e-3
+    tolerance = 1e-5
   )
   expect_equal(deserialize_tensor_to_r(file.path(output, "h_hiv_adult")),
     expected$h_hiv_adult,
-    tolerance = 1e-3
+    tolerance = 1e-5
   )
   expect_equal(deserialize_tensor_to_r(file.path(output, "h_art_adult")),
     expected$h_art_adult,
-    tolerance = 1e-3
+    tolerance = 1e-5
   )
   expect_equal(
     deserialize_tensor_to_r(file.path(output, "h_hiv_deaths_no_art")),
     expected$h_hiv_deaths_no_art,
-    tolerance = 1e-3
+    tolerance = 1e-5
   )
   expect_equal(deserialize_tensor_to_r(file.path(output, "p_infections")),
     expected$p_infections,
-    tolerance = 1e-3
+    tolerance = 1e-5
   )
   expect_equal(deserialize_tensor_to_r(file.path(output, "h_hiv_deaths_art")),
     expected$h_hiv_deaths_art,
-    tolerance = 1e-3
+    tolerance = 1e-5
   )
   expect_equal(deserialize_tensor_to_r(file.path(output, "h_art_initiation")),
     expected$h_art_initiation,
-    tolerance = 1e-3
+    tolerance = 1e-5
   )
   expect_equal(deserialize_tensor_to_r(file.path(output, "p_hiv_deaths")),
     expected$p_hiv_deaths,
-    tolerance = 1e-3
+    tolerance = 1e-5
   )
 })
