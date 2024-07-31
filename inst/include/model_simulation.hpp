@@ -239,27 +239,42 @@ void run_h_art_initiation(int hiv_step,
   const auto art = pars.base.art;
   const auto dt = pars.base.options.dt;
   const auto hIDX_15PLUS = pars.base.options.hIDX_15PLUS;
+
   for (int g = 0; g < ss.NS; ++g) {
+
     intermediate.base.Xart_15plus = 0.0;
+
+    intermediate.base.artelig_hm.setZero();
     intermediate.base.Xartelig_15plus = 0.0;
+
+    intermediate.base.expect_mort_artelig_hm.setZero();
     intermediate.base.expect_mort_artelig15plus = 0.0;
+    
     for (int ha = hIDX_15PLUS; ha < ss.hAG; ++ha) {
       for (int hm = intermediate.base.everARTelig_idx; hm < ss.hDS; ++hm) {
+	
         if (hm >= intermediate.base.anyelig_idx) {
           // TODO: Implement special population ART eligibility
           real_type prop_elig = 1.0;
-          intermediate.base.artelig_hahm(hm, ha - hIDX_15PLUS) =
-              prop_elig * state_next.base.h_hiv_adult(hm, ha, g);
-          intermediate.base.Xartelig_15plus += intermediate.base.artelig_hahm(
-              hm, ha - hIDX_15PLUS);
-          intermediate.base.expect_mort_artelig15plus +=
-              natural_history.cd4_mortality(hm, ha, g) *
-              intermediate.base.artelig_hahm(hm, ha - hIDX_15PLUS);
+
+	  real_type tmp_artelig = prop_elig * state_next.base.h_hiv_adult(hm, ha, g);
+		
+          intermediate.base.artelig_hahm(hm, ha - hIDX_15PLUS) = tmp_artelig;
+	  intermediate.base.artelig_hm(hm) += tmp_artelig;
+	  intermediate.base.Xartelig_15plus += tmp_artelig;
+
+	  real_type tmp_expect_mort = natural_history.cd4_mortality(hm, ha, g) *
+	    intermediate.base.artelig_hahm(hm, ha - hIDX_15PLUS);
+	  intermediate.base.expect_mort_artelig_hm(hm) += tmp_expect_mort;
+          intermediate.base.expect_mort_artelig15plus += tmp_expect_mort;
         }
-        for (int hu = 0; hu < ss.hTS; ++hu)
+	
+        for (int hu = 0; hu < ss.hTS; ++hu) {
           intermediate.base.Xart_15plus +=
               state_next.base.h_art_adult(hu, hm, ha, g) +
               dt * intermediate.base.gradART(hu, hm, ha, g);
+	}
+
       }
     }
 
@@ -333,22 +348,34 @@ void run_h_art_initiation(int hiv_step,
         intermediate.base.Xart_15plus : 0.0;
 
     // Use mixture of eligibility and expected mortality for initiation distribution
+    // Spectrum ART allocation is 2-step process
+    // 1. Allocate by CD4 category (weighted by 'eligible' and 'expected mortality')
+    // 2. Allocate by age groups (weighted only by eligibility)
+
+    // Step 1: allocate ART by CD4 stage
+    for(int hm = intermediate.base.anyelig_idx; hm < ss.hDS; ++hm) {
+      intermediate.base.artinit_hm(hm) = intermediate.base.artinit_hts *
+	( (1.0 - pars.base.art.initiation_mortality_weight) *
+	  intermediate.base.artelig_hm(hm) / intermediate.base.Xartelig_15plus +
+	  pars.base.art.initiation_mortality_weight *
+	  intermediate.base.expect_mort_artelig_hm(hm) / intermediate.base.expect_mort_artelig15plus );
+    }
+
+    // Step 2: within CD4 category, allocate ART by age proportional to
+    // eligibility
     for (int ha = hIDX_15PLUS; ha < ss.hAG; ++ha) {
       for (int hm = intermediate.base.anyelig_idx; hm < ss.hDS; ++hm) {
-        if (intermediate.base.Xartelig_15plus > 0.0) {
-          intermediate.base.artinit_hahm =
-              intermediate.base.artinit_hts *
-              intermediate.base.artelig_hahm(hm, ha - hIDX_15PLUS) *
-              ((1.0 - pars.base.art.initiation_mortality_weight) /
-               intermediate.base.Xartelig_15plus +
-               pars.base.art.initiation_mortality_weight *
-               natural_history.cd4_mortality(hm, ha, g) /
-               intermediate.base.expect_mort_artelig15plus);
+
+        if (intermediate.base.artelig_hm(hm) > 0.0) {
+	  
+          intermediate.base.artinit_hahm = intermediate.base.artinit_hm(hm) *
+	    intermediate.base.artelig_hahm(hm, ha - hIDX_15PLUS) /
+	    intermediate.base.artelig_hm(hm);
+	  
           if (intermediate.base.artinit_hahm >
               intermediate.base.artelig_hahm(hm, ha - hIDX_15PLUS)) {
-            intermediate.base.artinit_hahm = intermediate.base.artelig_hahm(hm,
-                                                                            ha -
-                                                                            hIDX_15PLUS);
+            intermediate.base.artinit_hahm =
+	      intermediate.base.artelig_hahm(hm, ha - hIDX_15PLUS);
           }
           if (intermediate.base.artinit_hahm >
               state_next.base.h_hiv_adult(hm, ha, g) +
@@ -361,8 +388,8 @@ void run_h_art_initiation(int hiv_step,
               intermediate.base.artinit_hahm / dt;
           intermediate.base.gradART(ART0MOS, hm, ha, g) +=
               intermediate.base.artinit_hahm / dt;
-          state_next.base.h_art_initiation(hm, ha,
-                                           g) += intermediate.base.artinit_hahm;
+          state_next.base.h_art_initiation(hm, ha, g) +=
+	      intermediate.base.artinit_hahm;
         }
       }
     }

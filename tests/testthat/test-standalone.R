@@ -44,18 +44,21 @@ test_that("We can compile the standalone program", {
   expect_true(file.exists(file.path(output, "h_art_initiation")))
   expect_true(file.exists(file.path(output, "p_hiv_deaths")))
 
-  expected <- readRDS(test_path("testdata/leapfrog_fit.rds"))
+  demp <- readRDS(test_path("testdata/demographic_projection_object_adult.rds"))
+  parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
+  expected <- run_model(demp, parameters, 1970:2030L, 10L,
+                        run_child_model = FALSE)
 
-  ## We're only reporting out last year atm so check final time point agrees
-  ## We're also expecting some precision loss due to serialization so check
-  ## up to some tolerance
+  ## There is some precision loss in standalone data due to serialization
+  ## so check up to appropriate tolerance
   expect_equal(deserialize_tensor_to_r(file.path(output, "p_total_pop")),
     expected$totpop1,
     tolerance = 1e-3
   )
   expect_equal(as.numeric(deserialize_tensor_to_r(file.path(output, "births"))),
     expected$births,
-    tolerance = 1e-3
+    tolerance = 1e-3,
+    ignore_attr = TRUE
   )
   expect_equal(
     deserialize_tensor_to_r(file.path(output, "p_total_pop_natural_deaths")),
