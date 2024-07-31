@@ -52,55 +52,55 @@ test_that("We can compile the standalone program", {
   ## There is some precision loss in standalone data due to serialization
   ## so check up to appropriate tolerance
   expect_equal(deserialize_tensor_to_r(file.path(output, "p_total_pop")),
-    expected$totpop1,
-    tolerance = 1e-3
+    expected$p_total_pop,
+    tolerance = 1e-5
   )
   expect_equal(as.numeric(deserialize_tensor_to_r(file.path(output, "births"))),
     expected$births,
-    tolerance = 1e-3,
+    tolerance = 1e-5,
     ignore_attr = TRUE
   )
   expect_equal(
     deserialize_tensor_to_r(file.path(output, "p_total_pop_natural_deaths")),
-    expected$natdeaths,
-    tolerance = 1e-3
+    expected$p_total_pop_natural_deaths,
+    tolerance = 1e-5
   )
   expect_equal(deserialize_tensor_to_r(file.path(output, "p_hiv_pop")),
-    expected$hivpop1,
-    tolerance = 1e-3
+    expected$p_hiv_pop,
+    tolerance = 1e-5
   )
   expect_equal(
     deserialize_tensor_to_r(file.path(output, "p_hiv_pop_natural_deaths")),
-    expected$natdeaths_hivpop,
-    tolerance = 1e-3
+    expected$p_hiv_pop_natural_deaths,
+    tolerance = 1e-5
   )
   expect_equal(deserialize_tensor_to_r(file.path(output, "h_hiv_adult")),
-    expected$hivstrat_adult,
-    tolerance = 1e-3
+    expected$h_hiv_adult,
+    tolerance = 1e-5
   )
   expect_equal(deserialize_tensor_to_r(file.path(output, "h_art_adult")),
-    expected$artstrat_adult,
-    tolerance = 1e-3
+    expected$h_art_adult,
+    tolerance = 1e-5
   )
   expect_equal(
     deserialize_tensor_to_r(file.path(output, "h_hiv_deaths_no_art")),
-    expected$aidsdeaths_noart,
-    tolerance = 1e-3
+    expected$h_hiv_deaths_no_art,
+    tolerance = 1e-5
   )
   expect_equal(deserialize_tensor_to_r(file.path(output, "p_infections")),
-    expected$infections,
-    tolerance = 1e-3
+    expected$p_infections,
+    tolerance = 1e-5
   )
   expect_equal(deserialize_tensor_to_r(file.path(output, "h_hiv_deaths_art")),
-    expected$aidsdeaths_art,
-    tolerance = 1e-3
+    expected$h_hiv_deaths_art,
+    tolerance = 1e-5
   )
   expect_equal(deserialize_tensor_to_r(file.path(output, "h_art_initiation")),
-    expected$artinit,
-    tolerance = 1e-3
+    expected$h_art_initiation,
+    tolerance = 1e-5
   )
   expect_equal(deserialize_tensor_to_r(file.path(output, "p_hiv_deaths")),
-    expected$hivdeaths,
-    tolerance = 1e-3
+    expected$p_hiv_deaths,
+    tolerance = 1e-5
   )
 })
