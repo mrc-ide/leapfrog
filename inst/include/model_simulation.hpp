@@ -258,7 +258,6 @@ void run_h_art_initiation(int hiv_step,
           real_type prop_elig = 1.0;
 
 	  real_type tmp_artelig = prop_elig * state_next.base.h_hiv_adult(hm, ha, g);
-		
           intermediate.base.artelig_hahm(hm, ha - hIDX_15PLUS) = tmp_artelig;
 	  intermediate.base.artelig_hm(hm) += tmp_artelig;
 	  intermediate.base.Xartelig_15plus += tmp_artelig;
@@ -279,54 +278,82 @@ void run_h_art_initiation(int hiv_step,
     }
 
     // calculate number on ART at end of ts, based on number or percent
-    if (dt * (hiv_step + 1) < 0.5) {
+    if (pars.base.options.proj_period_int == internal::PROJPERIOD_MIDYEAR &&
+	dt * (hiv_step + 1) < 0.5) {
+      
       if (!art.adults_on_art_is_percent(g, time_step - 2) &&
           !art.adults_on_art_is_percent(g, time_step - 1)) {
+	
         // Both values are numbers
         intermediate.base.artnum_hts =
             (0.5 - dt * (hiv_step + 1)) * art.adults_on_art(g, time_step - 2) +
             (dt * (hiv_step + 1) + 0.5) * art.adults_on_art(g, time_step - 1);
+	
       } else if (art.adults_on_art_is_percent(g, time_step - 2) &&
                  art.adults_on_art_is_percent(g, time_step - 1)) {
+	
         // Both values are percentages
         intermediate.base.artcov_hts =
-            (0.5 - dt * (hiv_step + 1)) * art.adults_on_art(g, time_step - 2) +
-            (dt * (hiv_step + 1) + 0.5) * art.adults_on_art(g, time_step - 1);
+	  (0.5 - dt * (hiv_step + 1)) * art.adults_on_art(g, time_step - 2) +
+	  (dt * (hiv_step + 1) + 0.5) * art.adults_on_art(g, time_step - 1);
         intermediate.base.artnum_hts =
-            intermediate.base.artcov_hts *
-            (intermediate.base.Xart_15plus + intermediate.base.Xartelig_15plus);
+	  intermediate.base.artcov_hts *
+	  (intermediate.base.Xart_15plus + intermediate.base.Xartelig_15plus);
+	
       } else if (!art.adults_on_art_is_percent(g, time_step - 2) &&
                  art.adults_on_art_is_percent(g, time_step - 1)) {
+	
         // Transition from number to percentage
         intermediate.base.curr_coverage =
             intermediate.base.Xart_15plus /
             (intermediate.base.Xart_15plus + intermediate.base.Xartelig_15plus);
+	
         intermediate.base.artcov_hts = intermediate.base.curr_coverage +
                                        (art.adults_on_art(g, time_step - 1) -
                                         intermediate.base.curr_coverage) * dt /
                                        (0.5 - dt * hiv_step);
+	
         intermediate.base.artnum_hts =
             intermediate.base.artcov_hts *
             (intermediate.base.Xart_15plus + intermediate.base.Xartelig_15plus);
       }
     } else {
+      
+      // If the projection period is calendar year (>= Spectrum v6.2), 
+      // this condition is always followed, and it interpolates between
+      // end of last year and current year (+ 1.0).
+      // If projection period was mid-year (<= Spectrum v6.19), the second
+      // half of the projection year interpolates the first half of the
+      // calendar year (e.g. hts 7/10 for 2019 interpolates December 2018
+      // to December 2019)
+
+      real_type art_interp_w = dt * (hiv_step + 1.0);
+      if (pars.base.options.proj_period_int == internal::PROJPERIOD_MIDYEAR) {
+	art_interp_w -= 0.5;
+      }
+
       if (!art.adults_on_art_is_percent(g, time_step - 1) &&
           !art.adults_on_art_is_percent(g, time_step)) {
+	
         // Both values are numbers
         intermediate.base.artnum_hts =
-            (1.5 - dt * (hiv_step + 1)) * art.adults_on_art(g, time_step - 1) +
-            (dt * (hiv_step + 1) - 0.5) * art.adults_on_art(g, time_step);
+	  (1.0 - art_interp_w) * art.adults_on_art(g, time_step - 1) +
+	  art_interp_w * art.adults_on_art(g, time_step);
+	
       } else if (art.adults_on_art_is_percent(g, time_step - 1) &&
                  art.adults_on_art_is_percent(g, time_step)) {
+	
         // Both values are percentages
-        intermediate.base.artcov_hts =
-            (1.5 - dt * (hiv_step + 1)) * art.adults_on_art(g, time_step - 1) +
-            (dt * (hiv_step + 1) - 0.5) * art.adults_on_art(g, time_step);
+        intermediate.base.artcov_hts = 
+	  (1.0 - art_interp_w) * art.adults_on_art(g, time_step - 1) +
+	  art_interp_w * art.adults_on_art(g, time_step);
         intermediate.base.artnum_hts =
             intermediate.base.artcov_hts *
             (intermediate.base.Xart_15plus + intermediate.base.Xartelig_15plus);
+	
       } else if (!art.adults_on_art_is_percent(g, time_step - 1) &&
                  art.adults_on_art_is_percent(g, time_step)) {
+	
         // Transition from number to percentage
         intermediate.base.curr_coverage =
             intermediate.base.Xart_15plus /
@@ -334,7 +361,7 @@ void run_h_art_initiation(int hiv_step,
         intermediate.base.artcov_hts = intermediate.base.curr_coverage +
                                        (art.adults_on_art(g, time_step) -
                                         intermediate.base.curr_coverage) * dt /
-                                       (1.5 - dt * hiv_step);
+                                       (1.0 - art_interp_w + dt);
         intermediate.base.artnum_hts =
             intermediate.base.artcov_hts *
             (intermediate.base.Xart_15plus + intermediate.base.Xartelig_15plus);

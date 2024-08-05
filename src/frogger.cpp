@@ -51,10 +51,23 @@ Rcpp::List simulate_model(const leapfrog::StateSpace<ModelVariant> ss,
                           const int proj_years,
                           const int hiv_steps,
                           const std::vector<int> save_steps) {
+
+  int projection_period_int = leapfrog::internal::PROJPERIOD_CALENDAR;
+  Rcpp::String projection_period_str = data["projection_period"];
+  if (projection_period_str == "calendar") {
+    projection_period_int = leapfrog::internal::PROJPERIOD_CALENDAR;
+  } else if (projection_period_str == "midyear") {
+    projection_period_int = leapfrog::internal::PROJPERIOD_MIDYEAR;
+  } else {
+    Rf_error("projection_period \"%s\" not found. Please select \"midyear\" or \"calendar\".\n",
+	     projection_period_str.get_cstring());
+  }
+  
   const leapfrog::Options<double> opts = {
       hiv_steps,
       Rcpp::as<int>(data["t_ART_start"]) - 1,
-      ss.base.hAG
+      ss.base.hAG,
+      projection_period_int
   };
 
   const auto params = setup_model_params<ModelVariant, double>(data, opts, proj_years);

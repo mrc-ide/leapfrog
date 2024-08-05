@@ -121,9 +121,11 @@ int main(int argc, char *argv[]) {
   const auto ss = leapfrog::StateSpace<leapfrog::BaseModelFullAgeStratification>().base;
 
   const leapfrog::Options<double> options = {
-      hts_per_year,       // HIV steps per year
-      30,                 // Time ART start
-      ss.hAG              // Age groups HIV 15+
+      hts_per_year,        // HIV steps per year
+      30,                  // Time ART start
+      ss.hAG,              // Age groups HIV 15+
+      // Projection period, 0 for calendar year, 1 for midyear
+      leapfrog::internal::PROJPERIOD_MIDYEAR
   };
 
   leapfrog::Tensor1<int> v = serialize::deserialize_tensor<int, 1>(
