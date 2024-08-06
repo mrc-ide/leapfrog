@@ -7,16 +7,16 @@
 namespace leapfrog {
 
 template<typename real_type>
-using TensorMap1 = Eigen::TensorMap <Eigen::Tensor<real_type, 1>>;
+using TensorMap1 = Eigen::TensorMap <const Eigen::Tensor<real_type, 1>>;
 
 template<typename real_type>
-using TensorMap2 = Eigen::TensorMap <Eigen::Tensor<real_type, 2>>;
+using TensorMap2 = Eigen::TensorMap <const Eigen::Tensor<real_type, 2>>;
 
 template<typename real_type>
-using TensorMap3 = Eigen::TensorMap <Eigen::Tensor<real_type, 3>>;
+using TensorMap3 = Eigen::TensorMap <const Eigen::Tensor<real_type, 3>>;
 
 template<typename real_type>
-using TensorMap4 = Eigen::TensorMap <Eigen::Tensor<real_type, 4>>;
+using TensorMap4 = Eigen::TensorMap <const Eigen::Tensor<real_type, 4>>;
 
 template<typename real_type>
 using Tensor1 = Eigen::Tensor<real_type, 1>;

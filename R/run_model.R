@@ -148,17 +148,33 @@ test_tmb <- function(data, parameters, sim_years,
   save_steps <- transform_output_steps(output_steps)
   hiv_steps <- transform_hts_per_year(hts_per_year)
 
+  # TMB specific stuff
+  names_data <- names(data)
+  for (name in names_data) {
+    if (length(data[[name]]) > 1 && !is.array(data[[name]])) {
+      data[[name]] <- array(data[[name]])
+    }
+  }
 
-  # TMB part starts
-  extra_inputs <- list(
+  parameter_tmb <- list(incidinput_scalar = 0.5)
+
+  data_tmb <- list(
+    data_vars = data,
+    t_ART_start = data$t_ART_start,
     model_variant = model_variant,
     proj_years = proj_years,
     hiv_steps = hiv_steps,
-    save_steps = save_steps
+    save_steps = save_steps,
+    basepop = data$basepop,
+    sd = 10000,
+    incidinput_data = data$incidinput
   )
-  data_tmb <- c(data, extra_inputs)
-  parameter_tmb <- list(x = 0)
+
   obj <- TMB::MakeADFun(data_tmb, parameter_tmb, DLL = "frogger_TMB")
   obj$hessian <- TRUE
   opt <- do.call("optim", obj)
+  list(
+    obj = obj,
+    opt = opt
+  )
 }

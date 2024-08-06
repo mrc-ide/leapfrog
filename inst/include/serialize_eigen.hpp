@@ -147,7 +147,7 @@ void serialize_tensor(const Eigen::Tensor <T, rank> &data, const std::string &pa
 }
 
 template<typename T, int rank>
-void serialize_tensor_map(const Eigen::TensorMap <Eigen::Tensor<T, rank>> &data, const std::string &path) {
+void serialize_tensor_map(const Eigen::TensorMap <const Eigen::Tensor<T, rank>> &data, const std::string &path) {
   Eigen::Tensor <T, rank> d = data;
   serialize_tensor(d, path);
 }

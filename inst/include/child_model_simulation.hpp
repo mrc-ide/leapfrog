@@ -444,7 +444,7 @@ void run_bf_transmission_rate(int time_step,
     for(int bf = 0; bf < index; ++bf){
       intermediate.children.percent_no_treatment -= intermediate.children.bf_transmission_rate(bf);
     }
-    int temp;
+    real_type temp;
     temp = 0.0;
     for (int hp = 0; hp < hc_ss.hPS; hp++) {
       //hp = 0 is option A

@@ -1,0 +1,28 @@
+{{header}}
+
+#pragma once
+
+#include <unsupported/Eigen/CXX11/Tensor>
+
+#include "../tmb_utils.hpp"
+
+template<typename Type, typename ModelVariant>
+struct TMBData {
+{{tmb_data_members}}
+
+  TMBData(SEXP data) {
+{{constructors}}
+  }
+};
+
+template<typename ModelVariant, typename Type>
+leapfrog::Parameters<ModelVariant, Type> setup_tmb_params(
+  const TMBData<Type, ModelVariant> &tmb_data,
+  const leapfrog::Options<Type> &options,
+  const int proj_years
+) {
+  constexpr auto ss = leapfrog::StateSpace<ModelVariant>();
+  constexpr auto base = ss.base;
+
+{{function_body}}
+}

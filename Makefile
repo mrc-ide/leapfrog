@@ -32,6 +32,6 @@ check_all:
 	${RSCRIPT} -e "rcmdcheck::rcmdcheck(args = c('--as-cran', '--no-manual'))"
 
 clean:
-	rm -f src/*.o src/*.so src/*.gcda src/*.gcno src/*.gcov
+	rm -f src/*.o src/*.so src/*.gcda src/*.gcno src/*.gcov src/TMB/*.o src/TMB/*.so src/TMB/*.dll
 
 .PHONY: clean all test document install

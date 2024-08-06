@@ -19,12 +19,12 @@ int * r_data(SEXP x) {
 }
 
 template<typename T, std::size_t rank>
-auto convert_0_based(const Eigen::TensorMap<Eigen::Tensor<int, rank>> map) {
+auto convert_0_based(const Eigen::TensorMap<const Eigen::Tensor<int, rank>> map) {
   static_assert(sizeof(T) == 0, "Only specializations of convert_0_based can be used");
 }
 
 template<std::size_t rank>
-auto convert_0_based(const Eigen::TensorMap<Eigen::Tensor<double, rank>> map) {
+auto convert_0_based(const Eigen::TensorMap<const Eigen::Tensor<double, rank>> map) {
   Eigen::Tensor<double, rank> new_tensor = map; // Create a copy
   for (int i = 0; i < new_tensor.size(); ++i) {
     // 0-based indexing in C++ vs 1-based indexing in R
@@ -34,7 +34,7 @@ auto convert_0_based(const Eigen::TensorMap<Eigen::Tensor<double, rank>> map) {
 }
 
 template<std::size_t rank>
-auto convert_0_based(const Eigen::TensorMap<Eigen::Tensor<int, rank>> map) {
+auto convert_0_based(const Eigen::TensorMap<const Eigen::Tensor<int, rank>> map) {
   Eigen::Tensor<int, rank> new_tensor = map; // Create a copy
   for (int i = 0; i < new_tensor.size(); ++i) {
     // 0-based indexing in C++ vs 1-based indexing in R
@@ -66,5 +66,5 @@ auto parse_data(const Rcpp::List data, const std::string& key, Args... dims) {
                LENGTH(array_data));
   }
 
-  return Eigen::TensorMap<Eigen::Tensor<T, rank>>(r_data<T>(array_data), static_cast<int>(dims)...);
+  return Eigen::TensorMap<const Eigen::Tensor<T, rank>>(r_data<T>(array_data), static_cast<int>(dims)...);
 }

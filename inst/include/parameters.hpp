@@ -10,7 +10,7 @@ namespace leapfrog {
 template<typename real_type>
 struct Options {
   int hts_per_year;
-  double dt;
+  real_type dt;
   const int p_idx_fertility_first;
   const int p_fertility_age_groups;
   const int p_idx_hiv_first_adult;
