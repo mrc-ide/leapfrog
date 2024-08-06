@@ -255,8 +255,7 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   v$age15hivpop <- projp$age15hivpop
 
   ## Use Beer's coefficients to distribution IRRs by age/sex
-  Amat <- eppasm:::create_beers(17)
-  v$incrr_age <- apply(projp$incrr_age, 2:3, function(x)  Amat %*% x)[16:81, , ] ## !! Hard coded
+  v$incrr_age <- apply(projp$incrr_age, 2:3, beers_open_ended)[16:81, , ] ## !! Hard coded
   v$incrr_age[v$incrr_age < 0] <- 0
 
   v$cd4_initdist_full <- projp$cd4_initdist[ , idx_expand_full, ]
