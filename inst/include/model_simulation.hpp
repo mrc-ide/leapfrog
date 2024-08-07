@@ -210,16 +210,23 @@ void run_art_progression_and_mortality(int hiv_step,
         }
 
         // ART dropout
-        if (art.dropout(time_step) > 0) {
+        if (art.dropout_rate(time_step) > 0) {
           for (int hu = 0; hu < ss.hTS; ++hu) {
-            intermediate.base.grad(hm, ha, g) += art.dropout(time_step) *
-                                                 state_next.base.h_art_adult(hu,
-                                                                             hm,
-                                                                             ha,
-                                                                             g);
+	    
+	    if (art.dropout_recover_cd4 && hu >= 2 && hm >= 1) {
+	      // recover people on ART >1 year to one higher CD4 category
+	      intermediate.base.grad(hm-1, ha, g) +=
+		art.dropout_rate(time_step) *
+		state_next.base.h_art_adult(hu, hm, ha, g);
+	    } else {
+	      intermediate.base.grad(hm, ha, g) +=
+		art.dropout_rate(time_step) *
+		state_next.base.h_art_adult(hu, hm, ha, g);
+	    }
+	    
             intermediate.base.gradART(hu, hm, ha, g) -=
-                art.dropout(time_step) *
-                state_next.base.h_art_adult(hu, hm, ha, g);
+	      art.dropout_rate(time_step) *
+	      state_next.base.h_art_adult(hu, hm, ha, g);
           }
         }
       }

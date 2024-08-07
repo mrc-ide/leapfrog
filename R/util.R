@@ -103,3 +103,16 @@ group_list_of_lists <- function(list, on) {
 paste_lines <- function(...) {
   paste(..., collapse = "\n")
 }
+
+#' Beers Ordinary Graduation with Open-Ended Age Group
+#'
+#' Graduates vector from 5-year to single-year age,
+#' assuming the final value is an open-ended age group
+#' rather than an additional 5-year age group to be
+#' graduated.
+#' 
+#' @param x vector of length at least 6
+#'
+beers_open_ended <- function(x) {
+  c(beers::beers_sub_ordinary(x[-length(x)]), x[length(x)])
+}
