@@ -84,7 +84,6 @@ void run_wlhiv_births(int time_step,
     intermediate.children.asfr_sum += demog.age_specific_fertility_rate(a, time_step);
   } // end a
 
-  intermediate.children.births_sum = state_next.base.births;
 
   for (int a = 0; a < pars.base.options.p_fertility_age_groups; ++a) {
     intermediate.children.nHIVcurr = 0.0;
@@ -210,19 +209,22 @@ void convert_PMTCT_num_to_perc(int time_step,
   } else {
     intermediate.children.need_PMTCT = state_next.children.hiv_births;
   }
-
+  //intermediate.children.need_PMTCT += cpars.patients_reallocated(time_step);
+  intermediate.children.OnPMTCT = intermediate.children.sumARV + cpars.patients_reallocated(time_step);
+  if(intermediate.children.OnPMTCT > intermediate.children.need_PMTCT){
+    intermediate.children.OnPMTCT = intermediate.children.need_PMTCT;
+  }
 
   //replace all instances of coverage input as numbers with percentage covered
   if (cpars.PMTCT_input_is_percent(time_step)) {
     for (int hp = 0; hp < hc_ss.hPS; ++hp) {
       intermediate.children.PMTCT_coverage(hp) =  cpars.PMTCT(hp,time_step) / 100;
     } //end hPS
+    intermediate.children.sumARV = intermediate.children.sumARV * intermediate.children.need_PMTCT;
+
   } else {
 
-    intermediate.children.sumARV += cpars.patients_reallocated(time_step);
-
     for (int hp = 0; hp < hc_ss.hPS; ++hp) {
-      intermediate.children.OnPMTCT = intermediate.children.sumARV ;
       if (intermediate.children.sumARV == 0) {
         intermediate.children.PMTCT_coverage(hp) = 0.0;
       } else {
@@ -230,6 +232,8 @@ void convert_PMTCT_num_to_perc(int time_step,
       }
     } //end hPS
   }
+
+
   intermediate.children.PMTCT_coverage(4) = intermediate.children.PMTCT_coverage(4) * cpars.PMTCT_dropout(0,time_step);
   intermediate.children.PMTCT_coverage(5) = intermediate.children.PMTCT_coverage(5) * cpars.PMTCT_dropout(1,time_step);
 }
@@ -374,9 +378,12 @@ void run_calculate_perinatal_transmission_rate(int time_step,
   static_assert(ModelVariant::run_child_model,
                 "run_calculate_perinatal_transmission_rate can only be called for model variants where run_child_model is true");
 
+  intermediate.children.births_sum = state_next.base.births;
+
   //TODO: add in patients reallocated
   internal::convert_PMTCT_num_to_perc(time_step, pars, state_curr, state_next, intermediate);
   internal::adjust_optAB_transmission_rate(time_step, pars, state_curr, state_next, intermediate);
+  internal::calc_hiv_negative_pop(time_step, pars, state_curr, state_next, intermediate);
 
   // ///////////////////////////////////
   // //Calculate transmission rate
@@ -394,7 +401,10 @@ void run_calculate_perinatal_transmission_rate(int time_step,
     intermediate.children.PMTCT_coverage(6) * cpars.PMTCT_transmission_rate(0,6,0);
 
   intermediate.children.receiving_PMTCT = intermediate.children.PMTCT_coverage(0) + intermediate.children.PMTCT_coverage(1) + intermediate.children.PMTCT_coverage(2) + intermediate.children.PMTCT_coverage(3) + intermediate.children.retained_on_ART + intermediate.children.retained_started_ART + intermediate.children.PMTCT_coverage(6);
-  intermediate.children.no_PMTCT = 1 - intermediate.children.receiving_PMTCT;
+  intermediate.children.no_PMTCT = 1 -  intermediate.children.receiving_PMTCT;
+  if(intermediate.children.no_PMTCT < 0){
+    intermediate.children.no_PMTCT = 0;
+  }
 
   //Transmission among women not on treatment
   if (intermediate.children.num_wlhiv > 0) {
@@ -414,12 +424,13 @@ void run_calculate_perinatal_transmission_rate(int time_step,
   }// end a
   for (int a = 0; a < pars.base.options.p_fertility_age_groups; ++a) {
     intermediate.children.age_weighted_hivneg += demog.age_specific_fertility_rate(a, time_step) / intermediate.children.asfr_sum  * intermediate.children.p_hiv_neg_pop(a + 15,1) ; //HIV negative 15-49 women weighted for ASFR
-    intermediate.children.age_weighted_infections +=  demog.age_specific_fertility_rate(a, time_step) / intermediate.children.asfr_sum  * state_curr.base.p_infections(a + 15,1) ; //newly infected 15-49 women, weighted for ASFR
+    intermediate.children.age_weighted_infections +=  demog.age_specific_fertility_rate(a, time_step) / intermediate.children.asfr_sum  * state_next.base.p_infections(a + 15,1) ; //newly infected 15-49 women, weighted for ASFR
   }//end
 
   if (intermediate.children.age_weighted_hivneg > 0.0) {
     intermediate.children.incidence_rate_wlhiv = intermediate.children.age_weighted_infections / intermediate.children.age_weighted_hivneg;
-    intermediate.children.perinatal_transmission_from_incidence = intermediate.children.incidence_rate_wlhiv * (9/12) * (intermediate.children.births_sum - intermediate.children.need_PMTCT) * cpars.vertical_transmission_rate(7,0);
+    //0.75 is 9/12, gestational period
+    intermediate.children.perinatal_transmission_from_incidence = intermediate.children.incidence_rate_wlhiv * 0.75 * (intermediate.children.births_sum - intermediate.children.need_PMTCT) * cpars.vertical_transmission_rate(7,0);
   } else {
     intermediate.children.incidence_rate_wlhiv = 0.0;
     intermediate.children.perinatal_transmission_from_incidence = 0.0;
@@ -430,6 +441,9 @@ void run_calculate_perinatal_transmission_rate(int time_step,
   } else {
     intermediate.children.perinatal_transmission_rate = intermediate.children.perinatal_transmission_rate;
   }
+
+
+
 }
 
 template<typename ModelVariant, typename real_type>
@@ -602,8 +616,11 @@ void run_child_hiv_infections(int time_step,
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
 
+
+
   if (state_next.children.hiv_births > 0 ) {
     internal::run_calculate_perinatal_transmission_rate(time_step, pars, state_curr, state_next, intermediate);
+
     //Perinatal transmission
     for (int s = 0; s < ss.NS; ++s) {
       for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
@@ -616,7 +633,6 @@ void run_child_hiv_infections(int time_step,
       state_next.base.p_hiv_pop(0, s) +=  state_next.children.hiv_births * intermediate.children.perinatal_transmission_rate * demog.births_sex_prop(s,time_step);
       state_next.base.p_infections(0, s) += state_next.children.hiv_births * intermediate.children.perinatal_transmission_rate * demog.births_sex_prop(s,time_step);
     }// end NS
-
 
     //Breastfeeding transmission
 

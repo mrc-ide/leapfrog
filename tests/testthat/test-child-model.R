@@ -233,3 +233,4 @@ test_that("HIV related deaths among CLHIV on ART align", {
 
   expect_true(all(abs(dt$diff) < 5e-1))
 })
+
