@@ -63,8 +63,12 @@ struct ChildModelStateSpace<true> {
   static constexpr int hc2_agestart = 5;
   //  Number of age groups in the hc1 category (0-4)
   static constexpr int hc1AG = 5;
+  // Coarse age groups under five, used for paed progression
+  static constexpr int hc1AG_c = 2;
   //  Number of age groups in the hc2 category (5-14)
   static constexpr int hc2AG = 10;
+  // Coarse age groups 5-14, used for paed progression
+  static constexpr int hc2AG_c = 1;
   // Age at which the paediatric age group ends (hc1AG + hc2AG)
   static constexpr int hcAG_end = 15;
   // Number of transmission types
@@ -83,6 +87,7 @@ struct ChildModelStateSpace<true> {
   static constexpr int hcAG_coarse = 4;
   // Abortion value and indicator of whether it is a percent or number
   static constexpr int hAB_ind = 2;
+
 };
 
 template<>
