@@ -121,9 +121,11 @@ int main(int argc, char *argv[]) {
   const auto ss = leapfrog::StateSpace<leapfrog::BaseModelFullAgeStratification>().base;
 
   const leapfrog::Options<double> options = {
-      hts_per_year,       // HIV steps per year
-      30,                 // Time ART start
-      ss.hAG              // Age groups HIV 15+
+      hts_per_year,        // HIV steps per year
+      30,                  // Time ART start
+      ss.hAG,              // Age groups HIV 15+
+      // Projection period, 0 for calendar year, 1 for midyear
+      leapfrog::internal::PROJPERIOD_MIDYEAR
   };
 
   leapfrog::Tensor1<int> v = serialize::deserialize_tensor<int, 1>(
@@ -193,10 +195,10 @@ int main(int argc, char *argv[]) {
       std::string("art_mortality_time_rate_ratio"));
   const leapfrog::TensorMap2<double> art_mortality_time_rate_ratio = tensor_to_tensor_map<double, 2>(
       art_mortality_time_rate_ratio_data);
-  leapfrog::Tensor1<double> art_dropout_data = serialize::deserialize_tensor<double, 1>(
-      std::string("art_dropout"));
-  const leapfrog::TensorMap1<double> art_dropout = tensor_to_tensor_map<double, 1>(
-      art_dropout_data);
+  leapfrog::Tensor1<double> art_dropout_rate_data = serialize::deserialize_tensor<double, 1>(
+      std::string("art_dropout_rate"));
+  const leapfrog::TensorMap1<double> art_dropout_rate = tensor_to_tensor_map<double, 1>(
+      art_dropout_rate_data);
   Eigen::Tensor<double, 2> adults_on_art_data = serialize::deserialize_tensor<double, 2>(
       std::string("adults_on_art"));
   const leapfrog::TensorMap2<double> adults_on_art = tensor_to_tensor_map<double, 2>(
@@ -231,7 +233,8 @@ int main(int argc, char *argv[]) {
       idx_hm_elig,
       art_mortality_rate,
       art_mortality_time_rate_ratio,
-      art_dropout,
+      0, // art_dropout_recover_cd4
+      art_dropout_rate,
       adults_on_art,
       adults_on_art_is_percent,
       h_art_stage_dur,
