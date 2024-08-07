@@ -125,7 +125,7 @@ int main(int argc, char *argv[]) {
       30,                  // Time ART start
       ss.hAG,              // Age groups HIV 15+
       // Projection period, 0 for calendar year, 1 for midyear
-      leapfrog::internal::PROJPERIOD_CALENDAR
+      leapfrog::internal::PROJPERIOD_MIDYEAR
   };
 
   leapfrog::Tensor1<int> v = serialize::deserialize_tensor<int, 1>(
@@ -233,7 +233,7 @@ int main(int argc, char *argv[]) {
       idx_hm_elig,
       art_mortality_rate,
       art_mortality_time_rate_ratio,
-      TRUE, // art_dropout_recover_cd4
+      0, // art_dropout_recover_cd4
       art_dropout_rate,
       adults_on_art,
       adults_on_art_is_percent,
