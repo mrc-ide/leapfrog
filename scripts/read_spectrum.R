@@ -11,9 +11,18 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   v$paed_cd4_dist <- dp_read_paed_cd4_dist(pjnz) / 100
 
   prog = dp_read_paed_cd4_prog(pjnz)
-  paed_cd4_prog <- array(c(prog[1,1:6],0), dim = 7, dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5')))
+  paed_cd4_prog <- array(0, dim = c(7,2,2), dimnames = list(cd4pct = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'),
+                                                            age = c('0-2', '3-4'),
+                                                            sex = c('male', 'female')))
+  paed_cd4_prog[,1,1] <- c(prog[1,1:6], 0)
+  paed_cd4_prog[,1,2] <- c(prog[2,1:6], 0)
 
-  adol_cd4_prog <- array(c(prog[1,14:18],0), dim = 6, dimnames = list(cd4 = c('>1000', '750-999', '500-749', '350-499', '200-349', 'lte200')))
+  paed_cd4_prog[,2,1] <- c(prog[1,7:12], 0)
+  paed_cd4_prog[,2,2] <- c(prog[2,7:12], 0)
+
+  adol_cd4_prog <- array(c(prog[1,14:18],0), dim = c(6,1,2), dimnames = list(cd4 = c('>1000', '750-999', '500-749', '350-499', '200-349', 'lte200'),
+                                                                             age = c('5-14'),
+                                                                             sex = c('male', 'female')))
 
   v$paed_cd4_prog <- paed_cd4_prog
   v$adol_cd4_prog <- adol_cd4_prog
@@ -266,9 +275,10 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   proj.years <- yr_start:yr_end
   timedat.idx <- 4+1:length(proj.years)-1
 
-  abort <- dpsub(tag = "<PregTermAbortionPerNum MV2>", rows = 2, cols = timedat.idx)
-  abort <- as.numeric(abort) / 100 / 100
-  v$abortions <- abort
+
+  v$abortion <- input_abortion(pjnz)
+
+  v$patients_reallocated <- input_mothers_reallocated(pjnz)
 
 
   ##extract needed outputs to just run paed model
@@ -294,6 +304,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   v$prop_lt200 <- colSums(wlhiv_cd4[5:7,]) / colSums(wlhiv_cd4)
 
   v$hc_age_coarse <- rep(c(1,2,3), each = 5)
+  v$hc_age_coarse_cd4 <- rep(0:2, times = c(3, 2, 10))
 
 
   return(v)
@@ -565,6 +576,25 @@ dp_read_abortion <- function(dp) {
 
   list(pregtermabortion = pregtermabortion,
        pregtermabortion_ispercent = pregtermabortion_ispercent)
+}
+
+#' @rdname dp_read_mothers_reallocated
+#' @export
+dp_read_mothers_reallocated <- function(dp) {
+
+  dp <- get_dp_data(dp)
+  dpy <- get_dp_years(dp)
+
+
+  if (exists_dptag(dp, "<DP_TGX_PatientsReallocated_MV>")) {
+    patients_reallocated <- dpsub(dp, "<DP_TGX_PatientsReallocated_MV>", 2, dpy$time_data_idx)
+  } else {
+    stop("PatientsReallocated tag not found. Function probably needs update for this .DP file.")
+  }
+
+  patients_reallocated <- setNames(as.numeric(patients_reallocated), dpy$proj_years)
+
+  patients_reallocated
 }
 
 
