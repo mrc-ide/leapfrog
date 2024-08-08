@@ -102,12 +102,14 @@ void run_fertility_and_infant_migration(int time_step,
     state_next.base.p_total_pop(0, g) =
         births_sex * demog.survival_probability(0, g, time_step);
 
+    if (pars.base.options.proj_period_int == internal::PROJPERIOD_MIDYEAR) {
     // Assume 2/3 survival_probability rate since mortality in first six months higher
     // than second 6 months (Spectrum manual, section 6.2.7.4)
-    real_type migration_rate_a0 = demog.net_migration(0, g, time_step) *
-                                  (1.0 + 2.0 * demog.survival_probability(0, g, time_step)) /
-                                  3.0 / state_next.base.p_total_pop(0, g);
-    state_next.base.p_total_pop(0, g) *= 1.0 + migration_rate_a0;
+      real_type migration_rate_a0 = demog.net_migration(0, g, time_step) *
+                                    (1.0 + 2.0 * demog.survival_probability(0, g, time_step)) /
+                                    3.0 / state_next.base.p_total_pop(0, g);
+      state_next.base.p_total_pop(0, g) *= 1.0 + migration_rate_a0;
+    }
   }
 }
 
@@ -121,8 +123,34 @@ void run_general_pop_demographic_projection(int time_step,
                                             State<ModelVariant, real_type> &state_next,
                                             internal::IntermediateData<ModelVariant, real_type> &intermediate) {
   internal::run_ageing_and_mortality<ModelVariant>(time_step, pars, state_curr, state_next, intermediate);
-  internal::run_migration<ModelVariant>(time_step, pars, state_curr, state_next, intermediate);
+  if (pars.base.options.proj_period_int == internal::PROJPERIOD_MIDYEAR) {
+    internal::run_migration<ModelVariant>(time_step, pars, state_curr, state_next, intermediate);
+  }
   internal::run_fertility_and_infant_migration<ModelVariant>(time_step, pars, state_curr, state_next, intermediate);
+}
+
+
+template<typename ModelVariant, typename real_type>
+void run_end_year_migration(int time_step,
+                            const Parameters<ModelVariant, real_type> &pars,
+                            const State<ModelVariant, real_type> &state_curr,
+                            State<ModelVariant, real_type> &state_next,
+                            internal::IntermediateData<ModelVariant, real_type> &intermediate) {
+
+  constexpr auto ss = StateSpace<ModelVariant>().base;
+  const auto demog = pars.base.demography;
+
+  for (int g = 0; g < ss.NS; ++g) {
+
+    // Migration for ages 0, ..., 80+
+    for (int a = 0; a < ss.pAG; ++a) {
+
+      // Calculate migration rate as number of net migrants divided by total pop.
+      intermediate.base.migration_rate(a, g) = demog.net_migration(a, g, time_step) /
+        state_next.base.p_total_pop(a, g);
+      state_next.base.p_total_pop(a, g) *= 1.0 + intermediate.base.migration_rate(a, g);
+    }
+  }
 }
 
 }
