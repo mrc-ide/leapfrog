@@ -429,7 +429,7 @@ void run_calculate_perinatal_transmission_rate(int time_step,
 
   if (intermediate.children.age_weighted_hivneg > 0.0) {
     intermediate.children.incidence_rate_wlhiv = intermediate.children.age_weighted_infections / intermediate.children.age_weighted_hivneg;
-    //0.75 is 9/12, gestational period
+    //0.75 is 9/12, gestational period, index 7 in the vertical trasnmission object is the index for maternal seroconversion
     intermediate.children.perinatal_transmission_from_incidence = intermediate.children.incidence_rate_wlhiv * 0.75 * (intermediate.children.births_sum - intermediate.children.need_PMTCT) * cpars.vertical_transmission_rate(7,0);
   } else {
     intermediate.children.incidence_rate_wlhiv = 0.0;

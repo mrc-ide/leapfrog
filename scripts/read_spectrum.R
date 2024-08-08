@@ -11,7 +11,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   v$paed_cd4_dist <- dp_read_paed_cd4_dist(pjnz) / 100
 
   prog = dp_read_paed_cd4_prog(pjnz)
-  paed_cd4_prog <- array(0, dim = c(7,2,2), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'),
+  paed_cd4_prog <- array(0, dim = c(7,2,2), dimnames = list(cd4pct = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'),
                                                             age = c('0-2', '3-4'),
                                                             sex = c('male', 'female')))
   paed_cd4_prog[,1,1] <- c(prog[1,1:6], 0)
@@ -304,7 +304,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   v$prop_lt200 <- colSums(wlhiv_cd4[5:7,]) / colSums(wlhiv_cd4)
 
   v$hc_age_coarse <- rep(c(1,2,3), each = 5)
-  v$hc_age_coarse_cd4 <- c(0,0,0,1,1,rep(2,10))
+  v$hc_age_coarse_cd4 <- rep(0:2, times = c(3, 2, 10))
 
 
   return(v)
