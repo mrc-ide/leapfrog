@@ -1317,7 +1317,7 @@ void calc_art_initiates(int time_step,
   internal::calc_art_last_year(time_step, pars, state_curr, state_next, intermediate);
   internal::calc_art_this_year(time_step, pars, state_curr, state_next, intermediate);
 
- // intermediate.children.retained = 1 - cpars.paed_art_ltfu(time_step);
+  intermediate.children.retained = 1; //- cpars.paed_art_ltfu(time_step);
 
   for (int ag = 0; ag < 4; ++ag) {
     state_next.children.hc_art_init(ag) = 0.5 * (intermediate.children.total_art_last_year(ag) + intermediate.children.total_art_this_year(ag)) - intermediate.children.on_art(ag) * intermediate.children.retained ;
