@@ -64,6 +64,9 @@ template<typename ModelVariant>
 constexpr int hc2AG = StateSpace<ModelVariant>().children.hc2AG;
 
 template<typename ModelVariant>
+constexpr int hcAG_end = StateSpace<ModelVariant>().children.hcAG_end;
+
+template<typename ModelVariant>
 constexpr int hc2DS = StateSpace<ModelVariant>().children.hc2DS;
 
 template<typename ModelVariant>
@@ -73,10 +76,22 @@ template<typename ModelVariant>
 constexpr int hPS = StateSpace<ModelVariant>().children.hPS;
 
 template<typename ModelVariant>
+constexpr int hPS_dropout = StateSpace<ModelVariant>().chhcildren.hPS_dropout;
+
+template<typename ModelVariant>
+constexpr int hVT = StateSpace<ModelVariant>().children.hVT;
+
+template<typename ModelVariant>
 constexpr int hBF = StateSpace<ModelVariant>().children.hBF;
 
 template<typename ModelVariant>
 constexpr int hBF_coarse = StateSpace<ModelVariant>().children.hBF_coarse;
+
+template<typename ModelVariant>
+constexpr int hcAG_coarse = StateSpace<ModelVariant>().children.hcAG_coarse;
+
+template<typename ModelVariant>
+constexpr int hAB_ind = StateSpace<ModelVariant>().children.hAB_ind;
 
 namespace {
 using Eigen::Sizes;
