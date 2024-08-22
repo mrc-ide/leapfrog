@@ -90,6 +90,7 @@ struct Children {
   TensorMap2<real_type> abortion;
   TensorMap1<real_type> patients_reallocated;
   TensorMap1<real_type> hc_age_coarse_cd4;
+  TensorMap1<real_type> hc_art_ltfu;
 };
 
 }

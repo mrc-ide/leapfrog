@@ -133,6 +133,7 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
     const leapfrog::TensorMap2<real_type> abortion = parse_data<real_type>(data, "abortion", children.hAB_ind, proj_years);
     const leapfrog::TensorMap1<real_type> patients_reallocated = parse_data<real_type>(data, "patients_reallocated", proj_years);
     const leapfrog::TensorMap1<real_type> hc_age_coarse_cd4 = parse_data<real_type>(data, "hc_age_coarse_cd4", 15);
+    const leapfrog::TensorMap1<real_type> hc_art_ltfu = parse_data<real_type>(data, "paed_art_ltfu", proj_years);
     const leapfrog::Children<real_type> children_params = {
         hc_nosocomial,
         hc1_cd4_dist,
@@ -175,6 +176,7 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
         abortion,
         patients_reallocated,
         hc_age_coarse_cd4,
+        hc_art_ltfu,
     };
     const leapfrog::ChildModelParameters<ModelVariant, real_type> child_model_params = {
         children_params

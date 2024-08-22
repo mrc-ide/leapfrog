@@ -61,3 +61,4 @@ hc_age_coarse,Children.hc_age_coarse,real_type,ModelVariant::run_child_model,,FA
 abortion,Children.abortion,real_type,ModelVariant::run_child_model,,FALSE,2,children.hAB_ind,proj_years,,
 patients_reallocated,Children.patients_reallocated,real_type,ModelVariant::run_child_model,,FALSE,1,proj_years,,,
 hc_age_coarse_cd4,Children.hc_age_coarse_cd4,real_type,ModelVariant::run_child_model,,FALSE,1,15,,,
+paed_art_ltfu,Children.hc_art_ltfu,real_type,ModelVariant::run_child_model,,FALSE,1,proj_years,,,

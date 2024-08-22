@@ -1266,7 +1266,9 @@ void calc_art_initiates(int time_step,
   internal::calc_art_last_year(time_step, pars, state_curr, state_next, intermediate);
   internal::calc_art_this_year(time_step, pars, state_curr, state_next, intermediate);
 
-  intermediate.children.retained = 1 ;// - cpars.paed_art_ltfu(time_step);
+  intermediate.children.retained = 1  - cpars.hc_art_ltfu(time_step);
+
+
 
   for (int ag = 0; ag < 4; ++ag) {
     state_next.children.hc_art_init(ag) = 0.5 * (intermediate.children.total_art_last_year(ag) + intermediate.children.total_art_this_year(ag)) - intermediate.children.on_art(ag) * intermediate.children.retained ;
@@ -1275,6 +1277,7 @@ void calc_art_initiates(int time_step,
     }
   }// end ag
 
+
   for (int ag = 0; ag < 4; ++ag) {
     if (state_next.children.hc_art_init(ag) > (intermediate.children.unmet_need(ag) ))
       state_next.children.hc_art_init(ag) = (intermediate.children.unmet_need(ag));
@@ -1282,6 +1285,46 @@ void calc_art_initiates(int time_step,
 
 }
 
+template<typename ModelVariant, typename real_type>
+void calc_art_ltfu(int time_step,
+                   const Parameters<ModelVariant, real_type> &pars,
+                   const State<ModelVariant, real_type> &state_curr,
+                   State<ModelVariant, real_type> &state_next,
+                   IntermediateData<ModelVariant, real_type> &intermediate) {
+  static_assert(ModelVariant::run_child_model,
+                "calc_art_ltfu can only be called for model variants where run_child_model is true");
+  constexpr auto ss = StateSpace<ModelVariant>().base;
+  constexpr auto hc_ss = StateSpace<ModelVariant>().children;
+  const auto cpars = pars.children.children;
+
+  for (int s = 0; s <ss.NS; ++s) {
+    for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
+      for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
+        if (a < hc_ss.hc2_agestart) {
+          //all LTFU go to perinatal category
+          state_next.children.hc1_hiv_pop(0, hd, a, s) +=  state_next.children.hc1_art_pop(2, hd, a, s) * cpars.hc_art_ltfu(time_step);
+        } else if (hd < (hc_ss.hc2DS)) {
+          state_next.children.hc2_hiv_pop(0, hd, a - hc_ss.hc2_agestart, s) +=  state_next.children.hc2_art_pop(2, hd, a - hc_ss.hc2_agestart, s) * cpars.hc_art_ltfu(time_step);
+        }
+      } //end hc_ss.hc1DS
+    } // end a
+  } // end ss.NS
+
+  for (int s = 0; s <ss.NS; ++s) {
+    for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
+      for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
+        if (a < hc_ss.hc2_agestart) {
+          //hard coded two as this will only occur among children that are on ART more than a year
+          state_next.children.hc1_art_pop(2, hd, a, s) -=  state_next.children.hc1_art_pop(2, hd, a, s) * cpars.hc_art_ltfu(time_step);
+        } else if (hd < (hc_ss.hc2DS )) {
+          state_next.children.hc2_art_pop(2, hd, a - hc_ss.hc2_agestart, s) -=  state_next.children.hc2_art_pop(2, hd, a - hc_ss.hc2_agestart, s) * cpars.hc_art_ltfu(time_step);
+        }
+      } //end hc_ss.hc1DS
+    } // end a
+  } // end ss.NS
+
+
+}
 
 template<typename ModelVariant, typename real_type>
 void hc_art_initiation_by_age(int time_step,
@@ -1296,6 +1339,8 @@ void hc_art_initiation_by_age(int time_step,
   const auto cpars = pars.children.children;
 
   internal::calc_art_initiates(time_step, pars, state_curr, state_next, intermediate);
+
+
 
   if (cpars.hc_art_is_age_spec(time_step)) {
     for (int s = 0; s < ss.NS; ++s) {
@@ -1351,7 +1396,7 @@ void hc_art_initiation_by_age(int time_step,
       for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
         for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
           for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
-            intermediate.children.hc_initByAge(0 )  += state_next.children.hc_art_need_init(hd, cat, a, s) * cpars.hc_art_init_dist(a, time_step);
+            intermediate.children.hc_initByAge(0)  += state_next.children.hc_art_need_init(hd, cat, a, s) * cpars.hc_art_init_dist(a, time_step);
           } //end hcTT
         } // end hc_ss.hc1DS
       } //end a
@@ -1362,7 +1407,6 @@ void hc_art_initiation_by_age(int time_step,
     } else {
       intermediate.children.hc_adj(0) =  state_next.children.hc_art_init(0) / intermediate.children.hc_initByAge(0);
     }
-    //divergence is coming from this hc_art_init
 
     for (int s = 0; s <ss.NS; ++s) {
       for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
@@ -1375,7 +1419,7 @@ void hc_art_initiation_by_age(int time_step,
             } else {
               intermediate.children.hc_art_scalar(0) = intermediate.children.hc_adj(0) * cpars.hc_art_init_dist(a, time_step);
             }
-            if (cpars.hc_art_val(0, time_step) > 0.0) {
+            if ((cpars.hc_art_val(0, time_step) + cpars.hc_art_val(0, time_step - 1)) > 0.0) {
               intermediate.children.hc_art_scalar(0) = intermediate.children.hc_art_scalar(0);
             } else {
               intermediate.children.hc_art_scalar(0) = 0.0;
@@ -1465,7 +1509,8 @@ void run_child_model_simulation(int time_step,
       //mortality among those on ART less than one year
       internal::on_art_mortality(time_step, pars, state_curr, state_next, intermediate, 0);
       internal::progress_time_on_art(time_step, pars, state_curr, state_next, intermediate, 1, 2);
-      //progress 6 to 12 mo to 12 plus months
+      //progress 6 to 12 mo to 12 plus months#
+      internal::calc_art_ltfu(time_step, pars, state_curr, state_next, intermediate);
       internal::fill_model_outputs(time_step, pars, state_curr, state_next, intermediate);
       internal::run_nosocomial_infections(time_step, pars, state_curr, state_next, intermediate);
     }
