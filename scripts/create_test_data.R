@@ -33,6 +33,8 @@ saveRDS(lmod, testthat::test_path("testdata/fit_demography.rds"))
 
 #Create paeds parameters (Run from leapfrog/uncertainrt_analysis_working)
 pjnz_child <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct.PJNZ")
+pjnz_child <- testthat::test_path("testdata/bwa_aim-no-special-elig-art_retention.PJNZ")
+
 demp <- prepare_leapfrog_demp(pjnz_child)
 proj <- prepare_leapfrog_projp(pjnz_child)
 proj <- prepare_hc_leapfrog_projp(pjnz_child, proj)
@@ -112,6 +114,8 @@ f = aids_deathsart[166:180,]
 aids_deathsart <- array(0, dim = c(15,2,61))
 aids_deathsart[,1,] <- m
 aids_deathsart[,2,] <- f
+
+proj$hc_age_coarse_cd4 <- as.numeric(proj$hc_age_coarse_cd4)
 
 saveRDS(list(proj = proj, demp = demp, dp = dp, timedat.idx = timedat.idx, pjnz = pjnz_child,
              pop1_outputs = x, on_treatment = df$on_treatment, off_trt = df$off_treatment,

@@ -592,12 +592,8 @@ void run_nosocomial_infections(int time_step,
         //5.0 is used because we want to evenly distribute across the 5 age groups in 0-4
         state_next.base.p_infections(a, s) = cpars.hc_nosocomial(time_step) / (5.0 * ss.NS);
         state_next.base.p_hiv_pop(a, s) += state_next.base.p_infections(a, s);
-        for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-          // putting them all in perinatal hcTT to match spec nosocomial
-          if (cpars.hc1_cd4_dist(hd) > 0) {
-            state_next.children.hc1_hiv_pop(hd, 0, a, s) += state_next.base.p_infections(a, s) * cpars.hc1_cd4_dist(hd);
-          }
-        } // end hc1DS
+          // putting them all in perinatal hcTT and first cd4 category to match spec nosocomial
+            state_next.children.hc1_hiv_pop(0, 0, a, s) += state_next.base.p_infections(a, s) ;
       }
     } //end a
   } // end NS
