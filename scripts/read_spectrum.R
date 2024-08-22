@@ -467,6 +467,9 @@ dp_read_paed_cd4_dist <- function(dp) {
     ##only extracting 0-4 for right now
     cd4_dist <- dpdescription(dp, "Distribution of new infections by CD4 percent for Children" , 1, 4:10)
     cd4_dist <- sapply(cd4_dist, as.numeric)
+  } else if(exists_dpdescription(dp, "Répartition des nouvelles infections par pourcentage de CD4 chez les enfants")) {
+    cd4_dist <- dpdescription(dp, "Répartition des nouvelles infections par pourcentage de CD4 chez les enfants" , 1, 4:10)
+    cd4_dist <- sapply(cd4_dist, as.numeric)
   } else {
     stop("CD4 distribution for paeds description not recognized. Function probably needs update for this .DP file.")
   }
@@ -817,7 +820,9 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   v$mtct <- mtct
 
   mort_rr_art <- dp_read_child_mort_mult(pjnz)
-  mort_rr_art_target <- array(NA, dim = c(3, 15, 61), dimnames = list(transmission = c('0to6mo', '7to12mo', '12+mo'), age = 0:14, year = 1970:2030))
+  years_idx <- ncol(mort_rr_art)
+  years = (1970:2030)[1:years_idx]
+  mort_rr_art_target <- array(NA, dim = c(3, 15, years_idx), dimnames = list(transmission = c('0to6mo', '7to12mo', '12+mo'), age = 0:14, year = years))
   mort_rr_art_target[1:2, 1:5,] <- rep(unlist(mort_rr_art[1,]), each = 10)
   mort_rr_art_target[3, 1:5,] <- rep(unlist(mort_rr_art[2,]), each = 5)
   mort_rr_art_target[1:2, 6:15,] <- rep(unlist(mort_rr_art[3,]), each = 20)
@@ -876,7 +881,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
     out
   }
 
-  paed_art_elig_cd4 <- array(data = NA, dim = c(15, 61), dimnames = list(age = c(0:14), year = c(1970:2030)))
+  paed_art_elig_cd4 <- array(data = NA, dim = c(15, years_idx), dimnames = list(age = c(0:14), year = c(years)))
   paed_art_elig_cd4[1,] <- get_ordinal(unname(cd4_elig[1,]))
   paed_art_elig_cd4[2:3,] <- get_ordinal(unname(cd4_elig[2,]))
   paed_art_elig_cd4[4:5,] <- get_ordinal(unname(cd4_elig[3,]))
@@ -931,7 +936,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   v$mat_hiv_births <- as.array(as.numeric(unlist(wlhiv_births)))
 
 
-  dp <- read_dp(pjnz1)
+  dp <- read_dp(pjnz)
   hivpop <- SpectrumUtils::dp.output.hivpop(dp.raw = dp, direction = 'long') %>% data.table() %>% setnames(old = 'Value', new = 'hivpop')
   totpop <- SpectrumUtils::dp.output.bigpop(dp.raw = dp, direction = 'long') %>% data.table()  %>% setnames(old = 'Value', new = 'totpop')
   inc <- SpectrumUtils::dp.output.incident.hiv(dp.raw = dp, direction = 'long') %>% data.table() %>% setnames(old = 'Value', new = 'inc')
@@ -941,15 +946,15 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   dt <- dt[Sex == 'Female' & Age %in% 15:49,]
   dt <- dcast(dt[,.(Age, Year, hivnpop)], Age ~ Year, value.var = 'hivnpop')
 
-  hivnpop <- array(NA, dim = c(length(15:49), 61), dimnames = list(age = 15:49, year = 1970:2030))
-  for(i in 1:61){
+  hivnpop <- array(NA, dim = c(length(15:49), years_idx), dimnames = list(age = 15:49, year = years))
+  for(i in 1:years_idx){
     hivnpop[,i] <- dt[[(i+1)]]
   }
 
   inc <- dcast(inc[Sex == 'Female' & Age %in% 15:49,.(Age, Year, inc)], Age ~ Year, value.var = 'inc')
 
-  inc.array <- array(NA, dim = c(length(15:49), 61), dimnames = list(age = 15:49, year = 1970:2030))
-  for(i in 1:61){
+  inc.array <- array(NA, dim = c(length(15:49), years_idx), dimnames = list(age = 15:49, year = years))
+  for(i in 1:years_idx){
     inc.array[,i] <- inc[[(i+1)]]
   }
 
