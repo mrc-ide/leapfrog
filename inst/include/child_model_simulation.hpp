@@ -1300,15 +1300,61 @@ void calc_art_ltfu(int time_step,
   for (int s = 0; s <ss.NS; ++s) {
     for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
       for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
+        for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+
         if (a < hc_ss.hc2_agestart) {
-          //all LTFU go to perinatal category
-          state_next.children.hc1_hiv_pop(0, hd, a, s) +=  state_next.children.hc1_art_pop(2, hd, a, s) * cpars.hc_art_ltfu(time_step);
+          intermediate.children.hc_hiv_total(hd, a, s) += state_next.children.hc1_hiv_pop(hd, cat, a, s);
         } else if (hd < (hc_ss.hc2DS)) {
-          state_next.children.hc2_hiv_pop(0, hd, a - hc_ss.hc2_agestart, s) +=  state_next.children.hc2_art_pop(2, hd, a - hc_ss.hc2_agestart, s) * cpars.hc_art_ltfu(time_step);
+          intermediate.children.hc_hiv_total(hd, a, s) += state_next.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s);
         }
+
+        } // end hc_ss.hcTT
       } //end hc_ss.hc1DS
     } // end a
   } // end ss.NS
+
+
+  for (int s = 0; s <ss.NS; ++s) {
+    for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
+      for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
+        for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
+        if (a < hc_ss.hc2_agestart) {
+          intermediate.children.hc_hiv_dist(hd, cat, a, s) =  state_next.children.hc1_hiv_pop(hd, cat, a, s) / intermediate.children.hc_hiv_total(hd, a, s);
+        } else if (hd < (hc_ss.hc2DS)) {
+          intermediate.children.hc_hiv_dist(hd, cat, a, s) += state_next.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s) / intermediate.children.hc_hiv_total(hd, a, s);
+        }
+
+        } // end hc_ss.hcTT
+      } //end hc_ss.hc1DS
+    } // end a
+  } // end ss.NS
+
+
+  for (int s = 0; s <ss.NS; ++s) {
+    for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
+      for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
+        for(int cat = 0; cat < hc_ss.hcTT; ++cat){
+
+        if(intermediate.children.hc_hiv_total(hd, a, s)  > 0){
+          if (a < hc_ss.hc2_agestart) {
+            state_next.children.hc1_hiv_pop(hd, cat, a, s) +=  state_next.children.hc1_art_pop(2, hd, a, s) * cpars.hc_art_ltfu(time_step) * intermediate.children.hc_hiv_dist(hd, cat, a, s);
+          } else if (hd < (hc_ss.hc2DS)) {
+            state_next.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s) +=  state_next.children.hc2_art_pop(2, hd, a - hc_ss.hc2_agestart, s) * cpars.hc_art_ltfu(time_step) * intermediate.children.hc_hiv_dist(hd, cat, a, s);
+          }
+        }else{
+          //if no one is off treatment, equally distribute across 4 transmission categories
+            if (a < hc_ss.hc2_agestart) {
+                state_next.children.hc1_hiv_pop(hd, cat, a, s) +=  state_next.children.hc1_art_pop(2, hd, a, s) * cpars.hc_art_ltfu(time_step) * 0.25;
+            } else if (hd < (hc_ss.hc2DS)) {
+                  state_next.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s) +=  state_next.children.hc2_art_pop(2, hd, a - hc_ss.hc2_agestart, s) * cpars.hc_art_ltfu(time_step) * 0.25;
+            }
+        }
+
+        }// end hc_ss.hcTT
+      } //end hc_ss.hc1DS
+    } // end a
+  } // end ss.NS
+
 
   for (int s = 0; s <ss.NS; ++s) {
     for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
@@ -1376,6 +1422,8 @@ void hc_art_initiation_by_age(int time_step,
               intermediate.children.hc_art_scalar(cpars.hc_age_coarse(a)) = 0.0;
             }
 
+
+
             if (a < hc_ss.hc2_agestart) {
               state_next.children.hc1_art_pop(0, hd, a, s) += intermediate.children.hc_art_scalar(cpars.hc_age_coarse(a)) * state_next.children.hc_art_need_init(hd, cat, a, s);
             } else if (hd < (hc_ss.hc2DS)) {
@@ -1412,6 +1460,8 @@ void hc_art_initiation_by_age(int time_step,
       for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
         for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
           for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
+
+
             if ((intermediate.children.hc_adj(0) * cpars.hc_art_init_dist(a, time_step)) > 1.0) {
               intermediate.children.hc_art_scalar(0) = 1.0;
               //issue is that in 2030 this is being activated when it shouldn't be for age one
@@ -1419,16 +1469,26 @@ void hc_art_initiation_by_age(int time_step,
             } else {
               intermediate.children.hc_art_scalar(0) = intermediate.children.hc_adj(0) * cpars.hc_art_init_dist(a, time_step);
             }
+
             if ((cpars.hc_art_val(0, time_step) + cpars.hc_art_val(0, time_step - 1)) > 0.0) {
               intermediate.children.hc_art_scalar(0) = intermediate.children.hc_art_scalar(0);
             } else {
               intermediate.children.hc_art_scalar(0) = 0.0;
             }
+
+            //if total need is less than the total number of ART available, initiate everyone
+            if(intermediate.children.total_art_this_year(0) == 0){
+              if((0.5 * intermediate.children.total_art_last_year(0) + 0.5 * intermediate.children.total_art_this_year(0)) > intermediate.children.total_need(0)){
+                intermediate.children.hc_art_scalar(0) = 1;
+              }
+            }
+
             if (a < hc_ss.hc2_agestart) {
               state_next.children.hc1_art_pop(0, hd, a, s) += intermediate.children.hc_art_scalar(0) * state_next.children.hc_art_need_init(hd, cat, a, s);
             } else if (hd < (hc_ss.hc2DS)) {
               state_next.children.hc2_art_pop(0, hd, a - hc_ss.hc2_agestart, s) += intermediate.children.hc_art_scalar(0) * state_next.children.hc_art_need_init(hd, cat, a, s);
             }
+
             if (a < hc_ss.hc2_agestart) {
               state_next.children.hc1_hiv_pop(hd, cat, a, s) -= intermediate.children.hc_art_scalar(0) * state_next.children.hc_art_need_init(hd, cat, a, s);
             } else if (hd < (hc_ss.hc2DS )) {

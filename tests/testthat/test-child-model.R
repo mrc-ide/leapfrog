@@ -76,7 +76,8 @@ test_that("CLHIV align", {
   out <- run_model(demp, parameters, 1970:2030, NULL, run_child_model = TRUE)
 
   spec_prev <- input$offtrt
-  hc1 <- dplyr::right_join(data.frame(reshape2::melt(out$hc1_hiv_pop)), data.frame(Var1 = 1:7, cd4_cat = c("gte30", "26-30", "21-25", "16-20", "11-5", "5-10", "lte5")), by = "Var1")
+
+  hc1 <- dplyr::right_join((reshape2::melt(out$hc1_hiv_pop)), data.frame(Var1 = 1:7, cd4_cat = c("gte30", "26-30", "21-25", "16-20", "11-5", "5-10", "lte5")), by = "Var1")
   hc2 <- dplyr::right_join(data.frame(reshape2::melt(out$hc2_hiv_pop)), data.frame(Var1 = 1:6, cd4_cat = c("gte1000", "750-999", "500-749", "350-499", "200-349", "lte200")), by = "Var1")
   hc1 <- dplyr::right_join(hc1, data.frame(Var2 = 1:4, transmission = c("perinatal", "bf0-6", "bf7-12", "bf12+")), by = "Var2")
   hc2 <- dplyr::right_join(hc2, data.frame(Var2 = 1:4, transmission = c("perinatal", "bf0-6", "bf7-12", "bf12+")), by = "Var2")
@@ -111,7 +112,6 @@ test_that("CLHIV align", {
   dt <- dt %>%
     dplyr::mutate(diff = pop - fr) %>%
     dplyr::filter(year < 2030)
-  y <- data.table(dt)
 
   expect_true(all(abs(dt$diff) < 5e-1))
 })
@@ -162,7 +162,6 @@ test_that("CLHIV on ART align", {
   dt <- dt %>%
     dplyr::mutate(diff = pop - fr) %>%
     dplyr::filter(year < 2030)
-  x <- data.table::data.table(dt)
 
   expect_true(all(abs(dt$diff) < 5e-1))
 })

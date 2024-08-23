@@ -97,7 +97,19 @@ input_breastfeeding_dur <- function(pjnz){
   bf <- dp_read_breastfeeding(pjnz)
   dimnames(bf)
 
-  out <- array(data = NA, dim = c(nrow(bf$notbreastfeeding_percent_noarv), ncol(bf$notbreastfeeding_percent_noarv), 2), dimnames = list(child_age_months = rownames(bf$notbreastfeeding_percent_arv), year = 1970:2030, trt = c('no_art', 'art')))
+  dpfile <- grep(".DP$", utils::unzip(pjnz, list=TRUE)$Name, value=TRUE)
+  dp <- utils::read.csv(unz(pjnz, dpfile), as.is=TRUE)
+  dpsub_new <- function(tag, rows, cols, tagcol=1){
+    dp[which(dp[,tagcol]==tag)+rows, cols]
+  }
+
+  yr_start <- as.integer(dpsub_new("<FirstYear MV2>",2,4))
+  yr_end <- as.integer(dpsub_new("<FinalYear MV2>",2,4))
+  proj.years <- yr_start:yr_end
+  timedat.idx <- 4+1:length(proj.years)-1
+
+  out <- array(data = NA, dim = c(nrow(bf$notbreastfeeding_percent_noarv), ncol(bf$notbreastfeeding_percent_noarv), 2),
+               dimnames = list(child_age_months = rownames(bf$notbreastfeeding_percent_arv), year = proj.years, trt = c('no_art', 'art')))
   out[,,1] <- bf$notbreastfeeding_percent_noarv / 100
   out[,,2] <- bf$notbreastfeeding_percent_arv / 100
 
