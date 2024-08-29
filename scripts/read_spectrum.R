@@ -959,9 +959,9 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   }
 
   v$hivnpop <- hivnpop
-  v$inc <- inc.array
+  v$adult_female_infections <- inc.array
 
-  total_births <- dp.output.births(dp.raw = dp, direction = 'long')$Value %>% as.array()
+  total_births <- SpectrumUtils::dp.output.births(dp.raw = dp, direction = 'long')$Value %>% as.array()
   v$total_births <- total_births
 
 

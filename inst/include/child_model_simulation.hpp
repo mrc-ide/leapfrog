@@ -388,7 +388,7 @@ void run_calculate_transmission_from_incidence_during_gestation(int time_step,
   if (cpars.mat_prev_input(time_step)) {
     for (int a = 0; a < pars.base.options.p_fertility_age_groups; ++a) {
       intermediate.children.age_weighted_hivneg += demog.age_specific_fertility_rate(a, time_step) / intermediate.children.asfr_sum * cpars.adult_female_hivnpop(a,time_step) ; //HIV negative 15-49 women weighted for ASFR
-      intermediate.children.age_weighted_infections +=  demog.age_specific_fertility_rate(a, time_step) / intermediate.children.asfr_sum  * cpars.adult_female_inf(a,time_step); //newly infected 15-49 women, weighted for ASFR
+      intermediate.children.age_weighted_infections +=  demog.age_specific_fertility_rate(a, time_step) / intermediate.children.asfr_sum  * cpars.adult_female_infections(a,time_step); //newly infected 15-49 women, weighted for ASFR
     }//end
 
     if (intermediate.children.age_weighted_hivneg > 0.0) {

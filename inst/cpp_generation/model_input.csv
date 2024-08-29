@@ -61,6 +61,6 @@ hc_age_coarse,Children.hc_age_coarse,real_type,ModelVariant::run_child_model,,FA
 abortion,Children.abortion,real_type,ModelVariant::run_child_model,,FALSE,2,children.hAB_ind,proj_years,,
 patients_reallocated,Children.patients_reallocated,real_type,ModelVariant::run_child_model,,FALSE,1,proj_years,,,
 hc_age_coarse_cd4,Children.hc_age_coarse_cd4,int,ModelVariant::run_child_model,,FALSE,1,options.p_idx_hiv_first_adult,,,
-inc,Children.adult_female_inf,real_type,ModelVariant::run_child_model,,FALSE,2,options.p_fertility_age_groups,proj_years,,
+adult_female_infections,Children.adult_female_infections,real_type,ModelVariant::run_child_model,,FALSE,2,options.p_fertility_age_groups,proj_years,,
 hivnpop,Children.adult_female_hivnpop,real_type,ModelVariant::run_child_model,,FALSE,2,options.p_fertility_age_groups,proj_years,,
 total_births,Children.total_births,real_type,ModelVariant::run_child_model,,FALSE,1,proj_years,,,
