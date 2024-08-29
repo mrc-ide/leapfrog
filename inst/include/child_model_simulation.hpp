@@ -962,22 +962,6 @@ void hc_initiate_art_by_cd4(int time_step,
     } // end hcTT
   } // end ss.NS
 
-  double temp;
-  temp = 0.0;
-  for (int s = 0; s < ss.NS; ++s) {
-    for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
-      for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-        for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
-          temp += state_next.children.hc_art_need_init(hd, cat, a, s) ;
-        }
-      }
-    }
-  }
-
-  if(time_step == 34){
-    // std::cout << temp;
-  }
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -1295,11 +1279,7 @@ void calc_art_initiates(int time_step,
       state_next.children.hc_art_init(ag) = 0.0;
     }
   }// end ag
-  if(time_step == 37){
-    std::cout << intermediate.children.on_art(0) ;
-    std::cout << intermediate.children.unmet_need(0);
 
-  }
   for (int ag = 0; ag < 4; ++ag) {
     if (state_next.children.hc_art_init(ag) > (intermediate.children.unmet_need(ag)+intermediate.children.on_art(ag) * cpars.hc_art_ltfu(time_step)))
       state_next.children.hc_art_init(ag) = (intermediate.children.unmet_need(ag)+intermediate.children.on_art(ag) * cpars.hc_art_ltfu(time_step));

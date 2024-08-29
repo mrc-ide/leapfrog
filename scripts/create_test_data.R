@@ -33,7 +33,6 @@ source('./scripts/read_spectrum.R')
 
 #Create paeds parameters (Run from leapfrog/uncertainrt_analysis_working)
 pjnz_child <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct.PJNZ")
-#pjnz_child <- testthat::test_path("testdata/bwa_aim-no-special-elig-art_retention.PJNZ")
 
 demp <- prepare_leapfrog_demp(pjnz_child)
 proj <- prepare_leapfrog_projp(pjnz_child)
