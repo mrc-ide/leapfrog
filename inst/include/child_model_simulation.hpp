@@ -1295,12 +1295,15 @@ void calc_art_initiates(int time_step,
       state_next.children.hc_art_init(ag) = 0.0;
     }
   }// end ag
+  if(time_step == 37){
+    std::cout << intermediate.children.on_art(0) ;
+    std::cout << intermediate.children.unmet_need(0);
 
+  }
   for (int ag = 0; ag < 4; ++ag) {
-    if (state_next.children.hc_art_init(ag) > (intermediate.children.unmet_need(ag) ))
-      state_next.children.hc_art_init(ag) = (intermediate.children.unmet_need(ag));
+    if (state_next.children.hc_art_init(ag) > (intermediate.children.unmet_need(ag)+intermediate.children.on_art(ag) * cpars.hc_art_ltfu(time_step)))
+      state_next.children.hc_art_init(ag) = (intermediate.children.unmet_need(ag)+intermediate.children.on_art(ag) * cpars.hc_art_ltfu(time_step));
   }// end ag
-
 
 
 }
@@ -1543,7 +1546,7 @@ void hc_art_initiation_by_age(int time_step,
             //if total need is less than the total number of ART available, initiate everyone
             if(intermediate.children.total_art_this_year(0) == 0){
               if((0.5 * intermediate.children.total_art_last_year(0) + 0.5 * intermediate.children.total_art_this_year(0)) > intermediate.children.total_need(0)){
-                // intermediate.children.hc_art_scalar(0) = 1;
+               // intermediate.children.hc_art_scalar(0) = 1;
               }
             }
 
@@ -1621,13 +1624,6 @@ void run_child_model_simulation(int time_step,
     }
 
     internal::adjust_hiv_births(time_step, pars, state_curr, state_next, intermediate);
-
-    if(time_step == 34){
-      std::cout << state_next.children.hc2_hiv_pop(2,0,1,0);
-      std::cout << state_next.children.hc2_hiv_pop(3,0,1,0);
-      std::cout << state_next.children.hc2_hiv_pop(4,0,1,0);
-      std::cout << state_next.children.hc2_hiv_pop(5,0,1,0);
-    }
 
     // if (state_next.children.hiv_births > 0) {
     internal::run_child_hiv_infections(time_step, pars, state_curr, state_next, intermediate);
