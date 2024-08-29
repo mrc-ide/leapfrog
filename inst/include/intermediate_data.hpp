@@ -248,6 +248,7 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
   //TODO: change this hard coding
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, 15, NS<ChildModel>>> hc_hiv_dist;
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>,  15, NS<ChildModel>>> hc_hiv_total;
+  TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, 15, NS<ChildModel>>> art_ltfu_grad;
   real_type asfr_sum;
   real_type births_sum;
   real_type nHIVcurr;
@@ -316,6 +317,7 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
     hc_art_scalar.setZero();
     hc_hiv_dist.setZero();
     hc_hiv_total.setZero();
+    art_ltfu_grad.setZero();
     hc_initByAge.setZero();
     hc_adj.setZero();
     hc_art_deaths.setZero();
