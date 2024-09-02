@@ -12,23 +12,23 @@ library(dplyr)
 source('./scripts/spectrum_inputs_paeds.R')
 source('./scripts/read_spectrum.R')
 
-## Create demographic and projection parameters for adults
-pjnz_adult <- system.file("pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ", package = "frogger", mustWork = TRUE)
-
-demp <- prepare_leapfrog_demp(pjnz_adult)
-saveRDS(demp, testthat::test_path("testdata/demographic_projection_object_adult.rds"))
-proj <- prepare_leapfrog_projp(pjnz_adult)
-saveRDS(proj, testthat::test_path("testdata/projection_parameters_adult.rds"))
-
-# Used as reference data (Run from leapfrog/master)
-lmod <- leapfrog::leapfrogR(demp, proj)
-saveRDS(lmod, testthat::test_path("testdata/leapfrog_fit.rds"))
-
-lmod <- leapfrog::leapfrogR(demp, proj, hiv_strat = "coarse")
-saveRDS(lmod, testthat::test_path("testdata/leapfrog_fit_coarse.rds"))
-
-mod <- leapfrog::leapfrogR(demp, proj, hiv_steps_per_year = 0L)
-saveRDS(lmod, testthat::test_path("testdata/fit_demography.rds"))
+# ## Create demographic and projection parameters for adults
+# pjnz_adult <- system.file("pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ", package = "frogger", mustWork = TRUE)
+#
+# demp <- prepare_leapfrog_demp(pjnz_adult)
+# saveRDS(demp, testthat::test_path("testdata/demographic_projection_object_adult.rds"))
+# proj <- prepare_leapfrog_projp(pjnz_adult)
+# saveRDS(proj, testthat::test_path("testdata/projection_parameters_adult.rds"))
+#
+# # Used as reference data (Run from leapfrog/master)
+# lmod <- leapfrog::leapfrogR(demp, proj)
+# saveRDS(lmod, testthat::test_path("testdata/leapfrog_fit.rds"))
+#
+# lmod <- leapfrog::leapfrogR(demp, proj, hiv_strat = "coarse")
+# saveRDS(lmod, testthat::test_path("testdata/leapfrog_fit_coarse.rds"))
+#
+# mod <- leapfrog::leapfrogR(demp, proj, hiv_steps_per_year = 0L)
+# saveRDS(lmod, testthat::test_path("testdata/fit_demography.rds"))
 
 
 #Create paeds parameters (Run from leapfrog/uncertainrt_analysis_working)
@@ -36,7 +36,6 @@ pjnz_child <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct.PJN
 demp <- prepare_leapfrog_demp(pjnz_child)
 proj <- prepare_leapfrog_projp(pjnz_child)
 proj <- prepare_hc_leapfrog_projp(pjnz_child, proj)
-
 
 demp$netmigr <- leapfrog:::read_netmigr(pjnz_child, adjust_u5mig = FALSE)
 demp$netmigr_adj <- leapfrog:::adjust_spectrum_netmigr(demp$netmigr)
@@ -112,6 +111,7 @@ f = aids_deathsart[166:180,]
 aids_deathsart <- array(0, dim = c(15,2,61))
 aids_deathsart[,1,] <- m
 aids_deathsart[,2,] <- f
+
 
 saveRDS(list(proj = proj, demp = demp, dp = dp, timedat.idx = timedat.idx, pjnz = pjnz_child,
              pop1_outputs = x, on_treatment = df$on_treatment, off_trt = df$off_treatment,

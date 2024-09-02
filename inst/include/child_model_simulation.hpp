@@ -368,6 +368,54 @@ void adjust_optAB_bf_transmission_rate(int time_step,
 }
 
 template<typename ModelVariant, typename real_type>
+void run_calculate_transmission_from_incidence_during_gestation(int time_step,
+                                                                const Parameters<ModelVariant, real_type> &pars,
+                                                                const State<ModelVariant, real_type> &state_curr,
+                                                                State<ModelVariant, real_type> &state_next,
+                                                                IntermediateData<ModelVariant, real_type> &intermediate) {
+  const auto demog = pars.base.demography;
+  const auto cpars = pars.children.children;
+  static_assert(ModelVariant::run_child_model,
+                "run_calculate_transmission_from_incidence_during_gestation can only be called for model variants where run_child_model is true");
+
+  //Transmission due to incident infections
+  intermediate.children.asfr_sum = 0.0;
+  for (int a = 0; a < pars.base.options.p_fertility_age_groups; ++a) {
+    intermediate.children.asfr_sum += demog.age_specific_fertility_rate(a, time_step);
+  }// end a
+
+
+  if (cpars.mat_prev_input(time_step)) {
+    for (int a = 0; a < pars.base.options.p_fertility_age_groups; ++a) {
+      intermediate.children.age_weighted_hivneg += demog.age_specific_fertility_rate(a, time_step) / intermediate.children.asfr_sum * cpars.adult_female_hivnpop(a,time_step) ; //HIV negative 15-49 women weighted for ASFR
+      intermediate.children.age_weighted_infections +=  demog.age_specific_fertility_rate(a, time_step) / intermediate.children.asfr_sum  * cpars.adult_female_infections(a,time_step); //newly infected 15-49 women, weighted for ASFR
+    }//end
+
+    if (intermediate.children.age_weighted_hivneg > 0.0) {
+      intermediate.children.incidence_rate_wlhiv = intermediate.children.age_weighted_infections / intermediate.children.age_weighted_hivneg;
+      //0.75 is 9/12, gestational period, index 7 in the vertical trasnmission object is the index for maternal seroconversion
+      intermediate.children.perinatal_transmission_from_incidence = intermediate.children.incidence_rate_wlhiv * 0.75 * (cpars.total_births(time_step)  - intermediate.children.need_PMTCT) * cpars.vertical_transmission_rate(7,0);
+    } else {
+      intermediate.children.incidence_rate_wlhiv = 0.0;
+      intermediate.children.perinatal_transmission_from_incidence = 0.0;
+    }
+  } else {
+    for (int a = 0; a < pars.base.options.p_fertility_age_groups; ++a) {
+      intermediate.children.age_weighted_hivneg += demog.age_specific_fertility_rate(a, time_step) / intermediate.children.asfr_sum * intermediate.children.p_hiv_neg_pop(a + 15,1) ; //HIV negative 15-49 women weighted for ASFR
+      intermediate.children.age_weighted_infections +=  demog.age_specific_fertility_rate(a, time_step) / intermediate.children.asfr_sum  * state_next.base.p_infections(a + 15,1) ; //newly infected 15-49 women, weighted for ASFR
+    }//end
+    if (intermediate.children.age_weighted_hivneg > 0.0) {
+      intermediate.children.incidence_rate_wlhiv = intermediate.children.age_weighted_infections / intermediate.children.age_weighted_hivneg;
+      //0.75 is 9/12, gestational period, index 7 in the vertical trasnmission object is the index for maternal seroconversion
+      intermediate.children.perinatal_transmission_from_incidence = intermediate.children.incidence_rate_wlhiv * 0.75 * (state_next.base.births - intermediate.children.need_PMTCT) * cpars.vertical_transmission_rate(7,0);
+    } else {
+      intermediate.children.incidence_rate_wlhiv = 0.0;
+      intermediate.children.perinatal_transmission_from_incidence = 0.0;
+    }
+  }
+}
+
+template<typename ModelVariant, typename real_type>
 void run_calculate_perinatal_transmission_rate(int time_step,
                                                const Parameters<ModelVariant, real_type> &pars,
                                                const State<ModelVariant, real_type> &state_curr,
@@ -417,24 +465,8 @@ void run_calculate_perinatal_transmission_rate(int time_step,
   }
   intermediate.children.perinatal_transmission_rate_bf_calc = intermediate.children.perinatal_transmission_rate;
 
-  //Transmission due to incident infections
-  intermediate.children.asfr_sum = 0.0;
-  for (int a = 0; a < pars.base.options.p_fertility_age_groups; ++a) {
-    intermediate.children.asfr_sum += demog.age_specific_fertility_rate(a, time_step);
-  }// end a
-  for (int a = 0; a < pars.base.options.p_fertility_age_groups; ++a) {
-    intermediate.children.age_weighted_hivneg += demog.age_specific_fertility_rate(a, time_step) / intermediate.children.asfr_sum  * intermediate.children.p_hiv_neg_pop(a + 15,1) ; //HIV negative 15-49 women weighted for ASFR
-    intermediate.children.age_weighted_infections +=  demog.age_specific_fertility_rate(a, time_step) / intermediate.children.asfr_sum  * state_next.base.p_infections(a + 15,1) ; //newly infected 15-49 women, weighted for ASFR
-  }//end
+  internal::run_calculate_transmission_from_incidence_during_gestation(time_step, pars, state_curr, state_next, intermediate);
 
-  if (intermediate.children.age_weighted_hivneg > 0.0) {
-    intermediate.children.incidence_rate_wlhiv = intermediate.children.age_weighted_infections / intermediate.children.age_weighted_hivneg;
-    //0.75 is 9/12, gestational period, index 7 in the vertical trasnmission object is the index for maternal seroconversion
-    intermediate.children.perinatal_transmission_from_incidence = intermediate.children.incidence_rate_wlhiv * 0.75 * (intermediate.children.births_sum - intermediate.children.need_PMTCT) * cpars.vertical_transmission_rate(7,0);
-  } else {
-    intermediate.children.incidence_rate_wlhiv = 0.0;
-    intermediate.children.perinatal_transmission_from_incidence = 0.0;
-  }
 
   if (intermediate.children.need_PMTCT > 0.0) {
     intermediate.children.perinatal_transmission_rate = intermediate.children.perinatal_transmission_rate + intermediate.children.perinatal_transmission_from_incidence / intermediate.children.need_PMTCT;
@@ -445,6 +477,8 @@ void run_calculate_perinatal_transmission_rate(int time_step,
 
 
 }
+
+
 
 template<typename ModelVariant, typename real_type>
 void run_calculate_transmission_from_incidence_during_breastfeeding(int time_step,
@@ -642,12 +676,25 @@ void run_child_hiv_infections(int time_step,
     internal::convert_PMTCT_pre_bf(time_step, pars, state_curr, state_next, intermediate);
     internal::run_bf_transmission_rate(time_step, pars,  state_curr, state_next, intermediate, 0, 3, 0);
 
+    real_type total_births = 0.0;
+    if (cpars.mat_prev_input(time_step)) {
+      total_births = cpars.total_births(time_step);
+    } else {
+      total_births = state_next.base.births;
+    }
+
+
     for (int s = 0; s < ss.NS; ++s) {
       for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-        state_next.children.hc1_hiv_pop(hd, 1, 0, s) +=  state_next.children.hiv_births *  demog.births_sex_prop(s,time_step) * cpars.hc1_cd4_dist(hd) * (intermediate.children.bf_incident_hiv_transmission_rate + intermediate.children.bf_transmission_rate(0));
+        state_next.children.hc1_hiv_pop(hd, 1, 0, s) +=  state_next.children.hiv_births *  demog.births_sex_prop(s,time_step) * cpars.hc1_cd4_dist(hd) * (intermediate.children.bf_transmission_rate(0));
+        state_next.children.hc1_hiv_pop(hd, 1, 0, s) +=  (total_births - state_next.children.hiv_births) *  demog.births_sex_prop(s,time_step) * cpars.hc1_cd4_dist(hd) * (intermediate.children.bf_incident_hiv_transmission_rate);
+
       }// end hc1DS
-      state_next.base.p_hiv_pop(0, s) +=  state_next.children.hiv_births  * demog.births_sex_prop(s,time_step) * (intermediate.children.bf_incident_hiv_transmission_rate + intermediate.children.bf_transmission_rate(0));
-      state_next.base.p_infections(0, s) += state_next.children.hiv_births  * demog.births_sex_prop(s,time_step) * (intermediate.children.bf_incident_hiv_transmission_rate + intermediate.children.bf_transmission_rate(0));
+      state_next.base.p_hiv_pop(0, s) +=  state_next.children.hiv_births  * demog.births_sex_prop(s,time_step) * (intermediate.children.bf_transmission_rate(0));
+      state_next.base.p_infections(0, s) += state_next.children.hiv_births  * demog.births_sex_prop(s,time_step) * (intermediate.children.bf_transmission_rate(0));
+
+      state_next.base.p_hiv_pop(0, s) += (total_births - state_next.children.hiv_births) *  demog.births_sex_prop(s,time_step) * (intermediate.children.bf_incident_hiv_transmission_rate);
+      state_next.base.p_infections(0, s) += (total_births - state_next.children.hiv_births) *  demog.births_sex_prop(s,time_step) * (intermediate.children.bf_incident_hiv_transmission_rate);
     }// end NS
 
     //6-12
@@ -1270,7 +1317,7 @@ void calc_art_initiates(int time_step,
   internal::calc_art_last_year(time_step, pars, state_curr, state_next, intermediate);
   internal::calc_art_this_year(time_step, pars, state_curr, state_next, intermediate);
 
-  intermediate.children.retained = 1 ;// - cpars.paed_art_ltfu(time_step);
+  intermediate.children.retained = 1; //- cpars.paed_art_ltfu(time_step);
 
   for (int ag = 0; ag < 4; ++ag) {
     state_next.children.hc_art_init(ag) = 0.5 * (intermediate.children.total_art_last_year(ag) + intermediate.children.total_art_this_year(ag)) - intermediate.children.on_art(ag) * intermediate.children.retained ;

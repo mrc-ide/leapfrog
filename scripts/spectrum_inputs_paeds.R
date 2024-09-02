@@ -97,7 +97,7 @@ input_breastfeeding_dur <- function(pjnz){
   bf <- dp_read_breastfeeding(pjnz)
   dimnames(bf)
 
-  out <- array(data = NA, dim = c(nrow(bf$notbreastfeeding_percent_noarv), ncol(bf$notbreastfeeding_percent_noarv), 2), dimnames = list(child_age_months = rownames(bf$notbreastfeeding_percent_arv), year = 1970:2030, trt = c('no_art', 'art')))
+  out <- array(data = NA, dim = c(nrow(bf$notbreastfeeding_percent_noarv), ncol(bf$notbreastfeeding_percent_noarv), 2), dimnames = list(child_age_months = rownames(bf$notbreastfeeding_percent_arv), year = (1970:2030)[1:ncol(bf$notbreastfeeding_percent_noarv)], trt = c('no_art', 'art')))
   out[,,1] <- bf$notbreastfeeding_percent_noarv / 100
   out[,,2] <- bf$notbreastfeeding_percent_arv / 100
 
