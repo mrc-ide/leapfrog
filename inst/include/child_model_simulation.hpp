@@ -1447,7 +1447,7 @@ void calc_art_ltfu_artpop(int time_step,
                           State<ModelVariant, real_type> &state_next,
                           IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "calc_art_ltfu can only be called for model variants where run_child_model is true");
+                "calc_art_ltfu_artpop can only be called for model variants where run_child_model is true");
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
