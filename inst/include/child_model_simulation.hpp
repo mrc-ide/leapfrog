@@ -1570,13 +1570,6 @@ void hc_art_initiation_by_age(int time_step,
               intermediate.children.hc_art_scalar(0) = 0.0;
             }
 
-            //if total need is less than the total number of ART available, initiate everyone
-            if(intermediate.children.total_art_this_year(0) == 0){
-              if((0.5 * intermediate.children.total_art_last_year(0) + 0.5 * intermediate.children.total_art_this_year(0)) > intermediate.children.total_need(0)){
-               // intermediate.children.hc_art_scalar(0) = 1;
-              }
-            }
-
             if (a < hc_ss.hc2_agestart) {
               state_next.children.hc1_art_pop(0, hd, a, s) += intermediate.children.hc_art_scalar(0) * state_next.children.hc_art_need_init(hd, cat, a, s);
             } else if (hd < (hc_ss.hc2DS)) {
