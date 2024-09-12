@@ -85,7 +85,6 @@ void run_wlhiv_births(int time_step,
     intermediate.children.asfr_sum += demog.age_specific_fertility_rate(a, time_step);
   } // end a
 
-
   for (int a = 0; a < pars.base.options.p_fertility_age_groups; ++a) {
     intermediate.children.nHIVcurr = 0.0;
     intermediate.children.nHIVlast = 0.0;
@@ -393,7 +392,6 @@ void run_calculate_transmission_from_incidence_during_gestation(int time_step,
     intermediate.children.asfr_sum += demog.age_specific_fertility_rate(a, time_step);
   }// end a
 
-
   if (cpars.mat_prev_input(time_step)) {
     for (int a = 0; a < pars.base.options.p_fertility_age_groups; ++a) {
       intermediate.children.age_weighted_hivneg += demog.age_specific_fertility_rate(a, time_step) / intermediate.children.asfr_sum * cpars.adult_female_hivnpop(a,time_step) ; //HIV negative 15-49 women weighted for ASFR
@@ -484,11 +482,7 @@ void run_calculate_perinatal_transmission_rate(int time_step,
     intermediate.children.perinatal_transmission_rate = intermediate.children.perinatal_transmission_rate;
   }
 
-
-
 }
-
-
 
 template<typename ModelVariant, typename real_type>
 void run_calculate_transmission_from_incidence_during_breastfeeding(int time_step,
@@ -691,7 +685,6 @@ void run_child_hiv_infections(int time_step,
     }// end NS
 
     //Breastfeeding transmission
-
     //0-6
     internal::run_calculate_transmission_from_incidence_during_breastfeeding(time_step, pars, state_curr, state_next, intermediate);
     internal::adjust_optAB_bf_transmission_rate(time_step, pars, state_curr, state_next, intermediate);
@@ -704,7 +697,6 @@ void run_child_hiv_infections(int time_step,
     } else {
       total_births = state_next.base.births;
     }
-
 
     for (int s = 0; s < ss.NS; ++s) {
       for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
@@ -751,7 +743,6 @@ void run_child_hiv_infections(int time_step,
       state_next.base.p_hiv_pop(2, s) +=  state_next.children.hiv_births  * (intermediate.children.bf_transmission_rate(3))*
         (state_next.base.p_total_pop(2,s) - state_next.base.p_hiv_pop(2,s)) / ((state_next.base.p_total_pop(2,0) + state_next.base.p_total_pop(2,1)) - (state_next.base.p_hiv_pop(2,0) + state_next.base.p_hiv_pop(2,1)));
     }// end NS
-
   }
 
 }
@@ -767,6 +758,7 @@ void calc_need_for_ctx(int time_step,
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
+
   //all children under a certain age eligible for ART
   for (int s = 0; s <ss.NS; ++s) {
     for (int a = 0; a < cpars.hc_art_elig_age(time_step); ++a) {
@@ -1398,7 +1390,6 @@ void calc_art_ltfu(int time_step,
     } // end a
   } // end ss.NS
 
-
   for (int s = 0; s <ss.NS; ++s) {
     for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
       for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
@@ -1452,7 +1443,6 @@ void calc_art_ltfu_hivpop(int time_step,
   constexpr auto ss = StateSpace<ModelVariant>().base;
   constexpr auto hc_ss = StateSpace<ModelVariant>().children;
   const auto cpars = pars.children.children;
-
 
   for (int s = 0; s <ss.NS; ++s) {
     for (int a = 0; a < pars.base.options.p_idx_fertility_first; ++a) {
@@ -1617,8 +1607,8 @@ void hc_art_initiation_by_age(int time_step,
         } // end a
       } // end hcTT
     } // end ss.NS
-
   }// end if
+
 }
 
 template<typename ModelVariant, typename real_type>

@@ -258,7 +258,6 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
   real_type birthsCurrAge;
   real_type birthsHE;
   real_type births_HE_15_24;
-  //started here
   TensorFixedSize <real_type, Sizes<hAG<ChildModel>, NS<ChildModel>>> p_hiv_neg_pop;
   real_type sumARV;
   real_type need_PMTCT;
