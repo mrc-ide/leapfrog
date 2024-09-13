@@ -13,54 +13,70 @@ void run_child_ageing(int time_step,
                       const State<ModelVariant, real_type> &state_curr,
                       State<ModelVariant, real_type> &state_next,
                       IntermediateData<ModelVariant, real_type> &intermediate) {
-  const auto demog = pars.base.demography;
-  const auto cpars = pars.children.children;
+  const auto survival_probability = pars.base.demography.survival_probability;
+  const auto hc_cd4_transition = pars.children.children.hc_cd4_transition;
+  const auto p_idx_fertility_first = pars.base.options.p_idx_fertility_first;
+
+  const auto hc1_hiv_pop_curr = state_curr.children.hc1_hiv_pop;
+  const auto hc1_art_pop_curr = state_curr.children.hc1_art_pop;
+  const auto hc2_hiv_pop_curr = state_curr.children.hc2_hiv_pop;
+  const auto hc2_art_pop_curr = state_curr.children.hc2_art_pop;
+
+  auto hc1_hiv_pop_next = state_next.children.hc1_hiv_pop;
+  auto hc1_art_pop_next = state_next.children.hc1_art_pop;
+  auto hc2_hiv_pop_next = state_next.children.hc2_hiv_pop;
+  auto hc2_art_pop_next = state_next.children.hc2_art_pop;
+
   static_assert(ModelVariant::run_child_model,
                 "run_hiv_child_infections can only be called for model variants where run_child_model is true");
-  constexpr auto ss = StateSpace<ModelVariant>().base;
-  constexpr auto hc_ss = StateSpace<ModelVariant>().children;
+  constexpr StateSpace<ModelVariant> ss = StateSpace<ModelVariant>();
+  constexpr auto NS = ss.base.NS;
+  constexpr auto hTS = ss.base.hTS;
+  constexpr auto hc2_agestart = ss.children.hc2_agestart;
+  constexpr auto hc1DS = ss.children.hc1DS;
+  constexpr auto hc2DS = ss.children.hc2DS;
+  constexpr auto hcTT = ss.children.hcTT;
+  constexpr auto hc1_ageend = ss.children.hc1_ageend;
 
-  for (int s = 0; s < ss.NS; ++s) {
+  for (int s = 0; s < NS; ++s) {
     //less than 5 because there is a cd4 transition between ages 4 and 5
-    for (int a = 1; a < hc_ss.hc2_agestart; ++a) {
-      for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-        for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
-          state_next.children.hc1_hiv_pop(hd, cat, a, s) +=
-            state_curr.children.hc1_hiv_pop(hd, cat, a - 1, s) * demog.survival_probability(a, s, time_step);
+    for (int a = 1; a < hc2_agestart; ++a) {
+      const auto survival_prob_per_group = survival_probability(a, s, time_step);
+      for (int hd = 0; hd < hc1DS; ++hd) {
+        for (int cat = 0; cat < hcTT; ++cat) {
+          hc1_hiv_pop_next(hd, cat, a, s) += hc1_hiv_pop_curr(hd, cat, a - 1, s) * survival_prob_per_group;
         }
-        for (int dur = 0; dur < ss.hTS; ++dur) {
-          state_next.children.hc1_art_pop(dur, hd, a, s) +=
-            state_curr.children.hc1_art_pop(dur, hd, a - 1, s) * demog.survival_probability(a, s, time_step);
-        }
-      }
-    }
-  }
-
-  for (int s = 0; s < ss.NS; ++s) {
-    for (int hd = 0; hd < hc_ss.hc1DS; ++hd) {
-      for (int hd_alt = 0; hd_alt < hc_ss.hc2DS; ++hd_alt) {
-        for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
-          state_next.children.hc2_hiv_pop(hd_alt, cat, 0, s) += state_curr.children.hc1_hiv_pop(hd, cat, hc_ss.hc1_ageend, s) * demog.survival_probability(hc_ss.hc2_agestart, s, time_step) * cpars.hc_cd4_transition(hd_alt, hd);
-        }
-        for (int dur = 0; dur < ss.hTS; ++dur) {
-          state_next.children.hc2_art_pop(dur, hd_alt, 0, s) += state_curr.children.hc1_art_pop(dur, hd, hc_ss.hc1_ageend, s) * demog.survival_probability(hc_ss.hc2_agestart, s, time_step) * cpars.hc_cd4_transition(hd_alt, hd);
+        for (int dur = 0; dur < hTS; ++dur) {
+          hc1_art_pop_next(dur, hd, a, s) += hc1_art_pop_curr(dur, hd, a - 1, s) * survival_prob_per_group;
         }
       }
     }
   }
 
-  for (int s = 0; s < ss.NS; ++s) {
-    for (int a = (hc_ss.hc2_agestart + 1); a < pars.base.options.p_idx_fertility_first; ++a) {
-      for (int hd = 0; hd < hc_ss.hc2DS; ++hd) {
-        for (int cat = 0; cat < hc_ss.hcTT; ++cat) {
-          state_next.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart, s) +=
-            state_curr.children.hc2_hiv_pop(hd, cat, a - hc_ss.hc2_agestart - 1, s) *
-            demog.survival_probability(a, s, time_step);
+  for (int s = 0; s < NS; ++s) {
+    for (int hd = 0; hd < hc1DS; ++hd) {
+      for (int hd_alt = 0; hd_alt < hc2DS; ++hd_alt) {
+        const auto cd4_transition_prob = survival_probability(hc2_agestart, s, time_step) * hc_cd4_transition(hd_alt, hd);
+        for (int cat = 0; cat < hcTT; ++cat) {
+          hc2_hiv_pop_next(hd_alt, cat, 0, s) += hc1_hiv_pop_curr(hd, cat, hc1_ageend, s) * cd4_transition_prob;
         }
-        for (int dur = 0; dur < ss.hTS; ++dur) {
-          state_next.children.hc2_art_pop(dur, hd, a - hc_ss.hc2_agestart, s) +=
-            state_curr.children.hc2_art_pop(dur, hd, a - hc_ss.hc2_agestart - 1, s) *
-            demog.survival_probability(a, s, time_step);
+        for (int dur = 0; dur < hTS; ++dur) {
+          hc2_art_pop_next(dur, hd_alt, 0, s) += hc1_art_pop_curr(dur, hd, hc1_ageend, s) * cd4_transition_prob;
+        }
+      }
+    }
+  }
+
+  for (int s = 0; s < NS; ++s) {
+    for (int a = (hc2_agestart + 1); a < p_idx_fertility_first; ++a) {
+      const auto survival_prob_per_group = survival_probability(a, s, time_step);
+      const auto hc2_age = a - hc2_agestart;
+      for (int hd = 0; hd < hc2DS; ++hd) {
+        for (int cat = 0; cat < hcTT; ++cat) {
+          hc2_hiv_pop_next(hd, cat, hc2_age, s) += hc2_hiv_pop_curr(hd, cat, hc2_age - 1, s) * survival_prob_per_group;
+        }
+        for (int dur = 0; dur < hTS; ++dur) {
+          hc2_art_pop_next(dur, hd, hc2_age, s) += hc2_art_pop_curr(dur, hd, hc2_age - 1, s) * survival_prob_per_group;
         }
       }
     }
