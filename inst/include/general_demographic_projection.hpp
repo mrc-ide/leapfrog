@@ -26,8 +26,8 @@ void run_ageing_and_mortality(int t,
     }
 
     // open age group
-    real_type p_total_pop_natural_deaths_open_age =
-      c_ba.p_total_pop(ss_b.pAG - 1, g) * (1.0 - p_dm.survival_probability(ss_b.pAG, g, t));
+    real_type p_total_pop_natural_deaths_open_age = c_ba.p_total_pop(ss_b.pAG - 1, g) *
+                                                    (1.0 - p_dm.survival_probability(ss_b.pAG, g, t));
     n_ba.p_total_pop_natural_deaths(ss_b.pAG - 1, g) += p_total_pop_natural_deaths_open_age;
     n_ba.p_total_pop(ss_b.pAG - 1, g) += c_ba.p_total_pop(ss_b.pAG - 1, g) - p_total_pop_natural_deaths_open_age;
   }
