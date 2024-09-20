@@ -14,10 +14,12 @@ namespace leapfrog {
 template<typename ModelVariant, typename real_type>
 void set_initial_state(State<ModelVariant, real_type> &state,
                        const Parameters<ModelVariant, real_type> &pars) {
-  constexpr auto ss = StateSpace<ModelVariant>().base;
-  for (int g = 0; g < ss.NS; ++g) {
-    for (int a = 0; a < ss.pAG; ++a) {
-      state.base.p_total_pop(a, g) = pars.base.demography.base_pop(a, g);
+  constexpr auto ss_b = StateSpace<ModelVariant>().base;
+  const auto& p_dm = pars.base.demography;
+
+  for (int g = 0; g < ss_b.NS; ++g) {
+    for (int a = 0; a < ss_b.pAG; ++a) {
+      state.base.p_total_pop(a, g) = p_dm.base_pop(a, g);
     }
   }
 }
