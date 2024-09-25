@@ -29,13 +29,13 @@ void run_calculate_incidence_rate(int t,
   constexpr auto ss_b = StateSpace<ModelVariant>().base;
   const auto& p_op = pars.base.options;
   const auto& c_ba = state_curr.base;
-  const auto& i_ba = intermediate.base;
+  auto& i_ba = intermediate.base;
 
   const auto adult_incid_first_age_group = p_op.adult_incidence_first_age_group;
   const auto adult_incid_last_age_group = adult_incid_first_age_group + p_op.pAG_INCIDPOP;
 
   for (int g = 0; g < ss_b.NS; ++g) {
-    for (int a = adult_incid_first_age_group; a < adult_incid_max_age_group; ++a) {
+    for (int a = adult_incid_first_age_group; a < adult_incid_last_age_group; ++a) {
       i_ba.hiv_neg_aggregate(g) += c_ba.p_total_pop(a, g) - c_ba.p_hiv_pop(a, g);
     }
   }
