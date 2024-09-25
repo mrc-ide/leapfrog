@@ -345,8 +345,8 @@ void run_h_art_initiation(int hiv_step,
           i_ba.artinit_hahm = i_ba.artinit_hm(hm) *
 	                            i_ba.artelig_hahm(hm, ha - p_op.hIDX_15PLUS) /
 	                            i_ba.artelig_hm(hm);
-          i_ba.artinit_hahm = std::max(i_ba.artinit_hahm, i_ba.artelig_hahm(hm, ha - p_op.hIDX_15PLUS));
-          i_ba.artinit_hahm = std::max(i_ba.artinit_hahm,
+          i_ba.artinit_hahm = std::min(i_ba.artinit_hahm, i_ba.artelig_hahm(hm, ha - p_op.hIDX_15PLUS));
+          i_ba.artinit_hahm = std::min(i_ba.artinit_hahm,
                                        n_ba.h_hiv_adult(hm, ha, g) + p_op.dt * i_ba.grad(hm, ha, g));
           i_ba.grad(hm, ha, g) -= i_ba.artinit_hahm / p_op.dt;
           i_ba.gradART(ART0MOS, hm, ha, g) += i_ba.artinit_hahm / p_op.dt;
