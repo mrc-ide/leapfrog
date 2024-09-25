@@ -38,6 +38,8 @@ template<typename ModelVariant, typename real_type>
 OutputState<ModelVariant, real_type> run_model(int time_steps,
                                                std::vector<int> save_steps,
                                                const Parameters<ModelVariant, real_type> &pars) {
+  const auto& p_op = pars.base.options;
+
   auto state = State<ModelVariant, real_type>(pars);
   auto state_next = state;
   set_initial_state<ModelVariant, real_type>(state, pars);
@@ -61,7 +63,7 @@ OutputState<ModelVariant, real_type> run_model(int time_steps,
       run_child_model_simulation<ModelVariant>(step, pars, state, state_next, intermediate);
     }
 
-    if (pars.base.options.proj_period_int == internal::PROJPERIOD_CALENDAR) {
+    if (p_op.proj_period_int == internal::PROJPERIOD_CALENDAR) {
       run_end_year_migration<ModelVariant>(step, pars, state, state_next, intermediate);    
       run_hiv_pop_end_year_migration<ModelVariant>(step, pars, state, state_next, intermediate);
     }
