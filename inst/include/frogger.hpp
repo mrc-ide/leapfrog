@@ -44,7 +44,7 @@ OutputState<ModelVariant, real_type> run_model(int time_steps,
   auto state_next = state;
   set_initial_state<ModelVariant, real_type>(state, pars);
 
-  internal::IntermediateData<ModelVariant, real_type> intermediate(pars.base.options.hAG_15plus);
+  internal::IntermediateData<ModelVariant, real_type> intermediate(p_op.hAG_15plus);
 
   intermediate.reset();
 
