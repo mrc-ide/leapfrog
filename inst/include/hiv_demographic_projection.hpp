@@ -72,7 +72,6 @@ void run_hiv_and_art_stratified_ageing(int t,
   constexpr auto ss = StateSpace<ModelVariant>();
   constexpr auto ss_b = ss.base;
   constexpr auto ss_c = ss.children;
-  const auto& p_hc = pars.children.children;
   const auto& p_op = pars.base.options;
   const auto& c_ba = state_curr.base;
   auto& n_ba = state_next.base;
@@ -113,6 +112,8 @@ void run_hiv_and_art_stratified_ageing(int t,
   }
 
   if constexpr (ModelVariant::run_child_model) {
+    const auto& p_hc = pars.children.children;
+
     for (int g = 0; g < ss_b.NS; ++g) {
       for (int hm = 0; hm < ss_b.hDS; ++hm) {
         for (int hm_adol = 0; hm_adol < ss_c.hc2DS; ++hm_adol){
