@@ -16,7 +16,10 @@ knitr::opts_chunk$set(
 
 # Frogger naming rules
 
-* `p_` prefix indicates this is age stratified by total single year i.e. same age stratification as total population
+* `p_` prefix in a tensor name indicates this is age stratified by total single year, i.e. same age stratification as total population. At the start of our functions we also define unpacked structs and the prefix here means the unpacking comes from the `pars` struct (parameters)
+* `c_` prefix at the start of a function means we are unpacking the `state_curr` struct
+* `n_` prefix at the start of a function means we are unpacking the `state_next` struct
+* `i_` prefix at the start of a function means we are unpacking the `intermediate` struct
 * `h_` prefix indicates this is age stratified by same age stratification as HIV adult population, this might be single
   year from
   15+ or could be coarse age groups
@@ -28,10 +31,40 @@ knitr::opts_chunk$set(
 * Uppercase means this is a dimension of the state space e.g. `NS` or `pAG`
 * `ts_` prefix means this is a time step
 * `hts_` prefix means this is an HIV time step (i.e. a time step of the inner HIV loop)
+* `t` variable name is reserved for the time step
 
 These prefixes can be merged e.g.
 
 * `p_idx_hiv_first_adult` - Is the index of the first age group within singe-year ages to be considered an adult
+
+# Rules for unpacking structs
+
+The `p_`, `c_`, `n_`, `i_` prefixes correspond to `pars`, `state_curr`, `state_next`, `intermediate` structs respectively. These will be followed by 2 letters indicating what part we are unpacking:
+
+* `dm` - `base.demography`
+* `tx` - `base.art`
+* `nh` - `base.natural_history`
+* `in` - `base.incidence`
+* `op` - `base.options`
+* `hc` - children, in the case of `pars` it is `children.children` and in the case of `state_next`, `state_curr`, `intermediate` it is `children`
+* `ba` - `base` (for `intermediate`, `state_next`, `state_curr` structs)
+
+So for example:
+
+* `p_dm` = `pars.base.demography`
+* `p_hc` = `pars.children.children`
+* `c_hc` = `state_curr.children`
+* `i_ba` = `intermediate.base`
+
+For the `StateSpace` struct (defined as `ss` in the code) we use the `ss_` prefix with:
+
+* `b` - `base`
+* `c` - `children`
+
+so for example:
+
+* `ss_b` = `ss.base`
+* `ss_c` = `ss.children`
 
 # Leapfrog to Frogger glossary
 
