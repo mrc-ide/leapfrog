@@ -14,10 +14,12 @@ namespace leapfrog {
 template<typename ModelVariant, typename real_type>
 void set_initial_state(State<ModelVariant, real_type> &state,
                        const Parameters<ModelVariant, real_type> &pars) {
-  constexpr auto ss = StateSpace<ModelVariant>().base;
-  for (int g = 0; g < ss.NS; ++g) {
-    for (int a = 0; a < ss.pAG; ++a) {
-      state.base.p_total_pop(a, g) = pars.base.demography.base_pop(a, g);
+  constexpr auto ss_b = StateSpace<ModelVariant>().base;
+  const auto& p_dm = pars.base.demography;
+
+  for (int g = 0; g < ss_b.NS; ++g) {
+    for (int a = 0; a < ss_b.pAG; ++a) {
+      state.base.p_total_pop(a, g) = p_dm.base_pop(a, g);
     }
   }
 }
@@ -36,11 +38,13 @@ template<typename ModelVariant, typename real_type>
 OutputState<ModelVariant, real_type> run_model(int time_steps,
                                                std::vector<int> save_steps,
                                                const Parameters<ModelVariant, real_type> &pars) {
+  const auto& p_op = pars.base.options;
+
   auto state = State<ModelVariant, real_type>(pars);
   auto state_next = state;
   set_initial_state<ModelVariant, real_type>(state, pars);
 
-  internal::IntermediateData<ModelVariant, real_type> intermediate(pars.base.options.hAG_15plus);
+  internal::IntermediateData<ModelVariant, real_type> intermediate(p_op.hAG_15plus);
 
   intermediate.reset();
 
@@ -59,7 +63,7 @@ OutputState<ModelVariant, real_type> run_model(int time_steps,
       run_child_model_simulation<ModelVariant>(step, pars, state, state_next, intermediate);
     }
 
-    if (pars.base.options.proj_period_int == internal::PROJPERIOD_CALENDAR) {
+    if (p_op.proj_period_int == internal::PROJPERIOD_CALENDAR) {
       run_end_year_migration<ModelVariant>(step, pars, state, state_next, intermediate);    
       run_hiv_pop_end_year_migration<ModelVariant>(step, pars, state, state_next, intermediate);
     }
