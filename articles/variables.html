@@ -92,8 +92,20 @@
 </h2>
 <ul>
 <li>
-<code>p_</code> prefix indicates this is age stratified by total
-single year i.e. same age stratification as total population</li>
+<code>p_</code> prefix in a tensor name indicates this is age
+stratified by total single year, i.e. same age stratification as total
+population. At the start of our functions we also define unpacked
+structs and the prefix here means the unpacking comes from the
+<code>pars</code> struct (parameters)</li>
+<li>
+<code>c_</code> prefix at the start of a function means we are
+unpacking the <code>state_curr</code> struct</li>
+<li>
+<code>n_</code> prefix at the start of a function means we are
+unpacking the <code>state_next</code> struct</li>
+<li>
+<code>i_</code> prefix at the start of a function means we are
+unpacking the <code>intermediate</code> struct</li>
 <li>
 <code>h_</code> prefix indicates this is age stratified by same age
 stratification as HIV adult population, this might be single year from
@@ -120,12 +132,83 @@ e.g. <code>NS</code> or <code>pAG</code>
 <li>
 <code>hts_</code> prefix means this is an HIV time step (i.e. a time
 step of the inner HIV loop)</li>
+<li>
+<code>t</code> variable name is reserved for the time step</li>
 </ul>
 <p>These prefixes can be merged e.g.</p>
 <ul>
 <li>
 <code>p_idx_hiv_first_adult</code> - Is the index of the first age
 group within singe-year ages to be considered an adult</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="rules-for-unpacking-structs">Rules for unpacking structs<a class="anchor" aria-label="anchor" href="#rules-for-unpacking-structs"></a>
+</h2>
+<p>The <code>p_</code>, <code>c_</code>, <code>n_</code>,
+<code>i_</code> prefixes correspond to <code>pars</code>,
+<code>state_curr</code>, <code>state_next</code>,
+<code>intermediate</code> structs respectively. These will be followed
+by 2 letters indicating what part we are unpacking:</p>
+<ul>
+<li>
+<code>dm</code> - <code>base.demography</code>
+</li>
+<li>
+<code>tx</code> - <code>base.art</code>
+</li>
+<li>
+<code>nh</code> - <code>base.natural_history</code>
+</li>
+<li>
+<code>in</code> - <code>base.incidence</code>
+</li>
+<li>
+<code>op</code> - <code>base.options</code>
+</li>
+<li>
+<code>hc</code> - children, in the case of <code>pars</code> it is
+<code>children.children</code> and in the case of
+<code>state_next</code>, <code>state_curr</code>,
+<code>intermediate</code> it is <code>children</code>
+</li>
+<li>
+<code>ba</code> - <code>base</code> (for <code>intermediate</code>,
+<code>state_next</code>, <code>state_curr</code> structs)</li>
+</ul>
+<p>So for example:</p>
+<ul>
+<li>
+<code>p_dm</code> = <code>pars.base.demography</code>
+</li>
+<li>
+<code>p_hc</code> = <code>pars.children.children</code>
+</li>
+<li>
+<code>c_hc</code> = <code>state_curr.children</code>
+</li>
+<li>
+<code>i_ba</code> = <code>intermediate.base</code>
+</li>
+</ul>
+<p>For the <code>StateSpace</code> struct (defined as <code>ss</code> in
+the code) we use the <code>ss_</code> prefix with:</p>
+<ul>
+<li>
+<code>b</code> - <code>base</code>
+</li>
+<li>
+<code>c</code> - <code>children</code>
+</li>
+</ul>
+<p>so for example:</p>
+<ul>
+<li>
+<code>ss_b</code> = <code>ss.base</code>
+</li>
+<li>
+<code>ss_c</code> = <code>ss.children</code>
+</li>
 </ul>
 </div>
 <div class="section level2">
