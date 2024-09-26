@@ -30,7 +30,6 @@ saveRDS(lmod, testthat::test_path("testdata/leapfrog_fit_coarse.rds"))
 mod <- leapfrog::leapfrogR(demp, proj, hiv_steps_per_year = 0L)
 saveRDS(lmod, testthat::test_path("testdata/fit_demography.rds"))
 
-
 #Create paeds parameters (Run from leapfrog/uncertainrt_analysis_working)
 pjnz_child <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct.PJNZ")
 
