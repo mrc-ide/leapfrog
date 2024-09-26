@@ -12,27 +12,28 @@ library(dplyr)
 source('./scripts/spectrum_inputs_paeds.R')
 source('./scripts/read_spectrum.R')
 
-# ## Create demographic and projection parameters for adults
-# pjnz_adult <- system.file("pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ", package = "frogger", mustWork = TRUE)
-#
-# demp <- prepare_leapfrog_demp(pjnz_adult)
-# saveRDS(demp, testthat::test_path("testdata/demographic_projection_object_adult.rds"))
-# proj <- prepare_leapfrog_projp(pjnz_adult)
-# saveRDS(proj, testthat::test_path("testdata/projection_parameters_adult.rds"))
-#
-# # Used as reference data (Run from leapfrog/master)
-# lmod <- leapfrog::leapfrogR(demp, proj)
-# saveRDS(lmod, testthat::test_path("testdata/leapfrog_fit.rds"))
-#
-# lmod <- leapfrog::leapfrogR(demp, proj, hiv_strat = "coarse")
-# saveRDS(lmod, testthat::test_path("testdata/leapfrog_fit_coarse.rds"))
-#
-# mod <- leapfrog::leapfrogR(demp, proj, hiv_steps_per_year = 0L)
-# saveRDS(lmod, testthat::test_path("testdata/fit_demography.rds"))
+## Create demographic and projection parameters for adults
+pjnz_adult <- system.file("pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ", package = "frogger", mustWork = TRUE)
+
+demp <- prepare_leapfrog_demp(pjnz_adult)
+saveRDS(demp, testthat::test_path("testdata/demographic_projection_object_adult.rds"))
+proj <- prepare_leapfrog_projp(pjnz_adult)
+saveRDS(proj, testthat::test_path("testdata/projection_parameters_adult.rds"))
+
+# Used as reference data (Run from leapfrog/master)
+lmod <- leapfrog::leapfrogR(demp, proj)
+saveRDS(lmod, testthat::test_path("testdata/leapfrog_fit.rds"))
+
+lmod <- leapfrog::leapfrogR(demp, proj, hiv_strat = "coarse")
+saveRDS(lmod, testthat::test_path("testdata/leapfrog_fit_coarse.rds"))
+
+mod <- leapfrog::leapfrogR(demp, proj, hiv_steps_per_year = 0L)
+saveRDS(lmod, testthat::test_path("testdata/fit_demography.rds"))
 
 
 #Create paeds parameters (Run from leapfrog/uncertainrt_analysis_working)
 pjnz_child <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct.PJNZ")
+
 demp <- prepare_leapfrog_demp(pjnz_child)
 proj <- prepare_leapfrog_projp(pjnz_child)
 proj <- prepare_hc_leapfrog_projp(pjnz_child, proj)
@@ -62,7 +63,7 @@ spectrum_output <- function(file = "../testdata/spectrum/v6.13/bwa_aim-adult-chi
   df <- eppasm::read_pop1(df, country, years = years_in)
   if(any(0:14 %in% ages)){
     df_paed <- df %>% dplyr::filter(age < 5) %>%
-      dplyr::right_join(y = data.frame(cd4 = 1:8, cd4_cat = c('neg', 'gte30', '26-30', '21-25', '16-20', '11-5', '5-10', 'lte5'))) %>%
+      dplyr::right_join(y = data.frame(cd4 = 1:8, cd4_cat = c('neg', 'gte30', '26-30', '21-25', '16-20', '11-15', '5-10', 'lte5'))) %>%
       dplyr::right_join(y = data.frame(artdur = 2:8, transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+', 'ARTlte5mo', 'ART6to12mo', 'ARTgte12mo'))) %>%
       dplyr::filter(cd4_cat != 'neg')
 

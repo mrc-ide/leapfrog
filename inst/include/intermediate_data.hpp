@@ -245,6 +245,9 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
   TensorFixedSize <real_type, Sizes<4>> hc_initByAge;
   TensorFixedSize <real_type, Sizes<4>> hc_adj;
   TensorFixedSize <real_type, Sizes<4>> hc_art_deaths;
+  TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hcAG_end<ChildModel>, NS<ChildModel>>> hc_hiv_dist;
+  TensorFixedSize <real_type, Sizes<hDS<ChildModel>,  hcAG_end<ChildModel>, NS<ChildModel>>> hc_hiv_total;
+  TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hcAG_end<ChildModel>, NS<ChildModel>>> art_ltfu_grad;
   real_type asfr_sum;
   real_type births_sum;
   real_type nHIVcurr;
@@ -254,7 +257,6 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
   real_type birthsCurrAge;
   real_type birthsHE;
   real_type births_HE_15_24;
-  //started here
   TensorFixedSize <real_type, Sizes<hAG<ChildModel>, NS<ChildModel>>> p_hiv_neg_pop;
   real_type sumARV;
   real_type need_PMTCT;
@@ -311,6 +313,9 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
     hc_death_rate = 0.0;
     hc_art_grad.setZero();
     hc_art_scalar.setZero();
+    hc_hiv_dist.setZero();
+    hc_hiv_total.setZero();
+    art_ltfu_grad.setZero();
     hc_initByAge.setZero();
     hc_adj.setZero();
     hc_art_deaths.setZero();

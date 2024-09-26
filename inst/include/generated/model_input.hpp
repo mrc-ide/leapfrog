@@ -132,6 +132,7 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
     const leapfrog::TensorMap1<real_type> hc_age_coarse = parse_data<real_type>(data, "hc_age_coarse", children.hcAG_end);
     const leapfrog::TensorMap2<real_type> abortion = parse_data<real_type>(data, "abortion", children.hAB_ind, proj_years);
     const leapfrog::TensorMap1<real_type> patients_reallocated = parse_data<real_type>(data, "patients_reallocated", proj_years);
+    const leapfrog::TensorMap1<real_type> hc_art_ltfu = parse_data<real_type>(data, "paed_art_ltfu", proj_years);
     const leapfrog::TensorMap1<int> hc_age_coarse_cd4 = parse_data<int>(data, "hc_age_coarse_cd4", options.p_idx_hiv_first_adult);
     const leapfrog::TensorMap2<real_type> adult_female_infections = parse_data<real_type>(data, "adult_female_infections", options.p_fertility_age_groups, proj_years);
     const leapfrog::TensorMap2<real_type> adult_female_hivnpop = parse_data<real_type>(data, "hivnpop", options.p_fertility_age_groups, proj_years);
@@ -177,6 +178,7 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
         hc_age_coarse,
         abortion,
         patients_reallocated,
+        hc_art_ltfu,
         hc_age_coarse_cd4,
         adult_female_infections,
         adult_female_hivnpop,

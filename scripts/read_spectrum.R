@@ -645,6 +645,18 @@ dp_read_paed_art_eligibility <- function(dp) {
 }
 
 prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
+  ## projection parameters
+  dpfile <- grep(".DP$", utils::unzip(pjnz, list=TRUE)$Name, value=TRUE)
+  dp <- utils::read.csv(unz(pjnz, dpfile), as.is=TRUE)
+  dpsub <- function(tag, rows, cols, tagcol=1){
+    dp[which(dp[,tagcol]==tag)+rows, cols]
+  }
+  yr_start <- as.integer(dpsub("<FirstYear MV2>",2,4))
+  yr_end <- as.integer(dpsub("<FinalYear MV2>",2,4))
+  proj.years <- yr_start:yr_end
+  timedat.idx <- 4+1:length(proj.years)-1
+  year.idx <- 1:length(proj.years)
+
   ## Hard coded to expand age groups 15-24, 25-34, 35-44, 45+ to
   ## single-year ages 15:80.
   ## Requires extension for coarse HIV age group stratification
@@ -758,7 +770,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   ctx_pct[is.na(ctx_pct)] <- FALSE
   v$ctx_val_ispercent <- ctx_pct
   ## ctx_effect_notrt <- c(rep(0.33, 5), rep(0,5))
-  ctx_effect <- rep(0.33,61)
+  ctx_effect <- rep(0.33,length(proj.years))
   v$ctx_val <- input_childart(pjnz)$ctx
   if(any(v$ctx_val_ispercent)){
     v$ctx_val[v$ctx_val_ispercent] <- v$ctx_val[v$ctx_val_ispercent] / 100
@@ -779,9 +791,9 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   v$pmtct <- pmtct_list
 
   if(sum(pmtct_list[,,1]) == 0){
-    v$pmtct_input_isperc = rep(F, length(1970:2030))
+    v$pmtct_input_isperc = rep(F, length(proj.years))
   }else{
-    v$pmtct_input_isperc = rep(T, length(1970:2030))
+    v$pmtct_input_isperc = rep(T, length(proj.years))
   }
 
   v$pmtct_input_isperc <- !(apply(input_pmtct_ispercent(pjnz), 2, any))
@@ -820,9 +832,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   v$mtct <- mtct
 
   mort_rr_art <- dp_read_child_mort_mult(pjnz)
-  years_idx <- ncol(mort_rr_art)
-  years = (1970:2030)[1:years_idx]
-  mort_rr_art_target <- array(NA, dim = c(3, 15, years_idx), dimnames = list(transmission = c('0to6mo', '7to12mo', '12+mo'), age = 0:14, year = years))
+  mort_rr_art_target <- array(NA, dim = c(3, 15, length(year.idx)), dimnames = list(transmission = c('0to6mo', '7to12mo', '12+mo'), age = 0:14, year = proj.years))
   mort_rr_art_target[1:2, 1:5,] <- rep(unlist(mort_rr_art[1,]), each = 10)
   mort_rr_art_target[3, 1:5,] <- rep(unlist(mort_rr_art[2,]), each = 5)
   mort_rr_art_target[1:2, 6:15,] <- rep(unlist(mort_rr_art[3,]), each = 20)
@@ -881,7 +891,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
     out
   }
 
-  paed_art_elig_cd4 <- array(data = NA, dim = c(15, years_idx), dimnames = list(age = c(0:14), year = c(years)))
+  paed_art_elig_cd4 <- array(data = NA, dim = c(15, length(year.idx)), dimnames = list(age = c(0:14), year = c(proj.years)))
   paed_art_elig_cd4[1,] <- get_ordinal(unname(cd4_elig[1,]))
   paed_art_elig_cd4[2:3,] <- get_ordinal(unname(cd4_elig[2,]))
   paed_art_elig_cd4[4:5,] <- get_ordinal(unname(cd4_elig[3,]))
@@ -911,19 +921,6 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
 
   v$paed_cd4_transition <- paed_cd4_transition
 
-
-  ## projection parameters
-  dpfile <- grep(".DP$", utils::unzip(pjnz, list=TRUE)$Name, value=TRUE)
-  dp <- utils::read.csv(unz(pjnz, dpfile), as.is=TRUE)
-  dpsub <- function(tag, rows, cols, tagcol=1){
-    dp[which(dp[,tagcol]==tag)+rows, cols]
-  }
-  yr_start <- as.integer(dpsub("<FirstYear MV2>",2,4))
-  yr_end <- as.integer(dpsub("<FinalYear MV2>",2,4))
-  proj.years <- yr_start:yr_end
-  timedat.idx <- 4+1:length(proj.years)-1
-
-
   v$abortion <- input_abortion(pjnz)
 
   v$patients_reallocated <- input_mothers_reallocated(pjnz)
@@ -946,15 +943,15 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   dt <- dt[Sex == 'Female' & Age %in% 15:49,]
   dt <- dcast(dt[,.(Age, Year, hivnpop)], Age ~ Year, value.var = 'hivnpop')
 
-  hivnpop <- array(NA, dim = c(length(15:49), years_idx), dimnames = list(age = 15:49, year = years))
-  for(i in 1:years_idx){
+  hivnpop <- array(NA, dim = c(length(15:49), length(year.idx)), dimnames = list(age = 15:49, year = proj.years))
+  for(i in 1:length(year.idx)){
     hivnpop[,i] <- dt[[(i+1)]]
   }
 
   inc <- dcast(inc[Sex == 'Female' & Age %in% 15:49,.(Age, Year, inc)], Age ~ Year, value.var = 'inc')
 
-  inc.array <- array(NA, dim = c(length(15:49), years_idx), dimnames = list(age = 15:49, year = years))
-  for(i in 1:years_idx){
+  inc.array <- array(NA, dim = c(length(15:49), length(year.idx)), dimnames = list(age = 15:49, year = proj.years))
+  for(i in 1:length(year.idx)){
     inc.array[,i] <- inc[[(i+1)]]
   }
 
