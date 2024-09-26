@@ -256,21 +256,17 @@ void run_h_art_initiation(int hiv_step,
     // calculate number on ART at end of ts, based on number or percent
     real_type art_interp_w = p_op.dt * (hiv_step + 1.0);
     if (p_op.proj_period_int == internal::PROJPERIOD_MIDYEAR && art_interp_w < 0.5) {
-      // case: both values are numbers
       if (!p_tx.adults_on_art_is_percent(g, t - 2) && !p_tx.adults_on_art_is_percent(g, t - 1)) {
+        // case: both values are numbers
         i_ba.artnum_hts = (0.5 - art_interp_w) * p_tx.adults_on_art(g, t - 2) +
                           (art_interp_w + 0.5) * p_tx.adults_on_art(g, t - 1);
-      }
-      
-      // case: both values are percentages
-      if (p_tx.adults_on_art_is_percent(g, t - 2) && p_tx.adults_on_art_is_percent(g, t - 1)) {
+      } else if (p_tx.adults_on_art_is_percent(g, t - 2) && p_tx.adults_on_art_is_percent(g, t - 1)) {
+        // case: both values are percentages
         i_ba.artcov_hts = (0.5 - art_interp_w) * p_tx.adults_on_art(g, t - 2) +
 	                        (art_interp_w + 0.5) * p_tx.adults_on_art(g, t - 1);
         i_ba.artnum_hts = i_ba.artcov_hts * (i_ba.Xart_15plus + i_ba.Xartelig_15plus);
-      }
-      
-      // case: value is percentage only at time t - 1
-      if (!p_tx.adults_on_art_is_percent(g, t - 2) && p_tx.adults_on_art_is_percent(g, t - 1)) {
+      } else if (!p_tx.adults_on_art_is_percent(g, t - 2) && p_tx.adults_on_art_is_percent(g, t - 1)) {
+        // case: value is percentage only at time t - 1
         // transition from number to percentage
         i_ba.curr_coverage = i_ba.Xart_15plus / (i_ba.Xart_15plus + i_ba.Xartelig_15plus);
         i_ba.artcov_hts = i_ba.curr_coverage +
@@ -292,22 +288,18 @@ void run_h_art_initiation(int hiv_step,
 	      art_interp_w -= 0.5;
       }
 
-      // case: both values are numbers
       if (!p_tx.adults_on_art_is_percent(g, t - 1) && !p_tx.adults_on_art_is_percent(g, t)) {
+        // case: both values are numbers
         i_ba.artnum_hts = (1.0 - art_interp_w) * p_tx.adults_on_art(g, t - 1) +
 	                        art_interp_w * p_tx.adults_on_art(g, t);
-      }
-      
-      // case: both values are percentages
-      if (p_tx.adults_on_art_is_percent(g, t - 1) && p_tx.adults_on_art_is_percent(g, t)) {
+      } else if (p_tx.adults_on_art_is_percent(g, t - 1) && p_tx.adults_on_art_is_percent(g, t)) {
+        // case: both values are percentages
         i_ba.artcov_hts = (1.0 - art_interp_w) * p_tx.adults_on_art(g, t - 1) +
 	                        art_interp_w * p_tx.adults_on_art(g, t);
         // transition to number
         i_ba.artnum_hts = i_ba.artcov_hts * (i_ba.Xart_15plus + i_ba.Xartelig_15plus);	
-      }
-      
-      // case: value is percentage only at time t
-      if (!p_tx.adults_on_art_is_percent(g, t - 1) && p_tx.adults_on_art_is_percent(g, t)) {
+      } else if (!p_tx.adults_on_art_is_percent(g, t - 1) && p_tx.adults_on_art_is_percent(g, t)) {
+        // case: value is percentage only at time t
         // transition from number to percentage
         i_ba.curr_coverage = i_ba.Xart_15plus / (i_ba.Xart_15plus + i_ba.Xartelig_15plus);
         i_ba.artcov_hts = i_ba.curr_coverage +
