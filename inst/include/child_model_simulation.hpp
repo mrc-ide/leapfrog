@@ -372,7 +372,8 @@ void adjust_optAB_bf_transmission_rate(int t,
     auto total_PMTCT_coverage = i_hc.PMTCT_coverage(0) + i_hc.PMTCT_coverage(1);
     if (total_PMTCT_coverage > i_hc.prop_wlhiv_gte350) {
       i_hc.excessratio_bf = total_PMTCT_coverage - i_hc.prop_wlhiv_gte350;
-      auto excessfactor_bf = i_hc.excessratio_bf * (1.45 / 0.46) / total_PMTCT_coverage + i_hc.prop_wlhiv_gte350;
+      auto excessfactor_bf = i_hc.excessratio_bf / total_PMTCT_coverage * (1.45 / 0.46) +
+                             i_hc.prop_wlhiv_gte350;
       i_hc.optA_bf_transmission_rate = excessfactor_bf * p_hc.PMTCT_transmission_rate(4, 0, 1);
       i_hc.optB_bf_transmission_rate = excessfactor_bf * p_hc.PMTCT_transmission_rate(4, 1, 1);
     } else {
