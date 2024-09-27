@@ -230,12 +230,12 @@ void convert_PMTCT_num_to_perc(int t,
 
   // replace all instances of coverage input as numbers with percentage covered
   if (p_hc.PMTCT_input_is_percent(t)) {
-    for (int hp = 0; hp < hc_ss.hPS; ++hp) {
+    for (int hp = 0; hp < ss_c.hPS; ++hp) {
       i_hc.PMTCT_coverage(hp) = p_hc.PMTCT(hp, t) / 100;
     } // end hPS
     i_hc.sumARV = i_hc.sumARV * i_hc.need_PMTCT;
   } else {
-    for (int hp = 0; hp < hc_ss.hPS; ++hp) {
+    for (int hp = 0; hp < ss_c.hPS; ++hp) {
       if (i_hc.sumARV == 0) {
         i_hc.PMTCT_coverage(hp) = 0.0;
       } else {
