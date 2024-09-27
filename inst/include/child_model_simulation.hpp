@@ -417,8 +417,8 @@ void run_calculate_transmission_from_incidence_during_gestation(int t,
       i_hc.incidence_rate_wlhiv = i_hc.age_weighted_infections / i_hc.age_weighted_hivneg;
       // 0.75 is 9/12, gestational period, index 7 in the vertical trasnmission object is the index for maternal seroconversion
       i_hc.perinatal_transmission_from_incidence = i_hc.incidence_rate_wlhiv * 0.75 *
-                                                   (p_hc.total_births(t)  - i_hc.need_PMTCT) *
-                                                   p_hc.vertical_transmission_rate(7,0);
+                                                   (p_hc.total_births(t) - i_hc.need_PMTCT) *
+                                                   p_hc.vertical_transmission_rate(7, 0);
     } else {
       i_hc.incidence_rate_wlhiv = 0.0;
       i_hc.perinatal_transmission_from_incidence = 0.0;
@@ -427,7 +427,7 @@ void run_calculate_transmission_from_incidence_during_gestation(int t,
     for (int a = 0; a < p_op.p_fertility_age_groups; ++a) {
       auto asfr_weight = p_dm.age_specific_fertility_rate(a, t) / i_hc.asfr_sum;
       i_hc.age_weighted_hivneg += asfr_weight * i_hc.p_hiv_neg_pop(a + 15, 1); // HIV negative 15-49 women weighted for ASFR
-      i_hc.age_weighted_infections +=  asfr_weight  * n_ba.p_infections(a + 15, 1); // newly infected 15-49 women, weighted for ASFR
+      i_hc.age_weighted_infections += asfr_weight * n_ba.p_infections(a + 15, 1); // newly infected 15-49 women, weighted for ASFR
     } // end a
 
     if (i_hc.age_weighted_hivneg > 0.0) {
@@ -489,8 +489,6 @@ void run_calculate_perinatal_transmission_rate(int t,
                                  i_hc.prop_wlhiv_200to350 * p_hc.vertical_transmission_rate(2, 0) +
                                  i_hc.prop_wlhiv_gte350 * p_hc.vertical_transmission_rate(0, 0);
     i_hc.perinatal_transmission_rate += i_hc.no_PMTCT * vertical_transmission;
-  } else {
-    i_hc.perinatal_transmission_rate = i_hc.perinatal_transmission_rate;
   }
   i_hc.perinatal_transmission_rate_bf_calc = i_hc.perinatal_transmission_rate;
 
@@ -499,8 +497,6 @@ void run_calculate_perinatal_transmission_rate(int t,
   if (i_hc.need_PMTCT > 0.0) {
     i_hc.perinatal_transmission_rate = i_hc.perinatal_transmission_rate +
                                        i_hc.perinatal_transmission_from_incidence / i_hc.need_PMTCT;
-  } else {
-    i_hc.perinatal_transmission_rate = i_hc.perinatal_transmission_rate;
   }
 }
 
@@ -686,7 +682,7 @@ void run_child_hiv_infections(int t,
   auto& n_hc = state_next.children;
   auto& i_hc = intermediate.children;
 
-  if (n_hc.hiv_births > 0 ) {
+  if (n_hc.hiv_births > 0) {
     internal::run_calculate_perinatal_transmission_rate(t, pars, state_curr, state_next, intermediate);
 
     // Perinatal transmission
@@ -746,20 +742,17 @@ void run_child_hiv_infections(int t,
     // 12 plus
     internal::run_bf_transmission_rate(t, pars, state_curr, state_next, intermediate, 6, 12, 2);
     internal::run_bf_transmission_rate(t, pars, state_curr, state_next, intermediate, 12, ss_c.hBF, 3);
-    auto total_uninfected_12_24 = n_ba.p_total_pop(1, 0) - n_ba.p_hiv_pop(1, 0) +
-                                  n_ba.p_total_pop(1, 1) - n_ba.p_hiv_pop(1, 1);
-    auto total_uninfected_24_plus = n_ba.p_total_pop(2, 0) - n_ba.p_hiv_pop(2, 0) +
-                                    n_ba.p_total_pop(2, 1) - n_ba.p_hiv_pop(2, 1);
     for (int s = 0; s < ss_b.NS; ++s) {
-      auto uninfected_prop_12_24 = (n_ba.p_total_pop(1, s) - n_ba.p_hiv_pop(1, s)) / total_uninfected_12_24;
-      auto uninfected_prop_24_plus = (n_ba.p_total_pop(2, s) - n_ba.p_hiv_pop(2, s)) / total_uninfected_24_plus;
+      auto uninfected_prop_12_24 = (n_ba.p_total_pop(1, s) - n_ba.p_hiv_pop(1, s)) /
+                                   (n_ba.p_total_pop(1, 0) - n_ba.p_hiv_pop(1, 0) + n_ba.p_total_pop(1, 1) - n_ba.p_hiv_pop(1, 1));
+      auto uninfected_prop_24_plus = (n_ba.p_total_pop(2, s) - n_ba.p_hiv_pop(2, s)) /
+                                     (n_ba.p_total_pop(2, 0) - n_ba.p_hiv_pop(2, 0) + n_ba.p_total_pop(2, 1) - n_ba.p_hiv_pop(2, 1));
       auto bf_hiv_transmission_12_24 = n_hc.hiv_births * i_hc.bf_transmission_rate(2) * uninfected_prop_12_24;
       auto bf_hiv_transmission_24_plus = n_hc.hiv_births * i_hc.bf_transmission_rate(3) * uninfected_prop_24_plus;
       for (int hd = 0; hd < ss_c.hc1DS; ++hd) {
         // 12-24
-        auto new_hc1_infections_12_24 = p_hc.hc1_cd4_dist(hd) * bf_hiv_transmission_12_24;
-        n_hc.hc1_hiv_pop(hd, 3, 1, s) += new_hc1_infections_12_24;
-        n_ba.p_infections(1, s) += new_hc1_infections_12_24;
+        n_hc.hc1_hiv_pop(hd, 3, 1, s) += p_hc.hc1_cd4_dist(hd) * bf_hiv_transmission_12_24;
+        n_ba.p_infections(1, s) += n_hc.hc1_hiv_pop(hd, 3, 1, s);
 
         // 24 plus
         auto new_hc1_infections_24_plus = p_hc.hc1_cd4_dist(hd) * bf_hiv_transmission_24_plus;
