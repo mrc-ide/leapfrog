@@ -633,7 +633,7 @@ void run_bf_transmission_rate(int t,
     }
 
     if (bf < 1) {
-      i_hc.bf_transmission_rate(index) /= 4;
+      i_hc.bf_transmission_rate(index) /= 4.0;
     }
   }
 }
