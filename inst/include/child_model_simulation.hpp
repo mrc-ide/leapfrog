@@ -263,7 +263,7 @@ void convert_PMTCT_pre_bf(int t,
 
   // TODO: Maggie to confirm why Option A/B alt tr aren't used
   for (int hp = 0; hp < ss_c.hPS; ++hp) {
-    i_hc.PMTCT_coverage(hp) *= 1 - p_hc.PMTCT_transmission_rate(4, hp, 0);
+    i_hc.PMTCT_coverage(hp) *= 1.0 - p_hc.PMTCT_transmission_rate(4, hp, 0);
   } // end hPS
 }
 
