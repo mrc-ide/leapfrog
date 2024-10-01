@@ -1303,13 +1303,10 @@ void calc_age_specific_last_year(int t,
                                   i_hc.total_art_last_year(3);
 
     for (int ag = 1; ag < 4; ++ag) {
-      auto hc_art_val_per_ag = p_hc.hc_art_val(0, t - 1) *
-                               i_hc.total_art_last_year(ag) / i_hc.total_art_last_year(0);
+      i_hc.total_art_last_year(ag) = p_hc.hc_art_val(0, t - 1) *
+                                     i_hc.total_art_last_year(ag) / i_hc.total_art_last_year(0);
       if (p_hc.hc_art_isperc(t - 1)) {
-        i_hc.total_art_last_year(ag) = hc_art_val_per_ag *
-                                       (i_hc.total_need(0) + i_hc.hc_art_deaths(ag));
-      } else {
-        i_hc.total_art_last_year(ag) = hc_art_val_per_ag;
+        i_hc.total_art_last_year(ag) *= i_hc.total_need(0) + i_hc.hc_art_deaths(ag);
       }
     } // end ag
   }
