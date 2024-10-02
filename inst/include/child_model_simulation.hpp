@@ -39,15 +39,15 @@ void run_child_ageing(int t,
   for (int s = 0; s < ss_b.NS; ++s) {
     for (int hd = 0; hd < ss_c.hc1DS; ++hd) {
       for (int hd_alt = 0; hd_alt < ss_c.hc2DS; ++hd_alt) {
-        const auto cd4_transition_prob_per_group = p_dm.survival_probability(ss_c.hc2_agestart, s, t) *
-                                                   p_hc.hc_cd4_transition(hd_alt, hd);
         for (int cat = 0; cat < ss_c.hcTT; ++cat) {
           n_hc.hc2_hiv_pop(hd_alt, cat, 0, s) += c_hc.hc1_hiv_pop(hd, cat, ss_c.hc1_ageend, s) *
-                                                 cd4_transition_prob_per_group;
+                                                 p_dm.survival_probability(ss_c.hc2_agestart, s, t) *
+                                                 p_hc.hc_cd4_transition(hd_alt, hd);
         }
         for (int dur = 0; dur < ss_b.hTS; ++dur) {
           n_hc.hc2_art_pop(dur, hd_alt, 0, s) += c_hc.hc1_art_pop(dur, hd, ss_c.hc1_ageend, s) *
-                                                 cd4_transition_prob_per_group;
+                                                 p_dm.survival_probability(ss_c.hc2_agestart, s, t) *
+                                                 p_hc.hc_cd4_transition(hd_alt, hd);
         }
       }
     }
@@ -224,7 +224,6 @@ void convert_PMTCT_num_to_perc(int t,
 
   i_hc.need_PMTCT = std::max(i_hc.sumARV, n_hc.hiv_births);
 
-  // i_hc.need_PMTCT += p_hc.patients_reallocated(t);
   i_hc.OnPMTCT = i_hc.sumARV + p_hc.patients_reallocated(t);
   i_hc.OnPMTCT = std::min(i_hc.OnPMTCT, i_hc.need_PMTCT);
 
@@ -372,10 +371,10 @@ void adjust_optAB_bf_transmission_rate(int t,
     auto option_A_B_coverage = i_hc.PMTCT_coverage(0) + i_hc.PMTCT_coverage(1);
     if (option_A_B_coverage > i_hc.prop_wlhiv_gte350) {
       i_hc.excessratio_bf = option_A_B_coverage - i_hc.prop_wlhiv_gte350;
-      auto excessfactor_bf = i_hc.excessratio_bf / option_A_B_coverage * (1.45 / 0.46) +
-                             i_hc.prop_wlhiv_gte350;
-      i_hc.optA_bf_transmission_rate = excessfactor_bf * p_hc.PMTCT_transmission_rate(4, 0, 1);
-      i_hc.optB_bf_transmission_rate = excessfactor_bf * p_hc.PMTCT_transmission_rate(4, 1, 1);
+      auto excess_factor_bf = i_hc.excessratio_bf / option_A_B_coverage * (1.45 / 0.46) +
+                              i_hc.prop_wlhiv_gte350;
+      i_hc.optA_bf_transmission_rate = excess_factor_bf * p_hc.PMTCT_transmission_rate(4, 0, 1);
+      i_hc.optB_bf_transmission_rate = excess_factor_bf * p_hc.PMTCT_transmission_rate(4, 1, 1);
     } else {
       i_hc.optA_bf_transmission_rate = p_hc.PMTCT_transmission_rate(4, 0, 1);
       i_hc.optB_bf_transmission_rate = p_hc.PMTCT_transmission_rate(4, 1, 1);
