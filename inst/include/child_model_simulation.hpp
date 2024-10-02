@@ -39,15 +39,15 @@ void run_child_ageing(int t,
   for (int s = 0; s < ss_b.NS; ++s) {
     for (int hd = 0; hd < ss_c.hc1DS; ++hd) {
       for (int hd_alt = 0; hd_alt < ss_c.hc2DS; ++hd_alt) {
-        const auto cd4_transition_prob_per_group = p_dm.survival_probability(ss_c.hc2_agestart, s, t) *
-                                                   p_hc.hc_cd4_transition(hd_alt, hd);
         for (int cat = 0; cat < ss_c.hcTT; ++cat) {
           n_hc.hc2_hiv_pop(hd_alt, cat, 0, s) += c_hc.hc1_hiv_pop(hd, cat, ss_c.hc1_ageend, s) *
-                                                 cd4_transition_prob_per_group;
+                                                 p_dm.survival_probability(ss_c.hc2_agestart, s, t) *
+                                                 p_hc.hc_cd4_transition(hd_alt, hd);
         }
         for (int dur = 0; dur < ss_b.hTS; ++dur) {
           n_hc.hc2_art_pop(dur, hd_alt, 0, s) += c_hc.hc1_art_pop(dur, hd, ss_c.hc1_ageend, s) *
-                                                 cd4_transition_prob_per_group;
+                                                 p_dm.survival_probability(ss_c.hc2_agestart, s, t) *
+                                                 p_hc.hc_cd4_transition(hd_alt, hd);
         }
       }
     }
@@ -122,8 +122,8 @@ void run_wlhiv_births(int t,
 
 
     if (i_hc.nHIVcurr > 0) {
-      auto mean_nHIV = (i_hc.nHIVcurr + i_hc.nHIVlast) / 2;
-      i_hc.df = i_hc.df / mean_nHIV;
+      auto midyear_fertileHIV = (i_hc.nHIVcurr + i_hc.nHIVlast) / 2;
+      i_hc.df = i_hc.df / midyear_fertileHIV;
     } else {
       i_hc.df = 1;
     }
@@ -140,8 +140,8 @@ void run_wlhiv_births(int t,
       } // end hTS
     } // end hDS
 
-    auto mean_nHIV = (i_hc.nHIVcurr + i_hc.nHIVlast) / 2;
-    i_hc.birthsCurrAge = mean_nHIV * p_hc.total_fertility_rate(t) *
+    auto midyear_fertileHIV = (i_hc.nHIVcurr + i_hc.nHIVlast) / 2;
+    i_hc.birthsCurrAge = midyear_fertileHIV * p_hc.total_fertility_rate(t) *
                          i_hc.df / (i_hc.df * i_hc.prev + 1 - i_hc.prev) *
                          p_dm.age_specific_fertility_rate(a, t) / i_hc.asfr_sum ;
     i_hc.birthsHE += i_hc.birthsCurrAge;
@@ -224,7 +224,6 @@ void convert_PMTCT_num_to_perc(int t,
 
   i_hc.need_PMTCT = std::max(i_hc.sumARV, n_hc.hiv_births);
 
-  // i_hc.need_PMTCT += p_hc.patients_reallocated(t);
   i_hc.OnPMTCT = i_hc.sumARV + p_hc.patients_reallocated(t);
   i_hc.OnPMTCT = std::min(i_hc.OnPMTCT, i_hc.need_PMTCT);
 
@@ -335,10 +334,10 @@ void adjust_optAB_transmission_rate(int t,
   // option AB will be less effective for these women so we adjust for that
   internal::calc_wlhiv_cd4_proportion(t, pars, state_curr, state_next, intermediate);
 
-  auto total_PMTCT_coverage = i_hc.PMTCT_coverage(0) + i_hc.PMTCT_coverage(1);
-  if (total_PMTCT_coverage > i_hc.prop_wlhiv_gte350) {
+  auto option_A_B_coverage = i_hc.PMTCT_coverage(0) + i_hc.PMTCT_coverage(1);
+  if (option_A_B_coverage > i_hc.prop_wlhiv_gte350) {
     if (i_hc.prop_wlhiv_gte350 > 0) {
-      i_hc.excessratio = total_PMTCT_coverage / i_hc.prop_wlhiv_gte350 - 1;
+      i_hc.excessratio = option_A_B_coverage / i_hc.prop_wlhiv_gte350 - 1;
     } else {
       i_hc.excessratio = 0;
     }
@@ -369,13 +368,13 @@ void adjust_optAB_bf_transmission_rate(int t,
   // option AB will be less effective for these women so we adjust for that
 
   if (i_hc.prop_wlhiv_gte350 > 0) {
-    auto total_PMTCT_coverage = i_hc.PMTCT_coverage(0) + i_hc.PMTCT_coverage(1);
-    if (total_PMTCT_coverage > i_hc.prop_wlhiv_gte350) {
-      i_hc.excessratio_bf = total_PMTCT_coverage - i_hc.prop_wlhiv_gte350;
-      auto excessfactor_bf = i_hc.excessratio_bf / total_PMTCT_coverage * (1.45 / 0.46) +
-                             i_hc.prop_wlhiv_gte350;
-      i_hc.optA_bf_transmission_rate = excessfactor_bf * p_hc.PMTCT_transmission_rate(4, 0, 1);
-      i_hc.optB_bf_transmission_rate = excessfactor_bf * p_hc.PMTCT_transmission_rate(4, 1, 1);
+    auto option_A_B_coverage = i_hc.PMTCT_coverage(0) + i_hc.PMTCT_coverage(1);
+    if (option_A_B_coverage > i_hc.prop_wlhiv_gte350) {
+      i_hc.excessratio_bf = option_A_B_coverage - i_hc.prop_wlhiv_gte350;
+      auto excess_factor_bf = i_hc.excessratio_bf / option_A_B_coverage * (1.45 / 0.46) +
+                              i_hc.prop_wlhiv_gte350;
+      i_hc.optA_bf_transmission_rate = excess_factor_bf * p_hc.PMTCT_transmission_rate(4, 0, 1);
+      i_hc.optB_bf_transmission_rate = excess_factor_bf * p_hc.PMTCT_transmission_rate(4, 1, 1);
     } else {
       i_hc.optA_bf_transmission_rate = p_hc.PMTCT_transmission_rate(4, 0, 1);
       i_hc.optB_bf_transmission_rate = p_hc.PMTCT_transmission_rate(4, 1, 1);
