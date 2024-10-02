@@ -858,13 +858,13 @@ void cotrim_need_coverage(int t,
 }
 
 template<typename ModelVariant, typename real_type>
-void run_child_natural_history(int t,
-                               const Parameters<ModelVariant, real_type> &pars,
-                               const State<ModelVariant, real_type> &state_curr,
-                               State<ModelVariant, real_type> &state_next,
-                               IntermediateData<ModelVariant, real_type> &intermediate) {
+void cd4_mortality(int t,
+                   const Parameters<ModelVariant, real_type> &pars,
+                   const State<ModelVariant, real_type> &state_curr,
+                   State<ModelVariant, real_type> &state_next,
+                   IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "run_child_natural_history can only be called for model variants where run_child_model is true");
+                "cd4_mortality can only be called for model variants where run_child_model is true");
   constexpr auto ss_b = StateSpace<ModelVariant>().base;
   constexpr auto ss_c = StateSpace<ModelVariant>().children;
   const auto& p_hc = pars.children.children;
@@ -877,8 +877,8 @@ void run_child_natural_history(int t,
     for (int a = 0; a < ss_c.hc2_agestart; ++a) {
       for (int cat = 0; cat < ss_c.hcTT; ++cat) {
         for (int hd = 0; hd < ss_c.hc1DS; ++hd) {
-          auto hiv_deaths_per_group = n_hc.ctx_mean * n_hc.hc1_hiv_pop(hd, cat, a, s) * p_hc.hc1_cd4_mort(hd, cat, a);
-          i_hc.hc_posthivmort(hd, cat, a, s) = n_hc.hc1_hiv_pop(hd, cat, a, s) - hiv_deaths_per_group;
+          auto hiv_deaths_strat = n_hc.ctx_mean * n_hc.hc1_hiv_pop(hd, cat, a, s) * p_hc.hc1_cd4_mort(hd, cat, a);
+          i_hc.hc_posthivmort(hd, cat, a, s) = n_hc.hc1_hiv_pop(hd, cat, a, s) - hiv_deaths_strat;
         }
       }
     }
@@ -888,10 +888,10 @@ void run_child_natural_history(int t,
     for (int a = ss_c.hc2_agestart; a < p_op.p_idx_fertility_first; ++a) {
       for (int cat = 0; cat < ss_c.hcTT; ++cat) {
         for (int hd = 0; hd < ss_c.hc2DS; ++hd) {
-          auto hiv_deaths_per_group = n_hc.ctx_mean * n_hc.hc2_hiv_pop(hd, cat, a - ss_c.hc2_agestart, s) *
-                                      p_hc.hc2_cd4_mort(hd, cat, a - ss_c.hc2_agestart);
+          auto hiv_deaths_strat = n_hc.ctx_mean * n_hc.hc2_hiv_pop(hd, cat, a - ss_c.hc2_agestart, s) *
+                                  p_hc.hc2_cd4_mort(hd, cat, a - ss_c.hc2_agestart);
           i_hc.hc_posthivmort(hd, cat, a, s) = n_hc.hc2_hiv_pop(hd, cat, a - ss_c.hc2_agestart, s) -
-                                               hiv_deaths_per_group;
+                                               hiv_deaths_strat;
         }
       }
     }
@@ -903,11 +903,11 @@ void run_child_natural_history(int t,
       for (int a = 0; a < ss_c.hc2_agestart; ++a) {
         for (int cat = 0; cat < ss_c.hcTT; ++cat) {
           const auto& coarse_hc1_cd4_prog = p_hc.hc1_cd4_prog(hd - 1, p_hc.hc_age_coarse_cd4(a), s);
-          auto hc_moving_to_curr_cd4 = coarse_hc1_cd4_prog *
-                                       (i_hc.hc_posthivmort(hd - 1, cat, a, s) + n_hc.hc1_hiv_pop(hd - 1, cat, a, s)) /
-                                       2.0;
-          i_hc.hc_grad(hd - 1, cat, a, s) -= hc_moving_to_curr_cd4; // moving to next cd4 category
-          i_hc.hc_grad(hd, cat, a, s) += hc_moving_to_curr_cd4; // moving into this cd4 category
+          auto cd4_grad = coarse_hc1_cd4_prog *
+                          (i_hc.hc_posthivmort(hd - 1, cat, a, s) + n_hc.hc1_hiv_pop(hd - 1, cat, a, s)) /
+                          2.0;
+          i_hc.hc_grad(hd - 1, cat, a, s) -= cd4_grad; // moving to next cd4 category
+          i_hc.hc_grad(hd, cat, a, s) += cd4_grad; // moving into this cd4 category
         }
       }
     }
@@ -918,11 +918,11 @@ void run_child_natural_history(int t,
     for (int hd = 1; hd < ss_c.hc2DS; ++hd) {
       for (int a = ss_c.hc2_agestart; a < p_op.p_idx_fertility_first; ++a) {
         for (int cat = 0; cat < ss_c.hcTT; ++cat) {
-          auto hc_moving_to_curr_cd4 = p_hc.hc2_cd4_prog(hd - 1, 0, s) *
-                                       (i_hc.hc_posthivmort(hd - 1, cat, a, s) + n_hc.hc2_hiv_pop(hd - 1, cat, a - ss_c.hc2_agestart, s)) /
-                                       2.0;
-          i_hc.hc_grad(hd - 1, cat, a, s) -= hc_moving_to_curr_cd4; // moving to next cd4 category
-          i_hc.hc_grad(hd, cat, a, s) += hc_moving_to_curr_cd4; // moving into this cd4 category
+          auto cd4_grad = p_hc.hc2_cd4_prog(hd - 1, 0, s) *
+                          (i_hc.hc_posthivmort(hd - 1, cat, a, s) + n_hc.hc2_hiv_pop(hd - 1, cat, a - ss_c.hc2_agestart, s)) /
+                          2.0;
+          i_hc.hc_grad(hd - 1, cat, a, s) -= cd4_grad; // moving to next cd4 category
+          i_hc.hc_grad(hd, cat, a, s) += cd4_grad; // moving into this cd4 category
         }
       }
     }
@@ -948,10 +948,10 @@ void run_child_hiv_mort(int t,
     for (int a = 0; a < ss_c.hc2_agestart; ++a) {
       for (int cat = 0; cat < ss_c.hcTT; ++cat) {
         for (int hd = 0; hd < ss_c.hc1DS; ++hd) {
-          auto hc1_cd4_mort_deaths = n_hc.ctx_mean * n_hc.hc1_hiv_pop(hd, cat, a, s) *
-                                    p_hc.hc1_cd4_mort(hd, cat, a);
-          i_hc.hc_grad(hd, cat, a, s) -= hc1_cd4_mort_deaths;
-          n_hc.hc1_noart_aids_deaths(hd, cat, a, s) += hc1_cd4_mort_deaths;
+          auto cd4_deaths_grad = n_hc.ctx_mean * n_hc.hc1_hiv_pop(hd, cat, a, s) *
+                                 p_hc.hc1_cd4_mort(hd, cat, a);
+          i_hc.hc_grad(hd, cat, a, s) -= cd4_deaths_grad;
+          n_hc.hc1_noart_aids_deaths(hd, cat, a, s) += cd4_deaths_grad;
         }
       }
     }
@@ -961,11 +961,11 @@ void run_child_hiv_mort(int t,
     for (int a = ss_c.hc2_agestart; a < p_op.p_idx_fertility_first; ++a) {
       for (int cat = 0; cat < ss_c.hcTT; ++cat) {
         for (int hd = 0; hd < ss_c.hc2DS; ++hd) {
-          auto hc2_cd4_mort_deaths = n_hc.ctx_mean *
-                                     n_hc.hc2_hiv_pop(hd, cat, a - ss_c.hc2_agestart, s) *
-                                     p_hc.hc2_cd4_mort(hd, cat, a - ss_c.hc2_agestart);
-          i_hc.hc_grad(hd, cat, a, s) -= hc2_cd4_mort_deaths;
-          n_hc.hc2_noart_aids_deaths(hd, cat, a - ss_c.hc2_agestart, s) += hc2_cd4_mort_deaths;
+          auto cd4_mort_grad = n_hc.ctx_mean *
+                               n_hc.hc2_hiv_pop(hd, cat, a - ss_c.hc2_agestart, s) *
+                               p_hc.hc2_cd4_mort(hd, cat, a - ss_c.hc2_agestart);
+          i_hc.hc_grad(hd, cat, a, s) -= cd4_mort_grad;
+          n_hc.hc2_noart_aids_deaths(hd, cat, a - ss_c.hc2_agestart, s) += cd4_mort_grad;
         }
       }
     }
@@ -1008,13 +1008,13 @@ void add_child_grad(int t,
 }
 
 template<typename ModelVariant, typename real_type>
-void hc_initiate_art_by_age(int t,
+void art_eligibility_by_age(int t,
                             const Parameters<ModelVariant, real_type> &pars,
                             const State<ModelVariant, real_type> &state_curr,
                             State<ModelVariant, real_type> &state_next,
                             IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "hc_initiate_art_by_age can only be called for model variants where run_child_model is true");
+                "art_eligibility_by_age can only be called for model variants where run_child_model is true");
   constexpr auto ss_b = StateSpace<ModelVariant>().base;
   constexpr auto ss_c = StateSpace<ModelVariant>().children;
   const auto& p_hc = pars.children.children;
@@ -1037,13 +1037,13 @@ void hc_initiate_art_by_age(int t,
 }
 
 template<typename ModelVariant, typename real_type>
-void hc_initiate_art_by_cd4(int t,
+void art_eligibility_by_cd4(int t,
                             const Parameters<ModelVariant, real_type> &pars,
                             const State<ModelVariant, real_type> &state_curr,
                             State<ModelVariant, real_type> &state_next,
                             IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "hc_initiate_art_by_cd4 can only be called for model variants where run_child_model is true");
+                "art_eligibility_by_cd4 can only be called for model variants where run_child_model is true");
   constexpr auto ss_b = StateSpace<ModelVariant>().base;
   constexpr auto ss_c = StateSpace<ModelVariant>().children;
   const auto& p_hc = pars.children.children;
@@ -1081,8 +1081,8 @@ void eligible_for_treatment(int t,
   auto& n_hc = state_next.children;
   auto& i_hc = intermediate.children;
 
-  internal::hc_initiate_art_by_age(t, pars, state_curr, state_next, intermediate);
-  internal::hc_initiate_art_by_cd4(t, pars, state_curr, state_next, intermediate);
+  internal::art_eligibility_by_age(t, pars, state_curr, state_next, intermediate);
+  internal::art_eligibility_by_cd4(t, pars, state_curr, state_next, intermediate);
 
   for (int s = 0; s < ss_b.NS; ++s) {
     for (int cat = 0; cat < ss_c.hcTT; ++cat) {
@@ -1111,10 +1111,9 @@ void on_art_mortality(int t,
   auto& n_hc = state_next.children;
   auto& i_hc = intermediate.children;
 
-  // !!! TODO: fix order of for loop
   for (int s = 0; s < ss_b.NS; ++s) {
-    for (int hd = 0; hd < ss_c.hc1DS; ++hd) {
-      for (int a = 0; a < p_op.p_idx_fertility_first; ++a) {
+    for (int a = 0; a < p_op.p_idx_fertility_first; ++a) {
+      for (int hd = 0; hd < ss_c.hc1DS; ++hd) {
         i_hc.hc_death_rate = 0.0;
         i_hc.hc_art_grad(t_art_idx, hd, a, s) = 0.0;
         bool is_hc2_art_pop = n_hc.hc2_art_pop(t_art_idx, hd, a - ss_c.hc2_agestart, s) > 0;
@@ -1217,13 +1216,13 @@ void progress_time_on_art(int t,
 }
 
 template<typename ModelVariant, typename real_type>
-void calc_total_and_unmet_need(int t,
-                               const Parameters<ModelVariant, real_type> &pars,
-                               const State<ModelVariant, real_type> &state_curr,
-                               State<ModelVariant, real_type> &state_next,
-                               IntermediateData<ModelVariant, real_type> &intermediate) {
+void calc_total_and_unmet_art_need(int t,
+                                   const Parameters<ModelVariant, real_type> &pars,
+                                   const State<ModelVariant, real_type> &state_curr,
+                                   State<ModelVariant, real_type> &state_next,
+                                   IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "calc_total_and_unmet_need can only be called for model variants where run_child_model is true");
+                "calc_total_and_unmet_art_need can only be called for model variants where run_child_model is true");
   constexpr auto ss_b = StateSpace<ModelVariant>().base;
   constexpr auto ss_c = StateSpace<ModelVariant>().children;
   const auto& p_hc = pars.children.children;
@@ -1379,7 +1378,7 @@ void calc_art_initiates(int t,
   internal::progress_time_on_art(t, pars, state_curr, state_next, intermediate, 0, 1);
   internal::on_art_mortality(t, pars, state_curr, state_next, intermediate, 2);
   internal::deaths_this_year(t, pars, state_curr, state_next, intermediate);
-  internal::calc_total_and_unmet_need(t, pars, state_curr, state_next, intermediate);
+  internal::calc_total_and_unmet_art_need(t, pars, state_curr, state_next, intermediate);
   internal::calc_art_last_year(t, pars, state_curr, state_next, intermediate);
   internal::calc_art_this_year(t, pars, state_curr, state_next, intermediate);
 
@@ -1708,7 +1707,7 @@ void run_child_model_simulation(int t,
     // if (state_next.children.hiv_births > 0) {
     internal::add_infections(t, pars, state_curr, state_next, intermediate);
     internal::cotrim_need_coverage(t, pars, state_curr, state_next, intermediate);
-    internal::run_child_natural_history(t, pars, state_curr, state_next, intermediate);
+    internal::cd4_mortality(t, pars, state_curr, state_next, intermediate);
     internal::run_child_hiv_mort(t, pars, state_curr, state_next, intermediate);
     internal::add_child_grad(t, pars, state_curr, state_next, intermediate);
 
