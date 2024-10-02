@@ -1263,13 +1263,13 @@ void calc_total_and_unmet_art_need(int t,
 }
 
 template<typename ModelVariant, typename real_type>
-void calc_age_specific_last_year(int t,
+void age_specific_art_last_year(int t,
                                  const Parameters<ModelVariant, real_type> &pars,
                                  const State<ModelVariant, real_type> &state_curr,
                                  State<ModelVariant, real_type> &state_next,
                                  IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "calc_age_specific_last_year can only be called for model variants where run_child_model is true");
+                "age_specific_art_last_year can only be called for model variants where run_child_model is true");
   constexpr auto ss_b = StateSpace<ModelVariant>().base;
   constexpr auto ss_c = StateSpace<ModelVariant>().children;
   const auto& p_hc = pars.children.children;
@@ -1310,43 +1310,47 @@ void calc_age_specific_last_year(int t,
 }
 
 template<typename ModelVariant, typename real_type>
-void calc_art_last_year(int t,
-                        const Parameters<ModelVariant, real_type> &pars,
-                        const State<ModelVariant, real_type> &state_curr,
-                        State<ModelVariant, real_type> &state_next,
-                        IntermediateData<ModelVariant, real_type> &intermediate) {
+void art_last_year(int t,
+                   const Parameters<ModelVariant, real_type> &pars,
+                   const State<ModelVariant, real_type> &state_curr,
+                   State<ModelVariant, real_type> &state_next,
+                   IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "calc_art_last_year can only be called for model variants where run_child_model is true");
+                "art_last_year can only be called for model variants where run_child_model is true");
   const auto& p_hc = pars.children.children;
   auto& i_hc = intermediate.children;
 
   if (p_hc.hc_art_is_age_spec(t)) {
     // If the present time step is age specific, we need to calculate what last years age spec
     // breakdown would have been
-    internal::calc_age_specific_last_year(t, pars, state_curr, state_next, intermediate);
+
+    // Age specific ART will always be entered as a number
+    internal::age_specific_art_last_year(t, pars, state_curr, state_next, intermediate);
   } else {
     if (p_hc.hc_art_isperc(t - 1)) {
-      // ART entered as percent last year
+      // ART entered as percent last year so convert to number
       i_hc.total_art_last_year(0) = p_hc.hc_art_val(0, t - 1) * i_hc.total_need(0);
     } else if (p_hc.hc_art_is_age_spec(t - 1)) {
-      // ART entered as number last year
+      // ART entered as number last year but this year isn't then aggregate
+      // ages
       i_hc.total_art_last_year(0) = p_hc.hc_art_val(1, t - 1) +
                                     p_hc.hc_art_val(2, t - 1) +
                                     p_hc.hc_art_val(3, t - 1);
     } else {
+      // Last year was age aggregated and a number so use previous value
       i_hc.total_art_last_year(0) = p_hc.hc_art_val(0, t - 1);
     }
   }
 }
 
 template<typename ModelVariant, typename real_type>
-void calc_art_this_year(int t,
-                        const Parameters<ModelVariant, real_type> &pars,
-                        const State<ModelVariant, real_type> &state_curr,
-                        State<ModelVariant, real_type> &state_next,
-                        IntermediateData<ModelVariant, real_type> &intermediate) {
+void art_this_year(int t,
+                   const Parameters<ModelVariant, real_type> &pars,
+                   const State<ModelVariant, real_type> &state_curr,
+                   State<ModelVariant, real_type> &state_next,
+                   IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "calc_art_this_year can only be called for model variants where run_child_model is true");
+                "art_this_year can only be called for model variants where run_child_model is true");
   const auto& p_hc = pars.children.children;
   auto& i_hc = intermediate.children;
 
@@ -1376,8 +1380,8 @@ void calc_art_initiates(int t,
   internal::on_art_mortality(t, pars, state_curr, state_next, intermediate, 2);
   internal::deaths_this_year(t, pars, state_curr, state_next, intermediate);
   internal::calc_total_and_unmet_art_need(t, pars, state_curr, state_next, intermediate);
-  internal::calc_art_last_year(t, pars, state_curr, state_next, intermediate);
-  internal::calc_art_this_year(t, pars, state_curr, state_next, intermediate);
+  internal::art_last_year(t, pars, state_curr, state_next, intermediate);
+  internal::art_this_year(t, pars, state_curr, state_next, intermediate);
 
   i_hc.retained = 1 - p_hc.hc_art_ltfu(t);
   for (int ag = 0; ag < 4; ++ag) {
@@ -1390,13 +1394,13 @@ void calc_art_initiates(int t,
 }
 
 template<typename ModelVariant, typename real_type>
-void calc_art_ltfu(int t,
-                   const Parameters<ModelVariant, real_type> &pars,
-                   const State<ModelVariant, real_type> &state_curr,
-                   State<ModelVariant, real_type> &state_next,
-                   IntermediateData<ModelVariant, real_type> &intermediate) {
+void art_ltfu(int t,
+              const Parameters<ModelVariant, real_type> &pars,
+              const State<ModelVariant, real_type> &state_curr,
+              State<ModelVariant, real_type> &state_next,
+              IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "calc_art_ltfu can only be called for model variants where run_child_model is true");
+                "art_ltfu can only be called for model variants where run_child_model is true");
   constexpr auto ss_b = StateSpace<ModelVariant>().base;
   constexpr auto ss_c = StateSpace<ModelVariant>().children;
   const auto& p_hc = pars.children.children;
@@ -1423,7 +1427,7 @@ void calc_art_ltfu(int t,
       for (int hd = 0; hd < ss_c.hc1DS; ++hd) {
         for (int cat = 0; cat < ss_c.hcTT; ++cat) {
           if (a < ss_c.hc2_agestart) {
-            i_hc.hc_hiv_dist(hd, cat, a, s) = n_hc.hc1_hiv_pop(hd, cat, a, s) / i_hc.hc_hiv_total(hd, a, s);
+            i_hc.hc_hiv_dist(hd, cat, a, s) += n_hc.hc1_hiv_pop(hd, cat, a, s) / i_hc.hc_hiv_total(hd, a, s);
           } else if (hd < ss_c.hc2DS) {
             i_hc.hc_hiv_dist(hd, cat, a, s) += n_hc.hc2_hiv_pop(hd, cat, a - ss_c.hc2_agestart, s) / i_hc.hc_hiv_total(hd, a, s);
           }
@@ -1437,20 +1441,20 @@ void calc_art_ltfu(int t,
       for (int hd = 0; hd < ss_c.hc1DS; ++hd) {
         for (int cat = 0; cat < ss_c.hcTT; ++cat) {
           if (a < ss_c.hc2_agestart) {
-            auto hc_art_ltfu_val = (n_hc.hc1_art_pop(2, hd, a, s) + n_hc.hc1_art_pop(0, hd, a, s)) *
-                                   p_hc.hc_art_ltfu(t);
+            auto ltfu_grad = (n_hc.hc1_art_pop(2, hd, a, s) + n_hc.hc1_art_pop(0, hd, a, s)) *
+                             p_hc.hc_art_ltfu(t);
             if (i_hc.hc_hiv_total(hd, a, s) > 0) {
-              i_hc.art_ltfu_grad(hd, cat, a, s) += hc_art_ltfu_val * i_hc.hc_hiv_dist(hd, cat, a, s);
+              i_hc.art_ltfu_grad(hd, cat, a, s) += ltfu_grad * i_hc.hc_hiv_dist(hd, cat, a, s);
             } else {
-              i_hc.art_ltfu_grad(hd, cat, a, s) += hc_art_ltfu_val * 0.25;
+              i_hc.art_ltfu_grad(hd, cat, a, s) += ltfu_grad * 0.25;
             }
           } else if (hd < ss_c.hc2DS) {
-            auto hc_art_ltfu_val = (n_hc.hc2_art_pop(2, hd, a - ss_c.hc2_agestart, s) + n_hc.hc2_art_pop(0, hd, a - ss_c.hc2_agestart, s)) *
-                                   p_hc.hc_art_ltfu(t);
+            auto ltfu_grad = (n_hc.hc2_art_pop(2, hd, a - ss_c.hc2_agestart, s) + n_hc.hc2_art_pop(0, hd, a - ss_c.hc2_agestart, s)) *
+                             p_hc.hc_art_ltfu(t);
             if (i_hc.hc_hiv_total(hd, a, s) > 0) {
-              i_hc.art_ltfu_grad(hd, cat, a, s) += hc_art_ltfu_val * i_hc.hc_hiv_dist(hd, cat, a, s);
+              i_hc.art_ltfu_grad(hd, cat, a, s) += ltfu_grad * i_hc.hc_hiv_dist(hd, cat, a, s);
             } else {
-              i_hc.art_ltfu_grad(hd, cat, a, s) += hc_art_ltfu_val * 0.25;
+              i_hc.art_ltfu_grad(hd, cat, a, s) += ltfu_grad * 0.25;
             }
           }
         } // end ss_c.hcTT
@@ -1460,13 +1464,13 @@ void calc_art_ltfu(int t,
 }
 
 template<typename ModelVariant, typename real_type>
-void calc_art_ltfu_hivpop(int t,
-                   const Parameters<ModelVariant, real_type> &pars,
-                   const State<ModelVariant, real_type> &state_curr,
-                   State<ModelVariant, real_type> &state_next,
-                   IntermediateData<ModelVariant, real_type> &intermediate) {
+void apply_ltfu_to_hivpop(int t,
+                          const Parameters<ModelVariant, real_type> &pars,
+                          const State<ModelVariant, real_type> &state_curr,
+                          State<ModelVariant, real_type> &state_next,
+                          IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "calc_art_ltfu_hivpop can only be called for model variants where run_child_model is true");
+                "apply_ltfu_to_hivpop can only be called for model variants where run_child_model is true");
   constexpr auto ss_b = StateSpace<ModelVariant>().base;
   constexpr auto ss_c = StateSpace<ModelVariant>().children;
   const auto& p_op = pars.base.options;
@@ -1489,13 +1493,13 @@ void calc_art_ltfu_hivpop(int t,
 }
 
 template<typename ModelVariant, typename real_type>
-void calc_art_ltfu_artpop(int t,
+void apply_ltfu_to_artpop(int t,
                           const Parameters<ModelVariant, real_type> &pars,
                           const State<ModelVariant, real_type> &state_curr,
                           State<ModelVariant, real_type> &state_next,
                           IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "calc_art_ltfu_artpop can only be called for model variants where run_child_model is true");
+                "apply_ltfu_to_artpop can only be called for model variants where run_child_model is true");
   constexpr auto ss_b = StateSpace<ModelVariant>().base;
   constexpr auto ss_c = StateSpace<ModelVariant>().children;
   const auto& p_op = pars.base.options;
@@ -1519,13 +1523,13 @@ void calc_art_ltfu_artpop(int t,
 }
 
 template<typename ModelVariant, typename real_type>
-void hc_art_initiation_by_age(int t,
-                              const Parameters<ModelVariant, real_type> &pars,
-                              const State<ModelVariant, real_type> &state_curr,
-                              State<ModelVariant, real_type> &state_next,
-                              IntermediateData<ModelVariant, real_type> &intermediate) {
+void art_initiation_by_age(int t,
+                           const Parameters<ModelVariant, real_type> &pars,
+                           const State<ModelVariant, real_type> &state_curr,
+                           State<ModelVariant, real_type> &state_next,
+                           IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "hc_art_initiation_by_age can only be called for model variants where run_child_model is true");
+                "art_initiation_by_age can only be called for model variants where run_child_model is true");
   constexpr auto ss_b = StateSpace<ModelVariant>().base;
   constexpr auto ss_c = StateSpace<ModelVariant>().children;
   const auto& p_hc = pars.children.children;
@@ -1569,13 +1573,13 @@ void hc_art_initiation_by_age(int t,
               coarse_hc_art_scalar = std::min(coarse_hc_adj * p_hc.hc_art_init_dist(a, t), 1.0);
             }
 
-            auto new_art_pop = coarse_hc_art_scalar * n_hc.hc_art_need_init(hd, cat, a, s); 
+            auto art_initiates = coarse_hc_art_scalar * n_hc.hc_art_need_init(hd, cat, a, s); 
             if (a < ss_c.hc2_agestart) {
-              n_hc.hc1_art_pop(0, hd, a, s) += new_art_pop;
-              n_hc.hc1_hiv_pop(hd, cat, a, s) -= new_art_pop;
+              n_hc.hc1_art_pop(0, hd, a, s) += art_initiates;
+              n_hc.hc1_hiv_pop(hd, cat, a, s) -= art_initiates;
             } else if (hd < (ss_c.hc2DS)) {
-              n_hc.hc2_art_pop(0, hd, a - ss_c.hc2_agestart, s) += new_art_pop;
-              n_hc.hc2_hiv_pop(hd, cat, a - ss_c.hc2_agestart, s) -=  new_art_pop;
+              n_hc.hc2_art_pop(0, hd, a - ss_c.hc2_agestart, s) += art_initiates;
+              n_hc.hc2_hiv_pop(hd, cat, a - ss_c.hc2_agestart, s) -=  art_initiates;
             }
           } // end ss_c.hc1DS
         } // end a
@@ -1611,13 +1615,13 @@ void hc_art_initiation_by_age(int t,
               i_hc.hc_art_scalar(0) = std::min(i_hc.hc_adj(0) * p_hc.hc_art_init_dist(a, t), 1.0);
             }
 
-            auto new_art_pop = i_hc.hc_art_scalar(0) * n_hc.hc_art_need_init(hd, cat, a, s); 
+            auto art_initiates = i_hc.hc_art_scalar(0) * n_hc.hc_art_need_init(hd, cat, a, s); 
             if (a < ss_c.hc2_agestart) {
-              n_hc.hc1_art_pop(0, hd, a, s) += new_art_pop;
-              n_hc.hc1_hiv_pop(hd, cat, a, s) -= new_art_pop;
+              n_hc.hc1_art_pop(0, hd, a, s) += art_initiates;
+              n_hc.hc1_hiv_pop(hd, cat, a, s) -= art_initiates;
             } else if (hd < (ss_c.hc2DS)) {
-              n_hc.hc2_art_pop(0, hd, a - ss_c.hc2_agestart, s) += new_art_pop;
-              n_hc.hc2_hiv_pop(hd, cat, a - ss_c.hc2_agestart, s) -= new_art_pop;
+              n_hc.hc2_art_pop(0, hd, a - ss_c.hc2_agestart, s) += art_initiates;
+              n_hc.hc2_hiv_pop(hd, cat, a - ss_c.hc2_agestart, s) -= art_initiates;
             }
           } // end ss_c.hc1DS
         } // end a
@@ -1627,13 +1631,13 @@ void hc_art_initiation_by_age(int t,
 }
 
 template<typename ModelVariant, typename real_type>
-void fill_model_outputs(int t,
-                        const Parameters<ModelVariant, real_type> &pars,
-                        const State<ModelVariant, real_type> &state_curr,
-                        State<ModelVariant, real_type> &state_next,
-                        IntermediateData<ModelVariant, real_type> &intermediate) {
+void fill_total_pop_outputs(int t,
+                            const Parameters<ModelVariant, real_type> &pars,
+                            const State<ModelVariant, real_type> &state_curr,
+                            State<ModelVariant, real_type> &state_next,
+                            IntermediateData<ModelVariant, real_type> &intermediate) {
   static_assert(ModelVariant::run_child_model,
-                "fill_model_outputs can only be called for model variants where run_child_model is true");
+                "fill_total_pop_outputs can only be called for model variants where run_child_model is true");
   constexpr auto ss_b = StateSpace<ModelVariant>().base;
   constexpr auto ss_c = StateSpace<ModelVariant>().children;
   const auto& p_op = pars.base.options;
@@ -1694,16 +1698,16 @@ void run_child_model_simulation(int t,
   internal::add_child_grad(t, pars, state_curr, state_next, intermediate);
 
   // assume paed art doesn't start before adult
-  if (t > pars.base.options.ts_art_start) {
-    internal::calc_art_ltfu(t, pars, state_curr, state_next, intermediate);
-    internal::hc_art_initiation_by_age(t, pars, state_curr, state_next, intermediate);
+  if (t > p_op.ts_art_start) {
+    internal::art_ltfu(t, pars, state_curr, state_next, intermediate);
+    internal::art_initiation_by_age(t, pars, state_curr, state_next, intermediate);
     // mortality among those on ART less than one year
     internal::on_art_mortality(t, pars, state_curr, state_next, intermediate, 0);
     internal::progress_time_on_art(t, pars, state_curr, state_next, intermediate, 1, 2);
     // progress 6 to 12 mo to 12 plus months#
-    internal::calc_art_ltfu_hivpop(t, pars, state_curr, state_next, intermediate);
-    internal::calc_art_ltfu_artpop(t, pars, state_curr, state_next, intermediate);
-    internal::fill_model_outputs(t, pars, state_curr, state_next, intermediate);
+    internal::apply_ltfu_to_hivpop(t, pars, state_curr, state_next, intermediate);
+    internal::apply_ltfu_to_artpop(t, pars, state_curr, state_next, intermediate);
+    internal::fill_total_pop_outputs(t, pars, state_curr, state_next, intermediate);
     internal::nosocomial_infections(t, pars, state_curr, state_next, intermediate);
   }
 }
