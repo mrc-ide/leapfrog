@@ -1,3 +1,7 @@
+# leapfrog 0.0.4
+
+* Function `dp_read_viral_suppression()` to read VL testing and suppression Program Statistics tab
+
 # leapfrog 0.0.3
 
 * Implement Spectrum ART allocation.
