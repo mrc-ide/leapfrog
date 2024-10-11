@@ -8,6 +8,7 @@
 \alias{dp_read_breastfeeding}
 \alias{dp_read_childart}
 \alias{dp_read_childltfu}
+\alias{dp_read_viral_suppression}
 \title{Read Spectrum programme data inputs}
 \usage{
 dp_read_anc_testing(dp)
@@ -23,6 +24,8 @@ dp_read_breastfeeding(dp)
 dp_read_childart(dp)
 
 dp_read_childltfu(dp)
+
+dp_read_viral_suppression(dp)
 }
 \arguments{
 \item{dp}{An `"spectrum_dp"` object created by `read_dp()` or a path to a Spectrum
@@ -51,11 +54,13 @@ pjnz <- system.file("pjnz/bwa2021_v6.13.pjnz", package = "leapfrog")
 dp <- read_dp(pjnz)
 dp_anc_testing <- dp_read_anc_testing(dp)
 dp_pmtct <- dp_read_pmtct(dp)
-dp_read_pmtct <- dp_read_pmtct_retained(dp)
+dp_pmtct_ret <- dp_read_pmtct_retained(dp)
 dp_abortion <- dp_read_abortion(dp)
 dp_notbreastfeeding <- dp_read_breastfeeding(dp)
 dp_childart <- dp_read_childart(dp)
 dp_childltfu <- dp_read_childltfu(dp)
+
+dp_vls <- dp_read_viral_suppression(dp)
 
 ## Can either pass PJNZ path or parsed "spectrum_dp" object
 

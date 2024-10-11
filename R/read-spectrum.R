@@ -83,6 +83,11 @@ get_dp_years <- function(dp) {
        time_data_idx = time_data_idx)
 }
 
+stop_tag_not_found <- function(tag) {
+  stop('Tag "', tag, '" not recognized. Function probably needs update for this .DP file.')
+}
+
+
 
 #' Read Spectrum programme data inputs
 #' 
@@ -111,11 +116,13 @@ get_dp_years <- function(dp) {
 #' dp <- read_dp(pjnz)
 #' dp_anc_testing <- dp_read_anc_testing(dp)
 #' dp_pmtct <- dp_read_pmtct(dp)
-#' dp_read_pmtct <- dp_read_pmtct_retained(dp)
+#' dp_pmtct_ret <- dp_read_pmtct_retained(dp)
 #' dp_abortion <- dp_read_abortion(dp)
 #' dp_notbreastfeeding <- dp_read_breastfeeding(dp)
 #' dp_childart <- dp_read_childart(dp)
 #' dp_childltfu <- dp_read_childltfu(dp)
+#'
+#' dp_vls <- dp_read_viral_suppression(dp)
 #'
 #' ## Can either pass PJNZ path or parsed "spectrum_dp" object
 #'
@@ -341,4 +348,54 @@ dp_read_childltfu <- function(dp) {
   names(childart_ltfu) <- dpy$proj_years
 
   childart_ltfu
+}
+
+#' @rdname dp_read_anc_testing
+#' @export 
+dp_read_viral_suppression <- function(dp) {
+
+  dp <- get_dp_data(dp)
+  dpy <- get_dp_years(dp)
+
+  tag <- "<ViralSuppressionInputType MV2>"
+  if (exists_dptag(dp, tag)) {
+    vls_input_type <- as.integer(dpsub(dp, tag, 2, 4))
+  } else {
+    stop_tag_not_found(tag)
+  }
+
+  tag <- "<ViralSuppressionThreshold MV4>"
+  if (exists_dptag(dp, tag)) {
+    vls_threshold <- as.numeric(dpsub(dp, tag, 2, dpy$time_data_idx))
+  } else {
+    stop_tag_not_found(tag)
+  }
+
+  vl_indicators <- c("BLANK",
+                     "vl_tested_child",
+                     "vl_suppressed_child",
+                     "BLANK",
+                     "vl_tested_male15pl",
+                     "vl_suppressed_male15pl",
+                     "BLANK",
+                     "vl_tested_female15pl",
+                     "vl_suppressed_female15pl")
+  
+  tag <- "<ViralSuppressionInput MV4>"
+  if (exists_dptag(dp, tag)) {
+    vl_suppression <- dpsub(dp, tag, 2:10, dpy$time_data_idx)
+    vl_suppression <- sapply(vl_suppression, as.numeric)
+    dimnames(vl_suppression) <- list(indicator = vl_indicators, year = dpy$proj_years)
+  } else {
+    stop_tag_not_found(tag)
+  }
+
+  vl_suppression <- vl_suppression[vl_indicators != "BLANK", ]
+  vl_suppression[vl_suppression == -9999] <- NA_real_
+
+  vl_suppression <- rbind(vl_suppression,
+                          vls_threshold = vls_threshold,
+                          vls_input_type = vls_input_type)
+  
+  vl_suppression
 }
