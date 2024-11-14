@@ -86,9 +86,9 @@ dpdescription <- function(dp, description, rows, cols, tagcol = 2) {
   dp[which(dp[, tagcol] == description) + rows, cols]
 }
 
-get_dp_years <- function(dp) {
-  yr_start <- as.integer(dpsub(dp, "<FirstYear MV2>", 2, 4))
-  yr_end <- as.integer(dpsub(dp, "<FinalYear MV2>", 2, 4))
+get_dp_years <- function(dp.x) {
+  yr_start <- as.integer(dpsub(dp = dp.x, tag =  "<FirstYear MV2>",rows = 2,cols = 4))
+  yr_end <- as.integer(dpsub(dp = dp.x,tag =  "<FinalYear MV2>", rows = 2,cols = 4))
 
   proj_years <- yr_start:yr_end
   time_data_idx <- 4 + 1:length(proj_years) - 1
@@ -645,14 +645,23 @@ dp_read_paed_art_eligibility <- function(dp) {
 }
 
 prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
+  dp.x <- get_dp_data(pjnz)
+  dpsub <- function(dp, tag, rows, cols, tagcol = 1) {
+
+    stopifnot(inherits(dp, "spectrum_dp"))
+    stopifnot(is.character(tag))
+    all.equal(rows, as.integer(rows))
+    all.equal(cols, as.integer(cols))
+
+    dp[which(dp[, tagcol] == tag) + rows, cols]
+  }
+
   ## projection parameters
   dpfile <- grep(".DP$", utils::unzip(pjnz, list=TRUE)$Name, value=TRUE)
   dp <- utils::read.csv(unz(pjnz, dpfile), as.is=TRUE)
-  dpsub <- function(tag, rows, cols, tagcol=1){
-    dp[which(dp[,tagcol]==tag)+rows, cols]
-  }
-  yr_start <- as.integer(dpsub("<FirstYear MV2>",2,4))
-  yr_end <- as.integer(dpsub("<FinalYear MV2>",2,4))
+
+  yr_start <- as.integer(dpsub(dp = dp.x, "<FirstYear MV2>",2,4))
+  yr_end <- as.integer(dpsub(dp = dp.x, "<FinalYear MV2>",2,4))
   proj.years <- yr_start:yr_end
   timedat.idx <- 4+1:length(proj.years)-1
   year.idx <- 1:length(proj.years)
@@ -927,16 +936,15 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
 
 
   ##extract needed outputs to just run paed model
-  wlhiv_births <- dpsub("<ChildNeedPMTCT MV>", 2, timedat.idx) %>% unname()
+
+  wlhiv_births <- dpsub(dp = dp.x, "<ChildNeedPMTCT MV>", 2, timedat.idx) %>% unname()
   names(wlhiv_births) <- proj.years
   rownames(wlhiv_births) <- NULL
   v$mat_hiv_births <- as.array(as.numeric(unlist(wlhiv_births)))
 
-
-  dp <- read_dp(pjnz)
-  hivpop <- SpectrumUtils::dp.output.hivpop(dp.raw = dp, direction = 'long') %>% data.table() %>% setnames(old = 'Value', new = 'hivpop')
-  totpop <- SpectrumUtils::dp.output.bigpop(dp.raw = dp, direction = 'long') %>% data.table()  %>% setnames(old = 'Value', new = 'totpop')
-  inc <- SpectrumUtils::dp.output.incident.hiv(dp.raw = dp, direction = 'long') %>% data.table() %>% setnames(old = 'Value', new = 'inc')
+  hivpop <- SpectrumUtils::dp.output.hivpop(dp.raw = dp.x, direction = 'long') %>% data.table() %>% setnames(old = 'Value', new = 'hivpop')
+  totpop <- SpectrumUtils::dp.output.bigpop(dp.raw = dp.x, direction = 'long') %>% data.table()  %>% setnames(old = 'Value', new = 'totpop')
+  inc <- SpectrumUtils::dp.output.incident.hiv(dp.raw = dp.x, direction = 'long') %>% data.table() %>% setnames(old = 'Value', new = 'inc')
 
   dt <- merge(hivpop, totpop, by = c('Sex', 'Age', 'Year'))
   dt[,hivnpop := totpop - hivpop]
@@ -958,7 +966,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   v$hivnpop <- hivnpop
   v$adult_female_infections <- inc.array
 
-  total_births <- SpectrumUtils::dp.output.births(dp.raw = dp, direction = 'long')$Value %>% as.array()
+  total_births <- SpectrumUtils::dp.output.births(dp.raw = dp.x, direction = 'long')$Value %>% as.array()
   v$total_births <- total_births
 
 
@@ -974,7 +982,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   mod1 <- eppasm::simmod(fp1)
 
   #cd4
-  wlhiv_cd4 <- array(as.numeric(unlist(dpsub("<CD4Distribution15_49 MV2>", 19:25, timedat.idx))), dim = c(7,length(timedat.idx)))
+  wlhiv_cd4 <- array(as.numeric(unlist(dpsub(dp = dp.x, "<CD4Distribution15_49 MV2>", 19:25, timedat.idx))), dim = c(7,length(timedat.idx)))
   v$prop_gte350 <- colSums(wlhiv_cd4[1:2,]) / colSums(wlhiv_cd4)
   v$prop_lt200 <- colSums(wlhiv_cd4[5:7,]) / colSums(wlhiv_cd4)
 
