@@ -169,7 +169,7 @@ void calc_hiv_negative_pop(int t,
 
   for (int s = 0; s < ss_b.NS; ++s) {
     for (int a = 0; a < ss_b.hAG; ++a) {
-      i_hc.p_hiv_neg_pop(a, s) = p_dm.base_pop(a, s) - n_ba.p_hiv_pop(a, s);
+      i_hc.p_hiv_neg_pop(a, s) = n_ba.p_total_pop(a, s) - n_ba.p_hiv_pop(a, s);
     }// end a
   }// end s
 }
@@ -642,7 +642,6 @@ void nosocomial_infections(int t,
       if (p_hc.hc_nosocomial(t) > 0) {
         // 5.0 is used because we want to evenly distribute across the 5 age groups in 0-4
         n_ba.p_infections(a, s) = p_hc.hc_nosocomial(t) / (5.0 * ss_b.NS);
-        n_ba.p_hiv_pop(a, s) += n_ba.p_infections(a, s);
         // Putting all nosocomial acquired HIV infections in perinatally acquired infection timing and highest CD4 category to match Spectrum implementation
         n_hc.hc1_hiv_pop(0, 0, a, s) += n_ba.p_infections(a, s);
       }
@@ -676,14 +675,15 @@ void add_infections(int t,
         if (s == 0) {
           n_hc.hc1_hiv_pop(hd, 0, 0, 0) += perinatal_transmission_births *
                                            p_dm.births_sex_prop(0, t) * p_hc.hc1_cd4_dist(hd);
+
         } else {
           n_hc.hc1_hiv_pop(hd, 0, 0, s) += perinatal_transmission_births *
                                            (1 - p_dm.births_sex_prop(0, t)) * p_hc.hc1_cd4_dist(hd);
         }
       } // end hc1DS
       auto perinatal_births_by_sex = perinatal_transmission_births * p_dm.births_sex_prop(s, t);
-      n_ba.p_hiv_pop(0, s) += perinatal_births_by_sex;
       n_ba.p_infections(0, s) += perinatal_births_by_sex;
+      n_hc.infection_by_type(0,0,s) += perinatal_births_by_sex;
     } // end NS
 
     // Breastfeeding transmission
@@ -710,8 +710,8 @@ void add_infections(int t,
       for (int hd = 0; hd < ss_c.hc1DS; ++hd) {
         n_hc.hc1_hiv_pop(hd, 1, 0, s) += p_hc.hc1_cd4_dist(hd) * bf_hiv_by_sex;
       } // end hc1DS
-      n_ba.p_hiv_pop(0, s) += bf_hiv_by_sex;
       n_ba.p_infections(0, s) += bf_hiv_by_sex;
+      n_hc.infection_by_type(1,0,s) += bf_hiv_by_sex;
     } // end NS
 
     // 6-12
@@ -721,36 +721,34 @@ void add_infections(int t,
       for (int hd = 0; hd < ss_c.hc1DS; ++hd) {
         n_hc.hc1_hiv_pop(hd, 2, 0, s) += p_hc.hc1_cd4_dist(hd) * bf_hiv_by_sex;
       } // end hc1DS
-      n_ba.p_hiv_pop(0, s) += bf_hiv_by_sex;
       n_ba.p_infections(0, s) += bf_hiv_by_sex;
+      n_hc.infection_by_type(2,0,s) += bf_hiv_by_sex;
     } // end NS
 
     // 12 plus
     internal::run_bf_transmission_rate(t, pars, state_curr, state_next, intermediate, 6, 12, 2);
     internal::run_bf_transmission_rate(t, pars, state_curr, state_next, intermediate, 12, ss_c.hBF, 3);
     for (int s = 0; s < ss_b.NS; ++s) {
-      auto uninfected_prop_12_24 = (n_ba.p_total_pop(1, s) - n_ba.p_hiv_pop(1, s)) /
-                                   (n_ba.p_total_pop(1, 0) - n_ba.p_hiv_pop(1, 0) + n_ba.p_total_pop(1, 1) - n_ba.p_hiv_pop(1, 1));
-      auto uninfected_prop_24_plus = (n_ba.p_total_pop(2, s) - n_ba.p_hiv_pop(2, s)) /
-                                     (n_ba.p_total_pop(2, 0) - n_ba.p_hiv_pop(2, 0) + n_ba.p_total_pop(2, 1) - n_ba.p_hiv_pop(2, 1));
-      auto bf_hiv_transmission_12_24 = n_hc.hiv_births * i_hc.bf_transmission_rate(2) * uninfected_prop_12_24;
-      auto bf_hiv_transmission_24_plus = n_hc.hiv_births * i_hc.bf_transmission_rate(3) * uninfected_prop_24_plus;
       for (int hd = 0; hd < ss_c.hc1DS; ++hd) {
+        auto uninfected_prop_12_24 = (n_ba.p_total_pop(1, s) - n_ba.p_hiv_pop(1, s)) /
+          (n_ba.p_total_pop(1, 0) - n_ba.p_hiv_pop(1, 0) + n_ba.p_total_pop(1, 1) - n_ba.p_hiv_pop(1, 1));
+
+        auto uninfected_prop_24_plus = (n_ba.p_total_pop(2, s) - n_ba.p_hiv_pop(2, s)) /
+          (n_ba.p_total_pop(2, 0) - n_ba.p_hiv_pop(2, 0) + n_ba.p_total_pop(2, 1) - n_ba.p_hiv_pop(2, 1));
+        auto bf_hiv_transmission_12_24 = n_hc.hiv_births * i_hc.bf_transmission_rate(2) * uninfected_prop_12_24;
+        auto bf_hiv_transmission_24_plus = n_hc.hiv_births * i_hc.bf_transmission_rate(3) * uninfected_prop_24_plus;
         // 12-24
         n_hc.hc1_hiv_pop(hd, 3, 1, s) += p_hc.hc1_cd4_dist(hd) * bf_hiv_transmission_12_24;
-        n_ba.p_infections(1, s) += n_hc.hc1_hiv_pop(hd, 3, 1, s);
+        n_ba.p_infections(1, s) += p_hc.hc1_cd4_dist(hd) * bf_hiv_transmission_12_24;
+        n_hc.infection_by_type(3,1,s) += p_hc.hc1_cd4_dist(hd) * bf_hiv_transmission_12_24;
 
         // 24 plus
-        auto new_hc1_infections_24_plus = p_hc.hc1_cd4_dist(hd) * bf_hiv_transmission_24_plus;
-        n_hc.hc1_hiv_pop(hd, 3, 2, s) += new_hc1_infections_24_plus;
-        n_ba.p_infections(2, s) += new_hc1_infections_24_plus;
+        n_hc.hc1_hiv_pop(hd, 3, 2, s) += p_hc.hc1_cd4_dist(hd) * bf_hiv_transmission_24_plus;
+        n_ba.p_infections(2, s) += p_hc.hc1_cd4_dist(hd) * bf_hiv_transmission_24_plus;
+        n_hc.infection_by_type(3,2,s) += p_hc.hc1_cd4_dist(hd) * bf_hiv_transmission_24_plus;
+
       } // end hc1DS
 
-      // 12-24
-      n_ba.p_hiv_pop(1, s) += bf_hiv_transmission_12_24;
-
-      // 24 plus
-      n_ba.p_hiv_pop(2, s) += bf_hiv_transmission_24_plus;
     } // end NS
   }
 }
@@ -1655,6 +1653,15 @@ void fill_total_pop_outputs(int t,
       } // end ss_b.NS
     } // end a
   } // end hDS
+
+
+  //somehow this isn't working
+  for (int a = 0; a < p_op.p_idx_fertility_first; ++a) {
+    for (int s = 0; s < ss_b.NS; ++s) {
+      n_ba.p_hiv_pop(a, s) += n_ba.p_infections(a, s);
+      n_ba.p_hiv_pop(a, s) -= n_ba.p_hiv_deaths(a, s);
+    }
+  }
 }
 
 } // namespace internal
@@ -1669,8 +1676,12 @@ void run_child_model_simulation(int t,
                 "run_child_model_simulation can only be called for model variants where run_child_model is true");
   const auto& p_hc = pars.children.children;
   const auto& p_op = pars.base.options;
+  auto& n_hc = state_next.children;
+
+
 
   internal::run_child_ageing(t, pars, state_curr, state_next, intermediate);
+
 
   if (p_hc.mat_prev_input(t)) {
     internal::run_wlhiv_births_input_mat_prev(t, pars, state_curr, state_next, intermediate);
@@ -1695,9 +1706,10 @@ void run_child_model_simulation(int t,
     // progress 6 to 12 mo to 12 plus months#
     internal::apply_ltfu_to_hivpop(t, pars, state_curr, state_next, intermediate);
     internal::apply_ltfu_to_artpop(t, pars, state_curr, state_next, intermediate);
-    internal::fill_total_pop_outputs(t, pars, state_curr, state_next, intermediate);
     internal::nosocomial_infections(t, pars, state_curr, state_next, intermediate);
   }
+  internal::fill_total_pop_outputs(t, pars, state_curr, state_next, intermediate);
+
 }
 
 } // namespace leapfrog

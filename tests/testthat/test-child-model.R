@@ -16,7 +16,7 @@ test_that("Child model can be run for all years", {
       "hc1_noart_aids_deaths", "hc2_noart_aids_deaths",
       "hc1_art_aids_deaths", "hc2_art_aids_deaths", "hiv_births",
       "hc_art_init", "hc_art_need_init", "ctx_need",
-      "ctx_mean"
+      "ctx_mean", "infection_by_type"
     )
   )
 
@@ -30,6 +30,140 @@ test_that("Child model can be run for all years", {
   expect_true(all(out$hc1_art_aids_deaths[, , , , ] >= 0))
   expect_true(all(out$hc2_art_aids_deaths[, , , , ] >= 0))
   expect_true(all(out$hiv_births >= 0))
+})
+
+test_that("Model outputs are consistent", {
+  input <- setup_childmodel(testinput = "testdata/child_parms.rds")
+  demp <- input$demp
+  parameters <- input$parameters
+
+  out <- run_model(demp, parameters, 1970:2030, NULL, run_child_model = TRUE)
+
+  ###############################
+  ##Infections stratified by infection type and population infections should be the same
+  ###############################
+  strat <- apply(out$infection_by_type, c(2,3,4), sum)
+  pop <- out$p_infections[1:5,,]
+  expect_equal(strat, pop)
+
+  ###############################
+  ##Stratified deaths and population deaths should be the same
+  ###############################
+  ##p_hiv_deaths & hc1_art_aids_deaths, hc1_noart_aids_deaths, hc2_art_aids_deaths, hc2_noart_aids_deaths
+  hc1_hiv <- apply(out$hc1_noart_aids_deaths, c(3,4,5), sum)
+  hc1_art <- apply(out$hc1_art_aids_deaths, c(3,4,5), sum)
+  hc1 <- hc1_hiv + hc1_art
+  dimnames(hc1) <- list(age = 0:4, sex = c('male','female'), year = 1970:2030)
+  p_hiv_deaths <- out$p_hiv_deaths[1:5, , ]
+  dimnames(p_hiv_deaths) <- list(age = 0:4, sex = c('male','female'), year = 1970:2030)
+
+  hc1_df <- as.data.frame(as.table(hc1))
+  out_df <- as.data.frame(as.table(out$p_hiv_deaths[1:5, , ]))
+  colnames(hc1_df) <- c("Var1", "Var2", "Var3", "strat")
+  colnames(out_df) <- c("Var1", "Var2", "Var3", "pop")
+  c1 <- hc1_df %>%
+    inner_join(out_df, by = c("Var1", "Var2", "Var3")) %>%
+    mutate(diff = strat - pop)
+  expect_true(all(abs(c1$diff) < 1e-5))
+
+  hc2_hiv <- apply(out$hc2_noart_aids_deaths, c(3,4,5), sum)
+  hc2_art <- apply(out$hc2_art_aids_deaths, c(3,4,5), sum)
+  hc2 <- hc2_hiv + hc2_art
+  dimnames(hc2) <- list(age = 5:14, sex = c('male','female'), year = 1970:2030)
+  p_hiv_deaths <- out$p_hiv_deaths[6:15, , ]
+  dimnames(p_hiv_deaths) <- list(age = 5:14, sex = c('male','female'), year = 1970:2030)
+  hc2_df <- as.data.frame(as.table(hc2))
+  out_df <- as.data.frame(as.table(p_hiv_deaths))
+  colnames(hc2_df) <- c("Var1", "Var2", "Var3", "strat")
+  colnames(out_df) <- c("Var1", "Var2", "Var3", "pop")
+  c2 <- hc2_df %>%
+    inner_join(out_df, by = c("Var1", "Var2", "Var3")) %>%
+    mutate(diff = strat - pop)
+  expect_true(all(abs(c2$diff) < 1e-5))
+
+  ###############################
+  ##Stratified hiv pop and population hiv pop should be the same
+  ###############################
+  ##p_hiv_pop & hc1_hiv_pop, hc1_art_pop, hc2_hiv_pop, hc2_hiv_pop
+  hc1_hiv <- apply(out$hc1_hiv_pop, c(3,4,5), sum)
+  hc1_art <- apply(out$hc1_art_pop, c(3,4,5), sum)
+  hc1 <- hc1_hiv + hc1_art
+  dimnames(hc1) <- list(age = 0:4, sex = c('male','female'), year = 1970:2030)
+  p_hiv <- out$p_hiv_pop[1:5, , ]
+  dimnames(p_hiv) <- list(age = 0:4, sex = c('male','female'), year = 1970:2030)
+  hc1_df <- as.data.frame(as.table(hc1))
+  out_df <- as.data.frame(as.table(p_hiv))
+  colnames(hc1_df) <- c("Var1", "Var2", "Var3", "strat")
+  colnames(out_df) <- c("Var1", "Var2", "Var3", "pop")
+  c1 <- hc1_df %>%
+    inner_join(out_df, by = c("Var1", "Var2", "Var3")) %>%
+    mutate(diff = strat - pop)
+  expect_true(all(abs(c1$diff) < 1e-5))
+
+  hc2_hiv <- apply(out$hc2_hiv_pop, c(3,4,5), sum)
+  hc2_art <- apply(out$hc2_art_pop, c(3,4,5), sum)
+  hc2 <- hc2_hiv + hc2_art
+  dimnames(hc2) <- list(age = 5:14, sex = c('male','female'), year = 1970:2030)
+  p_hiv <- out$p_hiv_pop[6:15, , ]
+  dimnames(p_hiv) <- list(age = 5:14, sex = c('male','female'), year = 1970:2030)
+  hc2_df <- as.data.frame(as.table(hc2))
+  out_df <- as.data.frame(as.table(p_hiv))
+  colnames(hc2_df) <- c("Var1", "Var2", "Var3", "strat")
+  colnames(out_df) <- c("Var1", "Var2", "Var3", "pop")
+  c2 <- hc2_df %>%
+    inner_join(out_df, by = c("Var1", "Var2", "Var3")) %>%
+    mutate(diff = strat - pop)
+  expect_true(all(abs(c2$diff) < 1e-5))
+
+})
+
+
+test_that("Female adult pop aligns", {
+  input <- setup_childmodel(testinput = "testdata/child_parms.rds")
+  demp <- input$demp
+  parameters <- input$parameters
+  dp <- input$dp
+  pjnz <- input$pjnz
+
+  out <- run_model(demp, parameters, 1970:2030, NULL, run_child_model = TRUE)
+  spec <- SpectrumUtils::dp.output.hivpop(dp, direction = 'long')
+  spec <- spec %>%
+    dplyr::filter(Age %in% 15:49 & Sex == 'Female') %>%
+    dplyr::group_by(Year) %>%
+    dplyr::summarise(Value = sum(Value))
+
+  lfrog <- out$p_hiv_pop[16:50,2,] %>%
+    colSums()
+  lfrog <- data.frame(lfrog = lfrog, Year = 1970:2030)
+
+  dt <- dplyr::right_join(spec, lfrog, by = c("Year"))
+  dt <- dt %>%
+    dplyr::mutate(diff = Value - lfrog)
+  dt <- data.table(dt)
+  dt
+
+  expect_true(all(abs(dt$diff) < 1e-3))
+})
+
+test_that("Mothers that need ptmct align", {
+  input <- setup_childmodel(testinput = "testdata/child_parms.rds")
+  demp <- input$demp
+  parameters <- input$parameters
+  dp <- input$dp
+  pjnz <- input$pjnz
+
+  out <- run_model(demp, parameters, 1970:2030, NULL, run_child_model = TRUE)
+  spec <- SpectrumUtils::dp.output.pmtct.need(dp, direction = 'long')
+
+  lfrog <- data.frame(lfrog = out$hiv_births, Year = 1970:2030)
+
+  dt <- dplyr::right_join(spec, lfrog, by = c("Year"))
+  dt <- dt %>%
+    dplyr::mutate(diff = Value - lfrog)
+  dt <- data.table(dt)
+  dt
+
+  expect_true(all(abs(dt$diff) < 1e-3))
 })
 
 test_that("Infections among children align", {
@@ -62,6 +196,7 @@ test_that("Infections among children align", {
   dt <- dplyr::right_join(inf_spec, lfrog, by = c("Age", "Year"))
   dt <- dt %>%
     dplyr::mutate(diff = Spec - lfrog)
+  dt <- data.table(dt)
 
   expect_true(all(abs(dt$diff) < 5e-1))
 })

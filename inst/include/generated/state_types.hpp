@@ -73,6 +73,7 @@ struct ChildModelState<ChildModel, real_type> {
   TensorFixedSize<real_type, Sizes<hc1DS<ChildModel>, hcTT<ChildModel>, hcAG_end<ChildModel>, NS<ChildModel>>> hc_art_need_init;
   real_type ctx_need;
   real_type ctx_mean;
+  TensorFixedSize<real_type, Sizes<hcTT<ChildModel>, hc1AG<ChildModel>, NS<ChildModel>>> infection_by_type;
 
   ChildModelState(const Parameters<ChildModel, real_type> &pars) {
     reset();
@@ -92,6 +93,7 @@ struct ChildModelState<ChildModel, real_type> {
     hc_art_need_init.setZero();
     ctx_need = 0;
     ctx_mean = 0;
+    infection_by_type.setZero();
   }
 };
 
