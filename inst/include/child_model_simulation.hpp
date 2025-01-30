@@ -128,18 +128,6 @@ void run_wlhiv_births(int t,
       i_hc.df = 1;
     }
 
-    for (int hd = 0; hd < ss_b.hDS; ++hd) {
-      i_hc.df += p_hc.local_adj_factor * p_hc.fert_mult_by_age(a) * p_hc.fert_mult_off_art(hd) *
-                 (n_ba.h_hiv_adult(hd, a, 1) + c_ba.h_hiv_adult(hd, a, 1)) / 2;
-      // women on ART less than 6 months use the off art fertility multiplier
-      i_hc.df += p_hc.local_adj_factor * p_hc.fert_mult_by_age(a) * p_hc.fert_mult_off_art(hd) *
-                 (n_ba.h_art_adult(0, hd, a, 1) + c_ba.h_art_adult(0, hd, a, 1)) / 2;
-      for (int ht = 1; ht < ss_b.hTS; ++ht) {
-        i_hc.df += p_hc.local_adj_factor * p_hc.fert_mult_on_art(a) *
-                   (n_ba.h_art_adult(ht, hd, a, 1) + c_ba.h_art_adult(ht, hd, a, 1)) / 2;
-      } // end hTS
-    } // end hDS
-
     auto midyear_fertileHIV = (i_hc.nHIVcurr + i_hc.nHIVlast) / 2;
     i_hc.birthsCurrAge = midyear_fertileHIV * p_hc.total_fertility_rate(t) *
                          i_hc.df / (i_hc.df * i_hc.prev + 1 - i_hc.prev) *
@@ -615,7 +603,7 @@ void run_bf_transmission_rate(int t,
         i_hc.percent_no_treatment -= i_hc.percent_on_treatment;
       }
     }
-  
+
     i_hc.percent_no_treatment = std::max(i_hc.percent_no_treatment, 0.0);
 
     // No treatment
@@ -1573,7 +1561,7 @@ void art_initiation_by_age(int t,
               coarse_hc_art_scalar = std::min(coarse_hc_adj * p_hc.hc_art_init_dist(a, t), 1.0);
             }
 
-            auto art_initiates = coarse_hc_art_scalar * n_hc.hc_art_need_init(hd, cat, a, s); 
+            auto art_initiates = coarse_hc_art_scalar * n_hc.hc_art_need_init(hd, cat, a, s);
             if (a < ss_c.hc2_agestart) {
               n_hc.hc1_art_pop(0, hd, a, s) += art_initiates;
               n_hc.hc1_hiv_pop(hd, cat, a, s) -= art_initiates;
@@ -1615,7 +1603,7 @@ void art_initiation_by_age(int t,
               i_hc.hc_art_scalar(0) = std::min(i_hc.hc_adj(0) * p_hc.hc_art_init_dist(a, t), 1.0);
             }
 
-            auto art_initiates = i_hc.hc_art_scalar(0) * n_hc.hc_art_need_init(hd, cat, a, s); 
+            auto art_initiates = i_hc.hc_art_scalar(0) * n_hc.hc_art_need_init(hd, cat, a, s);
             if (a < ss_c.hc2_agestart) {
               n_hc.hc1_art_pop(0, hd, a, s) += art_initiates;
               n_hc.hc1_hiv_pop(hd, cat, a, s) -= art_initiates;

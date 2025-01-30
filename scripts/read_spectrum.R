@@ -936,6 +936,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
 
 
   ##extract needed outputs to just run paed model
+  v$laf <- SpectrumUtils::dp.inputs.hiv.frr.location(dp.raw = dp.x)
 
   wlhiv_births <- dpsub(dp = dp.x, "<ChildNeedPMTCT MV>", 2, timedat.idx) %>% unname()
   names(wlhiv_births) <- proj.years
