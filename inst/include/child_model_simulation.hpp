@@ -130,18 +130,6 @@ void run_wlhiv_births(int t,
       i_hc.df = 1;
     }
 
-    for (int hd = 0; hd < ss_h.hDS; ++hd) {
-      i_hc.df += p_hc.local_adj_factor * p_hc.fert_mult_by_age(a) * p_hc.fert_mult_off_art(hd) *
-                 (n_ha.h_hiv_adult(hd, a, 1) + c_ba.h_hiv_adult(hd, a, 1)) / 2;
-      // women on ART less than 6 months use the off art fertility multiplier
-      i_hc.df += p_hc.local_adj_factor * p_hc.fert_mult_by_age(a) * p_hc.fert_mult_off_art(hd) *
-                 (n_ha.h_art_adult(0, hd, a, 1) + c_ba.h_art_adult(0, hd, a, 1)) / 2;
-      for (int ht = 1; ht < ss_h.hTS; ++ht) {
-        i_hc.df += p_hc.local_adj_factor * p_hc.fert_mult_on_art(a) *
-                   (n_ha.h_art_adult(ht, hd, a, 1) + c_ba.h_art_adult(ht, hd, a, 1)) / 2;
-      } // end hTS
-    } // end hDS
-
     auto midyear_fertileHIV = (i_hc.nHIVcurr + i_hc.nHIVlast) / 2;
     i_hc.birthsCurrAge = midyear_fertileHIV * p_hc.total_fertility_rate(t) *
                          i_hc.df / (i_hc.df * i_hc.prev + 1 - i_hc.prev) *
