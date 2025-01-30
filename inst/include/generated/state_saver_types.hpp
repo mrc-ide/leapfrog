@@ -137,6 +137,7 @@ struct ChildModelOutputState<ChildModel, real_type> {
   Tensor5<real_type> hc_art_need_init;
   Tensor1<real_type> ctx_need;
   Tensor1<real_type> ctx_mean;
+  Tensor4<real_type> infection_by_type;
 
   ChildModelOutputState(int output_years):
     hc1_hiv_pop(
@@ -214,6 +215,12 @@ struct ChildModelOutputState<ChildModel, real_type> {
     ),
     ctx_mean(
       output_years
+    ),
+    infection_by_type(
+      StateSpace<ChildModel>().children.hcTT,
+      StateSpace<ChildModel>().children.hc1AG,
+      StateSpace<ChildModel>().dp.NS,
+      output_years
     ) {
     hc1_hiv_pop.setZero();
     hc2_hiv_pop.setZero();
@@ -228,6 +235,7 @@ struct ChildModelOutputState<ChildModel, real_type> {
     hc_art_need_init.setZero();
     ctx_need.setZero();
     ctx_mean.setZero();
+    infection_by_type.setZero();
   }
 };
 
@@ -299,6 +307,7 @@ public:
     output_state.hc_art_need_init.chip(i, output_state.hc_art_need_init.NumDimensions - 1) = state.children.hc_art_need_init;
     output_state.ctx_need(i) = state.children.ctx_need;
     output_state.ctx_mean(i) = state.children.ctx_mean;
+    output_state.infection_by_type.chip(i, output_state.infection_by_type.NumDimensions - 1) = state.children.infection_by_type;
     return;
   }
 };

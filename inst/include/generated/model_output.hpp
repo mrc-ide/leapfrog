@@ -93,6 +93,7 @@ Rcpp::List build_r_output(const leapfrog::OutputState<ModelVariant, real_type> &
     Rcpp::NumericVector r_hc_art_need_init(children.hc1DS * children.hcTT * children.hcAG_end * dp.NS * output_years);
     Rcpp::NumericVector r_ctx_need(output_years);
     Rcpp::NumericVector r_ctx_mean(output_years);
+    Rcpp::NumericVector r_infection_by_type(children.hcTT * children.hc1AG * dp.NS * output_years);
     r_hc1_hiv_pop.attr("dim") = Rcpp::NumericVector::create(children.hc1DS, children.hcTT, children.hc1AG, dp.NS, output_years);
     r_hc2_hiv_pop.attr("dim") = Rcpp::NumericVector::create(children.hc2DS, children.hcTT, children.hc2AG, dp.NS, output_years);
     r_hc1_art_pop.attr("dim") = Rcpp::NumericVector::create(hiv.hTS, children.hc1DS, children.hc1AG, dp.NS, output_years);
@@ -106,6 +107,7 @@ Rcpp::List build_r_output(const leapfrog::OutputState<ModelVariant, real_type> &
     r_hc_art_need_init.attr("dim") = Rcpp::NumericVector::create(children.hc1DS, children.hcTT, children.hcAG_end, dp.NS, output_years);
     r_ctx_need.attr("dim") = Rcpp::NumericVector::create(output_years);
     r_ctx_mean.attr("dim") = Rcpp::NumericVector::create(output_years);
+    r_infection_by_type.attr("dim") = Rcpp::NumericVector::create(children.hcTT, children.hc1AG, dp.NS, output_years);
     std::copy_n(state.children.hc1_hiv_pop.data(), state.children.hc1_hiv_pop.size(), REAL(r_hc1_hiv_pop));
     std::copy_n(state.children.hc2_hiv_pop.data(), state.children.hc2_hiv_pop.size(), REAL(r_hc2_hiv_pop));
     std::copy_n(state.children.hc1_art_pop.data(), state.children.hc1_art_pop.size(), REAL(r_hc1_art_pop));
@@ -119,6 +121,7 @@ Rcpp::List build_r_output(const leapfrog::OutputState<ModelVariant, real_type> &
     std::copy_n(state.children.hc_art_need_init.data(), state.children.hc_art_need_init.size(), REAL(r_hc_art_need_init));
     std::copy_n(state.children.ctx_need.data(), state.children.ctx_need.size(), REAL(r_ctx_need));
     std::copy_n(state.children.ctx_mean.data(), state.children.ctx_mean.size(), REAL(r_ctx_mean));
+    std::copy_n(state.children.infection_by_type.data(), state.children.infection_by_type.size(), REAL(r_infection_by_type));
     ret.push_back(r_hc1_hiv_pop, "hc1_hiv_pop");
     ret.push_back(r_hc2_hiv_pop, "hc2_hiv_pop");
     ret.push_back(r_hc1_art_pop, "hc1_art_pop");
@@ -132,6 +135,7 @@ Rcpp::List build_r_output(const leapfrog::OutputState<ModelVariant, real_type> &
     ret.push_back(r_hc_art_need_init, "hc_art_need_init");
     ret.push_back(r_ctx_need, "ctx_need");
     ret.push_back(r_ctx_mean, "ctx_mean");
+    ret.push_back(r_infection_by_type, "infection_by_type");
   }
 
   return ret;
