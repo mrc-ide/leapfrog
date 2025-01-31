@@ -198,6 +198,10 @@ test_that("Infections among children align", {
   dt <- dt %>%
     dplyr::mutate(diff = Spec - lfrog)
   dt <- data.table(dt)
+  dt[Age == 0]
+  dt[Age == 1]
+  dt[Age == 2]
+
 
   expect_true(all(abs(dt$diff) < 5e-1))
 })

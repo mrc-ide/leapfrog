@@ -238,6 +238,7 @@ void convert_PMTCT_num_to_perc(int t,
       }
     } // end hPS
   }
+  if(t == 30){ }
 
   i_hc.PMTCT_coverage(4) = i_hc.PMTCT_coverage(4) * p_hc.PMTCT_dropout(0, t);
   i_hc.PMTCT_coverage(5) = i_hc.PMTCT_coverage(5) * p_hc.PMTCT_dropout(1, t);
@@ -536,8 +537,10 @@ void run_bf_transmission_rate(int t,
     // i_hc.perinatal_transmission_rate_bf_calc is the transmission that has already occurred due to perinatal transmission
     // i_hc.percent_no_treatment is the percentage of women who are still vulnerable to HIV transmission to their babies
     i_hc.percent_no_treatment = 1 - i_hc.perinatal_transmission_rate_bf_calc - i_hc.bf_transmission_rate(index) ;
-    for (int bf = 0; bf < index; ++bf) {
-      i_hc.percent_no_treatment -= i_hc.bf_transmission_rate(bf);
+    if(index > 0){
+      for (int bf = 0; bf < index; ++bf) {
+        i_hc.percent_no_treatment -= i_hc.bf_transmission_rate(bf);
+      }
     }
 
     for (int hp = 0; hp < ss_c.hPS; hp++) {
@@ -571,11 +574,16 @@ void run_bf_transmission_rate(int t,
       // sdnvp
       if (hp == 2 && i_hc.PMTCT_coverage(hp) > 0) {
         i_hc.percent_on_treatment = i_hc.PMTCT_coverage(hp);
-        i_hc.percent_on_treatment -= i_hc.previous_mtct(hp);
+        // i_hc.percent_on_treatment -= i_hc.previous_mtct(hp);
         auto sdnvp_bf_tr = i_hc.percent_on_treatment *
                            p_hc.PMTCT_transmission_rate(0, hp, 1) *
                            2 * (1 - p_hc.breastfeeding_duration_art(bf, t));
-        i_hc.previous_mtct(hp) += sdnvp_bf_tr;
+        if(bf == 0){
+          i_hc.PMTCT_coverage(hp) -= sdnvp_bf_tr * 0.25;
+        }else{
+          i_hc.PMTCT_coverage(hp) -= sdnvp_bf_tr;
+        }
+        // i_hc.previous_mtct(hp) += sdnvp_bf_tr;
         i_hc.bf_transmission_rate(index) += sdnvp_bf_tr;
         i_hc.percent_no_treatment -=  i_hc.percent_on_treatment;
       }
@@ -583,11 +591,16 @@ void run_bf_transmission_rate(int t,
       // dual arv
       if (hp == 3 && i_hc.PMTCT_coverage(hp) > 0) {
         i_hc.percent_on_treatment = i_hc.PMTCT_coverage(hp);
-        i_hc.percent_on_treatment -= i_hc.previous_mtct(hp);
+        // i_hc.percent_on_treatment -= i_hc.previous_mtct(hp);
         auto dual_arv_bf_tr = i_hc.percent_on_treatment *
                               p_hc.PMTCT_transmission_rate(4, hp, 1) *
                               2 * (1 - p_hc.breastfeeding_duration_art(bf, t));
-        i_hc.previous_mtct(hp) += dual_arv_bf_tr;
+        if(bf == 0){
+          i_hc.PMTCT_coverage(hp) -= dual_arv_bf_tr * 0.25;
+        }else{
+          i_hc.PMTCT_coverage(hp) -= dual_arv_bf_tr;
+        }
+        // i_hc.previous_mtct(hp) += dual_arv_bf_tr;
         i_hc.bf_transmission_rate(index) += dual_arv_bf_tr;
         i_hc.percent_no_treatment -= i_hc.percent_on_treatment;
       }
@@ -602,15 +615,21 @@ void run_bf_transmission_rate(int t,
                                       pow(1 - p_hc.PMTCT_dropout(4, t) * 2, 5) *
                                       pow(1 - p_hc.PMTCT_dropout(5, t) * 2, bf - 5);
         }
-        i_hc.percent_on_treatment -= i_hc.previous_mtct(hp);
         auto art_bf_tr = i_hc.percent_on_treatment *
                          p_hc.PMTCT_transmission_rate(4,hp,1) *
                          2 * (1 - p_hc.breastfeeding_duration_art(bf, t));
-        i_hc.previous_mtct(hp) += art_bf_tr;
+
+        if(bf == 0){
+          i_hc.PMTCT_coverage(hp) -= art_bf_tr * 0.25;
+        }else{
+          i_hc.PMTCT_coverage(hp) -= art_bf_tr;
+        }
         i_hc.bf_transmission_rate(index) += art_bf_tr;
         i_hc.percent_no_treatment -= i_hc.percent_on_treatment;
+
       }
     }
+
 
     i_hc.percent_no_treatment = std::max(i_hc.percent_no_treatment, 0.0);
 
