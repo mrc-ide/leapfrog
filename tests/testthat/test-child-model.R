@@ -117,7 +117,6 @@ test_that("Model outputs are consistent", {
 
 })
 
-
 test_that("Female adult pop aligns", {
   input <- setup_childmodel(testinput = "testdata/child_parms.rds")
   demp <- input$demp
@@ -129,14 +128,16 @@ test_that("Female adult pop aligns", {
   spec <- SpectrumUtils::dp.output.hivpop(dp, direction = 'long')
   spec <- spec %>%
     dplyr::filter(Age %in% 15:49 & Sex == 'Female') %>%
-    dplyr::group_by(Year) %>%
-    dplyr::summarise(Value = sum(Value))
+    dplyr::group_by(Year)
 
-  lfrog <- out$p_hiv_pop[16:50,2,] %>%
-    colSums()
-  lfrog <- data.frame(lfrog = lfrog, Year = 1970:2030)
+  lfrog <- out$p_hiv_pop[16:50,2,]
+  dimnames(lfrog) <- list(Age = 15:49, Year = 1970:2030)
+  lfrog <- as.data.frame(as.table(lfrog)) %>%
+    rename(lfrog = Freq)
+  lfrog$Year <- as.integer(as.character(lfrog$Year))
 
-  dt <- dplyr::right_join(spec, lfrog, by = c("Year"))
+
+  dt <- dplyr::right_join(spec, lfrog, by = c("Year", "Age"))
   dt <- dt %>%
     dplyr::mutate(diff = Value - lfrog)
   dt <- data.table(dt)

@@ -60,7 +60,6 @@ spectrum_output <- function(file = "../testdata/spectrum/v6.13/bwa_aim-adult-chi
   #   df <- test_path(df)
   # }
   df <- eppasm::read_pop1(df, country, years = years_in)
-  if(any(0:14 %in% ages)){
     df_paed <- df %>% dplyr::filter(age < 5) %>%
       dplyr::right_join(y = data.frame(cd4 = 1:8, cd4_cat = c('neg', 'gte30', '26-30', '21-25', '16-20', '11-15', '5-10', 'lte5'))) %>%
       dplyr::right_join(y = data.frame(artdur = 2:8, transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+', 'ARTlte5mo', 'ART6to12mo', 'ARTgte12mo'))) %>%
@@ -71,14 +70,14 @@ spectrum_output <- function(file = "../testdata/spectrum/v6.13/bwa_aim-adult-chi
       dplyr::right_join(y = data.frame(artdur = 2:8, transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+', 'ARTlte5mo', 'ART6to12mo', 'ARTgte12mo'))) %>%
       dplyr::filter(cd4_cat != 'neg')
 
-    df <- rbind(df_paed, df_adol)
-    df <- df %>% dplyr::filter(age %in% ages)
-  }else{
+    df_paed <- rbind(df_paed, df_adol)
+
     df <- df %>% dplyr::filter(age %in%  c(15:max(ages))) %>%
       dplyr::right_join(y = data.frame(cd4 = 2:8, cd4_cat = c('gte500', '350-500', '250-349', '200-249', '100-199','50-99', 'lte50'))) %>%
       dplyr::right_join(y = data.frame(artdur = 2:8, transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+', 'ARTlte5mo', 'ART6to12mo', 'ARTgte12mo'))) %>%
       dplyr::filter(cd4_cat != 'neg')
-  }
+
+    df <- rbind(df, df_paed)
   # setnames(df, 'cd4', 'cd4_cat')
   df <- df %>% dplyr::select(sex, age, cd4_cat, year, pop, transmission)
 
@@ -89,7 +88,7 @@ spectrum_output <- function(file = "../testdata/spectrum/v6.13/bwa_aim-adult-chi
   return(list(on_treatment = df_on_treatment, off_treatment = df_off_treatment, total = df_total))
 
 }
-df <- spectrum_output(pop1, ages = 0:14, 'country', years_in = 1970:2030)
+df <- spectrum_output(pop1, ages = 0:80, 'country', years_in = 1970:2030)
 x = data.table(df$total)
 
 tag.x ="<AIDSDeathsNoARTSingleAge MV>"
