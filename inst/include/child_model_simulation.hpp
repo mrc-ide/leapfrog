@@ -124,14 +124,17 @@ void run_wlhiv_births(int t,
     if (i_hc.nHIVcurr > 0) {
       auto midyear_fertileHIV = (i_hc.nHIVcurr + i_hc.nHIVlast) / 2;
       i_hc.df = i_hc.df / midyear_fertileHIV;
+      i_hc.birthsCurrAge = midyear_fertileHIV * p_hc.total_fertility_rate(t) *
+        i_hc.df / (i_hc.df * i_hc.prev + 1 - i_hc.prev) *
+        p_dm.age_specific_fertility_rate(a, t) / i_hc.asfr_sum ;
     } else {
+      auto midyear_fertileHIV = (i_hc.nHIVcurr + i_hc.nHIVlast) / 2;
       i_hc.df = 1;
+      i_hc.birthsCurrAge = midyear_fertileHIV * p_hc.total_fertility_rate(t) *
+        i_hc.df / (i_hc.df * i_hc.prev + 1 - i_hc.prev) *
+        p_dm.age_specific_fertility_rate(a, t) / i_hc.asfr_sum ;
     }
 
-    auto midyear_fertileHIV = (i_hc.nHIVcurr + i_hc.nHIVlast) / 2;
-    i_hc.birthsCurrAge = midyear_fertileHIV * p_hc.total_fertility_rate(t) *
-                         i_hc.df / (i_hc.df * i_hc.prev + 1 - i_hc.prev) *
-                         p_dm.age_specific_fertility_rate(a, t) / i_hc.asfr_sum ;
     i_hc.birthsHE += i_hc.birthsCurrAge;
     if (a < 9) {
       i_hc.births_HE_15_24 += i_hc.birthsCurrAge;
