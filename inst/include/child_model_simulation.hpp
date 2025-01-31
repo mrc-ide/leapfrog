@@ -277,7 +277,6 @@ void calc_wlhiv_cd4_proportion(int t,
   // Option A and B were only authorized for women with greater than 350 CD4, so if the percentage of women
   // on option A/B > the proportion of women in this cd4 category, we assume that some must have a cd4 less than 350
   // option AB will be less effective for these women so we adjust for that
-
   if (p_hc.mat_prev_input(t)) {
     i_hc.prop_wlhiv_lt200 = p_hc.prop_lt200(t);
     i_hc.prop_wlhiv_200to350 = 1.0 - p_hc.prop_gte350(t) - p_hc.prop_lt200(t);
@@ -547,27 +546,26 @@ void run_bf_transmission_rate(int t,
       i_hc.percent_on_treatment = 0;
       // hp = 0 is option A
       if (hp == 0 && i_hc.PMTCT_coverage(hp) > 0) {
-        if (bf < 6) {
-          i_hc.percent_on_treatment = i_hc.PMTCT_coverage(hp) *
-                                      pow(1 - p_hc.PMTCT_dropout(4, t) * 2, bf);
-        } else {
-          i_hc.percent_on_treatment = i_hc.PMTCT_coverage(hp) *
-                                      pow(1 - p_hc.PMTCT_dropout(4, t) * 2, 5) *
-                                      pow(1 - p_hc.PMTCT_dropout(5, t) * 2, bf - 5);
+        if(bf > 0){
+          if (bf < 6) {
+            i_hc.PMTCT_coverage(hp) *= (1 - p_hc.PMTCT_dropout(4, t) * 2);
+          } else {
+            i_hc.PMTCT_coverage(hp) *= (1 - p_hc.PMTCT_dropout(5, t) * 2);
+          }
         }
+
         i_hc.percent_no_treatment -= i_hc.percent_on_treatment;
       }
 
 
       // hp = 1 is option B
       if (hp == 1 && i_hc.PMTCT_coverage(hp) > 0) {
-        if (bf < 6) {
-          i_hc.percent_on_treatment = i_hc.PMTCT_coverage(hp) *
-                                      pow(1 - p_hc.PMTCT_dropout(4, t) * 2, bf);
-        } else {
-          i_hc.percent_on_treatment = i_hc.PMTCT_coverage(hp) *
-                                      pow(1 - p_hc.PMTCT_dropout(4, t) * 2, 5) *
-                                      pow(1 - p_hc.PMTCT_dropout(5, t) * 2, bf - 5);
+        if(bf > 0){
+          if (bf < 6) {
+            i_hc.PMTCT_coverage(hp) *= (1 - p_hc.PMTCT_dropout(4, t) * 2);
+          } else {
+            i_hc.PMTCT_coverage(hp) *= (1 - p_hc.PMTCT_dropout(5, t) * 2);
+          }
         }
         i_hc.percent_no_treatment -=  i_hc.percent_on_treatment;
       }
@@ -608,15 +606,18 @@ void run_bf_transmission_rate(int t,
 
       // on art pre preg
       if (hp > 3 && i_hc.PMTCT_coverage(hp) > 0) {
-        if (bf < 6) {
-          i_hc.percent_on_treatment = i_hc.PMTCT_coverage(hp) *
-                                      pow(1 - p_hc.PMTCT_dropout(4, t) * 2, bf);
-        } else {
-          i_hc.percent_on_treatment = i_hc.PMTCT_coverage(hp) *
-                                      pow(1 - p_hc.PMTCT_dropout(4, t) * 2, 5) *
-                                      pow(1 - p_hc.PMTCT_dropout(5, t) * 2, bf - 5);
+        if(bf > 0){
+          if (bf < 6) {
+            i_hc.PMTCT_coverage(hp) *= (1 - p_hc.PMTCT_dropout(4, t) * 2);
+          } else {
+            i_hc.PMTCT_coverage(hp) *= (1 - p_hc.PMTCT_dropout(5, t) * 2);
+          }
         }
-        auto art_bf_tr = i_hc.percent_on_treatment *
+
+        if(hp == 5 & t == 31 & index == 0){
+          std::cout << i_hc.PMTCT_coverage(hp);
+        }
+        auto art_bf_tr = i_hc.PMTCT_coverage(hp) *
                          p_hc.PMTCT_transmission_rate(4,hp,1) *
                          2 * (1 - p_hc.breastfeeding_duration_art(bf, t));
 
@@ -626,10 +627,7 @@ void run_bf_transmission_rate(int t,
           i_hc.PMTCT_coverage(hp) -= art_bf_tr;
         }
         i_hc.bf_transmission_rate(index) += art_bf_tr;
-        i_hc.percent_no_treatment -= i_hc.percent_on_treatment;
-        if(hp==5 & t == 31 & index < 2){
-          std::cout << i_hc.percent_on_treatment;
-        }
+        i_hc.percent_no_treatment -= i_hc.PMTCT_coverage(hp);
       }
     }
 
