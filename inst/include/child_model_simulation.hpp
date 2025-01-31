@@ -553,6 +553,7 @@ void run_bf_transmission_rate(int t,
         i_hc.percent_no_treatment -= i_hc.percent_on_treatment;
       }
 
+
       // hp = 1 is option B
       if (hp == 1 && i_hc.PMTCT_coverage(hp) > 0) {
         if (bf < 6) {
@@ -621,7 +622,9 @@ void run_bf_transmission_rate(int t,
         }
         i_hc.bf_transmission_rate(index) += art_bf_tr;
         i_hc.percent_no_treatment -= i_hc.percent_on_treatment;
-
+        if(hp==5 & t == 31 & index < 2){
+          std::cout << i_hc.percent_on_treatment;
+        }
       }
     }
 
