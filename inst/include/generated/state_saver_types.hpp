@@ -136,7 +136,7 @@ struct ChildModelOutputState<ChildModel, real_type> {
   Tensor2<real_type> hc_art_init;
   Tensor5<real_type> hc_art_need_init;
   Tensor1<real_type> ctx_need;
-  Tensor1<real_type> ctx_mean;
+  Tensor2<real_type> ctx_mean;
   Tensor4<real_type> infection_by_type;
 
   ChildModelOutputState(int output_years):
@@ -214,6 +214,7 @@ struct ChildModelOutputState<ChildModel, real_type> {
       output_years
     ),
     ctx_mean(
+      2,
       output_years
     ),
     infection_by_type(
@@ -306,7 +307,7 @@ public:
     output_state.hc_art_init.chip(i, output_state.hc_art_init.NumDimensions - 1) = state.children.hc_art_init;
     output_state.hc_art_need_init.chip(i, output_state.hc_art_need_init.NumDimensions - 1) = state.children.hc_art_need_init;
     output_state.ctx_need(i) = state.children.ctx_need;
-    output_state.ctx_mean(i) = state.children.ctx_mean;
+    output_state.ctx_mean.chip(i, output_state.ctx_mean.NumDimensions - 1) = state.children.ctx_mean;
     output_state.infection_by_type.chip(i, output_state.infection_by_type.NumDimensions - 1) = state.children.infection_by_type;
     return;
   }

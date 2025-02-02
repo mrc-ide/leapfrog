@@ -92,7 +92,7 @@ Rcpp::List build_r_output(const leapfrog::OutputState<ModelVariant, real_type> &
     Rcpp::NumericVector r_hc_art_init(children.hcAG_coarse * output_years);
     Rcpp::NumericVector r_hc_art_need_init(children.hc1DS * children.hcTT * children.hcAG_end * dp.NS * output_years);
     Rcpp::NumericVector r_ctx_need(output_years);
-    Rcpp::NumericVector r_ctx_mean(output_years);
+    Rcpp::NumericVector r_ctx_mean(2 * output_years);
     Rcpp::NumericVector r_infection_by_type(children.hcTT * children.hc1AG * dp.NS * output_years);
     r_hc1_hiv_pop.attr("dim") = Rcpp::NumericVector::create(children.hc1DS, children.hcTT, children.hc1AG, dp.NS, output_years);
     r_hc2_hiv_pop.attr("dim") = Rcpp::NumericVector::create(children.hc2DS, children.hcTT, children.hc2AG, dp.NS, output_years);
@@ -106,7 +106,7 @@ Rcpp::List build_r_output(const leapfrog::OutputState<ModelVariant, real_type> &
     r_hc_art_init.attr("dim") = Rcpp::NumericVector::create(children.hcAG_coarse, output_years);
     r_hc_art_need_init.attr("dim") = Rcpp::NumericVector::create(children.hc1DS, children.hcTT, children.hcAG_end, dp.NS, output_years);
     r_ctx_need.attr("dim") = Rcpp::NumericVector::create(output_years);
-    r_ctx_mean.attr("dim") = Rcpp::NumericVector::create(output_years);
+    r_ctx_mean.attr("dim") = Rcpp::NumericVector::create(2, output_years);
     r_infection_by_type.attr("dim") = Rcpp::NumericVector::create(children.hcTT, children.hc1AG, dp.NS, output_years);
     std::copy_n(state.children.hc1_hiv_pop.data(), state.children.hc1_hiv_pop.size(), REAL(r_hc1_hiv_pop));
     std::copy_n(state.children.hc2_hiv_pop.data(), state.children.hc2_hiv_pop.size(), REAL(r_hc2_hiv_pop));
