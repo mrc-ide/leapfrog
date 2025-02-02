@@ -177,33 +177,29 @@ test_that("Infections among children align", {
   out <- run_model(demp, parameters, 1970:2030, NULL, run_child_model = TRUE)
   inf_spec <- SpectrumUtils::dp.output.incident.hiv(dp.raw = dp)
   inf_spec <- inf_spec %>%
-    dplyr::filter(Sex == "Male+Female") %>%
+    dplyr::filter(Sex != "Male+Female") %>%
     dplyr::filter(Age != "80+") %>%
     dplyr::mutate(Age = as.numeric(Age)) %>%
     dplyr::filter(Age < 15) %>%
     reshape2::melt(id.vars = c("Sex", "Age")) %>%
     dplyr::rename(Year = variable, Spec = value) %>%
     dplyr::mutate(Year = as.numeric(as.character(Year))) %>%
-    dplyr::select(Age, Year, Spec) %>%
+    dplyr::select(Age, Year, Sex, Spec) %>%
     dplyr::as_tibble()
 
   lfrog <- out$p_infections[1:15, , ] %>%
     reshape2::melt() %>%
     dplyr::rename(Age = Var1, Sex = Var2, Year = Var3, lfrog = value) %>%
-    dplyr::mutate(Age = Age - 1, Year = Year + 1969) %>%
-    dplyr::group_by(Age, Year) %>%
+    dplyr::mutate(Age = Age - 1, Year = Year + 1969, Sex = ifelse(Sex == 1, 'Male', 'Female')) %>%
+    dplyr::group_by(Age, Year, Sex) %>%
     dplyr::summarise(lfrog = sum(lfrog))
 
-  dt <- dplyr::right_join(inf_spec, lfrog, by = c("Age", "Year"))
+  dt <- dplyr::right_join(inf_spec, lfrog, by = c("Age", "Year", "Sex"))
   dt <- dt %>%
-    dplyr::mutate(diff = Spec - lfrog)
+    dplyr::mutate(diff = Spec - lfrog) %>%
+    dplyr::filter(Age < 4 & Year < 2030)
   dt <- data.table(dt)
-  dt[Age == 0]
-  dt[Age == 1]
-  dt[Age == 2]
-
-
-  expect_true(all(abs(dt$diff) < 5e-1))
+  expect_true(all(abs(dt$diff) < 1e-3))
 })
 
 test_that("CLHIV align", {
@@ -251,9 +247,10 @@ test_that("CLHIV align", {
   dt <- dplyr::right_join(hc, spec_prev, by = c("sex", "age", "cd4_cat", "year", "transmission"))
   dt <- dt %>%
     dplyr::mutate(diff = pop - fr) %>%
-    dplyr::filter(year < 2030)
+    dplyr::filter(year < 2030) %>%
+    dplyr::filter(age < 15)
 
-  expect_true(all(abs(dt$diff) < 5e-1))
+  expect_true(all(abs(dt$diff) < 1e-2))
 })
 
 test_that("CLHIV on ART align", {
@@ -302,6 +299,7 @@ test_that("CLHIV on ART align", {
   dt <- dt %>%
     dplyr::mutate(diff = pop - fr) %>%
     dplyr::filter(year < 2030)
+  y <- data.table(dt)
 
   expect_true(all(abs(dt$diff) < 5e-1))
 })
@@ -315,7 +313,6 @@ test_that("HIV related deaths among CLHIV not on ART align", {
   aids_deathsnoart <- input$deaths_noart
 
   out <- run_model(demp, parameters, 1970:2030, NULL, run_child_model = TRUE)
-
 
   hc1 <- apply(out$hc1_noart_aids_deaths, c(3:5), sum)
   hc2 <- apply(out$hc2_noart_aids_deaths, c(3:5), sum)
@@ -334,6 +331,8 @@ test_that("HIV related deaths among CLHIV not on ART align", {
     dplyr::select(age, sex, year, fr, spec)
   dt <- dt %>%
     dplyr::mutate(diff = spec - fr)
+  dt <- data.table(dt)
+  dt[year == 2000]
 
   expect_true(all(abs(dt$diff) < 5e-1))
 })
@@ -347,7 +346,6 @@ test_that("HIV related deaths among CLHIV on ART align", {
   aids_deathsart <- input$deaths_art
 
   out <- run_model(demp, parameters, 1970:2030, NULL, run_child_model = TRUE)
-
 
   ## right now this is only working for the first year of ART, assuming its something with the timing on art
   hc1 <- apply(out$hc1_art_aids_deaths, c(3:5), sum)

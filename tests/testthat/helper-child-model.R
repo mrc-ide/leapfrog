@@ -4,7 +4,7 @@ setup_childmodel <- function(testinput = "testdata/child_parms.rds") {
   parameters <- input$proj
 
   #### TO DO: move this into the frogger version of spectrum-inputs.R
-  parameters$ctx_effect <- 0.33
+  # parameters$ctx_effect <- 0.33
  # parameters$laf <- 1
   parameters$paed_art_elig_age <- as.integer(parameters$paed_art_elig_age)
   parameters$mat_prev_input <- rep(TRUE, 61)
@@ -14,6 +14,7 @@ setup_childmodel <- function(testinput = "testdata/child_parms.rds") {
   ## pick out which ones were inserted as percent
   pmtct_new[, which(colSums(parameters$pmtct)[, 1] == 0)] <- parameters$pmtct[, which(colSums(parameters$pmtct)[, 1] == 0), 2]
   parameters$pmtct <- pmtct_new
+ #:parameters$t_ART_start <- 29L
 
   return(list(
     dp = input$dp, demp = demp, parameters = parameters,

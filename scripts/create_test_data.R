@@ -32,6 +32,9 @@ source('./scripts/read_spectrum.R')
 
 #Create paeds parameters (Run from leapfrog/uncertainrt_analysis_working)
 pjnz_child <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct - Copy.PJNZ")
+#pjnz_child <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct.PJNZ")
+#pjnz_child <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct-COTRIM.PJNZ")
+
 
 demp <- prepare_leapfrog_demp(pjnz_child)
 proj <- prepare_leapfrog_projp(pjnz_child)
@@ -90,6 +93,7 @@ spectrum_output <- function(file = "../testdata/spectrum/v6.13/bwa_aim-adult-chi
 }
 df <- spectrum_output(pop1, ages = 0:80, 'country', years_in = 1970:2030)
 x = data.table(df$total)
+x[age <10 & year == 2001]
 
 tag.x ="<AIDSDeathsNoARTSingleAge MV>"
 start.id = 20898

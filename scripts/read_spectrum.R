@@ -778,13 +778,16 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   ctx_pct <- input_childart(pjnz)$ctx_percent
   ctx_pct[is.na(ctx_pct)] <- FALSE
   v$ctx_val_ispercent <- ctx_pct
-  ## ctx_effect_notrt <- c(rep(0.33, 5), rep(0,5))
-  ctx_effect <- rep(0.33,length(proj.years))
   v$ctx_val <- input_childart(pjnz)$ctx
   if(any(v$ctx_val_ispercent)){
     v$ctx_val[v$ctx_val_ispercent] <- v$ctx_val[v$ctx_val_ispercent] / 100
   }
-  v$ctx_effect <- as.array(ctx_effect)
+  ##cotrim is effective for five years for children not on ART and for four years for children on ART
+  ctx_effect <- dpsub(dp = dp.x, "<EffectTreatChild MV>",3:4,4:13)
+  off_art_ctx <- sum(as.numeric(unlist(ctx_effect[1,]))) / 5
+  on_art_ctx <- sum(as.numeric(unlist(ctx_effect[2,]))) / 4
+  ctx_effect <- array(data = c(off_art_ctx, on_art_ctx), dim = c(2), dimnames = list(ctx_effect = c('Off ART', 'On ART')))
+  v$ctx_effect <- ctx_effect
 
   ## pull in ART coverage numbers
   art = input_childart(pjnz)
