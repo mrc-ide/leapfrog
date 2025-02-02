@@ -249,6 +249,7 @@ test_that("CLHIV align", {
     dplyr::mutate(diff = pop - fr) %>%
     dplyr::filter(year < 2030) %>%
     dplyr::filter(age < 15)
+  x = data.table(dt)
 
   expect_true(all(abs(dt$diff) < 1e-2))
 })
@@ -332,7 +333,6 @@ test_that("HIV related deaths among CLHIV not on ART align", {
   dt <- dt %>%
     dplyr::mutate(diff = spec - fr)
   dt <- data.table(dt)
-  dt[year == 2000]
 
   expect_true(all(abs(dt$diff) < 5e-1))
 })
