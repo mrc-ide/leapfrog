@@ -94,6 +94,7 @@ struct Children {
   TensorMap2<real_type> adult_female_infections;
   TensorMap2<real_type> adult_female_hivnpop;
   TensorMap1<real_type> total_births;
+  real_type hc_art_start;
 };
 
 }

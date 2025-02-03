@@ -137,6 +137,7 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
     const leapfrog::TensorMap2<real_type> adult_female_infections = parse_data<real_type>(data, "adult_female_infections", options.p_fertility_age_groups, proj_years);
     const leapfrog::TensorMap2<real_type> adult_female_hivnpop = parse_data<real_type>(data, "hivnpop", options.p_fertility_age_groups, proj_years);
     const leapfrog::TensorMap1<real_type> total_births = parse_data<real_type>(data, "total_births", proj_years);
+    const real_type hc_art_start = Rcpp::as<real_type>(data["hc_art_start"]);
     const leapfrog::Children<real_type> children_params = {
         hc_nosocomial,
         hc1_cd4_dist,
@@ -183,6 +184,7 @@ leapfrog::Parameters<ModelVariant, real_type> setup_model_params(const Rcpp::Lis
         adult_female_infections,
         adult_female_hivnpop,
         total_births,
+        hc_art_start,
     };
     const leapfrog::ChildModelParameters<ModelVariant, real_type> child_model_params = {
         children_params
