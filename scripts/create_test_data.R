@@ -31,7 +31,7 @@ source('./scripts/read_spectrum.R')
 # saveRDS(lmod, testthat::test_path("testdata/fit_demography.rds"))
 
 #Create paeds parameters (Run from leapfrog/uncertainrt_analysis_working)
-pjnz_child <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct - Copy.PJNZ")
+pjnz_child <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct - Copy ART.PJNZ")
 #pjnz_child <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct.PJNZ")
 #pjnz_child <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct-COTRIM.PJNZ")
 

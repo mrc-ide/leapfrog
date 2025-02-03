@@ -238,7 +238,6 @@ void convert_PMTCT_num_to_perc(int t,
       }
     } // end hPS
   }
-  if(t == 30){ }
 
   i_hc.PMTCT_coverage(4) = i_hc.PMTCT_coverage(4) * p_hc.PMTCT_dropout(0, t);
   i_hc.PMTCT_coverage(5) = i_hc.PMTCT_coverage(5) * p_hc.PMTCT_dropout(1, t);
@@ -1399,6 +1398,7 @@ void calc_art_initiates(int t,
     n_hc.hc_art_init(ag) = std::min(n_hc.hc_art_init(ag),
                                     i_hc.unmet_need(ag) + i_hc.on_art(ag) * p_hc.hc_art_ltfu(t));
   } // end ag
+
 }
 
 template<typename ModelVariant, typename real_type>
@@ -1575,13 +1575,16 @@ void art_initiation_by_age(int t,
             auto& coarse_hc_art_scalar = i_hc.hc_art_scalar(p_hc.hc_age_coarse(a));
             auto hc_art_val_sum = p_hc.hc_art_val(0, t) + p_hc.hc_art_val(1, t) +
                                   p_hc.hc_art_val(2, t) + p_hc.hc_art_val(3, t);
-            if (hc_art_val_sum <= 0.0) {
+            auto hc_art_val_sum_last = p_hc.hc_art_val(0, t-1) + p_hc.hc_art_val(1, t-1) +
+              p_hc.hc_art_val(2, t-1) + p_hc.hc_art_val(3, t-1);
+            if ((hc_art_val_sum + hc_art_val_sum_last) <= 0.0) {
               coarse_hc_art_scalar = 0.0;
             } else {
               coarse_hc_art_scalar = std::min(coarse_hc_adj * p_hc.hc_art_init_dist(a, t), 1.0);
             }
 
             auto art_initiates = coarse_hc_art_scalar * n_hc.hc_art_need_init(hd, cat, a, s);
+
             if (a < ss_c.hc2_agestart) {
               n_hc.hc1_art_pop(0, hd, a, s) += art_initiates;
               n_hc.hc1_hiv_pop(hd, cat, a, s) -= art_initiates;
@@ -1636,6 +1639,8 @@ void art_initiation_by_age(int t,
       } // end hcTT
     } // end ss_d.NS
   } // end if
+
+
 }
 
 template<typename ModelVariant, typename real_type>
@@ -1716,7 +1721,7 @@ void run_child_model_simulation(int t,
   internal::add_child_grad(t, pars, state_curr, state_next, intermediate);
 
     // assume paed art doesn't start before adult
-    if ((p_hc.hc_art_val(0, t) + p_hc.hc_art_val(1, t) + p_hc.hc_art_val(2, t) + p_hc.hc_art_val(3, t)) > 0) {
+    if (t >= p_hc.hc_art_start) {
       internal::art_ltfu(t, pars, state_curr, state_next, intermediate);
       internal::art_initiation_by_age(t, pars, state_curr, state_next, intermediate);
       // mortality among those on ART less than one year

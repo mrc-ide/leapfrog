@@ -796,6 +796,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   art$child_art[1,which(art$art_ispercent[2,])] <- art$child_art[1,which(art$art_ispercent[2,])] / 100
   v$paed_art_val <- art$child_art
   v$paed_art_age_spec <- art$age_spec
+  v$hc_art_start <- unname(which(colSums(art$child_art) > 0)[1]) - 1
 
   ##PMTCT
   pmtct_list <- input_pmtct(pjnz)

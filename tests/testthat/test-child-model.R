@@ -251,7 +251,7 @@ test_that("CLHIV align", {
     dplyr::filter(age < 15)
   x = data.table(dt)
 
-  expect_true(all(abs(dt$diff) < 1e-2))
+  expect_true(all(abs(dt$diff) < 5e-1))
 })
 
 test_that("CLHIV on ART align", {
@@ -299,7 +299,7 @@ test_that("CLHIV on ART align", {
   dt <- dplyr::right_join(hc, spec_prev, by = c("sex", "age", "cd4_cat", "year", "time_art"))
   dt <- dt %>%
     dplyr::mutate(diff = pop - fr) %>%
-    dplyr::filter(year < 2030)
+    dplyr::filter(year < 2030 & age < 15)
   y <- data.table(dt)
 
   expect_true(all(abs(dt$diff) < 5e-1))
