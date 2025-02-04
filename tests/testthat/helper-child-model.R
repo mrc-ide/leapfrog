@@ -1,4 +1,4 @@
-setup_ChildModel <- function(testinput = "testdata/child_parms.rds") {
+setup_childmodel <- function(testinput = "testdata/child_parms.rds") {
   input <- readRDS(testthat::test_path(testinput))
   demp <- input$demp
   parameters <- input$proj
