@@ -83,7 +83,7 @@ In `StateSpace` struct
 | hAG_SPAN | hAG_span | Array of HIV age group sizes                                   |
 | hDS_paed | hc1DS    | Number of disease stages in the 0-4 population                 |
 | hDS_adol | hc2DS    | Number of disease stages in the 5-14 population                |
-| hTM      | hcTT     | Number of transmission types for the child population     |
+| hTM      | hcTT     | Number of transmission types for the paediatric population     |
 | NA       | hc1AG    | Number of age groups in the 0-4 population                     |
 | NA       | hc2AG    | Number of age groups in the 5-14 population                    |
 | hBF       | hBF      | Number of 2 month breastfeeding durations                     |
@@ -110,7 +110,7 @@ In `Options` struct. Some of these come from data, some are static, some are an 
 | pAG_FERT           | p_fertility_age_groups | Number of ages eligible for fertility                  |
 | pIDX_HIVADULT      | p_idx_hiv_first_adult  | Index of the first age group to be considered an adult |
 | t_ART_start        | ts_art_start           | Time step to start modelling ART                       |
-| NA                 | run_child_model        | Whether the child model should be run             |
+| NA                 | run_child_model        | Whether the paediatric model should be run             |
 
 
 ## Input data
@@ -250,7 +250,7 @@ In 5 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 | hivpop_ha(ha)             | hivpop_ha                       | HIV population by coarse HIV age group stratification                     |
 | hivqx_ha                  |                                 |                                                                           |
 | hivdeaths_a               |                                 |                                                                           |
-| age15_hivpop              | age15_hiv_pop                   | 15 year olds aging out of the child population                       |
+| age15_hivpop              | age15_hiv_pop                   | 15 year olds aging out of the paediatric population                       |
 | deaths_paeds              | hc_posthivmort                  | PLHIV 0-14y stratified by age, sex, transmission type, and CD4 after HIV related mortality |
 | grad_paeds                | hc_grad                         | Difference in PLHIV 0-14 stratified by age, sex, transmission type, and CD4 between the current and next timestep      |
 |                           | eligible                        | Children eligilbe for ART by CD4, age, and sex. Summed hc_art_need_init by transmission category.|

@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <type_traits>
-
 #include "../intermediate_data.hpp"
 #include "../parameters.hpp"
 #include "../state_space.hpp"

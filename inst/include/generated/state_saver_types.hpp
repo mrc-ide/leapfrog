@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <type_traits>
-
 #include "../intermediate_data.hpp"
 #include "../model_variants.hpp"
 

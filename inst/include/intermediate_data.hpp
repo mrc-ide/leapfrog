@@ -118,7 +118,7 @@ struct DemographicProjectionIntermediateData {
   }
 };
 
-template<bool run_hiv_simulation, typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, typename Enable = void>
 struct HivSimulationIntermediateData {
   HivSimulationIntermediateData(int hAG_15plus) {};
 
@@ -126,7 +126,7 @@ struct HivSimulationIntermediateData {
 };
 
 template<typename ModelVariant, typename real_type>
-struct HivSimulationIntermediateData<true, ModelVariant, real_type> {
+struct HivSimulationIntermediateData<ModelVariant, real_type, std::enable_if_t<ModelVariant::run_hiv_simulation>> {
   TensorFixedSize <real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>> hiv_net_migration;
   TensorFixedSize <real_type, Sizes<hAG<ModelVariant>, NS<ModelVariant>>> p_hiv_pop_coarse_ages;
   TensorFixedSize <real_type, Sizes<hAG<ModelVariant>, NS<ModelVariant>>> hiv_age_up_prob;
@@ -388,7 +388,7 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
 template<typename ModelVariant, typename real_type>
 struct IntermediateData {
   DemographicProjectionIntermediateData<ModelVariant, real_type> dp;
-  HivSimulationIntermediateData<ModelVariant::run_hiv_simulation, ModelVariant, real_type> hiv;
+  HivSimulationIntermediateData<ModelVariant, real_type> hiv;
   ChildModelIntermediateData<ModelVariant, real_type> children;
 
   IntermediateData(int hAG_15plus)

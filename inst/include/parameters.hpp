@@ -1,7 +1,5 @@
 #pragma once
 
-#include <variant>
-
 #include "intermediate_data.hpp"
 #include "state_space.hpp"
 #include "model_variants.hpp"
@@ -72,7 +70,6 @@ struct Parameters {
     Options<real_type> options;
     DemographicProjectionParameters<real_type> dp;
 
-    // Conditionally include components
     [[no_unique_address]] std::conditional_t<ModelVariant::run_hiv_simulation,
         HivSimulationParameters<ModelVariant::run_hiv_simulation, real_type>,
         Empty> hiv;

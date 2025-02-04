@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <optional>
 #include <Rcpp.h>
 #include <unsupported/Eigen/CXX11/Tensor>
 
