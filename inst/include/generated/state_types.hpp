@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include "../intermediate_data.hpp"
 #include "../parameters.hpp"
 #include "../state_space.hpp"
@@ -17,17 +19,39 @@ using Eigen::TensorFixedSize;
 }
 
 template<typename ModelVariant, typename real_type>
-struct ChildModelState {
-  ChildModelState(const Parameters<ModelVariant, real_type> &pars) {}
+struct PaediatricModelState {
+  PaediatricModelState(const Parameters<ModelVariant, real_type> &pars) {}
 
   void reset() {}
 };
 
 template<typename ModelVariant, typename real_type>
-struct BaseModelState {
+struct DemographicProjectionState {
   TensorFixedSize<real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>> p_total_pop;
   real_type births;
   TensorFixedSize<real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>> p_total_pop_natural_deaths;
+
+  DemographicProjectionState(const Parameters<ModelVariant, real_type> &pars) {
+    reset();
+  }
+
+  void reset() {
+    p_total_pop.setZero();
+    births = 0;
+    p_total_pop_natural_deaths.setZero();
+  }
+};
+
+template<typename ModelVariant, typename real_type, typename Enable = void>
+struct HivSimulationState {
+  HivSimulationState(const Parameters<ModelVariant, real_type> &pars) {}
+
+  void reset() {}
+};
+
+template<typename ModelVariant, typename real_type>
+struct HivSimulationState<ModelVariant, real_type,
+    std::enable_if_t<ModelVariant::run_hiv_simulation>> {
   TensorFixedSize<real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>> p_hiv_pop;
   TensorFixedSize<real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>> p_hiv_pop_natural_deaths;
   TensorFixedSize<real_type, Sizes<hDS<ModelVariant>, hAG<ModelVariant>, NS<ModelVariant>>> h_hiv_adult;
@@ -38,14 +62,11 @@ struct BaseModelState {
   TensorFixedSize<real_type, Sizes<hDS<ModelVariant>, hAG<ModelVariant>, NS<ModelVariant>>> h_art_initiation;
   TensorFixedSize<real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>> p_hiv_deaths;
 
-  BaseModelState(const Parameters<ModelVariant, real_type> &pars) {
+  HivSimulationState(const Parameters<ModelVariant, real_type> &pars) {
     reset();
   }
 
   void reset() {
-    p_total_pop.setZero();
-    births = 0;
-    p_total_pop_natural_deaths.setZero();
     p_hiv_pop.setZero();
     p_hiv_pop_natural_deaths.setZero();
     h_hiv_adult.setZero();
@@ -59,22 +80,22 @@ struct BaseModelState {
 };
 
 template<typename real_type>
-struct ChildModelState<ChildModel, real_type> {
-  TensorFixedSize<real_type, Sizes<hc1DS<ChildModel>, hcTT<ChildModel>, hc1AG<ChildModel>, NS<ChildModel>>> hc1_hiv_pop;
-  TensorFixedSize<real_type, Sizes<hc2DS<ChildModel>, hcTT<ChildModel>, hc2AG<ChildModel>, NS<ChildModel>>> hc2_hiv_pop;
-  TensorFixedSize<real_type, Sizes<hTS<ChildModel>, hc1DS<ChildModel>, hc1AG<ChildModel>, NS<ChildModel>>> hc1_art_pop;
-  TensorFixedSize<real_type, Sizes<hTS<ChildModel>, hc2DS<ChildModel>, hc2AG<ChildModel>, NS<ChildModel>>> hc2_art_pop;
-  TensorFixedSize<real_type, Sizes<hc1DS<ChildModel>, hcTT<ChildModel>, hc1AG<ChildModel>, NS<ChildModel>>> hc1_noart_aids_deaths;
-  TensorFixedSize<real_type, Sizes<hc2DS<ChildModel>, hcTT<ChildModel>, hc2AG<ChildModel>, NS<ChildModel>>> hc2_noart_aids_deaths;
-  TensorFixedSize<real_type, Sizes<hTS<ChildModel>, hc1DS<ChildModel>, hc1AG<ChildModel>, NS<ChildModel>>> hc1_art_aids_deaths;
-  TensorFixedSize<real_type, Sizes<hTS<ChildModel>, hc2DS<ChildModel>, hc2AG<ChildModel>, NS<ChildModel>>> hc2_art_aids_deaths;
+struct PaediatricModelState<PaediatricModel, real_type> {
+  TensorFixedSize<real_type, Sizes<hc1DS<PaediatricModel>, hcTT<PaediatricModel>, hc1AG<PaediatricModel>, NS<PaediatricModel>>> hc1_hiv_pop;
+  TensorFixedSize<real_type, Sizes<hc2DS<PaediatricModel>, hcTT<PaediatricModel>, hc2AG<PaediatricModel>, NS<PaediatricModel>>> hc2_hiv_pop;
+  TensorFixedSize<real_type, Sizes<hTS<PaediatricModel>, hc1DS<PaediatricModel>, hc1AG<PaediatricModel>, NS<PaediatricModel>>> hc1_art_pop;
+  TensorFixedSize<real_type, Sizes<hTS<PaediatricModel>, hc2DS<PaediatricModel>, hc2AG<PaediatricModel>, NS<PaediatricModel>>> hc2_art_pop;
+  TensorFixedSize<real_type, Sizes<hc1DS<PaediatricModel>, hcTT<PaediatricModel>, hc1AG<PaediatricModel>, NS<PaediatricModel>>> hc1_noart_aids_deaths;
+  TensorFixedSize<real_type, Sizes<hc2DS<PaediatricModel>, hcTT<PaediatricModel>, hc2AG<PaediatricModel>, NS<PaediatricModel>>> hc2_noart_aids_deaths;
+  TensorFixedSize<real_type, Sizes<hTS<PaediatricModel>, hc1DS<PaediatricModel>, hc1AG<PaediatricModel>, NS<PaediatricModel>>> hc1_art_aids_deaths;
+  TensorFixedSize<real_type, Sizes<hTS<PaediatricModel>, hc2DS<PaediatricModel>, hc2AG<PaediatricModel>, NS<PaediatricModel>>> hc2_art_aids_deaths;
   real_type hiv_births;
-  TensorFixedSize<real_type, Sizes<hcAG_coarse<ChildModel>>> hc_art_init;
-  TensorFixedSize<real_type, Sizes<hc1DS<ChildModel>, hcTT<ChildModel>, hcAG_end<ChildModel>, NS<ChildModel>>> hc_art_need_init;
+  TensorFixedSize<real_type, Sizes<hcAG_coarse<PaediatricModel>>> hc_art_init;
+  TensorFixedSize<real_type, Sizes<hc1DS<PaediatricModel>, hcTT<PaediatricModel>, hcAG_end<PaediatricModel>, NS<PaediatricModel>>> hc_art_need_init;
   real_type ctx_need;
   real_type ctx_mean;
 
-  ChildModelState(const Parameters<ChildModel, real_type> &pars) {
+  PaediatricModelState(const Parameters<PaediatricModel, real_type> &pars) {
     reset();
   }
 
@@ -97,15 +118,18 @@ struct ChildModelState<ChildModel, real_type> {
 
 template<typename ModelVariant, typename real_type>
 struct State {
-  BaseModelState<ModelVariant, real_type> base;
-  ChildModelState<ModelVariant, real_type> children;
+  DemographicProjectionState<ModelVariant, real_type> dp;
+  HivSimulationState<ModelVariant, real_type> hiv;
+  PaediatricModelState<ModelVariant, real_type> children;
 
   State(const Parameters<ModelVariant, real_type> &pars) :
-      base(pars),
+      dp(pars),
+      hiv(pars),
       children(pars) {}
 
   void reset() {
-    base.reset();
+    dp.reset();
+    hiv.reset();
     children.reset();
   }
 };

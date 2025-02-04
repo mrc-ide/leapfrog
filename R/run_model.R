@@ -5,6 +5,7 @@
 #' @param sim_years Simulation years to run model for default 1970:2030
 #' @param hts_per_year Number of HIV time steps per year, default 10
 #' @param output_steps Which sim years to output for default same as sim_years
+#' @param run_hiv_simulation If TRUE then runs HIV simulation
 #' @param hiv_age_stratification The age stratification for HIV population,
 #'  "coarse" or "full"
 #' @param run_child_model If TRUE then run the child model
@@ -14,6 +15,7 @@
 run_model <- function(data, parameters, sim_years,
                       hts_per_year,
                       output_steps = NULL,
+                      run_hiv_simulation = TRUE,
                       hiv_age_stratification = "full",
                       run_child_model = TRUE) {
   if (is.null(sim_years)) {
@@ -36,15 +38,19 @@ run_model <- function(data, parameters, sim_years,
     output_steps <- which(sim_years %in% output_steps)
   }
 
-  assert_enum(hiv_age_stratification, c("full", "coarse"))
-  if (hiv_age_stratification == "full" && !run_child_model) {
-    model_variant <- "BaseModelFullAgeStratification"
+  assert_enum(hiv_age_stratification, c("full", "coarse", "none"))
+  if (!run_hiv_simulation) {
+    model_variant <- "DemographicProjection"
+  } else if (hiv_age_stratification == "full" && !run_child_model) {
+    model_variant <- "HivFullAgeStratification"
   } else if (hiv_age_stratification == "coarse" && !run_child_model) {
-    model_variant <- "BaseModelCoarseAgeStratification"
+    model_variant <- "HivCoarseAgeStratification"
   } else if (hiv_age_stratification == "full" && run_child_model) {
-    model_variant <- "ChildModel"
+    model_variant <- "PaediatricModel"
   } else if (hiv_age_stratification == "coarse" && run_child_model) {
     stop("Cannot run child model with coarse age stratification")
+  } else if (hiv_age_stratification == "none" && run_hiv_simulation) {
+    stop("Cannot run HIV simulation with unspecified age stratification")
   }
   if (hiv_age_stratification == "full") {
     parameters$hAG_SPAN <- parameters[["hAG_SPAN_full"]]
@@ -52,7 +58,7 @@ run_model <- function(data, parameters, sim_years,
     parameters$cd4_prog <- parameters[["cd4_prog_full"]]
     parameters$cd4_mort <- parameters[["cd4_mort_full"]]
     parameters$art_mort <- parameters[["art_mort_full"]]
-  } else {
+  } else if (hiv_age_stratification == "coarse") {
     parameters$hAG_SPAN <- parameters[["hAG_SPAN_coarse"]]
     parameters$cd4_initdist <- parameters[["cd4_initdist_coarse"]]
     parameters$cd4_prog <- parameters[["cd4_prog_coarse"]]

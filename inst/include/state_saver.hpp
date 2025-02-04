@@ -8,19 +8,22 @@ namespace leapfrog {
 
 template<typename ModelVariant, typename real_type>
 struct OutputState {
-  BaseModelOutputState<ModelVariant, real_type> base;
-  ChildModelOutputState<ModelVariant, real_type> children;
+  DemographicProjectionOutputState<ModelVariant, real_type> dp;
+  HivSimulationOutputState<ModelVariant, real_type> hiv;
+  PaediatricModelOutputState<ModelVariant, real_type> children;
 
   OutputState(int output_years) :
-    base(output_years),
+    dp(output_years),
+    hiv(output_years),
     children(output_years) {}
 };
 
 template<typename ModelVariant, typename real_type>
 class StateSaver {
 public:
-  BaseModelStateSaver<ModelVariant, real_type> base;
-  ChildModelStateSaver<ModelVariant, real_type> children;
+  DemographicProjectionStateSaver<ModelVariant, real_type> dp;
+  HivSimulationStateSaver<ModelVariant, real_type> hiv;
+  PaediatricModelStateSaver<ModelVariant, real_type> children;
 
   StateSaver(int time_steps,
              std::vector<int> save_steps) :
@@ -45,7 +48,8 @@ public:
   void save_state(const State<ModelVariant, real_type> &state, int current_year) {
     for (size_t i = 0; i < save_steps.size(); ++i) {
       if (current_year == save_steps[i]) {
-        base.save_state(full_state.base, i, state);
+        dp.save_state(full_state.dp, i, state);
+        hiv.save_state(full_state.hiv, i, state);
         children.save_state(full_state.children, i, state);
       }
     }

@@ -242,7 +242,7 @@ generate_header <- function(source_file) {
 generate_return <- function() {
   ## TODO: Generate this when we have type definitions being generated
   c(
-    "  const leapfrog::ChildModelParameters<ModelVariant, real_type> child_model_params = {",
+    "  const leapfrog::PaediatricModelParameters<ModelVariant, real_type> child_model_params = {",
     "      children_params",
     "  };",
     "  return leapfrog::Parameters<ModelVariant, real_type> {",
@@ -531,8 +531,10 @@ generate_state_saver_func_body <- function(output) {
 
 model_variant_to_name <- function(model_variant) {
   if (model_variant == "ModelVariant") {
-    "base"
-  } else if (model_variant == "ChildModel") {
+    "demographic"
+  } else if (model_variant == "HivSimulation") {
+    "hiv"
+  } else if (model_variant == "PaediatricModel") {
     "children"
   } else {
     stop(sprintf("Unknown model variant %s, fix typo or add to mapping",

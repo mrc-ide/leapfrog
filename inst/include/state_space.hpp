@@ -24,14 +24,22 @@ create_array(const T &value) {
   return internal::create_array(value, std::make_index_sequence<N>());
 }
 
-
-template<HivAgeStratification S>
-struct BaseModelStateSpace;
-
-template<>
-struct BaseModelStateSpace<coarse> {
+struct DemographicProjectionStateSpace {
   static constexpr int NS = 2;
   static constexpr int pAG = 81;
+};
+
+
+template<HivAgeStratification S>
+struct HivSimulationStateSpace;
+
+template<>
+struct HivSimulationStateSpace<none> {
+  static constexpr int hAG = 0; // Need this to initialise options (TODO: split these up)
+};
+
+template<>
+struct HivSimulationStateSpace<coarse> {
   static constexpr int hAG = 9;
   static constexpr int hDS = 7;
   static constexpr int hTS = 3;
@@ -39,9 +47,7 @@ struct BaseModelStateSpace<coarse> {
 };
 
 template<>
-struct BaseModelStateSpace<full> {
-  static constexpr int NS = 2;
-  static constexpr int pAG = 81;
+struct HivSimulationStateSpace<full> {
   static constexpr int hAG = 66;
   static constexpr int hDS = 7;
   static constexpr int hTS = 3;
@@ -49,10 +55,10 @@ struct BaseModelStateSpace<full> {
 };
 
 template<bool enabled>
-struct ChildModelStateSpace;
+struct PaediatricModelStateSpace;
 
 template<>
-struct ChildModelStateSpace<true> {
+struct PaediatricModelStateSpace<true> {
   // Number of disease stages within the 1st child age category (0 - 4)
   static constexpr int hc1DS = 7;
   // Number of disease stages within the 2nd child age category (5 - 14)
@@ -91,13 +97,14 @@ struct ChildModelStateSpace<true> {
 };
 
 template<>
-struct ChildModelStateSpace<false> {
+struct PaediatricModelStateSpace<false> {
 };
 
 template<typename ModelVariant>
 struct StateSpace {
-  static constexpr auto base = BaseModelStateSpace<ModelVariant::stratification>();
-  static constexpr auto children = ChildModelStateSpace<ModelVariant::run_child_model>();
+  static constexpr auto dp = DemographicProjectionStateSpace();
+  static constexpr auto hiv = HivSimulationStateSpace<ModelVariant::stratification>();
+  static constexpr auto children = PaediatricModelStateSpace<ModelVariant::run_child_model>();
 };
 
 }

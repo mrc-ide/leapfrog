@@ -212,7 +212,7 @@ test_that("child model can be run twice on the same data", {
   ## Regression test as we saw the 2nd run failing as the first fit
   ## was modifying the R stored data causing the 2nd run on the same
   ## data to read from an index of -1
-  input <- setup_childmodel(testinput = "testdata/child_parms.rds")
+  input <- setup_PaediatricModel(testinput = "testdata/child_parms.rds")
 
   out <- run_model(input$demp, input$parameters, NULL, NULL,
     run_child_model = TRUE
@@ -241,7 +241,7 @@ test_that("error thrown if model run with invalid HIV stratification", {
     run_model(demp, parameters, NULL, NULL, 2030L,
       hiv_age_stratification = "fine"
     ),
-    "hiv_age_stratification must be one of 'full', 'coarse', got 'fine'"
+    "hiv_age_stratification must be one of 'full', 'coarse', 'none', got 'fine'"
   )
 })
 
@@ -259,7 +259,7 @@ test_that("error thrown if size of stratified data does not match expected", {
 })
 
 test_that("error thrown if trying to save output from invalid steps", {
-  input <- setup_childmodel(testinput = "testdata/child_parms.rds")
+  input <- setup_PaediatricModel(testinput = "testdata/child_parms.rds")
 
   expect_error(
     run_model(input$demp, input$parameters, NULL, NULL, -1L),

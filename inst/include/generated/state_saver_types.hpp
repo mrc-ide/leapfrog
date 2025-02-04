@@ -4,21 +4,51 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include "../intermediate_data.hpp"
 #include "../model_variants.hpp"
 
 namespace leapfrog {
 
 template<typename ModelVariant, typename real_type>
-struct ChildModelOutputState {
-  ChildModelOutputState(int output_years) {}
+struct PaediatricModelOutputState {
+  PaediatricModelOutputState(int output_years) {}
 };
 
 template<typename ModelVariant, typename real_type>
-struct BaseModelOutputState {
+struct DemographicProjectionOutputState {
   Tensor3<real_type> p_total_pop;
   Tensor1<real_type> births;
   Tensor3<real_type> p_total_pop_natural_deaths;
+
+  DemographicProjectionOutputState(int output_years):
+    p_total_pop(
+      StateSpace<ModelVariant>().dp.pAG,
+      StateSpace<ModelVariant>().dp.NS,
+      output_years
+    ),
+    births(
+      output_years
+    ),
+    p_total_pop_natural_deaths(
+      StateSpace<ModelVariant>().dp.pAG,
+      StateSpace<ModelVariant>().dp.NS,
+      output_years
+    ) {
+    p_total_pop.setZero();
+    births.setZero();
+    p_total_pop_natural_deaths.setZero();
+  }
+};
+
+template<typename ModelVariant, typename real_type, typename Enable = void>
+struct HivSimulationOutputState {
+  HivSimulationOutputState(int output_years) {}
+};
+
+template<typename ModelVariant, typename real_type>
+struct HivSimulationOutputState<ModelVariant, real_type, std::enable_if_t<ModelVariant::run_hiv_simulation>> {
   Tensor3<real_type> p_hiv_pop;
   Tensor3<real_type> p_hiv_pop_natural_deaths;
   Tensor4<real_type> h_hiv_adult;
@@ -29,75 +59,59 @@ struct BaseModelOutputState {
   Tensor4<real_type> h_art_initiation;
   Tensor3<real_type> p_hiv_deaths;
 
-  BaseModelOutputState(int output_years): 
-    p_total_pop(
-      StateSpace<ModelVariant>().base.pAG,
-      StateSpace<ModelVariant>().base.NS,
-      output_years
-    ),
-    births(
-      output_years
-    ),
-    p_total_pop_natural_deaths(
-      StateSpace<ModelVariant>().base.pAG,
-      StateSpace<ModelVariant>().base.NS,
-      output_years
-    ),
+  HivSimulationOutputState(int output_years):
     p_hiv_pop(
-      StateSpace<ModelVariant>().base.pAG,
-      StateSpace<ModelVariant>().base.NS,
+      StateSpace<ModelVariant>().dp.pAG,
+      StateSpace<ModelVariant>().dp.NS,
       output_years
     ),
     p_hiv_pop_natural_deaths(
-      StateSpace<ModelVariant>().base.pAG,
-      StateSpace<ModelVariant>().base.NS,
+      StateSpace<ModelVariant>().dp.pAG,
+      StateSpace<ModelVariant>().dp.NS,
       output_years
     ),
     h_hiv_adult(
-      StateSpace<ModelVariant>().base.hDS,
-      StateSpace<ModelVariant>().base.hAG,
-      StateSpace<ModelVariant>().base.NS,
+      StateSpace<ModelVariant>().hiv.hDS,
+      StateSpace<ModelVariant>().hiv.hAG,
+      StateSpace<ModelVariant>().dp.NS,
       output_years
     ),
     h_art_adult(
-      StateSpace<ModelVariant>().base.hTS,
-      StateSpace<ModelVariant>().base.hDS,
-      StateSpace<ModelVariant>().base.hAG,
-      StateSpace<ModelVariant>().base.NS,
+      StateSpace<ModelVariant>().hiv.hTS,
+      StateSpace<ModelVariant>().hiv.hDS,
+      StateSpace<ModelVariant>().hiv.hAG,
+      StateSpace<ModelVariant>().dp.NS,
       output_years
     ),
     h_hiv_deaths_no_art(
-      StateSpace<ModelVariant>().base.hDS,
-      StateSpace<ModelVariant>().base.hAG,
-      StateSpace<ModelVariant>().base.NS,
+      StateSpace<ModelVariant>().hiv.hDS,
+      StateSpace<ModelVariant>().hiv.hAG,
+      StateSpace<ModelVariant>().dp.NS,
       output_years
     ),
     p_infections(
-      StateSpace<ModelVariant>().base.pAG,
-      StateSpace<ModelVariant>().base.NS,
+      StateSpace<ModelVariant>().dp.pAG,
+      StateSpace<ModelVariant>().dp.NS,
       output_years
     ),
     h_hiv_deaths_art(
-      StateSpace<ModelVariant>().base.hTS,
-      StateSpace<ModelVariant>().base.hDS,
-      StateSpace<ModelVariant>().base.hAG,
-      StateSpace<ModelVariant>().base.NS,
+      StateSpace<ModelVariant>().hiv.hTS,
+      StateSpace<ModelVariant>().hiv.hDS,
+      StateSpace<ModelVariant>().hiv.hAG,
+      StateSpace<ModelVariant>().dp.NS,
       output_years
     ),
     h_art_initiation(
-      StateSpace<ModelVariant>().base.hDS,
-      StateSpace<ModelVariant>().base.hAG,
-      StateSpace<ModelVariant>().base.NS,
+      StateSpace<ModelVariant>().hiv.hDS,
+      StateSpace<ModelVariant>().hiv.hAG,
+      StateSpace<ModelVariant>().dp.NS,
       output_years
     ),
     p_hiv_deaths(
-      StateSpace<ModelVariant>().base.pAG,
-      StateSpace<ModelVariant>().base.NS,
+      StateSpace<ModelVariant>().dp.pAG,
+      StateSpace<ModelVariant>().dp.NS,
       output_years
     ) {
-    p_total_pop.setZero();
-    births.setZero();
-    p_total_pop_natural_deaths.setZero();
     p_hiv_pop.setZero();
     p_hiv_pop_natural_deaths.setZero();
     h_hiv_adult.setZero();
@@ -111,7 +125,7 @@ struct BaseModelOutputState {
 };
 
 template<typename real_type>
-struct ChildModelOutputState<ChildModel, real_type> {
+struct PaediatricModelOutputState<PaediatricModel, real_type> {
   Tensor5<real_type> hc1_hiv_pop;
   Tensor5<real_type> hc2_hiv_pop;
   Tensor5<real_type> hc1_art_pop;
@@ -126,75 +140,75 @@ struct ChildModelOutputState<ChildModel, real_type> {
   Tensor1<real_type> ctx_need;
   Tensor1<real_type> ctx_mean;
 
-  ChildModelOutputState(int output_years): 
+  PaediatricModelOutputState(int output_years):
     hc1_hiv_pop(
-      StateSpace<ChildModel>().children.hc1DS,
-      StateSpace<ChildModel>().children.hcTT,
-      StateSpace<ChildModel>().children.hc1AG,
-      StateSpace<ChildModel>().base.NS,
+      StateSpace<PaediatricModel>().children.hc1DS,
+      StateSpace<PaediatricModel>().children.hcTT,
+      StateSpace<PaediatricModel>().children.hc1AG,
+      StateSpace<PaediatricModel>().dp.NS,
       output_years
     ),
     hc2_hiv_pop(
-      StateSpace<ChildModel>().children.hc2DS,
-      StateSpace<ChildModel>().children.hcTT,
-      StateSpace<ChildModel>().children.hc2AG,
-      StateSpace<ChildModel>().base.NS,
+      StateSpace<PaediatricModel>().children.hc2DS,
+      StateSpace<PaediatricModel>().children.hcTT,
+      StateSpace<PaediatricModel>().children.hc2AG,
+      StateSpace<PaediatricModel>().dp.NS,
       output_years
     ),
     hc1_art_pop(
-      StateSpace<ChildModel>().base.hTS,
-      StateSpace<ChildModel>().children.hc1DS,
-      StateSpace<ChildModel>().children.hc1AG,
-      StateSpace<ChildModel>().base.NS,
+      StateSpace<PaediatricModel>().hiv.hTS,
+      StateSpace<PaediatricModel>().children.hc1DS,
+      StateSpace<PaediatricModel>().children.hc1AG,
+      StateSpace<PaediatricModel>().dp.NS,
       output_years
     ),
     hc2_art_pop(
-      StateSpace<ChildModel>().base.hTS,
-      StateSpace<ChildModel>().children.hc2DS,
-      StateSpace<ChildModel>().children.hc2AG,
-      StateSpace<ChildModel>().base.NS,
+      StateSpace<PaediatricModel>().hiv.hTS,
+      StateSpace<PaediatricModel>().children.hc2DS,
+      StateSpace<PaediatricModel>().children.hc2AG,
+      StateSpace<PaediatricModel>().dp.NS,
       output_years
     ),
     hc1_noart_aids_deaths(
-      StateSpace<ChildModel>().children.hc1DS,
-      StateSpace<ChildModel>().children.hcTT,
-      StateSpace<ChildModel>().children.hc1AG,
-      StateSpace<ChildModel>().base.NS,
+      StateSpace<PaediatricModel>().children.hc1DS,
+      StateSpace<PaediatricModel>().children.hcTT,
+      StateSpace<PaediatricModel>().children.hc1AG,
+      StateSpace<PaediatricModel>().dp.NS,
       output_years
     ),
     hc2_noart_aids_deaths(
-      StateSpace<ChildModel>().children.hc2DS,
-      StateSpace<ChildModel>().children.hcTT,
-      StateSpace<ChildModel>().children.hc2AG,
-      StateSpace<ChildModel>().base.NS,
+      StateSpace<PaediatricModel>().children.hc2DS,
+      StateSpace<PaediatricModel>().children.hcTT,
+      StateSpace<PaediatricModel>().children.hc2AG,
+      StateSpace<PaediatricModel>().dp.NS,
       output_years
     ),
     hc1_art_aids_deaths(
-      StateSpace<ChildModel>().base.hTS,
-      StateSpace<ChildModel>().children.hc1DS,
-      StateSpace<ChildModel>().children.hc1AG,
-      StateSpace<ChildModel>().base.NS,
+      StateSpace<PaediatricModel>().hiv.hTS,
+      StateSpace<PaediatricModel>().children.hc1DS,
+      StateSpace<PaediatricModel>().children.hc1AG,
+      StateSpace<PaediatricModel>().dp.NS,
       output_years
     ),
     hc2_art_aids_deaths(
-      StateSpace<ChildModel>().base.hTS,
-      StateSpace<ChildModel>().children.hc2DS,
-      StateSpace<ChildModel>().children.hc2AG,
-      StateSpace<ChildModel>().base.NS,
+      StateSpace<PaediatricModel>().hiv.hTS,
+      StateSpace<PaediatricModel>().children.hc2DS,
+      StateSpace<PaediatricModel>().children.hc2AG,
+      StateSpace<PaediatricModel>().dp.NS,
       output_years
     ),
     hiv_births(
       output_years
     ),
     hc_art_init(
-      StateSpace<ChildModel>().children.hcAG_coarse,
+      StateSpace<PaediatricModel>().children.hcAG_coarse,
       output_years
     ),
     hc_art_need_init(
-      StateSpace<ChildModel>().children.hc1DS,
-      StateSpace<ChildModel>().children.hcTT,
-      StateSpace<ChildModel>().children.hcAG_end,
-      StateSpace<ChildModel>().base.NS,
+      StateSpace<PaediatricModel>().children.hc1DS,
+      StateSpace<PaediatricModel>().children.hcTT,
+      StateSpace<PaediatricModel>().children.hcAG_end,
+      StateSpace<PaediatricModel>().dp.NS,
       output_years
     ),
     ctx_need(
@@ -221,41 +235,59 @@ struct ChildModelOutputState<ChildModel, real_type> {
 
 
 template<typename ModelVariant, typename real_type>
-struct ChildModelStateSaver {
+struct PaediatricModelStateSaver {
 public:
-  void save_state(ChildModelOutputState<ModelVariant, real_type> &full_state,
+  void save_state(PaediatricModelOutputState<ModelVariant, real_type> &full_state,
                   const size_t i,
                   const State<ModelVariant, real_type> &state) {}
 };
 
 template<typename ModelVariant, typename real_type>
-struct BaseModelStateSaver {
+struct DemographicProjectionStateSaver {
 public:
-  void save_state(BaseModelOutputState<ModelVariant, real_type> &output_state,
+  void save_state(DemographicProjectionOutputState<ModelVariant, real_type> &output_state,
                   const size_t i,
                   const State<ModelVariant, real_type> &state) {
-    output_state.p_total_pop.chip(i, output_state.p_total_pop.NumDimensions - 1) = state.base.p_total_pop;
-    output_state.births(i) = state.base.births;
-    output_state.p_total_pop_natural_deaths.chip(i, output_state.p_total_pop_natural_deaths.NumDimensions - 1) = state.base.p_total_pop_natural_deaths;
-    output_state.p_hiv_pop.chip(i, output_state.p_hiv_pop.NumDimensions - 1) = state.base.p_hiv_pop;
-    output_state.p_hiv_pop_natural_deaths.chip(i, output_state.p_hiv_pop_natural_deaths.NumDimensions - 1) = state.base.p_hiv_pop_natural_deaths;
-    output_state.h_hiv_adult.chip(i, output_state.h_hiv_adult.NumDimensions - 1) = state.base.h_hiv_adult;
-    output_state.h_art_adult.chip(i, output_state.h_art_adult.NumDimensions - 1) = state.base.h_art_adult;
-    output_state.h_hiv_deaths_no_art.chip(i, output_state.h_hiv_deaths_no_art.NumDimensions - 1) = state.base.h_hiv_deaths_no_art;
-    output_state.p_infections.chip(i, output_state.p_infections.NumDimensions - 1) = state.base.p_infections;
-    output_state.h_hiv_deaths_art.chip(i, output_state.h_hiv_deaths_art.NumDimensions - 1) = state.base.h_hiv_deaths_art;
-    output_state.h_art_initiation.chip(i, output_state.h_art_initiation.NumDimensions - 1) = state.base.h_art_initiation;
-    output_state.p_hiv_deaths.chip(i, output_state.p_hiv_deaths.NumDimensions - 1) = state.base.p_hiv_deaths;
+    output_state.p_total_pop.chip(i, output_state.p_total_pop.NumDimensions - 1) = state.dp.p_total_pop;
+    output_state.births(i) = state.dp.births;
+    output_state.p_total_pop_natural_deaths.chip(i, output_state.p_total_pop_natural_deaths.NumDimensions - 1) = state.dp.p_total_pop_natural_deaths;
+    return;
+  }
+};
+
+template<typename ModelVariant, typename real_type, typename Enable = void>
+struct HivSimulationStateSaver {
+public:
+  void save_state(HivSimulationOutputState<ModelVariant, real_type> &full_state,
+                  const size_t i,
+                  const State<ModelVariant, real_type> &state) {}
+};
+
+template<typename ModelVariant, typename real_type>
+struct HivSimulationStateSaver<ModelVariant, real_type, std::enable_if_t<ModelVariant::run_hiv_simulation>> {
+public:
+  void save_state(HivSimulationOutputState<ModelVariant, real_type> &output_state,
+                  const size_t i,
+                  const State<ModelVariant, real_type> &state) {
+    output_state.p_hiv_pop.chip(i, output_state.p_hiv_pop.NumDimensions - 1) = state.hiv.p_hiv_pop;
+    output_state.p_hiv_pop_natural_deaths.chip(i, output_state.p_hiv_pop_natural_deaths.NumDimensions - 1) = state.hiv.p_hiv_pop_natural_deaths;
+    output_state.h_hiv_adult.chip(i, output_state.h_hiv_adult.NumDimensions - 1) = state.hiv.h_hiv_adult;
+    output_state.h_art_adult.chip(i, output_state.h_art_adult.NumDimensions - 1) = state.hiv.h_art_adult;
+    output_state.h_hiv_deaths_no_art.chip(i, output_state.h_hiv_deaths_no_art.NumDimensions - 1) = state.hiv.h_hiv_deaths_no_art;
+    output_state.p_infections.chip(i, output_state.p_infections.NumDimensions - 1) = state.hiv.p_infections;
+    output_state.h_hiv_deaths_art.chip(i, output_state.h_hiv_deaths_art.NumDimensions - 1) = state.hiv.h_hiv_deaths_art;
+    output_state.h_art_initiation.chip(i, output_state.h_art_initiation.NumDimensions - 1) = state.hiv.h_art_initiation;
+    output_state.p_hiv_deaths.chip(i, output_state.p_hiv_deaths.NumDimensions - 1) = state.hiv.p_hiv_deaths;
     return;
   }
 };
 
 template<typename real_type>
-struct ChildModelStateSaver<ChildModel, real_type> {
+struct PaediatricModelStateSaver<PaediatricModel, real_type> {
 public:
-  void save_state(ChildModelOutputState<ChildModel, real_type> &output_state,
+  void save_state(PaediatricModelOutputState<PaediatricModel, real_type> &output_state,
                   const size_t i,
-                  const State<ChildModel, real_type> &state) {
+                  const State<PaediatricModel, real_type> &state) {
     output_state.hc1_hiv_pop.chip(i, output_state.hc1_hiv_pop.NumDimensions - 1) = state.children.hc1_hiv_pop;
     output_state.hc2_hiv_pop.chip(i, output_state.hc2_hiv_pop.NumDimensions - 1) = state.children.hc2_hiv_pop;
     output_state.hc1_art_pop.chip(i, output_state.hc1_art_pop.NumDimensions - 1) = state.children.hc1_art_pop;

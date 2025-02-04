@@ -5,6 +5,7 @@ test_that("demographic model is correct", {
   parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
 
   actual <- run_model(demp, parameters, NULL, 0L,
+    run_hiv_simulation = FALSE,
     run_child_model = FALSE
   )
 

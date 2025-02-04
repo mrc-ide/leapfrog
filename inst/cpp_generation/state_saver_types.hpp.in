@@ -8,16 +8,16 @@
 namespace leapfrog {
 
 template<typename ModelVariant, typename real_type>
-struct ChildModelOutputState {
-  ChildModelOutputState(int output_years) {}
+struct PaediatricModelOutputState {
+  PaediatricModelOutputState(int output_years) {}
 };
 
 {{output_state_def}}
 
 template<typename ModelVariant, typename real_type>
-struct ChildModelStateSaver {
+struct PaediatricModelStateSaver {
 public:
-  void save_state(ChildModelOutputState<ModelVariant, real_type> &full_state,
+  void save_state(PaediatricModelOutputState<ModelVariant, real_type> &full_state,
                   const size_t i,
                   const State<ModelVariant, real_type> &state) {}
 };

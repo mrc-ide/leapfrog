@@ -1,5 +1,9 @@
 #pragma once
 
+#include <optional>
+#include <variant>
+#include <type_traits>
+
 #include "intermediate_data.hpp"
 #include "state_space.hpp"
 #include "model_variants.hpp"
@@ -39,27 +43,45 @@ struct Options {
 };
 
 template<typename real_type>
-struct BaseModelParameters {
-  Options<real_type> options;
+struct DemographicProjectionParameters {
   Demography<real_type> demography;
+};
+
+template<bool run_hiv_simulation, typename real_type>
+struct HivSimulationParameters {
+};
+
+template<typename real_type>
+struct HivSimulationParameters<true, real_type> {
   Incidence<real_type> incidence;
   NaturalHistory<real_type> natural_history;
   Art<real_type> art;
 };
 
-template<typename ModelVariant, typename real_type>
-struct ChildModelParameters {
+template<bool run_child_model, typename real_type>
+struct PaediatricModelParameters {
 };
 
 template<typename real_type>
-struct ChildModelParameters<ChildModel, real_type> {
+struct PaediatricModelParameters<true, real_type> {
   Children<real_type> children;
 };
 
+struct Empty {};
+
 template<typename ModelVariant, typename real_type>
 struct Parameters {
-  BaseModelParameters<real_type> base;
-  ChildModelParameters<ModelVariant, real_type> children;
+    Options<real_type> options;
+    DemographicProjectionParameters<real_type> dp;
+
+    // Conditionally include components
+    [[no_unique_address]] std::conditional_t<ModelVariant::run_hiv_simulation,
+        HivSimulationParameters<ModelVariant::run_hiv_simulation, real_type>,
+        Empty> hiv;
+
+    [[no_unique_address]] std::conditional_t<ModelVariant::run_child_model,
+        PaediatricModelParameters<ModelVariant::run_child_model, real_type>,
+        Empty> children;
 };
 
 }
