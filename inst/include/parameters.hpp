@@ -1,8 +1,6 @@
 #pragma once
 
-#include <optional>
 #include <variant>
-#include <type_traits>
 
 #include "intermediate_data.hpp"
 #include "state_space.hpp"
