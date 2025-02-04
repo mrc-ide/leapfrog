@@ -12,8 +12,8 @@
 namespace leapfrog {
 
 template<typename ModelVariant, typename real_type>
-struct PaediatricModelOutputState {
-  PaediatricModelOutputState(int output_years) {}
+struct ChildModelOutputState {
+  ChildModelOutputState(int output_years) {}
 };
 
 template<typename ModelVariant, typename real_type>
@@ -125,7 +125,7 @@ struct HivSimulationOutputState<ModelVariant, real_type, std::enable_if_t<ModelV
 };
 
 template<typename real_type>
-struct PaediatricModelOutputState<PaediatricModel, real_type> {
+struct ChildModelOutputState<ChildModel, real_type> {
   Tensor5<real_type> hc1_hiv_pop;
   Tensor5<real_type> hc2_hiv_pop;
   Tensor5<real_type> hc1_art_pop;
@@ -140,75 +140,75 @@ struct PaediatricModelOutputState<PaediatricModel, real_type> {
   Tensor1<real_type> ctx_need;
   Tensor1<real_type> ctx_mean;
 
-  PaediatricModelOutputState(int output_years):
+  ChildModelOutputState(int output_years):
     hc1_hiv_pop(
-      StateSpace<PaediatricModel>().children.hc1DS,
-      StateSpace<PaediatricModel>().children.hcTT,
-      StateSpace<PaediatricModel>().children.hc1AG,
-      StateSpace<PaediatricModel>().dp.NS,
+      StateSpace<ChildModel>().children.hc1DS,
+      StateSpace<ChildModel>().children.hcTT,
+      StateSpace<ChildModel>().children.hc1AG,
+      StateSpace<ChildModel>().dp.NS,
       output_years
     ),
     hc2_hiv_pop(
-      StateSpace<PaediatricModel>().children.hc2DS,
-      StateSpace<PaediatricModel>().children.hcTT,
-      StateSpace<PaediatricModel>().children.hc2AG,
-      StateSpace<PaediatricModel>().dp.NS,
+      StateSpace<ChildModel>().children.hc2DS,
+      StateSpace<ChildModel>().children.hcTT,
+      StateSpace<ChildModel>().children.hc2AG,
+      StateSpace<ChildModel>().dp.NS,
       output_years
     ),
     hc1_art_pop(
-      StateSpace<PaediatricModel>().hiv.hTS,
-      StateSpace<PaediatricModel>().children.hc1DS,
-      StateSpace<PaediatricModel>().children.hc1AG,
-      StateSpace<PaediatricModel>().dp.NS,
+      StateSpace<ChildModel>().hiv.hTS,
+      StateSpace<ChildModel>().children.hc1DS,
+      StateSpace<ChildModel>().children.hc1AG,
+      StateSpace<ChildModel>().dp.NS,
       output_years
     ),
     hc2_art_pop(
-      StateSpace<PaediatricModel>().hiv.hTS,
-      StateSpace<PaediatricModel>().children.hc2DS,
-      StateSpace<PaediatricModel>().children.hc2AG,
-      StateSpace<PaediatricModel>().dp.NS,
+      StateSpace<ChildModel>().hiv.hTS,
+      StateSpace<ChildModel>().children.hc2DS,
+      StateSpace<ChildModel>().children.hc2AG,
+      StateSpace<ChildModel>().dp.NS,
       output_years
     ),
     hc1_noart_aids_deaths(
-      StateSpace<PaediatricModel>().children.hc1DS,
-      StateSpace<PaediatricModel>().children.hcTT,
-      StateSpace<PaediatricModel>().children.hc1AG,
-      StateSpace<PaediatricModel>().dp.NS,
+      StateSpace<ChildModel>().children.hc1DS,
+      StateSpace<ChildModel>().children.hcTT,
+      StateSpace<ChildModel>().children.hc1AG,
+      StateSpace<ChildModel>().dp.NS,
       output_years
     ),
     hc2_noart_aids_deaths(
-      StateSpace<PaediatricModel>().children.hc2DS,
-      StateSpace<PaediatricModel>().children.hcTT,
-      StateSpace<PaediatricModel>().children.hc2AG,
-      StateSpace<PaediatricModel>().dp.NS,
+      StateSpace<ChildModel>().children.hc2DS,
+      StateSpace<ChildModel>().children.hcTT,
+      StateSpace<ChildModel>().children.hc2AG,
+      StateSpace<ChildModel>().dp.NS,
       output_years
     ),
     hc1_art_aids_deaths(
-      StateSpace<PaediatricModel>().hiv.hTS,
-      StateSpace<PaediatricModel>().children.hc1DS,
-      StateSpace<PaediatricModel>().children.hc1AG,
-      StateSpace<PaediatricModel>().dp.NS,
+      StateSpace<ChildModel>().hiv.hTS,
+      StateSpace<ChildModel>().children.hc1DS,
+      StateSpace<ChildModel>().children.hc1AG,
+      StateSpace<ChildModel>().dp.NS,
       output_years
     ),
     hc2_art_aids_deaths(
-      StateSpace<PaediatricModel>().hiv.hTS,
-      StateSpace<PaediatricModel>().children.hc2DS,
-      StateSpace<PaediatricModel>().children.hc2AG,
-      StateSpace<PaediatricModel>().dp.NS,
+      StateSpace<ChildModel>().hiv.hTS,
+      StateSpace<ChildModel>().children.hc2DS,
+      StateSpace<ChildModel>().children.hc2AG,
+      StateSpace<ChildModel>().dp.NS,
       output_years
     ),
     hiv_births(
       output_years
     ),
     hc_art_init(
-      StateSpace<PaediatricModel>().children.hcAG_coarse,
+      StateSpace<ChildModel>().children.hcAG_coarse,
       output_years
     ),
     hc_art_need_init(
-      StateSpace<PaediatricModel>().children.hc1DS,
-      StateSpace<PaediatricModel>().children.hcTT,
-      StateSpace<PaediatricModel>().children.hcAG_end,
-      StateSpace<PaediatricModel>().dp.NS,
+      StateSpace<ChildModel>().children.hc1DS,
+      StateSpace<ChildModel>().children.hcTT,
+      StateSpace<ChildModel>().children.hcAG_end,
+      StateSpace<ChildModel>().dp.NS,
       output_years
     ),
     ctx_need(
@@ -235,9 +235,9 @@ struct PaediatricModelOutputState<PaediatricModel, real_type> {
 
 
 template<typename ModelVariant, typename real_type>
-struct PaediatricModelStateSaver {
+struct ChildModelStateSaver {
 public:
-  void save_state(PaediatricModelOutputState<ModelVariant, real_type> &full_state,
+  void save_state(ChildModelOutputState<ModelVariant, real_type> &full_state,
                   const size_t i,
                   const State<ModelVariant, real_type> &state) {}
 };
@@ -283,11 +283,11 @@ public:
 };
 
 template<typename real_type>
-struct PaediatricModelStateSaver<PaediatricModel, real_type> {
+struct ChildModelStateSaver<ChildModel, real_type> {
 public:
-  void save_state(PaediatricModelOutputState<PaediatricModel, real_type> &output_state,
+  void save_state(ChildModelOutputState<ChildModel, real_type> &output_state,
                   const size_t i,
-                  const State<PaediatricModel, real_type> &state) {
+                  const State<ChildModel, real_type> &state) {
     output_state.hc1_hiv_pop.chip(i, output_state.hc1_hiv_pop.NumDimensions - 1) = state.children.hc1_hiv_pop;
     output_state.hc2_hiv_pop.chip(i, output_state.hc2_hiv_pop.NumDimensions - 1) = state.children.hc2_hiv_pop;
     output_state.hc1_art_pop.chip(i, output_state.hc1_art_pop.NumDimensions - 1) = state.children.hc1_art_pop;

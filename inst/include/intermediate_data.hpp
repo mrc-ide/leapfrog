@@ -235,20 +235,20 @@ struct HivSimulationIntermediateData<true, ModelVariant, real_type> {
 };
 
 template<typename ModelVariant, typename real_type>
-struct PaediatricModelIntermediateData {
-  PaediatricModelIntermediateData() {};
+struct ChildModelIntermediateData {
+  ChildModelIntermediateData() {};
 
   void reset() {};
 };
 
 template<typename real_type>
-struct PaediatricModelIntermediateData<PaediatricModel, real_type> {
-  TensorFixedSize <real_type, Sizes<hDS<PaediatricModel>, NS<PaediatricModel>>> age15_hiv_pop;
-  TensorFixedSize <real_type, Sizes<hTS<PaediatricModel>, hDS<PaediatricModel>, NS<PaediatricModel>>> age15_art_pop;
-  TensorFixedSize <real_type, Sizes<hDS<PaediatricModel>, hcTT<PaediatricModel>, hAG<PaediatricModel>, NS<PaediatricModel>>> hc_posthivmort;
-  TensorFixedSize <real_type, Sizes<hDS<PaediatricModel>, hcTT<PaediatricModel>, hAG<PaediatricModel>, NS<PaediatricModel>>> hc_grad;
-  TensorFixedSize <real_type, Sizes<hDS<PaediatricModel>, hcTT<PaediatricModel>, hAG<PaediatricModel>, NS<PaediatricModel>>> hc_ctx_need;
-  TensorFixedSize <real_type, Sizes<hDS<PaediatricModel>, hAG<PaediatricModel>, NS<PaediatricModel>>> eligible;
+struct ChildModelIntermediateData<ChildModel, real_type> {
+  TensorFixedSize <real_type, Sizes<hDS<ChildModel>, NS<ChildModel>>> age15_hiv_pop;
+  TensorFixedSize <real_type, Sizes<hTS<ChildModel>, hDS<ChildModel>, NS<ChildModel>>> age15_art_pop;
+  TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_posthivmort;
+  TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_grad;
+  TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_ctx_need;
+  TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> eligible;
   TensorFixedSize <real_type, Sizes<4>> unmet_need;
   TensorFixedSize <real_type, Sizes<4>> total_need;
   TensorFixedSize <real_type, Sizes<4>> on_art;
@@ -256,15 +256,15 @@ struct PaediatricModelIntermediateData<PaediatricModel, real_type> {
   TensorFixedSize <real_type, Sizes<4>> total_art_last_year;
   TensorFixedSize <real_type, Sizes<4>> total_art_this_year;
   real_type hc_death_rate;
-  TensorFixedSize <real_type, Sizes<hDS<PaediatricModel>, hcTT<PaediatricModel>, hAG<PaediatricModel>, NS<PaediatricModel>>> hc_art_grad;
+  TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_art_grad;
   TensorFixedSize <real_type, Sizes<4>> hc_art_scalar;
   TensorFixedSize <real_type, Sizes<4>> hc_initByAge;
   TensorFixedSize <real_type, Sizes<4>> hc_adj;
   TensorFixedSize <real_type, Sizes<4>> hc_art_deaths;
-  TensorFixedSize <real_type, Sizes<hDS<PaediatricModel>, hcTT<PaediatricModel>, hcAG_end<PaediatricModel>, NS<PaediatricModel>>> hc_hiv_dist;
-  TensorFixedSize <real_type, Sizes<hDS<PaediatricModel>,  hcAG_end<PaediatricModel>, NS<PaediatricModel>>> hc_hiv_total;
-  TensorFixedSize <real_type, Sizes<hDS<PaediatricModel>, hcTT<PaediatricModel>, hcAG_end<PaediatricModel>, NS<PaediatricModel>>> art_ltfu_grad;
-  TensorFixedSize <real_type, Sizes<hPS<PaediatricModel>>> previous_mtct;
+  TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hcAG_end<ChildModel>, NS<ChildModel>>> hc_hiv_dist;
+  TensorFixedSize <real_type, Sizes<hDS<ChildModel>,  hcAG_end<ChildModel>, NS<ChildModel>>> hc_hiv_total;
+  TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hcAG_end<ChildModel>, NS<ChildModel>>> art_ltfu_grad;
+  TensorFixedSize <real_type, Sizes<hPS<ChildModel>>> previous_mtct;
   real_type asfr_sum;
   real_type births_sum;
   real_type nHIVcurr;
@@ -274,10 +274,10 @@ struct PaediatricModelIntermediateData<PaediatricModel, real_type> {
   real_type birthsCurrAge;
   real_type birthsHE;
   real_type births_HE_15_24;
-  TensorFixedSize <real_type, Sizes<hAG<PaediatricModel>, NS<PaediatricModel>>> p_hiv_neg_pop;
+  TensorFixedSize <real_type, Sizes<hAG<ChildModel>, NS<ChildModel>>> p_hiv_neg_pop;
   real_type sumARV;
   real_type need_PMTCT;
-  TensorFixedSize <real_type, Sizes<hPS<PaediatricModel>>> PMTCT_coverage;
+  TensorFixedSize <real_type, Sizes<hPS<ChildModel>>> PMTCT_coverage;
   real_type OnPMTCT;
   real_type num_wlhiv_lt200;
   real_type num_wlhiv_200to350;
@@ -307,12 +307,12 @@ struct PaediatricModelIntermediateData<PaediatricModel, real_type> {
   real_type bf_incident_hiv_transmission_rate;
   real_type percent_no_treatment;
   real_type percent_on_treatment;
-  TensorFixedSize <real_type, Sizes<hBF_coarse<PaediatricModel>>> bf_transmission_rate;
+  TensorFixedSize <real_type, Sizes<hBF_coarse<ChildModel>>> bf_transmission_rate;
   real_type ctx_coverage;
   real_type need_cotrim;
 
 
-  PaediatricModelIntermediateData() {};
+  ChildModelIntermediateData() {};
 
   void reset() {
     age15_hiv_pop.setZero();
@@ -389,7 +389,7 @@ template<typename ModelVariant, typename real_type>
 struct IntermediateData {
   DemographicProjectionIntermediateData<ModelVariant, real_type> dp;
   HivSimulationIntermediateData<ModelVariant::run_hiv_simulation, ModelVariant, real_type> hiv;
-  PaediatricModelIntermediateData<ModelVariant, real_type> children;
+  ChildModelIntermediateData<ModelVariant, real_type> children;
 
   IntermediateData(int hAG_15plus)
       :

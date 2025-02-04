@@ -1,7 +1,3 @@
----
-output: github_document
----
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ```{r, include = FALSE}
@@ -9,6 +5,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
+  fig.cap = "",
   out.width = "100%"
 )
 ```
@@ -42,8 +39,9 @@ The simulation model is callable in R via a wrapper function `run_model()` creat
 
 You can control how the simulation model is run with the following arguments:
 
+* `run_hiv_simulation` which is `TRUE` by default. Set to `FALSE` to turn off the HIV simulation and run only the demographic projection.
 * `hiv_age_stratification` which must be "coarse" or "full". Coarse is run with 5-year age groups and full with single year ages.
-* `run_child_model` which is `FALSE` by default. Set to `TRUE` to run the paediatric portion of the model.
+* `run_child_model` which is `FALSE` by default. Set to `TRUE` to run the child portion of the model.
 
 ## Example
 
@@ -55,7 +53,7 @@ Prepare model inputs.
 ```{r example}
 library(frogger)
 
-pjnz <- system.file("pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ", 
+pjnz <- system.file("pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ",
                     package = "frogger", mustWork = TRUE)
 
 demp <- prepare_leapfrog_demp(pjnz)
@@ -66,14 +64,14 @@ Simulate adult 'full' age group (single-year age) and 'coarse' age group (collap
 age groups) models from 1970 to 2030 with 10 HIV time steps per year.
 
 ```{r simulate_leapfrog}
-lsimF <- run_model(demp, hivp, 1970:2030, 10L, 
+lsimF <- run_model(demp, hivp, 1970:2030, 10L,
                    hiv_age_stratification = "full", run_child_model = FALSE)
-lsimC <- run_model(demp, hivp, 1970:2030, 10L, 
+lsimC <- run_model(demp, hivp, 1970:2030, 10L,
                    hiv_age_stratification = "coarse", run_child_model = FALSE)
 ```
 
-Compare the HIV prevalence age 15-49 years and AIDS deaths 50+ years. Deaths 50+ 
-years are to show some noticeable divergence between the `"full"` and `"coarse"` 
+Compare the HIV prevalence age 15-49 years and AIDS deaths 50+ years. Deaths 50+
+years are to show some noticeable divergence between the `"full"` and `"coarse"`
 age group simulations.
 
 ```{r sim_prev}
@@ -88,7 +86,7 @@ lines(1970:2030, prevC, col = 2)
 
 plot(1970:2030, deathsF, type = "l", main = "AIDS Deaths 50+ years")
 lines(1970:2030, deathsC, col = 2)
-``` 
+```
 
 ## Benchmarking
 
@@ -119,8 +117,8 @@ The code uses header-only open source libraries to maximize portability.
 
 ### R functions
 
-The file `src/frogger.cpp` contains R wrapper functions for the model simulation 
-via [Rcpp](http://dirk.eddelbuettel.com/code/rcpp.html) and 
+The file `src/frogger.cpp` contains R wrapper functions for the model simulation
+via [Rcpp](http://dirk.eddelbuettel.com/code/rcpp.html) and
 [RcppEigen](http://dirk.eddelbuettel.com/code/rcpp.eigen.html).
 
 

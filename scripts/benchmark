@@ -20,7 +20,7 @@ bench::mark(
 )
 
 source(testthat::test_path("helper-child-model.R"))
-input <- setup_PaediatricModel(testinput = "testdata/child_parms.rds")
+input <- setup_ChildModel(testinput = "testdata/child_parms.rds")
 
 message("Benchmarking child model")
 bench::mark(

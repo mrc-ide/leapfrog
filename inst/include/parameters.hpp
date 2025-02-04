@@ -59,11 +59,11 @@ struct HivSimulationParameters<true, real_type> {
 };
 
 template<bool run_child_model, typename real_type>
-struct PaediatricModelParameters {
+struct ChildModelParameters {
 };
 
 template<typename real_type>
-struct PaediatricModelParameters<true, real_type> {
+struct ChildModelParameters<true, real_type> {
   Children<real_type> children;
 };
 
@@ -80,7 +80,7 @@ struct Parameters {
         Empty> hiv;
 
     [[no_unique_address]] std::conditional_t<ModelVariant::run_child_model,
-        PaediatricModelParameters<ModelVariant::run_child_model, real_type>,
+        ChildModelParameters<ModelVariant::run_child_model, real_type>,
         Empty> children;
 };
 

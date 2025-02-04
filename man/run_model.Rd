@@ -10,6 +10,7 @@ run_model(
   sim_years,
   hts_per_year,
   output_steps = NULL,
+  run_hiv_simulation = TRUE,
   hiv_age_stratification = "full",
   run_child_model = TRUE
 )
@@ -24,6 +25,8 @@ run_model(
 \item{hts_per_year}{Number of HIV time steps per year, default 10}
 
 \item{output_steps}{Which sim years to output for default same as sim_years}
+
+\item{run_hiv_simulation}{If TRUE then runs HIV simulation}
 
 \item{hiv_age_stratification}{The age stratification for HIV population,
 "coarse" or "full"}

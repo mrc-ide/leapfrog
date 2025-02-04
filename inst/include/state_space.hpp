@@ -55,10 +55,10 @@ struct HivSimulationStateSpace<full> {
 };
 
 template<bool enabled>
-struct PaediatricModelStateSpace;
+struct ChildModelStateSpace;
 
 template<>
-struct PaediatricModelStateSpace<true> {
+struct ChildModelStateSpace<true> {
   // Number of disease stages within the 1st child age category (0 - 4)
   static constexpr int hc1DS = 7;
   // Number of disease stages within the 2nd child age category (5 - 14)
@@ -75,7 +75,7 @@ struct PaediatricModelStateSpace<true> {
   static constexpr int hc2AG = 10;
   // Coarse age groups 5-14, used for paed progression
   static constexpr int hc2AG_c = 1;
-  // Age at which the paediatric age group ends (hc1AG + hc2AG)
+  // Age at which the child age group ends (hc1AG + hc2AG)
   static constexpr int hcAG_end = 15;
   // Number of transmission types
   static constexpr int hcTT = 4;
@@ -97,14 +97,14 @@ struct PaediatricModelStateSpace<true> {
 };
 
 template<>
-struct PaediatricModelStateSpace<false> {
+struct ChildModelStateSpace<false> {
 };
 
 template<typename ModelVariant>
 struct StateSpace {
   static constexpr auto dp = DemographicProjectionStateSpace();
   static constexpr auto hiv = HivSimulationStateSpace<ModelVariant::stratification>();
-  static constexpr auto children = PaediatricModelStateSpace<ModelVariant::run_child_model>();
+  static constexpr auto children = ChildModelStateSpace<ModelVariant::run_child_model>();
 };
 
 }

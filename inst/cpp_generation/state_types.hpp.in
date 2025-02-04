@@ -15,8 +15,8 @@ using Eigen::TensorFixedSize;
 }
 
 template<typename ModelVariant, typename real_type>
-struct PaediatricModelState {
-  PaediatricModelState(const Parameters<ModelVariant, real_type> &pars) {}
+struct ChildModelState {
+  ChildModelState(const Parameters<ModelVariant, real_type> &pars) {}
 
   void reset() {}
 };
@@ -25,7 +25,7 @@ struct PaediatricModelState {
 template<typename ModelVariant, typename real_type>
 struct State {
   BaseModelState<ModelVariant, real_type> base;
-  PaediatricModelState<ModelVariant, real_type> children;
+  ChildModelState<ModelVariant, real_type> children;
 
   State(const Parameters<ModelVariant, real_type> &pars) :
       base(pars),

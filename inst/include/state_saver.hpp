@@ -10,7 +10,7 @@ template<typename ModelVariant, typename real_type>
 struct OutputState {
   DemographicProjectionOutputState<ModelVariant, real_type> dp;
   HivSimulationOutputState<ModelVariant, real_type> hiv;
-  PaediatricModelOutputState<ModelVariant, real_type> children;
+  ChildModelOutputState<ModelVariant, real_type> children;
 
   OutputState(int output_years) :
     dp(output_years),
@@ -23,7 +23,7 @@ class StateSaver {
 public:
   DemographicProjectionStateSaver<ModelVariant, real_type> dp;
   HivSimulationStateSaver<ModelVariant, real_type> hiv;
-  PaediatricModelStateSaver<ModelVariant, real_type> children;
+  ChildModelStateSaver<ModelVariant, real_type> children;
 
   StateSaver(int time_steps,
              std::vector<int> save_steps) :

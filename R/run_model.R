@@ -46,7 +46,7 @@ run_model <- function(data, parameters, sim_years,
   } else if (hiv_age_stratification == "coarse" && !run_child_model) {
     model_variant <- "HivCoarseAgeStratification"
   } else if (hiv_age_stratification == "full" && run_child_model) {
-    model_variant <- "PaediatricModel"
+    model_variant <- "ChildModel"
   } else if (hiv_age_stratification == "coarse" && run_child_model) {
     stop("Cannot run child model with coarse age stratification")
   } else if (hiv_age_stratification == "none" && run_hiv_simulation) {

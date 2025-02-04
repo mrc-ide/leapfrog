@@ -1,5 +1,5 @@
 ###############################################
-###Paediatric input formatting
+###Child input formatting
 ###############################################
 library(dplyr)
 

@@ -93,9 +93,9 @@ Rcpp::List run_base_model(const Rcpp::List data,
   if (model_variant == "DemographicProjection") {
     constexpr auto ss = leapfrog::StateSpace<leapfrog::DemographicProjection>();
     ret = simulate_model<leapfrog::DemographicProjection>(ss, data, proj_years, hiv_steps, save_steps);
-  } else if (model_variant == "PaediatricModel") {
-    constexpr auto ss = leapfrog::StateSpace<leapfrog::PaediatricModel>();
-    ret = simulate_model<leapfrog::PaediatricModel>(ss, data, proj_years, hiv_steps, save_steps);
+  } else if (model_variant == "ChildModel") {
+    constexpr auto ss = leapfrog::StateSpace<leapfrog::ChildModel>();
+    ret = simulate_model<leapfrog::ChildModel>(ss, data, proj_years, hiv_steps, save_steps);
   } else if (model_variant == "HivFullAgeStratification") {
     constexpr auto ss = leapfrog::StateSpace<leapfrog::HivFullAgeStratification>();
     ret = simulate_model<leapfrog::HivFullAgeStratification>(ss, data, proj_years, hiv_steps, save_steps);
@@ -104,7 +104,7 @@ Rcpp::List run_base_model(const Rcpp::List data,
     ret = simulate_model<leapfrog::HivCoarseAgeStratification>(ss, data, proj_years, hiv_steps, save_steps);
   } else {
     Rcpp::stop("Invalid model variant " + model_variant + " must be one of " +
-               "'DemographicProjection', 'HivFullAgeStratification', 'HivCoarseAgeStratification' or 'PaediatricModel'");
+               "'DemographicProjection', 'HivFullAgeStratification', 'HivCoarseAgeStratification' or 'ChildModel'");
   }
 
   return ret;

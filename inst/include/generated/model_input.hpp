@@ -78,7 +78,7 @@ static hiv_params_type<ModelVariant, real_type> get_hiv_params(const Rcpp::List 
 template <typename ModelVariant, typename real_type>
 using child_params_type = std::conditional_t<
     ModelVariant::run_child_model,
-    leapfrog::PaediatricModelParameters<ModelVariant::run_child_model, real_type>,
+    leapfrog::ChildModelParameters<ModelVariant::run_child_model, real_type>,
     leapfrog::Empty>;
 
 template <typename ModelVariant, typename real_type>
@@ -182,7 +182,7 @@ static child_params_type<ModelVariant, real_type> get_child_params(const Rcpp::L
         adult_female_hivnpop,
         total_births,
     };
-    return leapfrog::PaediatricModelParameters<ModelVariant::run_child_model, real_type> {
+    return leapfrog::ChildModelParameters<ModelVariant::run_child_model, real_type> {
       children_params
     };
   } else {

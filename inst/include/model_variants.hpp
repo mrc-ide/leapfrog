@@ -26,7 +26,7 @@ struct HivCoarseAgeStratification {
   static constexpr bool run_child_model = false;
 };
 
-struct PaediatricModel {
+struct ChildModel {
   static constexpr bool run_hiv_simulation = true;
   static constexpr HivAgeStratification stratification = full;
   static constexpr bool run_child_model = true;
