@@ -227,11 +227,11 @@ void run_hiv_pop_demographic_projection(int t,
 }
 
 
-template<typename ModelVariant, typename real_type>
+template<typename ModelVariant, typename real_type, bool OwnedData>
 void run_hiv_pop_end_year_migration(int t,
                                     const Parameters<ModelVariant, real_type> &pars,
-                                    const State<ModelVariant, real_type> &state_curr,
-                                    State<ModelVariant, real_type> &state_next,
+                                    const State<ModelVariant, real_type, OwnedData> &state_curr,
+                                    State<ModelVariant, real_type, OwnedData> &state_next,
                                     internal::IntermediateData<ModelVariant, real_type> &intermediate) {
   constexpr auto ss_h = StateSpace<ModelVariant>().hiv;
   constexpr auto ss_d = StateSpace<ModelVariant>().dp;

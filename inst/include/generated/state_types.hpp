@@ -24,8 +24,10 @@ using TensorType = std::conditional_t<OwnedData,
 
 template<typename ModelVariant, typename real_type, bool OwnedData>
 struct ChildModelState {
+  template<bool O = OwnedData, typename = std::enable_if_t<O>>
   ChildModelState(const Parameters<ModelVariant, real_type> &pars) {}
 
+  template<bool O = OwnedData, typename = std::enable_if_t<O>>
   void reset() {}
 };
 
@@ -35,6 +37,7 @@ struct DemographicProjectionState {
   TensorType<real_type, Sizes<1>, OwnedData> births;
   TensorType<real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>, OwnedData> p_total_pop_natural_deaths;
 
+  template<bool O = OwnedData, typename = std::enable_if_t<O>>
   DemographicProjectionState(const Parameters<ModelVariant, real_type> &pars) {
     static_assert(OwnedData,
       "DemographicProjectionState can only be constructed from parameters if it owns the data.");
@@ -45,6 +48,7 @@ struct DemographicProjectionState {
     reset();
   }
 
+  template<bool O = OwnedData, typename = std::enable_if_t<!O>>
   DemographicProjectionState(
     const TensorType<real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>, OwnedData>& p_total_pop,
     const TensorType<real_type, Sizes<1>, OwnedData>& births,
@@ -54,6 +58,7 @@ struct DemographicProjectionState {
     births(births),
     p_total_pop_natural_deaths(p_total_pop_natural_deaths) {}
 
+  template<bool O = OwnedData, typename = std::enable_if_t<O>>
   void reset() {
     p_total_pop.setZero();
     births.setZero();
@@ -61,15 +66,17 @@ struct DemographicProjectionState {
   }
 };
 
-template<typename ModelVariant, typename real_type, typename Enable = void>
+template<typename ModelVariant, typename real_type, bool OwnedData, typename Enable = void>
 struct HivSimulationState {
+  template<bool O = OwnedData, typename = std::enable_if_t<O>>
   HivSimulationState(const Parameters<ModelVariant, real_type> &pars) {}
 
+  template<bool O = OwnedData, typename = std::enable_if_t<O>>
   void reset() {}
 };
 
-template<typename ModelVariant, typename real_type>
-struct HivSimulationState<ModelVariant, real_type,
+template<typename ModelVariant, typename real_type, bool OwnedData>
+struct HivSimulationState<ModelVariant, real_type, OwnedData,
     std::enable_if_t<ModelVariant::run_hiv_simulation>> {
   TensorType<real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>, OwnedData> p_hiv_pop;
   TensorType<real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>, OwnedData> p_hiv_pop_natural_deaths;
@@ -81,6 +88,7 @@ struct HivSimulationState<ModelVariant, real_type,
   TensorType<real_type, Sizes<hDS<ModelVariant>, hAG<ModelVariant>, NS<ModelVariant>>, OwnedData> h_art_initiation;
   TensorType<real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>, OwnedData> p_hiv_deaths;
 
+  template<bool O = OwnedData, typename = std::enable_if_t<O>>
   HivSimulationState(const Parameters<ModelVariant, real_type> &pars) {
     static_assert(OwnedData,
       "HivSimulationState can only be constructed from parameters if it owns the data.");
@@ -97,6 +105,7 @@ struct HivSimulationState<ModelVariant, real_type,
     reset();
   }
 
+  template<bool O = OwnedData, typename = std::enable_if_t<!O>>
   HivSimulationState(
     const TensorType<real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>, OwnedData>& p_hiv_pop,
     const TensorType<real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>, OwnedData>& p_hiv_pop_natural_deaths,
@@ -118,6 +127,7 @@ struct HivSimulationState<ModelVariant, real_type,
     h_art_initiation(h_art_initiation),
     p_hiv_deaths(p_hiv_deaths) {}
 
+  template<bool O = OwnedData, typename = std::enable_if_t<O>>
   void reset() {
     p_hiv_pop.setZero();
     p_hiv_pop_natural_deaths.setZero();
@@ -141,16 +151,49 @@ struct ChildModelState<ChildModel, real_type, OwnedData> {
   TensorType<real_type, Sizes<hc2DS<ChildModel>, hcTT<ChildModel>, hc2AG<ChildModel>, NS<ChildModel>>, OwnedData> hc2_noart_aids_deaths;
   TensorType<real_type, Sizes<hTS<ChildModel>, hc1DS<ChildModel>, hc1AG<ChildModel>, NS<ChildModel>>, OwnedData> hc1_art_aids_deaths;
   TensorType<real_type, Sizes<hTS<ChildModel>, hc2DS<ChildModel>, hc2AG<ChildModel>, NS<ChildModel>>, OwnedData> hc2_art_aids_deaths;
-  real_type hiv_births;
-  TensorFixedSize<real_type, Sizes<hcAG_coarse<ChildModel>>, OwnedData> hc_art_init;
-  TensorFixedSize<real_type, Sizes<hc1DS<ChildModel>, hcTT<ChildModel>, hcAG_end<ChildModel>, NS<ChildModel>>, OwnedData> hc_art_need_init;
-  real_type ctx_need;
-  real_type ctx_mean;
+  TensorType<real_type, Sizes<1>, OwnedData> hiv_births;
+  TensorType<real_type, Sizes<hcAG_coarse<ChildModel>>, OwnedData> hc_art_init;
+  TensorType<real_type, Sizes<hc1DS<ChildModel>, hcTT<ChildModel>, hcAG_end<ChildModel>, NS<ChildModel>>, OwnedData> hc_art_need_init;
+  TensorType<real_type, Sizes<1>, OwnedData> ctx_need;
+  TensorType<real_type, Sizes<1>, OwnedData> ctx_mean;
 
+  template<bool O = OwnedData, typename = std::enable_if_t<O>>
   ChildModelState(const Parameters<ChildModel, real_type> &pars) {
+
     reset();
   }
 
+  template<bool O = OwnedData, typename = std::enable_if_t<!O>>
+  ChildModelState(
+    const TensorType<real_type, Sizes<hc1DS<ChildModel>, hcTT<ChildModel>, hc1AG<ChildModel>, NS<ChildModel>>, OwnedData>& hc1_hiv_pop,
+    const TensorType<real_type, Sizes<hc2DS<ChildModel>, hcTT<ChildModel>, hc2AG<ChildModel>, NS<ChildModel>>, OwnedData>& hc2_hiv_pop,
+    const TensorType<real_type, Sizes<hTS<ChildModel>, hc1DS<ChildModel>, hc1AG<ChildModel>, NS<ChildModel>>, OwnedData>& hc1_art_pop,
+    const TensorType<real_type, Sizes<hTS<ChildModel>, hc2DS<ChildModel>, hc2AG<ChildModel>, NS<ChildModel>>, OwnedData>& hc2_art_pop,
+    const TensorType<real_type, Sizes<hc1DS<ChildModel>, hcTT<ChildModel>, hc1AG<ChildModel>, NS<ChildModel>>, OwnedData>& hc1_noart_aids_deaths,
+    const TensorType<real_type, Sizes<hc2DS<ChildModel>, hcTT<ChildModel>, hc2AG<ChildModel>, NS<ChildModel>>, OwnedData>& hc2_noart_aids_deaths,
+    const TensorType<real_type, Sizes<hTS<ChildModel>, hc1DS<ChildModel>, hc1AG<ChildModel>, NS<ChildModel>>, OwnedData>& hc1_art_aids_deaths,
+    const TensorType<real_type, Sizes<hTS<ChildModel>, hc2DS<ChildModel>, hc2AG<ChildModel>, NS<ChildModel>>, OwnedData>& hc2_art_aids_deaths,
+    const TensorType<real_type, Sizes<1>, OwnedData>& hiv_births,
+    const TensorType<real_type, Sizes<hcAG_coarse<ChildModel>>, OwnedData>& hc_art_init,
+    const TensorType<real_type, Sizes<hc1DS<ChildModel>, hcTT<ChildModel>, hcAG_end<ChildModel>, NS<ChildModel>>, OwnedData>& hc_art_need_init,
+    const TensorType<real_type, Sizes<1>, OwnedData>& ctx_need,
+    const TensorType<real_type, Sizes<1>, OwnedData>& ctx_mean
+  ) :
+    hc1_hiv_pop(hc1_hiv_pop),
+    hc2_hiv_pop(hc2_hiv_pop),
+    hc1_art_pop(hc1_art_pop),
+    hc2_art_pop(hc2_art_pop),
+    hc1_noart_aids_deaths(hc1_noart_aids_deaths),
+    hc2_noart_aids_deaths(hc2_noart_aids_deaths),
+    hc1_art_aids_deaths(hc1_art_aids_deaths),
+    hc2_art_aids_deaths(hc2_art_aids_deaths),
+    hiv_births(hiv_births),
+    hc_art_init(hc_art_init),
+    hc_art_need_init(hc_art_need_init),
+    ctx_need(ctx_need),
+    ctx_mean(ctx_mean) {}
+
+  template<bool O = OwnedData, typename = std::enable_if_t<O>>
   void reset() {
     hc1_hiv_pop.setZero();
     hc2_hiv_pop.setZero();
@@ -160,11 +203,11 @@ struct ChildModelState<ChildModel, real_type, OwnedData> {
     hc2_noart_aids_deaths.setZero();
     hc1_art_aids_deaths.setZero();
     hc2_art_aids_deaths.setZero();
-    hiv_births = 0;
+    hiv_births.setZero();
     hc_art_init.setZero();
     hc_art_need_init.setZero();
-    ctx_need = 0;
-    ctx_mean = 0;
+    ctx_need.setZero();
+    ctx_mean.setZero();
   }
 };
 
@@ -174,11 +217,13 @@ struct State {
   HivSimulationState<ModelVariant, real_type, OwnedData> hiv;
   ChildModelState<ModelVariant, real_type, OwnedData> children;
 
+  template<bool O = OwnedData, typename = std::enable_if_t<O>>
   State(const Parameters<ModelVariant, real_type> &pars) :
       dp(pars),
       hiv(pars),
       children(pars) {}
 
+  template<bool O = OwnedData, typename = std::enable_if_t<!O>>
   State(const DemographicProjectionState<ModelVariant, real_type, OwnedData> &dp,
         const HivSimulationState<ModelVariant, real_type, OwnedData> &hiv,
         const ChildModelState<ModelVariant, real_type, OwnedData> &children)
@@ -186,6 +231,7 @@ struct State {
       hiv(hiv),
       children(children) {}
 
+  template<bool O = OwnedData, typename = std::enable_if_t<O>>
   void reset() {
     dp.reset();
     hiv.reset();

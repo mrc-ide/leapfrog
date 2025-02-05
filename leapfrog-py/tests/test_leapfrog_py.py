@@ -12,10 +12,19 @@ from leapfrog_py.leapfrog_py import (
 @pytest.fixture
 def parameters():
     current_dir = os.path.dirname(__file__)
-    test_data_dir = os.path.join(current_dir, "../../inst/standalone_model/data/adult_data")
-    test_data_files = [f for f in os.listdir(test_data_dir) if os.path.isfile(os.path.join(test_data_dir, f))]
+    test_data_dir = os.path.join(
+        current_dir, "../../inst/standalone_model/data/child_data"
+    )
+    test_data_files = [
+        f
+        for f in os.listdir(test_data_dir)
+        if os.path.isfile(os.path.join(test_data_dir, f))
+    ]
 
-    parameters = {f: read_standalone_data(os.path.join(test_data_dir, f)) for f in test_data_files}
+    parameters = {
+        f: read_standalone_data(os.path.join(test_data_dir, f))
+        for f in test_data_files
+    }
     parameters["h_art_stage_dur"] = np.array([0.5, 0.5], order="F")
     return parameters
 
@@ -27,6 +36,11 @@ def state():
     hAG = 66  # noqa: N806
     hDS = 7  # noqa: N806
     hTS = 3  # noqa: N806
+    hc1DS = 7  # noqa: N806
+    hc2DS = 6  # noqa: N806
+    hc1AG = 5  # noqa: N806
+    hc2AG = 10  # noqa: N806
+    hcTT = 4  # noqa: N806
     no_output_years = 61
     return {
         "p_total_pop": np.zeros((pAG, NS, no_output_years), order="F"),
@@ -53,6 +67,38 @@ def state():
             (hDS, hAG, NS, no_output_years), order="F"
         ),
         "p_hiv_deaths": np.zeros((pAG, NS, no_output_years), order="F"),
+        "hc1_hiv_pop": np.zeros(
+            (hc1DS, hcTT, hc1AG, NS, no_output_years), order="F"
+        ),
+        "hc2_hiv_pop": np.zeros(
+            (hc2DS, hcTT, hc2AG, NS, no_output_years), order="F"
+        ),
+        "hc1_art_pop": np.zeros(
+            (hTS, hc1DS, hc1AG, NS, no_output_years), order="F"
+        ),
+        "hc2_art_pop": np.zeros(
+            (hTS, hc2DS, hc2AG, NS, no_output_years), order="F"
+        ),
+        "hc1_noart_aids_deaths": np.zeros(
+            (hc1DS, hcTT, hc1AG, NS, no_output_years), order="F"
+        ),
+        "hc2_noart_aids_deaths": np.zeros(
+            (hc2DS, hcTT, hc2AG, NS, no_output_years), order="F"
+        ),
+        "hc1_art_aids_deaths": np.zeros(
+            (hTS, hc1DS, hc1AG, NS, no_output_years), order="F"
+        ),
+        "hc2_art_aids_deaths": np.zeros(
+            (hTS, hc2DS, hc2AG, NS, no_output_years), order="F"
+        ),
+        "hiv_births": np.zeros(no_output_years, order="F"),
+        "hc_art_total": np.zeros((4, no_output_years), order="F"),
+        "hc_art_init": np.zeros((4, no_output_years), order="F"),
+        "hc_art_need_init": np.zeros(
+            (hc1DS, hcTT, 15, NS, no_output_years), order="F"
+        ),
+        "ctx_need": np.zeros(no_output_years, order="F"),
+        "ctx_mean": np.zeros(no_output_years, order="F"),
     }
 
 
@@ -108,33 +154,17 @@ def test_can_run_single_year(parameters, state):
     assert np.all(state["p_hiv_deaths"] == 0)
 
 
-def test_can_run_model(parameters, state):
+def test_single_year_and_full_fit_agree(parameters, state):
     full_fit = run_leapfrog(parameters)
 
     set_initial_state(parameters, state)
     for i in range(1, 61):
         project_single_year(i, parameters, state)
 
-    assert np.all(full_fit["p_total_pop"] == state["p_total_pop"])
-    assert np.all(full_fit["births"] == state["births"])
-    assert np.all(
-        full_fit["p_total_pop_natural_deaths"]
-        == state["p_total_pop_natural_deaths"]
-    )
-    assert np.all(full_fit["p_hiv_pop"] == state["p_hiv_pop"])
-    assert np.all(
-        full_fit["p_hiv_pop_natural_deaths"]
-        == state["p_hiv_pop_natural_deaths"]
-    )
-    assert np.all(full_fit["h_hiv_adult"] == state["h_hiv_adult"])
-    assert np.all(full_fit["h_art_adult"] == state["h_art_adult"])
-    assert np.all(
-        full_fit["h_hiv_deaths_no_art"] == state["h_hiv_deaths_no_art"]
-    )
-    assert np.all(full_fit["p_infections"] == state["p_infections"])
-    assert np.all(full_fit["h_art_initiation"] == state["h_art_initiation"])
-    assert np.all(full_fit["h_hiv_deaths_art"] == state["h_hiv_deaths_art"])
-    assert np.all(full_fit["p_hiv_deaths"] == state["p_hiv_deaths"])
+    for key in full_fit:
+        assert np.all(
+            full_fit[key] == state[key]
+        ), f"Different result for output {key}"
 
 
 def test_year_bounds_are_checked(parameters, state):
@@ -150,12 +180,6 @@ def test_can_run_full_model(parameters):
 
     # TODO: this is duplicating tests from R, ideally we could compare the output to the R output
 
-    # No HIV population < age 15
-    assert np.all(out["p_hiv_pop"][0:14, :, :] < 1e-20)
-    assert np.all(out["p_hiv_pop"][0:14, :, :] > -1e-20)
-    assert np.all(out["p_hiv_pop_natural_deaths"][0:15, :, :] == 0)
-    assert np.all(out["p_infections"][0:14, :, :] == 0)
-
     # There is HIV population after age 15
     assert np.all(out["p_hiv_pop"][15:, :, 60] > 0)
 
@@ -167,23 +191,10 @@ def test_can_run_full_model(parameters):
     assert np.all(out["p_infections"][15:69, :, 60] > 0)
 
     assert np.all(out["h_hiv_adult"][:, :, :, 60] != 0)
-    # TODO: Why are these 2 failing? I expect input data differences
-    # assert np.all(out["h_art_adult"][:, :, :, :, 60] != 0)
-    # assert np.all(out["h_art_initiation"][:, :, :, 60] != 0)
 
     # Outputs cannot be negative
-    assert np.all(out["p_total_pop"] >= 0)
-    assert np.all(out["births"] >= 0)
-    assert np.all(out["p_total_pop_natural_deaths"] >= 0)
-    assert np.all(out["p_hiv_pop"] >= 0)
-    assert np.all(out["p_hiv_pop_natural_deaths"] >= 0)
-    assert np.all(out["h_hiv_adult"] >= 0)
-    assert np.all(out["h_art_adult"] >= 0)
-    assert np.all(out["h_hiv_deaths_no_art"] >= 0)
-    assert np.all(out["p_infections"] >= 0)
-    assert np.all(out["h_art_initiation"] >= 0)
-    assert np.all(out["h_hiv_deaths_art"] >= 0)
-    assert np.all(out["p_hiv_deaths"] >= 0)
+    for key in out:
+        assert np.all(out[key] >= 0)
 
 
 def test_can_run_full_model_for_specified_years(parameters):
