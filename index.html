@@ -100,9 +100,11 @@
 <p>You can control how the simulation model is run with the following arguments:</p>
 <ul>
 <li>
+<code>run_hiv_simulation</code> which is <code>TRUE</code> by default. Set to <code>FALSE</code> to turn off the HIV simulation and run only the demographic projection.</li>
+<li>
 <code>hiv_age_stratification</code> which must be “coarse” or “full”. Coarse is run with 5-year age groups and full with single year ages.</li>
 <li>
-<code>run_child_model</code> which is <code>FALSE</code> by default. Set to <code>TRUE</code> to run the paediatric portion of the model.</li>
+<code>run_child_model</code> which is <code>FALSE</code> by default. Set to <code>TRUE</code> to run the child portion of the model.</li>
 </ul>
 </div>
 <div class="section level2">
@@ -113,16 +115,16 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mrc-ide/frogger" class="external-link">frogger</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">pjnz</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ"</span>, </span>
+<span><span class="va">pjnz</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ"</span>,</span>
 <span>                    package <span class="op">=</span> <span class="st">"frogger"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">demp</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/prepare_leapfrog_demp.html">prepare_leapfrog_demp</a></span><span class="op">(</span><span class="va">pjnz</span><span class="op">)</span></span>
 <span><span class="va">hivp</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/prepare_leapfrog_projp.html">prepare_leapfrog_projp</a></span><span class="op">(</span><span class="va">pjnz</span><span class="op">)</span></span></code></pre></div>
 <p>Simulate adult ‘full’ age group (single-year age) and ‘coarse’ age group (collapsed age groups) models from 1970 to 2030 with 10 HIV time steps per year.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">lsimF</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/run_model.html">run_model</a></span><span class="op">(</span><span class="va">demp</span>, <span class="va">hivp</span>, <span class="fl">1970</span><span class="op">:</span><span class="fl">2030</span>, <span class="fl">10L</span>, </span>
+<code class="sourceCode R"><span><span class="va">lsimF</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/run_model.html">run_model</a></span><span class="op">(</span><span class="va">demp</span>, <span class="va">hivp</span>, <span class="fl">1970</span><span class="op">:</span><span class="fl">2030</span>, <span class="fl">10L</span>,</span>
 <span>                   hiv_age_stratification <span class="op">=</span> <span class="st">"full"</span>, run_child_model <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="va">lsimC</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/run_model.html">run_model</a></span><span class="op">(</span><span class="va">demp</span>, <span class="va">hivp</span>, <span class="fl">1970</span><span class="op">:</span><span class="fl">2030</span>, <span class="fl">10L</span>, </span>
+<span><span class="va">lsimC</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/run_model.html">run_model</a></span><span class="op">(</span><span class="va">demp</span>, <span class="va">hivp</span>, <span class="fl">1970</span><span class="op">:</span><span class="fl">2030</span>, <span class="fl">10L</span>,</span>
 <span>                   hiv_age_stratification <span class="op">=</span> <span class="st">"coarse"</span>, run_child_model <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p>Compare the HIV prevalence age 15-49 years and AIDS deaths 50+ years. Deaths 50+ years are to show some noticeable divergence between the <code>"full"</code> and <code>"coarse"</code> age group simulations.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
