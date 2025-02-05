@@ -4,3 +4,4 @@ set -e
 HERE=$(dirname $0)
 
 unzip $HERE/data/adult_data.zip -d $HERE/data/adult_data
+unzip $HERE/data/child_data.zip -d $HERE/data/child_data

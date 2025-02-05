@@ -7,11 +7,22 @@
 root_dir <- here::here()
 save_root_dir <- "inst/standalone_model/data"
 
-demp <- readRDS(testthat::test_path("testdata/demographic_projection_object_adult.rds"))
-parameters <- readRDS(testthat::test_path("testdata/projection_parameters_adult.rds"))
+write_standalone_data <- function(input_data, data_map, dest) {
+  t <- tempfile()
+  dir.create(t)
 
-t <- tempfile()
-dir.create(t)
+  ## Basepop handled separately as we only save a slice of this out
+  frogger:::serialize_r_to_tensor(demp$basepop[, , 1], file.path(t, "basepop"))
+  for (r_name in names(data_map)) {
+    frogger:::serialize_r_to_tensor(input_data[[r_name]], file.path(t, data_map[[r_name]]))
+  }
+  o <- zip::zip(dest,
+                list.files(t, full.names = TRUE),
+                include_directories = FALSE,
+                root = save_root_dir,
+                mode = "cherry-pick")
+  file.path(save_root_dir, o)
+}
 
 ## Map from name in demp/parameters to name expected in C++ code
 adult_model_data_map <- list(
@@ -32,47 +43,73 @@ adult_model_data_map <- list(
   art15plus_isperc = "adults_on_art_is_percent",
   artcd4elig_idx = "idx_hm_elig"
 )
-## Basepop handled separately as we only save a slice of this out
-frogger:::serialize_r_to_tensor(demp$basepop[, , 1], file.path(t, "basepop"))
-input_data <- c(demp, parameters)
-for (r_name in names(adult_model_data_map)) {
-  frogger:::serialize_r_to_tensor(input_data[[r_name]], file.path(t, adult_model_data_map[[r_name]]))
-}
-o <- zip::zip("adult_data.zip",
-              list.files(t, full.names = TRUE),
-              include_directories = FALSE,
-              root = save_root_dir,
-              mode = "cherry-pick")
-message(sprintf("Wrote adult test data to %s", file.path(save_root_dir, o)))
 
-# source(file.path("R", "spectrum_inputs.R"))
-# child <- setup_childmodel(testthat::test_path("testdata/child_parms.rds"))
-#
-# t_child <- tempfile()
-# dir.create(t_child)
-#
-# frogger:::serialize_r_to_tensor(child$demp$basepop[, , 1], file.path(t_child, "basepop"))
-# frogger:::serialize_r_to_tensor(child$demp$Sx, file.path(t_child, "survival"))
-# frogger:::serialize_r_to_tensor(child$demp$netmigr, file.path(t_child, "net_migration"))
-# frogger:::serialize_r_to_tensor(child$demp$asfr, file.path(t_child, "age_sex_fertility_ratio"))
-# frogger:::serialize_r_to_tensor(child$demp$births_sex_prop, file.path(t_child, "births_sex_prop"))
-# frogger:::serialize_r_to_tensor(child$demp$mx, file.path(t_child, "births_sex_prop"))
-# frogger:::serialize_r_to_tensor(child$demp$tfr, file.path(t_child, "births_sex_prop"))
-# frogger:::serialize_r_to_tensor(child$demp$asfd, file.path(t_child, "births_sex_prop"))
-# frogger:::serialize_r_to_tensor(child$demp$srb, file.path(t_child, "births_sex_prop"))
-# frogger:::serialize_r_to_tensor(child$demp$births, file.path(t_child, "births_sex_prop"))
-# frogger:::serialize_r_to_tensor(child$demp$projection_period, file.path(t_child, "births_sex_prop"))
-# frogger:::serialize_r_to_tensor(child$demp$netmigr_adj, file.path(t_child, "births_sex_prop"))
-#
-# frogger:::serialize_r_to_tensor(child$parameters$incidinput, file.path(t_child, "incidence_rate"))
-# frogger:::serialize_r_to_tensor(child$parameters$incrr_age, file.path(t_child, "incidence_rate_relative_risk_age"))
-# frogger:::serialize_r_to_tensor(child$parameters$incrr_sex, file.path(t_child, "incidence_rate_relative_risk_sex"))
-# frogger:::serialize_r_to_tensor(child$parameters$cd4_mort_full, file.path(t_child, "cd4_mortality_full"))
-# frogger:::serialize_r_to_tensor(child$parameters$cd4_prog_full, file.path(t_child, "cd4_progression_full"))
-# frogger:::serialize_r_to_tensor(child$parameters$cd4_initdist_full, file.path(t_child, "cd4_initdist_full"))
-# frogger:::serialize_r_to_tensor(child$parameters$art_mort_full, file.path(t_child, "art_mortality_full"))
-# frogger:::serialize_r_to_tensor(child$parameters$artmx_timerr, file.path(t_child, "artmx_timerr"))
-# frogger:::serialize_r_to_tensor(child$parameters$art_dropout, file.path(t_child, "art_dropout"))
-# frogger:::serialize_r_to_tensor(child$parameters$art15plus_num, file.path(t_child, "art15plus_num"))
-# frogger:::serialize_r_to_tensor(child$parameters$art15plus_isperc, file.path(t_child, "art15plus_isperc"))
-# frogger:::serialize_r_to_tensor(child$parameters$artcd4elig_idx, file.path(t_child, "artcd4elig_idx"))
+demp <- readRDS(testthat::test_path("testdata/demographic_projection_object_adult.rds"))
+parameters <- readRDS(testthat::test_path("testdata/projection_parameters_adult.rds"))
+input_data <- c(demp, parameters)
+path <- write_standalone_data(input_data, adult_model_data_map, "adult_data.zip")
+message(sprintf("Wrote adult test data to %s", path))
+
+
+child_model_data_map <- list(
+  Sx = "survival_probability",
+  netmigr_adj = "net_migration",
+  asfr = "age_specific_fertility_rate",
+  births_sex_prop = "births_sex_prop",
+  incidinput = "incidence_rate",
+  incrr_age = "incidence_age_rate_ratio",
+  incrr_sex = "incidence_sex_rate_ratio",
+  cd4_mort_full = "cd4_mortality_full",
+  cd4_prog_full = "cd4_progression_full",
+  cd4_initdist_full = "cd4_initial_distribution_full",
+  art_mort_full = "art_mortality_rate_full",
+  artmx_timerr = "art_mortality_time_rate_ratio",
+  art_dropout = "art_dropout",
+  art15plus_num = "adults_on_art",
+  art15plus_isperc = "adults_on_art_is_percent",
+  artcd4elig_idx = "idx_hm_elig",
+  paed_incid_input = "hc_nosocomial",
+  paed_cd4_dist = "hc1_cd4_dist",
+  paed_cd4_transition = "hc_cd4_transition",
+  paed_cd4_mort = "hc1_cd4_mort",
+  adol_cd4_mort = "hc2_cd4_mort",
+  paed_cd4_prog = "hc1_cd4_prog",
+  adol_cd4_prog = "hc2_cd4_prog",
+  ctx_effect = "ctx_effect",
+  ctx_val = "ctx_val",
+  paed_art_elig_age = "hc_art_elig_age",
+  paed_art_elig_cd4 = "hc_art_elig_cd4",
+  mort_art_rr = "hc_art_mort_rr",
+  paed_art_mort = "hc1_art_mort",
+  adol_art_mort = "hc2_art_mort",
+  artpaeds_isperc = "hc_art_isperc",
+  paed_art_val = "hc_art_val",
+  init_art_dist = "hc_art_init_dist",
+  adult_cd4_dist = "adult_cd4_dist",
+  fert_mult_by_age = "fert_mult_by_age",
+  fert_mult_offart = "fert_mult_off_art",
+  fert_mult_onart = "fert_mult_on_art",
+  tfr = "total_fertility_rate",
+  laf = "local_adj_factor",
+  pmtct = "PMTCT",
+  mtct = "vertical_transmission_rate",
+  pmtct_mtct = "PMTCT_transmission_rate",
+  pmtct_dropout = "PMTCT_dropout",
+  pmtct_input_isperc = "PMTCT_input_is_percent",
+  bf_duration_art = "breastfeeding_duration_art",
+  bf_duration_no_art = "breastfeeding_duration_no_art",
+  mat_hiv_births = "mat_hiv_births",
+  mat_prev_input = "mat_prev_input",
+  prop_lt200 = "prop_lt200",
+  prop_gte350 = "prop_gte350",
+  incrate = "incrate",
+  ctx_val_ispercent = "ctx_val_is_percent",
+  paed_art_age_spec = "hc_art_is_age_spec",
+  hc_age_coarse = "hc_age_coarse"
+)
+
+source(file.path("R", "spectrum_inputs.R"))
+child <- setup_childmodel(testthat::test_path("testdata/child_parms.rds"))
+input_data <- c(child$demp, child$parameters)
+path <- write_standalone_data(input_data, child_model_data_map, "child_data.zip")
+message(sprintf("Wrote child test data to %s", path))
