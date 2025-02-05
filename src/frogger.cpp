@@ -62,11 +62,11 @@ Rcpp::List simulate_model(const leapfrog::StateSpace<ModelVariant> ss,
     Rf_error("projection_period \"%s\" not found. Please select \"midyear\" or \"calendar\".\n",
 	     projection_period_str.get_cstring());
   }
-  
+
   const leapfrog::Options<double> opts = {
       hiv_steps,
       Rcpp::as<int>(data["t_ART_start"]) - 1,
-      ss.base.hAG,
+      ss.hiv.hAG,
       projection_period_int
   };
 
@@ -90,18 +90,21 @@ Rcpp::List run_base_model(const Rcpp::List data,
   const int hiv_steps = transform_hts_per_year(hts_per_year);
 
   Rcpp::List ret;
-  if (model_variant == "ChildModel") {
+  if (model_variant == "DemographicProjection") {
+    constexpr auto ss = leapfrog::StateSpace<leapfrog::DemographicProjection>();
+    ret = simulate_model<leapfrog::DemographicProjection>(ss, data, proj_years, hiv_steps, save_steps);
+  } else if (model_variant == "ChildModel") {
     constexpr auto ss = leapfrog::StateSpace<leapfrog::ChildModel>();
     ret = simulate_model<leapfrog::ChildModel>(ss, data, proj_years, hiv_steps, save_steps);
-  } else if (model_variant == "BaseModelFullAgeStratification") {
-    constexpr auto ss = leapfrog::StateSpace<leapfrog::BaseModelFullAgeStratification>();
-    ret = simulate_model<leapfrog::BaseModelFullAgeStratification>(ss, data, proj_years, hiv_steps, save_steps);
-  } else if (model_variant == "BaseModelCoarseAgeStratification") {
-    constexpr auto ss = leapfrog::StateSpace<leapfrog::BaseModelCoarseAgeStratification>();
-    ret = simulate_model<leapfrog::BaseModelCoarseAgeStratification>(ss, data, proj_years, hiv_steps, save_steps);
+  } else if (model_variant == "HivFullAgeStratification") {
+    constexpr auto ss = leapfrog::StateSpace<leapfrog::HivFullAgeStratification>();
+    ret = simulate_model<leapfrog::HivFullAgeStratification>(ss, data, proj_years, hiv_steps, save_steps);
+  } else if (model_variant == "HivCoarseAgeStratification") {
+    constexpr auto ss = leapfrog::StateSpace<leapfrog::HivCoarseAgeStratification>();
+    ret = simulate_model<leapfrog::HivCoarseAgeStratification>(ss, data, proj_years, hiv_steps, save_steps);
   } else {
     Rcpp::stop("Invalid model variant " + model_variant + " must be one of " +
-               "'BaseModelFullAgeStratification', 'BaseModelCoarseAgeStratification' or 'ChildModel'");
+               "'DemographicProjection', 'HivFullAgeStratification', 'HivCoarseAgeStratification' or 'ChildModel'");
   }
 
   return ret;

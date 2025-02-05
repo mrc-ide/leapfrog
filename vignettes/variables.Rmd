@@ -63,7 +63,8 @@ For the `StateSpace` struct (defined as `ss` in the code) we use the `ss_` prefi
 
 so for example:
 
-* `ss_b` = `ss.base`
+* `ss_d` = `ss.dp`
+* `ss_h` = `ss.hiv`
 * `ss_c` = `ss.children`
 
 # Leapfrog to Frogger glossary
@@ -140,9 +141,9 @@ In 5 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 | paed_cd4_dist      | children.hc1_cd4_dist                    | Distribution of infections by CD4 category by infection type                                                                                                          |
 | paed_cd4_transition| children.hc_cd4_transition               | CD4 mapping between 0-4 year olds and 5-14 year olds                                                                                                                  |
 | paed_cd4_mort      | children.hc1_cd4_mort                    | Probability of mortality by CD4 stage, age, and sex for 0-4 year olds                                                                                                 |
-| adol_cd4_mort      | children.hc2_cd4_mort                    | Probability of mortality by CD4 stage, age, and sex for 5-14 year olds                                                                                                |                               
+| adol_cd4_mort      | children.hc2_cd4_mort                    | Probability of mortality by CD4 stage, age, and sex for 5-14 year olds                                                                                                |
 | paed_cd4_prog      | children.hc1_cd4_prog                    | Probability of progressing to the subsequent CD4 stage for 0-4 year olds                                                                                              |
-| adol_cd4_prog      | children.hc2_cd4_prog                    | Probability of progressing to the subsequent CD4 stage for 5-14 year olds                                                                                             |                                               
+| adol_cd4_prog      | children.hc2_cd4_prog                    | Probability of progressing to the subsequent CD4 stage for 5-14 year olds                                                                                             |
 | ctx_effect         | children.ctx_effect                      | Effectiveness of cotrimoxazole at averting mortality                                                                                                                  |
 | ctx_val            | children.ctx_val                         | Number of children receiving cotrimoxazole                                                                                                                            |
 | paed_art_elig_age  | children.hc_art_elig_age                 | Age at which children are eligible for ART by year                                                                                                                    |

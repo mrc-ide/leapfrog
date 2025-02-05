@@ -24,14 +24,22 @@ create_array(const T &value) {
   return internal::create_array(value, std::make_index_sequence<N>());
 }
 
-
-template<HivAgeStratification S>
-struct BaseModelStateSpace;
-
-template<>
-struct BaseModelStateSpace<coarse> {
+struct DemographicProjectionStateSpace {
   static constexpr int NS = 2;
   static constexpr int pAG = 81;
+};
+
+
+template<HivAgeStratification S>
+struct HivSimulationStateSpace;
+
+template<>
+struct HivSimulationStateSpace<none> {
+  static constexpr int hAG = 0; // Need this to initialise options (TODO: split these up)
+};
+
+template<>
+struct HivSimulationStateSpace<coarse> {
   static constexpr int hAG = 9;
   static constexpr int hDS = 7;
   static constexpr int hTS = 3;
@@ -39,9 +47,7 @@ struct BaseModelStateSpace<coarse> {
 };
 
 template<>
-struct BaseModelStateSpace<full> {
-  static constexpr int NS = 2;
-  static constexpr int pAG = 81;
+struct HivSimulationStateSpace<full> {
   static constexpr int hAG = 66;
   static constexpr int hDS = 7;
   static constexpr int hTS = 3;
@@ -69,7 +75,7 @@ struct ChildModelStateSpace<true> {
   static constexpr int hc2AG = 10;
   // Coarse age groups 5-14, used for paed progression
   static constexpr int hc2AG_c = 1;
-  // Age at which the paediatric age group ends (hc1AG + hc2AG)
+  // Age at which the child age group ends (hc1AG + hc2AG)
   static constexpr int hcAG_end = 15;
   // Number of transmission types
   static constexpr int hcTT = 4;
@@ -96,7 +102,8 @@ struct ChildModelStateSpace<false> {
 
 template<typename ModelVariant>
 struct StateSpace {
-  static constexpr auto base = BaseModelStateSpace<ModelVariant::stratification>();
+  static constexpr auto dp = DemographicProjectionStateSpace();
+  static constexpr auto hiv = HivSimulationStateSpace<ModelVariant::stratification>();
   static constexpr auto children = ChildModelStateSpace<ModelVariant::run_child_model>();
 };
 

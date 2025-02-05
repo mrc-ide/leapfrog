@@ -24,10 +24,32 @@ struct ChildModelState {
 };
 
 template<typename ModelVariant, typename real_type>
-struct BaseModelState {
+struct DemographicProjectionState {
   TensorFixedSize<real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>> p_total_pop;
   real_type births;
   TensorFixedSize<real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>> p_total_pop_natural_deaths;
+
+  DemographicProjectionState(const Parameters<ModelVariant, real_type> &pars) {
+    reset();
+  }
+
+  void reset() {
+    p_total_pop.setZero();
+    births = 0;
+    p_total_pop_natural_deaths.setZero();
+  }
+};
+
+template<typename ModelVariant, typename real_type, typename Enable = void>
+struct HivSimulationState {
+  HivSimulationState(const Parameters<ModelVariant, real_type> &pars) {}
+
+  void reset() {}
+};
+
+template<typename ModelVariant, typename real_type>
+struct HivSimulationState<ModelVariant, real_type,
+    std::enable_if_t<ModelVariant::run_hiv_simulation>> {
   TensorFixedSize<real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>> p_hiv_pop;
   TensorFixedSize<real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>> p_hiv_pop_natural_deaths;
   TensorFixedSize<real_type, Sizes<hDS<ModelVariant>, hAG<ModelVariant>, NS<ModelVariant>>> h_hiv_adult;
@@ -38,14 +60,11 @@ struct BaseModelState {
   TensorFixedSize<real_type, Sizes<hDS<ModelVariant>, hAG<ModelVariant>, NS<ModelVariant>>> h_art_initiation;
   TensorFixedSize<real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>> p_hiv_deaths;
 
-  BaseModelState(const Parameters<ModelVariant, real_type> &pars) {
+  HivSimulationState(const Parameters<ModelVariant, real_type> &pars) {
     reset();
   }
 
   void reset() {
-    p_total_pop.setZero();
-    births = 0;
-    p_total_pop_natural_deaths.setZero();
     p_hiv_pop.setZero();
     p_hiv_pop_natural_deaths.setZero();
     h_hiv_adult.setZero();
@@ -97,15 +116,18 @@ struct ChildModelState<ChildModel, real_type> {
 
 template<typename ModelVariant, typename real_type>
 struct State {
-  BaseModelState<ModelVariant, real_type> base;
+  DemographicProjectionState<ModelVariant, real_type> dp;
+  HivSimulationState<ModelVariant, real_type> hiv;
   ChildModelState<ModelVariant, real_type> children;
 
   State(const Parameters<ModelVariant, real_type> &pars) :
-      base(pars),
+      dp(pars),
+      hiv(pars),
       children(pars) {}
 
   void reset() {
-    base.reset();
+    dp.reset();
+    hiv.reset();
     children.reset();
   }
 };

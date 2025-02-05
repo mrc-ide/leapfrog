@@ -39,27 +39,36 @@ struct Options {
 };
 
 template<typename real_type>
-struct BaseModelParameters {
-  Options<real_type> options;
+struct DemographicProjectionParameters {
   Demography<real_type> demography;
+};
+
+template<typename real_type>
+struct HivSimulationParameters {
   Incidence<real_type> incidence;
   NaturalHistory<real_type> natural_history;
   Art<real_type> art;
 };
 
-template<typename ModelVariant, typename real_type>
-struct ChildModelParameters {
-};
-
 template<typename real_type>
-struct ChildModelParameters<ChildModel, real_type> {
+struct ChildModelParameters {
   Children<real_type> children;
 };
 
+struct Empty {};
+
 template<typename ModelVariant, typename real_type>
 struct Parameters {
-  BaseModelParameters<real_type> base;
-  ChildModelParameters<ModelVariant, real_type> children;
+    Options<real_type> options;
+    DemographicProjectionParameters<real_type> dp;
+
+    [[no_unique_address]] std::conditional_t<ModelVariant::run_hiv_simulation,
+        HivSimulationParameters<real_type>,
+        Empty> hiv;
+
+    [[no_unique_address]] std::conditional_t<ModelVariant::run_child_model,
+        ChildModelParameters<real_type>,
+        Empty> children;
 };
 
 }

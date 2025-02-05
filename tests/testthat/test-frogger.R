@@ -241,7 +241,7 @@ test_that("error thrown if model run with invalid HIV stratification", {
     run_model(demp, parameters, NULL, NULL, 2030L,
       hiv_age_stratification = "fine"
     ),
-    "hiv_age_stratification must be one of 'full', 'coarse', got 'fine'"
+    "hiv_age_stratification must be one of 'full', 'coarse', 'none', got 'fine'"
   )
 })
 

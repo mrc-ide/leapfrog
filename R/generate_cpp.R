@@ -531,7 +531,9 @@ generate_state_saver_func_body <- function(output) {
 
 model_variant_to_name <- function(model_variant) {
   if (model_variant == "ModelVariant") {
-    "base"
+    "demographic"
+  } else if (model_variant == "HivSimulation") {
+    "hiv"
   } else if (model_variant == "ChildModel") {
     "children"
   } else {

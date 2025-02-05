@@ -21,52 +21,52 @@ void save_output(leapfrog::StateSaver<ModelVariant, double> &state_saver,
 
   std::filesystem::path out_path(output_path);
   std::filesystem::path p_total_pop_path = out_path / "p_total_pop";
-  serialize::serialize_tensor<double, 3>(state.base.p_total_pop,
+  serialize::serialize_tensor<double, 3>(state.dp.p_total_pop,
                                          p_total_pop_path);
 
   std::filesystem::path births_path = out_path / "births";
-  serialize::serialize_tensor<double, 1>(state.base.births, births_path);
+  serialize::serialize_tensor<double, 1>(state.dp.births, births_path);
 
   std::filesystem::path p_total_pop_natural_deaths_path =
       out_path / "p_total_pop_natural_deaths";
-  serialize::serialize_tensor<double, 3>(state.base.p_total_pop_natural_deaths,
+  serialize::serialize_tensor<double, 3>(state.hiv.p_total_pop_natural_deaths,
                                          p_total_pop_natural_deaths_path);
 
   std::filesystem::path p_hiv_pop_path = out_path / "p_hiv_pop";
-  serialize::serialize_tensor<double, 3>(state.base.p_hiv_pop, p_hiv_pop_path);
+  serialize::serialize_tensor<double, 3>(state.hiv.p_hiv_pop, p_hiv_pop_path);
 
   std::filesystem::path p_hiv_pop_natural_deaths_path =
       out_path / "p_hiv_pop_natural_deaths";
-  serialize::serialize_tensor<double, 3>(state.base.p_hiv_pop_natural_deaths,
+  serialize::serialize_tensor<double, 3>(state.hiv.p_hiv_pop_natural_deaths,
                                          p_hiv_pop_natural_deaths_path);
 
   std::filesystem::path h_hiv_adult_path = out_path / "h_hiv_adult";
-  serialize::serialize_tensor<double, 4>(state.base.h_hiv_adult,
+  serialize::serialize_tensor<double, 4>(state.hiv.h_hiv_adult,
                                          h_hiv_adult_path);
 
   std::filesystem::path h_art_adult_path = out_path / "h_art_adult";
-  serialize::serialize_tensor<double, 5>(state.base.h_art_adult,
+  serialize::serialize_tensor<double, 5>(state.hiv.h_art_adult,
                                          h_art_adult_path);
 
   std::filesystem::path h_hiv_deaths_no_art_path =
       out_path / "h_hiv_deaths_no_art";
-  serialize::serialize_tensor<double, 4>(state.base.h_hiv_deaths_no_art,
+  serialize::serialize_tensor<double, 4>(state.hiv.h_hiv_deaths_no_art,
                                          h_hiv_deaths_no_art_path);
 
   std::filesystem::path p_infections_path = out_path / "p_infections";
-  serialize::serialize_tensor<double, 3>(state.base.p_infections,
+  serialize::serialize_tensor<double, 3>(state.hiv.p_infections,
                                          p_infections_path);
 
   std::filesystem::path h_hiv_deaths_art_path = out_path / "h_hiv_deaths_art";
-  serialize::serialize_tensor<double, 5>(state.base.h_hiv_deaths_art,
+  serialize::serialize_tensor<double, 5>(state.hiv.h_hiv_deaths_art,
                                          h_hiv_deaths_art_path);
 
   std::filesystem::path h_art_initiation_path = out_path / "h_art_initiation";
-  serialize::serialize_tensor<double, 4>(state.base.h_art_initiation,
+  serialize::serialize_tensor<double, 4>(state.hiv.h_art_initiation,
                                          h_art_initiation_path);
 
   std::filesystem::path p_hiv_deaths_path = out_path / "p_hiv_deaths";
-  serialize::serialize_tensor<double, 3>(state.base.p_hiv_deaths,
+  serialize::serialize_tensor<double, 3>(state.hiv.p_hiv_deaths,
                                          p_hiv_deaths_path);
 }
 
@@ -118,7 +118,7 @@ int main(int argc, char *argv[]) {
   std::filesystem::current_path(input_abs);
 
   // Only fine-grained ages at first
-  const auto ss = leapfrog::StateSpace<leapfrog::BaseModelFullAgeStratification>().base;
+  const auto ss = leapfrog::StateSpace<leapfrog::HivFullAgeStratification>().hiv;
 
   const leapfrog::Options<double> options = {
       hts_per_year,        // HIV steps per year
@@ -241,14 +241,23 @@ int main(int argc, char *argv[]) {
       0.2  // initiation_mortality_weight
   };
 
-  const leapfrog::Parameters<leapfrog::BaseModelFullAgeStratification, double> params = {
-      options,
-      demography,
-      incidence,
-      natural_history,
-      art};
+  const leapfrog::DemographicProjectionParameters<double> demog_params = {
+    demography
+  };
 
-  leapfrog::internal::IntermediateData<leapfrog::BaseModelFullAgeStratification, double> intermediate(
+  const leapfrog::HivSimulationParameters<double> hiv_params = {
+    incidence,
+    natural_history,
+    art
+  };
+
+  const leapfrog::Parameters<leapfrog::HivFullAgeStratification, double> params = {
+    options,
+    demog_params,
+    hiv_params
+  };
+
+  leapfrog::internal::IntermediateData<leapfrog::HivFullAgeStratification, double> intermediate(
       options.hAG_15plus);
 
   std::vector<int> save_steps(61);
@@ -269,27 +278,27 @@ int main(int argc, char *argv[]) {
   }
 
   for (size_t i = 0; i < n_runs; ++i) {
-    auto state_current = leapfrog::State<leapfrog::BaseModelFullAgeStratification, double>(
+    auto state_current = leapfrog::State<leapfrog::HivFullAgeStratification, double>(
         params);
     auto state_next = state_current;
-    leapfrog::set_initial_state<leapfrog::BaseModelFullAgeStratification, double>(state_current, params);
+    leapfrog::set_initial_state<leapfrog::HivFullAgeStratification, double>(state_current, params);
 
     // Save initial state
     state_output.save_state(state_current, 0);
 
     // Each time step is mid-point of the year
     for (int step = 1; step <= sim_years; ++step) {
-      leapfrog::run_general_pop_demographic_projection<leapfrog::BaseModelFullAgeStratification, double>(
+      leapfrog::run_general_pop_demographic_projection<leapfrog::HivFullAgeStratification, double>(
           step, params,
           state_current,
           state_next,
           intermediate);
-      leapfrog::run_hiv_pop_demographic_projection<leapfrog::BaseModelFullAgeStratification, double>(
+      leapfrog::run_hiv_pop_demographic_projection<leapfrog::HivFullAgeStratification, double>(
           step, params,
           state_current,
           state_next,
           intermediate);
-      leapfrog::run_hiv_model_simulation<leapfrog::BaseModelFullAgeStratification, double>(
+      leapfrog::run_hiv_model_simulation<leapfrog::HivFullAgeStratification, double>(
           step, params, state_current,
           state_next, intermediate);
       state_output.save_state(state_next, step);

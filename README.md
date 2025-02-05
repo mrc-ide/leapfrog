@@ -44,10 +44,12 @@ The simulation model is callable in R via a wrapper function
 You can control how the simulation model is run with the following
 arguments:
 
+- `run_hiv_simulation` which is `TRUE` by default. Set to `FALSE` to
+  turn off the HIV simulation and run only the demographic projection.
 - `hiv_age_stratification` which must be “coarse” or “full”. Coarse is
   run with 5-year age groups and full with single year ages.
 - `run_child_model` which is `FALSE` by default. Set to `TRUE` to run
-  the paediatric portion of the model.
+  the child portion of the model.
 
 ## Example
 
@@ -60,7 +62,7 @@ Prepare model inputs.
 ``` r
 library(frogger)
 
-pjnz <- system.file("pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ", 
+pjnz <- system.file("pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ",
                     package = "frogger", mustWork = TRUE)
 
 demp <- prepare_leapfrog_demp(pjnz)
@@ -72,9 +74,9 @@ Simulate adult ‘full’ age group (single-year age) and ‘coarse’ age group
 per year.
 
 ``` r
-lsimF <- run_model(demp, hivp, 1970:2030, 10L, 
+lsimF <- run_model(demp, hivp, 1970:2030, 10L,
                    hiv_age_stratification = "full", run_child_model = FALSE)
-lsimC <- run_model(demp, hivp, 1970:2030, 10L, 
+lsimC <- run_model(demp, hivp, 1970:2030, 10L,
                    hiv_age_stratification = "coarse", run_child_model = FALSE)
 ```
 
