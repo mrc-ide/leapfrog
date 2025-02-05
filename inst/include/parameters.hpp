@@ -43,23 +43,15 @@ struct DemographicProjectionParameters {
   Demography<real_type> demography;
 };
 
-template<bool run_hiv_simulation, typename real_type>
-struct HivSimulationParameters {
-};
-
 template<typename real_type>
-struct HivSimulationParameters<true, real_type> {
+struct HivSimulationParameters {
   Incidence<real_type> incidence;
   NaturalHistory<real_type> natural_history;
   Art<real_type> art;
 };
 
-template<bool run_child_model, typename real_type>
-struct ChildModelParameters {
-};
-
 template<typename real_type>
-struct ChildModelParameters<true, real_type> {
+struct ChildModelParameters {
   Children<real_type> children;
 };
 
@@ -71,11 +63,11 @@ struct Parameters {
     DemographicProjectionParameters<real_type> dp;
 
     [[no_unique_address]] std::conditional_t<ModelVariant::run_hiv_simulation,
-        HivSimulationParameters<ModelVariant::run_hiv_simulation, real_type>,
+        HivSimulationParameters<real_type>,
         Empty> hiv;
 
     [[no_unique_address]] std::conditional_t<ModelVariant::run_child_model,
-        ChildModelParameters<ModelVariant::run_child_model, real_type>,
+        ChildModelParameters<real_type>,
         Empty> children;
 };
 

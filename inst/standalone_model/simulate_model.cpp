@@ -245,7 +245,7 @@ int main(int argc, char *argv[]) {
     demography
   };
 
-  const leapfrog::HivSimulationParameters<leapfrog::HivFullAgeStratification::run_hiv_simulation, double> hiv_params = {
+  const leapfrog::HivSimulationParameters<double> hiv_params = {
     incidence,
     natural_history,
     art
