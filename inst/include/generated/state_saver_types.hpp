@@ -126,6 +126,7 @@ struct ChildModelOutputState<ChildModel, real_type> {
   Tensor1<real_type> ctx_need;
   Tensor2<real_type> ctx_mean;
   Tensor4<real_type> infection_by_type;
+  Tensor3<real_type> hc_stacked_bar;
 
   ChildModelOutputState(int output_years): 
     hc1_hiv_pop(
@@ -210,6 +211,11 @@ struct ChildModelOutputState<ChildModel, real_type> {
       StateSpace<ChildModel>().children.hc1AG,
       StateSpace<ChildModel>().base.NS,
       output_years
+    ),
+    hc_stacked_bar(
+      7,
+      5,
+      output_years
     ) {
     hc1_hiv_pop.setZero();
     hc2_hiv_pop.setZero();
@@ -225,6 +231,7 @@ struct ChildModelOutputState<ChildModel, real_type> {
     ctx_need.setZero();
     ctx_mean.setZero();
     infection_by_type.setZero();
+    hc_stacked_bar.setZero();
   }
 };
 
@@ -279,6 +286,7 @@ public:
     output_state.ctx_need(i) = state.children.ctx_need;
     output_state.ctx_mean.chip(i, output_state.ctx_mean.NumDimensions - 1) = state.children.ctx_mean;
     output_state.infection_by_type.chip(i, output_state.infection_by_type.NumDimensions - 1) = state.children.infection_by_type;
+    output_state.hc_stacked_bar.chip(i, output_state.hc_stacked_bar.NumDimensions - 1) = state.children.hc_stacked_bar;
     return;
   }
 };
