@@ -37,7 +37,7 @@ jobs:
         uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
-          cache-dependency-glob: "uv.lock"
+          cache-dependency-glob: "leapfrog-py/uv.lock"
 
       - name: "Set up Python"
         uses: actions/setup-python@v5
@@ -64,7 +64,7 @@ jobs:
         run: uv sync --all-extras --dev
 
       - name: Run tests & coverage
-        run: uv run pytest --cov --cov-config=pyproject.toml
+        run: uv run pytest --cov --cov-report=xml --cov-config=pyproject.toml
 
       - name: Lint
         run: |
