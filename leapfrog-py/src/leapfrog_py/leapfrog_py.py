@@ -1,12 +1,14 @@
 import numpy as np
 from leapfrog import (  # type: ignore[attr-defined]
     Art,
-    BaseModelParameters,
-    BaseModelState,
     ChildModelParameters,
     ChildModelState,
     Children,
     Demography,
+    DemographicProjectionParameters,
+    DemographicProjectionState,
+    HivSimulationParameters,
+    HivSimulationState,
     Incidence,
     NaturalHistory,
     Options,
@@ -80,10 +82,12 @@ def _initialise_params(
         "art_idx_hm_elig",
         "art_mortality",
         "art_mortality_time_rate_ratio",
-        "art_dropout",
+        "art_dropout_recover_cd4",
+        "art_dropout_rate",
         "art_adults_on_art",
         "art_adults_on_art_is_percent",
         "art_h_art_stage_dur",
+        "art_initiation_mortality_weight",
         "children_hc_nosocomial",
         "children_hc1_cd4_dist",
         "children_hc_cd4_transition",
@@ -122,6 +126,13 @@ def _initialise_params(
         "children_ctx_val_is_percent",
         "children_hc_art_is_age_spec",
         "children_hc_age_coarse",
+        "children_abortion",
+        "children_patients_reallocated",
+        "children_hc_art_ltfu",
+        "children_hc_age_coarse_cd4",
+        "children_adult_female_infections",
+        "children_adult_female_hivnpop",
+        "children_total_births"
     ]
     assert_keys(params, required_input)
     assert_fortran_order(params)
@@ -133,6 +144,11 @@ def _initialise_params(
         params["demography_age_specific_fertility_rate"],
         params["demography_births_sex_prop"],
     )
+
+    demographic_model_params = DemographicProjectionParameters(
+        demography
+    )
+
     incidence = Incidence(
         params["incidence_total_rate"],
         params["incidence_relative_risk_age"],
@@ -148,17 +164,16 @@ def _initialise_params(
         params["art_idx_hm_elig"],
         params["art_mortality"],
         params["art_mortality_time_rate_ratio"],
-        params["art_dropout"],
+        params["art_dropout_recover_cd4"],
+        params["art_dropout_rate"],
         params["art_adults_on_art"],
         params["art_adults_on_art_is_percent"],
         params["art_h_art_stage_dur"],
         params["art_initiation_mortality_weight"].item(),
     )
-    # TODO: Move this into C++, 30 is time ART start and 66 is no of HIV age groups which should come from the
-    # state space in C++
-    options = Options(hts_per_year, 30, 66)
-    base_model_params = BaseModelParameters(
-        options, demography, incidence, nat_history, art
+
+    hiv_simulation_params = HivSimulationParameters(
+        incidence, nat_history, art
     )
 
     children = Children(
@@ -200,17 +215,30 @@ def _initialise_params(
         params["children_ctx_val_is_percent"][0, :],
         params["children_hc_art_is_age_spec"],
         params["children_hc_age_coarse"],
+        params["children_abortion"],
+        params["children_patients_reallocated"],
+        params["children_hc_art_ltfu"],
+        params["children_hc_age_coarse_cd4"],
+        params["children_adult_female_infections"],
+        params["children_adult_female_hivnpop"],
+        params["children_total_births"],
     )
     child_model_params = ChildModelParameters(children)
-    return Parameters(base_model_params, child_model_params)
+
+    # TODO: Move this into C++, 30 is time ART start and 66 is no of HIV age groups which should come from the
+    # state space in C++
+    options = Options(hts_per_year, 30, 66)
+    return Parameters(options, demographic_model_params, hiv_simulation_params, child_model_params)
 
 
 def _initialise_state(time_step: int, state: dict[str, np.ndarray]) -> State:
     year_state = {k: np.atleast_1d(v[..., time_step]) for k, v in state.items()}
-    base_model_state = BaseModelState(
+    demographic_projection_stae = DemographicProjectionState(
         p_total_pop=year_state["p_total_pop"],
         births=year_state["births"],
-        p_total_pop_natural_deaths=year_state["p_total_pop_natural_deaths"],
+        p_total_pop_natural_deaths=year_state["p_total_pop_natural_deaths"]
+    )
+    hiv_simulation_state = HivSimulationState(
         p_hiv_pop=year_state["p_hiv_pop"],
         p_hiv_pop_natural_deaths=year_state["p_hiv_pop_natural_deaths"],
         h_hiv_adult=year_state["h_hiv_adult"],
@@ -237,4 +265,4 @@ def _initialise_state(time_step: int, state: dict[str, np.ndarray]) -> State:
         ctx_need=year_state["ctx_need"],
         ctx_mean=year_state["ctx_mean"],
     )
-    return State(base_model_state, child_model_state)
+    return State(demographic_projection_stae, hiv_simulation_state, child_model_state)

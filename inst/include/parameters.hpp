@@ -24,7 +24,7 @@ struct Options {
   Options(int hts_per_year,
           int ts_art_start,
           int hAG_15plus,
-	  int proj_period_int) :
+	        int proj_period_int) :
       hts_per_year(hts_per_year),
       dt(1.0 / hts_per_year),
       p_idx_fertility_first(15),
