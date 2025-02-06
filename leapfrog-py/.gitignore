@@ -4,6 +4,7 @@ __pycache__
 .idea
 .vscode
 .direnv
+.venv
 /dist
 docs/_build
 .mypy_cache

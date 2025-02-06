@@ -12,7 +12,7 @@
 - [Development](#development)
 - [License](#license)
 
-## Installation
+## Installation from PyPI
 
 ```console
 pip install leapfrog-py
@@ -46,17 +46,17 @@ Parameters and state are both dictionaries of numpy arrays.
 
 This project uses [scikit-build-core](https://github.com/scikit-build/scikit-build-core) to build the C++ project. You'll need a recent version of CMake (>3.15) and Python (>3.7).
 
-I use [hatch](https://hatch.pypa.io/1.9/) to manage the project, but this should work without it if you prefer.
+I use [uv](https://docs.astral.sh/uv/) to manage the project, but this should work without it if you prefer.
 
-If you're using an IDE you might need to set the Python interpreter to the one in the hatch virtual environment. See instructions for [VSCode here](https://hatch.pypa.io/latest/how-to/integrate/vscode/).
+We use `Eigen` for linear algebra library, this will be installed automatically by CMake when this package is built. You can install manually:
 
-We use `Eigen` for linear algebra library, install this on linux
+On Linux
 
 ```console
 sudo apt-get install libeigen3-dev
 ```
 
-on windows download from https://eigen.tuxfamily.org/index.php?title=Main_Page, extract the archive and build and install it using cmake. From the extracted dir:
+On Windows download from https://eigen.tuxfamily.org/index.php?title=Main_Page, extract the archive and build and install it using cmake. From the extracted dir:
 
 ```console
 mkdir build
@@ -67,19 +67,13 @@ cmake --build . --target install
 
 ### Building, installing and running tests
 
-Use hatch
-
-```console
-hatch shell
-hatch run install
-hatch run test
-hatch run cov
-hatch run install_and_test
-hatch run lint:fmt
-hatch run lint:style
-hatch run lint:typing
-hatch run lint:all
-```
+* Sync the virtual env `uv sync`
+* Run tests `uv run pytest`
+* Build wheels `uv build` (currently not working as relying on files from parent)
+* Run coverage `uv run pytest --cov --cov-config=pyproject.toml`
+* Run lint style `uvx ruff check .` or `uvx black --check --diff .`
+* Run lint auto-format `uvx ruff check --fix` or `uvx black .`
+* Run lint typing `uv run --group check mypy --install-types --non-interactive src tests`
 
 To build with pipx
 

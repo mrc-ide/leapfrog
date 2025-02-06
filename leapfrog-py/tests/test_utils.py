@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+
 from leapfrog_py.utils import assert_fortran_order, assert_keys
 
 

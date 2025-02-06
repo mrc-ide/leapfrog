@@ -5,6 +5,7 @@ import statistics
 import timeit
 
 import numpy as np
+
 from leapfrog_py import (
     project_single_year,
     run_leapfrog,  # noqa F401

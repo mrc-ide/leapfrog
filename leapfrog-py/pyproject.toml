@@ -1,3 +1,41 @@
+[project]
+name = "leapfrog-py"
+version = "0.0.1"
+description = ''
+readme = "README.md"
+requires-python = ">=3.10"
+keywords = []
+authors = [
+  { name = "Rob Ashton", email = "robertashton94@gmail.com" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = ["numpy>=2.2.2"]
+
+[project.urls]
+Documentation = "https://github.com/mrc-ide/leapfrog#readme"
+Issues = "https://github.com/mrc-ide/leapfrog/issues"
+Source = "https://github.com/mrc-ide/leapfrog"
+
+[dependency-groups]
+dev = [
+  "pytest>=8.3.4",
+  "pytest_mock>=3.14.0",
+  "pytest-unordered>=0.6.1",
+  "pytest-cov>=6.0.0"
+]
+check = [
+  "mypy"
+]
+
 [build-system]
 requires = ["scikit-build-core", "pybind11"]
 build-backend = "scikit_build_core.build"
@@ -6,44 +44,6 @@ build-backend = "scikit_build_core.build"
 cmake.verbose = false
 cmake.build-type = "Release"
 install.strip = true
-
-[project]
-name = "leapfrog-py"
-version = "0.0.1"
-description = ''
-readme = "README.md"
-requires-python = ">=3.8"
-keywords = []
-authors = [
-  { name = "Rob Ashton", email = "robertashton94@gmail.com" },
-]
-classifiers = [
-  "Development Status :: 4 - Beta",
-  "Programming Language :: Python",
-  "Programming Language :: Python :: 3.8",
-  "Programming Language :: Python :: 3.9",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: 3.12",
-  "Programming Language :: Python :: Implementation :: CPython",
-  "Programming Language :: Python :: Implementation :: PyPy",
-]
-dependencies = ["numpy"]
-
-[project.urls]
-Documentation = "https://github.com/mrc-ide/leapfrog#readme"
-Issues = "https://github.com/mrc-ide/leapfrog/issues"
-Source = "https://github.com/mrc-ide/leapfrog"
-
-[tool.hatch.version]
-path = "src/leapfrog_py/__about__.py"
-
-[tool.hatch.envs.types]
-extra-dependencies = [
-  "mypy>=1.0.0",
-]
-[tool.hatch.envs.types.scripts]
-check = "mypy --install-types --non-interactive {args:src/leapfrog_py tests}"
 
 [tool.coverage.run]
 source_pkgs = ["leapfrog_py"]
@@ -64,59 +64,11 @@ exclude_lines = [
   "if TYPE_CHECKING:",
 ]
 
-[tool.hatch.envs.default]
-python = "3.12"
-version = "dev"
-dependencies = [
-  "pytest",
-  "pytest_mock",
-  "pytest-unordered",
-  "pytest-cov"
-]
-
-[tool.hatch.envs.default.scripts]
-install = "pip install -e ."
-test = "pytest {args:tests}"
-install_and_test = "hatch run install && hatch run test"
-test-cov = "pytest --cov --cov-report= --cov-config=pyproject.toml {args:tests}"
-cov-report = "coverage report --show-missing"
-cov = [
-  "test-cov",
-  "cov-report",
-]
-cov-report-xml = "coverage xml"
-cov-ci = [
-  "test-cov",
-  "cov-report-xml",
-]
-
 [tool.pytest.ini_options]
 addopts = [
     "--import-mode=importlib",
 ]
 testpaths = ["tests"]
-
-[tool.hatch.envs.lint]
-extra-dependencies = [
-  "black>=23.1.0",
-  "mypy>=1.0.0",
-  "ruff>=0.0.243",
-]
-[tool.hatch.envs.lint.scripts]
-typing = "mypy --install-types --non-interactive {args:src tests}"
-style = [
-  "ruff check {args:.}",
-  "black --check --diff {args:.}",
-]
-fmt = [
-  "black {args:.}",
-  "ruff check --fix {args:.}",
-  "style",
-]
-all = [
-  "style",
-  "typing",
-]
 
 [tool.black]
 target-version = ["py37"]

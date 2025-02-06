@@ -1,12 +1,13 @@
 import numpy as np
+
 from leapfrog import (  # type: ignore[attr-defined]
     Art,
     ChildModelParameters,
     ChildModelState,
     Children,
-    Demography,
     DemographicProjectionParameters,
     DemographicProjectionState,
+    Demography,
     HivSimulationParameters,
     HivSimulationState,
     Incidence,
@@ -18,7 +19,6 @@ from leapfrog import (  # type: ignore[attr-defined]
     run_model_cpp,
     set_initial_state_cpp,
 )
-
 from leapfrog_py.utils import assert_fortran_order, assert_keys
 
 
