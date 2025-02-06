@@ -36,6 +36,7 @@ input_data$cd4_prog_full <- input_data[["cd4_prog"]]
 input_data$cd4_mort_full <- input_data[["cd4_mort"]]
 input_data$art_mort_full <- input_data[["art_mort"]]
 input_data$t_ART_start <- 31L
+input_data$projection_period <- "calendar"
 
 out <- frogger::run_model(input_data, input_data, NULL, NULL, NULL,
                           hiv_age_stratification = "full",

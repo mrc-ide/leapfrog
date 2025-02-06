@@ -33,7 +33,7 @@ static hiv_params_type<ModelVariant, real_type> get_hiv_params(const Rcpp::List 
     const leapfrog::Tensor1<int> idx_hm_elig = convert_0_based<1>(parse_data<int>(data, "artcd4elig_idx", proj_years));
     const leapfrog::TensorMap3<real_type> cd4_initial_distribution = parse_data<real_type>(data, "cd4_initdist", hiv.hDS, hiv.hAG, dp.NS);
     const leapfrog::TensorMap4<real_type> mortality = parse_data<real_type>(data, "art_mort", hiv.hTS, hiv.hDS, hiv.hAG, dp.NS);
-    const leapfrog::TensorMap2<real_type> mortaility_time_rate_ratio = parse_data<real_type>(data, "artmx_timerr", hiv.hTS, proj_years);
+    const leapfrog::TensorMap2<real_type> mortality_time_rate_ratio = parse_data<real_type>(data, "artmx_timerr", hiv.hTS, proj_years);
     const int dropout_recover_cd4 = Rcpp::as<int>(data["art_dropout_recover_cd4"]);
     const leapfrog::TensorMap1<real_type> dropout_rate = parse_data<real_type>(data, "art_dropout_rate", proj_years);
     const leapfrog::TensorMap2<real_type> adults_on_art = parse_data<real_type>(data, "art15plus_num", dp.NS, proj_years);
@@ -56,7 +56,7 @@ static hiv_params_type<ModelVariant, real_type> get_hiv_params(const Rcpp::List 
     const leapfrog::Art<real_type> art_params = {
         idx_hm_elig,
         mortality,
-        mortaility_time_rate_ratio,
+        mortality_time_rate_ratio,
         dropout_recover_cd4,
         dropout_rate,
         adults_on_art,

@@ -164,7 +164,7 @@ def _initialise_params(
         params["art_idx_hm_elig"],
         params["art_mortality"],
         params["art_mortality_time_rate_ratio"],
-        params["art_dropout_recover_cd4"],
+        params["art_dropout_recover_cd4"].item(),
         params["art_dropout_rate"],
         params["art_adults_on_art"],
         params["art_adults_on_art_is_percent"],
@@ -215,7 +215,7 @@ def _initialise_params(
         params["children_ctx_val_is_percent"][0, :],
         params["children_hc_art_is_age_spec"],
         params["children_hc_age_coarse"],
-        params["children_abortion"],
+        params["children_abortion"][0, :, :],
         params["children_patients_reallocated"],
         params["children_hc_art_ltfu"],
         params["children_hc_age_coarse_cd4"],
@@ -227,7 +227,7 @@ def _initialise_params(
 
     # TODO: Move this into C++, 30 is time ART start and 66 is no of HIV age groups which should come from the
     # state space in C++
-    options = Options(hts_per_year, 30, 66)
+    options = Options(hts_per_year, 30, 66, 0)
     return Parameters(options, demographic_model_params, hiv_simulation_params, child_model_params)
 
 
@@ -259,7 +259,6 @@ def _initialise_state(time_step: int, state: dict[str, np.ndarray]) -> State:
         hc1_art_aids_deaths=year_state["hc1_art_aids_deaths"],
         hc2_art_aids_deaths=year_state["hc2_art_aids_deaths"],
         hiv_births=year_state["hiv_births"],
-        hc_art_total=year_state["hc_art_total"],
         hc_art_init=year_state["hc_art_init"],
         hc_art_need_init=year_state["hc_art_need_init"],
         ctx_need=year_state["ctx_need"],

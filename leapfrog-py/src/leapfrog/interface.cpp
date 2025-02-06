@@ -57,7 +57,7 @@ PYBIND11_MODULE(leapfrog, m) {
                       double>())
         .def_readonly("idx_hm_elig", &leapfrog::Art<double>::idx_hm_elig)
         .def_readonly("mortality", &leapfrog::Art<double>::mortality)
-        .def_readonly("mortality_time_rate_ratio", &leapfrog::Art<double>::mortaility_time_rate_ratio)
+        .def_readonly("mortality_time_rate_ratio", &leapfrog::Art<double>::mortality_time_rate_ratio)
         .def_readonly("dropout_recover_cd4", &leapfrog::Art<double>::dropout_recover_cd4)
         .def_readonly("dropout_rate", &leapfrog::Art<double>::dropout_rate)
         .def_readonly("adults_on_art", &leapfrog::Art<double>::adults_on_art)
@@ -98,13 +98,19 @@ PYBIND11_MODULE(leapfrog, m) {
                           const leapfrog::TensorMap2<double>&,
                           const leapfrog::TensorMap1<double>&,
                           const leapfrog::TensorMap1<int>&,
+
+                          // Nans as first 6 numbers here
                           const leapfrog::TensorMap1<double>&,
                           const leapfrog::TensorMap1<double>&,
+
                           const leapfrog::TensorMap1<double>&,
                           const leapfrog::TensorMap1<int>&,
                           const leapfrog::TensorMap1<int>&,
                           const leapfrog::TensorMap1<double>&,
+
+                          // Should be 3D
                           const leapfrog::TensorMap2<double>&,
+
                           const leapfrog::TensorMap1<double>&,
                           const leapfrog::TensorMap1<double>&,
                           const leapfrog::TensorMap1<int>&,

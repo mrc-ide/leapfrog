@@ -228,7 +228,7 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   ## v$who34percelig <- who34percelig
 
   v$art_dropout_recover_cd4 <- if (projp$spectrum_version >= "6.14") {TRUE} else {FALSE}
-  
+
   ## Convert input percent dropout in 12 months to an annual rate (Rob Glaubius email 25 July 2024)
   v$art_dropout_rate <- -log(1.0 - projp$art_dropout/100)
 
@@ -241,6 +241,10 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
 
   ## Scale mortality among untreated population by ART coverage
   v$scale_cd4_mort <- projp$scale_cd4_mort
+
+  ## State space dimensions
+  v$hAG_SPAN_full <- rep(1L, 66L)
+  v$hAG_SPAN_coarse <- c(2L, 3L, 5L, 5L, 5L, 5L, 5L, 5L, 31L)
 
   ## Add in pediatric components
   v$cd4fert_rat <- projp$cd4fert_rat
