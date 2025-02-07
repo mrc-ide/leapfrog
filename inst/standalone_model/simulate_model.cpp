@@ -263,7 +263,7 @@ int main(int argc, char *argv[]) {
 
   std::vector<int> save_steps(sim_years);
   std::iota(save_steps.begin(), save_steps.end(), 0);
-  leapfrog::StateSaver<leapfrog::BaseModelFullAgeStratification, double> state_output(
+  leapfrog::StateSaver<leapfrog::HivFullAgeStratification, double> state_output(
       sim_years, save_steps);
 
   const char *n_runs_char = std::getenv("N_RUNS");
@@ -279,17 +279,17 @@ int main(int argc, char *argv[]) {
   }
 
   for (size_t i = 0; i < n_runs; ++i) {
-    auto state_current = leapfrog::State<leapfrog::HivFullAgeStratification, double, true>(
+    auto state_current = leapfrog::State<leapfrog::HivFullAgeStratification, double>(
         params);
     auto state_next = state_current;
-    leapfrog::set_initial_state<leapfrog::HivFullAgeStratification, double, true>(state_current, params);
+    leapfrog::set_initial_state<leapfrog::HivFullAgeStratification, double>(state_current, params);
 
     // Save initial state
     state_output.save_state(state_current, 0);
 
     // Each time step is mid-point of the year
     for (int step = 1; step < sim_years; ++step) {
-      leapfrog::internal::project_year<leapfrog::HivFullAgeStratification, double, true>(step, params, state_current, state_next, intermediate);
+      leapfrog::internal::project_year<leapfrog::HivFullAgeStratification, double>(step, params, state_current, state_next, intermediate);
       state_output.save_state(state_next, step);
       std::swap(state_current, state_next);
       intermediate.reset();

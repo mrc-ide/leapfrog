@@ -31,11 +31,11 @@ All model functions are templated on the model variant, and any conditional beha
 All model functions should have the same signature e.g.
 
 ```
-template<typename ModelVariant, typename real_type, bool OwnedData>
+template<typename ModelVariant, typename real_type>
 void my_model_function(int time_step,
                        const Parameters<ModelVariant, real_type> &pars,
-                       const State<ModelVariant, real_type, OwnedData> &state_curr,
-                       State<ModelVariant, real_type, OwnedData> &state_next,
+                       const State<ModelVariant, real_type> &state_curr,
+                       State<ModelVariant, real_type> &state_next,
                        IntermediateData<ModelVariant, real_type> &intermediate) {
 ```
 
@@ -114,7 +114,7 @@ Note that the dims can be any of the state space sizes or `proj_years` for the n
 
 ### Intermediate data
 
-Intermediate data is used as a place to store 
+Intermediate data is used as a place to store
 The intermediate data is not handled by code generation as it only requires changes in one place. You can make modifications by adding new data into the struct in [`inst/include/types.hpp`](https://github.com/mrc-ide/frogger/blob/main/inst/include/types.hpp), making sure to set its default value in the `reset` function on the struct.
 
 ## Adding a new model variant

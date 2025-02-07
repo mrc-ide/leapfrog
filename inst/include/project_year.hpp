@@ -11,11 +11,11 @@ namespace leapfrog {
 
 namespace internal {
 
-template<typename ModelVariant, typename real_type, bool OwnedData>
+template<typename ModelVariant, typename real_type>
 void project_year(int t,
                   const Parameters<ModelVariant, real_type> &pars,
-                  const State<ModelVariant, real_type, OwnedData> &state_curr,
-                  State<ModelVariant, real_type, OwnedData> &state_next,
+                  const State<ModelVariant, real_type> &state_curr,
+                  State<ModelVariant, real_type> &state_next,
                   IntermediateData<ModelVariant, real_type> &intermediate) {
   run_general_pop_demographic_projection<ModelVariant>(t, pars, state_curr, state_next,
                                                        intermediate);
