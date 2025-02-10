@@ -175,6 +175,15 @@
 <h2 id="development-notes">Development notes<a class="anchor" aria-label="anchor" href="#development-notes"></a>
 </h2>
 <div class="section level3">
+<h3 id="testing">Testing<a class="anchor" aria-label="anchor" href="#testing"></a>
+</h3>
+<p>There is some pre-prepared test data available to make tests run faster. This is generated and saved <code>./scripts/create_test_data.R</code>.</p>
+<p>We also have some separate data written out in a generic format which can be read to test the model directly from C++. This is in <code>inst/standalone_model/data</code> in zipped files.</p>
+<p>If this is your first time running you will need to unzip the standalone test data</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>.<span class="sc">/</span>inst<span class="sc">/</span>standalone_model<span class="sc">/</span>extract_data</span></code></pre></div>
+<p>If you want to update the test data, it should be updated in the <code>./scripts/create_test_data.R</code> script so that we know how it was created and we can do it again fairly easily. Steps are 1. Update the script and generate the test data 1. Update the standalone data which is built from this <code>./scripts/update_standalone_data</code>. You might need to add a new mapping from R to serialized name if you are adding new input data 1. Unzip this for automated tests <code>./inst/standalone_model/extract_data</code></p>
+</div>
+<div class="section level3">
 <h3 id="simulation-model-2">Simulation model<a class="anchor" aria-label="anchor" href="#simulation-model-2"></a>
 </h3>
 <ul>
