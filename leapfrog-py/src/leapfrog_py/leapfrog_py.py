@@ -29,6 +29,7 @@ def set_initial_state(
     params = _initialise_params(parameters, 10)
     initial_state = _initialise_state(0, state)
     set_initial_state_cpp(initial_state, params)
+    _write_state(0, initial_state, state)
 
 
 def project_single_year(
@@ -48,6 +49,8 @@ def project_single_year(
     state_now = _initialise_state(i, state)
 
     project_single_year_cpp(i, params, state_prev, state_now)
+
+    _write_state(i, state_now, state)
 
 
 def run_leapfrog(
@@ -233,9 +236,9 @@ def _initialise_params(
 
 def _initialise_state(time_step: int, state: dict[str, np.ndarray]) -> State:
     year_state = {k: np.atleast_1d(v[..., time_step]) for k, v in state.items()}
-    demographic_projection_stae = DemographicProjectionState(
+    demographic_projection_state = DemographicProjectionState(
         p_total_pop=year_state["p_total_pop"],
-        births=year_state["births"],
+        births=year_state["births"].item(),
         p_total_pop_natural_deaths=year_state["p_total_pop_natural_deaths"]
     )
     hiv_simulation_state = HivSimulationState(
@@ -258,10 +261,45 @@ def _initialise_state(time_step: int, state: dict[str, np.ndarray]) -> State:
         hc2_noart_aids_deaths=year_state["hc2_noart_aids_deaths"],
         hc1_art_aids_deaths=year_state["hc1_art_aids_deaths"],
         hc2_art_aids_deaths=year_state["hc2_art_aids_deaths"],
-        hiv_births=year_state["hiv_births"],
+        hiv_births=year_state["hiv_births"].item(),
         hc_art_init=year_state["hc_art_init"],
         hc_art_need_init=year_state["hc_art_need_init"],
-        ctx_need=year_state["ctx_need"],
-        ctx_mean=year_state["ctx_mean"],
+        ctx_need=year_state["ctx_need"].item(),
+        ctx_mean=year_state["ctx_mean"].item(),
     )
-    return State(demographic_projection_stae, hiv_simulation_state, child_model_state)
+    return State(demographic_projection_state, hiv_simulation_state, child_model_state)
+
+def _write_state(
+    time_step: int, state: State, full_state: dict[str, np.ndarray]
+):
+    full_state["p_total_pop"][..., time_step] = state.dp.p_total_pop
+    full_state["births"][..., time_step] = state.dp.births
+    full_state["p_total_pop_natural_deaths"][
+        ..., time_step
+    ] = state.dp.p_total_pop_natural_deaths
+    full_state["p_hiv_pop"][..., time_step] = state.hiv.p_hiv_pop
+    full_state["p_hiv_pop_natural_deaths"][
+        ..., time_step
+    ] = state.hiv.p_hiv_pop_natural_deaths
+    full_state["h_hiv_adult"][..., time_step] = state.hiv.h_hiv_adult
+    full_state["h_art_adult"][..., time_step] = state.hiv.h_art_adult
+    full_state["h_hiv_deaths_no_art"][
+        ..., time_step
+    ] = state.hiv.h_hiv_deaths_no_art
+    full_state["p_infections"][..., time_step] = state.hiv.p_infections
+    full_state["h_hiv_deaths_art"][..., time_step] = state.hiv.h_hiv_deaths_art
+    full_state["h_art_initiation"][..., time_step] = state.hiv.h_art_initiation
+    full_state["p_hiv_deaths"][..., time_step] = state.hiv.p_hiv_deaths
+    full_state["hc1_hiv_pop"][..., time_step] = state.children.hc1_hiv_pop
+    full_state["hc2_hiv_pop"][..., time_step] = state.children.hc2_hiv_pop
+    full_state["hc1_art_pop"][..., time_step] = state.children.hc1_art_pop
+    full_state["hc2_art_pop"][..., time_step] = state.children.hc2_art_pop
+    full_state["hc1_noart_aids_deaths"][..., time_step] = state.children.hc1_noart_aids_deaths
+    full_state["hc2_noart_aids_deaths"][..., time_step] = state.children.hc2_noart_aids_deaths
+    full_state["hc1_art_aids_deaths"][..., time_step] = state.children.hc1_art_aids_deaths
+    full_state["hc2_art_aids_deaths"][..., time_step] = state.children.hc2_art_aids_deaths
+    full_state["hiv_births"][..., time_step] = state.children.hiv_births
+    full_state["hc_art_init"][..., time_step] = state.children.hc_art_init
+    full_state["hc_art_need_init"][..., time_step] = state.children.hc_art_need_init
+    full_state["ctx_need"][..., time_step] = state.children.ctx_need
+    full_state["ctx_mean"][..., time_step] = state.children.ctx_mean

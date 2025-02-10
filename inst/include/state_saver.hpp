@@ -45,7 +45,7 @@ public:
   }
 
 
-  void save_state(const State<ModelVariant, real_type, true> &state, int current_year) {
+  void save_state(const State<ModelVariant, real_type> &state, int current_year) {
     for (size_t i = 0; i < save_steps.size(); ++i) {
       if (current_year == save_steps[i]) {
         dp.save_state(full_state.dp, i, state);

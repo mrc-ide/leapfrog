@@ -75,6 +75,8 @@ cmake --build . --target install
 * Run lint auto-format `uvx ruff check --fix` or `uvx black .`
 * Run lint typing `uv run --group check mypy --install-types --non-interactive src tests`
 
+uv will rebuild automatically if you make a change to the C++ code in the `src` directory, but you will need to force it to reinstall if you updated the C++ library. To force recompilation, pass `--reinstall-package leapfrog-py`. If you want to see verbose output pass `--verbose`. These can be passed and used with any command.
+
 To build with pipx
 
 ```console
