@@ -78,8 +78,8 @@ test_that("can deseralize from R", {
   d1 <- deserialize_tensor_to_r(out1)
   d2 <- deserialize_tensor_to_r(out2)
 
-  expect_equal(foo$test_2d_double, d1)
-  expect_equal(foo$test_3d_int, d2)
+  expect_identical(foo$test_2d_double, d1)
+  expect_identical(foo$test_3d_int, d2)
 })
 
 test_that("R can serialize 1d vector", {

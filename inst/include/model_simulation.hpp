@@ -181,7 +181,7 @@ void run_art_progression_and_mortality(int hiv_step,
       for (int hm = i_ha.everARTelig_idx; hm < ss_h.hDS; ++hm) {
         for (int hu = 0; hu < ss_h.hTS; ++hu) {
           i_ha.deaths_art = p_tx.mortality(hu, hm, ha, g) *
-                            p_tx.mortaility_time_rate_ratio(hu, t) *
+                            p_tx.mortality_time_rate_ratio(hu, t) *
                             n_ha.h_art_adult(hu, hm, ha, g);
           const auto new_hiv_deaths_art = p_op.dt * i_ha.deaths_art;
           i_ha.p_hiv_deaths_age_sex(ha, g) += new_hiv_deaths_art;

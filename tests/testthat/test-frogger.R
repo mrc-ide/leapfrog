@@ -141,7 +141,7 @@ test_that("model can be run for all years", {
   demp <- readRDS(test_path("testdata/demographic_projection_object_adult.rds"))
   parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
 
-  out <- run_model(demp, parameters, NULL, NULL,
+  out <- run_model(demp, parameters, NULL, NULL, NULL,
     run_child_model = FALSE
   )
 
@@ -177,8 +177,8 @@ test_that("model can be run for all years", {
   expect_true(all(out$h_hiv_deaths_no_art >= 0))
   expect_true(all(out$p_infections >= 0))
   expect_true(all(out$h_art_initiation >= 0))
-  expect_true(all(out$p_infections >= 0))
-  expect_true(all(out$p_infections >= 0))
+  expect_true(all(out$h_hiv_deaths_art >= 0))
+  expect_true(all(out$p_hiv_deaths >= 0))
 })
 
 test_that("model can be run with ART initiation", {
@@ -212,7 +212,7 @@ test_that("child model can be run twice on the same data", {
   ## Regression test as we saw the 2nd run failing as the first fit
   ## was modifying the R stored data causing the 2nd run on the same
   ## data to read from an index of -1
-  input <- setup_childmodel(testinput = "testdata/child_parms.rds")
+  input <- setup_childmodel(test_path("testdata/child_parms.rds"))
 
   out <- run_model(input$demp, input$parameters, NULL, NULL,
     run_child_model = TRUE
@@ -259,7 +259,7 @@ test_that("error thrown if size of stratified data does not match expected", {
 })
 
 test_that("error thrown if trying to save output from invalid steps", {
-  input <- setup_childmodel(testinput = "testdata/child_parms.rds")
+  input <- setup_childmodel(test_path("testdata/child_parms.rds"))
 
   expect_error(
     run_model(input$demp, input$parameters, NULL, NULL, -1L),

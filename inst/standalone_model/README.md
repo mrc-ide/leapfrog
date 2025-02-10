@@ -14,6 +14,8 @@ Similarly, our serialisation format here is just the simplest thing that could
 work and not something we expect we will
 support long term; it's just a starting point for a discussion.
 
+The data is zipped up for ease of transport. Ensure to unzip it first using `./extract_data`.
+
 ### Using installed frogger & RcppEigen
 
 Install frogger, from an R terminal in this directory run
@@ -57,12 +59,12 @@ See usage with
 Run as
 
 ```
-./simulate_model 60 10 data output
+./simulate_model 61 10 data/adult_data output
 ```
 
 Where
 
-* 1st arg is number of sim years
+* 1st arg is number of sim years, 61 for 1970:2030 inclusive
 * 2nd arg is number of HIV steps within the year
 * 3rd arg is the path to the input data, `data` relative to this dir
 * 4th arg is the path where output should be saved

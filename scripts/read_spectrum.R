@@ -147,15 +147,15 @@ dp_read_anc_testing <- function(dp) {
 
   if (exists_dptag(dp, "<ANCTestingValues MV>")) {
     anc_testing <- dpsub(dp, "<ANCTestingValues MV>", 2:5, dpy$time_data_idx)
-    anc_testing <- sapply(anc_testing, as.numeric)
+    anc_testing <- df_as_numeric(anc_testing)
     dimnames(anc_testing) <- list(indicator = anc_indicators[1:4], year = dpy$proj_years)
   } else if (exists_dptag(dp, "<ANCTestingValues MV2>")) {
     anc_testing <- dpsub(dp, "<ANCTestingValues MV2>", 2:5, dpy$time_data_idx)
-    anc_testing <- sapply(anc_testing, as.numeric)
+    anc_testing <- df_as_numeric(anc_testing)
     dimnames(anc_testing) <- list(indicator = anc_indicators[1:4], year = dpy$proj_years)
   } else if (exists_dptag(dp, "<ANCTestingValues MV4>")) {
     anc_testing <- dpsub(dp, "<ANCTestingValues MV4>", 2:10, dpy$time_data_idx)
-    anc_testing <- sapply(anc_testing, as.numeric)
+    anc_testing <- df_as_numeric(anc_testing)
     dimnames(anc_testing) <- list(indicator = anc_indicators, year = dpy$proj_years)
   } else {
     stop("ANC testing tag not recognized. Function probably needs update for this .DP file.")
@@ -206,7 +206,7 @@ dp_read_pmtct <- function(dp) {
 
   if (exists_dptag(dp, "<ARVRegimen MV3>")) {
     pmtct_arv <- dpsub(dp, "<ARVRegimen MV3>", 2:27, dpy$time_data_idx + 1L)
-    pmtct_arv <- sapply(pmtct_arv, as.numeric)
+    pmtct_arv <- df_as_numeric(pmtct_arv)
     dimnames(pmtct_arv) <- list(indicator = pmtct_indicators, year = dpy$proj_years)
   } else {
     stop("PMTCT ARV tag not recognized. Function probably needs update for this .DP file.")
@@ -233,7 +233,7 @@ dp_read_pmtct_retained <- function(dp) {
     stop("PMTCT retained at delivery tag not recognized. Function probably needs update for this .DP file.")
   }
 
-  pmtct_retained <- sapply(pmtct_retained, as.numeric)
+  pmtct_retained <- df_as_numeric(pmtct_retained)
   dimnames(pmtct_retained) <- list(indicator = indicator_names, year = dpy$proj_years)
 
   pmtct_retained
@@ -305,7 +305,7 @@ dp_read_breastfeeding <- function(dp) {
     stop("Not Breastfeeding Percent tag not found. Function probably needs update for this .DP file.")
   }
 
-  notbreastfeeding_percent <- sapply(notbreastfeeding_percent, as.numeric)
+  notbreastfeeding_percent <- df_as_numeric(notbreastfeeding_percent)
   notbreastfeeding_percent_noarv <- notbreastfeeding_percent[1:18, ]
   notbreastfeeding_percent_arv <- notbreastfeeding_percent[18 + 1:18, ]
 
@@ -337,7 +337,7 @@ dp_read_childart <- function(dp) {
     stop("Child ART input tag not recognized. Function probably needs update for this .DP file.")
   }
 
-  childart <- sapply(childart, as.numeric)
+  childart <- df_as_numeric(childart)
   dimnames(childart) <- list(indicator = indicator_names, year = dpy$proj_years)
   childart[childart == -9999] <- NA_real_
 
@@ -347,7 +347,7 @@ dp_read_childart <- function(dp) {
     stop("Child ART input tag not recognized. Function probably needs update for this .DP file.")
   }
 
-  childart_ispercent <- sapply(childart_ispercent, as.logical)
+  childart_ispercent <- df_as_logical(childart_ispercent)
   dimnames(childart_ispercent) <- list(indicator = indicator_names, year = dpy$proj_years)
 
   list(childart = childart,
@@ -383,7 +383,7 @@ dp_read_art_dist <- function(dp) {
 
   if (exists_dptag(dp, "<ChildARTDist MV>")) {
     child_mort_mult <- dpsub(dp, "<ChildARTDist MV>", 2:16, dpy$time_data_idx)
-    child_mort_mult <- sapply(child_mort_mult, as.numeric)
+    child_mort_mult <- df_as_numeric(child_mort_mult)
     dimnames(child_mort_mult) <- list(age = 0:14, year = dpy$proj_years)
   } else {
     stop("Child ART distribution tag not recognized. Function probably needs update for this .DP file.")
@@ -406,7 +406,7 @@ dp_read_child_mort_mult <- function(dp) {
 
   if (exists_dptag(dp, "<ChildMortalityRates MV2>")) {
     child_mort_mult <- dpsub(dp, "<ChildMortalityRates MV2>", 2:5, dpy$time_data_idx)
-    child_mort_mult <- sapply(child_mort_mult, as.numeric)
+    child_mort_mult <- df_as_numeric(child_mort_mult)
     dimnames(child_mort_mult) <- list(mrr = indicator_names, year = dpy$proj_years)
   } else {
     stop("Child ART multiplier tag not recognized. Function probably needs update for this .DP file.")
@@ -427,7 +427,7 @@ dp_read_nosocom_infections <- function(dp) {
   if (exists_dptag(dp, "<NosocomialInfectionsByAge MV>")) {
     ##only extracting 0-4 for right now
     nosocomial_inf <- dpsub(dp, "<NosocomialInfectionsByAge MV>", 2, dpy$time_data_idx)
-    nosocomial_inf <- sapply(nosocomial_inf, as.numeric)
+    nosocomial_inf <- df_as_numeric(nosocomial_inf)
     names(nosocomial_inf) <- dpy$proj_years
   } else {
     stop("Nosocomial infections tag not recognized. Function probably needs update for this .DP file.")
@@ -447,7 +447,7 @@ dp_read_mtct_rates <- function(dp) {
   if (exists_dpdescription(dp, "Peripartum and breastfeeding transmission rates (%)")) {
     ##only extracting 0-4 for right now
     mtct_rates <- dpdescription(dp, "Peripartum and breastfeeding transmission rates (%)" , 1:11, 4:6)
-    mtct_rates <- sapply(mtct_rates, as.numeric)
+    mtct_rates <- df_as_numeric(mtct_rates)
   } else {
     stop("MTCT rates description not recognized. Function probably needs update for this .DP file.")
   }
@@ -466,10 +466,10 @@ dp_read_paed_cd4_dist <- function(dp) {
   if (exists_dpdescription(dp, "Distribution of new infections by CD4 percent for Children")) {
     ##only extracting 0-4 for right now
     cd4_dist <- dpdescription(dp, "Distribution of new infections by CD4 percent for Children" , 1, 4:10)
-    cd4_dist <- sapply(cd4_dist, as.numeric)
+    cd4_dist <- df_as_numeric(cd4_dist)
   } else if(exists_dpdescription(dp, "Répartition des nouvelles infections par pourcentage de CD4 chez les enfants")) {
     cd4_dist <- dpdescription(dp, "Répartition des nouvelles infections par pourcentage de CD4 chez les enfants" , 1, 4:10)
-    cd4_dist <- sapply(cd4_dist, as.numeric)
+    cd4_dist <- df_as_numeric(cd4_dist)
   } else {
     stop("CD4 distribution for paeds description not recognized. Function probably needs update for this .DP file.")
   }
@@ -491,7 +491,7 @@ dp_read_paed_cd4_prog <- function(dp) {
   if (exists_dpdescription(dp, "Annual rate of progression to next lower CD4 category for Children")) {
     ##only extracting 0-4 for right now
     cd4_prog <- dpdescription(dp, "Annual rate of progression to next lower CD4 category for Children", 2:3, 4:21)
-    cd4_prog <- sapply(cd4_prog, as.numeric)
+    cd4_prog <- df_as_numeric(cd4_prog)
     dimnames(cd4_prog) <- list(sex = c('Male', 'Female'), cd4_cat = cd4)
 
 
@@ -515,7 +515,7 @@ dp_read_paed_cd4_mort <- function(dp) {
   if (exists_dpdescription(dp, "Annual probability of HIV-related mortality among those not on ART by CD4 category for Children")) {
     ##only extracting 0-4 for right now
     cd4_mort <- dpdescription(dp, "Annual probability of HIV-related mortality among those not on ART by CD4 category for Children", 1:12, 4:10)
-    cd4_mort <- sapply(cd4_mort, as.numeric)
+    cd4_mort <- df_as_numeric(cd4_mort)
     dimnames(cd4_mort) <- list(trans = trans_type, cd4_cat = cd4)
 
 
@@ -540,7 +540,7 @@ dp_read_paed_art_mort <- function(dp) {
     ##only extracting 0-4 for right now
     art_mort <- dpsub(dp,"<ChildMortByCD4WithART0to6 MV2>",
                               2:3, 4:25)
-    art_mort <- sapply(art_mort, as.numeric)
+    art_mort <- df_as_numeric(art_mort)
     males_lt6mo <- array(art_mort[1,], dim = c(7, 3), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'), ages = c('0', '1-2', '3-4')))
     females_lt6mo <- array(art_mort[2,], dim = c(7, 3), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'), ages = c('0', '1-2', '3-4')))
     art_mort_lt6mo <- array(0, dim = c(7, 3, 2), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'), ages = c('0', '1-2', '3-4'), sex = c('Male', 'Female')))
@@ -551,7 +551,7 @@ dp_read_paed_art_mort <- function(dp) {
     ##only extracting 0-4 for right now
     art_mort <- dpsub(dp,"<ChildMortByCD4WithART0to6 MV2>",
                       2:3, 26:38)
-    art_mort <- sapply(art_mort, as.numeric)
+    art_mort <- df_as_numeric(art_mort)
     art_mort <- art_mort[,-7]
     adol_males_lt6mo <- array(art_mort[1,], dim = c(6, 2), dimnames = list(cd4 = c('>1000', '750-999', '500-749', '350-499', '200-349', '<200'), ages = c('5-9', '10-14')))
     adol_females_lt6mo <- array(art_mort[2,], dim = c(6, 2), dimnames = list(cd4 = c('>1000', '750-999', '500-749', '350-499', '200-349', '<200'), ages = c('5-9', '10-14')))
@@ -567,7 +567,7 @@ dp_read_paed_art_mort <- function(dp) {
     ##only extracting 0-4 for right now
     art_mort <- dpsub(dp,"<ChildMortByCD4WithART7to12 MV>",
                       3:4, 4:25)
-    art_mort <- sapply(art_mort, as.numeric)
+    art_mort <- df_as_numeric(art_mort)
     males_6to12mo <- array(art_mort[1,], dim = c(7, 3), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'), ages = c('0', '1-2', '3-4')))
     females_6to12mo <- array(art_mort[2,], dim = c(7, 3), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'), ages = c('0', '1-2', '3-4')))
     art_mort_6to12mo <- array(0, dim = c(7, 3, 2), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'), ages = c('0', '1-2', '3-4'), sex = c('Male', 'Female')))
@@ -576,7 +576,7 @@ dp_read_paed_art_mort <- function(dp) {
 
     art_mort <- dpsub(dp,"<ChildMortByCD4WithART7to12 MV>",
                       3:4, 26:38)
-    art_mort <- sapply(art_mort, as.numeric)
+    art_mort <- df_as_numeric(art_mort)
     art_mort <- art_mort[,-7]
     adol_males_6to12mo <- array(art_mort[1,], dim = c(6, 2), dimnames = list(cd4 = c('>1000', '750-999', '500-749', '350-499', '200-349', '<200'), ages = c('5-9', '10-14')))
     adol_females_6to12mo <- array(art_mort[2,], dim = c(6, 2), dimnames = list(cd4 = c('>1000', '750-999', '500-749', '350-499', '200-349', '<200'), ages = c('5-9', '10-14')))
@@ -592,7 +592,7 @@ dp_read_paed_art_mort <- function(dp) {
     ##only extracting 0-4 for right now
     art_mort <- dpsub(dp,"<ChildMortByCD4WithARTGT12 MV>",
                       3:4, 4:25)
-    art_mort <- sapply(art_mort, as.numeric)
+    art_mort <- df_as_numeric(art_mort)
     males_gte12mo <- array(art_mort[1,], dim = c(7, 3), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'), ages = c('0', '1-2', '3-4')))
     females_gte12mo <- array(art_mort[2,], dim = c(7, 3), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'), ages = c('0', '1-2', '3-4')))
     art_mort_gte12mo <- array(0, dim = c(7, 3, 2), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'), ages = c('0', '1-2', '3-4'), sex = c('Male', 'Female')))
@@ -601,7 +601,7 @@ dp_read_paed_art_mort <- function(dp) {
 
     art_mort <- dpsub(dp,"<ChildMortByCD4WithARTGT12 MV>",
                       3:4, 26:38)
-    art_mort <- sapply(art_mort, as.numeric)
+    art_mort <- df_as_numeric(art_mort)
     art_mort <- art_mort[,-7]
     adol_males_gte12mo <- array(art_mort[1,],  dim = c(6, 2), dimnames = list(cd4 = c('>1000', '750-999', '500-749', '350-499', '200-349', '<200'), ages = c('5-9', '10-14')))
     adol_females_gte12mo <- array(art_mort[2,], dim = c(6, 2), dimnames = list(cd4 = c('>1000', '750-999', '500-749', '350-499', '200-349', '<200'), ages = c('5-9', '10-14')))
@@ -630,11 +630,11 @@ dp_read_paed_art_eligibility <- function(dp) {
   if (exists_dpdescription(dp, "Eligibility for treatment - Children")) {
     ##only extracting 0-4 for right now
     art_elig <- dpdescription(dp, "Eligibility for treatment - Children", 1:8, dpy$time_data_idx)
-    art_elig <- sapply(art_elig, as.numeric)
+    art_elig <- df_as_numeric(art_elig)
     dimnames(art_elig) <- list(age = specs, years = dpy$proj_years)
 
     art_elig_age <- dpdescription(dp, "Age below which all HIV+ children should be on treatment (months)", 1, dpy$time_data_idx)
-    art_elig_age <- sapply(art_elig_age, as.numeric)
+    art_elig_age <- df_as_numeric(art_elig_age)
     names(art_elig_age) <-  dpy$proj_years
 
   } else {
@@ -985,3 +985,10 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   return(v)
 }
 
+df_as_numeric <- function(df) {
+  vapply(df, function(x) as.numeric(x), numeric(nrow(df)))
+}
+
+df_as_logical <- function(df) {
+  vapply(df, function(x) as.logical(as.numeric(x)), logical(nrow(df)))
+}
