@@ -195,7 +195,6 @@ void adjust_hiv_births(int t,
                        const State<ModelVariant, real_type> &state_curr,
                        State<ModelVariant, real_type> &state_next,
                        IntermediateData<ModelVariant, real_type> &intermediate) {
-  const auto cpars = pars.children.children;
   static_assert(ModelVariant::run_child_model,
                 "adjust_hiv_births can only be called for model variants where run_child_model is true");
   const auto& p_hc = pars.children.children;
