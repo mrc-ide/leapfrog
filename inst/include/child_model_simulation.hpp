@@ -690,9 +690,7 @@ void run_bf_transmission_rate(int t,
     i_hc.start_art_do += dropped_off_art_start;
     auto dropped_off_art_prepreg = (i_hc.retained_on_ART / p_hc.PMTCT_dropout(0, t)) * (1 - p_hc.PMTCT_dropout(0, t));
     i_hc.on_art_do += dropped_off_art_prepreg;
-    if(t == 53 & index == 0){
-      std::cout << dropped_off_art_prepreg;
-    }
+
     i_hc.percent_no_treatment = std::max(i_hc.percent_no_treatment, 0.0);
 
     // No treatment
@@ -708,13 +706,18 @@ void run_bf_transmission_rate(int t,
         untreated_vertical_bf_tr *= 0.25;
       }
 
-      n_hc.hc_stacked_bar(2, (index+1)) += i_hc.on_art_do * untreated_vertical_bf_tr *
+      n_hc.hc_stacked_bar(2, (index+1)) += i_hc.on_art_do *
+        untreated_vertical_bf_tr *
         2 * (1 - p_hc.breastfeeding_duration_no_art(bf, t));
-      n_hc.hc_stacked_bar(3, (index+1)) += i_hc.start_art_do * untreated_vertical_bf_tr *
+
+      n_hc.hc_stacked_bar(3, (index+1)) += i_hc.start_art_do *
+        untreated_vertical_bf_tr *
         2 * (1 - p_hc.breastfeeding_duration_no_art(bf, t));
+
       n_hc.hc_stacked_bar(5, (index+1)) += (i_hc.percent_no_treatment - i_hc.start_art_do - i_hc.on_art_do) *
         untreated_vertical_bf_tr *
         2 * (1 - p_hc.breastfeeding_duration_no_art(bf, t));
+
     }
 
     if (bf < 1) {
