@@ -165,66 +165,85 @@ void run_wlhiv_births_by_anc_attend(int t,
     i_hc.asfr_sum += p_dm.age_specific_fertility_rate(a, t);
   } // end a
 
-  for (int test = 0; test < 2; ++test) {
     for (int a = 0; a < p_op.p_fertility_age_groups; ++a) {
-      i_hc.nHIVcurr_test(test) = 0.0;
-      i_hc.nHIVlast_test(test) = 0.0;
-      i_hc.df_test(test)  = 0.0;
+      i_hc.nHIVcurr = 0.0;
+      i_hc.nHIVlast = 0.0;
+      i_hc.df_test(0)  = 0.0;
+      i_hc.df_test(1)  = 0.0;
 
       for (int hd = 0; hd < ss_b.hDS; ++hd) {
-        i_hc.nHIVcurr_test(test) += n_ba.h_hiv_adult(hd, a, 1) * p_hc.anc_testing(test);
-        i_hc.nHIVlast_test(test) += c_ba.h_hiv_adult(hd, a, 1) * p_hc.anc_testing(test);
+        i_hc.nHIVcurr += n_ba.h_hiv_adult(hd, a, 1);
+        i_hc.nHIVlast += c_ba.h_hiv_adult(hd, a, 1);
         for (int ht = 0; ht < ss_b.hTS; ++ht) {
-          i_hc.nHIVcurr_test(test)  += n_ba.h_art_adult(ht, hd, a, 1) * p_hc.anc_testing(test);
-          i_hc.nHIVlast_test(test)  += c_ba.h_art_adult(ht, hd, a, 1) * p_hc.anc_testing(test);
+          i_hc.nHIVcurr  += n_ba.h_art_adult(ht, hd, a, 1);
+          i_hc.nHIVlast  += c_ba.h_art_adult(ht, hd, a, 1);
         } // end hTS
       } // end hDS
 
-      i_hc.prev_test(test)  = i_hc.nHIVcurr_test(test) / n_ba.p_total_pop(a + 15, 1);
+      i_hc.prev = i_hc.nHIVcurr / n_ba.p_total_pop(a + 15, 1);
 
       for (int hd = 0; hd < ss_b.hDS; ++hd) {
-        if(test == 0){
-          i_hc.df_test(test)  += p_hc.local_adj_factor * p_hc.fert_mult_by_age(a) * p_hc.fert_mult_off_art(hd) *
-            p_hc.anc_testing(test) * (n_ba.h_hiv_adult(hd, a, 1) + c_ba.h_hiv_adult(hd, a, 1)) / 2;
+        //people who did attend ANC
+          i_hc.df_test(0)  += p_hc.local_adj_factor * p_hc.fert_mult_by_age(a) * p_hc.fert_mult_off_art(hd) *
+            (n_ba.h_hiv_adult(hd, a, 1) + c_ba.h_hiv_adult(hd, a, 1)) / 2;
           // women on ART less than 6 months use the off art fertility multiplier
-          i_hc.df_test(test)  += p_hc.local_adj_factor * p_hc.fert_mult_by_age(a) * p_hc.fert_mult_off_art(hd) *
-            p_hc.anc_testing(test) * (n_ba.h_art_adult(0, hd, a, 1) + c_ba.h_art_adult(0, hd, a, 1)) / 2;
+          i_hc.df_test(0)  += p_hc.local_adj_factor * p_hc.fert_mult_by_age(a) * p_hc.fert_mult_off_art(hd) *
+            (n_ba.h_art_adult(0, hd, a, 1) + c_ba.h_art_adult(0, hd, a, 1)) / 2;
           for (int ht = 1; ht < ss_b.hTS; ++ht) {
-            i_hc.df_test(test)  += p_hc.local_adj_factor * p_hc.fert_mult_on_art(a) *
-              p_hc.anc_testing(test) * (n_ba.h_art_adult(ht, hd, a, 1) + c_ba.h_art_adult(ht, hd, a, 1)) / 2;
+            i_hc.df_test(0)  += p_hc.local_adj_factor * p_hc.fert_mult_on_art(a) *
+              (n_ba.h_art_adult(ht, hd, a, 1) + c_ba.h_art_adult(ht, hd, a, 1)) / 2;
           } // end hTS
-        }else{
-          i_hc.df_test(test)  += p_hc.local_adj_factor * p_hc.local_adj_factor_scalar * p_hc.fert_mult_by_age(a) * p_hc.fert_mult_off_art(hd) *
-            p_hc.anc_testing(test) * (n_ba.h_hiv_adult(hd, a, 1) + c_ba.h_hiv_adult(hd, a, 1)) / 2;
+
+        //people who did not attend ANC
+          i_hc.df_test(1)  += p_hc.local_adj_factor * p_hc.local_adj_factor_scalar * p_hc.fert_mult_by_age(a) * p_hc.fert_mult_off_art(hd) *
+            (n_ba.h_hiv_adult(hd, a, 1) + c_ba.h_hiv_adult(hd, a, 1)) / 2;
           // women on ART less than 6 months use the off art fertility multiplier
-          i_hc.df_test(test)  += p_hc.local_adj_factor * p_hc.local_adj_factor_scalar * p_hc.fert_mult_by_age(a) * p_hc.fert_mult_off_art(hd) *
-            p_hc.anc_testing(test) * (n_ba.h_art_adult(0, hd, a, 1) + c_ba.h_art_adult(0, hd, a, 1)) / 2;
+          i_hc.df_test(1)  += p_hc.local_adj_factor * p_hc.local_adj_factor_scalar * p_hc.fert_mult_by_age(a) * p_hc.fert_mult_off_art(hd) *
+            (n_ba.h_art_adult(0, hd, a, 1) + c_ba.h_art_adult(0, hd, a, 1)) / 2;
           for (int ht = 1; ht < ss_b.hTS; ++ht) {
-            i_hc.df_test(test)  += p_hc.local_adj_factor * p_hc.local_adj_factor_scalar * p_hc.fert_mult_on_art(a) *
-              p_hc.anc_testing(test) * (n_ba.h_art_adult(ht, hd, a, 1) + c_ba.h_art_adult(ht, hd, a, 1)) / 2;
+            i_hc.df_test(1)  += p_hc.local_adj_factor * p_hc.local_adj_factor_scalar * p_hc.fert_mult_on_art(a) *
+              (n_ba.h_art_adult(ht, hd, a, 1) + c_ba.h_art_adult(ht, hd, a, 1)) / 2;
           } // end hTS
-        }
+
       } // end hDS
 
+
+
       if (i_hc.nHIVcurr > 0) {
-        auto midyear_fertileHIV = p_hc.anc_testing(test) * (i_hc.nHIVcurr_test(test) + i_hc.nHIVlast_test(test)) / 2;
-        i_hc.df_test(test) = i_hc.df_test(test) / midyear_fertileHIV;
-        i_hc.birthsCurrAge_test(test) = midyear_fertileHIV * p_hc.total_fertility_rate(t) *
-          i_hc.df_test(test) / (i_hc.df_test(test) * i_hc.prev_test(test) + 1 - i_hc.prev_test(test)) *
+        auto midyear_fertileHIV = (i_hc.nHIVcurr + i_hc.nHIVlast) / 2;
+
+        i_hc.df_test(0) = (i_hc.df_test(0)) / (midyear_fertileHIV);
+        i_hc.birthsCurrAge_test(0) = midyear_fertileHIV * p_hc.anc_testing(0) * p_hc.total_fertility_rate(t) *
+          i_hc.df_test(0) / (i_hc.df_test(0) * i_hc.prev + 1 - i_hc.prev) *
           p_dm.age_specific_fertility_rate(a, t) / i_hc.asfr_sum ;
+
+        i_hc.df_test(1) = (i_hc.df_test(1)) / (midyear_fertileHIV) ;
+        i_hc.birthsCurrAge_test(1) = midyear_fertileHIV * p_hc.anc_testing(1) * p_hc.total_fertility_rate(t) *
+          i_hc.df_test(1) / (i_hc.df_test(1) * i_hc.prev + 1 - i_hc.prev) *
+          p_dm.age_specific_fertility_rate(a, t) / i_hc.asfr_sum ;
+
       } else {
-        auto midyear_fertileHIV = p_hc.anc_testing(test) * (i_hc.nHIVcurr_test(test) + i_hc.nHIVlast_test(test)) / 2;
-        i_hc.df_test(test) = 1;
-        i_hc.birthsCurrAge_test(test) = midyear_fertileHIV * p_hc.total_fertility_rate(t) *
-          i_hc.df_test(test) / (i_hc.df_test(test) * i_hc.prev_test(test) + 1 - i_hc.prev_test(test)) *
+        auto midyear_fertileHIV = (i_hc.nHIVcurr + i_hc.nHIVlast) / 2;
+        i_hc.df_test(0) = 1;
+        i_hc.birthsCurrAge_test(0) = midyear_fertileHIV * p_hc.total_fertility_rate(t) *
+          i_hc.df_test(0) / (i_hc.df_test(0) * i_hc.prev_test(0) + 1 - i_hc.prev_test(0)) *
+          p_dm.age_specific_fertility_rate(a, t) / i_hc.asfr_sum ;
+
+        i_hc.df_test(1) = 1;
+        i_hc.birthsCurrAge_test(1) = midyear_fertileHIV * p_hc.total_fertility_rate(t) *
+          i_hc.df_test(1) / (i_hc.df_test(1) * i_hc.prev_test(1) + 1 - i_hc.prev_test(1)) *
           p_dm.age_specific_fertility_rate(a, t) / i_hc.asfr_sum ;
       }
 
-      i_hc.birthsHE_test(test) += i_hc.birthsCurrAge_test(test);
+      i_hc.birthsHE_test(0) += i_hc.birthsCurrAge_test(0);
+      i_hc.birthsHE_test(1) += i_hc.birthsCurrAge_test(1);
+
+
 
     } // end a
-    n_hc.hiv_births_test(test) = i_hc.birthsHE_test(test);
-  } // end test
+    n_hc.hiv_births_test(0) = i_hc.birthsHE_test(0);
+    n_hc.hiv_births_test(1) = i_hc.birthsHE_test(1);
+
 
 }
 

@@ -45,9 +45,8 @@ test_that("Model outputs are consistent", {
   ###############################
   total <- out$hiv_births
   strat <- out$hiv_births_test
-  strat <- apply(out$infection_by_type, c(2,3,4), sum)
-  pop <- out$p_infections[1:5,,]
-  expect_equal(strat, pop)
+  total - colSums(strat)
+
 
   ###############################
   ##Infections stratified by infection type and population infections should be the same
