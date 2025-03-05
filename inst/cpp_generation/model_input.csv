@@ -43,6 +43,7 @@ fert_mult_offart,Children.fert_mult_off_art,real_type,ModelVariant::run_child_mo
 fert_mult_onart,Children.fert_mult_on_art,real_type,ModelVariant::run_child_model,,FALSE,1,options.p_fertility_age_groups,,,
 tfr,Children.total_fertility_rate,real_type,ModelVariant::run_child_model,,FALSE,1,proj_years,,,
 laf,Children.local_adj_factor,real_type,ModelVariant::run_child_model,,FALSE,1,1,,,
+laf_scalar,Children.local_adj_factor_scalar,real_type,ModelVariant::run_child_model,,FALSE,1,1,,,
 pmtct,Children.PMTCT,real_type,ModelVariant::run_child_model,,FALSE,2,children.hPS,proj_years,,
 mtct,Children.vertical_transmission_rate,real_type,ModelVariant::run_child_model,,FALSE,2,base.hDS+1,children.hVT,,
 pmtct_mtct,Children.PMTCT_transmission_rate,real_type,ModelVariant::run_child_model,,FALSE,3,base.hDS,children.hPS,children.hVT,
@@ -66,3 +67,4 @@ adult_female_infections,Children.adult_female_infections,real_type,ModelVariant:
 hivnpop,Children.adult_female_hivnpop,real_type,ModelVariant::run_child_model,,FALSE,2,options.p_fertility_age_groups,proj_years,,
 total_births,Children.total_births,real_type,ModelVariant::run_child_model,,FALSE,1,proj_years,,,
 hc_art_start,Children.hc_art_start,real_type,ModelVariant::run_child_model,,FALSE,1,1,,,
+anc_testing,Children.anc_testing,real_type,ModelVariant::run_child_model,,FALSE,1,2,,,

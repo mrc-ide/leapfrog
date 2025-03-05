@@ -258,6 +258,12 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
   real_type birthsCurrAge;
   real_type birthsHE;
   real_type births_HE_15_24;
+  TensorFixedSize <real_type, Sizes<2>> nHIVcurr_test;
+  TensorFixedSize <real_type, Sizes<2>> nHIVlast_test;
+  TensorFixedSize <real_type, Sizes<2>> df_test;
+  TensorFixedSize <real_type, Sizes<2>> prev_test;
+  TensorFixedSize <real_type, Sizes<2>> birthsCurrAge_test;
+  TensorFixedSize <real_type, Sizes<2>> birthsHE_test;
   TensorFixedSize <real_type, Sizes<hAG<ChildModel>, NS<ChildModel>>> p_hiv_neg_pop;
   real_type sumARV;
   real_type need_PMTCT;
@@ -294,8 +300,7 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
   TensorFixedSize <real_type, Sizes<hBF_coarse<ChildModel>>> bf_transmission_rate;
   real_type ctx_coverage;
   real_type need_cotrim;
-  real_type on_art_do;
-  real_type start_art_do;
+  real_type bf_scalar;
 
 
   ChildModelIntermediateData() {};
@@ -332,6 +337,12 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
     birthsCurrAge = 0.0;
     birthsHE = 0.0;
     births_HE_15_24 = 0.0;
+    nHIVcurr_test.setZero();
+    nHIVlast_test.setZero();
+    df_test.setZero();
+    prev_test.setZero();
+    birthsCurrAge_test.setZero();
+    birthsHE_test.setZero();
     p_hiv_neg_pop.setZero();
     sumARV = 0.0;
     need_PMTCT = 0.0;
@@ -368,8 +379,7 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
     bf_transmission_rate.setZero();
     ctx_coverage = 0.0;
     need_cotrim = 0.0;
-    on_art_do = 0.0;
-    start_art_do = 0.0;
+    bf_scalar = 0.0;
   };
 };
 

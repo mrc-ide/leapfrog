@@ -72,6 +72,7 @@ struct Children {
   TensorMap1<real_type> fert_mult_on_art;
   TensorMap1<real_type> total_fertility_rate;
   real_type local_adj_factor;
+  real_type local_adj_factor_scalar;
   TensorMap2<real_type> PMTCT;
   TensorMap2<real_type> vertical_transmission_rate;
   TensorMap3<real_type> PMTCT_transmission_rate;
@@ -95,6 +96,7 @@ struct Children {
   TensorMap2<real_type> adult_female_hivnpop;
   TensorMap1<real_type> total_births;
   real_type hc_art_start;
+  TensorMap1<real_type> anc_testing;
 };
 
 }
