@@ -578,19 +578,20 @@ void run_bf_transmission_rate(int t,
     for (int hp = 0; hp < ss_c.hPS; hp++) {
       i_hc.percent_on_treatment = 0;
       i_hc.percent_no_treatment -=  i_hc.PMTCT_coverage(hp);
+
       if(hp > 1){
         if(hp == 2){
           auto tr = i_hc.PMTCT_coverage(hp) *
             //sdnvp stratifies transmission by CD4, but spectrum only uses one
             p_hc.PMTCT_transmission_rate(0, hp, 1) *
-            2 * (1 - p_hc.breastfeeding_duration_art(bf, t));
-          i_hc.PMTCT_coverage(hp) -= tr * i_hc.bf_scalar;
+            2 * (1 - p_hc.breastfeeding_duration_art(bf, t)) * i_hc.bf_scalar;
+          i_hc.PMTCT_coverage(hp) -= tr;
           i_hc.bf_transmission_rate(index) += tr;
         }else{
           auto tr = i_hc.PMTCT_coverage(hp) *
             p_hc.PMTCT_transmission_rate(4, hp, 1) *
-            2 * (1 - p_hc.breastfeeding_duration_art(bf, t));
-          i_hc.PMTCT_coverage(hp) -= tr * i_hc.bf_scalar;
+            2 * (1 - p_hc.breastfeeding_duration_art(bf, t)) * i_hc.bf_scalar;
+          i_hc.PMTCT_coverage(hp) -= tr;
           i_hc.bf_transmission_rate(index) += tr;
         }
       }
