@@ -15,9 +15,7 @@ test_that("Child model can be run for all years", {
       "hc1_art_pop", "hc2_art_pop",
       "hc1_noart_aids_deaths", "hc2_noart_aids_deaths",
       "hc1_art_aids_deaths", "hc2_art_aids_deaths", "hiv_births",
-      "hc_art_init", "hc_art_need_init", "ctx_need",
-      "ctx_mean", "infection_by_type", 'hc_stacked_bar'
-    )
+      "hc_art_init", "hc_art_need_init", "ctx_need", "infection_by_type")
   )
 
   ## Nothing should ever be negative
@@ -45,14 +43,6 @@ test_that("Model outputs are consistent", {
   strat <- apply(out$infection_by_type, c(2,3,4), sum)
   pop <- out$p_infections[1:5,,]
   expect_equal(strat, pop)
-
-  ###############################
-  ##Infections for stacked bar should match infections by age (aggregating for now)
-  ###############################
-  # pop <- apply(out$p_infections[1:5,,], 3, sum)
-  # stacked <- apply(out$hc_stacked_bar, 3, sum)
-  # stacked <- stacked * out$hiv_births ##stacked bar outputs are transmission rates, so multiple by HEI
-  # expect_true(all(abs(stacked - pop) < 1e-5))
 
   ###############################
   ##Stratified deaths and population deaths should be the same
@@ -141,7 +131,7 @@ test_that("Female adult pop aligns", {
   lfrog <- out$p_hiv_pop[16:50,2,]
   dimnames(lfrog) <- list(Age = 15:49, Year = 1970:2030)
   lfrog <- as.data.frame(as.table(lfrog)) %>%
-    rename(lfrog = Freq)
+     dplyr::mutate(lfrog = Freq)
   lfrog$Year <- as.integer(as.character(lfrog$Year))
 
 
@@ -196,7 +186,7 @@ test_that("Infections among children align", {
     dplyr::rename(Age = Var1, Sex = Var2, Year = Var3, lfrog = value) %>%
     dplyr::mutate(Age = Age - 1, Year = Year + 1969, Sex = ifelse(Sex == 1, 'Male', 'Female')) %>%
     dplyr::group_by(Age, Year, Sex) %>%
-    dplyr::summarise(lfrog = sum(lfrog))
+    dplyr::summarise(lfrog = sum(lfrog), .groups = c("keep"))
 
   dt <- dplyr::right_join(inf_spec, lfrog, by = c("Age", "Year", "Sex"))
   dt <- dt %>%
@@ -247,7 +237,7 @@ test_that("CLHIV align", {
       transmission = as.factor(transmission)
     ) %>%
     dplyr::group_by(age, cd4_cat, sex, year, transmission) %>%
-    dplyr::summarise(fr = sum(fr))
+    dplyr::summarise(fr = sum(fr), .groups = c("keep"))
   dt <- dplyr::right_join(hc, spec_prev, by = c("sex", "age", "cd4_cat", "year", "transmission"))
   dt <- dt %>%
     dplyr::mutate(diff = pop - fr) %>%

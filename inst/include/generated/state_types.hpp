@@ -125,9 +125,8 @@ struct ChildModelState<ChildModel, real_type> {
   TensorFixedSize<real_type, Sizes<hcAG_coarse<ChildModel>>> hc_art_init;
   TensorFixedSize<real_type, Sizes<hc1DS<ChildModel>, hcTT<ChildModel>, hcAG_end<ChildModel>, NS<ChildModel>>> hc_art_need_init;
   real_type ctx_need;
-  TensorFixedSize<real_type, Sizes<2>> ctx_mean;
   TensorFixedSize<real_type, Sizes<hcTT<ChildModel>, hc1AG<ChildModel>, NS<ChildModel>>> infection_by_type;
-  TensorFixedSize<real_type, Sizes<7, 5>> hc_stacked_bar;
+  TensorFixedSize<real_type, Sizes<2>> ctx_mean;
 
   // Used by R
   ChildModelState() {
@@ -177,9 +176,8 @@ struct ChildModelState<ChildModel, real_type> {
     hc_art_init.setZero();
     hc_art_need_init.setZero();
     ctx_need = 0;
-    ctx_mean.setZero();
     infection_by_type.setZero();
-    hc_stacked_bar.setZero();
+    ctx_mean.setZero();
   }
 };
 

@@ -23,6 +23,4 @@ hiv_births,hiv_births,REAL,ChildModel,ModelVariant::run_child_model,1,output_yea
 hc_art_init,hc_art_init,REAL,ChildModel,ModelVariant::run_child_model,2,children.hcAG_coarse,output_years,,,
 hc_art_need_init,hc_art_need_init,REAL,ChildModel,ModelVariant::run_child_model,5,children.hc1DS,children.hcTT,children.hcAG_end,base.NS,output_years
 ctx_need,ctx_need,REAL,ChildModel,ModelVariant::run_child_model,1,output_years,,,,
-ctx_mean,ctx_mean,REAL,ChildModel,ModelVariant::run_child_model,2,2,output_years,,,
 infection_by_type,infection_by_type,REAL,ChildModel,ModelVariant::run_child_model,4,children.hcTT,children.hc1AG,base.NS,output_years,
-hc_stacked_bar,hc_stacked_bar,REAL,ChildModel,ModelVariant::run_child_model,3,7,5,output_years,,

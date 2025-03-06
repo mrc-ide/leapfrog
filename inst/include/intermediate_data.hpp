@@ -248,24 +248,22 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
   TensorFixedSize <real_type, Sizes<hTS<ChildModel>, hDS<ChildModel>, NS<ChildModel>>> age15_art_pop;
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_posthivmort;
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_grad;
-  TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_ctx_need;
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> eligible;
-  TensorFixedSize <real_type, Sizes<4>> unmet_need;
-  TensorFixedSize <real_type, Sizes<4>> total_need;
-  TensorFixedSize <real_type, Sizes<4>> on_art;
+  TensorFixedSize <real_type, Sizes<hcAG_coarse<ChildModel>>> unmet_need;
+  TensorFixedSize <real_type, Sizes<hcAG_coarse<ChildModel>>> total_need;
+  TensorFixedSize <real_type, Sizes<hcAG_coarse<ChildModel>>> on_art;
   real_type retained;
-  TensorFixedSize <real_type, Sizes<4>> total_art_last_year;
-  TensorFixedSize <real_type, Sizes<4>> total_art_this_year;
+  TensorFixedSize <real_type, Sizes<hcAG_coarse<ChildModel>>> total_art_last_year;
+  TensorFixedSize <real_type, Sizes<hcAG_coarse<ChildModel>>> total_art_this_year;
   real_type hc_death_rate;
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hAG<ChildModel>, NS<ChildModel>>> hc_art_grad;
-  TensorFixedSize <real_type, Sizes<4>> hc_art_scalar;
-  TensorFixedSize <real_type, Sizes<4>> hc_initByAge;
-  TensorFixedSize <real_type, Sizes<4>> hc_adj;
-  TensorFixedSize <real_type, Sizes<4>> hc_art_deaths;
+  TensorFixedSize <real_type, Sizes<hcAG_coarse<ChildModel>>> hc_art_scalar;
+  TensorFixedSize <real_type, Sizes<hcAG_coarse<ChildModel>>> hc_initByAge;
+  TensorFixedSize <real_type, Sizes<hcAG_coarse<ChildModel>>> hc_adj;
+  TensorFixedSize <real_type, Sizes<hcAG_coarse<ChildModel>>> hc_art_deaths;
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hcAG_end<ChildModel>, NS<ChildModel>>> hc_hiv_dist;
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>,  hcAG_end<ChildModel>, NS<ChildModel>>> hc_hiv_total;
   TensorFixedSize <real_type, Sizes<hDS<ChildModel>, hcTT<ChildModel>, hcAG_end<ChildModel>, NS<ChildModel>>> art_ltfu_grad;
-  TensorFixedSize <real_type, Sizes<hPS<ChildModel>>> previous_mtct;
   real_type asfr_sum;
   real_type births_sum;
   real_type nHIVcurr;
@@ -279,7 +277,7 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
   real_type sumARV;
   real_type need_PMTCT;
   TensorFixedSize <real_type, Sizes<hPS<ChildModel>>> PMTCT_coverage;
-  real_type OnPMTCT;
+  real_type on_PMTCT;
   real_type num_wlhiv_lt200;
   real_type num_wlhiv_200to350;
   real_type num_wlhiv_gte350;
@@ -309,11 +307,8 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
   real_type percent_no_treatment;
   real_type percent_on_treatment;
   TensorFixedSize <real_type, Sizes<hBF_coarse<ChildModel>>> bf_transmission_rate;
-  real_type ctx_coverage;
-  real_type need_cotrim;
-  real_type on_art_do;
-  real_type start_art_do;
   real_type bf_scalar;
+  TensorFixedSize <real_type, Sizes<2>> ctx_mean;
 
 
   ChildModelIntermediateData() {};
@@ -323,7 +318,6 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
     age15_art_pop.setZero();
     hc_posthivmort.setZero();
     hc_grad.setZero();
-    hc_ctx_need.setZero();
     eligible.setZero();
     unmet_need.setZero();
     total_need.setZero();
@@ -337,7 +331,6 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
     hc_hiv_dist.setZero();
     hc_hiv_total.setZero();
     art_ltfu_grad.setZero();
-    previous_mtct.setZero();
     hc_initByAge.setZero();
     hc_adj.setZero();
     hc_art_deaths.setZero();
@@ -354,7 +347,7 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
     sumARV = 0.0;
     need_PMTCT = 0.0;
     PMTCT_coverage.setZero();
-    OnPMTCT = 0.0;
+    on_PMTCT = 0.0;
     num_wlhiv_lt200 = 0.0;
     num_wlhiv_200to350 = 0.0;
     num_wlhiv_gte350 = 0.0;
@@ -384,11 +377,8 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
     percent_no_treatment = 0.0;
     percent_on_treatment = 0.0;
     bf_transmission_rate.setZero();
-    ctx_coverage = 0.0;
-    need_cotrim = 0.0;
-    on_art_do = 0.0;
-    start_art_do = 0.0;
     bf_scalar = 0.0;
+    ctx_mean.setZero();
   };
 };
 

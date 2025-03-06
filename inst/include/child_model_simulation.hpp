@@ -219,8 +219,8 @@ void convert_PMTCT_num_to_perc(int t,
 
   i_hc.need_PMTCT = std::max(i_hc.sumARV, n_hc.hiv_births);
 
-  i_hc.OnPMTCT = i_hc.sumARV + p_hc.patients_reallocated(t);
-  i_hc.OnPMTCT = std::min(i_hc.OnPMTCT, i_hc.need_PMTCT);
+  i_hc.on_PMTCT = i_hc.sumARV + p_hc.patients_reallocated(t);
+  i_hc.on_PMTCT = std::min(i_hc.on_PMTCT, i_hc.need_PMTCT);
 
   // replace all instances of coverage input as numbers with percentage covered
   if (p_hc.PMTCT_input_is_percent(t)) {
@@ -234,7 +234,7 @@ void convert_PMTCT_num_to_perc(int t,
         i_hc.PMTCT_coverage(hp) = 0.0;
       } else {
         i_hc.PMTCT_coverage(hp) = p_hc.PMTCT(hp, t) / i_hc.sumARV *
-                                  i_hc.OnPMTCT / i_hc.need_PMTCT;
+                                  i_hc.on_PMTCT / i_hc.need_PMTCT;
       }
     } // end hPS
   }
@@ -677,7 +677,6 @@ void add_infections(int t,
     internal::adjust_option_A_B_bf_tr(t, pars, state_curr, state_next, intermediate);
     internal::convert_PMTCT_pre_bf(t, pars, state_curr, state_next, intermediate);
     internal::run_bf_transmission_rate(t, pars, state_curr, state_next, intermediate, 0, 3, 0);
-    n_hc.hc_stacked_bar(6,1) += i_hc.bf_incident_hiv_transmission_rate;
     real_type total_births = 0.0;
     if (p_hc.mat_prev_input(t)) {
       total_births = p_hc.total_births(t);
@@ -900,13 +899,14 @@ void get_cotrim_effect(int t,
                 "get_cotrim_effect can only be called for model variants where run_child_model is true");
   const auto& p_hc = pars.children.children;
   auto& n_hc = state_next.children;
+  auto& i_hc = intermediate.children;
 
   //note this is just for off art, need to also do for on art
   if (p_hc.ctx_val_is_percent(t)) {
-    n_hc.ctx_mean(art_flag) = (1 - p_hc.ctx_effect(art_flag)*  p_hc.ctx_val(t)) ;
+    i_hc.ctx_mean(art_flag) = (1 - p_hc.ctx_effect(art_flag)*  p_hc.ctx_val(t)) ;
   } else {
     if (n_hc.ctx_need > 0) {
-     n_hc.ctx_mean(art_flag) = (1 - p_hc.ctx_effect(art_flag) * (p_hc.ctx_val(t) / n_hc.ctx_need));
+     i_hc.ctx_mean(art_flag) = (1 - p_hc.ctx_effect(art_flag) * (p_hc.ctx_val(t) / n_hc.ctx_need));
     }
   }
 
@@ -934,7 +934,7 @@ void cd4_mortality(int t,
     for (int a = 0; a < ss_c.hc2_agestart; ++a) {
       for (int cat = 0; cat < ss_c.hcTT; ++cat) {
         for (int hd = 0; hd < ss_c.hc1DS; ++hd) {
-          auto hiv_deaths_strat = n_hc.ctx_mean(art_flag) * n_hc.hc1_hiv_pop(hd, cat, a, s) * p_hc.hc1_cd4_mort(hd, cat, a);
+          auto hiv_deaths_strat = i_hc.ctx_mean(art_flag) * n_hc.hc1_hiv_pop(hd, cat, a, s) * p_hc.hc1_cd4_mort(hd, cat, a);
           i_hc.hc_posthivmort(hd, cat, a, s) = n_hc.hc1_hiv_pop(hd, cat, a, s) - hiv_deaths_strat;
         }
       }
@@ -945,7 +945,7 @@ void cd4_mortality(int t,
     for (int a = ss_c.hc2_agestart; a < p_op.p_idx_fertility_first; ++a) {
       for (int cat = 0; cat < ss_c.hcTT; ++cat) {
         for (int hd = 0; hd < ss_c.hc2DS; ++hd) {
-          auto hiv_deaths_strat = n_hc.ctx_mean(art_flag) * n_hc.hc2_hiv_pop(hd, cat, a - ss_c.hc2_agestart, s) *
+          auto hiv_deaths_strat = i_hc.ctx_mean(art_flag) * n_hc.hc2_hiv_pop(hd, cat, a - ss_c.hc2_agestart, s) *
                                   p_hc.hc2_cd4_mort(hd, cat, a - ss_c.hc2_agestart);
           i_hc.hc_posthivmort(hd, cat, a, s) = n_hc.hc2_hiv_pop(hd, cat, a - ss_c.hc2_agestart, s) -
                                                hiv_deaths_strat;
@@ -1007,7 +1007,7 @@ void run_child_hiv_mort(int t,
     for (int a = 0; a < ss_c.hc2_agestart; ++a) {
       for (int cat = 0; cat < ss_c.hcTT; ++cat) {
         for (int hd = 0; hd < ss_c.hc1DS; ++hd) {
-          auto cd4_deaths_grad = n_hc.ctx_mean(art_flag) * n_hc.hc1_hiv_pop(hd, cat, a, s) *
+          auto cd4_deaths_grad = i_hc.ctx_mean(art_flag) * n_hc.hc1_hiv_pop(hd, cat, a, s) *
                                  p_hc.hc1_cd4_mort(hd, cat, a);
           i_hc.hc_grad(hd, cat, a, s) -= cd4_deaths_grad;
           n_hc.hc1_noart_aids_deaths(hd, cat, a, s) += cd4_deaths_grad;
@@ -1020,7 +1020,7 @@ void run_child_hiv_mort(int t,
     for (int a = ss_c.hc2_agestart; a < p_op.p_idx_fertility_first; ++a) {
       for (int cat = 0; cat < ss_c.hcTT; ++cat) {
         for (int hd = 0; hd < ss_c.hc2DS; ++hd) {
-          auto cd4_mort_grad = n_hc.ctx_mean(art_flag) *
+          auto cd4_mort_grad = i_hc.ctx_mean(art_flag) *
                                n_hc.hc2_hiv_pop(hd, cat, a - ss_c.hc2_agestart, s) *
                                p_hc.hc2_cd4_mort(hd, cat, a - ss_c.hc2_agestart);
           i_hc.hc_grad(hd, cat, a, s) -= cd4_mort_grad;
