@@ -31,4 +31,7 @@ concept HivDemographicProjectionEnabled = RunDemographicProjection<Config> && Ru
 template<typename Config>
 concept HivModelSimulationEnabled = RunDemographicProjection<Config> && RunHivSimulation<Config>;
 
+template<typename Config>
+concept ChildModelSimulationEnabled = RunDemographicProjection<Config> && RunHivSimulation<Config> && RunChildModel<Config>;
+
 }

@@ -4,6 +4,7 @@
 #include "models/general_demographic_projection.hpp"
 #include "models/hiv_demographic_projection.hpp"
 #include "models/hiv_model_simulation.hpp"
+#include "models/child_model_simulation.hpp"
 
 namespace leapfrog {
 
@@ -105,6 +106,7 @@ struct Leapfrog {
     GeneralDemographicProjection<Config> general_dp(args);
     HivDemographicProjection<Config> hiv_dp(args);
     HivModelSimulation<Config> hiv_sim(args);
+    ChildModelSimulation<Config> child_sim(args);
 
     if constexpr (ModelVariant::run_demographic_projection) {
       general_dp.run_general_pop_demographic_projection();
@@ -112,6 +114,10 @@ struct Leapfrog {
       if constexpr (ModelVariant::run_hiv_simulation) {
         hiv_dp.run_hiv_pop_demographic_projection();
         hiv_sim.run_hiv_model_simulation();
+      }
+
+      if constexpr (ModelVariant::run_child_model) {
+        child_sim.run_child_model_simulation();
       }
 
       if (args.opts.proj_period_int == SS::PROJPERIOD_CALENDAR) {
