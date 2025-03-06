@@ -1022,8 +1022,6 @@ void get_cotrim_effect(int t,
   auto& n_hc = state_next.children;
 
   //note this is just for off art, need to also do for on art
-
-
   if (p_hc.ctx_val_is_percent(t)) {
     n_hc.ctx_mean(art_flag) = (1 - p_hc.ctx_effect(art_flag)*  p_hc.ctx_val(t)) ;
   } else {
