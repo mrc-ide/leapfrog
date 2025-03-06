@@ -67,5 +67,24 @@ run_model <- function(data, parameters, sim_years,
   }
   data <- c(data, parameters)
 
-  run_base_model(data, sim_years, hts_per_year, output_steps, model_variant)
+  if (is.null(hts_per_year)) {
+    hts_per_year <- 10
+  }
+
+  # convert indices to 0 based
+  if ("artcd4elig_idx" %in% names(data)) {
+    # integer type
+    data[["artcd4elig_idx"]] <- data[["artcd4elig_idx"]] - 1L
+  }
+  if ("paed_art_elig_cd4" %in% names(data)) {
+    # double type
+    data[["paed_art_elig_cd4"]] <- data[["paed_art_elig_cd4"]] - 1
+  }
+
+  if (run_hiv_simulation) {
+    hTS <- dim(data[["art_mort"]])[[1]]
+    data[["h_art_stage_dur"]] <- rep(0.5, hTS - 1)
+  }
+
+  run_base_model(data, model_variant, length(sim_years), hts_per_year, output_steps - 1, data[["projection_period"]] == "midyear", data[["t_ART_start"]] - 1)
 }

@@ -1,34 +1,34 @@
 #pragma once
 
+#include "concepts.hpp"
+
 namespace leapfrog {
 
-enum HivAgeStratification {
-    full,
-    coarse,
-    none
-};
-
 struct DemographicProjection {
+  static constexpr bool run_demographic_projection = true;
   static constexpr bool run_hiv_simulation = false;
-  static constexpr HivAgeStratification stratification = none;
+  static constexpr bool use_full_stratification = true;
   static constexpr bool run_child_model = false;
 };
 
 struct HivFullAgeStratification {
+  static constexpr bool run_demographic_projection = true;
   static constexpr bool run_hiv_simulation = true;
-  static constexpr HivAgeStratification stratification = full;
+  static constexpr bool use_full_stratification = true;
   static constexpr bool run_child_model = false;
 };
 
 struct HivCoarseAgeStratification {
+  static constexpr bool run_demographic_projection = true;
   static constexpr bool run_hiv_simulation = true;
-  static constexpr HivAgeStratification stratification = coarse;
+  static constexpr bool use_full_stratification = false;
   static constexpr bool run_child_model = false;
 };
 
 struct ChildModel {
+  static constexpr bool run_demographic_projection = true;
   static constexpr bool run_hiv_simulation = true;
-  static constexpr HivAgeStratification stratification = full;
+  static constexpr bool use_full_stratification = true;
   static constexpr bool run_child_model = true;
 };
 
