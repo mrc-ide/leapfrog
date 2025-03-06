@@ -72,7 +72,6 @@ test_that("Model outputs are consistent", {
   c1 <- hc1_df %>%
     dplyr::inner_join(out_df, by = c("Var1", "Var2", "Var3")) %>%
     dplyr::mutate(diff = strat - pop)
-  ##these are misaligned, check these
   expect_true(all(abs(c1$diff) < 1e-5))
 
   hc2_hiv <- apply(out$hc2_noart_aids_deaths, c(3,4,5), sum)
@@ -107,7 +106,6 @@ test_that("Model outputs are consistent", {
   c1 <- hc1_df %>%
     dplyr::inner_join(out_df, by = c("Var1", "Var2", "Var3")) %>%
     dplyr::mutate(diff = strat - pop)
-  ##these are misaligned, check these
   expect_true(all(abs(c1$diff) < 1e-5))
 
   hc2_hiv <- apply(out$hc2_hiv_pop, c(3,4,5), sum)
@@ -123,7 +121,6 @@ test_that("Model outputs are consistent", {
   c2 <- hc2_df %>%
     dplyr::inner_join(out_df, by = c("Var1", "Var2", "Var3")) %>%
     dplyr::mutate(diff = strat - pop)
-  ##these are misaligned, check these
   expect_true(all(abs(c2$diff) < 1e-5))
 
 })
@@ -337,7 +334,6 @@ test_that("HIV related deaths among CLHIV not on ART align", {
     dplyr::select(age, sex, year, fr, spec)
   dt <- dt %>%
     dplyr::mutate(diff = spec - fr)
-  dt <- data.table(dt)
 
   expect_true(all(abs(dt$diff) < 5e-1))
 })
@@ -352,7 +348,6 @@ test_that("HIV related deaths among CLHIV on ART align", {
 
   out <- run_model(demp, parameters, 1970:2030, NULL, run_child_model = TRUE)
 
-  ## right now this is only working for the first year of ART, assuming its something with the timing on art
   hc1 <- apply(out$hc1_art_aids_deaths, c(3:5), sum)
   hc2 <- apply(out$hc2_art_aids_deaths, c(3:5), sum)
   hc <- array(0, dim = c(15, 2, 61))
