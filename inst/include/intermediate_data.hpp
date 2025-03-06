@@ -313,6 +313,7 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
   real_type need_cotrim;
   real_type on_art_do;
   real_type start_art_do;
+  real_type bf_scalar;
 
 
   ChildModelIntermediateData() {};
@@ -387,6 +388,7 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
     need_cotrim = 0.0;
     on_art_do = 0.0;
     start_art_do = 0.0;
+    bf_scalar = 0.0;
   };
 };
 

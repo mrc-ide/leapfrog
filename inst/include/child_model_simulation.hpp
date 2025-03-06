@@ -514,26 +514,31 @@ void maternal_incidence_in_bf_tr(int t,
 }
 
 template<typename ModelVariant, typename real_type>
-void get_bf_pmtct_coverage(int t,
-                                 const Parameters<ModelVariant, real_type> &pars,
-                                 const State<ModelVariant, real_type> &state_curr,
-                                 State<ModelVariant, real_type> &state_next,
-                                 IntermediateData<ModelVariant, real_type> &intermediate,
-                                 int bf) {
+void bf_dropout(int t,
+                const Parameters<ModelVariant, real_type> &pars,
+                const State<ModelVariant, real_type> &state_curr,
+                State<ModelVariant, real_type> &state_next,
+                IntermediateData<ModelVariant, real_type> &intermediate,
+                int bf) {
   static_assert(ModelVariant::run_child_model,
-                "maternal_incidence_in_bf_tr can only be called for model variants where run_child_model is true");
+                "bf_dropout can only be called for model variants where run_child_model is true");
   constexpr auto ss_c = StateSpace<ModelVariant>().children;
   const auto& p_hc = pars.children.children;
   auto& i_hc = intermediate.children;
 
-  for (int hp = 0; hp < ss_c.hPS; hp++) {
-      //skip this for hp 2 and 3
-      if (bf < 6) {
-        i_hc.PMTCT_coverage(hp) *= (1 - p_hc.PMTCT_dropout(4, t) * 2);
-      } else {
-        i_hc.PMTCT_coverage(hp) *= (1 - p_hc.PMTCT_dropout(5, t) * 2);
-      }
-    }
+  if(bf < 6){
+    i_hc.PMTCT_coverage(0) *= (1 - p_hc.PMTCT_dropout(4, t) * 2); //opt A
+    i_hc.PMTCT_coverage(1) *= (1 - p_hc.PMTCT_dropout(4, t) * 2); //opt B
+    i_hc.PMTCT_coverage(4) *= (1 - p_hc.PMTCT_dropout(4, t) * 2); //before pregnancy
+    i_hc.PMTCT_coverage(5) *= (1 - p_hc.PMTCT_dropout(4, t) * 2); //>4 weeks
+    i_hc.PMTCT_coverage(6) *= (1 - p_hc.PMTCT_dropout(4, t) * 2); //<4 weeks
+  }else{
+    i_hc.PMTCT_coverage(0) *= (1 - p_hc.PMTCT_dropout(5, t) * 2); //opt A
+    i_hc.PMTCT_coverage(1) *= (1 - p_hc.PMTCT_dropout(5, t) * 2); //opt B
+    i_hc.PMTCT_coverage(4) *= (1 - p_hc.PMTCT_dropout(5, t) * 2); //before pregnancy
+    i_hc.PMTCT_coverage(5) *= (1 - p_hc.PMTCT_dropout(5, t) * 2); //>4 weeks
+    i_hc.PMTCT_coverage(6) *= (1 - p_hc.PMTCT_dropout(5, t) * 2); //<4 weeks
+  }
 
 }
 
@@ -551,8 +556,16 @@ void run_bf_transmission_rate(int t,
   auto& i_hc = intermediate.children;
   auto& n_hc = state_next.children;
 
-
   for (int bf = bf_start; bf < bf_end; bf++) {
+    if(bf == 0){
+      //Perinatal transmission accounts for transmission up to 6 weeks, so we only use 1/4 of
+      //transmission from the first breastfeeding period
+      i_hc.bf_scalar = 0.25;
+    }else{
+      i_hc.bf_scalar = 1.0;
+      //dropout only occurs after the first month of breastfeeding
+      internal::bf_dropout(t, pars, state_curr, state_next, intermediate, bf);
+    }
     // i_hc.perinatal_transmission_rate_bf_calc is the transmission that has already occurred due to perinatal transmission
     // i_hc.percent_no_treatment is the percentage of women who are still vulnerable to HIV transmission to their babies
     i_hc.percent_no_treatment = 1 - i_hc.perinatal_transmission_rate_bf_calc - i_hc.bf_transmission_rate(index) ;
@@ -561,141 +574,39 @@ void run_bf_transmission_rate(int t,
         i_hc.percent_no_treatment -= i_hc.bf_transmission_rate(bf);
       }
     }
-    if(bf > 0){
-      get_bf_pmtct_coverage(t, pars, state_curr, state_next, intermediate, bf);
-    }
-    //reset the tracking for stacked bar
-    i_hc.on_art_do = 0.0;
-    i_hc.start_art_do = 0.0;
 
     for (int hp = 0; hp < ss_c.hPS; hp++) {
       i_hc.percent_on_treatment = 0;
-      // hp = 0 is option A
-      if (hp == 0 && i_hc.PMTCT_coverage(hp) > 0) {
-        if(bf > 0){
-          if (bf < 6) {
-            i_hc.PMTCT_coverage(hp) *= (1 - p_hc.PMTCT_dropout(4, t) * 2);
-          } else {
-            i_hc.PMTCT_coverage(hp) *= (1 - p_hc.PMTCT_dropout(5, t) * 2);
-          }
-        }
-
-        i_hc.percent_no_treatment -= i_hc.PMTCT_coverage(hp);
-      }
-
-      // hp = 1 is option B
-      if (hp == 1 && i_hc.PMTCT_coverage(hp) > 0) {
-        if(bf > 0){
-          if (bf < 6) {
-            i_hc.PMTCT_coverage(hp) *= (1 - p_hc.PMTCT_dropout(4, t) * 2);
-          } else {
-            i_hc.PMTCT_coverage(hp) *= (1 - p_hc.PMTCT_dropout(5, t) * 2);
-          }
-        }
-        i_hc.percent_no_treatment -=  i_hc.PMTCT_coverage(hp);
-      }
-
-      // sdnvp
-      if (hp == 2 && i_hc.PMTCT_coverage(hp) > 0) {
-        auto sdnvp_bf_tr = i_hc.PMTCT_coverage(hp) *
-                           p_hc.PMTCT_transmission_rate(0, hp, 1) *
-                           2 * (1 - p_hc.breastfeeding_duration_art(bf, t));
-        i_hc.percent_no_treatment -=  i_hc.PMTCT_coverage(hp);
-        if(bf == 0){
-          i_hc.PMTCT_coverage(hp) -= sdnvp_bf_tr * 0.25;
-          n_hc.hc_stacked_bar(4,(index+1)) += sdnvp_bf_tr * 0.25;
+      i_hc.percent_no_treatment -=  i_hc.PMTCT_coverage(hp);
+      if(hp > 1){
+        if(hp == 2){
+          auto tr = i_hc.PMTCT_coverage(hp) *
+            //sdnvp stratifies transmission by CD4, but spectrum only uses one
+            p_hc.PMTCT_transmission_rate(0, hp, 1) *
+            2 * (1 - p_hc.breastfeeding_duration_art(bf, t));
+          i_hc.PMTCT_coverage(hp) -= tr * i_hc.bf_scalar;
+          i_hc.bf_transmission_rate(index) += tr;
         }else{
-          i_hc.PMTCT_coverage(hp) -= sdnvp_bf_tr;
-          n_hc.hc_stacked_bar(4,(index+1)) += sdnvp_bf_tr;
+          auto tr = i_hc.PMTCT_coverage(hp) *
+            p_hc.PMTCT_transmission_rate(4, hp, 1) *
+            2 * (1 - p_hc.breastfeeding_duration_art(bf, t));
+          i_hc.PMTCT_coverage(hp) -= tr * i_hc.bf_scalar;
+          i_hc.bf_transmission_rate(index) += tr;
         }
-        i_hc.bf_transmission_rate(index) += sdnvp_bf_tr;
-      }
-
-      // dual arv
-      if (hp == 3 && i_hc.PMTCT_coverage(hp) > 0) {
-        auto dual_arv_bf_tr = i_hc.PMTCT_coverage(hp) *
-                              p_hc.PMTCT_transmission_rate(4, hp, 1) *
-                              2 * (1 - p_hc.breastfeeding_duration_art(bf, t));
-        i_hc.percent_no_treatment -= i_hc.PMTCT_coverage(hp);
-        if(bf == 0){
-          i_hc.PMTCT_coverage(hp) -= dual_arv_bf_tr * 0.25;
-          n_hc.hc_stacked_bar(4,(index+1)) += dual_arv_bf_tr * 0.25;
-        }else{
-          i_hc.PMTCT_coverage(hp) -= dual_arv_bf_tr;
-          n_hc.hc_stacked_bar(4,(index+1)) += dual_arv_bf_tr;
-        }
-        i_hc.bf_transmission_rate(index) += dual_arv_bf_tr;
-      }
-
-      // on art pre preg
-      if (hp > 3 && i_hc.PMTCT_coverage(hp) > 0) {
-          if (bf < 6) {
-              i_hc.PMTCT_coverage(hp) *= (1 - p_hc.PMTCT_dropout(4, t) * 2);
-          } else {
-               i_hc.PMTCT_coverage(hp) *= (1 - p_hc.PMTCT_dropout(5, t)  * 2);
-          }
-        auto art_bf_tr = i_hc.PMTCT_coverage(hp) *
-                         p_hc.PMTCT_transmission_rate(4,hp,1) *
-                         2 * (1 - p_hc.breastfeeding_duration_art(bf, t));
-
-        i_hc.percent_no_treatment -= i_hc.PMTCT_coverage(hp);
-        if(bf == 0){
-          i_hc.PMTCT_coverage(hp) -= art_bf_tr * 0.25;
-          if(hp == 4){
-            n_hc.hc_stacked_bar(0,(index+1)) += art_bf_tr * 0.25;
-          }else{
-            n_hc.hc_stacked_bar(1,(index+1)) += art_bf_tr * 0.25;
-          }
-        }else{
-          i_hc.PMTCT_coverage(hp) -= art_bf_tr;
-          if(hp == 4){
-            n_hc.hc_stacked_bar(0,(index+1)) += art_bf_tr;
-          }else{
-            n_hc.hc_stacked_bar(1,(index+1)) += art_bf_tr;
-          }
-        }
-        i_hc.bf_transmission_rate(index) += art_bf_tr;
       }
     }
-
-    auto dropped_off_art_start = (i_hc.retained_started_ART / p_hc.PMTCT_dropout(1, t)) * (1 - p_hc.PMTCT_dropout(1, t));
-    i_hc.start_art_do += dropped_off_art_start;
-    auto dropped_off_art_prepreg = (i_hc.retained_on_ART / p_hc.PMTCT_dropout(0, t)) * (1 - p_hc.PMTCT_dropout(0, t));
-    i_hc.on_art_do += dropped_off_art_prepreg;
-
-    i_hc.percent_no_treatment = std::max(i_hc.percent_no_treatment, 0.0);
 
     // No treatment
     if (p_hc.breastfeeding_duration_no_art(bf, t) < 1) {
+      i_hc.percent_no_treatment = std::max(i_hc.percent_no_treatment, 0.0);
       auto untreated_vertical_bf_tr = i_hc.prop_wlhiv_lt200 * p_hc.vertical_transmission_rate(4, 1) +
-                                      i_hc.prop_wlhiv_200to350 * p_hc.vertical_transmission_rate(2, 1) +
-                                      i_hc.prop_wlhiv_gte350 * p_hc.vertical_transmission_rate(0, 1);
-      i_hc.bf_transmission_rate(index) += i_hc.percent_no_treatment *
-                                          untreated_vertical_bf_tr *
-                                          2 * (1 - p_hc.breastfeeding_duration_no_art(bf, t));
-
-      if(bf == 0){
-        untreated_vertical_bf_tr *= 0.25;
-      }
-
-      n_hc.hc_stacked_bar(2, (index+1)) += i_hc.on_art_do *
+        i_hc.prop_wlhiv_200to350 * p_hc.vertical_transmission_rate(2, 1) +
+        i_hc.prop_wlhiv_gte350 * p_hc.vertical_transmission_rate(0, 1);
+      i_hc.bf_transmission_rate(index) += i_hc.bf_scalar *
+        i_hc.percent_no_treatment *
         untreated_vertical_bf_tr *
         2 * (1 - p_hc.breastfeeding_duration_no_art(bf, t));
-
-      n_hc.hc_stacked_bar(3, (index+1)) += i_hc.start_art_do *
-        untreated_vertical_bf_tr *
-        2 * (1 - p_hc.breastfeeding_duration_no_art(bf, t));
-
-      n_hc.hc_stacked_bar(5, (index+1)) += (i_hc.percent_no_treatment - i_hc.start_art_do - i_hc.on_art_do) *
-        untreated_vertical_bf_tr *
-        2 * (1 - p_hc.breastfeeding_duration_no_art(bf, t));
-
     }
-
-    if (bf < 1) {
-      i_hc.bf_transmission_rate(index) /= 4.0;
-    }
-
   }
 
 }
