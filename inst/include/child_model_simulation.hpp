@@ -438,50 +438,6 @@ void maternal_incidence_in_pregnancy_tr(int t,
 }
 
 template<typename ModelVariant, typename real_type>
-void perinatal_tr_stacked_bar(int t,
-                  const Parameters<ModelVariant, real_type> &pars,
-                  const State<ModelVariant, real_type> &state_curr,
-                  State<ModelVariant, real_type> &state_next,
-                  IntermediateData<ModelVariant, real_type> &intermediate) {
-  static_assert(ModelVariant::run_child_model,
-                "perinatal_tr can only be called for model variants where run_child_model is true");
-  const auto& p_hc = pars.children.children;
-  auto& i_hc = intermediate.children;
-  auto& n_hc = state_next.children;
-
-  //on ART pre-conception
-  n_hc.hc_stacked_bar(0,0) = i_hc.retained_on_ART * p_hc.PMTCT_transmission_rate(0, 4, 0);
-  //started ART during pregnancy
-  n_hc.hc_stacked_bar(1,0) = i_hc.retained_started_ART * p_hc.PMTCT_transmission_rate(0, 5, 0) +
-    i_hc.PMTCT_coverage(6) * p_hc.PMTCT_transmission_rate(0, 6, 0);
-  //short-course PVT
-  n_hc.hc_stacked_bar(4,0) = i_hc.PMTCT_coverage(0) * i_hc.optA_transmission_rate +
-    i_hc.PMTCT_coverage(1) * i_hc.optB_transmission_rate +
-    i_hc.PMTCT_coverage(2) * p_hc.PMTCT_transmission_rate(0, 2, 0) + // SDNVP
-    i_hc.PMTCT_coverage(3) * p_hc.PMTCT_transmission_rate(0, 3, 0); //dual ARV
-
-  // Transmission among women not on treatment
-  if (i_hc.num_wlhiv > 0) {
-    auto untreated_vertical_tr = i_hc.prop_wlhiv_lt200 * p_hc.vertical_transmission_rate(4, 0) +
-      i_hc.prop_wlhiv_200to350 * p_hc.vertical_transmission_rate(2, 0) +
-      i_hc.prop_wlhiv_gte350 * p_hc.vertical_transmission_rate(0, 0);
-    auto dropped_off_art_prepreg = (i_hc.retained_on_ART / p_hc.PMTCT_dropout(0, t)) * (1 - p_hc.PMTCT_dropout(0, t));
-    //on ART before pregnancy, dropped out
-    n_hc.hc_stacked_bar(2,0) = dropped_off_art_prepreg * untreated_vertical_tr;
-    auto dropped_off_art_start = (i_hc.retained_started_ART / p_hc.PMTCT_dropout(1, t)) * (1 - p_hc.PMTCT_dropout(1, t));
-    //started ART during pregnancy, dropped out
-    n_hc.hc_stacked_bar(3,0) = dropped_off_art_start * untreated_vertical_tr;
-    //no ARVs
-    n_hc.hc_stacked_bar(5,0) = (i_hc.no_PMTCT - dropped_off_art_start - dropped_off_art_prepreg) * untreated_vertical_tr;
-  }
-
-  //maternal seroconversion
-  n_hc.hc_stacked_bar(6,0) = (i_hc.perinatal_transmission_from_incidence / i_hc.need_PMTCT);
-
-}
-
-
-template<typename ModelVariant, typename real_type>
 void perinatal_tr(int t,
                   const Parameters<ModelVariant, real_type> &pars,
                   const State<ModelVariant, real_type> &state_curr,
@@ -536,9 +492,6 @@ void perinatal_tr(int t,
     i_hc.perinatal_transmission_rate += i_hc.perinatal_transmission_from_incidence / i_hc.need_PMTCT;
   }
 
-  ///stacked bar
-  internal::perinatal_tr_stacked_bar(t, pars, state_curr, state_next, intermediate);
-
 }
 
 template<typename ModelVariant, typename real_type>
@@ -558,6 +511,30 @@ void maternal_incidence_in_bf_tr(int t,
                        (1 - p_hc.breastfeeding_duration_no_art(bf, t));
   }
    i_hc.bf_incident_hiv_transmission_rate = i_hc.bf_at_risk * p_hc.vertical_transmission_rate(7, 1);
+}
+
+template<typename ModelVariant, typename real_type>
+void get_bf_pmtct_coverage(int t,
+                                 const Parameters<ModelVariant, real_type> &pars,
+                                 const State<ModelVariant, real_type> &state_curr,
+                                 State<ModelVariant, real_type> &state_next,
+                                 IntermediateData<ModelVariant, real_type> &intermediate,
+                                 int bf) {
+  static_assert(ModelVariant::run_child_model,
+                "maternal_incidence_in_bf_tr can only be called for model variants where run_child_model is true");
+  constexpr auto ss_c = StateSpace<ModelVariant>().children;
+  const auto& p_hc = pars.children.children;
+  auto& i_hc = intermediate.children;
+
+  for (int hp = 0; hp < ss_c.hPS; hp++) {
+      //skip this for hp 2 and 3
+      if (bf < 6) {
+        i_hc.PMTCT_coverage(hp) *= (1 - p_hc.PMTCT_dropout(4, t) * 2);
+      } else {
+        i_hc.PMTCT_coverage(hp) *= (1 - p_hc.PMTCT_dropout(5, t) * 2);
+      }
+    }
+
 }
 
 template<typename ModelVariant, typename real_type>
@@ -583,6 +560,9 @@ void run_bf_transmission_rate(int t,
       for (int bf = 0; bf < index; ++bf) {
         i_hc.percent_no_treatment -= i_hc.bf_transmission_rate(bf);
       }
+    }
+    if(bf > 0){
+      get_bf_pmtct_coverage(t, pars, state_curr, state_next, intermediate, bf);
     }
     //reset the tracking for stacked bar
     i_hc.on_art_do = 0.0;
@@ -650,21 +630,9 @@ void run_bf_transmission_rate(int t,
       // on art pre preg
       if (hp > 3 && i_hc.PMTCT_coverage(hp) > 0) {
           if (bf < 6) {
-            if(bf > 0){
-              if(hp == 4){
-                i_hc.on_art_do += i_hc.PMTCT_coverage(hp) * p_hc.PMTCT_dropout(4, t) * 2;
-              }else{
-                i_hc.start_art_do += i_hc.PMTCT_coverage(hp) * p_hc.PMTCT_dropout(4, t) * 2;
-              }
               i_hc.PMTCT_coverage(hp) *= (1 - p_hc.PMTCT_dropout(4, t) * 2);
-            }
           } else {
-            if(hp == 4){
-              i_hc.on_art_do += i_hc.PMTCT_coverage(hp) * p_hc.PMTCT_dropout(5, t) * 2;
-            }else{
-              i_hc.start_art_do += i_hc.PMTCT_coverage(hp) * p_hc.PMTCT_dropout(5, t) * 2;
-            }
-            i_hc.PMTCT_coverage(hp) *= (1 - p_hc.PMTCT_dropout(5, t)  * 2);
+               i_hc.PMTCT_coverage(hp) *= (1 - p_hc.PMTCT_dropout(5, t)  * 2);
           }
         auto art_bf_tr = i_hc.PMTCT_coverage(hp) *
                          p_hc.PMTCT_transmission_rate(4,hp,1) *
