@@ -1233,8 +1233,6 @@ void calc_total_and_unmet_art_need(int t,
   auto& n_hc = state_next.children;
   auto& i_hc = intermediate.children;
 
-  internal::eligible_for_treatment(t, pars, state_curr, state_next, intermediate);
-
   for (int s = 0; s < ss_d.NS; ++s) {
     for (int a = 0; a < p_op.p_idx_fertility_first; ++a) {
       for (int hd = 0; hd < ss_c.hc1DS; ++hd) {
@@ -1717,6 +1715,8 @@ void run_child_model_simulation(int t,
   internal::cd4_mortality(t, pars, state_curr, state_next, intermediate);
   internal::run_child_hiv_mort(t, pars, state_curr, state_next, intermediate);
   internal::add_child_grad(t, pars, state_curr, state_next, intermediate);
+  //this needs to be outside of the ART treatment if statement so that cotrim can be calcuated
+  internal::eligible_for_treatment(t, pars, state_curr, state_next, intermediate);
 
     // assume paed art doesn't start before adult
     if (t >= p_hc.hc_art_start) {
