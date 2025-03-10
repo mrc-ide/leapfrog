@@ -854,7 +854,7 @@ void need_for_cotrim(int t,
 
   //Children under five on ART also eligible
   for (int s = 0; s < ss_d.NS; ++s) {
-    for (int a = 0; a < p_hc.hc_art_elig_age(t); ++a) {
+    for (int a = 0; a < ss_c.hc2_agestart; ++a) {
       for (int dur = 0; dur < ss_h.hTS; ++dur) {
         for (int hd = 0; hd < ss_c.hc1DS; ++hd) {
           if(a == 1){
@@ -877,7 +877,7 @@ void need_for_cotrim(int t,
             n_hc.ctx_need += c_hc.hc2_hiv_pop(hd, cat, a - ss_c.hc2_agestart, s);
           }else{
             if (hd > p_hc.hc_art_elig_cd4(a, t-1)) {
-              n_hc.ctx_need += c_hc.hc2_hiv_pop(hd, cat, a - ss_c.hc2_agestart, s);
+            n_hc.ctx_need += c_hc.hc2_hiv_pop(hd, cat, a - ss_c.hc2_agestart, s);
             }
           }
         } // end ss_c.hc1DS

@@ -1,5 +1,5 @@
 test_that("Child model can be run for all years", {
-  input <- setup_childmodel(test_path("testdata/child_parms.rds"))
+  input <- readRDS(test_path("testdata/child_parms.rds"))
   demp <- input$demp
   parameters <- input$parameters
 
@@ -31,7 +31,7 @@ test_that("Child model can be run for all years", {
 })
 
 test_that("Model outputs are consistent", {
-  input <- setup_childmodel(testinput = "testdata/child_parms.rds")
+    input <- readRDS(test_path("testdata/child_parms.rds"))
   demp <- input$demp
   parameters <- input$parameters
 
@@ -116,7 +116,7 @@ test_that("Model outputs are consistent", {
 })
 
 test_that("Female 15-49y pop aligns", {
-  input <- setup_childmodel(testinput = "testdata/child_parms.rds")
+    input <- readRDS(test_path("testdata/child_parms.rds"))
   demp <- input$demp
   parameters <- input$parameters
   dp <- input$dp
@@ -143,7 +143,7 @@ test_that("Female 15-49y pop aligns", {
 })
 
 test_that("Mothers that need ptmct align", {
-  input <- setup_childmodel(testinput = "testdata/child_parms.rds")
+    input <- readRDS(test_path("testdata/child_parms.rds"))
   demp <- input$demp
   parameters <- input$parameters
   dp <- input$dp
@@ -162,7 +162,7 @@ test_that("Mothers that need ptmct align", {
 })
 
 test_that("Children in need of cotrim aligns", {
-  input <- setup_childmodel(testinput = "testdata/child_parms.rds")
+    input <- readRDS(test_path("testdata/child_parms.rds"))
   demp <- input$demp
   parameters <- input$parameters
   pjnz <- input$pjnz
@@ -181,7 +181,7 @@ test_that("Children in need of cotrim aligns", {
 })
 
 test_that("Infections among children align", {
-  input <- setup_childmodel(test_path("testdata/child_parms.rds"))
+  input <- readRDS(test_path("testdata/child_parms.rds"))
   demp <- input$demp
   parameters <- input$parameters
   dp <- input$dp
@@ -216,7 +216,7 @@ test_that("Infections among children align", {
 })
 
 test_that("CLHIV align", {
-  input <- setup_childmodel(test_path("testdata/child_parms.rds"))
+  input <- readRDS(test_path("testdata/child_parms.rds"))
   demp <- input$demp
   parameters <- input$parameters
   dp <- input$dp
@@ -267,7 +267,7 @@ test_that("CLHIV align", {
 })
 
 test_that("CLHIV on ART align", {
-  input <- setup_childmodel(test_path("testdata/child_parms.rds"))
+  input <- readRDS(test_path("testdata/child_parms.rds"))
   demp <- input$demp
   parameters <- input$parameters
   dp <- input$dp
@@ -317,7 +317,7 @@ test_that("CLHIV on ART align", {
 })
 
 test_that("HIV related deaths among CLHIV not on ART align", {
-  input <- setup_childmodel(test_path("testdata/child_parms.rds"))
+  input <- readRDS(test_path("testdata/child_parms.rds"))
   demp <- input$demp
   parameters <- input$parameters
   dp <- input$dp
@@ -348,7 +348,7 @@ test_that("HIV related deaths among CLHIV not on ART align", {
 })
 
 test_that("HIV related deaths among CLHIV on ART align", {
-  input <- setup_childmodel(test_path("testdata/child_parms.rds"))
+  input <- readRDS(test_path("testdata/child_parms.rds"))
   demp <- input$demp
   parameters <- input$parameters
   dp <- input$dp

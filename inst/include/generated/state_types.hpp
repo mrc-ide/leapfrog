@@ -126,7 +126,6 @@ struct ChildModelState<ChildModel, real_type> {
   TensorFixedSize<real_type, Sizes<hc1DS<ChildModel>, hcTT<ChildModel>, hcAG_end<ChildModel>, NS<ChildModel>>> hc_art_need_init;
   real_type ctx_need;
   TensorFixedSize<real_type, Sizes<hcTT<ChildModel>, hc1AG<ChildModel>, NS<ChildModel>>> infection_by_type;
-  TensorFixedSize<real_type, Sizes<2>> ctx_mean;
 
   // Used by R
   ChildModelState() {
@@ -146,8 +145,7 @@ struct ChildModelState<ChildModel, real_type> {
     const real_type hiv_births,
     const TensorFixedSize<real_type, Sizes<hcAG_coarse<ChildModel>>>& hc_art_init,
     const TensorFixedSize<real_type, Sizes<hc1DS<ChildModel>, hcTT<ChildModel>, hcAG_end<ChildModel>, NS<ChildModel>>>& hc_art_need_init,
-    const real_type ctx_need,
-    const real_type ctx_mean
+    const real_type ctx_need
   ) :
     hc1_hiv_pop(hc1_hiv_pop),
     hc2_hiv_pop(hc2_hiv_pop),
@@ -160,8 +158,8 @@ struct ChildModelState<ChildModel, real_type> {
     hiv_births(hiv_births),
     hc_art_init(hc_art_init),
     hc_art_need_init(hc_art_need_init),
-    ctx_need(ctx_need),
-    ctx_mean(ctx_mean) {}
+    ctx_need(ctx_need)
+    {}
 
   void reset() {
     hc1_hiv_pop.setZero();
@@ -177,7 +175,6 @@ struct ChildModelState<ChildModel, real_type> {
     hc_art_need_init.setZero();
     ctx_need = 0;
     infection_by_type.setZero();
-    ctx_mean.setZero();
   }
 };
 

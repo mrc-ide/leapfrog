@@ -136,7 +136,6 @@ struct ChildModelOutputState<ChildModel, real_type> {
   Tensor2<real_type> hc_art_init;
   Tensor5<real_type> hc_art_need_init;
   Tensor1<real_type> ctx_need;
-  Tensor2<real_type> ctx_mean;
   Tensor4<real_type> infection_by_type;
 
   ChildModelOutputState(int output_years):
@@ -213,9 +212,6 @@ struct ChildModelOutputState<ChildModel, real_type> {
     ctx_need(
       output_years
     ),
-    ctx_mean(
-      2, output_years
-    ),
     infection_by_type(
       StateSpace<ChildModel>().children.hcTT,
       StateSpace<ChildModel>().children.hc1AG,
@@ -235,7 +231,6 @@ struct ChildModelOutputState<ChildModel, real_type> {
     hc_art_need_init.setZero();
     ctx_need.setZero();
     infection_by_type.setZero();
-    ctx_mean.setZero();
   }
 };
 

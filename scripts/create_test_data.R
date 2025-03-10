@@ -33,7 +33,6 @@ source('./scripts/read_spectrum.R')
 #Create paeds parameters
 pjnz_child <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct - Copy.PJNZ")
 
-
 demp <- prepare_leapfrog_demp(pjnz_child)
 proj <- prepare_leapfrog_projp(pjnz_child)
 proj <- prepare_hc_leapfrog_projp(pjnz_child, proj)
@@ -114,8 +113,10 @@ aids_deathsart[,2,] <- f
 
 spec_ctx_need <- dpsub(dp, tag = '<ChildARTCalc MV2>', rows = 3, cols = timedat.idx)
 
-saveRDS(list(proj = proj, demp = demp, dp = dp, timedat.idx = timedat.idx, pjnz = pjnz_child,
-             pop1_outputs = x, on_treatment = df$on_treatment, off_trt = df$off_treatment,
+saveRDS(list(parameters = proj, demp = demp, dp = dp, timedat.idx = timedat.idx, pjnz = pjnz_child,
+             pop1 = x,
+             ontrt = df$on_treatment,
+             offtrt = df$off_treatment,
              deaths_noart = aids_deathsnoart,
              deaths_art = aids_deathsart,
              ctx_need = spec_ctx_need),
