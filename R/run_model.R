@@ -18,9 +18,16 @@ run_model <- function(data, parameters, sim_years,
                       run_hiv_simulation = TRUE,
                       hiv_age_stratification = "full",
                       run_child_model = TRUE) {
+  # TODO Mantra put dates into the cpp instead of having wrappers parse dates
   if (is.null(sim_years)) {
     sim_years <- 1970:2030
   }
+
+  # TODO Mantra where should this validation live? seems a bit arbitrary to put into cpp
+  if (length(sim_years) > dim(data$Sx)[[3]]) {
+    stop(sprintf("No of years > max years of %s", dim(data$Sx)[[3]]))
+  }
+
   if (is.null(output_steps)) {
     output_steps <- seq_along(sim_years)
   } else {

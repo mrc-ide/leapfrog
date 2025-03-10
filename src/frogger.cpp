@@ -12,7 +12,7 @@ Rcpp::List run_base_model(
   const bool is_midyear_projection,
   const int t_ART_start
 ) {
-  // TODO write docs, save_steps now must be 0 index based, nothing is nullable, projection_period is "calendar" or "midyear", t_ART_start is 0 based (so substract 1 from R value)
+  // TODO Mantra write docs, save_steps now must be 0 index based, nothing is nullable, projection_period is "calendar" or "midyear", t_ART_start is 0 based (so substract 1 from R value)
   if (model_variant == "DemographicProjection") {
     return leapfrog::Leapfrog<double, leapfrog::DemographicProjection>::simulate_model(data, time_steps, hiv_steps, save_steps, is_midyear_projection, t_ART_start);
   } else if (model_variant == "HivFullAgeStratification") {
