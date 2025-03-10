@@ -169,7 +169,6 @@ void calc_hiv_negative_pop(int t,
                 "calc_hiv_negative_pop can only be called for model variants where run_child_model is true");
   constexpr auto ss_d = StateSpace<ModelVariant>().dp;
   constexpr auto ss_h = StateSpace<ModelVariant>().hiv;
-  const auto& p_dm = pars.dp.demography;
   auto& n_ha = state_next.hiv;
   auto& n_dp = state_next.dp;
   auto& i_hc = intermediate.children;
@@ -520,7 +519,6 @@ void bf_dropout(int t,
                 int bf) {
   static_assert(ModelVariant::run_child_model,
                 "bf_dropout can only be called for model variants where run_child_model is true");
-  constexpr auto ss_c = StateSpace<ModelVariant>().children;
   const auto& p_hc = pars.children.children;
   auto& i_hc = intermediate.children;
 
@@ -552,7 +550,6 @@ void run_bf_transmission_rate(int t,
   constexpr auto ss_c = StateSpace<ModelVariant>().children;
   const auto& p_hc = pars.children.children;
   auto& i_hc = intermediate.children;
-  auto& n_hc = state_next.children;
 
   for (int bf = bf_start; bf < bf_end; bf++) {
     if(bf == 0){
@@ -797,6 +794,7 @@ void art_eligibility_by_cd4(int t,
   constexpr auto ss_c = StateSpace<ModelVariant>().children;
   const auto& p_hc = pars.children.children;
   const auto& p_op = pars.options;
+  auto& n_hc = state_next.children;
 
   // all children under a certain CD4 eligible for ART
   for (int s = 0; s < ss_d.NS; ++s) {
@@ -805,9 +803,9 @@ void art_eligibility_by_cd4(int t,
         for (int hd = 0; hd < ss_c.hc1DS; ++hd) {
           if (hd > p_hc.hc_art_elig_cd4(a, t)) {
             if (a < ss_c.hc2_agestart) {
-              state_next.children.hc_art_need_init(hd, cat, a, s) += state_next.children.hc1_hiv_pop(hd, cat, a, s);
+              n_hc.hc_art_need_init(hd, cat, a, s) += n_hc.hc1_hiv_pop(hd, cat, a, s);
             } else if (hd < ss_c.hc2DS) {
-              state_next.children.hc_art_need_init(hd, cat, a, s) += state_next.children.hc2_hiv_pop(hd, cat, a - ss_c.hc2_agestart, s);
+              n_hc.hc_art_need_init(hd, cat, a, s) += n_hc.hc2_hiv_pop(hd, cat, a - ss_c.hc2_agestart, s);
             }
           }
         } // end ss_c.hc1DS
@@ -831,7 +829,6 @@ void need_for_cotrim(int t,
   const auto& p_hc = pars.children.children;
   const auto& p_op = pars.options;
   auto& n_hc = state_next.children;
-  auto& i_hc = intermediate.children;
   const auto& c_hc = state_curr.children;
 
   // Births from the last 18 months are eligible
@@ -1073,8 +1070,6 @@ void eligible_for_treatment(int t,
   constexpr auto ss_d = StateSpace<ModelVariant>().dp;
   constexpr auto ss_c = StateSpace<ModelVariant>().children;
   const auto& p_op = pars.options;
-  const auto& p_hc = pars.children.children;
-
   auto& n_hc = state_next.children;
   auto& i_hc = intermediate.children;
 
@@ -1287,11 +1282,9 @@ void calc_total_and_unmet_art_need(int t,
   static_assert(ModelVariant::run_child_model,
                 "calc_total_and_unmet_art_need can only be called for model variants where run_child_model is true");
   constexpr auto ss_d = StateSpace<ModelVariant>().dp;
-  constexpr auto ss_h = StateSpace<ModelVariant>().hiv;
   constexpr auto ss_c = StateSpace<ModelVariant>().children;
   const auto& p_hc = pars.children.children;
   const auto& p_op = pars.options;
-  auto& n_hc = state_next.children;
   auto& i_hc = intermediate.children;
 
   for (int s = 0; s < ss_d.NS; ++s) {
@@ -1738,8 +1731,6 @@ void run_child_model_simulation(int t,
   static_assert(ModelVariant::run_child_model,
                 "run_child_model_simulation can only be called for model variants where run_child_model is true");
   const auto& p_hc = pars.children.children;
-  const auto& p_op = pars.options;
-  auto& n_hc = state_next.children;
 
   internal::run_child_ageing(t, pars, state_curr, state_next, intermediate);
 
