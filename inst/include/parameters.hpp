@@ -24,7 +24,7 @@ struct Options {
   Options(int hts_per_year,
           int ts_art_start,
           int hAG_15plus,
-	  int proj_period_int) :
+          int proj_period_int) :
       hts_per_year(hts_per_year),
       dt(1.0 / hts_per_year),
       p_idx_fertility_first(15),
@@ -39,27 +39,36 @@ struct Options {
 };
 
 template<typename real_type>
-struct BaseModelParameters {
-  Options<real_type> options;
+struct DemographicProjectionParameters {
   Demography<real_type> demography;
+};
+
+template<typename real_type>
+struct HivSimulationParameters {
   Incidence<real_type> incidence;
   NaturalHistory<real_type> natural_history;
   Art<real_type> art;
 };
 
-template<typename ModelVariant, typename real_type>
-struct ChildModelParameters {
-};
-
 template<typename real_type>
-struct ChildModelParameters<ChildModel, real_type> {
+struct ChildModelParameters {
   Children<real_type> children;
 };
 
+struct Empty {};
+
 template<typename ModelVariant, typename real_type>
 struct Parameters {
-  BaseModelParameters<real_type> base;
-  ChildModelParameters<ModelVariant, real_type> children;
+    Options<real_type> options;
+    DemographicProjectionParameters<real_type> dp;
+
+    [[no_unique_address]] std::conditional_t<ModelVariant::run_hiv_simulation,
+        HivSimulationParameters<real_type>,
+        Empty> hiv;
+
+    [[no_unique_address]] std::conditional_t<ModelVariant::run_child_model,
+        ChildModelParameters<real_type>,
+        Empty> children;
 };
 
 }

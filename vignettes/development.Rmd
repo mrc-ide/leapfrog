@@ -114,7 +114,7 @@ Note that the dims can be any of the state space sizes or `proj_years` for the n
 
 ### Intermediate data
 
-Intermediate data is used as a place to store 
+Intermediate data is used as a place to store
 The intermediate data is not handled by code generation as it only requires changes in one place. You can make modifications by adding new data into the struct in [`inst/include/types.hpp`](https://github.com/mrc-ide/frogger/blob/main/inst/include/types.hpp), making sure to set its default value in the `reset` function on the struct.
 
 ## Adding a new model variant

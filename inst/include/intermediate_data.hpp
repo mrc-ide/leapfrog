@@ -34,19 +34,19 @@ template<typename real_type>
 using Tensor5 = Eigen::Tensor<real_type, 5>;
 
 template<typename ModelVariant>
-constexpr int NS = StateSpace<ModelVariant>().base.NS;
+constexpr int NS = StateSpace<ModelVariant>().dp.NS;
 
 template<typename ModelVariant>
-constexpr int pAG = StateSpace<ModelVariant>().base.pAG;
+constexpr int pAG = StateSpace<ModelVariant>().dp.pAG;
 
 template<typename ModelVariant>
-constexpr int hAG = StateSpace<ModelVariant>().base.hAG;
+constexpr int hAG = StateSpace<ModelVariant>().hiv.hAG;
 
 template<typename ModelVariant>
-constexpr int hDS = StateSpace<ModelVariant>().base.hDS;
+constexpr int hDS = StateSpace<ModelVariant>().hiv.hDS;
 
 template<typename ModelVariant>
-constexpr int hTS = StateSpace<ModelVariant>().base.hTS;
+constexpr int hTS = StateSpace<ModelVariant>().hiv.hTS;
 
 template<typename ModelVariant>
 constexpr int hc1DS = StateSpace<ModelVariant>().children.hc1DS;
@@ -108,8 +108,25 @@ const int PROJPERIOD_CALENDAR = 0;  // calendar-year projection (Spectrum 6.2 up
 const int PROJPERIOD_MIDYEAR = 1;   // mid-year projection period
 
 template<typename ModelVariant, typename real_type>
-struct BaseModelIntermediateData {
+struct DemographicProjectionIntermediateData {
   TensorFixedSize <real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>> migration_rate;
+
+  DemographicProjectionIntermediateData() {}
+
+  void reset() {
+    migration_rate.setZero();
+  }
+};
+
+template<typename ModelVariant, typename real_type, typename Enable = void>
+struct HivSimulationIntermediateData {
+  HivSimulationIntermediateData(int hAG_15plus) {};
+
+  void reset() {};
+};
+
+template<typename ModelVariant, typename real_type>
+struct HivSimulationIntermediateData<ModelVariant, real_type, std::enable_if_t<ModelVariant::run_hiv_simulation>> {
   TensorFixedSize <real_type, Sizes<pAG<ModelVariant>, NS<ModelVariant>>> hiv_net_migration;
   TensorFixedSize <real_type, Sizes<hAG<ModelVariant>, NS<ModelVariant>>> p_hiv_pop_coarse_ages;
   TensorFixedSize <real_type, Sizes<hAG<ModelVariant>, NS<ModelVariant>>> hiv_age_up_prob;
@@ -153,7 +170,7 @@ struct BaseModelIntermediateData {
   real_type hivdeaths_a;
   real_type Xhivn_incagerr;
 
-  BaseModelIntermediateData(int hAG_15plus)
+  HivSimulationIntermediateData(int hAG_15plus)
       :
       Xart_15plus(0.0),
       Xartelig_15plus(0.0),
@@ -177,7 +194,6 @@ struct BaseModelIntermediateData {
       Xhivn_incagerr(0.0) {}
 
   void reset() {
-    migration_rate.setZero();
     hiv_net_migration.setZero();
     p_hiv_pop_coarse_ages.setZero();
     hiv_age_up_prob.setZero();
@@ -190,6 +206,7 @@ struct BaseModelIntermediateData {
     gradART.setZero();
     hivpop_ha.setZero();
     cd4mx_scale = 1.0;
+    artpop_hahm = 0.0;
     deaths = 0.0;
     everARTelig_idx = 0;
     cd4elig_idx = 0;
@@ -371,16 +388,19 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
 
 template<typename ModelVariant, typename real_type>
 struct IntermediateData {
-  BaseModelIntermediateData<ModelVariant, real_type> base;
+  DemographicProjectionIntermediateData<ModelVariant, real_type> dp;
+  HivSimulationIntermediateData<ModelVariant, real_type> hiv;
   ChildModelIntermediateData<ModelVariant, real_type> children;
 
   IntermediateData(int hAG_15plus)
       :
-      base(hAG_15plus),
+      dp(),
+      hiv(hAG_15plus),
       children() {}
 
   void reset() {
-    base.reset();
+    dp.reset();
+    hiv.reset();
     children.reset();
   }
 };

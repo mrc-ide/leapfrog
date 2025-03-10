@@ -1,4 +1,3 @@
-
 read_sx <- function(pjnz, use_ep5=FALSE) {
 
   if(use_ep5) {
@@ -229,7 +228,7 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   ## v$who34percelig <- who34percelig
 
   v$art_dropout_recover_cd4 <- if (projp$spectrum_version >= "6.14") {TRUE} else {FALSE}
-  
+
   ## Convert input percent dropout in 12 months to an annual rate (Rob Glaubius email 25 July 2024)
   v$art_dropout_rate <- -log(1.0 - projp$art_dropout/100)
 
@@ -271,4 +270,35 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
 
 
   v
+}
+
+# Used for testing
+setup_childmodel <- function(testinput) {
+  input <- readRDS(testinput)
+  demp <- input$demp
+  parameters <- input$proj
+
+  parameters$ctx_effect <- 0.33
+  parameters$laf <- 1
+  parameters$paed_art_elig_age <- as.integer(parameters$paed_art_elig_age)
+  parameters$mat_prev_input <- rep(TRUE, 61)
+  pmtct_new <- array(0, dim = c(7, 61), dimnames = list(pmtct = c("Option A", "Option B", "SDNVP", "Dual ARV", "Option B+: before pregnancy", "Option B+: >4 weeks", "Option B+: <4 weeks")))
+  ## pick out which ones were inserted as numbers
+  pmtct_new[, which(colSums(parameters$pmtct)[, 1] > 0)] <- parameters$pmtct[, (which(colSums(parameters$pmtct)[, 1] > 0)), 1]
+  ## pick out which ones were inserted as percent
+  pmtct_new[, which(colSums(parameters$pmtct)[, 1] == 0)] <- parameters$pmtct[, which(colSums(parameters$pmtct)[, 1] == 0), 2]
+  parameters$pmtct <- pmtct_new
+
+  return(list(
+    dp = input$dp,
+    demp = demp,
+    parameters = parameters,
+    pjnz = input$pjnz,
+    timedat.idx = input$timedat.idx,
+    pop1 = input$pop1_outputs,
+    ontrt = input$on_treatment,
+    offtrt = input$off_trt,
+    deaths_noart = input$deaths_noart,
+    deaths_art = input$deaths_art
+  ))
 }

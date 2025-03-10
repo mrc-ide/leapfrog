@@ -1,3 +1,4 @@
 #!/bin/sh
 
-$R_HOME/bin/Rscript inst/cpp_generation/generate.R
+echo "TODO turn generate back on when generating out state_types needed by Python"
+#$R_HOME/bin/Rscript inst/cpp_generation/generate.R

@@ -63,7 +63,8 @@ For the `StateSpace` struct (defined as `ss` in the code) we use the `ss_` prefi
 
 so for example:
 
-* `ss_b` = `ss.base`
+* `ss_d` = `ss.dp`
+* `ss_h` = `ss.hiv`
 * `ss_c` = `ss.children`
 
 # Leapfrog to Frogger glossary
@@ -131,7 +132,7 @@ In 5 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 | cd4_mort           | natural_history.cd4_mortality            | Probability of mortality by CD4 stage, age and sex                                                                                                                    |
 | scale_cd4_mort     | natural_history.scale_cd4_mortality      | If 1 then scale HIV related mortality (i.e. cd4_mortality) as a proportion of number of people with HIV and over the number with HIV and on ART at this disease stage |
 | art_mort           | art.mortality_rate                       | Probability of mortality by treatment stage, CD4 stage, age and sex                                                                                                   |
-| artmx_timerr       | art.mortaility_time_rate_ratio           | ART mortality rate ratio by year for <12 months and >12 months on ART                                                                                                 |
+| artmx_timerr       | art.mortality_time_rate_ratio           | ART mortality rate ratio by year for <12 months and >12 months on ART                                                                                                 |
 | art15plus_num      | art.adults_on_art                        | Time series of # or % of adult PLHIV on ART by sex                                                                                                                    |
 | art15plus_isperc   | art.adults_on_art_is_percent             | Time series, TRUE if art15plus_num is a %, FALSE if it is a #                                                                                                         |
 | artcd4elig_idx     | art.idx_hm_elig                          | The index of the CD4 count at which people are eligible for ART by time step                                                                                          |
@@ -140,9 +141,9 @@ In 5 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 | paed_cd4_dist      | children.hc1_cd4_dist                    | Distribution of infections by CD4 category by infection type                                                                                                          |
 | paed_cd4_transition| children.hc_cd4_transition               | CD4 mapping between 0-4 year olds and 5-14 year olds                                                                                                                  |
 | paed_cd4_mort      | children.hc1_cd4_mort                    | Probability of mortality by CD4 stage, age, and sex for 0-4 year olds                                                                                                 |
-| adol_cd4_mort      | children.hc2_cd4_mort                    | Probability of mortality by CD4 stage, age, and sex for 5-14 year olds                                                                                                |                               
+| adol_cd4_mort      | children.hc2_cd4_mort                    | Probability of mortality by CD4 stage, age, and sex for 5-14 year olds                                                                                                |
 | paed_cd4_prog      | children.hc1_cd4_prog                    | Probability of progressing to the subsequent CD4 stage for 0-4 year olds                                                                                              |
-| adol_cd4_prog      | children.hc2_cd4_prog                    | Probability of progressing to the subsequent CD4 stage for 5-14 year olds                                                                                             |                                               
+| adol_cd4_prog      | children.hc2_cd4_prog                    | Probability of progressing to the subsequent CD4 stage for 5-14 year olds                                                                                             |
 | ctx_effect         | children.ctx_effect                      | Effectiveness of cotrimoxazole at averting mortality                                                                                                                  |
 | ctx_val            | children.ctx_val                         | Number of children receiving cotrimoxazole                                                                                                                            |
 | paed_art_elig_age  | children.hc_art_elig_age                 | Age at which children are eligible for ART by year                                                                                                                    |

@@ -44,10 +44,12 @@ The simulation model is callable in R via a wrapper function
 You can control how the simulation model is run with the following
 arguments:
 
+- `run_hiv_simulation` which is `TRUE` by default. Set to `FALSE` to
+  turn off the HIV simulation and run only the demographic projection.
 - `hiv_age_stratification` which must be “coarse” or “full”. Coarse is
   run with 5-year age groups and full with single year ages.
 - `run_child_model` which is `FALSE` by default. Set to `TRUE` to run
-  the paediatric portion of the model.
+  the child portion of the model.
 
 ## Example
 
@@ -60,7 +62,7 @@ Prepare model inputs.
 ``` r
 library(frogger)
 
-pjnz <- system.file("pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ", 
+pjnz <- system.file("pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ",
                     package = "frogger", mustWork = TRUE)
 
 demp <- prepare_leapfrog_demp(pjnz)
@@ -72,9 +74,9 @@ Simulate adult ‘full’ age group (single-year age) and ‘coarse’ age group
 per year.
 
 ``` r
-lsimF <- run_model(demp, hivp, 1970:2030, 10L, 
+lsimF <- run_model(demp, hivp, 1970:2030, 10L,
                    hiv_age_stratification = "full", run_child_model = FALSE)
-lsimC <- run_model(demp, hivp, 1970:2030, 10L, 
+lsimC <- run_model(demp, hivp, 1970:2030, 10L,
                    hiv_age_stratification = "coarse", run_child_model = FALSE)
 ```
 
@@ -139,6 +141,28 @@ simulation via [Rcpp](http://dirk.eddelbuettel.com/code/rcpp.html) and
 [RcppEigen](http://dirk.eddelbuettel.com/code/rcpp.eigen.html).
 
 ## Development notes
+
+### Testing
+
+There is some pre-prepared test data available to make tests run faster.
+This is generated and saved `./scripts/create_test_data.R`.
+
+We also have some separate data written out in a generic format which
+can be read to test the model directly from C++. This is in
+`inst/standalone_model/data` in zipped files.
+
+If this is your first time running you will need to unzip the standalone
+test data
+
+    ./inst/standalone_model/extract_data
+
+If you want to update the test data, it should be updated in the
+`./scripts/create_test_data.R` script so that we know how it was created
+and we can do it again fairly easily. Steps are 1. Update the script and
+generate the test data 1. Update the standalone data which is built from
+this `./scripts/update_standalone_data`. You might need to add a new
+mapping from R to serialized name if you are adding new input data 1.
+Unzip this for automated tests `./inst/standalone_model/extract_data`
 
 ### Simulation model
 

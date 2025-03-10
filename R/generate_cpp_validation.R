@@ -31,8 +31,8 @@ validate_and_parse_output <- function(output, filename, row_num) {
   validate_output_dims(output)
   if (output$model_variant == "ModelVariant") {
     ## If it is included for all model variants then data is stored on
-    ## structs called "BaseModel"
-    output$struct <- "BaseModel"
+    ## structs called "DemographicProjection"
+    output$struct <- "DemographicProjection"
   } else {
     output$struct <- output$model_variant
   }

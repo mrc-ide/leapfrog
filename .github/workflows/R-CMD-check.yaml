@@ -47,6 +47,9 @@ jobs:
           extra-packages: any::rcmdcheck, any::here
           needs: check
 
+      - name: Extract test data
+        run: ./inst/standalone_model/extract_data
+
       - uses: r-lib/actions/check-r-package@v2
         with:
           error-on: '"error"'
