@@ -30,11 +30,8 @@ source('./scripts/read_spectrum.R')
 # mod <- leapfrog::leapfrogR(demp, proj, hiv_steps_per_year = 0L)
 # saveRDS(lmod, testthat::test_path("testdata/fit_demography.rds"))
 
-#Create paeds parameters (Run from leapfrog/uncertainrt_analysis_working)
-#pjnz_child <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct - Copy ART.PJNZ")
+#Create paeds parameters
 pjnz_child <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct - Copy.PJNZ")
-#pjnz_child <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct.PJNZ")
-#pjnz_child <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct-COTRIM.PJNZ")
 
 
 demp <- prepare_leapfrog_demp(pjnz_child)
@@ -55,7 +52,6 @@ proj.years <- yr_start:yr_end
 timedat.idx <- 4+1:length(proj.years)-1
 
 pop1 = paste0(getwd(), '/', gsub(x = pjnz_child, pattern = '.PJNZ', replacement = '_pop1.xlsx'))
-#pop1 = paste0( gsub(x = pjnz_child, pattern = '.PJNZ', replacement = '_pop1.xlsx'))
 
 spectrum_output <- function(file = "../testdata/spectrum/v6.13/bwa_aim-adult-child-input-art-elig_spectrum-v6.13_2022-02-12_pop1.xlsx", ages = 0:14, country = 'Botswana', years_in = 1970:2030){
   ##pull out stratified population from the .xlsx file, This function doesn't take out the paediatric output, so going to just compare to the Spectrum software itself
@@ -116,9 +112,11 @@ aids_deathsart <- array(0, dim = c(15,2,61))
 aids_deathsart[,1,] <- m
 aids_deathsart[,2,] <- f
 
+spec_ctx_need <- dpsub(dp, tag = '<ChildARTCalc MV2>', rows = 3, cols = timedat.idx)
 
 saveRDS(list(proj = proj, demp = demp, dp = dp, timedat.idx = timedat.idx, pjnz = pjnz_child,
              pop1_outputs = x, on_treatment = df$on_treatment, off_trt = df$off_treatment,
              deaths_noart = aids_deathsnoart,
-             deaths_art = aids_deathsart),
+             deaths_art = aids_deathsart,
+             ctx_need = spec_ctx_need),
         testthat::test_path("testdata/child_parms.rds"))

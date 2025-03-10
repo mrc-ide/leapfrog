@@ -115,7 +115,7 @@ test_that("Model outputs are consistent", {
 
 })
 
-test_that("Female adult pop aligns", {
+test_that("Female 15-49y pop aligns", {
   input <- setup_childmodel(testinput = "testdata/child_parms.rds")
   demp <- input$demp
   parameters <- input$parameters
@@ -161,6 +161,25 @@ test_that("Mothers that need ptmct align", {
   expect_true(all(abs(dt$diff) < 1e-3))
 })
 
+test_that("Children in need of cotrim aligns", {
+  input <- setup_childmodel(testinput = "testdata/child_parms.rds")
+  demp <- input$demp
+  parameters <- input$parameters
+  pjnz <- input$pjnz
+  dp = input$dp
+
+  out <- run_model(demp, parameters, 1970:2030, NULL, run_child_model = TRUE)
+
+  spec <- input$ctx_need
+  dt <- data.frame(year = 1970:2030,
+                   spec = as.numeric(unlist(spec)),
+                   lfrog = out$ctx_need)
+  dt <- dt %>%
+    dplyr::mutate(diff = spec - lfrog)
+
+  expect_true(all(abs(dt$diff) < 5e-1))
+})
+
 test_that("Infections among children align", {
   input <- setup_childmodel(test_path("testdata/child_parms.rds"))
   demp <- input$demp
@@ -193,7 +212,7 @@ test_that("Infections among children align", {
     dplyr::mutate(diff = Spec - lfrog) %>%
     dplyr::filter(Age < 4 & Year < 2030)
 
-  expect_true(all(abs(dt$diff) < 6e-1))
+  expect_true(all(abs(dt$diff) < 5e-2))
 })
 
 test_that("CLHIV align", {
@@ -244,7 +263,7 @@ test_that("CLHIV align", {
     dplyr::filter(year < 2030) %>%
     dplyr::filter(age < 15)
 
-  expect_true(all(abs(dt$diff) < 5e-1))
+  expect_true(all(abs(dt$diff) < 5e-2))
 })
 
 test_that("CLHIV on ART align", {
@@ -294,7 +313,7 @@ test_that("CLHIV on ART align", {
     dplyr::mutate(diff = pop - fr) %>%
     dplyr::filter(year < 2030 & age < 15)
 
-  expect_true(all(abs(dt$diff) < 5e-1))
+  expect_true(all(abs(dt$diff) < 5e-2))
 })
 
 test_that("HIV related deaths among CLHIV not on ART align", {
@@ -325,7 +344,7 @@ test_that("HIV related deaths among CLHIV not on ART align", {
   dt <- dt %>%
     dplyr::mutate(diff = spec - fr)
 
-  expect_true(all(abs(dt$diff) < 5e-1))
+  expect_true(all(abs(dt$diff) < 5e-2))
 })
 
 test_that("HIV related deaths among CLHIV on ART align", {
@@ -357,6 +376,5 @@ test_that("HIV related deaths among CLHIV on ART align", {
     dplyr::mutate(diff = spec - fr) %>%
     dplyr::filter(year < 2030)
 
-  expect_true(all(abs(dt$diff) < 5e-1))
+  expect_true(all(abs(dt$diff) < 5e-2))
 })
-

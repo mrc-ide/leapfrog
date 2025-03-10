@@ -27,7 +27,7 @@ paed_cd4_mort,Children.hc1_cd4_mort,real_type,ModelVariant::run_child_model,,FAL
 adol_cd4_mort,Children.hc2_cd4_mort,real_type,ModelVariant::run_child_model,,FALSE,3,children.hc2DS,children.hcTT,children.hc2AG,
 paed_cd4_prog,Children.hc1_cd4_prog,real_type,ModelVariant::run_child_model,,FALSE,3,children.hc1DS,children.hc1AG_c,base.NS,
 adol_cd4_prog,Children.hc2_cd4_prog,real_type,ModelVariant::run_child_model,,FALSE,3,children.hc2DS,children.hc2AG_c,base.NS,
-ctx_effect,Children.ctx_effect,real_type,ModelVariant::run_child_model,,FALSE,1,2,,,
+ctx_effect,Children.ctx_effect,real_type,ModelVariant::run_child_model,,FALSE,1,3,,,
 ctx_val,Children.ctx_val,real_type,ModelVariant::run_child_model,,FALSE,1,proj_years,,,
 paed_art_elig_age,Children.hc_art_elig_age,int,ModelVariant::run_child_model,,FALSE,1,proj_years,,,
 paed_art_elig_cd4,Children.hc_art_elig_cd4,real_type,ModelVariant::run_child_model,,TRUE,2,options.p_idx_hiv_first_adult,proj_years,,

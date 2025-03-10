@@ -785,8 +785,11 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   ##cotrim is effective for five years for children not on ART and for four years for children on ART
   ctx_effect <- dpsub(dp = dp.x, "<EffectTreatChild MV>",3:4,4:13)
   off_art_ctx <- sum(as.numeric(unlist(ctx_effect[1,]))) / 5
-  on_art_ctx <- sum(as.numeric(unlist(ctx_effect[2,]))) / 4
-  ctx_effect <- array(data = c(off_art_ctx, on_art_ctx), dim = c(2), dimnames = list(ctx_effect = c('Off ART', 'On ART')))
+  on_art_ctx.lte12mo <- sum(as.numeric(unlist(ctx_effect[2,1])))
+  on_art_ctx.gte12mo <- sum(as.numeric(unlist(ctx_effect[2,2:5]))) / 4
+  ctx_effect <- array(data = c(off_art_ctx, on_art_ctx.lte12mo, on_art_ctx.gte12mo),
+                      dim = c(3),
+                      dimnames = list(ctx_effect = c('Off ART', 'On ART, lte12mo', 'On ART, gte12mo')))
   v$ctx_effect <- ctx_effect
 
   ## pull in ART coverage numbers

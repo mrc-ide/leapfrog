@@ -4,8 +4,6 @@ setup_childmodel <- function(testinput = "testdata/child_parms.rds") {
   parameters <- input$proj
 
   #### TO DO: move this into the frogger version of spectrum-inputs.R
-  # parameters$ctx_effect <- 0.33
- # parameters$laf <- 1
   parameters$paed_art_elig_age <- as.integer(parameters$paed_art_elig_age)
   parameters$mat_prev_input <- rep(TRUE, 61)
   pmtct_new <- array(0, dim = c(7, 61), dimnames = list(pmtct = c("Option A", "Option B", "SDNVP", "Dual ARV", "Option B+: before pregnancy", "Option B+: >4 weeks", "Option B+: <4 weeks")))
@@ -23,7 +21,8 @@ setup_childmodel <- function(testinput = "testdata/child_parms.rds") {
     ontrt = input$on_treatment,
     offtrt = input$off_trt,
     deaths_noart = input$deaths_noart,
-    deaths_art = input$deaths_art
+    deaths_art = input$deaths_art,
+    ctx_need = input$ctx_need
   ))
 }
 
