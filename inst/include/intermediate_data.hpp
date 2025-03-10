@@ -309,8 +309,6 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
   TensorFixedSize <real_type, Sizes<hBF_coarse<ChildModel>>> bf_transmission_rate;
   real_type bf_scalar;
   TensorFixedSize <real_type, Sizes<3>> ctx_mean;
-  real_type test;
-
 
   ChildModelIntermediateData() {};
 
@@ -380,7 +378,6 @@ struct ChildModelIntermediateData<ChildModel, real_type> {
     bf_transmission_rate.setZero();
     bf_scalar = 0.0;
     ctx_mean.setZero();
-    test = 0.0;
   };
 };
 

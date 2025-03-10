@@ -360,7 +360,6 @@ void adjust_option_A_B_bf_tr(int t,
   // Option A and B were only authorized for women with greater than 350 CD4, so if the percentage of women
   // on option A/B > the proportion of women in this cd4 category, we assume that some must have a cd4 less than 350
   // option AB will be less effective for these women so we adjust for that
-
   if (i_hc.prop_wlhiv_gte350 > 0) {
     auto option_A_B_coverage = i_hc.PMTCT_coverage(0) + i_hc.PMTCT_coverage(1);
     if (option_A_B_coverage > i_hc.prop_wlhiv_gte350) {
@@ -409,7 +408,7 @@ void maternal_incidence_in_pregnancy_tr(int t,
 
     if (i_hc.age_weighted_hivneg > 0.0) {
       i_hc.incidence_rate_wlhiv = i_hc.age_weighted_infections / i_hc.age_weighted_hivneg;
-      // 0.75 is 9/12, gestational period, index 7 in the vertical trasnmission object is the index for maternal seroconversion
+      // 0.75 is 9/12, gestational period, index 7 in the vertical transmission object is the index for maternal seroconversion
       i_hc.perinatal_transmission_from_incidence = i_hc.incidence_rate_wlhiv * 0.75 *
                                                    (p_hc.total_births(t) - i_hc.need_PMTCT) *
                                                    p_hc.vertical_transmission_rate(7, 0);
@@ -451,7 +450,6 @@ void perinatal_tr(int t,
 
   i_hc.births_sum = n_dp.births;
 
-  // TODO: add in patients reallocated
   internal::convert_PMTCT_num_to_perc(t, pars, state_curr, state_next, intermediate);
   internal::adjust_option_A_B_tr(t, pars, state_curr, state_next, intermediate);
   internal::calc_hiv_negative_pop(t, pars, state_curr, state_next, intermediate);
@@ -836,7 +834,6 @@ void need_for_cotrim(int t,
   auto& i_hc = intermediate.children;
   const auto& c_hc = state_curr.children;
 
-  //potentially this needs to be changed to include children started on ART
   // Births from the last 18 months are eligible
   n_hc.ctx_need = n_hc.hiv_births * 1.5;
 
@@ -871,7 +868,7 @@ void need_for_cotrim(int t,
   } // end ss_d.NS
 
   //All ART eligible children ages 5-14 eligible
-  //Spectrum uses a lagged population and eligibility for children over five which I think it a mistake
+  //Spectrum uses a lagged population and eligibility for children over five (TODO: verify)
   for (int s = 0; s < ss_d.NS; ++s) {
     for (int cat = 0; cat < ss_c.hcTT; ++cat) {
       for (int a = (ss_c.hc2_agestart); a < p_op.p_idx_fertility_first; ++a) {
@@ -902,7 +899,6 @@ void get_cotrim_effect(int t,
   auto& n_hc = state_next.children;
   auto& i_hc = intermediate.children;
 
-  //note this is just for off art, need to also do for on art
   if (p_hc.ctx_val_is_percent(t)) {
     i_hc.ctx_mean(art_flag) = (1 - p_hc.ctx_effect(art_flag) * p_hc.ctx_val(t));
   } else {
@@ -1199,7 +1195,7 @@ void deaths_this_year(int t,
           }
 
           //ctx reduction on mortality for those on ART
-          //NOTE: ART initiation calculations don't include the effect of cotrim, which I think is a mistake.
+          //NOTE: ART initiation calculations don't include the effect of cotrim (TODO: verify)
           // i_hc.hc_death_rate *= i_hc.ctx_mean(art_flag);
 
           bool any_hc1_art_deaths = i_hc.hc_death_rate * n_hc.hc1_art_pop(dur, hd, a, s) >= 0;
@@ -1591,8 +1587,6 @@ void art_initiation_by_age(int t,
   auto& n_hc = state_next.children;
   auto& i_hc = intermediate.children;
 
-  // internal::calc_art_initiates(t, pars, state_curr, state_next, intermediate);
-
   if (p_hc.hc_art_is_age_spec(t)) {
     for (int s = 0; s < ss_d.NS; ++s) {
       for (int a = 0; a < p_op.p_idx_fertility_first; ++a) {
@@ -1667,8 +1661,6 @@ void art_initiation_by_age(int t,
             if (hc_art_val_sum <= 0) {
               i_hc.hc_art_scalar(0) = 0.0;
             } else {
-              // issue is that in 2030 this is being activated when it shouldn't be for age one
-              // TLDR is that too many people are initiating who shouldn't be
               i_hc.hc_art_scalar(0) = std::min(i_hc.hc_adj(0) * p_hc.hc_art_init_dist(a, t), 1.0);
             }
 
@@ -1726,10 +1718,8 @@ void fill_total_pop_outputs(int t,
   } // end hDS
 
   for (int a = 0; a < p_op.p_idx_fertility_first; ++a) {
-  for (int s = 0; s < ss_d.NS; ++s) {
-    // if(s == 1 & a > 0){
-        n_ha.p_hiv_pop(a, s) += n_ha.p_infections(a, s);
-       // }
+    for (int s = 0; s < ss_d.NS; ++s) {
+      n_ha.p_hiv_pop(a, s) += n_ha.p_infections(a, s);
       n_ha.p_hiv_pop(a, s) -= n_ha.p_hiv_deaths(a, s);
     }
   }
@@ -1782,7 +1772,7 @@ void run_child_model_simulation(int t,
 
     //Calculate on ART mortality among those on ART < 6 months
       internal::on_art_mortality(t, pars, state_curr, state_next, intermediate, 0, 1);
-    // progress 6 to 12 mo to 12 plus months
+    // Progress 6 to 12 mo to 12 plus months
       internal::progress_time_on_art(t, pars, state_curr, state_next, intermediate, 1, 2);
 
     //Remove lost to follow ups
@@ -1792,7 +1782,6 @@ void run_child_model_simulation(int t,
 
     internal::nosocomial_infections(t, pars, state_curr, state_next, intermediate);
     internal::fill_total_pop_outputs(t, pars, state_curr, state_next, intermediate);
-
 
 }
 
