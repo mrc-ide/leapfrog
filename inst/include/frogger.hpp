@@ -79,6 +79,8 @@ struct Leapfrog {
   ) {
     auto state = State();
     auto state_next = state;
+
+    // TODO Mantra make run time switch with ability to input initial state
     if constexpr (ModelVariant::run_demographic_projection) {
       // set initial state
       state.dp.p_total_pop = pars.dp.base_pop;

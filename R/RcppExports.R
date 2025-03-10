@@ -5,3 +5,11 @@ run_base_model <- function(data, model_variant, time_steps, hiv_steps, save_step
     .Call(`_frogger_run_base_model`, data, model_variant, time_steps, hiv_steps, save_steps, is_midyear_projection, t_ART_start)
 }
 
+serialize_vector <- function(data, path1, path2) {
+    .Call(`_frogger_serialize_vector`, data, path1, path2)
+}
+
+deserialize_vector <- function(path1, path2) {
+    .Call(`_frogger_deserialize_vector`, path1, path2)
+}
+
