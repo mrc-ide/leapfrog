@@ -1,5 +1,6 @@
 #pragma once
 
+#include "generated/model_variants.hpp"
 #include "generated/config_mixer.hpp"
 #include "models/general_demographic_projection.hpp"
 #include "models/hiv_demographic_projection.hpp"

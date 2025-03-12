@@ -1,0 +1,138 @@
+{% from "template_utils.j2" import comma_except_last %}
+#pragma once
+
+#include "config.hpp"
+
+namespace leapfrog {
+
+template<typename ...Ts>
+struct ConfigMixer;
+
+template<typename real_type, MV ModelVariant>
+struct ConfigMixer<real_type, ModelVariant> {
+  struct Pars {};
+  static Pars get_pars(const Rcpp::List &data, const Opts<real_type> &options, const int proj_years) {
+    Pars p = {}; return p;
+  };
+
+  struct Intermediate {
+    void reset() {};
+  };
+
+  struct State {
+    State() {};
+    State(const auto initial_state) {};
+    void reset() {};
+  };
+
+  struct OutputState {
+    OutputState(int output_years) {};
+    void save_state(const size_t i, const auto &state) {};
+  };
+
+  static int get_build_output_size(int prev_size) {
+    return prev_size;
+  };
+  static int build_output(Rcpp::List& ret, Rcpp::CharacterVector& names, int index, const auto& state, const size_t& output_years) {
+    return index;
+  };
+};
+
+template<typename real_type, MV ModelVariant, typename Config, typename ...Ts>
+struct ConfigMixer<real_type, ModelVariant, Pair<false, Config>, Ts...> : public ConfigMixer<real_type, ModelVariant, Ts...> {};
+
+{% for config in configs %}
+template<typename real_type1, MV ModelVariant1, typename ...Ts>
+struct ConfigMixer<real_type1, ModelVariant1, Pair<true, {{ config.name }}Config<real_type1, ModelVariant1>>, Ts...> {
+  using real_type = real_type1;
+  using ModelVariant = ModelVariant1;
+  using CurrConfig = {{ config.name }}Config<real_type, ModelVariant>;
+  using NextConfigMixer = ConfigMixer<real_type, ModelVariant, Ts...>;
+  using SS = SSMixed<ModelVariant>;
+
+  struct Pars: public NextConfigMixer::Pars {
+    typename CurrConfig::Pars {{ config.namespace }};
+  };
+
+  static Pars get_pars(const Rcpp::List &data, const Opts<real_type> &options, const int proj_years) {
+    Pars p = {
+      NextConfigMixer::get_pars(data, options, proj_years),
+      CurrConfig::get_pars(data, options, proj_years)
+    };
+    return p;
+  };
+
+  struct Intermediate: public NextConfigMixer::Intermediate {
+    typename CurrConfig::Intermediate {{ config.namespace }};
+
+    Intermediate():
+      NextConfigMixer::Intermediate(),
+      {{ config.namespace }}() {};
+
+    void reset() {
+      NextConfigMixer::Intermediate::reset();
+      {{ config.namespace }}.reset();
+    };
+  };
+
+  struct State: public NextConfigMixer::State {
+    typename CurrConfig::State {{ config.namespace }};
+
+    State():
+      NextConfigMixer::State(),
+      {{ config.namespace }}() {};
+
+    State(const typename CurrConfig::State& initial_state):
+      NextConfigMixer::State(initial_state),
+      {{ config.namespace }}(initial_state) {};
+
+    void reset() {
+      NextConfigMixer::State::reset();
+      {{ config.namespace }}.reset();
+    };
+  };
+
+  struct OutputState: public NextConfigMixer::OutputState {
+    typename CurrConfig::OutputState {{ config.namespace }};
+
+    OutputState(int output_years):
+      NextConfigMixer::OutputState(output_years),
+      {{ config.namespace }}(output_years) {};
+
+    void save_state(const size_t i, const State &state) {
+      NextConfigMixer::OutputState::save_state(i, state);
+      {{ config.namespace }}.save_state(i, state.{{ config.namespace }});
+    };
+  };
+
+  static int get_build_output_size(int prev_size) {
+    int curr_size = NextConfigMixer::get_build_output_size(prev_size);
+    return CurrConfig::get_build_output_size(curr_size);
+  };
+
+  static int build_output(Rcpp::List& ret, Rcpp::CharacterVector& names, int index, const OutputState& state, const size_t& output_years) {
+    int new_index = CurrConfig::build_output(ret, names, index, state.{{ config.namespace }}, output_years);
+    return NextConfigMixer::build_output(ret, names, new_index, state, output_years);
+  };
+
+  using Options = Opts<real_type>;
+  struct Args {
+    int t;
+    const Pars& pars;
+    const State& state_curr;
+    State& state_next;
+    Intermediate& intermediate;
+    const Options& opts;
+  };
+}
+{% endfor %}
+
+template<typename real_type, MV ModelVariant>
+using ConfigMixed = ConfigMixer<
+  real_type, ModelVariant,
+  {% for config in configs %}
+  Pair<ModelVariant::{{ config.add_if }}, {{ config.name }}Config<real_type, ModelVariant>>{{ comma_except_last(loop) }}
+  {% endfor %}
+>;
+
+}

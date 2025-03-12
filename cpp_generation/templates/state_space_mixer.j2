@@ -1,3 +1,4 @@
+{% from "template_utils.j2" import comma_except_last %}
 #pragma once
 
 #include "state_space.hpp"
@@ -22,9 +23,9 @@ struct SSMixer<ModelVariant>: public BaseSS {};
 template<MV ModelVariant>
 using SSMixed = SSMixer<
   ModelVariant,
-  Pair<ModelVariant::run_demographic_projection, DpSS<ModelVariant>>,
-  Pair<ModelVariant::run_hiv_simulation, HaSS<ModelVariant>>,
-  Pair<ModelVariant::run_child_model, HcSS<ModelVariant>>
+  {% for config in configs %}
+  Pair<ModelVariant::{{ config.add_if }}, {{ config.name }}SS<ModelVariant>>{{ comma_except_last(loop) }}
+  {% endfor %}
 >;
 
 }

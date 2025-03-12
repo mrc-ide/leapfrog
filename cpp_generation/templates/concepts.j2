@@ -1,0 +1,17 @@
+#pragma once
+
+namespace leapfrog {
+
+template<typename ModelVariant>
+concept MV = requires (ModelVariant mv) {
+  {% for name in get_flags(variants) %}
+  { mv.{{ name }} } -> std::convertible_to<bool>;
+  {% endfor %}
+};
+
+{% for name in get_flags(variants) +%}
+template<typename Config>
+concept {{ name.replace("_", " ").title().replace(" ", "") }} = MV<typename Config::ModelVariant> && Config::ModelVariant::{{ name }};
+{% endfor %}
+
+}

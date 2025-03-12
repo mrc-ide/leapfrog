@@ -1,0 +1,183 @@
+{% from "template_utils.j2" import comma_except_last %}
+#pragma once
+
+#include <Rcpp.h>
+
+#include "state_space_mixer.hpp"
+#include "tensor_types.hpp"
+
+namespace leapfrog {
+
+template <typename T>
+T* r_data(SEXP x) {
+  static_assert(sizeof(T) == 0, "Only specializations of r_data can be used");
+}
+
+template <>
+double* r_data(SEXP x) {
+  return REAL(x);
+}
+
+template <>
+int* r_data(SEXP x) {
+  return INTEGER(x);
+}
+
+template<typename T, typename... Args>
+auto parse_data(const Rcpp::List data, const std::string& key, Args... dims) {
+  constexpr std::size_t rank = sizeof...(dims);
+  Eigen::array<int, rank> dimensions{ static_cast<int>(dims)... };
+
+  int length = std::accumulate(dimensions.begin(), dimensions.end(), 1, std::multiplies<int>());
+  SEXP array_data = data[key];
+  // In cases where the input data has project years we might not use all of it model fit
+  // So we can take create a Map over a smaller slice of the data
+  // As long as this is true we can be confident we're not referencing invalid memory
+  if (LENGTH(array_data) < length) {
+    Rcpp::stop("Invalid size of data for '%s', expected %d got %d",
+               key,
+               length,
+               LENGTH(array_data));
+  }
+
+  return Eigen::TensorMap<Eigen::Tensor<T, rank>>(r_data<T>(array_data), static_cast<int>(dims)...);
+}
+
+// ****************************** OPTIONS ****************************** //
+
+template<typename real_type>
+struct Opts {
+  int hts_per_year;
+  double dt;
+  const int p_idx_fertility_first;
+  const int p_fertility_age_groups;
+  const int p_idx_hiv_first_adult;
+  const int adult_incidence_first_age_group;
+  const int pAG_INCIDPOP;
+  const int ts_art_start;
+  const int hIDX_15PLUS;
+  const int proj_period_int;
+
+  Opts(
+    int hts_per_year,
+    int ts_art_start,
+    int proj_period_int
+  ):
+    hts_per_year(hts_per_year),
+    dt(1.0 / hts_per_year),
+    p_idx_fertility_first(15),
+    p_fertility_age_groups(35),
+    p_idx_hiv_first_adult(15),
+    adult_incidence_first_age_group(15),
+    pAG_INCIDPOP(35),
+    ts_art_start(ts_art_start),
+    hIDX_15PLUS(0),
+    proj_period_int(proj_period_int) {}
+};
+
+{% for config in configs %}
+template<typename real_type, MV ModelVariant>
+struct {{ config.name }}Config {
+  using SS = SSMixed<ModelVariant>;
+
+  struct Pars {
+    {% for name, cfg in config.pars.items() %}
+    {{ get_member_type(cfg) }} {{ name }};
+    {% endfor %}
+  };
+
+  static Pars get_pars(
+    const Rcpp::List &data,
+    const Opts<real_type> &opts,
+    const int proj_years
+  ) {
+    return {
+      {% for name, cfg in config.pars.items() %}
+      .{{ name }} = {{ get_parse_data(cfg) }}{{ comma_except_last(loop) }}
+      {% endfor %}
+    }
+  };
+
+  struct Intermediate {
+    {% for name, cfg in config.intermediate.items() %}
+    {{ get_member_type(cfg) }} {{ name }};
+    {% endfor %}
+
+    Intermediate() {};
+
+    void reset() {
+      {% for name, cfg in config.intermediate.items() %}
+      {{ get_reset(name, cfg) }};
+      {% endfor %}
+    };
+  };
+
+  struct State {
+    {% for name, cfg in config.state.items() %}
+    {{ get_member_type(cfg) }} {{ name }};
+    {% endfor %}
+
+    State() {
+      reset();
+    };
+
+    State(const State& initial_state):
+      {% for name in config.state.keys() %}
+      {{ name }}(initial_state.{{ name }}){{ comma_except_last(loop) }}
+      {% endfor %}
+    {};
+
+    void reset() {
+      {% for name, cfg in config.state.items() %}
+      {{ get_reset(name, cfg) }};
+      {% endfor %}
+    };
+  };
+
+  struct OutputState {
+    {% for name, cfg in config.state.items() %}
+    {{ get_output_state_member_type(cfg) }} {{ name }};
+    {% endfor %}
+
+    OutputState(int output_years):
+      {% for name, cfg in config.state.items() %}
+      {{ name }}({{ collapse_dims_with_trailing_sep(cfg) }}output_years){{ comma_except_last(loop) }}
+      {% endfor %}
+    {
+      {% for name in config.state.keys() %}
+      {{ name }}.setZero();
+      {% endfor %}
+    };
+
+    void save_state(const size_t i, const State &state) {
+      {% for name, cfg in config.state.items() %}
+      {{ get_output_state_chip(name, cfg) }} = state.{{ name }};
+      {% endfor %}
+    };
+  };
+
+  static constexpr int output_count = {{ dict_len(config.state) }};
+  static int get_build_output_size(int prev_size) {
+    return prev_size + output_count;
+  };
+
+  static int build_output(
+    Rcpp::List& ret,
+    Rcpp::CharacterVector& names,
+    int index,
+    const OutputState& state,
+    const size_t& output_years
+  ) {
+    {% for name, cfg in config.state.items() %}
+    Rcpp::NumericVector r_{{ name }}({{ collapse_dims_with_trailing_sep(cfg, " * ") }}output_years);
+    r_{{ name }}.attr("dim") = Rcpp::IntegerVector::create({{ collapse_dims_with_trailing_sep(cfg) }}output_years);
+    std::copy_n(state.{{ name }}.data(), state.{{ name }}.size(), {{ get_r_internal_data_pointer(cfg) }}(r_{{ name }}));
+    names[index + {{ loop.index0 }}] = "{{ name }}";
+    ret[index + {{ loop.index0 }}] = r_{{ name }};
+    {% endfor %}
+    return index + output_count;
+  };
+};
+{% endfor %}
+
+}

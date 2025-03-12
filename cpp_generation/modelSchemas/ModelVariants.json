@@ -1,0 +1,26 @@
+{
+  "DemographicProjection": {
+    "run_demographic_projection": "true",
+    "run_hiv_simulation": "false",
+    "use_coarse_stratification": "false",
+    "run_child_model": "false"
+  },
+  "HivFullAgeStratification": {
+    "run_demographic_projection": "true",
+    "run_hiv_simulation": "true",
+    "use_coarse_stratification": "false",
+    "run_child_model": "false"
+  },
+  "HivCoarseAgeStratification": {
+    "run_demographic_projection": "true",
+    "run_hiv_simulation": "true",
+    "use_coarse_stratification": "true",
+    "run_child_model": "false"
+  },
+  "ChildModel": {
+    "run_demographic_projection": "true",
+    "run_hiv_simulation": "true",
+    "use_coarse_stratification": "false",
+    "run_child_model": "true"
+  }
+}
