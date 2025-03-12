@@ -4,6 +4,9 @@
 
 namespace leapfrog {
 
+template<typename Config>	
+concept GeneralDemographicProjectionEnabled = RunDemographicProjection<Config>;	
+
 template<typename Config>
 struct GeneralDemographicProjection {
   GeneralDemographicProjection(...) {};

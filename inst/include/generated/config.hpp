@@ -97,7 +97,7 @@ struct DpConfig {
       .net_migration = parse_data<real_type>(data, "netmigr_adj", SS::pAG, SS::NS, proj_years),
       .age_specific_fertility_rate = parse_data<real_type>(data, "asfr", opts.p_fertility_age_groups, proj_years),
       .births_sex_prop = parse_data<real_type>(data, "births_sex_prop", SS::NS, proj_years)
-    }
+    };
   };
 
   struct Intermediate {
@@ -229,7 +229,7 @@ struct HaConfig {
       .adults_on_art_is_percent = parse_data<int>(data, "art15plus_isperc", SS::NS, proj_years),
       .h_art_stage_dur = parse_data<real_type>(data, "h_art_stage_dur", SS::hTS - 1),
       .initiation_mortality_weight = Rcpp::as<real_type>(data["art_alloc_mxweight"])
-    }
+    };
   };
 
   struct Intermediate {
@@ -559,7 +559,7 @@ struct HcConfig {
       .total_births = parse_data<real_type>(data, "total_births", proj_years),
       .ctx_effect = Rcpp::as<real_type>(data["ctx_effect"]),
       .local_adj_factor = Rcpp::as<real_type>(data["laf"])
-    }
+    };
   };
 
   struct Intermediate {

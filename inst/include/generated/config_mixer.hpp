@@ -40,6 +40,7 @@ struct ConfigMixer<real_type, ModelVariant> {
 template<typename real_type, MV ModelVariant, typename Config, typename ...Ts>
 struct ConfigMixer<real_type, ModelVariant, Pair<false, Config>, Ts...> : public ConfigMixer<real_type, ModelVariant, Ts...> {};
 
+
 template<typename real_type1, MV ModelVariant1, typename ...Ts>
 struct ConfigMixer<real_type1, ModelVariant1, Pair<true, DpConfig<real_type1, ModelVariant1>>, Ts...> {
   using real_type = real_type1;
@@ -122,7 +123,8 @@ struct ConfigMixer<real_type1, ModelVariant1, Pair<true, DpConfig<real_type1, Mo
     Intermediate& intermediate;
     const Options& opts;
   };
-}
+};
+
 template<typename real_type1, MV ModelVariant1, typename ...Ts>
 struct ConfigMixer<real_type1, ModelVariant1, Pair<true, HaConfig<real_type1, ModelVariant1>>, Ts...> {
   using real_type = real_type1;
@@ -205,7 +207,8 @@ struct ConfigMixer<real_type1, ModelVariant1, Pair<true, HaConfig<real_type1, Mo
     Intermediate& intermediate;
     const Options& opts;
   };
-}
+};
+
 template<typename real_type1, MV ModelVariant1, typename ...Ts>
 struct ConfigMixer<real_type1, ModelVariant1, Pair<true, HcConfig<real_type1, ModelVariant1>>, Ts...> {
   using real_type = real_type1;
@@ -288,7 +291,7 @@ struct ConfigMixer<real_type1, ModelVariant1, Pair<true, HcConfig<real_type1, Mo
     Intermediate& intermediate;
     const Options& opts;
   };
-}
+};
 
 template<typename real_type, MV ModelVariant>
 using ConfigMixed = ConfigMixer<

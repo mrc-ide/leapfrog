@@ -4,6 +4,9 @@
 
 namespace leapfrog {
 
+template<typename Config>	
+concept HivDemographicProjectionEnabled = RunDemographicProjection<Config> && RunHivSimulation<Config>;	
+
 template<typename Config>
 struct HivDemographicProjection {
   HivDemographicProjection(...) {};

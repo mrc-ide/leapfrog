@@ -41,7 +41,7 @@ struct ConfigMixer<real_type, ModelVariant> {
 template<typename real_type, MV ModelVariant, typename Config, typename ...Ts>
 struct ConfigMixer<real_type, ModelVariant, Pair<false, Config>, Ts...> : public ConfigMixer<real_type, ModelVariant, Ts...> {};
 
-{% for config in configs %}
+{% for config in configs +%}
 template<typename real_type1, MV ModelVariant1, typename ...Ts>
 struct ConfigMixer<real_type1, ModelVariant1, Pair<true, {{ config.name }}Config<real_type1, ModelVariant1>>, Ts...> {
   using real_type = real_type1;
@@ -124,7 +124,7 @@ struct ConfigMixer<real_type1, ModelVariant1, Pair<true, {{ config.name }}Config
     Intermediate& intermediate;
     const Options& opts;
   };
-}
+};
 {% endfor %}
 
 template<typename real_type, MV ModelVariant>

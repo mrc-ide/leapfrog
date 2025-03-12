@@ -95,7 +95,7 @@ struct {{ config.name }}Config {
       {% for name, cfg in config.pars.items() %}
       .{{ name }} = {{ get_parse_data(cfg) }}{{ comma_except_last(loop) }}
       {% endfor %}
-    }
+    };
   };
 
   struct Intermediate {
