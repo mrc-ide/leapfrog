@@ -41,7 +41,8 @@ env = Environment(
   loader = file_loader,
   trim_blocks = True,
   lstrip_blocks = True,
-  autoescape = select_autoescape()
+  autoescape = select_autoescape(),
+  keep_trailing_newline = True
 )
 
 generate_hpp("model_variants", dat)
