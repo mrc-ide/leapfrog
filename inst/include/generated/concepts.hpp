@@ -3,11 +3,11 @@
 namespace leapfrog {
 
 template<typename ModelVariant>
-concept MV = requires (ModelVariant mv) {
-    { mv.run_demographic_projection } -> std::convertible_to<bool>;
-    { mv.run_hiv_simulation } -> std::convertible_to<bool>;
-    { mv.use_full_stratification } -> std::convertible_to<bool>;
-    { mv.run_child_model } -> std::convertible_to<bool>;
+concept MV = requires {
+    { ModelVariant::run_demographic_projection } -> std::convertible_to<bool>;
+    { ModelVariant::run_hiv_simulation } -> std::convertible_to<bool>;
+    { ModelVariant::use_full_stratification } -> std::convertible_to<bool>;
+    { ModelVariant::run_child_model } -> std::convertible_to<bool>;
 };
 
 template<typename Config>
