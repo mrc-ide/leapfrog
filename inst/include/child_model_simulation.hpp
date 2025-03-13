@@ -243,7 +243,7 @@ void run_wlhiv_births_by_anc_attend(int t,
     } // end a
     n_hc.hiv_births_test(0) = i_hc.birthsHE_test(0);
     n_hc.hiv_births_test(1) = i_hc.birthsHE_test(1);
-
+    n_hc.hiv_births =  n_hc.hiv_births_test(0) +n_hc.hiv_births_test(1);
 
 }
 
