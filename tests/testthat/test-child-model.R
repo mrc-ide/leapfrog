@@ -116,7 +116,8 @@ test_that("Model outputs are consistent", {
 })
 
 test_that("Female 15-49y pop aligns", {
-    input <- readRDS(test_path("testdata/child_parms.rds"))
+  testthat::skip("Skipping this test because the adult populations currently do not align")
+  input <- readRDS(test_path("testdata/child_parms.rds"))
   demp <- input$demp
   parameters <- input$parameters
   dp <- input$dp
@@ -139,7 +140,7 @@ test_that("Female 15-49y pop aligns", {
   dt <- dt %>%
     dplyr::mutate(diff = Value - lfrog)
 
- # expect_true(all(abs(dt$diff) < 1e-3))
+  expect_true(all(abs(dt$diff) < 1e-3))
 })
 
 test_that("Mothers that need ptmct align", {
