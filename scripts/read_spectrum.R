@@ -86,9 +86,9 @@ dpdescription <- function(dp, description, rows, cols, tagcol = 2) {
   dp[which(dp[, tagcol] == description) + rows, cols]
 }
 
-get_dp_years <- function(dp) {
-  yr_start <- as.integer(dpsub(dp, "<FirstYear MV2>", 2, 4))
-  yr_end <- as.integer(dpsub(dp, "<FinalYear MV2>", 2, 4))
+get_dp_years <- function(dp.x) {
+  yr_start <- as.integer(dpsub(dp = dp.x, tag =  "<FirstYear MV2>",rows = 2,cols = 4))
+  yr_end <- as.integer(dpsub(dp = dp.x,tag =  "<FinalYear MV2>", rows = 2,cols = 4))
 
   proj_years <- yr_start:yr_end
   time_data_idx <- 4 + 1:length(proj_years) - 1
@@ -645,14 +645,20 @@ dp_read_paed_art_eligibility <- function(dp) {
 }
 
 prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
-  ## projection parameters
-  dpfile <- grep(".DP$", utils::unzip(pjnz, list=TRUE)$Name, value=TRUE)
-  dp <- utils::read.csv(unz(pjnz, dpfile), as.is=TRUE)
-  dpsub <- function(tag, rows, cols, tagcol=1){
-    dp[which(dp[,tagcol]==tag)+rows, cols]
+  dp.x <- get_dp_data(pjnz)
+  dpsub <- function(dp, tag, rows, cols, tagcol = 1) {
+
+    stopifnot(inherits(dp, "spectrum_dp"))
+    stopifnot(is.character(tag))
+    all.equal(rows, as.integer(rows))
+    all.equal(cols, as.integer(cols))
+
+    dp[which(dp[, tagcol] == tag) + rows, cols]
   }
-  yr_start <- as.integer(dpsub("<FirstYear MV2>",2,4))
-  yr_end <- as.integer(dpsub("<FinalYear MV2>",2,4))
+
+  ## projection parameters
+  yr_start <- as.integer(dpsub(dp = dp.x, "<FirstYear MV2>",2,4))
+  yr_end <- as.integer(dpsub(dp = dp.x, "<FinalYear MV2>",2,4))
   proj.years <- yr_start:yr_end
   timedat.idx <- 4+1:length(proj.years)-1
   year.idx <- 1:length(proj.years)
@@ -665,10 +671,10 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
 
   v <- params
   ## paed input
-  v$paed_incid_input <- dp_read_nosocom_infections(pjnz)
-  v$paed_cd4_dist <- dp_read_paed_cd4_dist(pjnz) / 100
+  v$paed_incid_input <- dp_read_nosocom_infections(dp.x)
+  v$paed_cd4_dist <- dp_read_paed_cd4_dist(dp.x) / 100
 
-  prog = dp_read_paed_cd4_prog(pjnz)
+  prog = dp_read_paed_cd4_prog(dp.x)
   paed_cd4_prog <- array(0, dim = c(7,2,2), dimnames = list(cd4pct = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'),
                                                             age = c('0-2', '3-4'),
                                                             sex = c('male', 'female')))
@@ -685,7 +691,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   v$paed_cd4_prog <- paed_cd4_prog
   v$adol_cd4_prog <- adol_cd4_prog
 
-  mort <- dp_read_paed_cd4_mort(pjnz)
+  mort <- dp_read_paed_cd4_mort(dp.x)
   paed_cd4_mort <- array(data = 0, dim = c(7, 4, 5), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'),
                                                                      transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'),
                                                                      age = c(0:4)))
@@ -711,7 +717,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   adol_cd4_mort[,4,] <- mort[12,2:7]
 
 
-  mort <- dp_read_paed_art_mort(pjnz)
+  mort <- dp_read_paed_art_mort(dp.x)
   paed_art_mort <- array(data = 0, dim = c(7, 3, 5), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'),
                                                                      transmission = c('0to6mo', '7to12mo', '12+mo'),
                                                                      age = c(0:4)))
@@ -751,7 +757,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   v$paed_art_mort <- paed_art_mort
   v$adol_art_mort <- adol_art_mort
 
-  mtct_rates_input <- dp_read_mtct_rates(pjnz)
+  mtct_rates_input <- dp_read_mtct_rates(dp.x)
   art_mtct <- array(0, dim = c(7,3,2), dimnames = list(cd4 = c('>500', '350-500', '250-349', '200-249', '100-199', '50-99', '<50'),
                                                        time = c('ART <4 weeks before delivery', 'ART >4 weeks before delivery', 'ART before pregnancy'), trans_type = c('perinatal', 'bf')))
   art_mtct[,1,1] <- mtct_rates_input[11,1] / 100
@@ -762,33 +768,39 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   art_mtct[5:7,3,2] <- mtct_rates_input[9,2] / 100
   v$art_mtct <- art_mtct
 
-  art_dist_paed <- dp_read_art_dist(pjnz)
+  art_dist_paed <- dp_read_art_dist(dp.x)
   v$art_dist_paed <- art_dist_paed
 
   ## pull in cotrim coverage numbers
-  ctx_pct <- input_childart(pjnz)$ctx_percent
+  ctx_pct <- input_childart(dp.x)$ctx_percent
   ctx_pct[is.na(ctx_pct)] <- FALSE
   v$ctx_val_ispercent <- ctx_pct
-  ## ctx_effect_notrt <- c(rep(0.33, 5), rep(0,5))
-  ctx_effect <- rep(0.33,length(proj.years))
-  v$ctx_val <- input_childart(pjnz)$ctx
+  v$ctx_val <- input_childart(dp.x)$ctx
   if(any(v$ctx_val_ispercent)){
     v$ctx_val[v$ctx_val_ispercent] <- v$ctx_val[v$ctx_val_ispercent] / 100
   }
-  v$ctx_effect <- as.array(ctx_effect)
+  ##cotrim is effective for five years for children not on ART and for four years for children on ART
+  ctx_effect <- dpsub(dp = dp.x, "<EffectTreatChild MV>",3:4,4:13)
+  off_art_ctx <- sum(as.numeric(unlist(ctx_effect[1,]))) / 5
+  on_art_ctx.lte12mo <- sum(as.numeric(unlist(ctx_effect[2,1])))
+  on_art_ctx.gte12mo <- sum(as.numeric(unlist(ctx_effect[2,2:5]))) / 4
+  ctx_effect <- array(data = c(off_art_ctx, on_art_ctx.lte12mo, on_art_ctx.gte12mo),
+                      dim = c(3),
+                      dimnames = list(ctx_effect = c('Off ART', 'On ART, lte12mo', 'On ART, gte12mo')))
+  v$ctx_effect <- ctx_effect
 
   ## pull in ART coverage numbers
-  art = input_childart(pjnz)
+  art = input_childart(dp.x)
   v$artpaeds_isperc <- art$art_ispercent[2,]
   v$artpaeds_isperc[] <- as.integer(ifelse(art$art_ispercent[2,] == FALSE, 0, 1))
   art$child_art[1,which(art$art_ispercent[2,])] <- art$child_art[1,which(art$art_ispercent[2,])] / 100
   v$paed_art_val <- art$child_art
   v$paed_art_age_spec <- art$age_spec
+  v$hc_art_start <- unname(which(colSums(art$child_art) > 0)[1]) - 1
 
   ##PMTCT
-  pmtct_list <- input_pmtct(pjnz)
+  pmtct_list <- input_pmtct(dp.x)
   pmtct_list <- pmtct_list[c(3,4,1,2,5:7),,]
-  v$pmtct <- pmtct_list
 
   if(sum(pmtct_list[,,1]) == 0){
     v$pmtct_input_isperc = rep(F, length(proj.years))
@@ -796,10 +808,17 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
     v$pmtct_input_isperc = rep(T, length(proj.years))
   }
 
-  v$pmtct_input_isperc <- !(apply(input_pmtct_ispercent(pjnz), 2, any))
+  pmtct_new <- array(0, dim = c(7, 61), dimnames = list(pmtct = c("Option A", "Option B", "SDNVP", "Dual ARV", "Option B+: before pregnancy", "Option B+: >4 weeks", "Option B+: <4 weeks")))
+  ## pick out which ones were inserted as numbers
+  pmtct_new[, which(colSums(pmtct_list)[, 1] > 0)] <- pmtct_list[, (which(colSums(pmtct_list)[, 1] > 0)), 1]
+  ## pick out which ones were inserted as percent
+  pmtct_new[, which(colSums(pmtct_list)[, 1] == 0)] <- pmtct_list[, which(colSums(pmtct_list)[, 1] == 0), 2]
+  v$pmtct <- pmtct_new
+
+  v$pmtct_input_isperc <- !(apply(input_pmtct_ispercent(dp.x), 2, any))
 
   ##PMTCT dropout
-  v$pmtct_dropout <- input_pmtct_retained(pjnz)
+  v$pmtct_dropout <- input_pmtct_retained(dp.x)
 
   ##rates of MTCT
   mtct_trt <- array(data = 0, dim = c(7,7,2), dimnames = list(cd4 = c('>500', '350-500', '250-349', '200-249', '100-199', '50-99', '<50'),
@@ -831,7 +850,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   mtct[8,] <- c(mtct_rates_input[4,1], mtct_rates_input[4,2]) / 100
   v$mtct <- mtct
 
-  mort_rr_art <- dp_read_child_mort_mult(pjnz)
+  mort_rr_art <- dp_read_child_mort_mult(dp.x)
   mort_rr_art_target <- array(NA, dim = c(3, 15, length(year.idx)), dimnames = list(transmission = c('0to6mo', '7to12mo', '12+mo'), age = 0:14, year = proj.years))
   mort_rr_art_target[1:2, 1:5,] <- rep(unlist(mort_rr_art[1,]), each = 10)
   mort_rr_art_target[3, 1:5,] <- rep(unlist(mort_rr_art[2,]), each = 5)
@@ -839,18 +858,18 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   mort_rr_art_target[3, 6:15,] <- rep(unlist(mort_rr_art[4,]), each = 10)
   v$mort_art_rr <- mort_rr_art_target
 
-  art_dist_paed <- dp_read_art_dist(pjnz)
+  art_dist_paed <- dp_read_art_dist(dp.x)
   v$init_art_dist <- art_dist_paed
 
   ##BF duration
-  bf_duration <- input_breastfeeding_dur(pjnz)
+  bf_duration <- input_breastfeeding_dur(dp.x)
   v$bf_duration_art <- bf_duration[,,2]
   v$bf_duration_no_art <- bf_duration[,,1]
   ##only keeping this for leapfrog
   v$bf_duration = bf_duration
 
-  art_elig = dp_read_paed_art_eligibility(pjnz)
-  v$paed_art_elig_age <- art_elig$age_elig / 12 ##converts from months to years
+  art_elig = dp_read_paed_art_eligibility(dp.x)
+  v$paed_art_elig_age <- as.integer(art_elig$age_elig / 12) ##converts from months to years
 
   ##MKW: stopped here
   cd4_elig <- art_elig$cd4_elig[c(5:7,4),]
@@ -899,7 +918,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   v$paed_art_elig_cd4 <- paed_art_elig_cd4
 
 
-  v$paed_art_ltfu <- input_childart_ltfu(pjnz) / 100
+  v$paed_art_ltfu <- input_childart_ltfu(dp.x) / 100
 
   paed_cd4_transition <- array(0, dim = c(6,7), dimnames = list(cd4_count = c('gte1000', '750-1000', '500-749', '350-499', '200-349', 'lte200'), cd4_pct = c('gte30', '26-30', '21-25', '16-20', '11-15', '5-10', 'lte5')))
   paed_cd4_transition[1:6,1] <- c(0.608439, 0.185181, 0.105789, 0.055594, 0.018498, 0.026497)
@@ -921,22 +940,23 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
 
   v$paed_cd4_transition <- paed_cd4_transition
 
-  v$abortion <- input_abortion(pjnz)
+  v$abortion <- input_abortion(dp.x)
 
-  v$patients_reallocated <- input_mothers_reallocated(pjnz)
+  v$patients_reallocated <- input_mothers_reallocated(dp.x)
 
 
   ##extract needed outputs to just run paed model
-  wlhiv_births <- dpsub("<ChildNeedPMTCT MV>", 2, timedat.idx) %>% unname()
+  v$laf <- SpectrumUtils::dp.inputs.hiv.frr.location(dp.raw = dp.x)
+
+  wlhiv_births <- dpsub(dp = dp.x, "<ChildNeedPMTCT MV>", 2, timedat.idx) %>% unname()
   names(wlhiv_births) <- proj.years
   rownames(wlhiv_births) <- NULL
   v$mat_hiv_births <- as.array(as.numeric(unlist(wlhiv_births)))
+  v$mat_prev_input = rep(TRUE, length(year.idx))
 
-
-  dp <- read_dp(pjnz)
-  hivpop <- SpectrumUtils::dp.output.hivpop(dp.raw = dp, direction = 'long') %>% data.table() %>% setnames(old = 'Value', new = 'hivpop')
-  totpop <- SpectrumUtils::dp.output.bigpop(dp.raw = dp, direction = 'long') %>% data.table()  %>% setnames(old = 'Value', new = 'totpop')
-  inc <- SpectrumUtils::dp.output.incident.hiv(dp.raw = dp, direction = 'long') %>% data.table() %>% setnames(old = 'Value', new = 'inc')
+  hivpop <- SpectrumUtils::dp.output.hivpop(dp.raw = dp.x, direction = 'long') %>% data.table() %>% setnames(old = 'Value', new = 'hivpop')
+  totpop <- SpectrumUtils::dp.output.bigpop(dp.raw = dp.x, direction = 'long') %>% data.table()  %>% setnames(old = 'Value', new = 'totpop')
+  inc <- SpectrumUtils::dp.output.incident.hiv(dp.raw = dp.x, direction = 'long') %>% data.table() %>% setnames(old = 'Value', new = 'inc')
 
   dt <- merge(hivpop, totpop, by = c('Sex', 'Age', 'Year'))
   dt[,hivnpop := totpop - hivpop]
@@ -958,23 +978,22 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   v$hivnpop <- hivnpop
   v$adult_female_infections <- inc.array
 
-  total_births <- SpectrumUtils::dp.output.births(dp.raw = dp, direction = 'long')$Value %>% as.array()
+  total_births <- SpectrumUtils::dp.output.births(dp.raw = dp.x, direction = 'long')$Value %>% as.array()
   v$total_births <- total_births
 
 
-  pjnz1 <- pjnz
-  specres <- eppasm::read_hivproj_output(pjnz1)
+  specres <- eppasm::read_hivproj_output(pjnz)
   newinf <- specres$newinf.f[4:10,] %>% colSums()
   newinf_rate <- newinf / colSums(specres$totpop.f[1:10,])
   v$incrate <- as.array(as.numeric(unlist(newinf_rate)))
 
-  fp1 <- eppasm::prepare_directincid(pjnz1)
+  fp1 <- eppasm::prepare_directincid(pjnz)
   fp1$tARTstart <- 61L
   #Need to run the adult model to pull out the propotion by CD4 category
   mod1 <- eppasm::simmod(fp1)
 
   #cd4
-  wlhiv_cd4 <- array(as.numeric(unlist(dpsub("<CD4Distribution15_49 MV2>", 19:25, timedat.idx))), dim = c(7,length(timedat.idx)))
+  wlhiv_cd4 <- array(as.numeric(unlist(dpsub(dp = dp.x, "<CD4Distribution15_49 MV2>", 19:25, timedat.idx))), dim = c(7,length(timedat.idx)))
   v$prop_gte350 <- colSums(wlhiv_cd4[1:2,]) / colSums(wlhiv_cd4)
   v$prop_lt200 <- colSums(wlhiv_cd4[5:7,]) / colSums(wlhiv_cd4)
 
