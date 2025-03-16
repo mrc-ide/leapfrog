@@ -127,6 +127,7 @@ struct ChildModelOutputState<ChildModel, real_type> {
   Tensor2<real_type> ctx_mean;
   Tensor4<real_type> infection_by_type;
   Tensor2<real_type> hiv_births_test;
+  Tensor2<real_type> hiv_births_age;
 
   ChildModelOutputState(int output_years): 
     hc1_hiv_pop(
@@ -215,6 +216,10 @@ struct ChildModelOutputState<ChildModel, real_type> {
     hiv_births_test(
       2,
       output_years
+    ),
+    hiv_births_age(
+      35,
+      output_years
     ) {
     hc1_hiv_pop.setZero();
     hc2_hiv_pop.setZero();
@@ -231,6 +236,7 @@ struct ChildModelOutputState<ChildModel, real_type> {
     ctx_mean.setZero();
     infection_by_type.setZero();
     hiv_births_test.setZero();
+    hiv_births_age.setZero();
   }
 };
 
@@ -286,6 +292,7 @@ public:
     output_state.ctx_mean.chip(i, output_state.ctx_mean.NumDimensions - 1) = state.children.ctx_mean;
     output_state.infection_by_type.chip(i, output_state.infection_by_type.NumDimensions - 1) = state.children.infection_by_type;
     output_state.hiv_births_test.chip(i, output_state.hiv_births_test.NumDimensions - 1) = state.children.hiv_births_test;
+    output_state.hiv_births_age.chip(i, output_state.hiv_births_age.NumDimensions - 1) = state.children.hiv_births_age;
     return;
   }
 };

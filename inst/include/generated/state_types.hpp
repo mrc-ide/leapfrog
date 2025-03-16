@@ -75,6 +75,7 @@ struct ChildModelState<ChildModel, real_type> {
   TensorFixedSize<real_type, Sizes<2>> ctx_mean;
   TensorFixedSize<real_type, Sizes<hcTT<ChildModel>, hc1AG<ChildModel>, NS<ChildModel>>> infection_by_type;
   TensorFixedSize<real_type, Sizes<2>> hiv_births_test;
+  TensorFixedSize<real_type, Sizes<35>> hiv_births_age;
 
   ChildModelState(const Parameters<ChildModel, real_type> &pars) {
     reset();
@@ -96,6 +97,7 @@ struct ChildModelState<ChildModel, real_type> {
     ctx_mean.setZero();
     infection_by_type.setZero();
     hiv_births_test.setZero();
+    hiv_births_age.setZero();
   }
 };
 

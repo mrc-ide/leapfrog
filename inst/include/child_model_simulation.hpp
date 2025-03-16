@@ -109,17 +109,18 @@ void run_wlhiv_births(int t,
     i_hc.prev = i_hc.nHIVcurr / n_ba.p_total_pop(a + 15, 1);
 
     for (int hd = 0; hd < ss_b.hDS; ++hd) {
-      i_hc.df += p_hc.local_adj_factor * p_hc.fert_mult_by_age(a) * p_hc.fert_mult_off_art(hd) *
+      i_hc.df += p_hc.fert_mult_by_age(a) * p_hc.fert_mult_off_art(hd) *
                  (n_ba.h_hiv_adult(hd, a, 1) + c_ba.h_hiv_adult(hd, a, 1)) / 2;
       // women on ART less than 6 months use the off art fertility multiplier
-      i_hc.df += p_hc.local_adj_factor * p_hc.fert_mult_by_age(a) * p_hc.fert_mult_off_art(hd) *
+      i_hc.df += p_hc.fert_mult_by_age(a) * p_hc.fert_mult_off_art(hd) *
                  (n_ba.h_art_adult(0, hd, a, 1) + c_ba.h_art_adult(0, hd, a, 1)) / 2;
       for (int ht = 1; ht < ss_b.hTS; ++ht) {
-        i_hc.df += p_hc.local_adj_factor * p_hc.fert_mult_on_art(a) *
+        i_hc.df += p_hc.fert_mult_on_art(a) *
                    (n_ba.h_art_adult(ht, hd, a, 1) + c_ba.h_art_adult(ht, hd, a, 1)) / 2;
       } // end hTS
     } // end hDS
 
+    i_hc.df *= p_hc.local_adj_factor;
 
     if (i_hc.nHIVcurr > 0) {
       auto midyear_fertileHIV = (i_hc.nHIVcurr + i_hc.nHIVlast) / 2;
@@ -134,7 +135,7 @@ void run_wlhiv_births(int t,
         i_hc.df / (i_hc.df * i_hc.prev + 1 - i_hc.prev) *
         p_dm.age_specific_fertility_rate(a, t) / i_hc.asfr_sum ;
     }
-
+    n_hc.hiv_births_age(a) = i_hc.birthsCurrAge;
     i_hc.birthsHE += i_hc.birthsCurrAge;
     if (a < 9) {
       i_hc.births_HE_15_24 += i_hc.birthsCurrAge;
@@ -243,7 +244,7 @@ void run_wlhiv_births_by_anc_attend(int t,
     } // end a
     n_hc.hiv_births_test(0) = i_hc.birthsHE_test(0);
     n_hc.hiv_births_test(1) = i_hc.birthsHE_test(1);
-    n_hc.hiv_births =  n_hc.hiv_births_test(0) +n_hc.hiv_births_test(1);
+  //  n_hc.hiv_births =  n_hc.hiv_births_test(0) +n_hc.hiv_births_test(1);
 
 }
 
