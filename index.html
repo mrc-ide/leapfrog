@@ -96,6 +96,9 @@
 <h2 id="simulation-model">Simulation model<a class="anchor" aria-label="anchor" href="#simulation-model"></a>
 </h2>
 <p>The simulation model is implemented in a header-only C++ library located in <a href="inst/include/frogger.hpp"><code>inst/include/frogger.hpp</code></a>. This location allows the C++ code to be imported in other R packages via specifying <code>LinkingTo: leapfrog</code> in the <code>DESCRIPTION</code> file.</p>
+<blockquote>
+<p>[!IMPORTANT] We use C++20 for this package. Please make sure you have a compiler that is compatible.</p>
+</blockquote>
 <p>The simulation model is callable in R via a wrapper function <code><a href="reference/run_model.html">run_model()</a></code> created with <a href="https://www.rcpp.org" class="external-link">Rcpp</a>.</p>
 <p>You can control how the simulation model is run with the following arguments:</p>
 <ul>
