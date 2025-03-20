@@ -252,7 +252,7 @@ test_that("error thrown if size of stratified data does not match expected", {
 
   expect_error(
     run_model(demp, parameters, NULL, NULL, 2030L,
-      hiv_age_stratification = "full"
+      hiv_age_stratification = "full", run_child_model = FALSE
     ),
     "Invalid size of data for 'cd4_mort', expected 924 got 3"
   )

@@ -1,14 +1,12 @@
 #include <Rcpp.h>
 
-#include "frogger.hpp"
-#include "intermediate_data.hpp"
 #include "serialize_eigen.hpp"
 
 // [[Rcpp::export]]
 Rcpp::List serialize_vector(const Rcpp::List data, const std::string path1, const std::string path2) {
   // 4 rows, 3 columns
-  const leapfrog::TensorMap2<double> test_2d(REAL(data["test_2d_double"]), 4, 3);
-  const leapfrog::TensorMap3<int> test_3d(INTEGER(data["test_3d_int"]), 2, 3, 4);
+  const Eigen::TensorMap<Eigen::Tensor<double, 2>> test_2d(REAL(data["test_2d_double"]), 4, 3);
+  const Eigen::TensorMap<Eigen::Tensor<int, 3>> test_3d(INTEGER(data["test_3d_int"]), 2, 3, 4);
 
   serialize::serialize_tensor_map(test_2d, path1);
   serialize::serialize_tensor_map(test_3d, path2);
