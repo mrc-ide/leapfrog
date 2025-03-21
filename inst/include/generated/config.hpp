@@ -599,7 +599,7 @@ struct HcConfig {
     real_type births_HE_15_24;
     real_type sumARV;
     real_type need_PMTCT;
-    real_type OnPMTCT;
+    real_type on_PMTCT;
     real_type num_wlhiv_lt200;
     real_type num_wlhiv_200to350;
     real_type num_wlhiv_gte350;
@@ -670,7 +670,7 @@ struct HcConfig {
       births_HE_15_24 = 0;
       sumARV = 0;
       need_PMTCT = 0;
-      OnPMTCT = 0;
+      on_PMTCT = 0;
       num_wlhiv_lt200 = 0;
       num_wlhiv_200to350 = 0;
       num_wlhiv_gte350 = 0;
