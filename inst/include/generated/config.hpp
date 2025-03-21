@@ -504,7 +504,8 @@ struct HcConfig {
     TM2<real_type> adult_female_infections;
     TM2<real_type> adult_female_hivnpop;
     TM1<real_type> total_births;
-    real_type ctx_effect;
+    TM1<real_type> ctx_effect;
+    real_type hc_art_start;
     real_type local_adj_factor;
   };
 
@@ -557,7 +558,8 @@ struct HcConfig {
       .adult_female_infections = parse_data<real_type>(data, "adult_female_infections", opts.p_fertility_age_groups, proj_years),
       .adult_female_hivnpop = parse_data<real_type>(data, "hivnpop", opts.p_fertility_age_groups, proj_years),
       .total_births = parse_data<real_type>(data, "total_births", proj_years),
-      .ctx_effect = Rcpp::as<real_type>(data["ctx_effect"]),
+      .ctx_effect = parse_data<real_type>(data, "ctx_effect", 3),
+      .hc_art_start = Rcpp::as<real_type>(data["hc_art_start"]),
       .local_adj_factor = Rcpp::as<real_type>(data["laf"])
     };
   };
@@ -567,22 +569,20 @@ struct HcConfig {
     TFS<real_type, SS::hTS, SS::hDS, SS::NS> age15_art_pop;
     TFS<real_type, SS::hDS, SS::hcTT, SS::hAG, SS::NS> hc_posthivmort;
     TFS<real_type, SS::hDS, SS::hcTT, SS::hAG, SS::NS> hc_grad;
-    TFS<real_type, SS::hDS, SS::hcTT, SS::hAG, SS::NS> hc_ctx_need;
     TFS<real_type, SS::hDS, SS::hAG, SS::NS> eligible;
-    TFS<real_type, 4> unmet_need;
-    TFS<real_type, 4> total_need;
-    TFS<real_type, 4> on_art;
-    TFS<real_type, 4> total_art_last_year;
-    TFS<real_type, 4> total_art_this_year;
+    TFS<real_type, SS::hcAG_coarse> unmet_need;
+    TFS<real_type, SS::hcAG_coarse> total_need;
+    TFS<real_type, SS::hcAG_coarse> on_art;
+    TFS<real_type, SS::hcAG_coarse> total_art_last_year;
+    TFS<real_type, SS::hcAG_coarse> total_art_this_year;
     TFS<real_type, SS::hDS, SS::hcTT, SS::hAG, SS::NS> hc_art_grad;
-    TFS<real_type, 4> hc_art_scalar;
-    TFS<real_type, 4> hc_initByAge;
-    TFS<real_type, 4> hc_adj;
-    TFS<real_type, 4> hc_art_deaths;
+    TFS<real_type, SS::hcAG_coarse> hc_art_scalar;
+    TFS<real_type, SS::hcAG_coarse> hc_initByAge;
+    TFS<real_type, SS::hcAG_coarse> hc_adj;
+    TFS<real_type, SS::hcAG_coarse> hc_art_deaths;
     TFS<real_type, SS::hDS, SS::hcTT, SS::hcAG_end, SS::NS> hc_hiv_dist;
     TFS<real_type, SS::hDS,  SS::hcAG_end, SS::NS> hc_hiv_total;
     TFS<real_type, SS::hDS, SS::hcTT, SS::hcAG_end, SS::NS> art_ltfu_grad;
-    TFS<real_type, SS::hPS> previous_mtct;
     TFS<real_type, SS::hAG, SS::NS> p_hiv_neg_pop;
     TFS<real_type, SS::hPS> PMTCT_coverage;
     TFS<real_type, SS::hBF_coarse> bf_transmission_rate;
@@ -628,8 +628,8 @@ struct HcConfig {
     real_type bf_incident_hiv_transmission_rate;
     real_type percent_no_treatment;
     real_type percent_on_treatment;
-    real_type ctx_coverage;
-    real_type need_cotrim;
+    real_type bf_scalar;
+    TFS<real_type, 3> ctx_mean;
 
     Intermediate() {};
 
@@ -638,7 +638,6 @@ struct HcConfig {
       age15_art_pop.setZero();
       hc_posthivmort.setZero();
       hc_grad.setZero();
-      hc_ctx_need.setZero();
       eligible.setZero();
       unmet_need.setZero();
       total_need.setZero();
@@ -653,7 +652,6 @@ struct HcConfig {
       hc_hiv_dist.setZero();
       hc_hiv_total.setZero();
       art_ltfu_grad.setZero();
-      previous_mtct.setZero();
       p_hiv_neg_pop.setZero();
       PMTCT_coverage.setZero();
       bf_transmission_rate.setZero();
@@ -699,8 +697,8 @@ struct HcConfig {
       bf_incident_hiv_transmission_rate = 0;
       percent_no_treatment = 0;
       percent_on_treatment = 0;
-      ctx_coverage = 0;
-      need_cotrim = 0;
+      bf_scalar = 0;
+      ctx_mean.setZero();
     };
   };
 
@@ -717,6 +715,7 @@ struct HcConfig {
     TFS<real_type, SS::hc1DS, SS::hcTT, SS::hcAG_end, SS::NS> hc_art_need_init;
     real_type hiv_births;
     real_type ctx_need;
+    TFS<real_type, SS::hcTT, SS::hc1AG, SS::NS> infection_by_type;
     real_type ctx_mean;
 
     State() {
@@ -736,6 +735,7 @@ struct HcConfig {
       hc_art_need_init(initial_state.hc_art_need_init),
       hiv_births(initial_state.hiv_births),
       ctx_need(initial_state.ctx_need),
+      infection_by_type(initial_state.infection_by_type),
       ctx_mean(initial_state.ctx_mean)
     {};
 
@@ -752,6 +752,7 @@ struct HcConfig {
       hc_art_need_init.setZero();
       hiv_births = 0;
       ctx_need = 0;
+      infection_by_type.setZero();
       ctx_mean = 0;
     };
   };
@@ -769,6 +770,7 @@ struct HcConfig {
     T5<real_type> hc_art_need_init;
     T1<real_type> hiv_births;
     T1<real_type> ctx_need;
+    T4<real_type> infection_by_type;
     T1<real_type> ctx_mean;
 
     OutputState(int output_years):
@@ -784,6 +786,7 @@ struct HcConfig {
       hc_art_need_init(SS::hc1DS, SS::hcTT, SS::hcAG_end, SS::NS, output_years),
       hiv_births(output_years),
       ctx_need(output_years),
+      infection_by_type(SS::hcTT, SS::hc1AG, SS::NS, output_years),
       ctx_mean(output_years)
     {
       hc1_hiv_pop.setZero();
@@ -798,6 +801,7 @@ struct HcConfig {
       hc_art_need_init.setZero();
       hiv_births.setZero();
       ctx_need.setZero();
+      infection_by_type.setZero();
       ctx_mean.setZero();
     };
 
@@ -814,11 +818,12 @@ struct HcConfig {
       hc_art_need_init.chip(i, hc_art_need_init.NumDimensions - 1) = state.hc_art_need_init;
       hiv_births(i) = state.hiv_births;
       ctx_need(i) = state.ctx_need;
+      infection_by_type.chip(i, infection_by_type.NumDimensions - 1) = state.infection_by_type;
       ctx_mean(i) = state.ctx_mean;
     };
   };
 
-  static constexpr int output_count = 13;
+  static constexpr int output_count = 14;
   static int get_build_output_size(int prev_size) {
     return prev_size + output_count;
   };
@@ -890,11 +895,16 @@ struct HcConfig {
     std::copy_n(state.ctx_need.data(), state.ctx_need.size(), REAL(r_ctx_need));
     names[index + 11] = "ctx_need";
     ret[index + 11] = r_ctx_need;
+    Rcpp::NumericVector r_infection_by_type(SS::hcTT * SS::hc1AG * SS::NS * output_years);
+    r_infection_by_type.attr("dim") = Rcpp::IntegerVector::create(SS::hcTT, SS::hc1AG, SS::NS, output_years);
+    std::copy_n(state.infection_by_type.data(), state.infection_by_type.size(), REAL(r_infection_by_type));
+    names[index + 12] = "infection_by_type";
+    ret[index + 12] = r_infection_by_type;
     Rcpp::NumericVector r_ctx_mean(output_years);
     r_ctx_mean.attr("dim") = Rcpp::IntegerVector::create(output_years);
     std::copy_n(state.ctx_mean.data(), state.ctx_mean.size(), REAL(r_ctx_mean));
-    names[index + 12] = "ctx_mean";
-    ret[index + 12] = r_ctx_mean;
+    names[index + 13] = "ctx_mean";
+    ret[index + 13] = r_ctx_mean;
     return index + output_count;
   };
 };
