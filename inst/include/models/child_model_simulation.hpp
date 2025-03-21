@@ -570,7 +570,7 @@ struct ChildModelSimulation<Config> {
         auto untreated_vertical_bf_tr = i_hc.prop_wlhiv_lt200 * p_hc.vertical_transmission_rate(4, 1) +
                                         i_hc.prop_wlhiv_200to350 * p_hc.vertical_transmission_rate(2, 1) +
                                         i_hc.prop_wlhiv_gte350 * p_hc.vertical_transmission_rate(0, 1);
-        i_hc.bf_transmission_rate(index) += i_hc.percent_no_treatment *
+        i_hc.bf_transmission_rate(index) += i_hc.bf_scalar * i_hc.percent_no_treatment *
                                             untreated_vertical_bf_tr *
                                             2 * (1 - p_hc.breastfeeding_duration_no_art(bf, t));
       }

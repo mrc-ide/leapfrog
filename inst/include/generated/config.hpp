@@ -716,7 +716,6 @@ struct HcConfig {
     real_type hiv_births;
     real_type ctx_need;
     TFS<real_type, SS::hcTT, SS::hc1AG, SS::NS> infection_by_type;
-    real_type ctx_mean;
 
     State() {
       reset();
@@ -735,8 +734,7 @@ struct HcConfig {
       hc_art_need_init(initial_state.hc_art_need_init),
       hiv_births(initial_state.hiv_births),
       ctx_need(initial_state.ctx_need),
-      infection_by_type(initial_state.infection_by_type),
-      ctx_mean(initial_state.ctx_mean)
+      infection_by_type(initial_state.infection_by_type)
     {};
 
     void reset() {
@@ -753,7 +751,6 @@ struct HcConfig {
       hiv_births = 0;
       ctx_need = 0;
       infection_by_type.setZero();
-      ctx_mean = 0;
     };
   };
 
@@ -771,7 +768,6 @@ struct HcConfig {
     T1<real_type> hiv_births;
     T1<real_type> ctx_need;
     T4<real_type> infection_by_type;
-    T1<real_type> ctx_mean;
 
     OutputState(int output_years):
       hc1_hiv_pop(SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, output_years),
@@ -786,8 +782,7 @@ struct HcConfig {
       hc_art_need_init(SS::hc1DS, SS::hcTT, SS::hcAG_end, SS::NS, output_years),
       hiv_births(output_years),
       ctx_need(output_years),
-      infection_by_type(SS::hcTT, SS::hc1AG, SS::NS, output_years),
-      ctx_mean(output_years)
+      infection_by_type(SS::hcTT, SS::hc1AG, SS::NS, output_years)
     {
       hc1_hiv_pop.setZero();
       hc2_hiv_pop.setZero();
@@ -802,7 +797,6 @@ struct HcConfig {
       hiv_births.setZero();
       ctx_need.setZero();
       infection_by_type.setZero();
-      ctx_mean.setZero();
     };
 
     void save_state(const size_t i, const State &state) {
@@ -819,11 +813,10 @@ struct HcConfig {
       hiv_births(i) = state.hiv_births;
       ctx_need(i) = state.ctx_need;
       infection_by_type.chip(i, infection_by_type.NumDimensions - 1) = state.infection_by_type;
-      ctx_mean(i) = state.ctx_mean;
     };
   };
 
-  static constexpr int output_count = 14;
+  static constexpr int output_count = 13;
   static int get_build_output_size(int prev_size) {
     return prev_size + output_count;
   };
@@ -900,11 +893,6 @@ struct HcConfig {
     std::copy_n(state.infection_by_type.data(), state.infection_by_type.size(), REAL(r_infection_by_type));
     names[index + 12] = "infection_by_type";
     ret[index + 12] = r_infection_by_type;
-    Rcpp::NumericVector r_ctx_mean(output_years);
-    r_ctx_mean.attr("dim") = Rcpp::IntegerVector::create(output_years);
-    std::copy_n(state.ctx_mean.data(), state.ctx_mean.size(), REAL(r_ctx_mean));
-    names[index + 13] = "ctx_mean";
-    ret[index + 13] = r_ctx_mean;
     return index + output_count;
   };
 };
