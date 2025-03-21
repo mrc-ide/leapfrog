@@ -88,28 +88,27 @@ struct ChildModelSimulation<Config> {
       art_ltfu();
       calc_art_initiates();
 
-    //Before initiating people on to ART, calculate deaths among CLHIV on ART 6-12 months,
-    //the progress them to on ART 6-12 months months and calculate deaths for those on ART >12 months
+      // Before initiating people on to ART, calculate deaths among CLHIV on ART 6-12 months,
+      // the progress them to on ART 6-12 months months and calculate deaths for those on ART >12 months
       on_art_mortality(0, 1);
       progress_time_on_art(0, 1);
       on_art_mortality(2, 2);
 
-    //Initiate CLHIV onto ART
+      // Initiate CLHIV onto ART
       art_initiation_by_age();
 
-    //Calculate on ART mortality among those on ART < 6 months
+      // Calculate on ART mortality among those on ART < 6 months
       on_art_mortality(0, 1);
-    // Progress 6 to 12 mo to 12 plus months
+      // Progress 6 to 12 mo to 12 plus months
       progress_time_on_art(1, 2);
 
-    //Remove lost to follow ups
+      // Remove lost to follow ups
       apply_ltfu_to_hivpop();
       apply_ltfu_to_artpop();
     }
 
     nosocomial_infections();
     fill_total_pop_outputs();
-    }
   };
 
   // private methods that we don't want people to call
