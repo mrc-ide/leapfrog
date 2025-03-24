@@ -38,6 +38,9 @@ in [`inst/include/frogger.hpp`](inst/include/frogger.hpp). This location
 allows the C++ code to be imported in other R packages via specifying
 `LinkingTo: leapfrog` in the `DESCRIPTION` file.
 
+> [!IMPORTANT]
+> We use C++20 for this package. Please make sure you have a compiler that is compatible.
+
 The simulation model is callable in R via a wrapper function
 `run_model()` created with [Rcpp](https://www.rcpp.org).
 
