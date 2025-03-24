@@ -2,8 +2,8 @@
   "name": "Ha",
   "namespace": "ha",
   "enable_if": "run_hiv_simulation",
-  "state_space": [
-    {
+  "state_space": {
+    "default": {
       "vars": {
         "hAG_span": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
         "hDS": 7,
@@ -11,16 +11,18 @@
         "hAG": 66
       }
     },
-    {
-      "requires": ["use_coarse_stratification"],
-      "vars": {
-        "hAG_span": [2, 3, 5, 5, 5, 5, 5, 5, 31],
-        "hDS": 7,
-        "hTS": 3,
-        "hAG": 9
+    "overrides": [
+      {
+        "applies_if": "use_coarse_stratification",
+        "vars": {
+          "hAG_span": [2, 3, 5, 5, 5, 5, 5, 5, 31],
+          "hDS": 7,
+          "hTS": 3,
+          "hAG": 9
+        }
       }
-    }
-  ],
+    ]
+  },
   "pars": {
     "total_rate": {
       "type": "TM",

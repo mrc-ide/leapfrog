@@ -5,16 +5,23 @@
 namespace leapfrog {
 
 {% for config in configs %}
-{% for ss in config.state_space %}
 
 template<MV ModelVariant>
-{{ get_template_specialisation(config.name, ss) }} {
-  {% for name, val in ss.vars.items() %}
+struct {{ config.name }}SS {
+  {% for name, val in config.state_space.default.vars.items() %}
   static constexpr {{ get_member_type(val) }} {{ name }} = {{ get_member_value(val) }};
   {% endfor %}
 };
-
+{% for override in config.state_space.overrides +%}
+template<MV ModelVariant>
+requires(ModelVariant::{{ override.applies_if }})
+struct {{ config.name }}SS<ModelVariant> {
+  {% for name, val in override.vars.items() %}
+  static constexpr {{ get_member_type(val) }} {{ name }} = {{ get_member_value(val) }};
+  {% endfor %}
+};
 {% endfor %}
+
 {% endfor %}
 
 struct BaseSS {
