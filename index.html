@@ -169,6 +169,12 @@
 <p>The simulation model is implemented as templated C++ code in <code>inst/include/frogger.hpp</code>. This is so the simulation model may be developed as a standalone C++ library that can be called by other software without requiring R-specific code features. The code uses header-only open source libraries to maximize portability.</p>
 </div>
 <div class="section level3">
+<h3 id="code-generation">Code generation<a class="anchor" aria-label="anchor" href="#code-generation"></a>
+</h3>
+<p>To change what parameters can be passed in from <code>R</code> or the structure of <code>Intermediate</code>, <code>State</code> or <code>OutputState</code>, please modify json files <a href="./cpp_generation/modelSchemas/">here</a>.</p>
+<p>Then to run code generation follow <a href="./cpp_generation/README.html">cpp_generation/README.md</a></p>
+</div>
+<div class="section level3">
 <h3 id="r-functions">R functions<a class="anchor" aria-label="anchor" href="#r-functions"></a>
 </h3>
 <p>The file <code>src/frogger.cpp</code> contains R wrapper functions for the model simulation via <a href="http://dirk.eddelbuettel.com/code/rcpp.html" class="external-link">Rcpp</a> and <a href="http://dirk.eddelbuettel.com/code/rcpp.eigen.html" class="external-link">RcppEigen</a>.</p>
