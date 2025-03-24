@@ -1,7 +1,7 @@
 {
   "name": "Ha",
   "namespace": "ha",
-  "add_if": "run_hiv_simulation",
+  "enable_if": "run_hiv_simulation",
   "state_space": [
     {
       "vars": {

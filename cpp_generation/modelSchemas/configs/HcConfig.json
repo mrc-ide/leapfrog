@@ -1,7 +1,7 @@
 {
   "name": "Hc",
   "namespace": "hc",
-  "add_if": "run_child_model",
+  "enable_if": "run_child_model",
   "state_space": [
     {
       "vars": {

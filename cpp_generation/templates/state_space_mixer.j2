@@ -24,7 +24,7 @@ template<MV ModelVariant>
 using SSMixed = SSMixer<
   ModelVariant,
   {% for config in configs %}
-  Pair<ModelVariant::{{ config.add_if }}, {{ config.name }}SS<ModelVariant>>{{ comma_except_last(loop) }}
+  Pair<ModelVariant::{{ config.enable_if }}, {{ config.name }}SS<ModelVariant>>{{ comma_except_last(loop) }}
   {% endfor %}
 >;
 

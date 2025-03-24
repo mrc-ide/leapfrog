@@ -1,7 +1,7 @@
 {
   "name": "Dp",
   "namespace": "dp",
-  "add_if": "run_demographic_projection",
+  "enable_if": "run_demographic_projection",
   "state_space": [
     {
       "vars": {
