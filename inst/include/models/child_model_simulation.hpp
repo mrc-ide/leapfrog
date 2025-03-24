@@ -516,13 +516,13 @@ struct ChildModelSimulation<Config> {
     auto& i_hc = intermediate.hc;
 
     const auto hPS_dropout_idx = (bf < 6) ? 4 : 5;
-    const auto PMTCT_continuing_rate = 1 - p_hc.PMTCT_dropout(hPS_dropout_idx, t) * 2;
+    const auto PMTCT_retention = 1 - p_hc.PMTCT_dropout(hPS_dropout_idx, t) * 2;
 
-    i_hc.PMTCT_coverage(0) *= PMTCT_continuing_rate; //opt A
-    i_hc.PMTCT_coverage(1) *= PMTCT_continuing_rate; //opt B
-    i_hc.PMTCT_coverage(4) *= PMTCT_continuing_rate; //before pregnancy
-    i_hc.PMTCT_coverage(5) *= PMTCT_continuing_rate; //>4 weeks
-    i_hc.PMTCT_coverage(6) *= PMTCT_continuing_rate; //<4 weeks
+    i_hc.PMTCT_coverage(0) *= PMTCT_retention; //opt A
+    i_hc.PMTCT_coverage(1) *= PMTCT_retention; //opt B
+    i_hc.PMTCT_coverage(4) *= PMTCT_retention; //before pregnancy
+    i_hc.PMTCT_coverage(5) *= PMTCT_retention; //>4 weeks
+    i_hc.PMTCT_coverage(6) *= PMTCT_retention; //<4 weeks
   };
 
   void run_bf_transmission_rate(int bf_start, int bf_end, int index) {
