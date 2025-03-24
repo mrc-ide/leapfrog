@@ -1,0 +1,3 @@
+{% macro comma_except_last(loop) %}
+{%- if not loop.last %},{% endif %}
+{% endmacro %}

@@ -1,0 +1,9 @@
+{
+  "variants": "ModelVariants.json",
+  "global_state_space": "GlobalStateSpace.json",
+  "configs": [
+    "configs/DpConfig.json",
+    "configs/HaConfig.json",
+    "configs/HcConfig.json"
+  ]
+}

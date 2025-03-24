@@ -1,0 +1,33 @@
+#pragma once
+
+#include "concepts.hpp"
+
+namespace leapfrog {
+
+{% for config in configs %}
+
+template<MV ModelVariant>
+struct {{ config.name }}SS {
+  {% for name, val in config.state_space.default.vars.items() %}
+  static constexpr {{ get_member_type(val) }} {{ name }} = {{ get_member_value(val) }};
+  {% endfor %}
+};
+{% for override in config.state_space.overrides +%}
+template<MV ModelVariant>
+requires(ModelVariant::{{ override.applies_if }})
+struct {{ config.name }}SS<ModelVariant> {
+  {% for name, val in override.vars.items() %}
+  static constexpr {{ get_member_type(val) }} {{ name }} = {{ get_member_value(val) }};
+  {% endfor %}
+};
+{% endfor %}
+
+{% endfor %}
+
+struct BaseSS {
+  {% for name, val in global_state_space.items() %}
+  static constexpr {{ get_member_type(val) }} {{ name }} = {{ get_member_value(val) }};
+  {% endfor %}
+};
+
+}

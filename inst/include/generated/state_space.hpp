@@ -1,8 +1,9 @@
 #pragma once
 
-#include "model_variants.hpp"
+#include "concepts.hpp"
 
 namespace leapfrog {
+
 
 template<MV ModelVariant>
 struct DpSS {
@@ -10,22 +11,24 @@ struct DpSS {
   static constexpr int pAG = 81;
 };
 
+
 template<MV ModelVariant>
 struct HaSS {
-  static constexpr std::array<int, 66> hAG_span = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+  static constexpr std::array<int, 66> hAG_span = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
   static constexpr int hDS = 7;
   static constexpr int hTS = 3;
-  static constexpr int hAG = hAG_span.size();
+  static constexpr int hAG = 66;
 };
 
 template<MV ModelVariant>
-requires (!ModelVariant::use_full_stratification)
+requires(ModelVariant::use_coarse_stratification)
 struct HaSS<ModelVariant> {
-  static constexpr std::array<int, 9> hAG_span = {2, 3, 5, 5, 5, 5, 5, 5, 31};
+  static constexpr std::array<int, 9> hAG_span = { 2, 3, 5, 5, 5, 5, 5, 5, 31 };
   static constexpr int hDS = 7;
   static constexpr int hTS = 3;
-  static constexpr int hAG = hAG_span.size();
+  static constexpr int hAG = 9;
 };
+
 
 template<MV ModelVariant>
 struct HcSS {
@@ -48,12 +51,13 @@ struct HcSS {
   static constexpr int hAB_ind = 2;
 };
 
+
 struct BaseSS {
   static constexpr int MALE = 0;
   static constexpr int FEMALE = 1;
   static constexpr int ART0MOS = 0;
-  static constexpr int PROJPERIOD_CALENDAR = 0;  // calendar-year projection (Spectrum 6.2 update; December 2022)
-  static constexpr int PROJPERIOD_MIDYEAR = 1;   // mid-year projection period
+  static constexpr int PROJPERIOD_CALENDAR = 0;
+  static constexpr int PROJPERIOD_MIDYEAR = 1;
 };
 
 }

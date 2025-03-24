@@ -1,0 +1,13 @@
+#pragma once
+
+namespace leapfrog {
+
+{% for variant_name, flags in variants.items() %}
+struct {{ variant_name }} {
+  {% for name, value in flags.items() %}
+  static constexpr bool {{ name }} = {{ value }};
+  {% endfor %}
+};
+{% endfor %}
+
+}

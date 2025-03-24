@@ -1,0 +1,78 @@
+{
+  "name": "Dp",
+  "namespace": "dp",
+  "enable_if": "run_demographic_projection",
+  "state_space": {
+    "default": {
+      "vars": {
+        "NS": 2,
+        "pAG": 81
+      }
+    }
+  },
+  "pars": {
+    "base_pop": {
+      "type": "TM",
+      "num_type": "real_type",
+      "dims": ["SS::pAG", "SS::NS"],
+      "alias": {
+        "r": "basepop"
+      }
+    },
+    "survival_probability": {
+      "type": "TM",
+      "num_type": "real_type",
+      "dims": ["SS::pAG + 1", "SS::NS", "proj_years"],
+      "alias": {
+        "r": "Sx"
+      }
+    },
+    "net_migration": {
+      "type": "TM",
+      "num_type": "real_type",
+      "dims": ["SS::pAG", "SS::NS", "proj_years"],
+      "alias": {
+        "r": "netmigr_adj"
+      }
+    },
+    "age_specific_fertility_rate": {
+      "type": "TM",
+      "num_type": "real_type",
+      "dims": ["opts.p_fertility_age_groups", "proj_years"],
+      "alias": {
+        "r": "asfr"
+      }
+    },
+    "births_sex_prop": {
+      "type": "TM",
+      "num_type": "real_type",
+      "dims": ["SS::NS", "proj_years"],
+      "alias": {
+        "r": "births_sex_prop"
+      }
+    }
+  },
+  "intermediate": {
+    "migration_rate": {
+      "type": "TFS",
+      "num_type": "real_type",
+      "dims": ["SS::pAG", "SS::NS"]
+    }
+  },
+  "state": {
+    "p_total_pop": {
+      "type": "TFS",
+      "num_type": "real_type",
+      "dims": ["SS::pAG", "SS::NS"]
+    },
+    "p_total_pop_natural_deaths": {
+      "type": "TFS",
+      "num_type": "real_type",
+      "dims": ["SS::pAG", "SS::NS"]
+    },
+    "births": {
+      "type": "scalar",
+      "num_type": "real_type"
+    }
+  }
+}
