@@ -1,9 +1,9 @@
 {
   "name": "Hc",
   "namespace": "hc",
-  "add_if": "run_child_model",
-  "state_space": [
-    {
+  "enable_if": "run_child_model",
+  "state_space": {
+    "default": {
       "vars": {
         "hc1DS": 7,
         "hc2DS": 6,
@@ -24,7 +24,7 @@
         "hAB_ind": 2
       }
     }
-  ],
+  },
   "pars": {
     "hc_nosocomial": {
       "type": "TM",

@@ -1,15 +1,15 @@
 {
   "name": "Dp",
   "namespace": "dp",
-  "add_if": "run_demographic_projection",
-  "state_space": [
-    {
+  "enable_if": "run_demographic_projection",
+  "state_space": {
+    "default": {
       "vars": {
         "NS": 2,
         "pAG": 81
       }
     }
-  ],
+  },
   "pars": {
     "base_pop": {
       "type": "TM",

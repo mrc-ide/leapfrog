@@ -20,7 +20,6 @@ struct HaSS {
   static constexpr int hAG = 66;
 };
 
-
 template<MV ModelVariant>
 requires(ModelVariant::use_coarse_stratification)
 struct HaSS<ModelVariant> {

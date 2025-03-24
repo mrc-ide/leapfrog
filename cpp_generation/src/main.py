@@ -9,34 +9,34 @@ import utils.config
 import utils.state_space
 
 
-def relative_file_path(path):
+def relative_file_path(*paths):
   dirname = os.path.dirname(__file__)
-  return os.path.join(dirname, path)
+  return os.path.join(dirname, *paths)
 
 
-def load_json(path):
-  with open(relative_file_path(path)) as f:
+def load_json(*paths):
+  with open(relative_file_path(*paths)) as f:
     return json.load(f)
 
 
 def load_children_model_schemas(paths):
   if isinstance(paths, str):
-    return load_json(f'../modelSchemas/{paths}')
+    return load_json("..", "modelSchemas", paths)
   else:
-    return [load_json(f'../modelSchemas/{p}') for p in paths]
+    return [load_json("..", "modelSchemas", p) for p in paths]
 
 
 def generate_hpp(template_name, *args, **kwargs):
   template = env.get_template(f'{template_name}.j2')
   output = template.render(*args, **kwargs)
-  with open(relative_file_path(f'../../inst/include/generated/{template_name}.hpp'), "w") as f:
+  with open(relative_file_path("..", "..", "inst", "include", "generated", f"{template_name}.hpp"), "w") as f:
     f.write(output)
 
 
-dat = load_json("../modelSchemas/FullModel.json")
+dat = load_json("..", "modelSchemas", "FullModel.json")
 dat = { k: load_children_model_schemas(v) for k, v in dat.items() }
 
-file_loader = FileSystemLoader(relative_file_path("../templates"))
+file_loader = FileSystemLoader(relative_file_path("..", "templates"))
 env = Environment(
   loader = file_loader,
   trim_blocks = True,

@@ -131,7 +131,7 @@ template<typename real_type, MV ModelVariant>
 using ConfigMixed = ConfigMixer<
   real_type, ModelVariant,
   {% for config in configs %}
-  Pair<ModelVariant::{{ config.add_if }}, {{ config.name }}Config<real_type, ModelVariant>>{{ comma_except_last(loop) }}
+  Pair<ModelVariant::{{ config.enable_if }}, {{ config.name }}Config<real_type, ModelVariant>>{{ comma_except_last(loop) }}
   {% endfor %}
 >;
 
