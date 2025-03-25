@@ -31,7 +31,7 @@ mod <- leapfrog::leapfrogR(demp, proj, hiv_steps_per_year = 0L)
 saveRDS(lmod, testthat::test_path("testdata/fit_demography.rds"))
 
 #Create paeds parameters
-pjnz_child <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct - Copy.PJNZ")
+pjnz_child <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct.PJNZ")
 
 demp <- prepare_leapfrog_demp(pjnz_child)
 proj <- prepare_leapfrog_projp(pjnz_child)
