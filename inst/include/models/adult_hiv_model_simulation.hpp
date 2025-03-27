@@ -4,16 +4,16 @@
 
 namespace leapfrog {
 
-template<typename Config>	
-concept HivModelSimulationEnabled = RunDemographicProjection<Config> && RunHivSimulation<Config>;
+template<typename Config>
+concept AdultHivModelSimulationEnabled = RunDemographicProjection<Config> && RunHivSimulation<Config>;
 
 template<typename Config>
-struct HivModelSimulation {
-  HivModelSimulation(...) {};
+struct AdultHivModelSimulation {
+  AdultHivModelSimulation(...) {};
 };
 
-template<HivModelSimulationEnabled Config>
-struct HivModelSimulation<Config> {
+template<AdultHivModelSimulationEnabled Config>
+struct AdultHivModelSimulation<Config> {
   using real_type = typename Config::real_type;
   using ModelVariant = typename Config::ModelVariant;
   using SS = Config::SS;
@@ -47,7 +47,7 @@ struct HivModelSimulation<Config> {
 
   // only exposing the constructor and some methods
   public:
-  HivModelSimulation(Args& args):
+  AdultHivModelSimulation(Args& args):
     t(args.t),
     pars(args.pars),
     state_curr(args.state_curr),
