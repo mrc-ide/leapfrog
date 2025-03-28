@@ -6,6 +6,7 @@
 #include "models/hiv_demographic_projection.hpp"
 #include "models/adult_hiv_model_simulation.hpp"
 #include "models/child_model_simulation.hpp"
+#include "utils/input_utils.hpp"
 
 namespace leapfrog {
 
@@ -20,8 +21,8 @@ struct Leapfrog {
   using Options = Config::Options;
   using Args = Config::Args;
 
-  static Rcpp::List simulate_model(
-    const Rcpp::List& data,
+  static InputData simulate_model(
+    const InputData &data,
     const int time_steps,
     const int hiv_steps,
     const std::vector<int>& save_steps,

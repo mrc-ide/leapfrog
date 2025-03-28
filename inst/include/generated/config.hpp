@@ -5,47 +5,11 @@
 
 #pragma once
 
-#include <Rcpp.h>
-
+#include "../utils/input_utils.hpp"
 #include "state_space_mixer.hpp"
 #include "tensor_types.hpp"
 
 namespace leapfrog {
-
-template <typename T>
-T* r_data(SEXP x) {
-  static_assert(sizeof(T) == 0, "Only specializations of r_data can be used");
-}
-
-template <>
-double* r_data(SEXP x) {
-  return REAL(x);
-}
-
-template <>
-int* r_data(SEXP x) {
-  return INTEGER(x);
-}
-
-template<typename T, typename... Args>
-auto parse_data(const Rcpp::List data, const std::string& key, Args... dims) {
-  constexpr std::size_t rank = sizeof...(dims);
-  Eigen::array<int, rank> dimensions{ static_cast<int>(dims)... };
-
-  int length = std::accumulate(dimensions.begin(), dimensions.end(), 1, std::multiplies<int>());
-  SEXP array_data = data[key];
-  // In cases where the input data has project years we might not use all of it model fit
-  // So we can take create a Map over a smaller slice of the data
-  // As long as this is true we can be confident we're not referencing invalid memory
-  if (LENGTH(array_data) < length) {
-    Rcpp::stop("Invalid size of data for '%s', expected %d got %d",
-               key,
-               length,
-               LENGTH(array_data));
-  }
-
-  return Eigen::TensorMap<Eigen::Tensor<T, rank>>(r_data<T>(array_data), static_cast<int>(dims)...);
-}
 
 // ****************************** OPTIONS ****************************** //
 
@@ -92,7 +56,7 @@ struct DpConfig {
   };
 
   static Pars get_pars(
-    const Rcpp::List &data,
+    const InputData &data,
     const Opts<real_type> &opts,
     const int proj_years
   ) {
@@ -213,7 +177,7 @@ struct HaConfig {
   };
 
   static Pars get_pars(
-    const Rcpp::List &data,
+    const InputData &data,
     const Opts<real_type> &opts,
     const int proj_years
   ) {
@@ -224,16 +188,16 @@ struct HaConfig {
       .cd4_mortality = parse_data<real_type>(data, "cd4_mort", SS::hDS, SS::hAG, SS::NS),
       .cd4_progression = parse_data<real_type>(data, "cd4_prog", SS::hDS - 1, SS::hAG, SS::NS),
       .cd4_initial_distribution = parse_data<real_type>(data, "cd4_initdist", SS::hDS, SS::hAG, SS::NS),
-      .scale_cd4_mortality = Rcpp::as<int>(data["scale_cd4_mort"]),
+      .scale_cd4_mortality = parse_data<int>(data, "scale_cd4_mort"),
       .idx_hm_elig = parse_data<int>(data, "artcd4elig_idx", proj_years),
       .mortality = parse_data<real_type>(data, "art_mort", SS::hTS, SS::hDS, SS::hAG, SS::NS),
       .mortality_time_rate_ratio = parse_data<real_type>(data, "artmx_timerr", SS::hTS, proj_years),
-      .dropout_recover_cd4 = Rcpp::as<int>(data["art_dropout_recover_cd4"]),
+      .dropout_recover_cd4 = parse_data<int>(data, "art_dropout_recover_cd4"),
       .dropout_rate = parse_data<real_type>(data, "art_dropout_rate", proj_years),
       .adults_on_art = parse_data<real_type>(data, "art15plus_num", SS::NS, proj_years),
       .adults_on_art_is_percent = parse_data<int>(data, "art15plus_isperc", SS::NS, proj_years),
       .h_art_stage_dur = parse_data<real_type>(data, "h_art_stage_dur", SS::hTS - 1),
-      .initiation_mortality_weight = Rcpp::as<real_type>(data["art_alloc_mxweight"])
+      .initiation_mortality_weight = parse_data<real_type>(data, "art_alloc_mxweight")
     };
   };
 
@@ -515,7 +479,7 @@ struct HcConfig {
   };
 
   static Pars get_pars(
-    const Rcpp::List &data,
+    const InputData &data,
     const Opts<real_type> &opts,
     const int proj_years
   ) {
@@ -563,9 +527,9 @@ struct HcConfig {
       .adult_female_infections = parse_data<real_type>(data, "adult_female_infections", opts.p_fertility_age_groups, proj_years),
       .adult_female_hivnpop = parse_data<real_type>(data, "hivnpop", opts.p_fertility_age_groups, proj_years),
       .total_births = parse_data<real_type>(data, "total_births", proj_years),
-      .ctx_effect = parse_data<real_type>(data, "ctx_effect", 3),
-      .hc_art_start = Rcpp::as<real_type>(data["hc_art_start"]),
-      .local_adj_factor = Rcpp::as<real_type>(data["laf"])
+      .ctx_effect = parse_data<real_type>(data, "ctx_effect"),
+      .hc_art_start = parse_data<real_type>(data, "hc_art_start"),
+      .local_adj_factor = parse_data<real_type>(data, "laf")
     };
   };
 
