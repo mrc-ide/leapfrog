@@ -61,7 +61,7 @@ auto parse_data(const InputData &input_dir, const std::string &key, Args... dims
   constexpr std::size_t rank = sizeof...(dims);
   if constexpr (rank == 0) {
     // TODO: impl
-    return serialize::deserialize_tensor<T, rank>(input_dir / key);
+    return 1.0;
   } else {
     return serialize::deserialize_tensor<T, rank>(input_dir / key);
   }

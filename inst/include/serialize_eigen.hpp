@@ -123,7 +123,7 @@ Eigen::Tensor <T, rank> deserialize_tensor(const std::string &path) {
 // 2nd line is the dimensions comma separated e.g. 2,3,2
 // 3rd line is the comma separated data
 template<typename T, int rank>
-void serialize_tensor(const Eigen::Tensor <T, rank> &data, const std::string &path) {
+void serialize_tensor(const Eigen::Tensor<T, rank> &data, const std::string &path) {
   std::ofstream dest(path);
   dest << internal::data_name<T>() << std::endl;
   const auto d = data.dimensions();

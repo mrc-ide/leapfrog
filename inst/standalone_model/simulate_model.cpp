@@ -112,9 +112,9 @@ int main(int argc, char *argv[]) {
   }
 
   std::vector<int> save_steps(sim_years);
-  const auto state = leapfrog::Leapfrog<double, leapfrog::HivFullAgeStratification>::simulate_model(input_abs, sim_years, hts_per_year, save_steps, true, 30);
+  leapfrog::Leapfrog<double, leapfrog::HivFullAgeStratification>::simulate_model(input_abs, sim_years, hts_per_year, save_steps, true, 30, output_abs);
 
-  save_output<double, leapfrog::HivFullAgeStratification>(state, output_abs);
+  //save_output<double, leapfrog::HivFullAgeStratification>(state, output_abs);
 
   return 0;
 }

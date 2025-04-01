@@ -22,24 +22,21 @@ struct Leapfrog {
   using Options = Config::Options;
   using Args = Config::Args;
 
-  static OutputData simulate_model(
+  static void simulate_model(
     const InputData &data,
     const int time_steps,
     const int hiv_steps,
     const std::vector<int>& save_steps,
     const bool is_midyear_projection,
-    const int t_ART_start
+    const int t_ART_start,
+    OutputData output
   ) {
     const auto opts = get_opts(hiv_steps, t_ART_start, is_midyear_projection);
     const auto pars = Config::get_pars(data, opts, time_steps);
 
     auto state = run_model(time_steps, save_steps, pars, opts);
 
-    const int output_size = Config::get_build_output_size(0);
-    auto ret = initialize_output(output_size);
-    Config::build_output(ret, 0, state, save_steps.size());
-
-    return ret;
+    Config::build_output(output, 0, state, save_steps.size());
   };
 
   private:

@@ -21,4 +21,23 @@ void write_output_data(OutputData &ret, const TensorType &tensor, const std::str
 
 }
 }
+
+#else
+
+#include <filesystem>
+#include "../serialize_eigen.hpp"
+
+namespace leapfrog {
+namespace internal {
+
+template<typename TensorType, typename... Args>
+void write_output_data(OutputData &ret, const TensorType &tensor, const std::string name, int idx, Args... dims) {
+  constexpr int rank = sizeof...(dims);
+  std::filesystem::path dest_path = ret / "name";
+  serialize::serialize_tensor<double, rank>(tensor, dest_path);
+}
+
+}
+}
+
 #endif
