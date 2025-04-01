@@ -14,7 +14,7 @@ write_standalone_data <- function(input_data, data_map, dest) {
 
   ## Basepop handled separately as we only save a slice of this out
   frogger:::serialize_r_to_tensor(demp$basepop[, , 1],
-                                  file.path(t, "demography_base_pop"))
+                                  file.path(t, "base_pop"))
   for (r_name in setdiff(names(data_map), "basepop")) {
     frogger:::serialize_r_to_tensor(input_data[[r_name]], file.path(t, data_map[[r_name]]))
   }
@@ -38,27 +38,38 @@ build_name_mapping <- function() {
   setNames(names(all_params), all_params)
 }
 
+prepare_input_data <- function(input_data) {
+  input_data$hAG_SPAN <- input_data[["hAG_SPAN_full"]]
+  input_data$cd4_initdist <- input_data[["cd4_initdist_full"]]
+  input_data$cd4_prog <- input_data[["cd4_prog_full"]]
+  input_data$cd4_mort <- input_data[["cd4_mort_full"]]
+  input_data$art_mort <- input_data[["art_mort_full"]]
+
+  # convert indices to 0 based
+  if ("artcd4elig_idx" %in% names(input_data)) {
+    # integer type
+    input_data[["artcd4elig_idx"]] <- input_data[["artcd4elig_idx"]] - 1L
+  }
+  if ("paed_art_elig_cd4" %in% names(input_data)) {
+    # double type
+    input_data[["paed_art_elig_cd4"]] <- input_data[["paed_art_elig_cd4"]] - 1
+  }
+
+  hTS <- dim(input_data[["art_mort"]])[[1]]
+  input_data$h_art_stage_dur <- rep(0.5, hTS - 1)
+  input_data
+}
+
 ## Map from name in demp/parameters to name expected in C++ code
 name_mapping <- build_name_mapping()
 
 demp <- readRDS(testthat::test_path("testdata/demographic_projection_object_adult.rds"))
 parameters <- readRDS(testthat::test_path("testdata/projection_parameters_adult.rds"))
-input_data <- c(demp, parameters)
-input_data$cd4_initdist <- input_data[["cd4_initdist_full"]]
-input_data$cd4_prog <- input_data[["cd4_prog_full"]]
-input_data$cd4_mort <- input_data[["cd4_mort_full"]]
-input_data$art_mort <- input_data[["art_mort_full"]]
-
+input_data <- prepare_input_data(c(demp, parameters))
 path <- write_standalone_data(input_data, name_mapping, "adult_data.zip")
 message(sprintf("Wrote adult test data to %s", path))
 
-source(file.path("R", "spectrum_inputs.R"))
 child <- readRDS(testthat::test_path("testdata/child_parms.rds"))
-input_data <- c(child$demp, child$parameters)
-input_data$cd4_initdist <- input_data[["cd4_initdist_full"]]
-input_data$cd4_prog <- input_data[["cd4_prog_full"]]
-input_data$cd4_mort <- input_data[["cd4_mort_full"]]
-input_data$art_mort <- input_data[["art_mort_full"]]
-
+input_data <- prepare_input_data(c(child$demp, child$parameters))
 path <- write_standalone_data(input_data, name_mapping, "child_data.zip")
 message(sprintf("Wrote child test data to %s", path))
