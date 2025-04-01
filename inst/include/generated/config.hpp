@@ -483,7 +483,7 @@ struct HcConfig {
       .adult_female_infections = parse_data<real_type>(data, "adult_female_infections", opts.p_fertility_age_groups, proj_years),
       .adult_female_hivnpop = parse_data<real_type>(data, "adult_female_hivnpop", opts.p_fertility_age_groups, proj_years),
       .total_births = parse_data<real_type>(data, "total_births", proj_years),
-      .ctx_effect = parse_data<real_type>(data, "ctx_effect"),
+      .ctx_effect = parse_data<real_type>(data, "ctx_effect", 3),
       .hc_art_start = parse_data<real_type>(data, "hc_art_start"),
       .local_adj_factor = parse_data<real_type>(data, "local_adj_factor")
     };

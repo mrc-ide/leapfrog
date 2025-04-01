@@ -1,5 +1,3 @@
-testthat::skip("Standalone tests currently broken")
-
 test_that("We can compile the standalone program", {
   skip_for_compilation()
   skip_on_os("windows")

@@ -95,7 +95,7 @@ csv_contents<T> parse_csv(const std::string &path) {
 }
 
 template<typename T, size_t rank>
-Eigen::Tensor <T, rank> deserialize_tensor(const std::string &path) {
+Eigen::Tensor<T, rank> deserialize_tensor(const std::string &path) {
   const auto contents = internal::parse_csv<T>(path);
   if (contents.dim.size() != rank) {
     std::stringstream ss;
@@ -115,6 +115,19 @@ Eigen::Tensor <T, rank> deserialize_tensor(const std::string &path) {
   }
 
   return ret;
+}
+
+template<typename T>
+T deserialize_scalar(const std::string &path) {
+  const auto contents = internal::parse_csv<T>(path);
+  if (contents.data.size() != 1) {
+    std::stringstream ss;
+    ss << "Data at path '" << path << "' is of wrong size. Trying to read as scalar '"
+       << "but data has size: '" << contents.data.size() << "'." << std::endl;
+    throw std::runtime_error(ss.str());
+  }
+
+  return contents.data[0];
 }
 
 // Basic seralization of tensor
