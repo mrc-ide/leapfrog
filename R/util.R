@@ -114,7 +114,7 @@ paste_lines <- function(...) {
 #' assuming the final value is an open-ended age group
 #' rather than an additional 5-year age group to be
 #' graduated.
-#' 
+#'
 #' @param x vector of length at least 6
 #'
 beers_open_ended <- function(x) {
