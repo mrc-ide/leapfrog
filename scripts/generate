@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-Rscript inst/cpp_generation/generate.R
+cd cpp_generation; uv run src/main.py
 

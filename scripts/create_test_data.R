@@ -50,9 +50,9 @@ yr_end <- as.integer(dpsub(dp, "<FinalYear MV2>",2,4))
 proj.years <- yr_start:yr_end
 timedat.idx <- 4+1:length(proj.years)-1
 
-pop1 = paste0(getwd(), '/', gsub(x = pjnz_child, pattern = '.PJNZ', replacement = '_pop1.xlsx'))
+pop1 = paste0(getwd(), '/', gsub(x = pjnz_child, pattern = '.PJNZ', replacement = '.xlsx'))
 
-spectrum_output <- function(file = "../testdata/spectrum/v6.13/bwa_aim-adult-child-input-art-elig_spectrum-v6.13_2022-02-12_pop1.xlsx", ages = 0:14, country = 'Botswana', years_in = 1970:2030){
+spectrum_output <- function(file = "../testdata/spectrum/v6.13/bwa_aim-no-special-elig-numpmtct.xlsx", ages = 0:14, country = 'Botswana', years_in = 1970:2030){
   ##pull out stratified population from the .xlsx file, This function doesn't take out the paediatric output, so going to just compare to the Spectrum software itself
   df <- file
   # if(grepl(pattern = 'testdata', file)){

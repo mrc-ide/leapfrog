@@ -22,15 +22,21 @@ input_data <- lapply(list.files(input_data_dir), function(filename) {
 names(input_data) <- list.files(input_data_dir)
 
 ## On disk we have the C++ name saved, so we need to map to the R name
-name_mapping <- frogger::frogger_input_name_mapping()
-r_names <- vapply(name_mapping, "[[", character(1), "r_name")
-cpp_names <- vapply(name_mapping, "[[", character(1), "cpp_name")
-struct_names <- vapply(name_mapping, "[[", character(1), "struct")
+repo_root <- gert::git_find()
+configs_dir <- file.path(repo_root, "cpp_generation/modelSchemas/configs")
+build_name_mapping <- function() {
+  cfgs <- list.files(configs_dir, full.names = TRUE)
+  all_params <- lapply(cfgs, function(cfg) {
+    params <- jsonlite::read_json(cfg)$pars
+    lapply(params, function(param) {
+      param$alias$r
+    })
+  })
+  all_params <- unlist(all_params)
+}
+name_mapping <- build_name_mapping()
 
-name_on_disk <- sprintf("%s_%s", tolower(struct_names), cpp_names)
-names(r_names) <- name_on_disk
-
-names(input_data) <- r_names[names(input_data)]
+names(input_data) <- name_mapping[names(input_data)]
 input_data$cd4_initdist_full <- input_data[["cd4_initdist"]]
 input_data$cd4_prog_full <- input_data[["cd4_prog"]]
 input_data$cd4_mort_full <- input_data[["cd4_mort"]]
@@ -50,4 +56,3 @@ for (output in names(out)) {
 }
 
 message(sprintf("Saved output to dir '%s'", dat$output_dir))
-

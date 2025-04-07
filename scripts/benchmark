@@ -28,7 +28,7 @@ bench::mark(
 )
 
 source(file.path("R", "spectrum_inputs.R"))
-input <- setup_childmodel(testthat::test_path("testdata/child_parms.rds"))
+input <- readRDS(testthat::test_path("testdata/child_parms.rds"))
 
 message("Benchmarking child model")
 bench::mark(
