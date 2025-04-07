@@ -371,10 +371,18 @@
       }
     },
     "ctx_effect": {
+      "type": "TM",
+      "num_type": "real_type",
+      "dims": ["3"],
+      "alias": {
+        "r": "ctx_effect"
+      }
+    },
+    "hc_art_start": {
       "type": "scalar",
       "num_type": "real_type",
       "alias": {
-        "r": "ctx_effect"
+        "r": "hc_art_start"
       }
     },
     "local_adj_factor": {
@@ -406,11 +414,6 @@
       "num_type": "real_type",
       "dims": ["SS::hDS", "SS::hcTT", "SS::hAG", "SS::NS"]
     },
-    "hc_ctx_need": {
-      "type": "TFS",
-      "num_type": "real_type",
-      "dims": ["SS::hDS", "SS::hcTT", "SS::hAG", "SS::NS"]
-    },
     "eligible": {
       "type": "TFS",
       "num_type": "real_type",
@@ -419,27 +422,27 @@
     "unmet_need": {
       "type": "TFS",
       "num_type": "real_type",
-      "dims": ["4"]
+      "dims": ["SS::hcAG_coarse"]
     },
     "total_need": {
       "type": "TFS",
       "num_type": "real_type",
-      "dims": ["4"]
+      "dims": ["SS::hcAG_coarse"]
     },
     "on_art": {
       "type": "TFS",
       "num_type": "real_type",
-      "dims": ["4"]
+      "dims": ["SS::hcAG_coarse"]
     },
     "total_art_last_year": {
       "type": "TFS",
       "num_type": "real_type",
-      "dims": ["4"]
+      "dims": ["SS::hcAG_coarse"]
     },
     "total_art_this_year": {
       "type": "TFS",
       "num_type": "real_type",
-      "dims": ["4"]
+      "dims": ["SS::hcAG_coarse"]
     },
     "hc_art_grad": {
       "type": "TFS",
@@ -449,22 +452,22 @@
     "hc_art_scalar": {
       "type": "TFS",
       "num_type": "real_type",
-      "dims": ["4"]
+      "dims": ["SS::hcAG_coarse"]
     },
     "hc_initByAge": {
       "type": "TFS",
       "num_type": "real_type",
-      "dims": ["4"]
+      "dims": ["SS::hcAG_coarse"]
     },
     "hc_adj": {
       "type": "TFS",
       "num_type": "real_type",
-      "dims": ["4"]
+      "dims": ["SS::hcAG_coarse"]
     },
     "hc_art_deaths": {
       "type": "TFS",
       "num_type": "real_type",
-      "dims": ["4"]
+      "dims": ["SS::hcAG_coarse"]
     },
     "hc_hiv_dist": {
       "type": "TFS",
@@ -480,11 +483,6 @@
       "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hDS", "SS::hcTT", "SS::hcAG_end", "SS::NS"]
-    },
-    "previous_mtct": {
-      "type": "TFS",
-      "num_type": "real_type",
-      "dims": ["SS::hPS"]
     },
     "p_hiv_neg_pop": {
       "type": "TFS",
@@ -553,7 +551,7 @@
       "type": "scalar",
       "num_type": "real_type"
     },
-    "OnPMTCT": {
+    "on_PMTCT": {
       "type": "scalar",
       "num_type": "real_type"
     },
@@ -669,13 +667,14 @@
       "type": "scalar",
       "num_type": "real_type"
     },
-    "ctx_coverage": {
+    "bf_scalar": {
       "type": "scalar",
       "num_type": "real_type"
     },
-    "need_cotrim": {
-      "type": "scalar",
-      "num_type": "real_type"
+    "ctx_mean": {
+      "type": "TFS",
+      "num_type": "real_type",
+      "dims": ["3"]
     }
   },
   "state": {
@@ -737,9 +736,10 @@
       "type": "scalar",
       "num_type": "real_type"
     },
-    "ctx_mean": {
-      "type": "scalar",
-      "num_type": "real_type"
+    "infection_by_type": {
+      "type": "TFS",
+      "num_type": "real_type",
+      "dims": ["SS::hcTT", "SS::hc1AG", "SS::NS"]
     }
   }
 }
