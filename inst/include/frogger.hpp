@@ -20,29 +20,6 @@ struct Leapfrog {
   using Options = Config::Options;
   using Args = Config::Args;
 
-  static Rcpp::List simulate_model(
-    const Rcpp::List& data,
-    const int time_steps,
-    const int hiv_steps,
-    const std::vector<int>& save_steps,
-    const bool is_midyear_projection,
-    const int t_ART_start
-  ) {
-    const auto opts = get_opts(hiv_steps, t_ART_start, is_midyear_projection);
-    const auto pars = Config::get_pars(data, opts, time_steps);
-
-    auto state = run_model(time_steps, save_steps, pars, opts);
-
-    const int output_size = Config::get_build_output_size(0);
-    Rcpp::List ret(output_size);
-    Rcpp::CharacterVector names(output_size);
-    Config::build_output(ret, names, 0, state, save_steps.size());
-    ret.attr("names") = names;
-
-    return ret;
-  };
-
-  private:
   static const Options get_opts(
     const int hiv_steps,
     const int t_ART_start,
@@ -57,19 +34,6 @@ struct Leapfrog {
       proj_period
     };
     return opts;
-  };
-
-  static void save_state_if_in_save_step(
-    const int step,
-    State& state_next,
-    OutputState& output_state,
-    const std::vector<int>& save_steps
-  ) {
-    for (size_t i = 0; i < save_steps.size(); ++i) {
-      if (step == save_steps[i]) {
-        output_state.save_state(i, state_next);
-      }
-    }
   };
 
   static OutputState run_model(
@@ -103,6 +67,20 @@ struct Leapfrog {
       intermediate.reset();
     }
     return output_state;
+  };
+
+  private:
+  static void save_state_if_in_save_step(
+    const int step,
+    State& state_next,
+    OutputState& output_state,
+    const std::vector<int>& save_steps
+  ) {
+    for (size_t i = 0; i < save_steps.size(); ++i) {
+      if (step == save_steps[i]) {
+        output_state.save_state(i, state_next);
+      }
+    }
   };
 
   static void project_year(Args& args) {

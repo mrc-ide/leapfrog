@@ -15,9 +15,6 @@ struct ConfigMixer;
 template<typename real_type, MV ModelVariant>
 struct ConfigMixer<real_type, ModelVariant> {
   struct Pars {};
-  static Pars get_pars(const Rcpp::List &data, const Opts<real_type> &options, const int proj_years) {
-    Pars p = {}; return p;
-  };
 
   struct Intermediate {
     void reset() {};
@@ -37,9 +34,6 @@ struct ConfigMixer<real_type, ModelVariant> {
   static int get_build_output_size(int prev_size) {
     return prev_size;
   };
-  static int build_output(Rcpp::List& ret, Rcpp::CharacterVector& names, int index, const auto& state, const size_t& output_years) {
-    return index;
-  };
 };
 
 template<typename real_type, MV ModelVariant, typename Config, typename ...Ts>
@@ -56,14 +50,6 @@ struct ConfigMixer<real_type1, ModelVariant1, Pair<true, DpConfig<real_type1, Mo
 
   struct Pars: public NextConfigMixer::Pars {
     typename CurrConfig::Pars dp;
-  };
-
-  static Pars get_pars(const Rcpp::List &data, const Opts<real_type> &options, const int proj_years) {
-    Pars p = {
-      NextConfigMixer::get_pars(data, options, proj_years),
-      CurrConfig::get_pars(data, options, proj_years)
-    };
-    return p;
   };
 
   struct Intermediate: public NextConfigMixer::Intermediate {
@@ -114,11 +100,6 @@ struct ConfigMixer<real_type1, ModelVariant1, Pair<true, DpConfig<real_type1, Mo
     return CurrConfig::get_build_output_size(curr_size);
   };
 
-  static int build_output(Rcpp::List& ret, Rcpp::CharacterVector& names, int index, const OutputState& state, const size_t& output_years) {
-    int new_index = CurrConfig::build_output(ret, names, index, state.dp, output_years);
-    return NextConfigMixer::build_output(ret, names, new_index, state, output_years);
-  };
-
   using Options = Opts<real_type>;
   struct Args {
     int t;
@@ -140,14 +121,6 @@ struct ConfigMixer<real_type1, ModelVariant1, Pair<true, HaConfig<real_type1, Mo
 
   struct Pars: public NextConfigMixer::Pars {
     typename CurrConfig::Pars ha;
-  };
-
-  static Pars get_pars(const Rcpp::List &data, const Opts<real_type> &options, const int proj_years) {
-    Pars p = {
-      NextConfigMixer::get_pars(data, options, proj_years),
-      CurrConfig::get_pars(data, options, proj_years)
-    };
-    return p;
   };
 
   struct Intermediate: public NextConfigMixer::Intermediate {
@@ -198,11 +171,6 @@ struct ConfigMixer<real_type1, ModelVariant1, Pair<true, HaConfig<real_type1, Mo
     return CurrConfig::get_build_output_size(curr_size);
   };
 
-  static int build_output(Rcpp::List& ret, Rcpp::CharacterVector& names, int index, const OutputState& state, const size_t& output_years) {
-    int new_index = CurrConfig::build_output(ret, names, index, state.ha, output_years);
-    return NextConfigMixer::build_output(ret, names, new_index, state, output_years);
-  };
-
   using Options = Opts<real_type>;
   struct Args {
     int t;
@@ -224,14 +192,6 @@ struct ConfigMixer<real_type1, ModelVariant1, Pair<true, HcConfig<real_type1, Mo
 
   struct Pars: public NextConfigMixer::Pars {
     typename CurrConfig::Pars hc;
-  };
-
-  static Pars get_pars(const Rcpp::List &data, const Opts<real_type> &options, const int proj_years) {
-    Pars p = {
-      NextConfigMixer::get_pars(data, options, proj_years),
-      CurrConfig::get_pars(data, options, proj_years)
-    };
-    return p;
   };
 
   struct Intermediate: public NextConfigMixer::Intermediate {
@@ -280,11 +240,6 @@ struct ConfigMixer<real_type1, ModelVariant1, Pair<true, HcConfig<real_type1, Mo
   static int get_build_output_size(int prev_size) {
     int curr_size = NextConfigMixer::get_build_output_size(prev_size);
     return CurrConfig::get_build_output_size(curr_size);
-  };
-
-  static int build_output(Rcpp::List& ret, Rcpp::CharacterVector& names, int index, const OutputState& state, const size_t& output_years) {
-    int new_index = CurrConfig::build_output(ret, names, index, state.hc, output_years);
-    return NextConfigMixer::build_output(ret, names, new_index, state, output_years);
   };
 
   using Options = Opts<real_type>;
