@@ -14,13 +14,13 @@ Rcpp::List run_base_model(
 ) {
   // TODO Mantra write docs, save_steps now must be 0 index based, nothing is nullable, projection_period is "calendar" or "midyear", t_ART_start is 0 based (so substract 1 from R value)
   if (model_variant == "DemographicProjection") {
-    return leapfrog::Leapfrog<double, leapfrog::DemographicProjection>::simulate_model(data, time_steps, hiv_steps, save_steps, is_midyear_projection, t_ART_start);
+    return leapfrog::Leapfrog<double, leapfrog::DemographicProjection>::simulate_model(data, time_steps, hiv_steps, save_steps, is_midyear_projection, t_ART_start).data;
   } else if (model_variant == "HivFullAgeStratification") {
-    return leapfrog::Leapfrog<double, leapfrog::HivFullAgeStratification>::simulate_model(data, time_steps, hiv_steps, save_steps, is_midyear_projection, t_ART_start);
+    return leapfrog::Leapfrog<double, leapfrog::HivFullAgeStratification>::simulate_model(data, time_steps, hiv_steps, save_steps, is_midyear_projection, t_ART_start).data;
   } else if (model_variant == "HivCoarseAgeStratification") {
-    return leapfrog::Leapfrog<double, leapfrog::HivCoarseAgeStratification>::simulate_model(data, time_steps, hiv_steps, save_steps, is_midyear_projection, t_ART_start);
+    return leapfrog::Leapfrog<double, leapfrog::HivCoarseAgeStratification>::simulate_model(data, time_steps, hiv_steps, save_steps, is_midyear_projection, t_ART_start).data;
   } else if (model_variant == "ChildModel") {
-    return leapfrog::Leapfrog<double, leapfrog::ChildModel>::simulate_model(data, time_steps, hiv_steps, save_steps, is_midyear_projection, t_ART_start);
+    return leapfrog::Leapfrog<double, leapfrog::ChildModel>::simulate_model(data, time_steps, hiv_steps, save_steps, is_midyear_projection, t_ART_start).data;
   } else {
     throw std::runtime_error(
       "Invalid model_variant: " + model_variant +

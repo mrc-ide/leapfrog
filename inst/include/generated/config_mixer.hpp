@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "../utils/input_utils.hpp"
+#include "../utils/language_types.hpp"
 #include "config.hpp"
 
 namespace leapfrog {
@@ -38,7 +38,8 @@ struct ConfigMixer<real_type, ModelVariant> {
   static int get_build_output_size(int prev_size) {
     return prev_size;
   };
-  static int build_output(Rcpp::List& ret, Rcpp::CharacterVector& names, int index, const auto& state, const size_t& output_years) {
+
+  static int build_output(OutputData& ret, int index, const auto& state, const size_t& output_years) {
     return index;
   };
 };
@@ -115,9 +116,9 @@ struct ConfigMixer<real_type1, ModelVariant1, Pair<true, DpConfig<real_type1, Mo
     return CurrConfig::get_build_output_size(curr_size);
   };
 
-  static int build_output(Rcpp::List& ret, Rcpp::CharacterVector& names, int index, const OutputState& state, const size_t& output_years) {
-    int new_index = CurrConfig::build_output(ret, names, index, state.dp, output_years);
-    return NextConfigMixer::build_output(ret, names, new_index, state, output_years);
+  static int build_output(OutputData& ret, int index, const OutputState& state, const size_t& output_years) {
+    int new_index = CurrConfig::build_output(ret, index, state.dp, output_years);
+    return NextConfigMixer::build_output(ret, new_index, state, output_years);
   };
 
   using Options = Opts<real_type>;
@@ -199,9 +200,9 @@ struct ConfigMixer<real_type1, ModelVariant1, Pair<true, HaConfig<real_type1, Mo
     return CurrConfig::get_build_output_size(curr_size);
   };
 
-  static int build_output(Rcpp::List& ret, Rcpp::CharacterVector& names, int index, const OutputState& state, const size_t& output_years) {
-    int new_index = CurrConfig::build_output(ret, names, index, state.ha, output_years);
-    return NextConfigMixer::build_output(ret, names, new_index, state, output_years);
+  static int build_output(OutputData& ret, int index, const OutputState& state, const size_t& output_years) {
+    int new_index = CurrConfig::build_output(ret, index, state.ha, output_years);
+    return NextConfigMixer::build_output(ret, new_index, state, output_years);
   };
 
   using Options = Opts<real_type>;
@@ -283,9 +284,9 @@ struct ConfigMixer<real_type1, ModelVariant1, Pair<true, HcConfig<real_type1, Mo
     return CurrConfig::get_build_output_size(curr_size);
   };
 
-  static int build_output(Rcpp::List& ret, Rcpp::CharacterVector& names, int index, const OutputState& state, const size_t& output_years) {
-    int new_index = CurrConfig::build_output(ret, names, index, state.hc, output_years);
-    return NextConfigMixer::build_output(ret, names, new_index, state, output_years);
+  static int build_output(OutputData& ret, int index, const OutputState& state, const size_t& output_years) {
+    int new_index = CurrConfig::build_output(ret, index, state.hc, output_years);
+    return NextConfigMixer::build_output(ret, new_index, state, output_years);
   };
 
   using Options = Opts<real_type>;

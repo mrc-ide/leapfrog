@@ -1,11 +1,10 @@
 #pragma once
 
+#include "language_types.hpp"
 #include <unsupported/Eigen/CXX11/Tensor>
 
 #ifdef CALLER_R
 #include <Rcpp.h>
-
-using InputData = Rcpp::List;
 
 template <typename T>
 T* r_data(SEXP x) {
@@ -49,5 +48,23 @@ auto parse_data(const InputData &data, const std::string& key, Args... dims) {
 
 #else
 
-#endif
+#include <filesystem>
+#include "../serialize_eigen.hpp"
 
+template<typename T, typename... Args>
+auto parse_data(const InputData &input_dir, const std::string &key, Args... dims) {
+  if (!std::filesystem::exists(input_dir / key)) {
+    std::string msg = "File '" + key + "' in input dir '" + input_dir.string() + "' does not exist.\n";
+    throw std::runtime_error(msg);
+  }
+
+  constexpr std::size_t rank = sizeof...(dims);
+  if constexpr (rank == 0) {
+    // TODO: impl
+    return serialize::deserialize_tensor<T, rank>(input_dir / key);
+  } else {
+    return serialize::deserialize_tensor<T, rank>(input_dir / key);
+  }
+}
+
+#endif
