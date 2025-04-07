@@ -3,8 +3,9 @@
 #include "../generated/config_mixer.hpp"
 
 namespace leapfrog {
+namespace internal {
 
-template<typename Config>	
+template<typename Config>
 concept ChildModelSimulationEnabled = RunDemographicProjection<Config> && RunHivSimulation<Config> && RunChildModel<Config>;
 
 template<typename Config>
@@ -670,7 +671,7 @@ struct ChildModelSimulation<Config> {
 
         auto total_pop_24_plus = n_dp.p_total_pop(2, 0) - n_ha.p_hiv_pop(2, 0) +
                                  n_dp.p_total_pop(2, 1) - n_ha.p_hiv_pop(2, 1);
-        if (s == 1) { 
+        if (s == 1) {
           total_pop_24_plus -= n_ha.p_infections(2, 0);
         }
         auto uninfected_prop_24_plus = (n_dp.p_total_pop(2, s) - n_ha.p_hiv_pop(2, s)) / total_pop_24_plus;
@@ -1430,4 +1431,5 @@ struct ChildModelSimulation<Config> {
   };
 };
 
+}
 }

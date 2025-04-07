@@ -3,6 +3,7 @@
 #include "../generated/config_mixer.hpp"
 
 namespace leapfrog {
+namespace internal {
 
 template<typename Config>
 concept AdultHivModelSimulationEnabled = RunDemographicProjection<Config> && RunHivSimulation<Config>;
@@ -441,4 +442,5 @@ struct AdultHivModelSimulation<Config> {
   };
 };
 
+}
 }

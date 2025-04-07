@@ -3,6 +3,7 @@
 #include <unsupported/Eigen/CXX11/Tensor>
 
 namespace leapfrog {
+namespace internal {
 
 template<typename real_type>
 using TM1 = Eigen::TensorMap<Eigen::Tensor<real_type, 1>>;
@@ -36,4 +37,5 @@ using T5 = Eigen::Tensor<real_type, 5>;
 template<typename real_type, typename std::ptrdiff_t... Dims>
 using TFS = Eigen::TensorFixedSize<real_type, Eigen::Sizes<Dims...>>;
 
+}
 }

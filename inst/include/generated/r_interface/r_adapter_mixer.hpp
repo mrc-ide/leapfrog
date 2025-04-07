@@ -4,6 +4,8 @@
 
 namespace leapfrog {
 
+namespace internal {
+
 template<typename ...Ts>
 struct AdapterMixer;
 
@@ -93,12 +95,14 @@ struct AdapterMixer<real_type1, ModelVariant1, Pair<true, HcConfig<real_type1, M
 
 };
 
-template<typename real_type, MV ModelVariant>
-using AdapterMixed = AdapterMixer<
+}
+
+template<typename real_type, internal::MV ModelVariant>
+using Adapter = internal::AdapterMixer<
   real_type, ModelVariant,
-  Pair<ModelVariant::run_demographic_projection, DpConfig<real_type, ModelVariant>>,
-  Pair<ModelVariant::run_hiv_simulation, HaConfig<real_type, ModelVariant>>,
-  Pair<ModelVariant::run_child_model, HcConfig<real_type, ModelVariant>>
+  internal::Pair<ModelVariant::run_demographic_projection, internal::DpConfig<real_type, ModelVariant>>,
+  internal::Pair<ModelVariant::run_hiv_simulation, internal::HaConfig<real_type, ModelVariant>>,
+  internal::Pair<ModelVariant::run_child_model, internal::HcConfig<real_type, ModelVariant>>
 >;
 
 }

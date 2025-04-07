@@ -6,6 +6,8 @@
 
 namespace leapfrog {
 
+namespace internal {
+
 template <typename T>
 T* r_data(SEXP x) {
   static_assert(sizeof(T) == 0, "Only specializations of r_data can be used");
@@ -316,4 +318,5 @@ struct HcAdapterR {
 };
 
 
+}
 }

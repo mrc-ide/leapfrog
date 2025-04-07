@@ -9,6 +9,7 @@
 #include "tensor_types.hpp"
 
 namespace leapfrog {
+namespace internal {
 
 // ****************************** OPTIONS ****************************** //
 
@@ -616,4 +617,5 @@ struct HcConfig {
   };
 };
 
+}
 }

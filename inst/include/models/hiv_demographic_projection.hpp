@@ -3,9 +3,10 @@
 #include "../generated/config_mixer.hpp"
 
 namespace leapfrog {
+namespace internal {
 
-template<typename Config>	
-concept HivDemographicProjectionEnabled = RunDemographicProjection<Config> && RunHivSimulation<Config>;	
+template<typename Config>
+concept HivDemographicProjectionEnabled = RunDemographicProjection<Config> && RunHivSimulation<Config>;
 
 template<typename Config>
 struct HivDemographicProjection {
@@ -104,7 +105,7 @@ struct HivDemographicProjection<Config> {
       }
     }
   };
-  
+
   // private methods that we don't want people to call
   private:
   void run_hiv_ageing_and_mortality() {
@@ -277,4 +278,5 @@ struct HivDemographicProjection<Config> {
   };
 };
 
+}
 }

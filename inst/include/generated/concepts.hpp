@@ -6,6 +6,7 @@
 #pragma once
 
 namespace leapfrog {
+namespace internal {
 
 template<typename ModelVariant>
 concept MV = requires (ModelVariant mv) {
@@ -28,4 +29,5 @@ concept UseCoarseStratification = MV<typename Config::ModelVariant> && Config::M
 template<typename Config>
 concept RunChildModel = MV<typename Config::ModelVariant> && Config::ModelVariant::run_child_model;
 
+}
 }

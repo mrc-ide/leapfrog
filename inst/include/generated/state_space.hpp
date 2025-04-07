@@ -8,7 +8,7 @@
 #include "concepts.hpp"
 
 namespace leapfrog {
-
+namespace internal {
 
 template<MV ModelVariant>
 struct DpSS {
@@ -65,4 +65,5 @@ struct BaseSS {
   static constexpr int PROJPERIOD_MIDYEAR = 1;
 };
 
+}
 }

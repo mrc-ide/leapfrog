@@ -9,16 +9,16 @@
 
 namespace leapfrog {
 
-template<typename real_type, MV ModelVariant>
+template<typename real_type, internal::MV ModelVariant>
 struct Leapfrog {
-  using Config = ConfigMixed<real_type, ModelVariant>;
-  using SS = Config::SS;
-  using Pars = Config::Pars;
-  using State = Config::State;
-  using Intermediate = Config::Intermediate;
-  using OutputState = Config::OutputState;
-  using Options = Config::Options;
-  using Args = Config::Args;
+  using Cfg = Config<real_type, ModelVariant>;
+  using SS = Cfg::SS;
+  using Pars = Cfg::Pars;
+  using State = Cfg::State;
+  using Intermediate = Cfg::Intermediate;
+  using OutputState = Cfg::OutputState;
+  using Options = Cfg::Options;
+  using Args = Cfg::Args;
 
   static const Options get_opts(
     const int hiv_steps,
@@ -26,8 +26,8 @@ struct Leapfrog {
     const bool is_midyear_projection
   ) {
     const int proj_period = is_midyear_projection
-      ? BaseSS::PROJPERIOD_MIDYEAR
-      : BaseSS::PROJPERIOD_CALENDAR;
+      ? internal::BaseSS::PROJPERIOD_MIDYEAR
+      : internal::BaseSS::PROJPERIOD_CALENDAR;
     const Options opts = {
       hiv_steps,
       t_ART_start,
@@ -84,10 +84,10 @@ struct Leapfrog {
   };
 
   static void project_year(Args& args) {
-    GeneralDemographicProjection<Config> general_dp(args);
-    HivDemographicProjection<Config> hiv_dp(args);
-    AdultHivModelSimulation<Config> hiv_sim(args);
-    ChildModelSimulation<Config> child_sim(args);
+    internal::GeneralDemographicProjection<Cfg> general_dp(args);
+    internal::HivDemographicProjection<Cfg> hiv_dp(args);
+    internal::AdultHivModelSimulation<Cfg> hiv_sim(args);
+    internal::ChildModelSimulation<Cfg> child_sim(args);
 
     if constexpr (ModelVariant::run_demographic_projection) {
       general_dp.run_general_pop_demographic_projection();

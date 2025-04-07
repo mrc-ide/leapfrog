@@ -3,9 +3,10 @@
 #include "../generated/config_mixer.hpp"
 
 namespace leapfrog {
+namespace internal {
 
-template<typename Config>	
-concept GeneralDemographicProjectionEnabled = RunDemographicProjection<Config>;	
+template<typename Config>
+concept GeneralDemographicProjectionEnabled = RunDemographicProjection<Config>;
 
 template<typename Config>
 struct GeneralDemographicProjection {
@@ -161,4 +162,5 @@ struct GeneralDemographicProjection<Config> {
   };
 };
 
+}
 }
