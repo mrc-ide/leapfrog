@@ -5,6 +5,22 @@
 namespace leapfrog {
 namespace internal {
 
+#ifdef CALLER_CPP
+
+template<typename real_type>
+using TM1 = Eigen::Tensor<real_type, 1>;
+
+template<typename real_type>
+using TM2 = Eigen::Tensor<real_type, 2>;
+
+template<typename real_type>
+using TM3 = Eigen::Tensor<real_type, 3>;
+
+template<typename real_type>
+using TM4 = Eigen::Tensor<real_type, 4>;
+
+#else
+
 template<typename real_type>
 using TM1 = Eigen::TensorMap<Eigen::Tensor<real_type, 1>>;
 
@@ -16,6 +32,8 @@ using TM3 = Eigen::TensorMap<Eigen::Tensor<real_type, 3>>;
 
 template<typename real_type>
 using TM4 = Eigen::TensorMap<Eigen::Tensor<real_type, 4>>;
+
+#endif
 
 
 template<typename real_type>

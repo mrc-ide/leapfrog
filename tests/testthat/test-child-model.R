@@ -31,7 +31,7 @@ test_that("Child model can be run for all years", {
 })
 
 test_that("Model outputs are consistent", {
-    input <- readRDS(test_path("testdata/child_parms.rds"))
+  input <- readRDS(test_path("testdata/child_parms.rds"))
   demp <- input$demp
   parameters <- input$parameters
 
