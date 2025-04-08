@@ -12,15 +12,15 @@ Rcpp::List simulate_model(
   const bool is_midyear_projection,
   const int t_ART_start
 ) {
-  const auto opts = leapfrog::Leapfrog<real_type, ModelVariant>::get_opts(hiv_steps, t_ART_start, is_midyear_projection);
-  const auto pars = leapfrog::Adapter<real_type, ModelVariant>::get_pars(data, opts, time_steps);
+  const auto opts = leapfrog::get_opts<real_type>(hiv_steps, t_ART_start, is_midyear_projection);
+  const auto pars = leapfrog::AdapterR<real_type, ModelVariant>::get_pars(data, opts, time_steps);
 
   auto state = leapfrog::Leapfrog<real_type, ModelVariant>::run_model(time_steps, save_steps, pars, opts);
 
-  const int output_size = leapfrog::Config<real_type, ModelVariant>::get_build_output_size(0);
+  const int output_size = leapfrog::Leapfrog<real_type, ModelVariant>::Cfg::get_build_output_size(0);
   Rcpp::List ret(output_size);
   Rcpp::CharacterVector names(output_size);
-  leapfrog::Adapter<real_type, ModelVariant>::build_output(ret, names, 0, state, save_steps.size());
+  leapfrog::AdapterR<real_type, ModelVariant>::build_output(ret, names, 0, state, save_steps.size());
   ret.attr("names") = names;
 
   return ret;

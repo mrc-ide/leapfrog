@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../options.hpp"
 #include "../generated/config_mixer.hpp"
 
 namespace leapfrog {
@@ -21,7 +22,6 @@ struct ChildModelSimulation<Config> {
   using Pars = Config::Pars;
   using State = Config::State;
   using Intermediate = Config::Intermediate;
-  using Options = Config::Options;
   using Args = Config::Args;
 
   // private members of this struct
@@ -52,7 +52,7 @@ struct ChildModelSimulation<Config> {
   const State& state_curr;
   State& state_next;
   Intermediate& intermediate;
-  const Options& opts;
+  const Options<real_type>& opts;
 
   // only exposing the constructor and some methods
   public:

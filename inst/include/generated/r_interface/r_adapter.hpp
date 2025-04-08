@@ -2,6 +2,7 @@
 
 #include <Rcpp.h>
 
+#include "../../options.hpp"
 #include "../config.hpp"
 
 namespace leapfrog {
@@ -50,7 +51,7 @@ struct DpAdapterR {
 
   static Config::Pars get_pars(
     const Rcpp::List &data,
-    const Opts<real_type> &opts,
+    const Options<real_type> &opts,
     const int proj_years
   ) {
     return {
@@ -97,7 +98,7 @@ struct HaAdapterR {
 
   static Config::Pars get_pars(
     const Rcpp::List &data,
-    const Opts<real_type> &opts,
+    const Options<real_type> &opts,
     const int proj_years
   ) {
     return {
@@ -186,7 +187,7 @@ struct HcAdapterR {
 
   static Config::Pars get_pars(
     const Rcpp::List &data,
-    const Opts<real_type> &opts,
+    const Options<real_type> &opts,
     const int proj_years
   ) {
     return {

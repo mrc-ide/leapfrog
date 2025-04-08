@@ -6,6 +6,7 @@
 #pragma once
 
 #include "config.hpp"
+#include "options.hpp"
 
 namespace leapfrog {
 
@@ -102,14 +103,13 @@ struct ConfigMixer<real_type1, ModelVariant1, Pair<true, DpConfig<real_type1, Mo
     return CurrConfig::get_build_output_size(curr_size);
   };
 
-  using Options = Opts<real_type>;
   struct Args {
     int t;
     const Pars& pars;
     const State& state_curr;
     State& state_next;
     Intermediate& intermediate;
-    const Options& opts;
+    const Options<real_type>& opts;
   };
 };
 
@@ -173,14 +173,13 @@ struct ConfigMixer<real_type1, ModelVariant1, Pair<true, HaConfig<real_type1, Mo
     return CurrConfig::get_build_output_size(curr_size);
   };
 
-  using Options = Opts<real_type>;
   struct Args {
     int t;
     const Pars& pars;
     const State& state_curr;
     State& state_next;
     Intermediate& intermediate;
-    const Options& opts;
+    const Options<real_type>& opts;
   };
 };
 
@@ -244,25 +243,23 @@ struct ConfigMixer<real_type1, ModelVariant1, Pair<true, HcConfig<real_type1, Mo
     return CurrConfig::get_build_output_size(curr_size);
   };
 
-  using Options = Opts<real_type>;
   struct Args {
     int t;
     const Pars& pars;
     const State& state_curr;
     State& state_next;
     Intermediate& intermediate;
-    const Options& opts;
+    const Options<real_type>& opts;
   };
 };
 
-}
-
-template<typename real_type, internal::MV ModelVariant>
-using Config = internal::ConfigMixer<
+template<typename real_type, MV ModelVariant>
+using Config = ConfigMixer<
   real_type, ModelVariant,
-  internal::Pair<ModelVariant::run_demographic_projection, internal::DpConfig<real_type, ModelVariant>>,
-  internal::Pair<ModelVariant::run_hiv_simulation, internal::HaConfig<real_type, ModelVariant>>,
-  internal::Pair<ModelVariant::run_child_model, internal::HcConfig<real_type, ModelVariant>>
+  Pair<ModelVariant::run_demographic_projection, DpConfig<real_type, ModelVariant>>,
+  Pair<ModelVariant::run_hiv_simulation, HaConfig<real_type, ModelVariant>>,
+  Pair<ModelVariant::run_child_model, HcConfig<real_type, ModelVariant>>
 >;
 
+}
 }

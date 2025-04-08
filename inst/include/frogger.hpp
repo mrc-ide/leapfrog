@@ -6,41 +6,25 @@
 #include "models/hiv_demographic_projection.hpp"
 #include "models/adult_hiv_model_simulation.hpp"
 #include "models/child_model_simulation.hpp"
+#include "options.hpp"
 
 namespace leapfrog {
 
 template<typename real_type, internal::MV ModelVariant>
 struct Leapfrog {
-  using Cfg = Config<real_type, ModelVariant>;
+  using Cfg = internal::Config<real_type, ModelVariant>;
   using SS = Cfg::SS;
   using Pars = Cfg::Pars;
   using State = Cfg::State;
   using Intermediate = Cfg::Intermediate;
   using OutputState = Cfg::OutputState;
-  using Options = Cfg::Options;
   using Args = Cfg::Args;
-
-  static const Options get_opts(
-    const int hiv_steps,
-    const int t_ART_start,
-    const bool is_midyear_projection
-  ) {
-    const int proj_period = is_midyear_projection
-      ? internal::BaseSS::PROJPERIOD_MIDYEAR
-      : internal::BaseSS::PROJPERIOD_CALENDAR;
-    const Options opts = {
-      hiv_steps,
-      t_ART_start,
-      proj_period
-    };
-    return opts;
-  };
 
   static OutputState run_model(
     const int time_steps,
     const std::vector<int> save_steps,
     const Pars& pars,
-    const Options& opts
+    const Options<real_type>& opts
   ) {
     auto state = State();
     auto state_next = state;

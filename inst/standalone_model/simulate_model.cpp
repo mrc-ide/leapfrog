@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "frogger.hpp"
+#include "options.hpp"
 #include "generated/model_variants.hpp"
 #include "generated/cpp_interface/cpp_adapter_mixer.hpp"
 #include "serialize_eigen.hpp"
@@ -65,8 +66,8 @@ int main(int argc, char *argv[]) {
     std::cout << "Running model fit " << n_runs << " times" << std::endl;
   }
 
-  const auto opts = leapfrog::Leapfrog<double, leapfrog::HivFullAgeStratification>::get_opts(hts_per_year, 30, true);
-  const auto pars = leapfrog::Adapter<double, leapfrog::HivFullAgeStratification>::get_pars(input_dir, opts, sim_years);
+  const auto opts = leapfrog::get_opts<double>(hts_per_year, 30, true);
+  const auto pars = leapfrog::AdapterCpp<double, leapfrog::HivFullAgeStratification>::get_pars(input_dir, opts, sim_years);
 
   for (size_t i = 0; i < n_runs; ++i) {
     auto state = leapfrog::Leapfrog<double, leapfrog::HivFullAgeStratification>::run_model(sim_years, save_steps, pars, opts);
@@ -74,7 +75,7 @@ int main(int argc, char *argv[]) {
   std::cout << "Fit complete" << std::endl;
 
   auto state = leapfrog::Leapfrog<double, leapfrog::HivFullAgeStratification>::run_model(sim_years, save_steps, pars, opts);
-  leapfrog::Adapter<double, leapfrog::HivFullAgeStratification>::write_output(output_abs, state);
+  leapfrog::AdapterCpp<double, leapfrog::HivFullAgeStratification>::write_output(output_abs, state);
 
   return 0;
 }

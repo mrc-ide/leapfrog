@@ -7,6 +7,8 @@ namespace internal {
 
 #ifdef CALLER_CPP
 
+// TODO: Write a note here about why this preprocessor flag
+
 template<typename real_type>
 using TM1 = Eigen::Tensor<real_type, 1>;
 
@@ -34,7 +36,6 @@ template<typename real_type>
 using TM4 = Eigen::TensorMap<Eigen::Tensor<real_type, 4>>;
 
 #endif
-
 
 template<typename real_type>
 using T1 = Eigen::Tensor<real_type, 1>;

@@ -4,6 +4,7 @@
 #include <string_view>
 #include <format>
 
+#include "../../options.hpp"
 #include "../config.hpp"
 #include "../../serialize_eigen.hpp"
 
@@ -32,7 +33,7 @@ struct DpAdapterCpp {
 
   static Config::Pars get_pars(
     const std::filesystem::path &input_dir,
-    const Opts<real_type> &opts,
+    const Options<real_type> &opts,
     const int proj_years
   ) {
     return {
@@ -61,7 +62,7 @@ struct HaAdapterCpp {
 
   static Config::Pars get_pars(
     const std::filesystem::path &input_dir,
-    const Opts<real_type> &opts,
+    const Options<real_type> &opts,
     const int proj_years
   ) {
     return {
@@ -108,7 +109,7 @@ struct HcAdapterCpp {
 
   static Config::Pars get_pars(
     const std::filesystem::path &input_dir,
-    const Opts<real_type> &opts,
+    const Options<real_type> &opts,
     const int proj_years
   ) {
     return {
