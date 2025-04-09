@@ -1,7 +1,7 @@
 #include <Rcpp.h>
 
 #include "frogger.hpp"
-#include "generated/r_interface/r_adapter_mixer.hpp"
+#include "generated/r_interface/r_adapters.hpp"
 
 template<typename real_type, typename ModelVariant>
 Rcpp::List simulate_model(
@@ -12,15 +12,18 @@ Rcpp::List simulate_model(
   const bool is_midyear_projection,
   const int t_ART_start
 ) {
+  using AdapterR = leapfrog::Adapter<leapfrog::R, real_type, ModelVariant>;
+  using LF = leapfrog::Leapfrog<real_type, ModelVariant>;
+
   const auto opts = leapfrog::get_opts<real_type>(hiv_steps, t_ART_start, is_midyear_projection);
-  const auto pars = leapfrog::AdapterR<real_type, ModelVariant>::get_pars(data, opts, time_steps);
+  const auto pars = AdapterR::get_pars(data, opts, time_steps);
 
-  auto state = leapfrog::Leapfrog<real_type, ModelVariant>::run_model(time_steps, save_steps, pars, opts);
+  auto state = LF::run_model(time_steps, save_steps, pars, opts);
 
-  const int output_size = leapfrog::Leapfrog<real_type, ModelVariant>::Cfg::get_build_output_size(0);
+  const int output_size = LF::Cfg::get_build_output_size(0);
   Rcpp::List ret(output_size);
   Rcpp::CharacterVector names(output_size);
-  leapfrog::AdapterR<real_type, ModelVariant>::build_output(0, state, ret, names, save_steps.size());
+  AdapterR::build_output(0, state, ret, names, save_steps.size());
   ret.attr("names") = names;
 
   return ret;

@@ -18,6 +18,8 @@ template<typename real_type, MV ModelVariant>
 struct ConfigMixer<real_type, ModelVariant> {
   struct Pars {};
 
+  struct PartialPars {};
+
   struct Intermediate {
     void reset() {};
   };
@@ -52,6 +54,10 @@ struct ConfigMixer<real_type1, ModelVariant1, Pair<true, DpConfig<real_type1, Mo
 
   struct Pars: public NextConfigMixer::Pars {
     typename CurrConfig::Pars dp;
+  };
+
+  struct PartialPars: public NextConfigMixer::PartialPars {
+    struct DpPars: public Pars {};
   };
 
   struct Intermediate: public NextConfigMixer::Intermediate {
@@ -124,6 +130,10 @@ struct ConfigMixer<real_type1, ModelVariant1, Pair<true, HaConfig<real_type1, Mo
     typename CurrConfig::Pars ha;
   };
 
+  struct PartialPars: public NextConfigMixer::PartialPars {
+    struct HaPars: public Pars {};
+  };
+
   struct Intermediate: public NextConfigMixer::Intermediate {
     typename CurrConfig::Intermediate ha;
 
@@ -192,6 +202,10 @@ struct ConfigMixer<real_type1, ModelVariant1, Pair<true, HcConfig<real_type1, Mo
 
   struct Pars: public NextConfigMixer::Pars {
     typename CurrConfig::Pars hc;
+  };
+
+  struct PartialPars: public NextConfigMixer::PartialPars {
+    struct HcPars: public Pars {};
   };
 
   struct Intermediate: public NextConfigMixer::Intermediate {

@@ -7,8 +7,7 @@
 
 #include <Rcpp.h>
 
-#include "../../options.hpp"
-#include "../config.hpp"
+#include "../adapter_mixer.hpp"
 
 namespace leapfrog {
 namespace internal {
@@ -48,7 +47,7 @@ auto parse_data(const Rcpp::List data, const std::string& key, Args... dims) {
 }
 
 template<typename real_type, MV ModelVariant>
-struct DpAdapterR {
+struct DpAdapter<R, real_type, ModelVariant> {
   using SS = SSMixed<ModelVariant>;
   using Config = DpConfig<real_type, ModelVariant>;
 
@@ -95,7 +94,7 @@ struct DpAdapterR {
 };
 
 template<typename real_type, MV ModelVariant>
-struct HaAdapterR {
+struct HaAdapter<R, real_type, ModelVariant> {
   using SS = SSMixed<ModelVariant>;
   using Config = HaConfig<real_type, ModelVariant>;
 
@@ -183,7 +182,7 @@ struct HaAdapterR {
 };
 
 template<typename real_type, MV ModelVariant>
-struct HcAdapterR {
+struct HcAdapter<R, real_type, ModelVariant> {
   using SS = SSMixed<ModelVariant>;
   using Config = HcConfig<real_type, ModelVariant>;
 

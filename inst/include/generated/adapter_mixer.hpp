@@ -5,29 +5,16 @@
 
 #pragma once
 
-#include "config.hpp"
-#include "config_mixer.hpp"
-#include "../options.hpp"
+#include "./adapter.hpp"
 
 namespace leapfrog {
 namespace internal {
 
-template<bool enable, typename ConfigMixin, typename AdapterMixin>
-struct Triple;
-
-template<typename TripleT>
-struct TripleToPair;
-
-template<bool enable, typename ConfigMixin, typename AdapterMixin>
-struct TripleToPair<Triple<enable, ConfigMixin, AdapterMixin>> {
-  using type = Pair<enable, ConfigMixin>;
-};
-
-template<typename ...Ts>
+template<Language L, typename ...Ts>
 struct AdapterMixer;
 
-template<typename real_type, MV ModelVariant>
-struct AdapterMixer<real_type, ModelVariant> {
+template<Language L, typename real_type, MV ModelVariant>
+struct AdapterMixer<L, real_type, ModelVariant> {
   using Config = ConfigMixer<real_type, ModelVariant>;
 
   template<typename... Args>
@@ -41,18 +28,19 @@ struct AdapterMixer<real_type, ModelVariant> {
   }
 };
 
-template<typename real_type, MV ModelVariant, typename ConfigMixin, typename AdapterMixin, typename ...Ts>
-struct AdapterMixer<real_type, ModelVariant, Triple<false, ConfigMixin, AdapterMixin>, Ts...> : public AdapterMixer<real_type, ModelVariant, Ts...> {};
+template<Language L, typename real_type, MV ModelVariant, typename AdapterMixin, typename ...Ts>
+struct AdapterMixer<L, real_type, ModelVariant, Pair<false, AdapterMixin>, Ts...> : public AdapterMixer<L, real_type, ModelVariant, Ts...> {};
 
 
-template<typename real_type, MV ModelVariant, typename AdapterMixin, typename ...Ts>
-struct AdapterMixer<real_type, ModelVariant, Triple<true, DpConfig<real_type, ModelVariant>, AdapterMixin>, Ts...> {
-  using NextAdapterMixer = AdapterMixer<real_type, ModelVariant, Ts...>;
-  using Config = ConfigMixer<real_type, ModelVariant, Pair<true, DpConfig<real_type, ModelVariant>>, typename TripleToPair<Ts>::type...>;
+template<Language L, typename real_type, MV ModelVariant, typename ...Ts>
+struct AdapterMixer<L, real_type, ModelVariant, Pair<true, DpAdapter<L, real_type, ModelVariant>>, Ts...> {
+  using NextAdapterMixer = AdapterMixer<L, real_type, ModelVariant, Ts...>;
+  using AdapterMixin = DpAdapter<L, real_type, ModelVariant>;
+  using Pars = Config<real_type, ModelVariant>::PartialPars::DpPars;
 
   template<typename... Args>
-  static typename Config::Pars get_pars(Args&&... args) {
-    typename Config::Pars p = {
+  static Pars get_pars(Args&&... args) {
+    Pars p = {
       NextAdapterMixer::get_pars(std::forward<Args>(args)...),
       AdapterMixin::get_pars(std::forward<Args>(args)...)
     };
@@ -66,14 +54,15 @@ struct AdapterMixer<real_type, ModelVariant, Triple<true, DpConfig<real_type, Mo
   }
 };
 
-template<typename real_type, MV ModelVariant, typename AdapterMixin, typename ...Ts>
-struct AdapterMixer<real_type, ModelVariant, Triple<true, HaConfig<real_type, ModelVariant>, AdapterMixin>, Ts...> {
-  using NextAdapterMixer = AdapterMixer<real_type, ModelVariant, Ts...>;
-  using Config = ConfigMixer<real_type, ModelVariant, Pair<true, HaConfig<real_type, ModelVariant>>, typename TripleToPair<Ts>::type...>;
+template<Language L, typename real_type, MV ModelVariant, typename ...Ts>
+struct AdapterMixer<L, real_type, ModelVariant, Pair<true, HaAdapter<L, real_type, ModelVariant>>, Ts...> {
+  using NextAdapterMixer = AdapterMixer<L, real_type, ModelVariant, Ts...>;
+  using AdapterMixin = HaAdapter<L, real_type, ModelVariant>;
+  using Pars = Config<real_type, ModelVariant>::PartialPars::HaPars;
 
   template<typename... Args>
-  static typename Config::Pars get_pars(Args&&... args) {
-    typename Config::Pars p = {
+  static Pars get_pars(Args&&... args) {
+    Pars p = {
       NextAdapterMixer::get_pars(std::forward<Args>(args)...),
       AdapterMixin::get_pars(std::forward<Args>(args)...)
     };
@@ -87,14 +76,15 @@ struct AdapterMixer<real_type, ModelVariant, Triple<true, HaConfig<real_type, Mo
   }
 };
 
-template<typename real_type, MV ModelVariant, typename AdapterMixin, typename ...Ts>
-struct AdapterMixer<real_type, ModelVariant, Triple<true, HcConfig<real_type, ModelVariant>, AdapterMixin>, Ts...> {
-  using NextAdapterMixer = AdapterMixer<real_type, ModelVariant, Ts...>;
-  using Config = ConfigMixer<real_type, ModelVariant, Pair<true, HcConfig<real_type, ModelVariant>>, typename TripleToPair<Ts>::type...>;
+template<Language L, typename real_type, MV ModelVariant, typename ...Ts>
+struct AdapterMixer<L, real_type, ModelVariant, Pair<true, HcAdapter<L, real_type, ModelVariant>>, Ts...> {
+  using NextAdapterMixer = AdapterMixer<L, real_type, ModelVariant, Ts...>;
+  using AdapterMixin = HcAdapter<L, real_type, ModelVariant>;
+  using Pars = Config<real_type, ModelVariant>::PartialPars::HcPars;
 
   template<typename... Args>
-  static typename Config::Pars get_pars(Args&&... args) {
-    typename Config::Pars p = {
+  static Pars get_pars(Args&&... args) {
+    Pars p = {
       NextAdapterMixer::get_pars(std::forward<Args>(args)...),
       AdapterMixin::get_pars(std::forward<Args>(args)...)
     };
@@ -108,5 +98,15 @@ struct AdapterMixer<real_type, ModelVariant, Triple<true, HcConfig<real_type, Mo
   }
 };
 
+
 } // namespace internal
+
+template<Language L, typename real_type, internal::MV ModelVariant>
+using Adapter = internal::AdapterMixer<
+  L, real_type, ModelVariant,
+  internal::Pair<ModelVariant::run_demographic_projection, internal::DpAdapter<L, real_type, ModelVariant>>,
+  internal::Pair<ModelVariant::run_hiv_simulation, internal::HaAdapter<L, real_type, ModelVariant>>,
+  internal::Pair<ModelVariant::run_child_model, internal::HcAdapter<L, real_type, ModelVariant>>
+>;
+
 } // namespace leapfrog
