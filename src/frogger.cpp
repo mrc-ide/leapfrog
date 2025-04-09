@@ -20,7 +20,7 @@ Rcpp::List simulate_model(
   const int output_size = leapfrog::Leapfrog<real_type, ModelVariant>::Cfg::get_build_output_size(0);
   Rcpp::List ret(output_size);
   Rcpp::CharacterVector names(output_size);
-  leapfrog::AdapterR<real_type, ModelVariant>::build_output(ret, names, 0, state, save_steps.size());
+  leapfrog::AdapterR<real_type, ModelVariant>::build_output(0, state, ret, names, save_steps.size());
   ret.attr("names") = names;
 
   return ret;

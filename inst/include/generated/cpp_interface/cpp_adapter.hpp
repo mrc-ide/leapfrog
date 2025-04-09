@@ -25,7 +25,6 @@ auto read_data(const std::filesystem::path &input_dir, std::string_view key, Arg
   }
 }
 
-
 template<typename real_type, MV ModelVariant>
 struct DpAdapterCpp {
   using SS = SSMixed<ModelVariant>;
@@ -45,13 +44,17 @@ struct DpAdapterCpp {
     };
   };
 
-  static void write_output(
-    std::filesystem::path& output_dir,
-    const Config::OutputState& state
+  static constexpr int output_count = 3;
+
+  static int build_output(
+    int index,
+    const Config::OutputState& state,
+    std::filesystem::path& output_dir
   ) {
     serialize::serialize_tensor<double, 3>(state.p_total_pop, output_dir / "p_total_pop");
     serialize::serialize_tensor<double, 3>(state.p_total_pop_natural_deaths, output_dir / "p_total_pop_natural_deaths");
     serialize::serialize_tensor<double, 1>(state.births, output_dir / "births");
+    return index + output_count;
   };
 };
 
@@ -85,9 +88,12 @@ struct HaAdapterCpp {
     };
   };
 
-  static void write_output(
-    std::filesystem::path& output_dir,
-    const Config::OutputState& state
+  static constexpr int output_count = 9;
+
+  static int build_output(
+    int index,
+    const Config::OutputState& state,
+    std::filesystem::path& output_dir
   ) {
     serialize::serialize_tensor<double, 3>(state.p_hiv_pop, output_dir / "p_hiv_pop");
     serialize::serialize_tensor<double, 3>(state.p_hiv_pop_natural_deaths, output_dir / "p_hiv_pop_natural_deaths");
@@ -98,9 +104,9 @@ struct HaAdapterCpp {
     serialize::serialize_tensor<double, 5>(state.h_hiv_deaths_art, output_dir / "h_hiv_deaths_art");
     serialize::serialize_tensor<double, 4>(state.h_art_initiation, output_dir / "h_art_initiation");
     serialize::serialize_tensor<double, 3>(state.p_hiv_deaths, output_dir / "p_hiv_deaths");
+    return index + output_count;
   };
 };
-
 
 template<typename real_type, MV ModelVariant>
 struct HcAdapterCpp {
@@ -162,9 +168,12 @@ struct HcAdapterCpp {
     };
   };
 
-  static void write_output(
-    std::filesystem::path& output_dir,
-    const Config::OutputState& state
+  static constexpr int output_count = 13;
+
+  static int build_output(
+    int index,
+    const Config::OutputState& state,
+    std::filesystem::path& output_dir
   ) {
     serialize::serialize_tensor<double, 5>(state.hc1_hiv_pop, output_dir / "hc1_hiv_pop");
     serialize::serialize_tensor<double, 5>(state.hc2_hiv_pop, output_dir / "hc2_hiv_pop");
@@ -179,9 +188,9 @@ struct HcAdapterCpp {
     serialize::serialize_tensor<double, 1>(state.hiv_births, output_dir / "hiv_births");
     serialize::serialize_tensor<double, 1>(state.ctx_need, output_dir / "ctx_need");
     serialize::serialize_tensor<double, 4>(state.infection_by_type, output_dir / "infection_by_type");
+    return index + output_count;
   };
 };
-
 
 }
 }

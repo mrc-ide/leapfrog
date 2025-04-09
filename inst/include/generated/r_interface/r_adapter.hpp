@@ -66,10 +66,10 @@ struct DpAdapterR {
   static constexpr int output_count = 3;
 
   static int build_output(
-    Rcpp::List& ret,
-    Rcpp::CharacterVector& names,
     int index,
     const Config::OutputState& state,
+    Rcpp::List& ret,
+    Rcpp::CharacterVector& names,
     const size_t& output_years
   ) {
     Rcpp::NumericVector r_p_total_pop(SS::pAG * SS::NS * output_years);
@@ -124,10 +124,10 @@ struct HaAdapterR {
   static constexpr int output_count = 9;
 
   static int build_output(
-    Rcpp::List& ret,
-    Rcpp::CharacterVector& names,
     int index,
     const Config::OutputState& state,
+    Rcpp::List& ret,
+    Rcpp::CharacterVector& names,
     const size_t& output_years
   ) {
     Rcpp::NumericVector r_p_hiv_pop(SS::pAG * SS::NS * output_years);
@@ -243,10 +243,10 @@ struct HcAdapterR {
   static constexpr int output_count = 13;
 
   static int build_output(
-    Rcpp::List& ret,
-    Rcpp::CharacterVector& names,
     int index,
     const Config::OutputState& state,
+    Rcpp::List& ret,
+    Rcpp::CharacterVector& names,
     const size_t& output_years
   ) {
     Rcpp::NumericVector r_hc1_hiv_pop(SS::hc1DS * SS::hcTT * SS::hc1AG * SS::NS * output_years);

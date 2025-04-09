@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
   std::cout << "Fit complete" << std::endl;
 
   auto state = leapfrog::Leapfrog<double, leapfrog::HivFullAgeStratification>::run_model(sim_years, save_steps, pars, opts);
-  leapfrog::AdapterCpp<double, leapfrog::HivFullAgeStratification>::write_output(output_abs, state);
+  leapfrog::AdapterCpp<double, leapfrog::HivFullAgeStratification>::build_output(0, state, output_abs);
 
   return 0;
 }
