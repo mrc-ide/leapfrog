@@ -9,7 +9,7 @@
 #include <string_view>
 #include <format>
 
-#include "../adapter_mixer.hpp"
+#include "../config_mixer.hpp"
 #include "../../serialize_eigen.hpp"
 
 namespace leapfrog {

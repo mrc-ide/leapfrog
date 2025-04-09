@@ -7,7 +7,7 @@
 
 #include <Rcpp.h>
 
-#include "../adapter_mixer.hpp"
+#include "../config_mixer.hpp"
 
 namespace leapfrog {
 namespace internal {

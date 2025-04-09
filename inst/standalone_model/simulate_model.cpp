@@ -63,11 +63,10 @@ int main(int argc, char *argv[]) {
     std::cout << "Running model fit " << n_runs << " times" << std::endl;
   }
 
-  using AdapterCpp = leapfrog::Adapter<leapfrog::Cpp, double, leapfrog::HivFullAgeStratification>;
-  using LF = leapfrog::Leapfrog<double, leapfrog::HivFullAgeStratification>;
+  using LF = leapfrog::Leapfrog<leapfrog::Cpp, double, leapfrog::HivFullAgeStratification>;
 
   const auto opts = leapfrog::get_opts<double>(hts_per_year, 30, true);
-  const auto pars = AdapterCpp::get_pars(input_dir, opts, sim_years);
+  const auto pars = LF::Cfg::get_pars(input_dir, opts, sim_years);
 
   for (size_t i = 0; i < n_runs; ++i) {
     auto state = LF::run_model(sim_years, save_steps, pars, opts);
@@ -75,7 +74,7 @@ int main(int argc, char *argv[]) {
   std::cout << "Fit complete" << std::endl;
 
   auto state = LF::run_model(sim_years, save_steps, pars, opts);
-  AdapterCpp::build_output(0, state, output_abs);
+  LF::Cfg::build_output(0, state, output_abs);
 
   return 0;
 }
