@@ -29,5 +29,5 @@ concept UseCoarseStratification = MV<typename Config::ModelVariant> && Config::M
 template<typename Config>
 concept RunChildModel = MV<typename Config::ModelVariant> && Config::ModelVariant::run_child_model;
 
-}
-}
+} // namespace internal
+} // namespace leapfrog

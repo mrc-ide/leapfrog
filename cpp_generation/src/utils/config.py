@@ -14,6 +14,8 @@ def collapse_dims_with_trailing_sep(cfg, sep = ", "):
 
 
 def dim_len(cfg):
+  if not cfg.get("dims"):
+    return 0
   return len(cfg["dims"])
 
 
@@ -30,12 +32,19 @@ def get_r_internal_data_pointer(cfg):
   return "INTEGER" if cfg["num_type"] == "int" else "REAL"
 
 
-def get_parse_data(cfg):
+def get_r_parse_data(cfg):
   r_alias = cfg["alias"]["r"]
   if cfg["type"] == "scalar":
     return f'Rcpp::as<{cfg["num_type"]}>(data["{r_alias}"])'
   else:
     return f'parse_data<{cfg["num_type"]}>(data, "{r_alias}", {collapse_dims(cfg)})'
+
+
+def get_cpp_read_data(name, cfg):
+  if cfg["type"] == "scalar":
+    return f'read_data<{cfg["num_type"]}>(input_dir, "{name}")'
+  else:
+    return f'read_data<{cfg["num_type"]}>(input_dir, "{name}", {collapse_dims(cfg)})'
 
 
 def get_reset(name, cfg):
@@ -55,6 +64,10 @@ def get_output_state_chip(name, cfg):
     return f'{name}(i)'
   else:
     return f'{name}.chip(i, {name}.NumDimensions - 1)'
+
+
+def get_num_type(cfg):
+  return cfg["num_type"]
 
 
 def dict_len(dict):

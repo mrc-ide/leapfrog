@@ -1,0 +1,65 @@
+{% from "template_utils.j2" import comma_except_last %}
+{% include "header.j2" %}
+
+#pragma once
+
+#include <filesystem>
+#include <string_view>
+#include <format>
+
+#include "../../options.hpp"
+#include "../config.hpp"
+#include "../../serialize_eigen.hpp"
+
+namespace leapfrog {
+namespace internal {
+
+template<typename T, typename... Args>
+auto read_data(const std::filesystem::path &input_dir, std::string_view key, Args... dims) {
+  if (!std::filesystem::exists(input_dir / key)) {
+    throw std::runtime_error(std::format("File '{}' in input dir '{}' does not exist.\n", key, input_dir.string()));
+  }
+
+  constexpr std::size_t rank = sizeof...(dims);
+  if constexpr (rank == 0) {
+    return serialize::deserialize_scalar<T>(input_dir / key);
+  } else {
+    return serialize::deserialize_tensor<T, rank>(input_dir / key);
+  }
+}
+
+{% for config in configs %}
+template<typename real_type, MV ModelVariant>
+struct {{ config.name }}AdapterCpp {
+  using SS = SSMixed<ModelVariant>;
+  using Config = {{ config.name }}Config<real_type, ModelVariant>;
+
+  static Config::Pars get_pars(
+    const std::filesystem::path &input_dir,
+    const Options<real_type> &opts,
+    const int proj_years
+  ) {
+    return {
+      {% for name, cfg in config.pars.items() %}
+      .{{ name }} = {{ get_cpp_read_data(name, cfg) }}{{ comma_except_last(loop) }}
+      {% endfor %}
+    };
+  };
+
+  static constexpr int output_count = {{ dict_len(config.state) }};
+
+  static int build_output(
+    int index,
+    const Config::OutputState& state,
+    std::filesystem::path& output_dir
+  ) {
+    {% for name, cfg in config.state.items() %}
+    serialize::serialize_tensor<{{ get_num_type(cfg) }}, {{ dim_len(cfg) + 1 }}>(state.{{ name }}, output_dir / "{{ name }}");
+    {% endfor %}
+    return index + output_count;
+  };
+};
+
+{% endfor %}
+} // namespace internal
+} // namespace leapfrog

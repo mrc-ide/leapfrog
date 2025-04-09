@@ -4,8 +4,10 @@
 #pragma once
 
 #include "config.hpp"
+#include "options.hpp"
 
 namespace leapfrog {
+namespace internal {
 
 template<typename ...Ts>
 struct ConfigMixer;
@@ -13,9 +15,6 @@ struct ConfigMixer;
 template<typename real_type, MV ModelVariant>
 struct ConfigMixer<real_type, ModelVariant> {
   struct Pars {};
-  static Pars get_pars(const Rcpp::List &data, const Opts<real_type> &options, const int proj_years) {
-    Pars p = {}; return p;
-  };
 
   struct Intermediate {
     void reset() {};
@@ -35,9 +34,6 @@ struct ConfigMixer<real_type, ModelVariant> {
   static int get_build_output_size(int prev_size) {
     return prev_size;
   };
-  static int build_output(Rcpp::List& ret, Rcpp::CharacterVector& names, int index, const auto& state, const size_t& output_years) {
-    return index;
-  };
 };
 
 template<typename real_type, MV ModelVariant, typename Config, typename ...Ts>
@@ -54,14 +50,6 @@ struct ConfigMixer<real_type1, ModelVariant1, Pair<true, {{ config.name }}Config
 
   struct Pars: public NextConfigMixer::Pars {
     typename CurrConfig::Pars {{ config.namespace }};
-  };
-
-  static Pars get_pars(const Rcpp::List &data, const Opts<real_type> &options, const int proj_years) {
-    Pars p = {
-      NextConfigMixer::get_pars(data, options, proj_years),
-      CurrConfig::get_pars(data, options, proj_years)
-    };
-    return p;
   };
 
   struct Intermediate: public NextConfigMixer::Intermediate {
@@ -112,29 +100,24 @@ struct ConfigMixer<real_type1, ModelVariant1, Pair<true, {{ config.name }}Config
     return CurrConfig::get_build_output_size(curr_size);
   };
 
-  static int build_output(Rcpp::List& ret, Rcpp::CharacterVector& names, int index, const OutputState& state, const size_t& output_years) {
-    int new_index = CurrConfig::build_output(ret, names, index, state.{{ config.namespace }}, output_years);
-    return NextConfigMixer::build_output(ret, names, new_index, state, output_years);
-  };
-
-  using Options = Opts<real_type>;
   struct Args {
     int t;
     const Pars& pars;
     const State& state_curr;
     State& state_next;
     Intermediate& intermediate;
-    const Options& opts;
+    const Options<real_type>& opts;
   };
 };
 {% endfor %}
 
 template<typename real_type, MV ModelVariant>
-using ConfigMixed = ConfigMixer<
+using Config = ConfigMixer<
   real_type, ModelVariant,
   {% for config in configs %}
   Pair<ModelVariant::{{ config.enable_if }}, {{ config.name }}Config<real_type, ModelVariant>>{{ comma_except_last(loop) }}
   {% endfor %}
 >;
 
-}
+} // namespace internal
+} // namespace leapfrog

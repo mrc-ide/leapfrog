@@ -9,7 +9,6 @@
 #include "options.hpp"
 
 namespace leapfrog {
-
 namespace internal {
 
 template<typename ...Ts>
@@ -261,5 +260,5 @@ using Config = ConfigMixer<
   Pair<ModelVariant::run_child_model, HcConfig<real_type, ModelVariant>>
 >;
 
-}
-}
+} // namespace internal
+} // namespace leapfrog

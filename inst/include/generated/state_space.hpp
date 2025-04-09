@@ -12,6 +12,7 @@
 namespace leapfrog {
 namespace internal {
 
+
 template<MV ModelVariant>
 struct DpSS {
   static constexpr int NS = 2;
@@ -67,5 +68,5 @@ struct BaseSS {
   static constexpr int PROJPERIOD_MIDYEAR = 1;
 };
 
-}
-}
+} // namespace internal
+} // namespace leapfrog

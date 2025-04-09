@@ -7,7 +7,15 @@ namespace internal {
 
 #ifdef CALLER_CPP
 
-// TODO: Write a note here about why this preprocessor flag
+// When we run the model from the "CPP" interface we read input data from disk
+// when we run it from R we map over data owned by R. So from CPP caller we need
+// to operate on owned data, not the mapped data. We could alternatively read
+// in the files from disk in the interface layer, and then convert to a map
+// in the cpp adapter but that is a bigger faff than just wrapping this
+// in a preprocessor flag.
+// We'll need something similar down the line when we add Delphi and Python
+// interfaces which will have a map over their output data. So we might want
+// to revisit this later
 
 template<typename real_type>
 using TM1 = Eigen::Tensor<real_type, 1>;

@@ -2,9 +2,12 @@
 
 #pragma once
 
+#include <array>
+
 #include "concepts.hpp"
 
 namespace leapfrog {
+namespace internal {
 
 {% for config in configs %}
 
@@ -32,4 +35,5 @@ struct BaseSS {
   {% endfor %}
 };
 
-}
+} // namespace internal
+} // namespace leapfrog

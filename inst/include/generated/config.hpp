@@ -82,6 +82,7 @@ struct DpConfig {
     return prev_size + output_count;
   };
 };
+
 template<typename real_type, MV ModelVariant>
 struct HaConfig {
   using SS = SSMixed<ModelVariant>;
@@ -274,6 +275,7 @@ struct HaConfig {
     return prev_size + output_count;
   };
 };
+
 template<typename real_type, MV ModelVariant>
 struct HcConfig {
   using SS = SSMixed<ModelVariant>;
@@ -585,5 +587,6 @@ struct HcConfig {
   };
 };
 
-}
-}
+
+} // namespace internal
+} // namespace leapfrog

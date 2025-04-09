@@ -3,7 +3,6 @@ import os
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-import utils
 import utils.concepts
 import utils.config
 import utils.state_space
@@ -51,3 +50,8 @@ generate_hpp("concepts", dat | vars(utils.concepts))
 generate_hpp("state_space_mixer", dat)
 generate_hpp("config", dat | vars(utils.config))
 generate_hpp("config_mixer", dat)
+generate_hpp("adapter_mixer", dat)
+generate_hpp("cpp_interface/cpp_adapter", dat | vars(utils.config))
+generate_hpp("cpp_interface/cpp_adapter_mixer", dat)
+generate_hpp("r_interface/r_adapter", dat | vars(utils.config))
+generate_hpp("r_interface/r_adapter_mixer", dat)
