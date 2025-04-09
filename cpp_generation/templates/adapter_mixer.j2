@@ -42,10 +42,8 @@ template<typename real_type, MV ModelVariant, typename ConfigMixin, typename Ada
 struct AdapterMixer<real_type, ModelVariant, Triple<false, ConfigMixin, AdapterMixin>, Ts...> : public AdapterMixer<real_type, ModelVariant, Ts...> {};
 
 {% for config in configs +%}
-template<typename real_type1, MV ModelVariant1, typename AdapterMixin, typename ...Ts>
-struct AdapterMixer<real_type1, ModelVariant1, Triple<true, {{ config.name }}Config<real_type1, ModelVariant1>, AdapterMixin>, Ts...> {
-  using real_type = real_type1;
-  using ModelVariant = ModelVariant1;
+template<typename real_type, MV ModelVariant, typename AdapterMixin, typename ...Ts>
+struct AdapterMixer<real_type, ModelVariant, Triple<true, {{ config.name }}Config<real_type, ModelVariant>, AdapterMixin>, Ts...> {
   using NextAdapterMixer = AdapterMixer<real_type, ModelVariant, Ts...>;
   using Config = ConfigMixer<real_type, ModelVariant, Pair<true, {{ config.name }}Config<real_type, ModelVariant>>, typename TripleToPair<Ts>::type...>;
 

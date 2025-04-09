@@ -45,10 +45,8 @@ template<typename real_type, MV ModelVariant, typename ConfigMixin, typename Ada
 struct AdapterMixer<real_type, ModelVariant, Triple<false, ConfigMixin, AdapterMixin>, Ts...> : public AdapterMixer<real_type, ModelVariant, Ts...> {};
 
 
-template<typename real_type1, MV ModelVariant1, typename AdapterMixin, typename ...Ts>
-struct AdapterMixer<real_type1, ModelVariant1, Triple<true, DpConfig<real_type1, ModelVariant1>, AdapterMixin>, Ts...> {
-  using real_type = real_type1;
-  using ModelVariant = ModelVariant1;
+template<typename real_type, MV ModelVariant, typename AdapterMixin, typename ...Ts>
+struct AdapterMixer<real_type, ModelVariant, Triple<true, DpConfig<real_type, ModelVariant>, AdapterMixin>, Ts...> {
   using NextAdapterMixer = AdapterMixer<real_type, ModelVariant, Ts...>;
   using Config = ConfigMixer<real_type, ModelVariant, Pair<true, DpConfig<real_type, ModelVariant>>, typename TripleToPair<Ts>::type...>;
 
@@ -68,10 +66,8 @@ struct AdapterMixer<real_type1, ModelVariant1, Triple<true, DpConfig<real_type1,
   }
 };
 
-template<typename real_type1, MV ModelVariant1, typename AdapterMixin, typename ...Ts>
-struct AdapterMixer<real_type1, ModelVariant1, Triple<true, HaConfig<real_type1, ModelVariant1>, AdapterMixin>, Ts...> {
-  using real_type = real_type1;
-  using ModelVariant = ModelVariant1;
+template<typename real_type, MV ModelVariant, typename AdapterMixin, typename ...Ts>
+struct AdapterMixer<real_type, ModelVariant, Triple<true, HaConfig<real_type, ModelVariant>, AdapterMixin>, Ts...> {
   using NextAdapterMixer = AdapterMixer<real_type, ModelVariant, Ts...>;
   using Config = ConfigMixer<real_type, ModelVariant, Pair<true, HaConfig<real_type, ModelVariant>>, typename TripleToPair<Ts>::type...>;
 
@@ -91,10 +87,8 @@ struct AdapterMixer<real_type1, ModelVariant1, Triple<true, HaConfig<real_type1,
   }
 };
 
-template<typename real_type1, MV ModelVariant1, typename AdapterMixin, typename ...Ts>
-struct AdapterMixer<real_type1, ModelVariant1, Triple<true, HcConfig<real_type1, ModelVariant1>, AdapterMixin>, Ts...> {
-  using real_type = real_type1;
-  using ModelVariant = ModelVariant1;
+template<typename real_type, MV ModelVariant, typename AdapterMixin, typename ...Ts>
+struct AdapterMixer<real_type, ModelVariant, Triple<true, HcConfig<real_type, ModelVariant>, AdapterMixin>, Ts...> {
   using NextAdapterMixer = AdapterMixer<real_type, ModelVariant, Ts...>;
   using Config = ConfigMixer<real_type, ModelVariant, Pair<true, HcConfig<real_type, ModelVariant>>, typename TripleToPair<Ts>::type...>;
 
