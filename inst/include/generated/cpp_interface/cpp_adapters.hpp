@@ -30,7 +30,7 @@ auto read_data(const std::filesystem::path &input_dir, std::string_view key, Arg
 }
 
 template<typename real_type, MV ModelVariant>
-struct DpAdapter<Cpp, real_type, ModelVariant> {
+struct DpAdapter<Language::Cpp, real_type, ModelVariant> {
   using SS = SSMixed<ModelVariant>;
   using Config = DpConfig<real_type, ModelVariant>;
 
@@ -63,7 +63,7 @@ struct DpAdapter<Cpp, real_type, ModelVariant> {
 };
 
 template<typename real_type, MV ModelVariant>
-struct HaAdapter<Cpp, real_type, ModelVariant> {
+struct HaAdapter<Language::Cpp, real_type, ModelVariant> {
   using SS = SSMixed<ModelVariant>;
   using Config = HaConfig<real_type, ModelVariant>;
 
@@ -113,7 +113,7 @@ struct HaAdapter<Cpp, real_type, ModelVariant> {
 };
 
 template<typename real_type, MV ModelVariant>
-struct HcAdapter<Cpp, real_type, ModelVariant> {
+struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
   using SS = SSMixed<ModelVariant>;
   using Config = HcConfig<real_type, ModelVariant>;
 

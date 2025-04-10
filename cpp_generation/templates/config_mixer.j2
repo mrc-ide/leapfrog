@@ -7,14 +7,33 @@
 #include "options.hpp"
 
 namespace leapfrog {
+
+enum Language {
+  Cpp,
+  R
+};
+
 namespace internal {
 
-template<typename ...Ts>
+template<Language L, typename real_type, MV ModelVariant>
+struct DpAdapter;
+
+template<Language L, typename real_type, MV ModelVariant>
+struct HaAdapter;
+
+template<Language L, typename real_type, MV ModelVariant>
+struct HcAdapter;
+
+template<Language L, typename ...Ts>
 struct ConfigMixer;
 
-template<typename real_type, MV ModelVariant>
-struct ConfigMixer<real_type, ModelVariant> {
+template<Language L, typename real_type, MV ModelVariant>
+struct ConfigMixer<L, real_type, ModelVariant> {
   struct Pars {};
+
+  static Pars get_pars(...) {
+    Pars p = {}; return p;
+  };
 
   struct Intermediate {
     void reset() {};
@@ -34,23 +53,37 @@ struct ConfigMixer<real_type, ModelVariant> {
   static int get_build_output_size(int prev_size) {
     return prev_size;
   };
+
+  static int build_output(int index, ...) {
+    return index;
+  };
 };
 
-template<typename real_type, MV ModelVariant, typename Config, typename ...Ts>
-struct ConfigMixer<real_type, ModelVariant, Pair<false, Config>, Ts...> : public ConfigMixer<real_type, ModelVariant, Ts...> {};
+template<Language L, typename real_type, MV ModelVariant, typename Config, typename ...Ts>
+struct ConfigMixer<L, real_type, ModelVariant, Pair<false, Config>, Ts...> : public ConfigMixer<L, real_type, ModelVariant, Ts...> {};
 
 {% for config in configs +%}
-template<typename real_type1, MV ModelVariant1, typename ...Ts>
-struct ConfigMixer<real_type1, ModelVariant1, Pair<true, {{ config.name }}Config<real_type1, ModelVariant1>>, Ts...> {
+template<Language L, typename real_type1, MV ModelVariant1, typename ...Ts>
+struct ConfigMixer<L, real_type1, ModelVariant1, Pair<true, {{ config.name }}Config<real_type1, ModelVariant1>>, Ts...> {
   using real_type = real_type1;
   using ModelVariant = ModelVariant1;
   using CurrConfig = {{ config.name }}Config<real_type, ModelVariant>;
-  using NextConfigMixer = ConfigMixer<real_type, ModelVariant, Ts...>;
+  using Adapter = {{ config.name }}Adapter<L, real_type, ModelVariant>;
+  using NextConfigMixer = ConfigMixer<L, real_type, ModelVariant, Ts...>;
   using SS = SSMixed<ModelVariant>;
 
   struct Pars: public NextConfigMixer::Pars {
     typename CurrConfig::Pars {{ config.namespace }};
   };
+
+  template<typename... Args>
+  static Pars get_pars(Args&&... args) {
+    Pars p = {
+      NextConfigMixer::get_pars(std::forward<Args>(args)...),
+      Adapter::get_pars(std::forward<Args>(args)...)
+    };
+    return p;
+  }
 
   struct Intermediate: public NextConfigMixer::Intermediate {
     typename CurrConfig::Intermediate {{ config.namespace }};
@@ -100,6 +133,12 @@ struct ConfigMixer<real_type1, ModelVariant1, Pair<true, {{ config.name }}Config
     return CurrConfig::get_build_output_size(curr_size);
   };
 
+  template<typename... Args>
+  static int build_output(int index, const OutputState& state, Args&&... args) {
+    int new_index = Adapter::build_output(index, state.{{ config.namespace }}, std::forward<Args>(args)...);
+    return NextConfigMixer::build_output(new_index, state, std::forward<Args>(args)...);
+  }
+
   struct Args {
     int t;
     const Pars& pars;
@@ -111,9 +150,9 @@ struct ConfigMixer<real_type1, ModelVariant1, Pair<true, {{ config.name }}Config
 };
 {% endfor %}
 
-template<typename real_type, MV ModelVariant>
+template<Language L, typename real_type, MV ModelVariant>
 using Config = ConfigMixer<
-  real_type, ModelVariant,
+  L, real_type, ModelVariant,
   {% for config in configs %}
   Pair<ModelVariant::{{ config.enable_if }}, {{ config.name }}Config<real_type, ModelVariant>>{{ comma_except_last(loop) }}
   {% endfor %}

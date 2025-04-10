@@ -7,8 +7,7 @@
 #include <string_view>
 #include <format>
 
-#include "../../options.hpp"
-#include "../config.hpp"
+#include "../config_mixer.hpp"
 #include "../../serialize_eigen.hpp"
 
 namespace leapfrog {
@@ -30,7 +29,7 @@ auto read_data(const std::filesystem::path &input_dir, std::string_view key, Arg
 
 {% for config in configs %}
 template<typename real_type, MV ModelVariant>
-struct {{ config.name }}AdapterCpp {
+struct {{ config.name }}Adapter<Language::Cpp, real_type, ModelVariant> {
   using SS = SSMixed<ModelVariant>;
   using Config = {{ config.name }}Config<real_type, ModelVariant>;
 

@@ -15,9 +15,7 @@ enum Language {
   R
 };
 
-
 namespace internal {
-
 
 template<Language L, typename real_type, MV ModelVariant>
 struct DpAdapter;
@@ -28,13 +26,13 @@ struct HaAdapter;
 template<Language L, typename real_type, MV ModelVariant>
 struct HcAdapter;
 
-
 template<Language L, typename ...Ts>
 struct ConfigMixer;
 
 template<Language L, typename real_type, MV ModelVariant>
 struct ConfigMixer<L, real_type, ModelVariant> {
   struct Pars {};
+
   static Pars get_pars(...) {
     Pars p = {}; return p;
   };
@@ -72,9 +70,9 @@ struct ConfigMixer<L, real_type1, ModelVariant1, Pair<true, DpConfig<real_type1,
   using real_type = real_type1;
   using ModelVariant = ModelVariant1;
   using CurrConfig = DpConfig<real_type, ModelVariant>;
+  using Adapter = DpAdapter<L, real_type, ModelVariant>;
   using NextConfigMixer = ConfigMixer<L, real_type, ModelVariant, Ts...>;
   using SS = SSMixed<ModelVariant>;
-  using Adapter = DpAdapter<L, real_type, ModelVariant>;
 
   struct Pars: public NextConfigMixer::Pars {
     typename CurrConfig::Pars dp;
@@ -158,9 +156,9 @@ struct ConfigMixer<L, real_type1, ModelVariant1, Pair<true, HaConfig<real_type1,
   using real_type = real_type1;
   using ModelVariant = ModelVariant1;
   using CurrConfig = HaConfig<real_type, ModelVariant>;
+  using Adapter = HaAdapter<L, real_type, ModelVariant>;
   using NextConfigMixer = ConfigMixer<L, real_type, ModelVariant, Ts...>;
   using SS = SSMixed<ModelVariant>;
-  using Adapter = HaAdapter<L, real_type, ModelVariant>;
 
   struct Pars: public NextConfigMixer::Pars {
     typename CurrConfig::Pars ha;
@@ -244,9 +242,9 @@ struct ConfigMixer<L, real_type1, ModelVariant1, Pair<true, HcConfig<real_type1,
   using real_type = real_type1;
   using ModelVariant = ModelVariant1;
   using CurrConfig = HcConfig<real_type, ModelVariant>;
+  using Adapter = HcAdapter<L, real_type, ModelVariant>;
   using NextConfigMixer = ConfigMixer<L, real_type, ModelVariant, Ts...>;
   using SS = SSMixed<ModelVariant>;
-  using Adapter = HcAdapter<L, real_type, ModelVariant>;
 
   struct Pars: public NextConfigMixer::Pars {
     typename CurrConfig::Pars hc;

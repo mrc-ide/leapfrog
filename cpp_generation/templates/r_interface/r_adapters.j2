@@ -5,8 +5,7 @@
 
 #include <Rcpp.h>
 
-#include "../../options.hpp"
-#include "../config.hpp"
+#include "../config_mixer.hpp"
 
 namespace leapfrog {
 namespace internal {
@@ -47,7 +46,7 @@ auto parse_data(const Rcpp::List data, const std::string& key, Args... dims) {
 
 {% for config in configs %}
 template<typename real_type, MV ModelVariant>
-struct {{ config.name }}AdapterR {
+struct {{ config.name }}Adapter<Language::R, real_type, ModelVariant> {
   using SS = SSMixed<ModelVariant>;
   using Config = {{ config.name }}Config<real_type, ModelVariant>;
 

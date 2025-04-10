@@ -47,7 +47,7 @@ auto parse_data(const Rcpp::List data, const std::string& key, Args... dims) {
 }
 
 template<typename real_type, MV ModelVariant>
-struct DpAdapter<R, real_type, ModelVariant> {
+struct DpAdapter<Language::R, real_type, ModelVariant> {
   using SS = SSMixed<ModelVariant>;
   using Config = DpConfig<real_type, ModelVariant>;
 
@@ -94,7 +94,7 @@ struct DpAdapter<R, real_type, ModelVariant> {
 };
 
 template<typename real_type, MV ModelVariant>
-struct HaAdapter<R, real_type, ModelVariant> {
+struct HaAdapter<Language::R, real_type, ModelVariant> {
   using SS = SSMixed<ModelVariant>;
   using Config = HaConfig<real_type, ModelVariant>;
 
@@ -182,7 +182,7 @@ struct HaAdapter<R, real_type, ModelVariant> {
 };
 
 template<typename real_type, MV ModelVariant>
-struct HcAdapter<R, real_type, ModelVariant> {
+struct HcAdapter<Language::R, real_type, ModelVariant> {
   using SS = SSMixed<ModelVariant>;
   using Config = HcConfig<real_type, ModelVariant>;
 
