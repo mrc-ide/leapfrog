@@ -6,77 +6,25 @@
 #include "models/hiv_demographic_projection.hpp"
 #include "models/adult_hiv_model_simulation.hpp"
 #include "models/child_model_simulation.hpp"
+#include "options.hpp"
 
 namespace leapfrog {
 
-template<typename real_type, MV ModelVariant>
+template<Language L, typename real_type, internal::MV ModelVariant>
 struct Leapfrog {
-  using Config = ConfigMixed<real_type, ModelVariant>;
-  using SS = Config::SS;
-  using Pars = Config::Pars;
-  using State = Config::State;
-  using Intermediate = Config::Intermediate;
-  using OutputState = Config::OutputState;
-  using Options = Config::Options;
-  using Args = Config::Args;
-
-  static Rcpp::List simulate_model(
-    const Rcpp::List& data,
-    const int time_steps,
-    const int hiv_steps,
-    const std::vector<int>& save_steps,
-    const bool is_midyear_projection,
-    const int t_ART_start
-  ) {
-    const auto opts = get_opts(hiv_steps, t_ART_start, is_midyear_projection);
-    const auto pars = Config::get_pars(data, opts, time_steps);
-
-    auto state = run_model(time_steps, save_steps, pars, opts);
-
-    const int output_size = Config::get_build_output_size(0);
-    Rcpp::List ret(output_size);
-    Rcpp::CharacterVector names(output_size);
-    Config::build_output(ret, names, 0, state, save_steps.size());
-    ret.attr("names") = names;
-
-    return ret;
-  };
-
-  private:
-  static const Options get_opts(
-    const int hiv_steps,
-    const int t_ART_start,
-    const bool is_midyear_projection
-  ) {
-    const int proj_period = is_midyear_projection
-      ? BaseSS::PROJPERIOD_MIDYEAR
-      : BaseSS::PROJPERIOD_CALENDAR;
-    const Options opts = {
-      hiv_steps,
-      t_ART_start,
-      proj_period
-    };
-    return opts;
-  };
-
-  static void save_state_if_in_save_step(
-    const int step,
-    State& state_next,
-    OutputState& output_state,
-    const std::vector<int>& save_steps
-  ) {
-    for (size_t i = 0; i < save_steps.size(); ++i) {
-      if (step == save_steps[i]) {
-        output_state.save_state(i, state_next);
-      }
-    }
-  };
+  using Cfg = internal::Config<L, real_type, ModelVariant>;
+  using SS = Cfg::SS;
+  using Pars = Cfg::Pars;
+  using State = Cfg::State;
+  using Intermediate = Cfg::Intermediate;
+  using OutputState = Cfg::OutputState;
+  using Args = Cfg::Args;
 
   static OutputState run_model(
     const int time_steps,
     const std::vector<int> save_steps,
     const Pars& pars,
-    const Options& opts
+    const Options<real_type>& opts
   ) {
     auto state = State();
     auto state_next = state;
@@ -105,11 +53,25 @@ struct Leapfrog {
     return output_state;
   };
 
+  private:
+  static void save_state_if_in_save_step(
+    const int step,
+    State& state_next,
+    OutputState& output_state,
+    const std::vector<int>& save_steps
+  ) {
+    for (size_t i = 0; i < save_steps.size(); ++i) {
+      if (step == save_steps[i]) {
+        output_state.save_state(i, state_next);
+      }
+    }
+  };
+
   static void project_year(Args& args) {
-    GeneralDemographicProjection<Config> general_dp(args);
-    HivDemographicProjection<Config> hiv_dp(args);
-    AdultHivModelSimulation<Config> hiv_sim(args);
-    ChildModelSimulation<Config> child_sim(args);
+    internal::GeneralDemographicProjection<Cfg> general_dp(args);
+    internal::HivDemographicProjection<Cfg> hiv_dp(args);
+    internal::AdultHivModelSimulation<Cfg> hiv_sim(args);
+    internal::ChildModelSimulation<Cfg> child_sim(args);
 
     if constexpr (ModelVariant::run_demographic_projection) {
       general_dp.run_general_pop_demographic_projection();

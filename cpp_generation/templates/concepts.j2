@@ -3,6 +3,7 @@
 #pragma once
 
 namespace leapfrog {
+namespace internal {
 
 template<typename ModelVariant>
 concept MV = requires (ModelVariant mv) {
@@ -16,4 +17,5 @@ template<typename Config>
 concept {{ name.replace("_", " ").title().replace(" ", "") }} = MV<typename Config::ModelVariant> && Config::ModelVariant::{{ name }};
 {% endfor %}
 
-}
+} // namespace internal
+} // namespace leapfrog

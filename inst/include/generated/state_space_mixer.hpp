@@ -8,6 +8,7 @@
 #include "state_space.hpp"
 
 namespace leapfrog {
+namespace internal {
 
 template<bool enable, typename Mixin>
 struct Pair;
@@ -32,4 +33,5 @@ using SSMixed = SSMixer<
   Pair<ModelVariant::run_child_model, HcSS<ModelVariant>>
 >;
 
+}
 }

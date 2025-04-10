@@ -5,9 +5,12 @@
 
 #pragma once
 
+#include <array>
+
 #include "concepts.hpp"
 
 namespace leapfrog {
+namespace internal {
 
 
 template<MV ModelVariant>
@@ -65,4 +68,5 @@ struct BaseSS {
   static constexpr int PROJPERIOD_MIDYEAR = 1;
 };
 
-}
+} // namespace internal
+} // namespace leapfrog

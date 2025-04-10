@@ -1,11 +1,13 @@
 #pragma once
 
+#include "../options.hpp"
 #include "../generated/config_mixer.hpp"
 
 namespace leapfrog {
+namespace internal {
 
-template<typename Config>	
-concept HivDemographicProjectionEnabled = RunDemographicProjection<Config> && RunHivSimulation<Config>;	
+template<typename Config>
+concept HivDemographicProjectionEnabled = RunDemographicProjection<Config> && RunHivSimulation<Config>;
 
 template<typename Config>
 struct HivDemographicProjection {
@@ -20,7 +22,6 @@ struct HivDemographicProjection<Config> {
   using Pars = Config::Pars;
   using State = Config::State;
   using Intermediate = Config::Intermediate;
-  using Options = Config::Options;
   using Args = Config::Args;
 
   // private members of this struct
@@ -40,7 +41,7 @@ struct HivDemographicProjection<Config> {
   const State& state_curr;
   State& state_next;
   Intermediate& intermediate;
-  const Options& opts;
+  const Options<real_type>& opts;
 
   // only exposing the constructor and some methods
   public:
@@ -104,7 +105,7 @@ struct HivDemographicProjection<Config> {
       }
     }
   };
-  
+
   // private methods that we don't want people to call
   private:
   void run_hiv_ageing_and_mortality() {
@@ -277,4 +278,5 @@ struct HivDemographicProjection<Config> {
   };
 };
 
+}
 }
