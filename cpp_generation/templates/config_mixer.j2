@@ -31,9 +31,10 @@ template<Language L, typename real_type, MV ModelVariant>
 struct ConfigMixer<L, real_type, ModelVariant> {
   struct Pars {};
 
-  static Pars get_pars(...) {
+  template<typename... Args>
+  static Pars get_pars(Args&&... args) {
     Pars p = {}; return p;
-  };
+  }
 
   struct Intermediate {
     void reset() {};
@@ -54,9 +55,10 @@ struct ConfigMixer<L, real_type, ModelVariant> {
     return prev_size;
   };
 
-  static int build_output(int index, ...) {
+  template<typename... Args>
+  static int build_output(int index, Args&&... args) {
     return index;
-  };
+  }
 };
 
 template<Language L, typename real_type, MV ModelVariant, typename Config, typename ...Ts>
