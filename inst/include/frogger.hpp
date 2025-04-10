@@ -10,9 +10,9 @@
 
 namespace leapfrog {
 
-template<typename real_type, internal::MV ModelVariant>
+template<Language L, typename real_type, internal::MV ModelVariant>
 struct Leapfrog {
-  using Cfg = internal::Config<real_type, ModelVariant>;
+  using Cfg = internal::Config<L, real_type, ModelVariant>;
   using SS = Cfg::SS;
   using Pars = Cfg::Pars;
   using State = Cfg::State;
