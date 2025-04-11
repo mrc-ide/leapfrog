@@ -22,7 +22,7 @@
     "survival_probability": {
       "type": "TM",
       "num_type": "real_type",
-      "dims": ["SS::pAG + 1", "SS::NS", "proj_years"],
+      "dims": ["SS::pAG + 1", "SS::NS", "opts.proj_time_steps"],
       "alias": {
         "r": "Sx"
       }
@@ -30,7 +30,7 @@
     "net_migration": {
       "type": "TM",
       "num_type": "real_type",
-      "dims": ["SS::pAG", "SS::NS", "proj_years"],
+      "dims": ["SS::pAG", "SS::NS", "opts.proj_time_steps"],
       "alias": {
         "r": "netmigr_adj"
       }
@@ -38,7 +38,7 @@
     "age_specific_fertility_rate": {
       "type": "TM",
       "num_type": "real_type",
-      "dims": ["opts.p_fertility_age_groups", "proj_years"],
+      "dims": ["opts.p_fertility_age_groups", "opts.proj_time_steps"],
       "alias": {
         "r": "asfr"
       }
@@ -46,7 +46,7 @@
     "births_sex_prop": {
       "type": "TM",
       "num_type": "real_type",
-      "dims": ["SS::NS", "proj_years"],
+      "dims": ["SS::NS", "opts.proj_time_steps"],
       "alias": {
         "r": "births_sex_prop"
       }
