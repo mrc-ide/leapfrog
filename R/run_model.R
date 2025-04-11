@@ -50,9 +50,6 @@ run_model <- function(parameters,
   parameters[["is_midyear_projection"]] <-
     parameters[["projection_period"]] == "midyear"
 
-  ## TODO: get this from PJNZ
-  parameters[["projection_start_year"]] <- 1970
-
   run_base_model(parameters, configuration, output_years)
 }
 

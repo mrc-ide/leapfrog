@@ -1,3 +1,17 @@
+read_start_year <- function(pjnz, use_ep5 = FALSE) {
+  if(use_ep5) {
+    dpfile <- grep(".ep5$", utils::unzip(pjnz, list = TRUE)$Name, value = TRUE)
+  } else {
+    dpfile <- grep(".DP$", utils::unzip(pjnz, list = TRUE)$Name, value = TRUE)
+  }
+
+  dp <- utils::read.csv(unz(pjnz, dpfile), as.is = TRUE)
+  dpsub <- function(tag, rows, cols, tagcol =1 ) {
+    dp[which(dp[, tagcol] == tag) + rows, cols]
+  }
+  as.integer(dpsub("<FirstYear MV2>",2,4))
+}
+
 read_sx <- function(pjnz, use_ep5=FALSE) {
 
   if(use_ep5) {
@@ -138,6 +152,7 @@ prepare_leapfrog_demp <- function(pjnz) {
 
   demp <- eppasm::read_specdp_demog_param(pjnz)
 
+  demp$projection_start_year <- read_start_year(pjnz)
   demp$Sx <- read_sx(pjnz)
   demp$netmigr <- read_netmigr(pjnz, sx = demp$Sx)
 
@@ -207,7 +222,7 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   adult_cd4_dist[5:7,6] <- c(0.35, 0.21, 0.44)
 
 
-  adult_cd4_dist_array <-adult_cd4_dist
+  adult_cd4_dist_array <- adult_cd4_dist
 
   v$adult_cd4_dist <- adult_cd4_dist_array
 
