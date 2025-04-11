@@ -128,6 +128,15 @@ developed as a standalone C++ library that can be called by other
 software without requiring R-specific code features. The code uses
 header-only open source libraries to maximize portability.
 
+### Code generation
+
+To change what parameters can be passed in from `R` or the structure of
+`Intermediate`, `State` or `OutputState`, please modify json files
+[here](./cpp_generation/modelSchemas/).
+
+Then to run code generation follow
+[cpp_generation/README.md](./cpp_generation/README.md)
+
 ### R functions
 
 The file `src/frogger.cpp` contains R wrapper functions for the model
