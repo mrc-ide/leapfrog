@@ -13,8 +13,6 @@ run_model <- function(parameters,
                       configuration = "HivFullAgeStratification",
                       output_years = seq(1970, 2030)) {
 
-  assert_configuration_valid(configuration)
-
   if (configuration == "HivCoarseAgeStratification") {
     parameters$hAG_SPAN <- parameters[["hAG_SPAN_coarse"]]
     parameters$cd4_initdist <- parameters[["cd4_initdist_coarse"]]
@@ -54,18 +52,7 @@ run_model <- function(parameters,
 }
 
 is_run_hiv_simulation <- function(configuration) {
-  configuration != "DemographicProjection"
-}
-
-assert_configuration_valid <- function(configuration) {
-  valid_configs <- c("DemographicProjection",
-                     "HivFullAgeStratification",
-                     "HivCoarseAgeStratification",
-                     "ChildModel")
-  if (!(configuration %in% valid_configs)) {
-    config_text <- paste(valid_configs, collapse = "', '")
-    stop(sprintf(
-      "Invalid configuration: '%s', must be one of '%s'.",
-      configuration, config_text))
-  }
+  configuration %in% c("HivCoarseAgeStratification",
+                       "HivFullAgeStratification",
+                       "ChildModel")
 }

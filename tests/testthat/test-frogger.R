@@ -217,7 +217,8 @@ test_that("error thrown if model run with invalid configuration", {
 
   expect_error(
     run_model(parameters, "HivFineAgeStratification", 2030L),
-    "Invalid configuration: 'HivFineAgeStratification', must be one of 'DemographicProjection'"
+    paste("Invalid configuration: 'HivFineAgeStratification'.",
+          "It must be one of 'DemographicProjection'")
   )
 })
 

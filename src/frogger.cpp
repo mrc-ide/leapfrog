@@ -3,6 +3,16 @@
 #include "frogger.hpp"
 #include "generated/r_interface/r_adapters.hpp"
 
+// This is language specific atm but we might be compiling for other
+std::vector<std::string> get_model_configurations() {
+  return std::vector<std::string>{
+    "DemographicProjection",
+    "HivFullAgeStratification",
+    "HivCoarseAgeStratification",
+    "ChildModel"
+  };
+}
+
 template<typename real_type, typename ModelVariant>
 Rcpp::List simulate_model(
   const Rcpp::List parameters,
@@ -41,22 +51,21 @@ Rcpp::List simulate_model(
 // [[Rcpp::export]]
 Rcpp::List run_base_model(
   const Rcpp::List parameters,
-  const std::string model_variant,
+  const std::string configuration,
   const std::vector<int> output_years
 ) {
-  // TODO Mantra write docs, save_steps now must be 0 index based, nothing is nullable, projection_period is "calendar" or "midyear", t_ART_start is 0 based (so substract 1 from R value)
-  if (model_variant == "DemographicProjection") {
+  if (configuration == "DemographicProjection") {
     return simulate_model<double, leapfrog::DemographicProjection>(parameters, output_years);
-  } else if (model_variant == "HivFullAgeStratification") {
+  } else if (configuration == "HivFullAgeStratification") {
     return simulate_model<double, leapfrog::HivFullAgeStratification>(parameters, output_years);
-  } else if (model_variant == "HivCoarseAgeStratification") {
+  } else if (configuration == "HivCoarseAgeStratification") {
     return simulate_model<double, leapfrog::HivCoarseAgeStratification>(parameters, output_years);
-  } else if (model_variant == "ChildModel") {
+  } else if (configuration == "ChildModel") {
     return simulate_model<double, leapfrog::ChildModel>(parameters, output_years);
   } else {
     throw std::runtime_error(
-      "Invalid model_variant: " + model_variant +
-      ". It must be one of" +
+      "Invalid configuration: '" + configuration +
+      "'. It must be one of " +
       "'DemographicProjection', " +
       "'HivFullAgeStratification', " +
       "'HivCoarseAgeStratification', " +

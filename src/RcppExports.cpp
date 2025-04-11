@@ -12,15 +12,15 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // run_base_model
-Rcpp::List run_base_model(const Rcpp::List parameters, const std::string model_variant, const std::vector<int> output_years);
-RcppExport SEXP _frogger_run_base_model(SEXP parametersSEXP, SEXP model_variantSEXP, SEXP output_yearsSEXP) {
+Rcpp::List run_base_model(const Rcpp::List parameters, const std::string configuration, const std::vector<int> output_years);
+RcppExport SEXP _frogger_run_base_model(SEXP parametersSEXP, SEXP configurationSEXP, SEXP output_yearsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::List >::type parameters(parametersSEXP);
-    Rcpp::traits::input_parameter< const std::string >::type model_variant(model_variantSEXP);
+    Rcpp::traits::input_parameter< const std::string >::type configuration(configurationSEXP);
     Rcpp::traits::input_parameter< const std::vector<int> >::type output_years(output_yearsSEXP);
-    rcpp_result_gen = Rcpp::wrap(run_base_model(parameters, model_variant, output_years));
+    rcpp_result_gen = Rcpp::wrap(run_base_model(parameters, configuration, output_years));
     return rcpp_result_gen;
 END_RCPP
 }
