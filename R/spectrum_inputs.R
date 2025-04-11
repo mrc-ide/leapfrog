@@ -100,6 +100,27 @@ adjust_spectrum_netmigr <- function(netmigr) {
   netmigr_adj
 }
 
+#' Prepare leapfrog input parameters from Spectrum PJNZ
+#'
+#' @param pjnz path to PJNZ file
+#'
+#' @return list of demographic and HIV projection input parameters
+#'
+#' @examples
+#' pjnz <- system.file(
+#'   "pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ",
+#'   package = "frogger")
+#' parameters <- prepare_leapfrog_parameters(pjnz)
+#'
+#' @export
+prepare_leapfrog_parameters <- function(pjnz) {
+  ## TODO: We're reading the PJNZ file several times below, revisit this,
+  ## we should only have to read this in once
+  dp <- prepare_leapfrog_demp(pjnz)
+  proj <- prepare_leapfrog_projp(pjnz)
+  c(dp, proj)
+}
+
 #' Prepare demographic inputs from Spectrum PJNZ
 #'
 #' @param pjnz path to PJNZ file
@@ -124,7 +145,6 @@ prepare_leapfrog_demp <- function(pjnz) {
 
   ## normalise ASFR distribution
   demp$asfr <- sweep(demp$asfr, 2, demp$tfr / colSums(demp$asfr), "*")
-
 
   ## NOTE: Reading this to obtain the Spectrum version number
   ##       This is a lot of redundant effort.

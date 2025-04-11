@@ -16,9 +16,9 @@ source('./scripts/read_spectrum.R')
 pjnz_adult <- system.file("pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ", package = "frogger", mustWork = TRUE)
 
 demp <- prepare_leapfrog_demp(pjnz_adult)
-saveRDS(demp, testthat::test_path("testdata/demographic_projection_object_adult.rds"))
 proj <- prepare_leapfrog_projp(pjnz_adult)
-saveRDS(proj, testthat::test_path("testdata/projection_parameters_adult.rds"))
+parameters <- c(demp, proj)
+saveRDS(parameters, testthat::test_path("testdata/adult_parms.rds"))
 
 # Used as reference data (Run from leapfrog/master)
 lmod <- leapfrog::leapfrogR(demp, proj)
@@ -113,7 +113,10 @@ aids_deathsart[,2,] <- f
 
 spec_ctx_need <- dpsub(dp, tag = '<ChildARTCalc MV2>', rows = 3, cols = timedat.idx)
 
-saveRDS(list(parameters = proj, demp = demp, dp = dp, timedat.idx = timedat.idx, pjnz = pjnz_child,
+saveRDS(list(parameters = c(proj, demp),
+             dp = dp,
+             timedat.idx = timedat.idx,
+             pjnz = pjnz_child,
              pop1 = x,
              ontrt = df$on_treatment,
              offtrt = df$off_treatment,

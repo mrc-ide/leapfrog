@@ -33,7 +33,7 @@ test_that("We can compile the standalone program", {
   input <- frogger_file("standalone_model/data/adult_data")
 
   res <- system2(file.path(tmp, "simulate_model"),
-    c(61, 10, input, output),
+    c(61, input, output),
     stdout = TRUE
   )
   expect_equal(res, c(
@@ -54,10 +54,8 @@ test_that("We can compile the standalone program", {
   expect_true(file.exists(file.path(output, "h_art_initiation")))
   expect_true(file.exists(file.path(output, "p_hiv_deaths")))
 
-  demp <- readRDS(test_path("testdata/demographic_projection_object_adult.rds"))
-  parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
-  expected <- run_model(demp, parameters, 1970:2030L, 10L,
-                        run_child_model = FALSE)
+  parameters <- readRDS(test_path("testdata/adult_parms.rds"))
+  expected <- run_model(parameters, output_years = 1970:2030L)
 
   ## There is some precision loss in standalone data due to serialization
   ## so check up to appropriate tolerance

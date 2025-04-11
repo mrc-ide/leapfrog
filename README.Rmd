@@ -60,18 +60,15 @@ library(frogger)
 pjnz <- system.file("pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ",
                     package = "frogger", mustWork = TRUE)
 
-demp <- prepare_leapfrog_demp(pjnz)
-hivp <- prepare_leapfrog_projp(pjnz)
+parameters <- prepare_leapfrog_parameters(pjnz)
 ```
 
 Simulate adult 'full' age group (single-year age) and 'coarse' age group (collapsed
 age groups) models from 1970 to 2030 with 10 HIV time steps per year.
 
 ```{r simulate_leapfrog}
-lsimF <- run_model(demp, hivp, 1970:2030, 10L,
-                   hiv_age_stratification = "full", run_child_model = FALSE)
-lsimC <- run_model(demp, hivp, 1970:2030, 10L,
-                   hiv_age_stratification = "coarse", run_child_model = FALSE)
+lsimF <- run_model(parameters, "HivFullAgeStratification", 1970:2030)
+lsimC <- run_model(parameters, "HivCoarseAgeStratification", 1970:2030)
 ```
 
 Compare the HIV prevalence age 15-49 years and AIDS deaths 50+ years. Deaths 50+

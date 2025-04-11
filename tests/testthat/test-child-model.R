@@ -1,9 +1,7 @@
 test_that("Child model can be run for all years", {
   input <- readRDS(test_path("testdata/child_parms.rds"))
-  demp <- input$demp
-  parameters <- input$parameters
 
-  expect_silent(out <- run_model(demp, parameters, 1970:2030, NULL, run_child_model = TRUE))
+  expect_silent(out <- run_model(input$parameters, "ChildModel", 1970:2030))
 
   expect_setequal(
     names(out),
@@ -32,10 +30,8 @@ test_that("Child model can be run for all years", {
 
 test_that("Model outputs are consistent", {
   input <- readRDS(test_path("testdata/child_parms.rds"))
-  demp <- input$demp
-  parameters <- input$parameters
 
-  out <- run_model(demp, parameters, 1970:2030, NULL, run_child_model = TRUE)
+  out <- run_model(input$parameters, "ChildModel", 1970:2030)
 
   ###############################
   ##Infections stratified by infection type and population infections should be the same
@@ -118,12 +114,10 @@ test_that("Model outputs are consistent", {
 test_that("Female 15-49y pop aligns", {
   testthat::skip("Skipping this test because the adult populations currently do not align")
   input <- readRDS(test_path("testdata/child_parms.rds"))
-  demp <- input$demp
-  parameters <- input$parameters
   dp <- input$dp
   pjnz <- input$pjnz
 
-  out <- run_model(demp, parameters, 1970:2030, NULL, run_child_model = TRUE)
+  out <- run_model(input$parameters, "ChildModel", 1970:2030)
   spec <- SpectrumUtils::dp.output.hivpop(dp, direction = 'long')
   spec <- spec %>%
     dplyr::filter(Age %in% 15:49 & Sex == 'Female') %>%
@@ -144,13 +138,11 @@ test_that("Female 15-49y pop aligns", {
 })
 
 test_that("Mothers that need ptmct align", {
-    input <- readRDS(test_path("testdata/child_parms.rds"))
-  demp <- input$demp
-  parameters <- input$parameters
+  input <- readRDS(test_path("testdata/child_parms.rds"))
   dp <- input$dp
   pjnz <- input$pjnz
 
-  out <- run_model(demp, parameters, 1970:2030, NULL, run_child_model = TRUE)
+  out <- run_model(input$parameters, "ChildModel", 1970:2030)
   spec <- SpectrumUtils::dp.output.pmtct.need(dp, direction = 'long')
 
   lfrog <- data.frame(lfrog = out$hiv_births, Year = 1970:2030)
@@ -163,13 +155,10 @@ test_that("Mothers that need ptmct align", {
 })
 
 test_that("Children in need of cotrim aligns", {
-    input <- readRDS(test_path("testdata/child_parms.rds"))
-  demp <- input$demp
-  parameters <- input$parameters
-  pjnz <- input$pjnz
-  dp = input$dp
+  input <- readRDS(test_path("testdata/child_parms.rds"))
+  dp <- input$dp
 
-  out <- run_model(demp, parameters, 1970:2030, NULL, run_child_model = TRUE)
+  out <- run_model(input$parameters, "ChildModel", 1970:2030)
 
   spec <- input$ctx_need
   dt <- data.frame(year = 1970:2030,
@@ -183,12 +172,10 @@ test_that("Children in need of cotrim aligns", {
 
 test_that("Infections among children align", {
   input <- readRDS(test_path("testdata/child_parms.rds"))
-  demp <- input$demp
-  parameters <- input$parameters
   dp <- input$dp
   pjnz <- input$pjnz
 
-  out <- run_model(demp, parameters, 1970:2030, NULL, run_child_model = TRUE)
+  out <- run_model(input$parameters, "ChildModel", 1970:2030)
   inf_spec <- SpectrumUtils::dp.output.incident.hiv(dp.raw = dp)
   inf_spec <- inf_spec %>%
     dplyr::filter(Sex != "Male+Female") %>%
@@ -218,12 +205,10 @@ test_that("Infections among children align", {
 
 test_that("CLHIV align", {
   input <- readRDS(test_path("testdata/child_parms.rds"))
-  demp <- input$demp
-  parameters <- input$parameters
   dp <- input$dp
   pjnz <- input$pjnz
 
-  out <- run_model(demp, parameters, 1970:2030, NULL, run_child_model = TRUE)
+  out <- run_model(input$parameters, "ChildModel", 1970:2030)
 
   spec_prev <- input$offtrt
 
@@ -269,12 +254,10 @@ test_that("CLHIV align", {
 
 test_that("CLHIV on ART align", {
   input <- readRDS(test_path("testdata/child_parms.rds"))
-  demp <- input$demp
-  parameters <- input$parameters
   dp <- input$dp
   pjnz <- input$pjnz
 
-  out <- run_model(demp, parameters, 1970:2030, NULL, run_child_model = TRUE)
+  out <- run_model(input$parameters, "ChildModel", 1970:2030)
 
   spec_prev <- input$ontrt
   spec_prev <- spec_prev %>%
@@ -319,13 +302,11 @@ test_that("CLHIV on ART align", {
 
 test_that("HIV related deaths among CLHIV not on ART align", {
   input <- readRDS(test_path("testdata/child_parms.rds"))
-  demp <- input$demp
-  parameters <- input$parameters
   dp <- input$dp
   pjnz <- input$pjnz
   aids_deathsnoart <- input$deaths_noart
 
-  out <- run_model(demp, parameters, 1970:2030, NULL, run_child_model = TRUE)
+  out <- run_model(input$parameters, "ChildModel", 1970:2030)
 
   hc1 <- apply(out$hc1_noart_aids_deaths, c(3:5), sum)
   hc2 <- apply(out$hc2_noart_aids_deaths, c(3:5), sum)
@@ -350,13 +331,11 @@ test_that("HIV related deaths among CLHIV not on ART align", {
 
 test_that("HIV related deaths among CLHIV on ART align", {
   input <- readRDS(test_path("testdata/child_parms.rds"))
-  demp <- input$demp
-  parameters <- input$parameters
   dp <- input$dp
   pjnz <- input$pjnz
   aids_deathsart <- input$deaths_art
 
-  out <- run_model(demp, parameters, 1970:2030, NULL, run_child_model = TRUE)
+  out <- run_model(input$parameters, "ChildModel", 1970:2030)
 
   hc1 <- apply(out$hc1_art_aids_deaths, c(3:5), sum)
   hc2 <- apply(out$hc2_art_aids_deaths, c(3:5), sum)
