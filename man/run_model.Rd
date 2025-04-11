@@ -16,9 +16,10 @@ run_model(
 \item{output_years}{Which years of the model to return from the simulation,
 defaults to all years from 1970 to 2030. Also used to control what years
 the simulation is run for. If output only 2030, simulation will be run
-from}
+from \code{projection_start_year} passed in the \code{parameters} list.}
 
-\item{configuation}{The model configuration to run, see TODO}
+\item{configuation}{The model configuration to run, see
+\code{\link[=list_model_configurations]{list_model_configurations()}} for available configurations}
 }
 \value{
 List of model outputs

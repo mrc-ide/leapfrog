@@ -11,6 +11,16 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// list_model_configurations
+std::vector<std::string> list_model_configurations();
+RcppExport SEXP _frogger_list_model_configurations() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(list_model_configurations());
+    return rcpp_result_gen;
+END_RCPP
+}
 // run_base_model
 Rcpp::List run_base_model(const Rcpp::List parameters, const std::string configuration, const std::vector<int> output_years);
 RcppExport SEXP _frogger_run_base_model(SEXP parametersSEXP, SEXP configurationSEXP, SEXP output_yearsSEXP) {
@@ -51,6 +61,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_frogger_list_model_configurations", (DL_FUNC) &_frogger_list_model_configurations, 0},
     {"_frogger_run_base_model", (DL_FUNC) &_frogger_run_base_model, 3},
     {"_frogger_serialize_vector", (DL_FUNC) &_frogger_serialize_vector, 3},
     {"_frogger_deserialize_vector", (DL_FUNC) &_frogger_deserialize_vector, 2},

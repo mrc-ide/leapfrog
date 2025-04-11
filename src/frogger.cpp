@@ -1,10 +1,18 @@
 #include <Rcpp.h>
+#include <vector>
+#include <string>
+#include <sstream>
 
 #include "frogger.hpp"
 #include "generated/r_interface/r_adapters.hpp"
 
-// This is language specific atm but we might be compiling for other
-std::vector<std::string> get_model_configurations() {
+
+//' List the avaialble model configurations
+//'
+//' @return List of available model configurations
+//' @export
+// [[Rcpp::export]]
+std::vector<std::string> list_model_configurations() {
   return std::vector<std::string>{
     "DemographicProjection",
     "HivFullAgeStratification",
@@ -63,13 +71,20 @@ Rcpp::List run_base_model(
   } else if (configuration == "ChildModel") {
     return simulate_model<double, leapfrog::ChildModel>(parameters, output_years);
   } else {
-    throw std::runtime_error(
-      "Invalid configuration: '" + configuration +
-      "'. It must be one of " +
-      "'DemographicProjection', " +
-      "'HivFullAgeStratification', " +
-      "'HivCoarseAgeStratification', " +
-      "'ChildModel'"
-    );
+    const auto available_variants = list_model_configurations();
+    std::ostringstream oss;
+    oss << "Invalid configuration: '" << configuration
+        << "'. It must be one of: ";
+
+    for (size_t i = 0; i < available_variants.size(); ++i) {
+      oss << "'" << available_variants[i] << "'";
+      if (i != available_variants.size() - 1) {
+        oss << ", ";
+      } else {
+        oss << ".";
+      }
+    }
+
+    throw std::runtime_error(oss.str());
   }
 }
