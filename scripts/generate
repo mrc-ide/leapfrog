@@ -1,4 +1,16 @@
 #!/usr/bin/env bash
 
-cd cpp_generation; uv run src/main.py
+if ! uv --version >> /dev/null 2>&1; then
+  echo -n "Couldn't find uv on your system, would you like to install uv via pip? (y/n) "
+  read user_response
+  if [[ "$user_response" == "y" ]]; then
+    pip install uv
+  else
+    echo "You can find more general installation instructions at: https://docs.astral.sh/uv/getting-started/installation/"
+    exit 1
+  fi
+fi
 
+echo "Generating C++..."
+
+cd cpp_generation; uv run src/main.py
