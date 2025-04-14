@@ -1,7 +1,7 @@
 #' Run leapfrog model fit
 #'
 #' @param parameters Projection parameters
-#' @param configuation The model configuration to run, see
+#' @param configuration The model configuration to run, see
 #'   [list_model_configurations()] for available configurations
 #' @param output_years Which years of the model to return from the simulation,
 #'   defaults to all years from 1970 to 2030. Also used to control what years
