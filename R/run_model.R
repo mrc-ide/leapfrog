@@ -49,9 +49,6 @@ run_model <- function(parameters,
     parameters[["hts_per_year"]] <- 10L
   }
 
-  parameters[["is_midyear_projection"]] <-
-    parameters[["projection_period"]] == "midyear"
-
   run_base_model(parameters, configuration, output_years)
 }
 

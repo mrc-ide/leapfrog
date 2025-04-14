@@ -241,3 +241,13 @@ test_that("error if trying to save output from before projection start", {
           "is before the projection start year: '1970'.")
   )
 })
+
+test_that("error thrown if invalid projection period set", {
+  parameters <- readRDS(test_path("testdata/adult_parms.rds"))
+  parameters$projection_period <- "unknown"
+
+  expect_error(
+    run_model(parameters, "HivFullAgeStratification", 2030L),
+    "Invalid projection period: 'unknown'. Allowed values are: 'midyear' or 'calendar'."
+  )
+})
