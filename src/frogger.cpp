@@ -31,10 +31,7 @@ Rcpp::List simulate_model(
   const int t_art_start = Rcpp::as<int>(parameters["t_ART_start"]);
   const bool is_midyear_projection = Rcpp::as<bool>(
     parameters["is_midyear_projection"]);
-  int hts_per_year = 10;
-  if (parameters.containsElementNamed("hts_per_year")) {
-    hts_per_year = Rcpp::as<int>(parameters["hts_per_year"]);
-  }
+  const int hts_per_year = Rcpp::as<int>(parameters["hts_per_year"]);
   const int proj_start_year = Rcpp::as<int>(
     parameters["projection_start_year"]);
 

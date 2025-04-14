@@ -45,6 +45,9 @@ run_model <- function(parameters,
     hTS <- dim(parameters[["art_mort"]])[[1]]
     parameters[["h_art_stage_dur"]] <- rep(0.5, hTS - 1)
   }
+  if (is.null(parameters[["hts_per_year"]])) {
+    parameters[["hts_per_year"]] <- 10L
+  }
 
   parameters[["is_midyear_projection"]] <-
     parameters[["projection_period"]] == "midyear"
