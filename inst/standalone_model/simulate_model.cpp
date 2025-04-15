@@ -65,11 +65,11 @@ int main(int argc, char *argv[]) {
   const auto pars = LF::Cfg::get_pars(input_dir, opts);
 
   for (size_t i = 0; i < n_runs; ++i) {
-    auto state = LF::run_model(pars, opts, output_years);
+    auto state = LF::run_model(pars, opts, std::nullopt, std::nullopt, output_years);
   }
   std::cout << "Fit complete" << std::endl;
 
-  auto state = LF::run_model(pars, opts, output_years);
+  auto state = LF::run_model(pars, opts, std::nullopt, std::nullopt, output_years);
   LF::Cfg::build_output(0, state, output_abs);
 
   return 0;

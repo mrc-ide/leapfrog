@@ -25,8 +25,8 @@ template<typename ModelVariant>
 Rcpp::List simulate_model(
   const Rcpp::List parameters,
   const std::vector<int> output_years,
-  const std::optional<Rcpp::List> initial_state_data = std::nullopt,
-  std::optional<int> start_from_year_nullable = std::nullopt
+  const std::optional<Rcpp::List> initial_state_data,
+  std::optional<int> start_from_year
 ) {
   using LF = leapfrog::Leapfrog<leapfrog::R, double, ModelVariant>;
 
@@ -42,24 +42,15 @@ Rcpp::List simulate_model(
   );
 
   const auto pars = LF::Cfg::get_pars(parameters, opts);
-  
-  typename LF::State initial_state = {};
+
+  std::optional<typename LF::State> initial_state;
   if (initial_state_data) {
-    initial_state = LF::Cfg::get_initial_state(initial_state_data.value());
+    typename LF::State parsed_state = LF::Cfg::get_initial_state(initial_state_data.value());
+    initial_state = parsed_state;
   } else {
-    initial_state.reset();
-    if constexpr (ModelVariant::run_demographic_projection) {
-      initial_state.dp.p_total_pop = pars.dp.base_pop;
-    }
+    initial_state = std::nullopt;
   }
-
-  int start_from_year;
-  if (start_from_year_nullable) {
-    start_from_year = start_from_year_nullable.value();
-  } else {
-    start_from_year = opts.proj_start_year;
-  }
-
+  
   auto state = LF::run_model(pars, opts, initial_state, start_from_year, output_years);
 
   const int output_size = LF::Cfg::get_build_output_size(0);
