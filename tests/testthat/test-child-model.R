@@ -1,7 +1,7 @@
 test_that("Child model can be run for all years", {
   input <- readRDS(test_path("testdata/child_parms.rds"))
 
-  expect_silent(out_new <- run_model(input$parameters, "ChildModel", 1970:2030))
+  expect_silent(out <- run_model(input$parameters, "ChildModel", 1970:2030))
 
   expect_setequal(
     names(out),
