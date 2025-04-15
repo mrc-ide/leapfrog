@@ -38,16 +38,6 @@ struct DpConfig {
     TFS<real_type, SS::pAG, SS::NS> p_total_pop_natural_deaths;
     real_type births;
 
-    State() {
-      reset();
-    };
-
-    State(const State& initial_state):
-      p_total_pop(initial_state.p_total_pop),
-      p_total_pop_natural_deaths(initial_state.p_total_pop_natural_deaths),
-      births(initial_state.births)
-    {};
-
     void reset() {
       p_total_pop.setZero();
       p_total_pop_natural_deaths.setZero();
@@ -194,22 +184,6 @@ struct HaConfig {
     TFS<real_type, SS::hTS, SS::hDS, SS::hAG, SS::NS> h_hiv_deaths_art;
     TFS<real_type, SS::hDS, SS::hAG, SS::NS> h_art_initiation;
     TFS<real_type, SS::pAG, SS::NS> p_hiv_deaths;
-
-    State() {
-      reset();
-    };
-
-    State(const State& initial_state):
-      p_hiv_pop(initial_state.p_hiv_pop),
-      p_hiv_pop_natural_deaths(initial_state.p_hiv_pop_natural_deaths),
-      h_hiv_adult(initial_state.h_hiv_adult),
-      h_art_adult(initial_state.h_art_adult),
-      h_hiv_deaths_no_art(initial_state.h_hiv_deaths_no_art),
-      p_infections(initial_state.p_infections),
-      h_hiv_deaths_art(initial_state.h_hiv_deaths_art),
-      h_art_initiation(initial_state.h_art_initiation),
-      p_hiv_deaths(initial_state.p_hiv_deaths)
-    {};
 
     void reset() {
       p_hiv_pop.setZero();
@@ -481,26 +455,6 @@ struct HcConfig {
     real_type hiv_births;
     real_type ctx_need;
     TFS<real_type, SS::hcTT, SS::hc1AG, SS::NS> infection_by_type;
-
-    State() {
-      reset();
-    };
-
-    State(const State& initial_state):
-      hc1_hiv_pop(initial_state.hc1_hiv_pop),
-      hc2_hiv_pop(initial_state.hc2_hiv_pop),
-      hc1_art_pop(initial_state.hc1_art_pop),
-      hc2_art_pop(initial_state.hc2_art_pop),
-      hc1_noart_aids_deaths(initial_state.hc1_noart_aids_deaths),
-      hc2_noart_aids_deaths(initial_state.hc2_noart_aids_deaths),
-      hc1_art_aids_deaths(initial_state.hc1_art_aids_deaths),
-      hc2_art_aids_deaths(initial_state.hc2_art_aids_deaths),
-      hc_art_init(initial_state.hc_art_init),
-      hc_art_need_init(initial_state.hc_art_need_init),
-      hiv_births(initial_state.hiv_births),
-      ctx_need(initial_state.ctx_need),
-      infection_by_type(initial_state.infection_by_type)
-    {};
 
     void reset() {
       hc1_hiv_pop.setZero();

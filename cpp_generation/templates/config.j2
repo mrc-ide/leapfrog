@@ -39,16 +39,6 @@ struct {{ config.name }}Config {
     {{ get_member_type(cfg) }} {{ name }};
     {% endfor %}
 
-    State() {
-      reset();
-    };
-
-    State(const State& initial_state):
-      {% for name in config.state.keys() %}
-      {{ name }}(initial_state.{{ name }}){{ comma_except_last(loop) }}
-      {% endfor %}
-    {};
-
     void reset() {
       {% for name, cfg in config.state.items() %}
       {{ get_reset(name, cfg) }};

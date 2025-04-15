@@ -7,12 +7,18 @@
 #'   defaults to all years from 1970 to 2030. Also used to control what years
 #'   the simulation is run for. If output only 2030, simulation will be run
 #'   from `projection_start_year` passed in the `parameters` list.
+#' @param initial_state If provided, the model will run from this initial state
+#'   usually `start_from_year` should also be specified with this. (default NULL)
+#' @param start_from_year If provided, start model simulation from a particular
+#'   this year. (default 1970)
 #'
 #' @return List of model outputs
 #' @export
 run_model <- function(parameters,
                       configuration = "HivFullAgeStratification",
-                      output_years = seq(1970, 2030)) {
+                      output_years = seq(1970, 2030),
+                      initial_state = NULL,
+                      start_from_year = 1970) {
 
   if (configuration == "HivCoarseAgeStratification") {
     parameters$hAG_SPAN <- parameters[["hAG_SPAN_coarse"]]
@@ -49,11 +55,39 @@ run_model <- function(parameters,
   parameters[["is_midyear_projection"]] <-
     parameters[["projection_period"]] == "midyear"
 
-  run_base_model(parameters, configuration, output_years)
+  if (is.null(initial_state)) {
+    run_base_model(parameters, configuration, output_years)
+  } else {
+    run_base_model_with_initial_state(parameters, configuration, output_years, initial_state, start_from_year)
+  }
 }
 
 is_run_hiv_simulation <- function(configuration) {
   configuration %in% c("HivCoarseAgeStratification",
                        "HivFullAgeStratification",
                        "ChildModel")
+}
+
+get_last_time_slice <- function(dat) {
+  dims <- dim(dat[[1]])
+  last_t_index <- dims[[length(dims)]]
+
+  last_ind <- function(x) {
+    nd <- length(dim(x))
+    inds <- rep(alist(,)[1], nd)
+    inds[nd] <- last_t_index
+    do.call(`[`, c(list(x), inds))
+  }
+
+  lapply(dat, last_ind)
+}
+
+concat_on_time_dim <- function(dat1, dat2) {
+  x <- lapply(names(dat1), function(name) {
+    con <- abind::abind(dat1[[name]], dat2[[name]])
+    dimnames(con) <- NULL
+    con
+  })
+  names(x) <- names(dat1)
+  x
 }

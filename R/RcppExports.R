@@ -13,6 +13,10 @@ run_base_model <- function(parameters, configuration, output_years) {
     .Call(`_frogger_run_base_model`, parameters, configuration, output_years)
 }
 
+run_base_model_with_initial_state <- function(parameters, configuration, output_years, initial_state, start_from_year) {
+    .Call(`_frogger_run_base_model_with_initial_state`, parameters, configuration, output_years, initial_state, start_from_year)
+}
+
 serialize_vector <- function(data, path1, path2) {
     .Call(`_frogger_serialize_vector`, data, path1, path2)
 }
