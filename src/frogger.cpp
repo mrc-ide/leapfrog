@@ -31,17 +31,14 @@ Rcpp::List simulate_model(
   using LF = leapfrog::Leapfrog<leapfrog::R, double, ModelVariant>;
 
   const int t_art_start = Rcpp::as<int>(parameters["t_ART_start"]);
-  const bool is_midyear_projection = Rcpp::as<bool>(
-    parameters["is_midyear_projection"]);
-  int hts_per_year = 10;
-  if (parameters.containsElementNamed("hts_per_year")) {
-    hts_per_year = Rcpp::as<int>(parameters["hts_per_year"]);
-  }
+  const int hts_per_year = Rcpp::as<int>(parameters["hts_per_year"]);
   const int proj_start_year = Rcpp::as<int>(
     parameters["projection_start_year"]);
+  const std::string projection_period = Rcpp::as<std::string>(
+    parameters["projection_period"]);
 
   const auto opts = leapfrog::get_opts<double>(
-    hts_per_year, t_art_start, is_midyear_projection, proj_start_year, output_years
+    hts_per_year, t_art_start, projection_period, proj_start_year, output_years
   );
 
   const auto pars = LF::Cfg::get_pars(parameters, opts);

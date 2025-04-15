@@ -9,7 +9,7 @@ namespace leapfrog {
 namespace internal {
 
 void validate_output_years(const std::vector<int> output_years,
-                                 const int proj_start_year) {
+                           const int proj_start_year) {
   const auto first_year = std::min_element(std::begin(output_years),
                                            std::end(output_years));
   if (*first_year < proj_start_year) {
@@ -25,6 +25,21 @@ int get_proj_end_year(const std::vector<int>& output_years) {
   const auto last_year = std::max_element(std::begin(output_years),
                                           std::end(output_years));
   return *last_year;
+}
+
+#include <stdexcept>
+#include <string_view>
+
+int get_proj_period_enum(std::string_view projection_period) {
+  if (projection_period == "midyear") {
+    return BaseSS::PROJPERIOD_MIDYEAR;
+  } else if (projection_period == "calendar") {
+    return BaseSS::PROJPERIOD_CALENDAR;
+  } else {
+    throw std::invalid_argument(
+      "Invalid projection period: '" + std::string(projection_period) +
+      "'. Allowed values are: 'midyear' or 'calendar'.");
+  }
 }
 
 }
@@ -71,14 +86,12 @@ template<typename real_type>
 const Options<real_type> get_opts(
   const int hiv_steps,
   const int t_ART_start,
-  const bool is_midyear_projection,
+  const std::string_view projection_period,
   const int proj_start_year,
   const std::vector<int>& output_years
 ) {
   internal::validate_output_years(output_years, proj_start_year);
-  const int proj_period = is_midyear_projection
-    ? internal::BaseSS::PROJPERIOD_MIDYEAR
-    : internal::BaseSS::PROJPERIOD_CALENDAR;
+  const int proj_period = internal::get_proj_period_enum(projection_period);
   const int proj_end_year = internal::get_proj_end_year(output_years);
   const Options<real_type> opts = {
     hiv_steps,

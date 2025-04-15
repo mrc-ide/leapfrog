@@ -38,6 +38,11 @@ remotes::install_github("mrc-ide/frogger")
 
 The simulation model is implemented in a header-only C++ library located in [`inst/include/frogger.hpp`](inst/include/frogger.hpp). This location allows the C++ code to be imported in other R packages via specifying `LinkingTo: leapfrog` in the `DESCRIPTION` file.
 
+```{=html}
+> [!IMPORTANT]
+> We use C++20 for this package. Please make sure you have a compiler that is compatible.
+```
+
 The simulation model is callable in R via a wrapper function `run_model()` created with [Rcpp](https://www.rcpp.org).
 
 You can control how the simulation model is run with the following arguments:

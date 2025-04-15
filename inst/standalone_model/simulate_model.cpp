@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <filesystem>
 #include <vector>
+#include <string_view>
 
 #include "frogger.hpp"
 #include "generated/cpp_interface/cpp_adapters.hpp"
@@ -60,7 +61,7 @@ int main(int argc, char *argv[]) {
 
   using LF = leapfrog::Leapfrog<leapfrog::Cpp, double, leapfrog::HivFullAgeStratification>;
 
-  const auto opts = leapfrog::get_opts<double>(10, 30, true, 1970, output_years);
+  const auto opts = leapfrog::get_opts<double>(10, 30, std::string_view{"midyear"}, 1970, output_years);
   const auto pars = LF::Cfg::get_pars(input_dir, opts);
 
   for (size_t i = 0; i < n_runs; ++i) {

@@ -1,7 +1,7 @@
 #' Run leapfrog model fit
 #'
 #' @param parameters Projection parameters
-#' @param configuation The model configuration to run, see
+#' @param configuration The model configuration to run, see
 #'   [list_model_configurations()] for available configurations
 #' @param output_years Which years of the model to return from the simulation,
 #'   defaults to all years from 1970 to 2030. Also used to control what years
@@ -51,9 +51,9 @@ run_model <- function(parameters,
     hTS <- dim(parameters[["art_mort"]])[[1]]
     parameters[["h_art_stage_dur"]] <- rep(0.5, hTS - 1)
   }
-
-  parameters[["is_midyear_projection"]] <-
-    parameters[["projection_period"]] == "midyear"
+  if (is.null(parameters[["hts_per_year"]])) {
+    parameters[["hts_per_year"]] <- 10L
+  }
 
   if (is.null(initial_state)) {
     run_base_model(parameters, configuration, output_years)
