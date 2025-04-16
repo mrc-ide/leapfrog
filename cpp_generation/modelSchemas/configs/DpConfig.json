@@ -4,51 +4,51 @@
   "enable_if": "run_demographic_projection",
   "state_space": {
     "default": {
-      "vars": {
-        "NS": 2,
-        "pAG": 81
-      }
+      "NS": 2,
+      "pAG": 81
     }
   },
   "pars": {
-    "base_pop": {
-      "type": "TM",
-      "num_type": "real_type",
-      "dims": ["SS::pAG", "SS::NS"],
-      "alias": {
-        "r": "basepop"
-      }
-    },
-    "survival_probability": {
-      "type": "TM",
-      "num_type": "real_type",
-      "dims": ["SS::pAG + 1", "SS::NS", "opts.proj_time_steps"],
-      "alias": {
-        "r": "Sx"
-      }
-    },
-    "net_migration": {
-      "type": "TM",
-      "num_type": "real_type",
-      "dims": ["SS::pAG", "SS::NS", "opts.proj_time_steps"],
-      "alias": {
-        "r": "netmigr_adj"
-      }
-    },
-    "age_specific_fertility_rate": {
-      "type": "TM",
-      "num_type": "real_type",
-      "dims": ["opts.p_fertility_age_groups", "opts.proj_time_steps"],
-      "alias": {
-        "r": "asfr"
-      }
-    },
-    "births_sex_prop": {
-      "type": "TM",
-      "num_type": "real_type",
-      "dims": ["SS::NS", "opts.proj_time_steps"],
-      "alias": {
-        "r": "births_sex_prop"
+    "default": {
+      "base_pop": {
+        "type": "TM",
+        "num_type": "real_type",
+        "dims": ["SS::pAG", "SS::NS"],
+        "alias": {
+          "r": "basepop"
+        }
+      },
+      "survival_probability": {
+        "type": "TM",
+        "num_type": "real_type",
+        "dims": ["SS::pAG + 1", "SS::NS", "opts.proj_time_steps"],
+        "alias": {
+          "r": "Sx"
+        }
+      },
+      "net_migration": {
+        "type": "TM",
+        "num_type": "real_type",
+        "dims": ["SS::pAG", "SS::NS", "opts.proj_time_steps"],
+        "alias": {
+          "r": "netmigr_adj"
+        }
+      },
+      "age_specific_fertility_rate": {
+        "type": "TM",
+        "num_type": "real_type",
+        "dims": ["opts.p_fertility_age_groups", "opts.proj_time_steps"],
+        "alias": {
+          "r": "asfr"
+        }
+      },
+      "births_sex_prop": {
+        "type": "TM",
+        "num_type": "real_type",
+        "dims": ["SS::NS", "opts.proj_time_steps"],
+        "alias": {
+          "r": "births_sex_prop"
+        }
       }
     }
   },
