@@ -64,14 +64,9 @@
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">run_model</span><span class="op">(</span></span>
-<span>  <span class="va">data</span>,</span>
 <span>  <span class="va">parameters</span>,</span>
-<span>  <span class="va">sim_years</span>,</span>
-<span>  <span class="va">hts_per_year</span>,</span>
-<span>  output_steps <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  run_hiv_simulation <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  hiv_age_stratification <span class="op">=</span> <span class="st">"full"</span>,</span>
-<span>  run_child_model <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  configuration <span class="op">=</span> <span class="st">"HivFullAgeStratification"</span>,</span>
+<span>  output_years <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1970</span>, <span class="fl">2030</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -79,37 +74,20 @@
     <h2>Arguments</h2>
 
 
-<dl><dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
-<dd><p>Input data</p></dd>
-
-
-<dt id="arg-parameters">parameters<a class="anchor" aria-label="anchor" href="#arg-parameters"></a></dt>
+<dl><dt id="arg-parameters">parameters<a class="anchor" aria-label="anchor" href="#arg-parameters"></a></dt>
 <dd><p>Projection parameters</p></dd>
 
 
-<dt id="arg-sim-years">sim_years<a class="anchor" aria-label="anchor" href="#arg-sim-years"></a></dt>
-<dd><p>Simulation years to run model for default 1970:2030</p></dd>
+<dt id="arg-output-years">output_years<a class="anchor" aria-label="anchor" href="#arg-output-years"></a></dt>
+<dd><p>Which years of the model to return from the simulation,
+defaults to all years from 1970 to 2030. Also used to control what years
+the simulation is run for. If output only 2030, simulation will be run
+from <code>projection_start_year</code> passed in the <code>parameters</code> list.</p></dd>
 
 
-<dt id="arg-hts-per-year">hts_per_year<a class="anchor" aria-label="anchor" href="#arg-hts-per-year"></a></dt>
-<dd><p>Number of HIV time steps per year, default 10</p></dd>
-
-
-<dt id="arg-output-steps">output_steps<a class="anchor" aria-label="anchor" href="#arg-output-steps"></a></dt>
-<dd><p>Which sim years to output for default same as sim_years</p></dd>
-
-
-<dt id="arg-run-hiv-simulation">run_hiv_simulation<a class="anchor" aria-label="anchor" href="#arg-run-hiv-simulation"></a></dt>
-<dd><p>If TRUE then runs HIV simulation</p></dd>
-
-
-<dt id="arg-hiv-age-stratification">hiv_age_stratification<a class="anchor" aria-label="anchor" href="#arg-hiv-age-stratification"></a></dt>
-<dd><p>The age stratification for HIV population,
-"coarse" or "full"</p></dd>
-
-
-<dt id="arg-run-child-model">run_child_model<a class="anchor" aria-label="anchor" href="#arg-run-child-model"></a></dt>
-<dd><p>If TRUE then run the child model</p></dd>
+<dt id="arg-configuation">configuation<a class="anchor" aria-label="anchor" href="#arg-configuation"></a></dt>
+<dd><p>The model configuration to run, see
+<code><a href="list_model_configurations.html">list_model_configurations()</a></code> for available configurations</p></dd>
 
 </dl></div>
     <div id="value">
