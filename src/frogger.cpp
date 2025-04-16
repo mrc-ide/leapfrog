@@ -26,7 +26,7 @@ Rcpp::List simulate_model(
   const Rcpp::List parameters,
   const std::vector<int> output_years,
   const std::optional<Rcpp::List> initial_state_data,
-  std::optional<int> start_from_year
+  const std::optional<int> start_from_year
 ) {
   using LF = leapfrog::Leapfrog<leapfrog::R, double, ModelVariant>;
 
@@ -43,16 +43,15 @@ Rcpp::List simulate_model(
 
   const auto pars = LF::Cfg::get_pars(parameters, opts);
 
-  std::optional<typename LF::State> initial_state;
-  if (initial_state_data) {
-    typename LF::State parsed_state = LF::Cfg::get_initial_state(initial_state_data.value());
-    initial_state = parsed_state;
+  typename LF::OutputState state;
+
+  if (initial_state_data && start_from_year) {
+    typename LF::State initial_state = LF::Cfg::get_initial_state(initial_state_data.value());
+    state = LF::run_model_from_state(pars, opts, initial_state, start_from_year.value(), output_years);
   } else {
-    initial_state = std::nullopt;
+    state = LF::run_model(pars, opts, output_years);
   }
   
-  auto state = LF::run_model(pars, opts, initial_state, start_from_year, output_years);
-
   const int output_size = LF::Cfg::get_build_output_size(0);
   Rcpp::List ret(output_size);
   Rcpp::CharacterVector names(output_size);
