@@ -358,3 +358,17 @@ test_that("HIV related deaths among CLHIV on ART align", {
 
   expect_true(all(abs(dt$diff) < 5e-2))
 })
+
+test_that("Child model agrees when run in single years vs all years", {
+  input <- readRDS(test_path("testdata/child_parms.rds"))
+
+  out_all_years <- run_model(input$parameters, "ChildModel", 1970:2030)
+
+  out_single_year <- run_model(input$parameters, "ChildModel", 1970)
+  for(year in 1971:2030) {
+    out <- run_model_from_state(input$parameters, "ChildModel", get_last_time_slice(out_single_year), year - 1, year)
+    out_single_year <- concat_on_time_dim(out_single_year, out)
+  }
+
+  expect_equal(out_all_years, out_single_year)
+})

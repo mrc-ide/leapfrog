@@ -41,10 +41,13 @@ struct ConfigMixer<L, real_type, ModelVariant> {
   };
 
   struct State {
-    State() {};
-    State(const auto initial_state) {};
     void reset() {};
   };
+
+  template<typename... Args>
+  static State get_initial_state(Args&&... args) {
+    State s = {}; return s;
+  }
 
   struct OutputState {
     OutputState(int output_years) {};
@@ -103,19 +106,19 @@ struct ConfigMixer<L, real_type1, ModelVariant1, Pair<true, {{ config.name }}Con
   struct State: public NextConfigMixer::State {
     typename CurrConfig::State {{ config.namespace }};
 
-    State():
-      NextConfigMixer::State(),
-      {{ config.namespace }}() {};
-
-    State(const typename CurrConfig::State& initial_state):
-      NextConfigMixer::State(initial_state),
-      {{ config.namespace }}(initial_state) {};
-
     void reset() {
       NextConfigMixer::State::reset();
       {{ config.namespace }}.reset();
     };
   };
+
+  template<typename... Args>
+  static State get_initial_state(Args&&... args) {
+    return {
+      NextConfigMixer::get_initial_state(std::forward<Args>(args)...),
+      Adapter::get_initial_state(std::forward<Args>(args)...)
+    };
+  }
 
   struct OutputState: public NextConfigMixer::OutputState {
     typename CurrConfig::OutputState {{ config.namespace }};

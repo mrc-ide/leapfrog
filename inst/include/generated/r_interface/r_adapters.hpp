@@ -64,6 +64,16 @@ struct DpAdapter<Language::R, real_type, ModelVariant> {
     };
   };
 
+  static Config::State get_initial_state(
+    const Rcpp::List &data
+  ) {
+    return {
+      .p_total_pop = parse_data<real_type>(data, "p_total_pop", SS::pAG, SS::NS),
+      .p_total_pop_natural_deaths = parse_data<real_type>(data, "p_total_pop_natural_deaths", SS::pAG, SS::NS),
+      .births = Rcpp::as<real_type>(data["births"])
+    };
+  };
+
   static constexpr int output_count = 3;
 
   static int build_output(
@@ -118,6 +128,22 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
       .adults_on_art_is_percent = parse_data<int>(data, "art15plus_isperc", SS::NS, opts.proj_time_steps),
       .h_art_stage_dur = parse_data<real_type>(data, "h_art_stage_dur", SS::hTS - 1),
       .initiation_mortality_weight = Rcpp::as<real_type>(data["art_alloc_mxweight"])
+    };
+  };
+
+  static Config::State get_initial_state(
+    const Rcpp::List &data
+  ) {
+    return {
+      .p_hiv_pop = parse_data<real_type>(data, "p_hiv_pop", SS::pAG, SS::NS),
+      .p_hiv_pop_natural_deaths = parse_data<real_type>(data, "p_hiv_pop_natural_deaths", SS::pAG, SS::NS),
+      .h_hiv_adult = parse_data<real_type>(data, "h_hiv_adult", SS::hDS, SS::hAG, SS::NS),
+      .h_art_adult = parse_data<real_type>(data, "h_art_adult", SS::hTS, SS::hDS, SS::hAG, SS::NS),
+      .h_hiv_deaths_no_art = parse_data<real_type>(data, "h_hiv_deaths_no_art", SS::hDS, SS::hAG, SS::NS),
+      .p_infections = parse_data<real_type>(data, "p_infections", SS::pAG, SS::NS),
+      .h_hiv_deaths_art = parse_data<real_type>(data, "h_hiv_deaths_art", SS::hTS, SS::hDS, SS::hAG, SS::NS),
+      .h_art_initiation = parse_data<real_type>(data, "h_art_initiation", SS::hDS, SS::hAG, SS::NS),
+      .p_hiv_deaths = parse_data<real_type>(data, "p_hiv_deaths", SS::pAG, SS::NS)
     };
   };
 
@@ -235,6 +261,26 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
       .ctx_effect = parse_data<real_type>(data, "ctx_effect", 3),
       .hc_art_start = Rcpp::as<real_type>(data["hc_art_start"]),
       .local_adj_factor = Rcpp::as<real_type>(data["laf"])
+    };
+  };
+
+  static Config::State get_initial_state(
+    const Rcpp::List &data
+  ) {
+    return {
+      .hc1_hiv_pop = parse_data<real_type>(data, "hc1_hiv_pop", SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS),
+      .hc2_hiv_pop = parse_data<real_type>(data, "hc2_hiv_pop", SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS),
+      .hc1_art_pop = parse_data<real_type>(data, "hc1_art_pop", SS::hTS, SS::hc1DS, SS::hc1AG, SS::NS),
+      .hc2_art_pop = parse_data<real_type>(data, "hc2_art_pop", SS::hTS, SS::hc2DS, SS::hc2AG, SS::NS),
+      .hc1_noart_aids_deaths = parse_data<real_type>(data, "hc1_noart_aids_deaths", SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS),
+      .hc2_noart_aids_deaths = parse_data<real_type>(data, "hc2_noart_aids_deaths", SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS),
+      .hc1_art_aids_deaths = parse_data<real_type>(data, "hc1_art_aids_deaths", SS::hTS, SS::hc1DS, SS::hc1AG, SS::NS),
+      .hc2_art_aids_deaths = parse_data<real_type>(data, "hc2_art_aids_deaths", SS::hTS, SS::hc2DS, SS::hc2AG, SS::NS),
+      .hc_art_init = parse_data<real_type>(data, "hc_art_init", SS::hcAG_coarse),
+      .hc_art_need_init = parse_data<real_type>(data, "hc_art_need_init", SS::hc1DS, SS::hcTT, SS::hcAG_end, SS::NS),
+      .hiv_births = Rcpp::as<real_type>(data["hiv_births"]),
+      .ctx_need = Rcpp::as<real_type>(data["ctx_need"]),
+      .infection_by_type = parse_data<real_type>(data, "infection_by_type", SS::hcTT, SS::hc1AG, SS::NS)
     };
   };
 

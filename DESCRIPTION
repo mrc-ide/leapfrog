@@ -38,6 +38,7 @@ Imports:
     glue,
     Rcpp
 Suggests:
+    abind,
     data.table,
     dplyr,
     knitr,

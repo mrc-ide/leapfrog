@@ -32,8 +32,8 @@ def get_r_internal_data_pointer(cfg):
   return "INTEGER" if cfg["num_type"] == "int" else "REAL"
 
 
-def get_r_parse_data(cfg):
-  r_alias = cfg["alias"]["r"]
+def get_r_parse_data(cfg, alias = None):
+  r_alias = alias or cfg["alias"]["r"]
   if cfg["type"] == "scalar":
     return f'Rcpp::as<{cfg["num_type"]}>(data["{r_alias}"])'
   else:
