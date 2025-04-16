@@ -57,10 +57,6 @@ process_parameters <- function(parameters, configuration) {
     parameters[["t_ART_start"]] <- parameters[["t_ART_start"]] - 1L
   }
 
-  if (is_run_hiv_simulation(configuration)) {
-    hTS <- dim(parameters[["artmx_timerr"]])[[1]]
-    parameters[["h_art_stage_dur"]] <- rep(0.5, hTS - 1)
-  }
   if (is.null(parameters[["hts_per_year"]])) {
     parameters[["hts_per_year"]] <- 10L
   }

@@ -26,6 +26,7 @@ struct HaSS {
   static constexpr int hDS = 7;
   static constexpr int hTS = 3;
   static constexpr int hAG = 66;
+  static constexpr std::array<double, 2> h_art_stage_dur = { 0.5, 0.5 };
 };
 
 template<MV ModelVariant>
@@ -35,6 +36,7 @@ struct HaSS<ModelVariant> {
   static constexpr int hDS = 7;
   static constexpr int hTS = 3;
   static constexpr int hAG = 9;
+  static constexpr std::array<double, 2> h_art_stage_dur = { 0.5, 0.5 };
 };
 
 

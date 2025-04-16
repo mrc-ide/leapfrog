@@ -85,7 +85,6 @@ struct HaAdapter<Language::Cpp, real_type, ModelVariant> {
       .dropout_rate = read_data<real_type>(input_dir, "dropout_rate", opts.proj_time_steps),
       .adults_on_art = read_data<real_type>(input_dir, "adults_on_art", SS::NS, opts.proj_time_steps),
       .adults_on_art_is_percent = read_data<int>(input_dir, "adults_on_art_is_percent", SS::NS, opts.proj_time_steps),
-      .h_art_stage_dur = read_data<real_type>(input_dir, "h_art_stage_dur", SS::hTS - 1),
       .initiation_mortality_weight = read_data<real_type>(input_dir, "initiation_mortality_weight")
     };
   };

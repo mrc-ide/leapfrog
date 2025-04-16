@@ -211,7 +211,6 @@ In 5 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 | pAG_INCIDPOP              | ?                               |                                                                           |
 | hAG_15PLUS                | age_groups_hiv_15plus           |                                                                           |
 | hIDX_15PLUS               | hIDX_15PLUS                     |                                                                           |
-| h_art_stage_dur           | ?                               |                                                                           |
 | everARTelig_idx           | everARTelig_idx                 |                                                                           |
 | migrate_ag                | migration_rate                  | Rate people migrate into population by age and sex                        |
 | sx_netmig                 | survival_netmig                 |                                                                           |

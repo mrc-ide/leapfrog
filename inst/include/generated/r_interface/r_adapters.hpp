@@ -126,7 +126,6 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
       .dropout_rate = parse_data<real_type>(data, "art_dropout_rate", opts.proj_time_steps),
       .adults_on_art = parse_data<real_type>(data, "art15plus_num", SS::NS, opts.proj_time_steps),
       .adults_on_art_is_percent = parse_data<int>(data, "art15plus_isperc", SS::NS, opts.proj_time_steps),
-      .h_art_stage_dur = parse_data<real_type>(data, "h_art_stage_dur", SS::hTS - 1),
       .initiation_mortality_weight = Rcpp::as<real_type>(data["art_alloc_mxweight"])
     };
   };
@@ -388,7 +387,6 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
       .dropout_rate = parse_data<real_type>(data, "art_dropout_rate", opts.proj_time_steps),
       .adults_on_art = parse_data<real_type>(data, "art15plus_num", SS::NS, opts.proj_time_steps),
       .adults_on_art_is_percent = parse_data<int>(data, "art15plus_isperc", SS::NS, opts.proj_time_steps),
-      .h_art_stage_dur = parse_data<real_type>(data, "h_art_stage_dur", SS::hTS - 1),
       .initiation_mortality_weight = Rcpp::as<real_type>(data["art_alloc_mxweight"])
     };
   };

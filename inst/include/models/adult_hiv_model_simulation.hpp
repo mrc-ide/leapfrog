@@ -37,6 +37,7 @@ struct AdultHivModelSimulation<Config> {
   static constexpr int MALE = SS::MALE;
   static constexpr int FEMALE = SS::FEMALE;
   static constexpr int ART0MOS = SS::ART0MOS;
+  static constexpr auto h_art_stage_dur = SS::h_art_stage_dur;
 
   // function args
   int t;
@@ -225,7 +226,7 @@ struct AdultHivModelSimulation<Config> {
           }
 
           for (int hu = 0; hu < (hTS - 1); ++hu) {
-            const auto art_adults_progressing_treatment_stage = n_ha.h_art_adult(hu, hm, ha, g) / p_ha.h_art_stage_dur(hu);
+            const auto art_adults_progressing_treatment_stage = n_ha.h_art_adult(hu, hm, ha, g) / h_art_stage_dur[hu];
             i_ha.gradART(hu, hm, ha, g) -= art_adults_progressing_treatment_stage;
             i_ha.gradART(hu + 1, hm, ha, g) += art_adults_progressing_treatment_stage;
           }

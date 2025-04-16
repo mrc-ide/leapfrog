@@ -1,8 +1,10 @@
 def get_member_type(val):
   if isinstance(val, int):
     return "int"
-  else:
+  elif isinstance(val[0], int):
     return f'std::array<int, {len(val)}>'
+  else:
+    return f'std::array<double, {len(val)}>'
 
 
 def get_member_value(val):
