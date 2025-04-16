@@ -366,7 +366,7 @@ test_that("Child model agrees when run in single years vs all years", {
 
   out_single_year <- run_model(input$parameters, "ChildModel", 1970)
   for(year in 1971:2030) {
-    out <- run_model(input$parameters, "ChildModel", year, get_last_time_slice(out_single_year), year - 1)
+    out <- run_model_from_state(input$parameters, "ChildModel", get_last_time_slice(out_single_year), year - 1, year)
     out_single_year <- concat_on_time_dim(out_single_year, out)
   }
 

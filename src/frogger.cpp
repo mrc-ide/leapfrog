@@ -99,12 +99,12 @@ Rcpp::List run_base_model(
 }
 
 // [[Rcpp::export]]
-Rcpp::List run_base_model_with_initial_state(
+Rcpp::List run_base_model_from_state( 
   const Rcpp::List parameters,
   const std::string configuration,
-  const std::vector<int> output_years,
   const Rcpp::List initial_state,
-  int start_from_year
+  int start_from_year,
+  const std::vector<int> output_years
 ) {
   return get_sim_model(configuration)(parameters, output_years, initial_state, start_from_year);
 }

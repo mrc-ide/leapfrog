@@ -7,19 +7,43 @@
 #'   defaults to all years from 1970 to 2030. Also used to control what years
 #'   the simulation is run for. If output only 2030, simulation will be run
 #'   from `projection_start_year` passed in the `parameters` list.
-#' @param initial_state If provided, the model will run from this initial state
-#'   usually `start_from_year` should also be specified with this. (default NULL)
-#' @param start_from_year If provided, start model simulation from a particular
-#'   this year. (default 1970)
 #'
 #' @return List of model outputs
 #' @export
 run_model <- function(parameters,
                       configuration = "HivFullAgeStratification",
-                      output_years = seq(1970, 2030),
-                      initial_state = NULL,
-                      start_from_year = 1970) {
+                      output_years = seq(1970, 2030)) {
+  parameters <- process_parameters(parameters, configuration)
 
+  run_base_model(parameters, configuration, output_years)
+}
+
+#' Run leapfrog model fit from initial state
+#'
+#' @param parameters Projection parameters
+#' @param configuration The model configuration to run, see
+#'   [list_model_configurations()] for available configurations
+#' @param initial_state The model will run from this initial state
+#' @param start_from_year Start the model simulation from a particular year
+#' @param output_years Which years of the model to return from the simulation,
+#'   defaults to all years from 1970 to 2030. Also used to control what years
+#'   the simulation is run for. If output only 2030, simulation will be run
+#'   from `projection_start_year` passed in the `parameters` list.
+#'
+#' @return List of model outputs
+#' @export
+run_model_from_state <- function(parameters,
+                                 configuration,
+                                 initial_state,
+                                 start_from_year,
+                                 output_years = seq(1970, 2030)) {
+  parameters <- process_parameters(parameters, configuration)
+
+  run_base_model_from_state(parameters, configuration, initial_state, start_from_year, output_years)
+}
+
+
+process_parameters <- function(parameters, configuration) {
   if (configuration == "HivCoarseAgeStratification") {
     parameters$hAG_SPAN <- parameters[["hAG_SPAN_coarse"]]
     parameters$cd4_initdist <- parameters[["cd4_initdist_coarse"]]
@@ -55,11 +79,7 @@ run_model <- function(parameters,
     parameters[["hts_per_year"]] <- 10L
   }
 
-  if (is.null(initial_state)) {
-    run_base_model(parameters, configuration, output_years)
-  } else {
-    run_base_model_with_initial_state(parameters, configuration, output_years, initial_state, start_from_year)
-  }
+  parameters
 }
 
 is_run_hiv_simulation <- function(configuration) {
