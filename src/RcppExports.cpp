@@ -11,20 +11,26 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// run_base_model
-Rcpp::List run_base_model(const Rcpp::List data, const std::string model_variant, const int time_steps, const int hiv_steps, const std::vector<int> save_steps, const bool is_midyear_projection, const int t_ART_start);
-RcppExport SEXP _frogger_run_base_model(SEXP dataSEXP, SEXP model_variantSEXP, SEXP time_stepsSEXP, SEXP hiv_stepsSEXP, SEXP save_stepsSEXP, SEXP is_midyear_projectionSEXP, SEXP t_ART_startSEXP) {
+// list_model_configurations
+std::vector<std::string> list_model_configurations();
+RcppExport SEXP _frogger_list_model_configurations() {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Rcpp::List >::type data(dataSEXP);
-    Rcpp::traits::input_parameter< const std::string >::type model_variant(model_variantSEXP);
-    Rcpp::traits::input_parameter< const int >::type time_steps(time_stepsSEXP);
-    Rcpp::traits::input_parameter< const int >::type hiv_steps(hiv_stepsSEXP);
-    Rcpp::traits::input_parameter< const std::vector<int> >::type save_steps(save_stepsSEXP);
-    Rcpp::traits::input_parameter< const bool >::type is_midyear_projection(is_midyear_projectionSEXP);
-    Rcpp::traits::input_parameter< const int >::type t_ART_start(t_ART_startSEXP);
-    rcpp_result_gen = Rcpp::wrap(run_base_model(data, model_variant, time_steps, hiv_steps, save_steps, is_midyear_projection, t_ART_start));
+    rcpp_result_gen = Rcpp::wrap(list_model_configurations());
+    return rcpp_result_gen;
+END_RCPP
+}
+// run_base_model
+Rcpp::List run_base_model(const Rcpp::List parameters, const std::string configuration, const std::vector<int> output_years);
+RcppExport SEXP _frogger_run_base_model(SEXP parametersSEXP, SEXP configurationSEXP, SEXP output_yearsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::List >::type parameters(parametersSEXP);
+    Rcpp::traits::input_parameter< const std::string >::type configuration(configurationSEXP);
+    Rcpp::traits::input_parameter< const std::vector<int> >::type output_years(output_yearsSEXP);
+    rcpp_result_gen = Rcpp::wrap(run_base_model(parameters, configuration, output_years));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -55,7 +61,8 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_frogger_run_base_model", (DL_FUNC) &_frogger_run_base_model, 7},
+    {"_frogger_list_model_configurations", (DL_FUNC) &_frogger_list_model_configurations, 0},
+    {"_frogger_run_base_model", (DL_FUNC) &_frogger_run_base_model, 3},
     {"_frogger_serialize_vector", (DL_FUNC) &_frogger_serialize_vector, 3},
     {"_frogger_deserialize_vector", (DL_FUNC) &_frogger_deserialize_vector, 2},
     {NULL, NULL, 0}

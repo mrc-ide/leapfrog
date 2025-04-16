@@ -18,7 +18,7 @@ build:
 	R CMD build .
 
 README.md: README.Rmd
-	Rscript -e 'devtools::load_all(); knitr::knit("README.Rmd")'
+	Rscript -e 'devtools::load_all(); rmarkdown::render("README.Rmd")'
 	sed -i.bak 's/[[:space:]]*$$//' README.md
 	rm -f $@.bak
 

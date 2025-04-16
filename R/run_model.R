@@ -1,97 +1,59 @@
 #' Run leapfrog model fit
 #'
-#' @param data Input data
 #' @param parameters Projection parameters
-#' @param sim_years Simulation years to run model for default 1970:2030
-#' @param hts_per_year Number of HIV time steps per year, default 10
-#' @param output_steps Which sim years to output for default same as sim_years
-#' @param run_hiv_simulation If TRUE then runs HIV simulation
-#' @param hiv_age_stratification The age stratification for HIV population,
-#'  "coarse" or "full"
-#' @param run_child_model If TRUE then run the child model
+#' @param configuration The model configuration to run, see
+#'   [list_model_configurations()] for available configurations
+#' @param output_years Which years of the model to return from the simulation,
+#'   defaults to all years from 1970 to 2030. Also used to control what years
+#'   the simulation is run for. If output only 2030, simulation will be run
+#'   from `projection_start_year` passed in the `parameters` list.
 #'
 #' @return List of model outputs
 #' @export
-run_model <- function(data, parameters, sim_years,
-                      hts_per_year,
-                      output_steps = NULL,
-                      run_hiv_simulation = TRUE,
-                      hiv_age_stratification = "full",
-                      run_child_model = TRUE) {
-  # TODO Mantra put dates into the cpp instead of having wrappers parse dates
-  if (is.null(sim_years)) {
-    sim_years <- 1970:2030
-  }
+run_model <- function(parameters,
+                      configuration = "HivFullAgeStratification",
+                      output_years = seq(1970, 2030)) {
 
-  # TODO Mantra where should this validation live? seems a bit arbitrary to put into cpp
-  if (length(sim_years) > dim(data$Sx)[[3]]) {
-    stop(sprintf("No of years > max years of %s", dim(data$Sx)[[3]]))
-  }
-
-  if (is.null(output_steps)) {
-    output_steps <- seq_along(sim_years)
-  } else {
-    ## We want users to think in terms of years, so interface has years
-    ## But for running the C++ loop we want to report out based on what
-    ## iteration step we're at so convert from years to index
-    invalid_steps <- output_steps[!(output_steps %in% sim_years)]
-    if (any(invalid_steps)) {
-      out_str <- paste(paste0("'", invalid_steps, "'"), collapse = ", ")
-      stop(sprintf(
-        "Invalid output %s %s. Can only output one of the simulation years.",
-        ngettext(length(invalid_steps), "step", "steps"), out_str
-      ))
-    }
-    output_steps <- which(sim_years %in% output_steps)
-  }
-
-  assert_enum(hiv_age_stratification, c("full", "coarse", "none"))
-  if (!run_hiv_simulation) {
-    model_variant <- "DemographicProjection"
-  } else if (hiv_age_stratification == "full" && !run_child_model) {
-    model_variant <- "HivFullAgeStratification"
-  } else if (hiv_age_stratification == "coarse" && !run_child_model) {
-    model_variant <- "HivCoarseAgeStratification"
-  } else if (hiv_age_stratification == "full" && run_child_model) {
-    model_variant <- "ChildModel"
-  } else if (hiv_age_stratification == "coarse" && run_child_model) {
-    stop("Cannot run child model with coarse age stratification")
-  } else if (hiv_age_stratification == "none" && run_hiv_simulation) {
-    stop("Cannot run HIV simulation with unspecified age stratification")
-  }
-  if (hiv_age_stratification == "full") {
-    parameters$hAG_SPAN <- parameters[["hAG_SPAN_full"]]
-    parameters$cd4_initdist <- parameters[["cd4_initdist_full"]]
-    parameters$cd4_prog <- parameters[["cd4_prog_full"]]
-    parameters$cd4_mort <- parameters[["cd4_mort_full"]]
-    parameters$art_mort <- parameters[["art_mort_full"]]
-  } else if (hiv_age_stratification == "coarse") {
+  if (configuration == "HivCoarseAgeStratification") {
     parameters$hAG_SPAN <- parameters[["hAG_SPAN_coarse"]]
     parameters$cd4_initdist <- parameters[["cd4_initdist_coarse"]]
     parameters$cd4_prog <- parameters[["cd4_prog_coarse"]]
     parameters$cd4_mort <- parameters[["cd4_mort_coarse"]]
     parameters$art_mort <- parameters[["art_mort_coarse"]]
-  }
-  data <- c(data, parameters)
-
-  if (is.null(hts_per_year)) {
-    hts_per_year <- 10
+  } else if (configuration %in% c("HivFullAgeStratification", "ChildModel")) {
+    parameters$hAG_SPAN <- parameters[["hAG_SPAN_full"]]
+    parameters$cd4_initdist <- parameters[["cd4_initdist_full"]]
+    parameters$cd4_prog <- parameters[["cd4_prog_full"]]
+    parameters$cd4_mort <- parameters[["cd4_mort_full"]]
+    parameters$art_mort <- parameters[["art_mort_full"]]
   }
 
   # convert indices to 0 based
-  if ("artcd4elig_idx" %in% names(data)) {
+  if ("artcd4elig_idx" %in% names(parameters)) {
     # integer type
-    data[["artcd4elig_idx"]] <- data[["artcd4elig_idx"]] - 1L
+    parameters[["artcd4elig_idx"]] <- parameters[["artcd4elig_idx"]] - 1L
   }
-  if ("paed_art_elig_cd4" %in% names(data)) {
+  if ("paed_art_elig_cd4" %in% names(parameters)) {
     # double type
-    data[["paed_art_elig_cd4"]] <- data[["paed_art_elig_cd4"]] - 1
+    parameters[["paed_art_elig_cd4"]] <- parameters[["paed_art_elig_cd4"]] - 1
+  }
+  if ("t_ART_start" %in% names(parameters)) {
+    parameters[["t_ART_start"]] <- parameters[["t_ART_start"]] - 1L
   }
 
-  if (run_hiv_simulation) {
-    hTS <- dim(data[["art_mort"]])[[1]]
-    data[["h_art_stage_dur"]] <- rep(0.5, hTS - 1)
+  if (is_run_hiv_simulation(configuration)) {
+    hTS <- dim(parameters[["art_mort"]])[[1]]
+    parameters[["h_art_stage_dur"]] <- rep(0.5, hTS - 1)
+  }
+  if (is.null(parameters[["hts_per_year"]])) {
+    parameters[["hts_per_year"]] <- 10L
   }
 
-  run_base_model(data, model_variant, length(sim_years), hts_per_year, output_steps - 1, data[["projection_period"]] == "midyear", data[["t_ART_start"]] - 1)
+  run_base_model(parameters, configuration, output_years)
+}
+
+is_run_hiv_simulation <- function(configuration) {
+  configuration %in% c("HivCoarseAgeStratification",
+                       "HivFullAgeStratification",
+                       "ChildModel")
 }

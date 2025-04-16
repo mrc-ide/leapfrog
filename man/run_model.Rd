@@ -5,33 +5,21 @@
 \title{Run leapfrog model fit}
 \usage{
 run_model(
-  data,
   parameters,
-  sim_years,
-  hts_per_year,
-  output_steps = NULL,
-  run_hiv_simulation = TRUE,
-  hiv_age_stratification = "full",
-  run_child_model = TRUE
+  configuration = "HivFullAgeStratification",
+  output_years = seq(1970, 2030)
 )
 }
 \arguments{
-\item{data}{Input data}
-
 \item{parameters}{Projection parameters}
 
-\item{sim_years}{Simulation years to run model for default 1970:2030}
+\item{output_years}{Which years of the model to return from the simulation,
+defaults to all years from 1970 to 2030. Also used to control what years
+the simulation is run for. If output only 2030, simulation will be run
+from \code{projection_start_year} passed in the \code{parameters} list.}
 
-\item{hts_per_year}{Number of HIV time steps per year, default 10}
-
-\item{output_steps}{Which sim years to output for default same as sim_years}
-
-\item{run_hiv_simulation}{If TRUE then runs HIV simulation}
-
-\item{hiv_age_stratification}{The age stratification for HIV population,
-"coarse" or "full"}
-
-\item{run_child_model}{If TRUE then run the child model}
+\item{configuation}{The model configuration to run, see
+\code{\link[=list_model_configurations]{list_model_configurations()}} for available configurations}
 }
 \value{
 List of model outputs

@@ -35,8 +35,7 @@ struct {{ config.name }}Adapter<Language::Cpp, real_type, ModelVariant> {
 
   static Config::Pars get_pars(
     const std::filesystem::path &input_dir,
-    const Options<real_type> &opts,
-    const int proj_years
+    const Options<real_type> &opts
   ) {
     return {
       {% for name, cfg in config.pars.items() %}

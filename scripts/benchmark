@@ -2,27 +2,25 @@
 
 root_dir <- here::here()
 
-demp <- readRDS(file.path(root_dir, "tests/testthat/testdata/demographic_projection_object_adult.rds"))
-parameters <- readRDS(file.path(root_dir, "tests/testthat/testdata/projection_parameters_adult.rds"))
+parameters <- readRDS(testthat::test_path("testdata/adult_parms.rds"))
 
 message("Benchmarking demographic projection")
 bench::mark(
-  frogger = frogger::run_model(demp, parameters, NULL, NULL, NULL, run_hiv_simulation = FALSE,
-                               hiv_age_stratification = "none", run_child_model = FALSE),
+  frogger = frogger::run_model(parameters, "DemographicProjection", 1970:2030),
   iterations = 10,
   check = FALSE
 )
 
 message("Benchmarking coarse-stratified adult HIV model")
 bench::mark(
-  frogger = frogger::run_model(demp, parameters, NULL, NULL, NULL, hiv_age_stratification = "coarse", run_child_model = FALSE),
+  frogger = frogger::run_model(parameters, "HivCoarseAgeStratification", 1970:2030),
   iterations = 10,
   check = FALSE
 )
 
 message("Benchmarking single-year stratified adult HIV model")
 bench::mark(
-  frogger = frogger::run_model(demp, parameters, NULL, NULL, NULL, hiv_age_stratification = "full", run_child_model = FALSE),
+  frogger = frogger::run_model(parameters, "HivFullAgeStratification", 1970:2030),
   iterations = 10,
   check = FALSE
 )
@@ -32,7 +30,7 @@ input <- readRDS(testthat::test_path("testdata/child_parms.rds"))
 
 message("Benchmarking child model")
 bench::mark(
-  frogger = frogger::run_model(input$demp, input$parameters, NULL, NULL, NULL, hiv_age_stratification = "full", run_child_model = TRUE),
+  frogger = frogger::run_model(input$parameters, "ChildModel", 1970:2030),
   iterations = 10,
   check = FALSE
 )

@@ -1,13 +1,9 @@
 testthat::skip("Reference tests currently broken")
 
 test_that("demographic model is correct", {
-  demp <- readRDS(test_path("testdata/demographic_projection_object_adult.rds"))
-  parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
+  parameters <- readRDS(test_path("testdata/adult_parms.rds"))
 
-  actual <- run_model(demp, parameters, NULL, 0L,
-    run_hiv_simulation = FALSE,
-    run_child_model = FALSE
-  )
+  actual <- run_model(parameters, "DemographicProjection")
 
   expected <- readRDS(test_path("testdata/fit_demography.rds"))
 
@@ -28,11 +24,8 @@ test_that("demographic model is correct", {
 
 
 test_that("model agrees with leapfrog impl", {
-  demp <- readRDS(test_path("testdata/demographic_projection_object_adult.rds"))
-  parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
-  actual <- run_model(demp, parameters, NULL, NULL,
-    run_child_model = FALSE
-  )
+  parameters <- readRDS(test_path("testdata/adult_parms.rds"))
+  actual <- run_model(parameters)
 
   expected <- readRDS(test_path("testdata/leapfrog_fit.rds"))
 
@@ -52,12 +45,8 @@ test_that("model agrees with leapfrog impl", {
 })
 
 test_that("model agrees with leapfrog impl", {
-  demp <- readRDS(test_path("testdata/demographic_projection_object_adult.rds"))
-  parameters <- readRDS(test_path("testdata/projection_parameters_adult.rds"))
-  actual <- run_model(demp, parameters, NULL, NULL,
-    hiv_age_stratification = "coarse",
-    run_child_model = FALSE
-  )
+  parameters <- readRDS(test_path("testdata/adult_parms.rds"))
+  actual <- run_model(parameters, "HivCoarseAgeStratification")
 
   expected <- readRDS(test_path("testdata/leapfrog_fit_coarse.rds"))
 

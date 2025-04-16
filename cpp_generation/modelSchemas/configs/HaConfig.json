@@ -27,7 +27,7 @@
     "total_rate": {
       "type": "TM",
       "num_type": "real_type",
-      "dims": ["proj_years"],
+      "dims": ["opts.proj_time_steps"],
       "alias": {
         "r": "incidinput"
       }
@@ -35,7 +35,7 @@
     "relative_risk_age": {
       "type": "TM",
       "num_type": "real_type",
-      "dims": ["SS::pAG - opts.p_idx_hiv_first_adult", "SS::NS", "proj_years"],
+      "dims": ["SS::pAG - opts.p_idx_hiv_first_adult", "SS::NS", "opts.proj_time_steps"],
       "alias": {
         "r": "incrr_age"
       }
@@ -43,7 +43,7 @@
     "relative_risk_sex": {
       "type": "TM",
       "num_type": "real_type",
-      "dims": ["proj_years"],
+      "dims": ["opts.proj_time_steps"],
       "alias": {
         "r": "incrr_sex"
       }
@@ -82,7 +82,7 @@
     "idx_hm_elig": {
       "type": "TM",
       "num_type": "int",
-      "dims": ["proj_years"],
+      "dims": ["opts.proj_time_steps"],
       "alias": {
         "r": "artcd4elig_idx"
       }
@@ -98,7 +98,7 @@
     "mortality_time_rate_ratio": {
       "type": "TM",
       "num_type": "real_type",
-      "dims": ["SS::hTS", "proj_years"],
+      "dims": ["SS::hTS", "opts.proj_time_steps"],
       "alias": {
         "r": "artmx_timerr"
       }
@@ -113,7 +113,7 @@
     "dropout_rate": {
       "type": "TM",
       "num_type": "real_type",
-      "dims": ["proj_years"],
+      "dims": ["opts.proj_time_steps"],
       "alias": {
         "r": "art_dropout_rate"
       }
@@ -121,7 +121,7 @@
     "adults_on_art": {
       "type": "TM",
       "num_type": "real_type",
-      "dims": ["SS::NS", "proj_years"],
+      "dims": ["SS::NS", "opts.proj_time_steps"],
       "alias": {
         "r": "art15plus_num"
       }
@@ -129,7 +129,7 @@
     "adults_on_art_is_percent": {
       "type": "TM",
       "num_type": "int",
-      "dims": ["SS::NS", "proj_years"],
+      "dims": ["SS::NS", "opts.proj_time_steps"],
       "alias": {
         "r": "art15plus_isperc"
       }

@@ -21,10 +21,9 @@ struct Leapfrog {
   using Args = Cfg::Args;
 
   static OutputState run_model(
-    const int time_steps,
-    const std::vector<int> save_steps,
     const Pars& pars,
-    const Options<real_type>& opts
+    const Options<real_type>& opts,
+    const std::vector<int> output_years
   ) {
     auto state = State();
     auto state_next = state;
@@ -38,14 +37,15 @@ struct Leapfrog {
     Intermediate intermediate;
     intermediate.reset();
 
-    OutputState output_state(save_steps.size());
-    save_state_if_in_save_step(0, state, output_state, save_steps);
+    OutputState output_state(output_years.size());
+    save_state(opts.proj_start_year, state, output_state, output_years);
 
     // Each time step is mid-point of the year
-    for (int step = 1; step < time_steps; ++step) {
+    for (int step = 1; step < opts.proj_time_steps; ++step) {
       Args args = { step, pars, state, state_next, intermediate, opts };
       project_year(args);
-      save_state_if_in_save_step(step, state_next, output_state, save_steps);
+      save_state(opts.proj_start_year + step, state_next,
+                 output_state, output_years);
       std::swap(state, state_next);
       state_next.reset();
       intermediate.reset();
@@ -54,14 +54,14 @@ struct Leapfrog {
   };
 
   private:
-  static void save_state_if_in_save_step(
+  static void save_state(
     const int step,
     State& state_next,
     OutputState& output_state,
-    const std::vector<int>& save_steps
+    const std::vector<int>& output_years
   ) {
-    for (size_t i = 0; i < save_steps.size(); ++i) {
-      if (step == save_steps[i]) {
+    for (size_t i = 0; i < output_years.size(); ++i) {
+      if (step == output_years[i]) {
         output_state.save_state(i, state_next);
       }
     }
