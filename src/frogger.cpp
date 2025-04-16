@@ -43,7 +43,7 @@ Rcpp::List simulate_model(
 
   const auto pars = LF::Cfg::get_pars(parameters, opts);
 
-  typename LF::OutputState state;
+  typename LF::OutputState state(output_years.size());
 
   if (initial_state_data && start_from_year) {
     typename LF::State initial_state = LF::Cfg::get_initial_state(initial_state_data.value());
