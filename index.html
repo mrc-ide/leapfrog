@@ -87,8 +87,13 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can install the development version of frogger from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
+<p>Please install from our <a href="https://mrc-ide.r-universe.dev/builds" class="external-link">r-universe</a>:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span></span>
+<span>  <span class="st">"frogger"</span>,</span>
+<span>  repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"https://mrc-ide.r-universe.dev"</span>, <span class="st">"https://cloud.r-project.org"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>You can install the development version of frogger from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"mrc-ide/frogger"</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -115,7 +120,7 @@
 </h2>
 <p>The file <code>pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ</code> contains an example Spectrum file constructed from default country data for Botswana with Spectrum (April 2022).</p>
 <p>Prepare model inputs.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mrc-ide/frogger" class="external-link">frogger</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">pjnz</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ"</span>,</span>
@@ -123,11 +128,11 @@
 <span></span>
 <span><span class="va">parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/prepare_leapfrog_parameters.html">prepare_leapfrog_parameters</a></span><span class="op">(</span><span class="va">pjnz</span><span class="op">)</span></span></code></pre></div>
 <p>Simulate adult ‘full’ age group (single-year age) and ‘coarse’ age group (collapsed age groups) models from 1970 to 2030 with 10 HIV time steps per year.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lsimF</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/run_model.html">run_model</a></span><span class="op">(</span><span class="va">parameters</span>, <span class="st">"HivFullAgeStratification"</span>, <span class="fl">1970</span><span class="op">:</span><span class="fl">2030</span><span class="op">)</span></span>
 <span><span class="va">lsimC</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/run_model.html">run_model</a></span><span class="op">(</span><span class="va">parameters</span>, <span class="st">"HivCoarseAgeStratification"</span>, <span class="fl">1970</span><span class="op">:</span><span class="fl">2030</span><span class="op">)</span></span></code></pre></div>
 <p>Compare the HIV prevalence age 15-49 years and AIDS deaths 50+ years. Deaths 50+ years are to show some noticeable divergence between the <code>"full"</code> and <code>"coarse"</code> age group simulations.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">prevF</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colSums</a></span><span class="op">(</span><span class="va">lsimF</span><span class="op">$</span><span class="va">p_hiv_pop</span><span class="op">[</span><span class="fl">16</span><span class="op">:</span><span class="fl">50</span>,,<span class="op">]</span>,,<span class="fl">2</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colSums</a></span><span class="op">(</span><span class="va">lsimF</span><span class="op">$</span><span class="va">p_total_pop</span><span class="op">[</span><span class="fl">16</span><span class="op">:</span><span class="fl">50</span>,,<span class="op">]</span>,,<span class="fl">2</span><span class="op">)</span></span>
 <span><span class="va">prevC</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colSums</a></span><span class="op">(</span><span class="va">lsimC</span><span class="op">$</span><span class="va">p_hiv_pop</span><span class="op">[</span><span class="fl">16</span><span class="op">:</span><span class="fl">50</span>,,<span class="op">]</span>,,<span class="fl">2</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colSums</a></span><span class="op">(</span><span class="va">lsimC</span><span class="op">$</span><span class="va">p_total_pop</span><span class="op">[</span><span class="fl">16</span><span class="op">:</span><span class="fl">50</span>,,<span class="op">]</span>,,<span class="fl">2</span><span class="op">)</span></span>
 <span></span>
@@ -137,7 +142,7 @@
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fl">1970</span><span class="op">:</span><span class="fl">2030</span>, <span class="va">prevF</span>, type <span class="op">=</span> <span class="st">"l"</span>, main <span class="op">=</span> <span class="st">"Prevalence 15-49"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="fl">1970</span><span class="op">:</span><span class="fl">2030</span>, <span class="va">prevC</span>, col <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-sim_prev-1.png" width="100%"></p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fl">1970</span><span class="op">:</span><span class="fl">2030</span>, <span class="va">deathsF</span>, type <span class="op">=</span> <span class="st">"l"</span>, main <span class="op">=</span> <span class="st">"AIDS Deaths 50+ years"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="fl">1970</span><span class="op">:</span><span class="fl">2030</span>, <span class="va">deathsC</span>, col <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
@@ -152,7 +157,7 @@
 <h2 id="lint">lint<a class="anchor" aria-label="anchor" href="#lint"></a>
 </h2>
 <p>Lint R code with <code>lintr</code></p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">lintr</span><span class="fu">::</span><span class="fu">lint_package</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Lint C++ code with <a href="https://github.com/cpplint/cpplint" class="external-link">cpplint</a></p>
 <pre class="console"><code>cpplint inst/include/*</code></pre>
@@ -186,7 +191,7 @@
 <p>There is some pre-prepared test data available to make tests run faster. This is generated and saved <code>./scripts/create_test_data.R</code>.</p>
 <p>We also have some separate data written out in a generic format which can be read to test the model directly from C++. This is in <code>inst/standalone_model/data</code> in zipped files.</p>
 <p>If this is your first time running you will need to unzip the standalone test data</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>.<span class="sc">/</span>inst<span class="sc">/</span>standalone_model<span class="sc">/</span>extract_data</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>.<span class="sc">/</span>inst<span class="sc">/</span>standalone_model<span class="sc">/</span>extract_data</span></code></pre></div>
 <p>If you want to update the test data, it should be updated in the <code>./scripts/create_test_data.R</code> script so that we know how it was created and we can do it again fairly easily. Steps are 1. Update the script and generate the test data 1. Update the standalone data which is built from this <code>./scripts/update_standalone_data</code>. You might need to add a new mapping from R to serialized name if you are adding new input data 1. Unzip this for automated tests <code>./inst/standalone_model/extract_data</code></p>
 </div>
 <div class="section level3">
