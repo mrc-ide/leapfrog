@@ -35,34 +35,34 @@ struct DpConfig {
 
   struct State {
     TFS<real_type, SS::pAG, SS::NS> p_total_pop;
-    TFS<real_type, SS::pAG, SS::NS> p_total_pop_natural_deaths;
+    TFS<real_type, SS::pAG, SS::NS> p_total_pop_background_deaths;
     real_type births;
 
     void reset() {
       p_total_pop.setZero();
-      p_total_pop_natural_deaths.setZero();
+      p_total_pop_background_deaths.setZero();
       births = 0;
     };
   };
 
   struct OutputState {
     T3<real_type> p_total_pop;
-    T3<real_type> p_total_pop_natural_deaths;
+    T3<real_type> p_total_pop_background_deaths;
     T1<real_type> births;
 
     OutputState(int output_years):
       p_total_pop(SS::pAG, SS::NS, output_years),
-      p_total_pop_natural_deaths(SS::pAG, SS::NS, output_years),
+      p_total_pop_background_deaths(SS::pAG, SS::NS, output_years),
       births(output_years)
     {
       p_total_pop.setZero();
-      p_total_pop_natural_deaths.setZero();
+      p_total_pop_background_deaths.setZero();
       births.setZero();
     };
 
     void save_state(const size_t i, const State &state) {
       p_total_pop.chip(i, p_total_pop.NumDimensions - 1) = state.p_total_pop;
-      p_total_pop_natural_deaths.chip(i, p_total_pop_natural_deaths.NumDimensions - 1) = state.p_total_pop_natural_deaths;
+      p_total_pop_background_deaths.chip(i, p_total_pop_background_deaths.NumDimensions - 1) = state.p_total_pop_background_deaths;
       births(i) = state.births;
     };
   };
@@ -176,7 +176,7 @@ struct HaConfig {
 
   struct State {
     TFS<real_type, SS::pAG, SS::NS> p_hiv_pop;
-    TFS<real_type, SS::pAG, SS::NS> p_hiv_pop_natural_deaths;
+    TFS<real_type, SS::pAG, SS::NS> p_hiv_pop_background_deaths;
     TFS<real_type, SS::hDS, SS::hAG, SS::NS> h_hiv_adult;
     TFS<real_type, SS::hTS, SS::hDS, SS::hAG, SS::NS> h_art_adult;
     TFS<real_type, SS::hDS, SS::hAG, SS::NS> h_hiv_deaths_no_art;
@@ -187,7 +187,7 @@ struct HaConfig {
 
     void reset() {
       p_hiv_pop.setZero();
-      p_hiv_pop_natural_deaths.setZero();
+      p_hiv_pop_background_deaths.setZero();
       h_hiv_adult.setZero();
       h_art_adult.setZero();
       h_hiv_deaths_no_art.setZero();
@@ -200,7 +200,7 @@ struct HaConfig {
 
   struct OutputState {
     T3<real_type> p_hiv_pop;
-    T3<real_type> p_hiv_pop_natural_deaths;
+    T3<real_type> p_hiv_pop_background_deaths;
     T4<real_type> h_hiv_adult;
     T5<real_type> h_art_adult;
     T4<real_type> h_hiv_deaths_no_art;
@@ -211,7 +211,7 @@ struct HaConfig {
 
     OutputState(int output_years):
       p_hiv_pop(SS::pAG, SS::NS, output_years),
-      p_hiv_pop_natural_deaths(SS::pAG, SS::NS, output_years),
+      p_hiv_pop_background_deaths(SS::pAG, SS::NS, output_years),
       h_hiv_adult(SS::hDS, SS::hAG, SS::NS, output_years),
       h_art_adult(SS::hTS, SS::hDS, SS::hAG, SS::NS, output_years),
       h_hiv_deaths_no_art(SS::hDS, SS::hAG, SS::NS, output_years),
@@ -221,7 +221,7 @@ struct HaConfig {
       p_hiv_deaths(SS::pAG, SS::NS, output_years)
     {
       p_hiv_pop.setZero();
-      p_hiv_pop_natural_deaths.setZero();
+      p_hiv_pop_background_deaths.setZero();
       h_hiv_adult.setZero();
       h_art_adult.setZero();
       h_hiv_deaths_no_art.setZero();
@@ -233,7 +233,7 @@ struct HaConfig {
 
     void save_state(const size_t i, const State &state) {
       p_hiv_pop.chip(i, p_hiv_pop.NumDimensions - 1) = state.p_hiv_pop;
-      p_hiv_pop_natural_deaths.chip(i, p_hiv_pop_natural_deaths.NumDimensions - 1) = state.p_hiv_pop_natural_deaths;
+      p_hiv_pop_background_deaths.chip(i, p_hiv_pop_background_deaths.NumDimensions - 1) = state.p_hiv_pop_background_deaths;
       h_hiv_adult.chip(i, h_hiv_adult.NumDimensions - 1) = state.h_hiv_adult;
       h_art_adult.chip(i, h_art_adult.NumDimensions - 1) = state.h_art_adult;
       h_hiv_deaths_no_art.chip(i, h_hiv_deaths_no_art.NumDimensions - 1) = state.h_hiv_deaths_no_art;

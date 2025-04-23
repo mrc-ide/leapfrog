@@ -55,7 +55,7 @@ struct DpAdapter<Language::Cpp, real_type, ModelVariant> {
     std::filesystem::path& output_dir
   ) {
     serialize::serialize_tensor<real_type, 3>(state.p_total_pop, output_dir / "p_total_pop");
-    serialize::serialize_tensor<real_type, 3>(state.p_total_pop_natural_deaths, output_dir / "p_total_pop_natural_deaths");
+    serialize::serialize_tensor<real_type, 3>(state.p_total_pop_background_deaths, output_dir / "p_total_pop_background_deaths");
     serialize::serialize_tensor<real_type, 1>(state.births, output_dir / "births");
     return index + output_count;
   };
@@ -98,7 +98,7 @@ struct HaAdapter<Language::Cpp, real_type, ModelVariant> {
     std::filesystem::path& output_dir
   ) {
     serialize::serialize_tensor<real_type, 3>(state.p_hiv_pop, output_dir / "p_hiv_pop");
-    serialize::serialize_tensor<real_type, 3>(state.p_hiv_pop_natural_deaths, output_dir / "p_hiv_pop_natural_deaths");
+    serialize::serialize_tensor<real_type, 3>(state.p_hiv_pop_background_deaths, output_dir / "p_hiv_pop_background_deaths");
     serialize::serialize_tensor<real_type, 4>(state.h_hiv_adult, output_dir / "h_hiv_adult");
     serialize::serialize_tensor<real_type, 5>(state.h_art_adult, output_dir / "h_art_adult");
     serialize::serialize_tensor<real_type, 4>(state.h_hiv_deaths_no_art, output_dir / "h_hiv_deaths_no_art");

@@ -43,9 +43,9 @@ test_that("We can compile the standalone program", {
 
   expect_true(file.exists(file.path(output, "p_total_pop")))
   expect_true(file.exists(file.path(output, "births")))
-  expect_true(file.exists(file.path(output, "p_total_pop_natural_deaths")))
+  expect_true(file.exists(file.path(output, "p_total_pop_background_deaths")))
   expect_true(file.exists(file.path(output, "p_hiv_pop")))
-  expect_true(file.exists(file.path(output, "p_hiv_pop_natural_deaths")))
+  expect_true(file.exists(file.path(output, "p_hiv_pop_background_deaths")))
   expect_true(file.exists(file.path(output, "h_hiv_adult")))
   expect_true(file.exists(file.path(output, "h_art_adult")))
   expect_true(file.exists(file.path(output, "h_hiv_deaths_no_art")))
@@ -69,8 +69,8 @@ test_that("We can compile the standalone program", {
     ignore_attr = TRUE
   )
   expect_equal(
-    deserialize_tensor_to_r(file.path(output, "p_total_pop_natural_deaths")),
-    expected$p_total_pop_natural_deaths,
+    deserialize_tensor_to_r(file.path(output, "p_total_pop_background_deaths")),
+    expected$p_total_pop_background_deaths,
     tolerance = 1e-5
   )
   expect_equal(deserialize_tensor_to_r(file.path(output, "p_hiv_pop")),
@@ -78,8 +78,8 @@ test_that("We can compile the standalone program", {
     tolerance = 1e-5
   )
   expect_equal(
-    deserialize_tensor_to_r(file.path(output, "p_hiv_pop_natural_deaths")),
-    expected$p_hiv_pop_natural_deaths,
+    deserialize_tensor_to_r(file.path(output, "p_hiv_pop_background_deaths")),
+    expected$p_hiv_pop_background_deaths,
     tolerance = 1e-5
   )
   expect_equal(deserialize_tensor_to_r(file.path(output, "h_hiv_adult")),
