@@ -42,6 +42,25 @@ run_model_from_state <- function(parameters,
   run_base_model_from_state(parameters, configuration, initial_state, start_from_year, output_years)
 }
 
+#' Run leapfrog model fit for a single year
+#'
+#' @param parameters Projection parameters
+#' @param configuration The model configuration to run, see
+#'   [list_model_configurations()] for available configurations
+#' @param initial_state The model will run from this initial state
+#' @param start_from_year Start the model simulation from this year
+#'
+#' @return List of model outputs
+#' @export
+run_model_single_year <- function(parameters,
+                                  configuration,
+                                  initial_state,
+                                  start_from_year) {
+  parameters <- process_parameters(parameters, configuration)
+
+  run_base_model_single_year(parameters, configuration, initial_state, start_from_year)
+}
+
 
 process_parameters <- function(parameters, configuration) {
   if (configuration == "HivCoarseAgeStratification") {
@@ -88,15 +107,20 @@ is_run_hiv_simulation <- function(configuration) {
                        "ChildModel")
 }
 
-get_last_time_slice <- function(dat) {
-  dims <- dim(dat[[1]])
-  last_t_index <- dims[[length(dims)]]
-
+get_time_slice <- function(dat, index) {
   last_ind <- function(x) {
     nd <- length(dim(x))
     inds <- rep(alist(,)[1], nd)
-    inds[nd] <- last_t_index
-    do.call(`[`, c(list(x), inds))
+    inds[nd] <- index
+    ret <- do.call(`[`, c(list(x), inds))
+
+    # R drops dimension by default when extracting a 1D
+    # vector which causes waldo compare to fail so we
+    # manually compute the dimension for those fields.
+    if (is.null(dim(ret)) && length(ret) > 1) {
+      dim(ret) <- length(ret)
+    }
+    ret
   }
 
   lapply(dat, last_ind)

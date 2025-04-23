@@ -49,6 +49,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// run_base_model_single_year
+Rcpp::List run_base_model_single_year(const Rcpp::List parameters, const std::string configuration, const Rcpp::List initial_state, int start_from_year);
+RcppExport SEXP _frogger_run_base_model_single_year(SEXP parametersSEXP, SEXP configurationSEXP, SEXP initial_stateSEXP, SEXP start_from_yearSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::List >::type parameters(parametersSEXP);
+    Rcpp::traits::input_parameter< const std::string >::type configuration(configurationSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List >::type initial_state(initial_stateSEXP);
+    Rcpp::traits::input_parameter< int >::type start_from_year(start_from_yearSEXP);
+    rcpp_result_gen = Rcpp::wrap(run_base_model_single_year(parameters, configuration, initial_state, start_from_year));
+    return rcpp_result_gen;
+END_RCPP
+}
 // serialize_vector
 Rcpp::List serialize_vector(const Rcpp::List data, const std::string path1, const std::string path2);
 RcppExport SEXP _frogger_serialize_vector(SEXP dataSEXP, SEXP path1SEXP, SEXP path2SEXP) {
@@ -79,6 +93,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_frogger_list_model_configurations", (DL_FUNC) &_frogger_list_model_configurations, 0},
     {"_frogger_run_base_model", (DL_FUNC) &_frogger_run_base_model, 3},
     {"_frogger_run_base_model_from_state", (DL_FUNC) &_frogger_run_base_model_from_state, 5},
+    {"_frogger_run_base_model_single_year", (DL_FUNC) &_frogger_run_base_model_single_year, 4},
     {"_frogger_serialize_vector", (DL_FUNC) &_frogger_serialize_vector, 3},
     {"_frogger_deserialize_vector", (DL_FUNC) &_frogger_deserialize_vector, 2},
     {NULL, NULL, 0}

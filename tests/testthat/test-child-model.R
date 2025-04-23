@@ -359,16 +359,22 @@ test_that("HIV related deaths among CLHIV on ART align", {
   expect_true(all(abs(dt$diff) < 5e-2))
 })
 
-test_that("Child model agrees when run in single years vs all years", {
+test_that("Child model agrees when run through all years vs two parts vs single year runs", {
   input <- readRDS(test_path("testdata/child_parms.rds"))
 
+  # All years
   out_all_years <- run_model(input$parameters, "ChildModel", 1970:2030)
 
-  out_single_year <- run_model(input$parameters, "ChildModel", 1970)
-  for(year in 1971:2030) {
-    out <- run_model_from_state(input$parameters, "ChildModel", get_last_time_slice(out_single_year), year - 1, year)
-    out_single_year <- concat_on_time_dim(out_single_year, out)
-  }
+  # In two parts
+  out_first_half_years <- run_model(input$parameters, "ChildModel", 1970:2000)
+  out_second_half_years <- run_model_from_state(input$parameters, "ChildModel", get_time_slice(out_first_half_years, 31), 2000, 2001:2030)
 
-  expect_equal(out_all_years, out_single_year)
+  expect_equal(out_all_years, concat_on_time_dim(out_first_half_years, out_second_half_years))
+
+  # Single years
+  out_single_year <- get_time_slice(run_model(input$parameters, "ChildModel", 1970), 1)
+  for(year in 1971:2030) {
+    out_single_year <- run_model_single_year(input$parameters, "ChildModel", out_single_year, year - 1)
+    expect_equal(out_single_year, get_time_slice(out_all_years, year - 1970 + 1))
+  }
 })
