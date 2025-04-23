@@ -27,6 +27,14 @@ The name _leapfrog_ is in honor of [Professor](https://iussp.org/en/basia-zaba-1
 
 ## Installation
 
+Please install from our [r-universe](https://mrc-ide.r-universe.dev/builds):
+
+```R
+install.packages(
+  "frogger",
+  repos = c("https://mrc-ide.r-universe.dev", "https://cloud.r-project.org"))
+```
+
 You can install the development version of frogger from [GitHub](https://github.com/) with:
 
 ``` r
