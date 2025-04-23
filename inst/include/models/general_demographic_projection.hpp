@@ -151,8 +151,8 @@ struct GeneralDemographicProjection<Config> {
       n_dp.p_total_pop(0, g) = births_sex * p_dp.survival_probability(0, g, t);
 
       if (opts.proj_period_int == PROJPERIOD_MIDYEAR) {
-      // Assume 2/3 survival_probability rate since mortality in first six months higher
-      // than second 6 months (Spectrum manual, section 6.2.7.4)
+        // Assume 2/3 survival_probability rate since mortality in first six months higher
+        // than second 6 months (Spectrum manual, section 6.2.7.4)
         real_type migration_rate_a0 = p_dp.net_migration(0, g, t) *
                                       (1.0 + 2.0 * p_dp.survival_probability(0, g, t)) /
                                       3.0 / n_dp.p_total_pop(0, g);
