@@ -12,7 +12,8 @@ namespace leapfrog {
 
 enum Language {
   Cpp,
-  R
+  R,
+  C
 };
 
 namespace internal {
