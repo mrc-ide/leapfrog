@@ -6,8 +6,8 @@ test_that("Child model can be run for all years", {
   expect_setequal(
     names(out),
     c(
-      "p_total_pop", "births", "p_total_pop_natural_deaths", "p_hiv_pop",
-      "p_hiv_pop_natural_deaths", "h_hiv_adult", "h_art_adult",
+      "p_total_pop", "births", "p_total_pop_background_deaths", "p_hiv_pop",
+      "p_hiv_pop_background_deaths", "h_hiv_adult", "h_art_adult",
       "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art",
       "h_art_initiation", "p_hiv_deaths", "hc1_hiv_pop", "hc2_hiv_pop",
       "hc1_art_pop", "hc2_art_pop",

@@ -183,8 +183,8 @@ In 5 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 | hivstrat_adult   | h_hiv_adult                | Projected PLHIV not on ART by age, sex and CD4                           |
 | artstrat_adult   | h_art_adult                | Projected PLHIV on ART by age, sex, CD4 and treatment stage              |
 | births           | births                     | Projected number of births                                               |
-| natdeaths        | p_total_pop_natural_deaths | Projected number of natural deaths                                       |
-| natdeaths_hivpop | p_hiv_pop_natural_deaths   | Projected number of natural deaths within HIV population                 |
+| natdeaths        | p_total_pop_background_deaths | Projected number of background deaths                                       |
+| natdeaths_hivpop | p_hiv_pop_background_deaths   | Projected number of background deaths within HIV population                 |
 | hivdeaths        | p_hiv_deaths               | Projected HIV-related deaths by sex and age                              |
 | aidsdeaths_noart | h_hiv_deaths_no_art        | Projected HIV-related deaths off ART by sex, age and CD4                 |
 | aidsdeaths_art   | h_hiv_deaths_art           | Projected HIV-related deaths on ART by sex, age, CD4 and treatment stage |
