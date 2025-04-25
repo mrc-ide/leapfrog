@@ -66,6 +66,25 @@ struct Leapfrog {
     return output_state;
   };
 
+  static State run_model_single_year(
+    const Pars& pars,
+    const Options<real_type>& opts,
+    const State& initial_state,
+    const int start_from_year
+  ) {
+    auto state = initial_state;
+    auto state_next = state;
+    state_next.reset();
+
+    Intermediate intermediate;
+    intermediate.reset();
+
+    Args args = { start_from_year - opts.proj_start_year + 1, pars, state, state_next, intermediate, opts };
+    project_year(args);
+
+    return args.state_next;
+  };
+
   private:
   static void save_state(
     const int step,

@@ -22,14 +22,12 @@ std::vector<std::string> list_model_configurations() {
 }
 
 template<typename ModelVariant>
-Rcpp::List simulate_model(
-  const Rcpp::List parameters,
-  const std::vector<int> output_years,
-  const std::optional<Rcpp::List> initial_state_data,
-  const std::optional<int> start_from_year
-) {
-  using LF = leapfrog::Leapfrog<leapfrog::R, double, ModelVariant>;
+using LeapfrogR = leapfrog::Leapfrog<leapfrog::R, double, ModelVariant>;
 
+auto get_opts_r(
+  const Rcpp::List parameters,
+  const std::vector<int> output_years
+) {
   const int t_art_start = Rcpp::as<int>(parameters["t_ART_start"]);
   const int hts_per_year = Rcpp::as<int>(parameters["hts_per_year"]);
   const int proj_start_year = Rcpp::as<int>(
@@ -37,39 +35,108 @@ Rcpp::List simulate_model(
   const std::string projection_period = Rcpp::as<std::string>(
     parameters["projection_period"]);
 
-  const auto opts = leapfrog::get_opts<double>(
+  return leapfrog::get_opts<double>(
     hts_per_year, t_art_start, projection_period, proj_start_year, output_years
   );
+}
 
-  const auto pars = LF::Cfg::get_pars(parameters, opts);
 
-  typename LF::OutputState state(output_years.size());
 
-  if (initial_state_data && start_from_year) {
-    typename LF::State initial_state = LF::Cfg::get_initial_state(initial_state_data.value());
-    state = LF::run_model_from_state(pars, opts, initial_state, start_from_year.value(), output_years);
-  } else {
-    state = LF::run_model(pars, opts, output_years);
-  }
-  
+template<typename ModelVariant>
+auto build_output_r(
+  typename LeapfrogR<ModelVariant>::OutputState output_state,
+  const std::vector<int> output_years
+) {
+  using LF = LeapfrogR<ModelVariant>;
+
   const int output_size = LF::Cfg::get_build_output_size(0);
   Rcpp::List ret(output_size);
   Rcpp::CharacterVector names(output_size);
-  LF::Cfg::build_output(0, state, ret, names, output_years.size());
+  LF::Cfg::build_output(0, output_state, ret, names, output_years.size());
   ret.attr("names") = names;
 
   return ret;
 }
 
-auto get_sim_model(const std::string configuration) {
+template<typename ModelVariant>
+auto build_output_r(
+  typename LeapfrogR<ModelVariant>::State state
+) {
+  using LF = LeapfrogR<ModelVariant>;
+
+  const int output_size = LF::Cfg::get_build_output_size(0);
+  Rcpp::List ret(output_size);
+  Rcpp::CharacterVector names(output_size);
+  LF::Cfg::build_output_single_year(0, state, ret, names);
+  ret.attr("names") = names;
+
+  return ret;
+}
+
+
+
+template<typename ModelVariant>
+Rcpp::List simulate_model(
+  const Rcpp::List parameters,
+  const std::vector<int> output_years
+) {
+  using LF = LeapfrogR<ModelVariant>;
+
+  const auto opts = get_opts_r(parameters, output_years);
+  const auto pars = LF::Cfg::get_pars(parameters, opts);
+
+  auto state = LF::run_model(pars, opts, output_years);
+
+  return build_output_r<ModelVariant>(state, output_years);
+}
+
+template<typename ModelVariant>
+Rcpp::List simulate_model(
+  const Rcpp::List parameters,
+  const std::vector<int> output_years,
+  Rcpp::List initial_state_data,
+  int start_from_year
+) {
+  using LF = LeapfrogR<ModelVariant>;
+
+  const auto opts = get_opts_r(parameters, output_years);
+  const auto pars = LF::Cfg::get_pars(parameters, opts);
+
+  typename LF::State initial_state = LF::Cfg::get_initial_state(initial_state_data);
+  auto state = LF::run_model_from_state(pars, opts, initial_state, start_from_year, output_years);
+  
+  return build_output_r<ModelVariant>(state, output_years);
+}
+
+template<typename ModelVariant>
+Rcpp::List simulate_model(
+  const Rcpp::List parameters,
+  Rcpp::List initial_state_data,
+  int start_from_year
+) {
+  using LF = LeapfrogR<ModelVariant>;
+
+  const auto opts = get_opts_r(parameters, { start_from_year + 1 });
+  const auto pars = LF::Cfg::get_pars(parameters, opts);
+
+  typename LF::State initial_state = LF::Cfg::get_initial_state(initial_state_data);
+  auto state = LF::run_model_single_year(pars, opts, initial_state, start_from_year);
+  
+  return build_output_r<ModelVariant>(state);
+}
+
+
+
+template<typename ...Args>
+auto sim_model(const std::string configuration, Args&&... args) {
   if (configuration == "DemographicProjection") {
-    return simulate_model<leapfrog::DemographicProjection>;
+    return simulate_model<leapfrog::DemographicProjection>(std::forward<Args>(args)...);
   } else if (configuration == "HivFullAgeStratification") {
-    return simulate_model<leapfrog::HivFullAgeStratification>;
+    return simulate_model<leapfrog::HivFullAgeStratification>(std::forward<Args>(args)...);
   } else if (configuration == "HivCoarseAgeStratification") {
-    return simulate_model<leapfrog::HivCoarseAgeStratification>;
+    return simulate_model<leapfrog::HivCoarseAgeStratification>(std::forward<Args>(args)...);
   } else if (configuration == "ChildModel") {
-    return simulate_model<leapfrog::ChildModel>;
+    return simulate_model<leapfrog::ChildModel>(std::forward<Args>(args)...);
   } else {
     const auto available_variants = list_model_configurations();
     std::ostringstream oss;
@@ -95,7 +162,7 @@ Rcpp::List run_base_model(
   const std::string configuration,
   const std::vector<int> output_years
 ) {
-  return get_sim_model(configuration)(parameters, output_years, std::nullopt, std::nullopt);
+  return sim_model(configuration, parameters, output_years);
 }
 
 // [[Rcpp::export]]
@@ -106,5 +173,15 @@ Rcpp::List run_base_model_from_state(
   int start_from_year,
   const std::vector<int> output_years
 ) {
-  return get_sim_model(configuration)(parameters, output_years, initial_state, start_from_year);
+  return sim_model(configuration, parameters, output_years, initial_state, start_from_year);
+}
+
+// [[Rcpp::export]]
+Rcpp::List run_base_model_single_year( 
+  const Rcpp::List parameters,
+  const std::string configuration,
+  const Rcpp::List initial_state,
+  int start_from_year
+) {
+  return sim_model(configuration, parameters, initial_state, start_from_year);
 }
