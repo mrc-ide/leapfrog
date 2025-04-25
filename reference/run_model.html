@@ -92,7 +92,10 @@ from <code>projection_start_year</code> passed in the <code>parameters</code> li
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>List of model outputs</p>
+    <p>List of model outputs, where the last dimension of each element is
+time, e.g. <code>p_total_pop</code> state variable has dimensions 81 x 2. If
+<code>output_years</code> specified has length 61 then the <code>p_total_pop</code> output
+will have dimensions 81 x 2 x 61.</p>
     </div>
 
   </div>
