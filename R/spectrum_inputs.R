@@ -156,7 +156,9 @@ prepare_leapfrog_demp <- function(pjnz) {
   demp$Sx <- read_sx(pjnz)
   demp$netmigr <- read_netmigr(pjnz, sx = demp$Sx)
 
-  demp$births_sex_prop <- rbind(male = demp$srb, female = 100) / (demp$srb + 100)
+  births_sex_prop_male <- demp$srb / (demp$srb + 100)
+  demp$births_sex_prop <- rbind(male = births_sex_prop_male,
+                                female = 1 - births_sex_prop_male)
 
   ## normalise ASFR distribution
   demp$asfr <- sweep(demp$asfr, 2, demp$tfr / colSums(demp$asfr), "*")
