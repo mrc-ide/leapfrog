@@ -28,7 +28,10 @@ the simulation is run for. If output only 2030, simulation will be run
 from \code{projection_start_year} passed in the \code{parameters} list.}
 }
 \value{
-List of model outputs
+List of model outputs, where the last dimension of each element is
+time, e.g. \code{p_total_pop} state variable has dimensions 81 x 2. If
+\code{output_years} specified has length 61 then the \code{p_total_pop} output
+will have dimensions 81 x 2 x 61.
 }
 \description{
 Run leapfrog model fit from initial state
