@@ -5,15 +5,17 @@
 
 #include <windows.h>
 #include <numeric>
+#include <stdexcept>
 
 #define DllExport extern "C"
 #define EXPORT comment(linker, "/EXPORT:" __FUNCTION__ "=" __FUNCDNAME__)
 
 DllExport HRESULT WINAPI run_dp(leapfrog::internal::DpParams& data, leapfrog::internal::DpOut& out) {
-    #pragma EXPORT
+  #pragma EXPORT
 
-    using LF = leapfrog::Leapfrog<leapfrog::C, double, leapfrog::DemographicProjection>;
+  using LF = leapfrog::Leapfrog<leapfrog::C, double, leapfrog::DemographicProjection>;
 
+  try {
     std::vector<int> output_years(61);
     std::iota(output_years.begin(), output_years.end(), 1970);
 
@@ -22,6 +24,9 @@ DllExport HRESULT WINAPI run_dp(leapfrog::internal::DpParams& data, leapfrog::in
 
     auto state = LF::run_model(pars, opts, output_years);
     LF::Cfg::build_output(0, state, out);
+  } catch (const std::invalid_argument& e) {
+    return E_INVALIDARG;
+  }
 
-    return S_OK;
+  return S_OK;
 }
