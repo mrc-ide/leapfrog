@@ -9,6 +9,7 @@
 #include <string_view>
 #include <format>
 #include <unsupported/Eigen/CXX11/Tensor>
+#include <stdexcept>
 
 #include "../config_mixer.hpp"
 #include "c_types.hpp"
@@ -17,19 +18,27 @@ namespace leapfrog {
 namespace internal {
 
 template<typename T, typename... Args>
-auto read_data(T* data, Args... dims) {
+auto read_data(T* data, int length, std::string_view name, Args... dims) {
   constexpr std::size_t rank = sizeof...(dims);
+  const auto size = (dims * ...);
+  if (length != size) {
+    throw std::invalid_argument(std::format("Input data '{}' is the wrong size. Received {}, expected {}.", name, size, length));
+  }
   return Eigen::TensorMap<Eigen::Tensor<T, rank>>(data, dims...);
 }
 
 template<typename T, int Rank>
-void write_data(const Eigen::Tensor<T, Rank>& tensor, T* output) {
-    const auto* dataPtr = tensor.data();
-    std::size_t totalSize = tensor.size();
+void write_data(const Eigen::Tensor<T, Rank>& tensor, T* output, int length, std::string_view name) {
+  const auto* dataPtr = tensor.data();
+  std::size_t totalSize = tensor.size();
 
-    for (std::size_t i = 0; i < totalSize; ++i) {
-        output[i] = dataPtr[i];
-    }
+  if (length != totalSize) {
+    throw std::invalid_argument(std::format("Output data '{}' is the wrong size. Received {}, expected {}.", name, totalSize, length));
+  }
+
+  for (std::size_t i = 0; i < totalSize; ++i) {
+    output[i] = dataPtr[i];
+  }
 }
 
 template<typename real_type, MV ModelVariant>
@@ -42,11 +51,11 @@ struct DpAdapter<Language::C, real_type, ModelVariant> {
     const Options<real_type> &opts
   ) {
     return {
-      .base_pop = read_data<real_type>(params.base_pop, SS::pAG, SS::NS),
-      .survival_probability = read_data<real_type>(params.survival_probability, SS::pAG + 1, SS::NS, opts.proj_time_steps),
-      .net_migration = read_data<real_type>(params.net_migration, SS::pAG, SS::NS, opts.proj_time_steps),
-      .age_specific_fertility_rate = read_data<real_type>(params.age_specific_fertility_rate, opts.p_fertility_age_groups, opts.proj_time_steps),
-      .births_sex_prop = read_data<real_type>(params.births_sex_prop, SS::NS, opts.proj_time_steps)
+      .base_pop = read_data<real_type>(params.base_pop, params.base_pop_length, "base_pop", SS::pAG, SS::NS),
+      .survival_probability = read_data<real_type>(params.survival_probability, params.survival_probability_length, "survival_probability", SS::pAG + 1, SS::NS, opts.proj_time_steps),
+      .net_migration = read_data<real_type>(params.net_migration, params.net_migration_length, "net_migration", SS::pAG, SS::NS, opts.proj_time_steps),
+      .age_specific_fertility_rate = read_data<real_type>(params.age_specific_fertility_rate, params.age_specific_fertility_rate_length, "age_specific_fertility_rate", opts.p_fertility_age_groups, opts.proj_time_steps),
+      .births_sex_prop = read_data<real_type>(params.births_sex_prop, params.births_sex_prop_length, "births_sex_prop", SS::NS, opts.proj_time_steps)
     };
   };
 
@@ -57,9 +66,9 @@ struct DpAdapter<Language::C, real_type, ModelVariant> {
     const Config::OutputState& state,
     DpOut& out
   ) {
-    write_data<real_type, 3>(state.p_total_pop, out.p_total_pop);
-    write_data<real_type, 3>(state.p_total_pop_natural_deaths, out.p_total_pop_natural_deaths);
-    write_data<real_type, 1>(state.births, out.births);
+    write_data<real_type, 3>(state.p_total_pop, out.p_total_pop, out.p_total_pop_length, "p_total_pop");
+    write_data<real_type, 3>(state.p_total_pop_natural_deaths, out.p_total_pop_natural_deaths, out.p_total_pop_natural_deaths_length, "p_total_pop_natural_deaths");
+    write_data<real_type, 1>(state.births, out.births, out.births_length, "births");
     return index + output_count;
   };
 };
