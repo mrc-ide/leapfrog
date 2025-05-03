@@ -117,12 +117,12 @@ struct HivDemographicProjection<Config> {
     // Non-hiv deaths
     for (int g = 0; g < NS; ++g) {
       for (int a = 1; a < pAG; ++a) {
-        n_ha.p_hiv_pop_natural_deaths(a, g) = c_ha.p_hiv_pop(a - 1, g) * (1.0 - p_dp.survival_probability(a, g, t));
+        n_ha.p_hiv_pop_background_deaths(a, g) = c_ha.p_hiv_pop(a - 1, g) * (1.0 - p_dp.survival_probability(a, g, t));
         n_ha.p_hiv_pop(a, g) = c_ha.p_hiv_pop(a - 1, g);
       }
 
       // open age group
-      n_ha.p_hiv_pop_natural_deaths(pAG - 1, g) += c_ha.p_hiv_pop(pAG - 1, g) *
+      n_ha.p_hiv_pop_background_deaths(pAG - 1, g) += c_ha.p_hiv_pop(pAG - 1, g) *
                                                    (1.0 - p_dp.survival_probability(pAG, g, t));
       n_ha.p_hiv_pop(pAG - 1, g) += c_ha.p_hiv_pop(pAG - 1, g);
     }
@@ -241,7 +241,7 @@ struct HivDemographicProjection<Config> {
     // remove non-HIV deaths and net migration from hiv stratified population
     for (int g = 0; g < NS; ++g) {
       for (int a = 1; a < pAG; ++a) {
-        n_ha.p_hiv_pop(a, g) -= n_ha.p_hiv_pop_natural_deaths(a, g);
+        n_ha.p_hiv_pop(a, g) -= n_ha.p_hiv_pop_background_deaths(a, g);
         if (opts.proj_period_int == PROJPERIOD_MIDYEAR) {
           i_ha.hiv_net_migration(a, g) = n_ha.p_hiv_pop(a, g) * i_dp.migration_rate(a, g);
           n_ha.p_hiv_pop(a, g) += i_ha.hiv_net_migration(a, g);
@@ -255,7 +255,7 @@ struct HivDemographicProjection<Config> {
       for (int ha = 0; ha < hAG; ++ha) {
         real_type deaths_migrate = 0.0;
         for (int i = 0; i < hAG_span[ha]; ++i, ++a) {
-          deaths_migrate -= n_ha.p_hiv_pop_natural_deaths(a, g);
+          deaths_migrate -= n_ha.p_hiv_pop_background_deaths(a, g);
           if (opts.proj_period_int == PROJPERIOD_MIDYEAR) {
             deaths_migrate += i_ha.hiv_net_migration(a, g);
           }

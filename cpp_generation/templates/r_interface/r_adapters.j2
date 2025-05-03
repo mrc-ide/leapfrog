@@ -89,6 +89,27 @@ struct {{ config.name }}Adapter<Language::R, real_type, ModelVariant> {
     {% endfor %}
     return index + output_count;
   };
+
+  static int build_output_single_year(
+    int index,
+    const Config::State& state,
+    Rcpp::List& ret,
+    Rcpp::CharacterVector& names
+  ) {
+    {% for name, cfg in config.state.items() %}
+    {% if cfg.type == "scalar" %}
+    names[index + {{ loop.index0 }}] = "{{ name }}";
+    ret[index + {{ loop.index0 }}] = state.{{ name }};
+    {% else %}
+    Rcpp::NumericVector r_{{ name }}({{ collapse_dims(cfg, " * ") }});
+    r_{{ name }}.attr("dim") = Rcpp::IntegerVector::create({{ collapse_dims(cfg) }});
+    std::copy_n(state.{{ name }}.data(), state.{{ name }}.size(), {{ get_r_internal_data_pointer(cfg) }}(r_{{ name }}));
+    names[index + {{ loop.index0 }}] = "{{ name }}";
+    ret[index + {{ loop.index0 }}] = r_{{ name }};
+    {% endif %}
+    {% endfor %}
+    return index + output_count;
+  };
 };
 
 {% endfor %}

@@ -8,7 +8,10 @@
 #'   the simulation is run for. If output only 2030, simulation will be run
 #'   from `projection_start_year` passed in the `parameters` list.
 #'
-#' @return List of model outputs
+#' @return List of model outputs, where the last dimension of each element is
+#'   time, e.g. `p_total_pop` state variable has dimensions 81 x 2. If
+#'   `output_years` specified has length 61 then the `p_total_pop` output
+#'   will have dimensions 81 x 2 x 61.
 #' @export
 run_model <- function(parameters,
                       configuration = "HivFullAgeStratification",
@@ -30,7 +33,10 @@ run_model <- function(parameters,
 #'   the simulation is run for. If output only 2030, simulation will be run
 #'   from `projection_start_year` passed in the `parameters` list.
 #'
-#' @return List of model outputs
+#' @return List of model outputs, where the last dimension of each element is
+#'   time, e.g. `p_total_pop` state variable has dimensions 81 x 2. If
+#'   `output_years` specified has length 61 then the `p_total_pop` output
+#'   will have dimensions 81 x 2 x 61.
 #' @export
 run_model_from_state <- function(parameters,
                                  configuration,
@@ -40,6 +46,31 @@ run_model_from_state <- function(parameters,
   parameters <- process_parameters(parameters, configuration)
 
   run_base_model_from_state(parameters, configuration, initial_state, start_from_year, output_years)
+}
+
+#' Run leapfrog model fit for a single year
+#'
+#' @param parameters Projection parameters
+#' @param configuration The model configuration to run, see
+#'   [list_model_configurations()] for available configurations
+#' @param initial_state The model will run from this initial state
+#' @param start_from_year Start the model simulation from this year
+#'
+#' @return List of model outputs without the last time dimension.
+#'   This is different from [run_model_from_state()] and [run_model()]
+#'   that do include the last time dimension. Since only the next time
+#'   step is returned, dropping the time dimensions makes it easier to
+#'   feed the returned list into the next single year model run. In
+#'   contrast to [run_model_from_state()] the `p_total_pop` output will
+#'   have dimensions 81 x 2 not 81 x 2 x 61.
+#' @export
+run_model_single_year <- function(parameters,
+                                  configuration,
+                                  initial_state,
+                                  start_from_year) {
+  parameters <- process_parameters(parameters, configuration)
+
+  run_base_model_single_year(parameters, configuration, initial_state, start_from_year)
 }
 
 
@@ -74,15 +105,20 @@ is_run_hiv_simulation <- function(configuration) {
                        "ChildModel")
 }
 
-get_last_time_slice <- function(dat) {
-  dims <- dim(dat[[1]])
-  last_t_index <- dims[[length(dims)]]
-
+get_time_slice <- function(dat, index) {
   last_ind <- function(x) {
     nd <- length(dim(x))
     inds <- rep(alist(,)[1], nd)
-    inds[nd] <- last_t_index
-    do.call(`[`, c(list(x), inds))
+    inds[nd] <- index
+    ret <- do.call(`[`, c(list(x), inds))
+
+    # R drops dimension by default when extracting a 1D
+    # vector which causes waldo compare to fail so we
+    # manually compute the dimension for those fields.
+    if (is.null(dim(ret)) && length(ret) > 1) {
+      dim(ret) <- length(ret)
+    }
+    ret
   }
 
   lapply(dat, last_ind)
