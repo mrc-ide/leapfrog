@@ -7,8 +7,7 @@
       "hAG_span": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
       "hDS": 7,
       "hTS": 3,
-      "hAG": 66,
-      "h_art_stage_dur": [0.5, 0.5]
+      "hAG": 66
     },
     "overrides": [
       {
@@ -33,7 +32,7 @@
       "relative_risk_age": {
         "type": "TM",
         "num_type": "real_type",
-        "dims": ["SS::pAG - opts.p_idx_hiv_first_adult", "SS::NS", "opts.proj_time_steps"],
+        "dims": ["SS::pAG - SS::p_idx_hiv_first_adult", "SS::NS", "opts.proj_time_steps"],
         "alias": {
           "r": "incrr_age"
         }
@@ -137,6 +136,14 @@
         "num_type": "real_type",
         "alias": {
           "r": "art_alloc_mxweight"
+        }
+      },
+      "h_art_stage_dur": {
+        "type": "TM",
+        "num_type": "real_type",
+        "dims": ["SS::hTS - 1"],
+        "alias": {
+          "r": "h_art_stage_dur"
         }
       }
     },

@@ -31,6 +31,8 @@ struct GeneralDemographicProjection<Config> {
   static constexpr int pAG = SS::pAG;
   static constexpr int FEMALE = SS::FEMALE;
   static constexpr int PROJPERIOD_MIDYEAR = SS::PROJPERIOD_MIDYEAR;
+  static constexpr int p_idx_fertility_first = SS::p_idx_fertility_first;
+  static constexpr int p_fertility_age_groups = SS::p_fertility_age_groups;
 
   // function args
   int t;
@@ -138,9 +140,9 @@ struct GeneralDemographicProjection<Config> {
     auto& n_dp = state_next.dp;
 
     n_dp.births = 0.0;
-    for (int af = 0; af < opts.p_fertility_age_groups; ++af) {
-      auto total_female_pop_per_age_group = c_dp.p_total_pop(opts.p_idx_fertility_first + af, FEMALE) +
-                                            n_dp.p_total_pop(opts.p_idx_fertility_first + af, FEMALE);
+    for (int af = 0; af < p_fertility_age_groups; ++af) {
+      auto total_female_pop_per_age_group = c_dp.p_total_pop(p_idx_fertility_first + af, FEMALE) +
+                                            n_dp.p_total_pop(p_idx_fertility_first + af, FEMALE);
       n_dp.births += total_female_pop_per_age_group * 0.5 * p_dp.age_specific_fertility_rate(af, t);
     }
 

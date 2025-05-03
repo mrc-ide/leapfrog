@@ -34,6 +34,7 @@ struct HivDemographicProjection<Config> {
   static constexpr int hAG = SS::hAG;
   static constexpr auto hAG_span = SS::hAG_span;
   static constexpr int PROJPERIOD_MIDYEAR = SS::PROJPERIOD_MIDYEAR;
+  static constexpr int p_idx_hiv_first_adult = SS::p_idx_hiv_first_adult;
 
   // function args
   int t;
@@ -80,7 +81,7 @@ struct HivDemographicProjection<Config> {
 
     // remove net migration from adult stratified population
     for (int g = 0; g < NS; ++g) {
-      int a = opts.p_idx_hiv_first_adult;
+      int a = p_idx_hiv_first_adult;
       for (int ha = 0; ha < hAG; ++ha) {
         real_type migration_num_ha = 0.0;
         real_type hivpop_ha_postmig = 0.0;
@@ -160,7 +161,7 @@ struct HivDemographicProjection<Config> {
 
     // age coarse stratified HIV population
     for (int g = 0; g < NS; ++g) {
-      int a = opts.p_idx_hiv_first_adult;
+      int a = p_idx_hiv_first_adult;
       // Note: loop stops at hAG-1; no one ages out of the open-ended
       // age group
       for (int ha = 0; ha < (hAG - 1); ++ha) {
@@ -229,7 +230,7 @@ struct HivDemographicProjection<Config> {
     auto& i_dp = intermediate.dp;
 
     for (int g = 0; g < NS; ++g) {
-      int a = opts.p_idx_hiv_first_adult;
+      int a = p_idx_hiv_first_adult;
       for (int ha = 0; ha < hAG; ++ha) {
         for (int i = 0; i < hAG_span[ha]; ++i, ++a) {
           i_ha.p_hiv_pop_coarse_ages(ha, g) += n_ha.p_hiv_pop(a, g);
@@ -250,7 +251,7 @@ struct HivDemographicProjection<Config> {
 
     // remove non-HIV deaths and net migration from adult stratified population
     for (int g = 0; g < NS; ++g) {
-      int a = opts.p_idx_hiv_first_adult;
+      int a = p_idx_hiv_first_adult;
       for (int ha = 0; ha < hAG; ++ha) {
         real_type deaths_migrate = 0.0;
         for (int i = 0; i < hAG_span[ha]; ++i, ++a) {

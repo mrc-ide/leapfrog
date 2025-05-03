@@ -100,7 +100,7 @@
       "hc_art_elig_cd4": {
         "type": "TM",
         "num_type": "real_type",
-        "dims": ["opts.p_idx_hiv_first_adult", "opts.proj_time_steps"],
+        "dims": ["SS::p_idx_hiv_first_adult", "opts.proj_time_steps"],
         "alias": {
           "r": "paed_art_elig_cd4"
         }
@@ -108,7 +108,7 @@
       "hc_art_mort_rr": {
         "type": "TM",
         "num_type": "real_type",
-        "dims": ["SS::hTS", "opts.p_idx_hiv_first_adult", "opts.proj_time_steps"],
+        "dims": ["SS::hTS", "SS::p_idx_hiv_first_adult", "opts.proj_time_steps"],
         "alias": {
           "r": "mort_art_rr"
         }
@@ -148,7 +148,7 @@
       "hc_art_init_dist": {
         "type": "TM",
         "num_type": "real_type",
-        "dims": ["opts.p_idx_hiv_first_adult", "opts.proj_time_steps"],
+        "dims": ["SS::p_idx_hiv_first_adult", "opts.proj_time_steps"],
         "alias": {
           "r": "init_art_dist"
         }
@@ -164,7 +164,7 @@
       "fert_mult_by_age": {
         "type": "TM",
         "num_type": "real_type",
-        "dims": ["opts.p_fertility_age_groups"],
+        "dims": ["SS::p_fertility_age_groups"],
         "alias": {
           "r": "fert_mult_by_age"
         }
@@ -180,7 +180,7 @@
       "fert_mult_on_art": {
         "type": "TM",
         "num_type": "real_type",
-        "dims": ["opts.p_fertility_age_groups"],
+        "dims": ["SS::p_fertility_age_groups"],
         "alias": {
           "r": "fert_mult_onart"
         }
@@ -340,7 +340,7 @@
       "hc_age_coarse_cd4": {
         "type": "TM",
         "num_type": "int",
-        "dims": ["opts.p_idx_hiv_first_adult"],
+        "dims": ["SS::p_idx_hiv_first_adult"],
         "alias": {
           "r": "hc_age_coarse_cd4"
         }
@@ -348,7 +348,7 @@
       "adult_female_infections": {
         "type": "TM",
         "num_type": "real_type",
-        "dims": ["opts.p_fertility_age_groups", "opts.proj_time_steps"],
+        "dims": ["SS::p_fertility_age_groups", "opts.proj_time_steps"],
         "alias": {
           "r": "adult_female_infections"
         }
@@ -356,7 +356,7 @@
       "adult_female_hivnpop": {
         "type": "TM",
         "num_type": "real_type",
-        "dims": ["opts.p_fertility_age_groups", "opts.proj_time_steps"],
+        "dims": ["SS::p_fertility_age_groups", "opts.proj_time_steps"],
         "alias": {
           "r": "hivnpop"
         }

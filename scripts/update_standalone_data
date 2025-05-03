@@ -49,6 +49,8 @@ prepare_input_data <- function(input_data) {
     input_data[["paed_art_elig_cd4"]] <- input_data[["paed_art_elig_cd4"]] - 1
   }
 
+  hTS <- dim(input_data[["artmx_timerr"]])[[1]]
+  input_data$h_art_stage_dur <- rep(0.5, hTS - 1)
   input_data
 }
 

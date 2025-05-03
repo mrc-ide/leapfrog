@@ -93,6 +93,7 @@ struct HaConfig {
     TM2<real_type> adults_on_art;
     TM2<int> adults_on_art_is_percent;
     real_type initiation_mortality_weight;
+    TM1<real_type> h_art_stage_dur;
   };
 
   struct Intermediate {

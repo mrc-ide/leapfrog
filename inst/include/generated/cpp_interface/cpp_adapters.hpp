@@ -42,7 +42,7 @@ struct DpAdapter<Language::Cpp, real_type, ModelVariant> {
       .base_pop = read_data<real_type>(input_dir, "base_pop", SS::pAG, SS::NS),
       .survival_probability = read_data<real_type>(input_dir, "survival_probability", SS::pAG + 1, SS::NS, opts.proj_time_steps),
       .net_migration = read_data<real_type>(input_dir, "net_migration", SS::pAG, SS::NS, opts.proj_time_steps),
-      .age_specific_fertility_rate = read_data<real_type>(input_dir, "age_specific_fertility_rate", opts.p_fertility_age_groups, opts.proj_time_steps),
+      .age_specific_fertility_rate = read_data<real_type>(input_dir, "age_specific_fertility_rate", SS::p_fertility_age_groups, opts.proj_time_steps),
       .births_sex_prop = read_data<real_type>(input_dir, "births_sex_prop", SS::NS, opts.proj_time_steps)
     };
   };
@@ -72,7 +72,7 @@ struct HaAdapter<Language::Cpp, real_type, ModelVariant> {
   ) {
     return {
       .total_rate = read_data<real_type>(input_dir, "total_rate", opts.proj_time_steps),
-      .relative_risk_age = read_data<real_type>(input_dir, "relative_risk_age", SS::pAG - opts.p_idx_hiv_first_adult, SS::NS, opts.proj_time_steps),
+      .relative_risk_age = read_data<real_type>(input_dir, "relative_risk_age", SS::pAG - SS::p_idx_hiv_first_adult, SS::NS, opts.proj_time_steps),
       .relative_risk_sex = read_data<real_type>(input_dir, "relative_risk_sex", opts.proj_time_steps),
       .cd4_mortality = read_data<real_type>(input_dir, "cd4_mortality", SS::hDS, SS::hAG, SS::NS),
       .cd4_progression = read_data<real_type>(input_dir, "cd4_progression", SS::hDS - 1, SS::hAG, SS::NS),
@@ -85,7 +85,8 @@ struct HaAdapter<Language::Cpp, real_type, ModelVariant> {
       .dropout_rate = read_data<real_type>(input_dir, "dropout_rate", opts.proj_time_steps),
       .adults_on_art = read_data<real_type>(input_dir, "adults_on_art", SS::NS, opts.proj_time_steps),
       .adults_on_art_is_percent = read_data<int>(input_dir, "adults_on_art_is_percent", SS::NS, opts.proj_time_steps),
-      .initiation_mortality_weight = read_data<real_type>(input_dir, "initiation_mortality_weight")
+      .initiation_mortality_weight = read_data<real_type>(input_dir, "initiation_mortality_weight"),
+      .h_art_stage_dur = read_data<real_type>(input_dir, "h_art_stage_dur", SS::hTS - 1)
     };
   };
 
@@ -128,17 +129,17 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
       .hc2_cd4_prog = read_data<real_type>(input_dir, "hc2_cd4_prog", SS::hc2DS, SS::hc2AG_c, SS::NS),
       .ctx_val = read_data<real_type>(input_dir, "ctx_val", opts.proj_time_steps),
       .hc_art_elig_age = read_data<int>(input_dir, "hc_art_elig_age", opts.proj_time_steps),
-      .hc_art_elig_cd4 = read_data<real_type>(input_dir, "hc_art_elig_cd4", opts.p_idx_hiv_first_adult, opts.proj_time_steps),
-      .hc_art_mort_rr = read_data<real_type>(input_dir, "hc_art_mort_rr", SS::hTS, opts.p_idx_hiv_first_adult, opts.proj_time_steps),
+      .hc_art_elig_cd4 = read_data<real_type>(input_dir, "hc_art_elig_cd4", SS::p_idx_hiv_first_adult, opts.proj_time_steps),
+      .hc_art_mort_rr = read_data<real_type>(input_dir, "hc_art_mort_rr", SS::hTS, SS::p_idx_hiv_first_adult, opts.proj_time_steps),
       .hc1_art_mort = read_data<real_type>(input_dir, "hc1_art_mort", SS::hc1DS, SS::hTS, SS::hc1AG),
       .hc2_art_mort = read_data<real_type>(input_dir, "hc2_art_mort", SS::hc2DS, SS::hTS, SS::hc2AG),
       .hc_art_isperc = read_data<int>(input_dir, "hc_art_isperc", opts.proj_time_steps),
       .hc_art_val = read_data<real_type>(input_dir, "hc_art_val", SS::hcAG_coarse, opts.proj_time_steps),
-      .hc_art_init_dist = read_data<real_type>(input_dir, "hc_art_init_dist", opts.p_idx_hiv_first_adult, opts.proj_time_steps),
+      .hc_art_init_dist = read_data<real_type>(input_dir, "hc_art_init_dist", SS::p_idx_hiv_first_adult, opts.proj_time_steps),
       .adult_cd4_dist = read_data<real_type>(input_dir, "adult_cd4_dist", SS::hDS, SS::hc2DS),
-      .fert_mult_by_age = read_data<real_type>(input_dir, "fert_mult_by_age", opts.p_fertility_age_groups),
+      .fert_mult_by_age = read_data<real_type>(input_dir, "fert_mult_by_age", SS::p_fertility_age_groups),
       .fert_mult_off_art = read_data<real_type>(input_dir, "fert_mult_off_art", SS::hDS),
-      .fert_mult_on_art = read_data<real_type>(input_dir, "fert_mult_on_art", opts.p_fertility_age_groups),
+      .fert_mult_on_art = read_data<real_type>(input_dir, "fert_mult_on_art", SS::p_fertility_age_groups),
       .total_fertility_rate = read_data<real_type>(input_dir, "total_fertility_rate", opts.proj_time_steps),
       .PMTCT = read_data<real_type>(input_dir, "PMTCT", SS::hPS, opts.proj_time_steps),
       .vertical_transmission_rate = read_data<real_type>(input_dir, "vertical_transmission_rate", SS::hDS + 1, SS::hVT),
@@ -158,9 +159,9 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
       .abortion = read_data<real_type>(input_dir, "abortion", SS::hAB_ind, opts.proj_time_steps),
       .patients_reallocated = read_data<real_type>(input_dir, "patients_reallocated", opts.proj_time_steps),
       .hc_art_ltfu = read_data<real_type>(input_dir, "hc_art_ltfu", opts.proj_time_steps),
-      .hc_age_coarse_cd4 = read_data<int>(input_dir, "hc_age_coarse_cd4", opts.p_idx_hiv_first_adult),
-      .adult_female_infections = read_data<real_type>(input_dir, "adult_female_infections", opts.p_fertility_age_groups, opts.proj_time_steps),
-      .adult_female_hivnpop = read_data<real_type>(input_dir, "adult_female_hivnpop", opts.p_fertility_age_groups, opts.proj_time_steps),
+      .hc_age_coarse_cd4 = read_data<int>(input_dir, "hc_age_coarse_cd4", SS::p_idx_hiv_first_adult),
+      .adult_female_infections = read_data<real_type>(input_dir, "adult_female_infections", SS::p_fertility_age_groups, opts.proj_time_steps),
+      .adult_female_hivnpop = read_data<real_type>(input_dir, "adult_female_hivnpop", SS::p_fertility_age_groups, opts.proj_time_steps),
       .total_births = read_data<real_type>(input_dir, "total_births", opts.proj_time_steps),
       .ctx_effect = read_data<real_type>(input_dir, "ctx_effect", 3),
       .hc_art_start = read_data<real_type>(input_dir, "hc_art_start"),

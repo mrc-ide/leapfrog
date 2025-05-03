@@ -59,7 +59,7 @@ struct DpAdapter<Language::R, real_type, ModelVariant> {
       .base_pop = parse_data<real_type>(data, "basepop", SS::pAG, SS::NS),
       .survival_probability = parse_data<real_type>(data, "Sx", SS::pAG + 1, SS::NS, opts.proj_time_steps),
       .net_migration = parse_data<real_type>(data, "netmigr_adj", SS::pAG, SS::NS, opts.proj_time_steps),
-      .age_specific_fertility_rate = parse_data<real_type>(data, "asfr", opts.p_fertility_age_groups, opts.proj_time_steps),
+      .age_specific_fertility_rate = parse_data<real_type>(data, "asfr", SS::p_fertility_age_groups, opts.proj_time_steps),
       .births_sex_prop = parse_data<real_type>(data, "births_sex_prop", SS::NS, opts.proj_time_steps)
     };
   };
@@ -113,7 +113,7 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
   ) {
     return {
       .total_rate = parse_data<real_type>(data, "incidinput", opts.proj_time_steps),
-      .relative_risk_age = parse_data<real_type>(data, "incrr_age", SS::pAG - opts.p_idx_hiv_first_adult, SS::NS, opts.proj_time_steps),
+      .relative_risk_age = parse_data<real_type>(data, "incrr_age", SS::pAG - SS::p_idx_hiv_first_adult, SS::NS, opts.proj_time_steps),
       .relative_risk_sex = parse_data<real_type>(data, "incrr_sex", opts.proj_time_steps),
       .cd4_mortality = parse_data<real_type>(data, "cd4_mort_full", SS::hDS, SS::hAG, SS::NS),
       .cd4_progression = parse_data<real_type>(data, "cd4_prog_full", SS::hDS - 1, SS::hAG, SS::NS),
@@ -126,7 +126,8 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
       .dropout_rate = parse_data<real_type>(data, "art_dropout_rate", opts.proj_time_steps),
       .adults_on_art = parse_data<real_type>(data, "art15plus_num", SS::NS, opts.proj_time_steps),
       .adults_on_art_is_percent = parse_data<int>(data, "art15plus_isperc", SS::NS, opts.proj_time_steps),
-      .initiation_mortality_weight = Rcpp::as<real_type>(data["art_alloc_mxweight"])
+      .initiation_mortality_weight = Rcpp::as<real_type>(data["art_alloc_mxweight"]),
+      .h_art_stage_dur = parse_data<real_type>(data, "h_art_stage_dur", SS::hTS - 1)
     };
   };
 
@@ -223,17 +224,17 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
       .hc2_cd4_prog = parse_data<real_type>(data, "adol_cd4_prog", SS::hc2DS, SS::hc2AG_c, SS::NS),
       .ctx_val = parse_data<real_type>(data, "ctx_val", opts.proj_time_steps),
       .hc_art_elig_age = parse_data<int>(data, "paed_art_elig_age", opts.proj_time_steps),
-      .hc_art_elig_cd4 = parse_data<real_type>(data, "paed_art_elig_cd4", opts.p_idx_hiv_first_adult, opts.proj_time_steps),
-      .hc_art_mort_rr = parse_data<real_type>(data, "mort_art_rr", SS::hTS, opts.p_idx_hiv_first_adult, opts.proj_time_steps),
+      .hc_art_elig_cd4 = parse_data<real_type>(data, "paed_art_elig_cd4", SS::p_idx_hiv_first_adult, opts.proj_time_steps),
+      .hc_art_mort_rr = parse_data<real_type>(data, "mort_art_rr", SS::hTS, SS::p_idx_hiv_first_adult, opts.proj_time_steps),
       .hc1_art_mort = parse_data<real_type>(data, "paed_art_mort", SS::hc1DS, SS::hTS, SS::hc1AG),
       .hc2_art_mort = parse_data<real_type>(data, "adol_art_mort", SS::hc2DS, SS::hTS, SS::hc2AG),
       .hc_art_isperc = parse_data<int>(data, "artpaeds_isperc", opts.proj_time_steps),
       .hc_art_val = parse_data<real_type>(data, "paed_art_val", SS::hcAG_coarse, opts.proj_time_steps),
-      .hc_art_init_dist = parse_data<real_type>(data, "init_art_dist", opts.p_idx_hiv_first_adult, opts.proj_time_steps),
+      .hc_art_init_dist = parse_data<real_type>(data, "init_art_dist", SS::p_idx_hiv_first_adult, opts.proj_time_steps),
       .adult_cd4_dist = parse_data<real_type>(data, "adult_cd4_dist", SS::hDS, SS::hc2DS),
-      .fert_mult_by_age = parse_data<real_type>(data, "fert_mult_by_age", opts.p_fertility_age_groups),
+      .fert_mult_by_age = parse_data<real_type>(data, "fert_mult_by_age", SS::p_fertility_age_groups),
       .fert_mult_off_art = parse_data<real_type>(data, "fert_mult_offart", SS::hDS),
-      .fert_mult_on_art = parse_data<real_type>(data, "fert_mult_onart", opts.p_fertility_age_groups),
+      .fert_mult_on_art = parse_data<real_type>(data, "fert_mult_onart", SS::p_fertility_age_groups),
       .total_fertility_rate = parse_data<real_type>(data, "tfr", opts.proj_time_steps),
       .PMTCT = parse_data<real_type>(data, "pmtct", SS::hPS, opts.proj_time_steps),
       .vertical_transmission_rate = parse_data<real_type>(data, "mtct", SS::hDS + 1, SS::hVT),
@@ -253,9 +254,9 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
       .abortion = parse_data<real_type>(data, "abortion", SS::hAB_ind, opts.proj_time_steps),
       .patients_reallocated = parse_data<real_type>(data, "patients_reallocated", opts.proj_time_steps),
       .hc_art_ltfu = parse_data<real_type>(data, "paed_art_ltfu", opts.proj_time_steps),
-      .hc_age_coarse_cd4 = parse_data<int>(data, "hc_age_coarse_cd4", opts.p_idx_hiv_first_adult),
-      .adult_female_infections = parse_data<real_type>(data, "adult_female_infections", opts.p_fertility_age_groups, opts.proj_time_steps),
-      .adult_female_hivnpop = parse_data<real_type>(data, "hivnpop", opts.p_fertility_age_groups, opts.proj_time_steps),
+      .hc_age_coarse_cd4 = parse_data<int>(data, "hc_age_coarse_cd4", SS::p_idx_hiv_first_adult),
+      .adult_female_infections = parse_data<real_type>(data, "adult_female_infections", SS::p_fertility_age_groups, opts.proj_time_steps),
+      .adult_female_hivnpop = parse_data<real_type>(data, "hivnpop", SS::p_fertility_age_groups, opts.proj_time_steps),
       .total_births = parse_data<real_type>(data, "total_births", opts.proj_time_steps),
       .ctx_effect = parse_data<real_type>(data, "ctx_effect", 3),
       .hc_art_start = Rcpp::as<real_type>(data["hc_art_start"]),
@@ -374,7 +375,7 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
   ) {
     return {
       .total_rate = parse_data<real_type>(data, "incidinput", opts.proj_time_steps),
-      .relative_risk_age = parse_data<real_type>(data, "incrr_age", SS::pAG - opts.p_idx_hiv_first_adult, SS::NS, opts.proj_time_steps),
+      .relative_risk_age = parse_data<real_type>(data, "incrr_age", SS::pAG - SS::p_idx_hiv_first_adult, SS::NS, opts.proj_time_steps),
       .relative_risk_sex = parse_data<real_type>(data, "incrr_sex", opts.proj_time_steps),
       .cd4_mortality = parse_data<real_type>(data, "cd4_mort_coarse", SS::hDS, SS::hAG, SS::NS),
       .cd4_progression = parse_data<real_type>(data, "cd4_prog_coarse", SS::hDS - 1, SS::hAG, SS::NS),
@@ -387,7 +388,8 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
       .dropout_rate = parse_data<real_type>(data, "art_dropout_rate", opts.proj_time_steps),
       .adults_on_art = parse_data<real_type>(data, "art15plus_num", SS::NS, opts.proj_time_steps),
       .adults_on_art_is_percent = parse_data<int>(data, "art15plus_isperc", SS::NS, opts.proj_time_steps),
-      .initiation_mortality_weight = Rcpp::as<real_type>(data["art_alloc_mxweight"])
+      .initiation_mortality_weight = Rcpp::as<real_type>(data["art_alloc_mxweight"]),
+      .h_art_stage_dur = parse_data<real_type>(data, "h_art_stage_dur", SS::hTS - 1)
     };
   };
 
