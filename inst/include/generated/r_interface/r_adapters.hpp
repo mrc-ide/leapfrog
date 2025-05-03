@@ -608,6 +608,60 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
     ret[index + 8] = r_p_hiv_deaths;
     return index + output_count;
   };
+
+  static int build_output_single_year(
+    int index,
+    const Config::State& state,
+    Rcpp::List& ret,
+    Rcpp::CharacterVector& names
+  ) {
+    Rcpp::NumericVector r_p_hiv_pop(SS::pAG * SS::NS);
+    r_p_hiv_pop.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS);
+    std::copy_n(state.p_hiv_pop.data(), state.p_hiv_pop.size(), REAL(r_p_hiv_pop));
+    names[index + 0] = "p_hiv_pop";
+    ret[index + 0] = r_p_hiv_pop;
+    Rcpp::NumericVector r_p_hiv_pop_background_deaths(SS::pAG * SS::NS);
+    r_p_hiv_pop_background_deaths.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS);
+    std::copy_n(state.p_hiv_pop_background_deaths.data(), state.p_hiv_pop_background_deaths.size(), REAL(r_p_hiv_pop_background_deaths));
+    names[index + 1] = "p_hiv_pop_background_deaths";
+    ret[index + 1] = r_p_hiv_pop_background_deaths;
+    Rcpp::NumericVector r_h_hiv_adult(SS::hDS * SS::hAG * SS::NS);
+    r_h_hiv_adult.attr("dim") = Rcpp::IntegerVector::create(SS::hDS, SS::hAG, SS::NS);
+    std::copy_n(state.h_hiv_adult.data(), state.h_hiv_adult.size(), REAL(r_h_hiv_adult));
+    names[index + 2] = "h_hiv_adult";
+    ret[index + 2] = r_h_hiv_adult;
+    Rcpp::NumericVector r_h_art_adult(SS::hTS * SS::hDS * SS::hAG * SS::NS);
+    r_h_art_adult.attr("dim") = Rcpp::IntegerVector::create(SS::hTS, SS::hDS, SS::hAG, SS::NS);
+    std::copy_n(state.h_art_adult.data(), state.h_art_adult.size(), REAL(r_h_art_adult));
+    names[index + 3] = "h_art_adult";
+    ret[index + 3] = r_h_art_adult;
+    Rcpp::NumericVector r_h_hiv_deaths_no_art(SS::hDS * SS::hAG * SS::NS);
+    r_h_hiv_deaths_no_art.attr("dim") = Rcpp::IntegerVector::create(SS::hDS, SS::hAG, SS::NS);
+    std::copy_n(state.h_hiv_deaths_no_art.data(), state.h_hiv_deaths_no_art.size(), REAL(r_h_hiv_deaths_no_art));
+    names[index + 4] = "h_hiv_deaths_no_art";
+    ret[index + 4] = r_h_hiv_deaths_no_art;
+    Rcpp::NumericVector r_p_infections(SS::pAG * SS::NS);
+    r_p_infections.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS);
+    std::copy_n(state.p_infections.data(), state.p_infections.size(), REAL(r_p_infections));
+    names[index + 5] = "p_infections";
+    ret[index + 5] = r_p_infections;
+    Rcpp::NumericVector r_h_hiv_deaths_art(SS::hTS * SS::hDS * SS::hAG * SS::NS);
+    r_h_hiv_deaths_art.attr("dim") = Rcpp::IntegerVector::create(SS::hTS, SS::hDS, SS::hAG, SS::NS);
+    std::copy_n(state.h_hiv_deaths_art.data(), state.h_hiv_deaths_art.size(), REAL(r_h_hiv_deaths_art));
+    names[index + 6] = "h_hiv_deaths_art";
+    ret[index + 6] = r_h_hiv_deaths_art;
+    Rcpp::NumericVector r_h_art_initiation(SS::hDS * SS::hAG * SS::NS);
+    r_h_art_initiation.attr("dim") = Rcpp::IntegerVector::create(SS::hDS, SS::hAG, SS::NS);
+    std::copy_n(state.h_art_initiation.data(), state.h_art_initiation.size(), REAL(r_h_art_initiation));
+    names[index + 7] = "h_art_initiation";
+    ret[index + 7] = r_h_art_initiation;
+    Rcpp::NumericVector r_p_hiv_deaths(SS::pAG * SS::NS);
+    r_p_hiv_deaths.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS);
+    std::copy_n(state.p_hiv_deaths.data(), state.p_hiv_deaths.size(), REAL(r_p_hiv_deaths));
+    names[index + 8] = "p_hiv_deaths";
+    ret[index + 8] = r_p_hiv_deaths;
+    return index + output_count;
+  };
 };
 
 } // namespace internal
