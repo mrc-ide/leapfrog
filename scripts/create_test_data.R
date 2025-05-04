@@ -16,9 +16,9 @@ source('./scripts/read_spectrum.R')
 pjnz_adult <- system.file("pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ", package = "frogger", mustWork = TRUE)
 
 demp <- prepare_leapfrog_demp(pjnz_adult)
-saveRDS(demp, testthat::test_path("testdata/demographic_projection_object_adult.rds"))
 proj <- prepare_leapfrog_projp(pjnz_adult)
-saveRDS(proj, testthat::test_path("testdata/projection_parameters_adult.rds"))
+parameters <- c(demp, proj)
+saveRDS(parameters, testthat::test_path("testdata/adult_parms.rds"))
 
 # Used as reference data (Run from leapfrog/master)
 lmod <- leapfrog::leapfrogR(demp, proj)
@@ -30,7 +30,7 @@ saveRDS(lmod, testthat::test_path("testdata/leapfrog_fit_coarse.rds"))
 mod <- leapfrog::leapfrogR(demp, proj, hiv_steps_per_year = 0L)
 saveRDS(lmod, testthat::test_path("testdata/fit_demography.rds"))
 
-#Create paeds parameters (Run from leapfrog/uncertainrt_analysis_working)
+#Create paeds parameters
 pjnz_child <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct.PJNZ")
 
 demp <- prepare_leapfrog_demp(pjnz_child)
@@ -50,17 +50,15 @@ yr_end <- as.integer(dpsub(dp, "<FinalYear MV2>",2,4))
 proj.years <- yr_start:yr_end
 timedat.idx <- 4+1:length(proj.years)-1
 
-pop1 = paste0(getwd(), '/', gsub(x = pjnz_child, pattern = '.PJNZ', replacement = '_pop1.xlsx'))
-#pop1 = paste0( gsub(x = pjnz_child, pattern = '.PJNZ', replacement = '_pop1.xlsx'))
+pop1 = paste0(getwd(), '/', gsub(x = pjnz_child, pattern = '.PJNZ', replacement = '.xlsx'))
 
-spectrum_output <- function(file = "../testdata/spectrum/v6.13/bwa_aim-adult-child-input-art-elig_spectrum-v6.13_2022-02-12_pop1.xlsx", ages = 0:14, country = 'Botswana', years_in = 1970:2030){
+spectrum_output <- function(file = "../testdata/spectrum/v6.13/bwa_aim-no-special-elig-numpmtct.xlsx", ages = 0:14, country = 'Botswana', years_in = 1970:2030){
   ##pull out stratified population from the .xlsx file, This function doesn't take out the paediatric output, so going to just compare to the Spectrum software itself
   df <- file
   # if(grepl(pattern = 'testdata', file)){
   #   df <- test_path(df)
   # }
   df <- eppasm::read_pop1(df, country, years = years_in)
-  if(any(0:14 %in% ages)){
     df_paed <- df %>% dplyr::filter(age < 5) %>%
       dplyr::right_join(y = data.frame(cd4 = 1:8, cd4_cat = c('neg', 'gte30', '26-30', '21-25', '16-20', '11-15', '5-10', 'lte5'))) %>%
       dplyr::right_join(y = data.frame(artdur = 2:8, transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+', 'ARTlte5mo', 'ART6to12mo', 'ARTgte12mo'))) %>%
@@ -71,14 +69,14 @@ spectrum_output <- function(file = "../testdata/spectrum/v6.13/bwa_aim-adult-chi
       dplyr::right_join(y = data.frame(artdur = 2:8, transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+', 'ARTlte5mo', 'ART6to12mo', 'ARTgte12mo'))) %>%
       dplyr::filter(cd4_cat != 'neg')
 
-    df <- rbind(df_paed, df_adol)
-    df <- df %>% dplyr::filter(age %in% ages)
-  }else{
+    df_paed <- rbind(df_paed, df_adol)
+
     df <- df %>% dplyr::filter(age %in%  c(15:max(ages))) %>%
       dplyr::right_join(y = data.frame(cd4 = 2:8, cd4_cat = c('gte500', '350-500', '250-349', '200-249', '100-199','50-99', 'lte50'))) %>%
       dplyr::right_join(y = data.frame(artdur = 2:8, transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+', 'ARTlte5mo', 'ART6to12mo', 'ARTgte12mo'))) %>%
       dplyr::filter(cd4_cat != 'neg')
-  }
+
+    df <- rbind(df, df_paed)
   # setnames(df, 'cd4', 'cd4_cat')
   df <- df %>% dplyr::select(sex, age, cd4_cat, year, pop, transmission)
 
@@ -89,8 +87,9 @@ spectrum_output <- function(file = "../testdata/spectrum/v6.13/bwa_aim-adult-chi
   return(list(on_treatment = df_on_treatment, off_treatment = df_off_treatment, total = df_total))
 
 }
-df <- spectrum_output(pop1, ages = 0:14, 'country', years_in = 1970:2030)
+df <- spectrum_output(pop1, ages = 0:80, 'country', years_in = 1970:2030)
 x = data.table(df$total)
+x[age <10 & year == 2001]
 
 tag.x ="<AIDSDeathsNoARTSingleAge MV>"
 start.id = 20898
@@ -112,9 +111,16 @@ aids_deathsart <- array(0, dim = c(15,2,61))
 aids_deathsart[,1,] <- m
 aids_deathsart[,2,] <- f
 
+spec_ctx_need <- dpsub(dp, tag = '<ChildARTCalc MV2>', rows = 3, cols = timedat.idx)
 
-saveRDS(list(proj = proj, demp = demp, dp = dp, timedat.idx = timedat.idx, pjnz = pjnz_child,
-             pop1_outputs = x, on_treatment = df$on_treatment, off_trt = df$off_treatment,
+saveRDS(list(parameters = c(proj, demp),
+             dp = dp,
+             timedat.idx = timedat.idx,
+             pjnz = pjnz_child,
+             pop1 = x,
+             ontrt = df$on_treatment,
+             offtrt = df$off_treatment,
              deaths_noart = aids_deathsnoart,
-             deaths_art = aids_deathsart),
+             deaths_art = aids_deathsart,
+             ctx_need = spec_ctx_need),
         testthat::test_path("testdata/child_parms.rds"))

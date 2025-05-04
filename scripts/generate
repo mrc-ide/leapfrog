@@ -1,4 +1,25 @@
 #!/usr/bin/env bash
 
-Rscript inst/cpp_generation/generate.R
+if ! uv --version >> /dev/null 2>&1; then
+  echo -n "Couldn't find uv on your system, would you like to install uv? (y/n) "
+  read user_response
+  if [[ "$user_response" == "y" ]]; then
+    wget -qO- https://astral.sh/uv/install.sh | sh
+    if [[ "$?" != "0" ]]; then
+      echo "Couldn't install via wget, trying pip..."
+      if pip --version; then
+        pip install uv
+      else
+        echo "Couldn't find pip on your system, please refer to https://docs.astral.sh/uv/getting-started/installation/ for other installation methods."
+        exit 1
+      fi
+    fi
+  else
+    echo "This project requires uv. You can find more general installation instructions at: https://docs.astral.sh/uv/getting-started/installation/"
+    exit 1
+  fi
+fi
 
+echo "Generating C++..."
+
+cd cpp_generation; uv run src/main.py

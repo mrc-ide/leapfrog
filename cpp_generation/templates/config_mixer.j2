@@ -1,0 +1,178 @@
+{% from "template_utils.j2" import comma_except_last %}
+{% include "header.j2" %}
+
+#pragma once
+
+#include "config.hpp"
+#include "options.hpp"
+
+namespace leapfrog {
+
+enum Language {
+  Cpp,
+  R
+};
+
+namespace internal {
+
+template<Language L, typename real_type, MV ModelVariant>
+struct DpAdapter;
+
+template<Language L, typename real_type, MV ModelVariant>
+struct HaAdapter;
+
+template<Language L, typename real_type, MV ModelVariant>
+struct HcAdapter;
+
+template<Language L, typename ...Ts>
+struct ConfigMixer;
+
+template<Language L, typename real_type, MV ModelVariant>
+struct ConfigMixer<L, real_type, ModelVariant> {
+  struct Pars {};
+
+  template<typename... Args>
+  static Pars get_pars(Args&&... args) {
+    Pars p = {}; return p;
+  }
+
+  struct Intermediate {
+    void reset() {};
+  };
+
+  struct State {
+    void reset() {};
+  };
+
+  template<typename... Args>
+  static State get_initial_state(Args&&... args) {
+    State s = {}; return s;
+  }
+
+  struct OutputState {
+    OutputState(int output_years) {};
+    void save_state(const size_t i, const auto &state) {};
+  };
+
+  static int get_build_output_size(int prev_size) {
+    return prev_size;
+  };
+
+  template<typename... Args>
+  static int build_output(int index, Args&&... args) {
+    return index;
+  }
+
+  template<typename... Args>
+  static int build_output_single_year(int index, Args&&... args) {
+    return index;
+  }
+};
+
+template<Language L, typename real_type, MV ModelVariant, typename Config, typename ...Ts>
+struct ConfigMixer<L, real_type, ModelVariant, Pair<false, Config>, Ts...> : public ConfigMixer<L, real_type, ModelVariant, Ts...> {};
+
+{% for config in configs +%}
+template<Language L, typename real_type1, MV ModelVariant1, typename ...Ts>
+struct ConfigMixer<L, real_type1, ModelVariant1, Pair<true, {{ config.name }}Config<real_type1, ModelVariant1>>, Ts...> {
+  using real_type = real_type1;
+  using ModelVariant = ModelVariant1;
+  using CurrConfig = {{ config.name }}Config<real_type, ModelVariant>;
+  using Adapter = {{ config.name }}Adapter<L, real_type, ModelVariant>;
+  using NextConfigMixer = ConfigMixer<L, real_type, ModelVariant, Ts...>;
+  using SS = SSMixed<ModelVariant>;
+
+  struct Pars: public NextConfigMixer::Pars {
+    typename CurrConfig::Pars {{ config.namespace }};
+  };
+
+  template<typename... Args>
+  static Pars get_pars(Args&&... args) {
+    Pars p = {
+      NextConfigMixer::get_pars(std::forward<Args>(args)...),
+      Adapter::get_pars(std::forward<Args>(args)...)
+    };
+    return p;
+  }
+
+  struct Intermediate: public NextConfigMixer::Intermediate {
+    typename CurrConfig::Intermediate {{ config.namespace }};
+
+    Intermediate():
+      NextConfigMixer::Intermediate(),
+      {{ config.namespace }}() {};
+
+    void reset() {
+      NextConfigMixer::Intermediate::reset();
+      {{ config.namespace }}.reset();
+    };
+  };
+
+  struct State: public NextConfigMixer::State {
+    typename CurrConfig::State {{ config.namespace }};
+
+    void reset() {
+      NextConfigMixer::State::reset();
+      {{ config.namespace }}.reset();
+    };
+  };
+
+  template<typename... Args>
+  static State get_initial_state(Args&&... args) {
+    return {
+      NextConfigMixer::get_initial_state(std::forward<Args>(args)...),
+      Adapter::get_initial_state(std::forward<Args>(args)...)
+    };
+  }
+
+  struct OutputState: public NextConfigMixer::OutputState {
+    typename CurrConfig::OutputState {{ config.namespace }};
+
+    OutputState(int output_years):
+      NextConfigMixer::OutputState(output_years),
+      {{ config.namespace }}(output_years) {};
+
+    void save_state(const size_t i, const State &state) {
+      NextConfigMixer::OutputState::save_state(i, state);
+      {{ config.namespace }}.save_state(i, state.{{ config.namespace }});
+    };
+  };
+
+  static int get_build_output_size(int prev_size) {
+    int curr_size = NextConfigMixer::get_build_output_size(prev_size);
+    return CurrConfig::get_build_output_size(curr_size);
+  };
+
+  template<typename... Args>
+  static int build_output(int index, const OutputState& state, Args&&... args) {
+    int new_index = Adapter::build_output(index, state.{{ config.namespace }}, std::forward<Args>(args)...);
+    return NextConfigMixer::build_output(new_index, state, std::forward<Args>(args)...);
+  }
+
+  template<typename... Args>
+  static int build_output_single_year(int index, const State& state, Args&&... args) {
+    int new_index = Adapter::build_output_single_year(index, state.{{ config.namespace }}, std::forward<Args>(args)...);
+    return NextConfigMixer::build_output_single_year(new_index, state, std::forward<Args>(args)...);
+  }
+
+  struct Args {
+    int t;
+    const Pars& pars;
+    const State& state_curr;
+    State& state_next;
+    Intermediate& intermediate;
+    const Options<real_type>& opts;
+  };
+};
+{% endfor %}
+
+template<Language L, typename real_type, MV ModelVariant>
+using Config = ConfigMixer<
+  L, real_type, ModelVariant,
+  {% for config in configs %}
+  Pair<ModelVariant::{{ config.enable_if }}, {{ config.name }}Config<real_type, ModelVariant>>{{ comma_except_last(loop) }}
+  {% endfor %}
+>;
+
+} // namespace internal
+} // namespace leapfrog

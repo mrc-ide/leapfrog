@@ -13,3 +13,4 @@ docker
 ^README\.Rmd$
 ^CPPLINT\.cfg$
 ^leapfrog-py$
+^cpp_generation$

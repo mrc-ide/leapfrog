@@ -4,16 +4,17 @@
 ## You might do this is say we add some new required data or if the data we are testing with
 ## changes for any reason
 
-root_dir <- here::here()
-save_root_dir <- "inst/standalone_model/data"
+repo_root <- gert::git_find()
+configs_dir <- file.path(repo_root, "cpp_generation/modelSchemas/configs")
+save_root_dir <- file.path(repo_root, "inst/standalone_model/data")
 
 write_standalone_data <- function(input_data, data_map, dest) {
   t <- tempfile()
   dir.create(t)
 
   ## Basepop handled separately as we only save a slice of this out
-  frogger:::serialize_r_to_tensor(demp$basepop[, , 1],
-                                  file.path(t, "demography_base_pop"))
+  frogger:::serialize_r_to_tensor(input_data$basepop[, , 1],
+                                  file.path(t, "base_pop"))
   for (r_name in setdiff(names(data_map), "basepop")) {
     frogger:::serialize_r_to_tensor(input_data[[r_name]], file.path(t, data_map[[r_name]]))
   }
@@ -25,48 +26,52 @@ write_standalone_data <- function(input_data, data_map, dest) {
   file.path(save_root_dir, o)
 }
 
-build_name_mapping <- function(name_mapping, structs = NULL) {
-  if (!is.null(structs)) {
-    adult_model_data <- vapply(name_mapping, function(map) {
-      map$struct %in% adult_model_structs
-    }, logical(1))
-    name_mapping <- name_mapping[adult_model_data]
-  }
-  data_cpp_name <- vapply(name_mapping, "[[", character(1), "cpp_name")
-  data_struct <- vapply(name_mapping, "[[", character(1), "struct")
-  data_map <- sprintf("%s_%s", tolower(data_struct), data_cpp_name)
-  names(data_map) <- vapply(name_mapping, "[[", character(1), "r_name")
-  data_map
+build_name_mapping <- function() {
+  cfgs <- list.files(configs_dir, full.names = TRUE)
+  all_params <- lapply(cfgs, function(cfg) {
+    params <- jsonlite::read_json(cfg)$pars
+    lapply(params, function(param) {
+      param$alias$r
+    })
+  })
+  all_params <- unlist(all_params)
+  setNames(names(all_params), all_params)
 }
 
-## Map from name in demp/parameters to name expected in C++ code
-name_mapping <- frogger::frogger_input_name_mapping()
-adult_model_structs <- c("Demography", "Incidence", "NaturalHistory", "Art")
+prepare_input_data <- function(input_data) {
+  input_data$hAG_SPAN <- input_data[["hAG_SPAN_full"]]
+  input_data$cd4_initdist <- input_data[["cd4_initdist_full"]]
+  input_data$cd4_prog <- input_data[["cd4_prog_full"]]
+  input_data$cd4_mort <- input_data[["cd4_mort_full"]]
+  input_data$art_mort <- input_data[["art_mort_full"]]
 
-adult_model_data_map <- build_name_mapping(name_mapping, adult_model_structs)
+  # convert indices to 0 based
+  if ("artcd4elig_idx" %in% names(input_data)) {
+    # integer type
+    input_data[["artcd4elig_idx"]] <- input_data[["artcd4elig_idx"]] - 1L
+  }
+  if ("paed_art_elig_cd4" %in% names(input_data)) {
+    # double type
+    input_data[["paed_art_elig_cd4"]] <- input_data[["paed_art_elig_cd4"]] - 1
+  }
 
+  hTS <- dim(input_data[["art_mort"]])[[1]]
+  input_data$h_art_stage_dur <- rep(0.5, hTS - 1)
+  input_data
+}
 
-demp <- readRDS(testthat::test_path("testdata/demographic_projection_object_adult.rds"))
-parameters <- readRDS(testthat::test_path("testdata/projection_parameters_adult.rds"))
-input_data <- c(demp, parameters)
-input_data$cd4_initdist <- input_data[["cd4_initdist_full"]]
-input_data$cd4_prog <- input_data[["cd4_prog_full"]]
-input_data$cd4_mort <- input_data[["cd4_mort_full"]]
-input_data$art_mort <- input_data[["art_mort_full"]]
+## Map from name in parameters to name expected in C++ code
+name_mapping <- build_name_mapping()
 
-path <- write_standalone_data(input_data, adult_model_data_map, "adult_data.zip")
+parameters <- readRDS(testthat::test_path("testdata/adult_parms.rds"))
+input_data <- prepare_input_data(parameters)
+
+path <- write_standalone_data(input_data, name_mapping, "adult_data.zip")
 message(sprintf("Wrote adult test data to %s", path))
 
-
-child_model_data_map <- build_name_mapping(name_mapping)
-
 source(file.path("R", "spectrum_inputs.R"))
-child <- setup_childmodel(testthat::test_path("testdata/child_parms.rds"))
-input_data <- c(child$demp, child$parameters)
-input_data$cd4_initdist <- input_data[["cd4_initdist_full"]]
-input_data$cd4_prog <- input_data[["cd4_prog_full"]]
-input_data$cd4_mort <- input_data[["cd4_mort_full"]]
-input_data$art_mort <- input_data[["art_mort_full"]]
+child <- readRDS(testthat::test_path("testdata/child_parms.rds"))
+input_data <- prepare_input_data(child$parameters)
 
-path <- write_standalone_data(input_data, child_model_data_map, "child_data.zip")
+path <- write_standalone_data(input_data, name_mapping, "child_data.zip")
 message(sprintf("Wrote child test data to %s", path))

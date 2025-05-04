@@ -1,0 +1,80 @@
+{% from "template_utils.j2" import comma_except_last %}
+{% include "header.j2" %}
+
+#pragma once
+
+#include "state_space_mixer.hpp"
+#include "tensor_types.hpp"
+
+namespace leapfrog {
+namespace internal {
+
+{% for config in configs %}
+template<typename real_type, MV ModelVariant>
+struct {{ config.name }}Config {
+  using SS = SSMixed<ModelVariant>;
+
+  struct Pars {
+    {% for name, cfg in config.pars.items() %}
+    {{ get_member_type(cfg) }} {{ name }};
+    {% endfor %}
+  };
+
+  struct Intermediate {
+    {% for name, cfg in config.intermediate.items() %}
+    {{ get_member_type(cfg) }} {{ name }};
+    {% endfor %}
+
+    Intermediate() {};
+
+    void reset() {
+      {% for name, cfg in config.intermediate.items() %}
+      {{ get_reset(name, cfg) }};
+      {% endfor %}
+    };
+  };
+
+  struct State {
+    {% for name, cfg in config.state.items() %}
+    {{ get_member_type(cfg) }} {{ name }};
+    {% endfor %}
+
+    void reset() {
+      {% for name, cfg in config.state.items() %}
+      {{ get_reset(name, cfg) }};
+      {% endfor %}
+    };
+  };
+
+  struct OutputState {
+    {% for name, cfg in config.state.items() %}
+    {{ get_output_state_member_type(cfg) }} {{ name }};
+    {% endfor %}
+
+    OutputState(int output_years):
+      {% for name, cfg in config.state.items() %}
+      {{ name }}({{ collapse_dims_with_trailing_sep(cfg) }}output_years){{ comma_except_last(loop) }}
+      {% endfor %}
+    {
+      {% for name in config.state.keys() %}
+      {{ name }}.setZero();
+      {% endfor %}
+    };
+
+    void save_state(const size_t i, const State &state) {
+      {% for name, cfg in config.state.items() %}
+      {{ get_output_state_chip(name, cfg) }} = state.{{ name }};
+      {% endfor %}
+    };
+  };
+
+  static constexpr int output_count = {{ dict_len(config.state) }};
+  static int get_build_output_size(int prev_size) {
+    return prev_size + output_count;
+  };
+};
+
+{% endfor %}
+
+} // namespace internal
+} // namespace leapfrog

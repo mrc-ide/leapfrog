@@ -1,67 +1,131 @@
 #pragma once
 
-#include "general_demographic_projection.hpp"
-#include "hiv_demographic_projection.hpp"
-#include "model_simulation.hpp"
-#include "child_model_simulation.hpp"
-#include "state_saver.hpp"
-#include "state_space.hpp"
-#include "project_year.hpp"
+#include "generated/model_variants.hpp"
+#include "generated/config_mixer.hpp"
+#include "models/general_demographic_projection.hpp"
+#include "models/hiv_demographic_projection.hpp"
+#include "models/adult_hiv_model_simulation.hpp"
+#include "models/child_model_simulation.hpp"
+#include "options.hpp"
 
 namespace leapfrog {
 
-// If we want to set any state for first iteration to something
-// other than 0 do it here.
-template<typename ModelVariant, typename real_type>
-void set_initial_state(State<ModelVariant, real_type> &state,
-                       const Parameters<ModelVariant, real_type> &pars) {
-  constexpr auto ss_d = StateSpace<ModelVariant>().dp;
-  const auto& p_dm = pars.dp.demography;
+template<Language L, typename real_type, internal::MV ModelVariant>
+struct Leapfrog {
+  using Cfg = internal::Config<L, real_type, ModelVariant>;
+  using SS = Cfg::SS;
+  using Pars = Cfg::Pars;
+  using State = Cfg::State;
+  using Intermediate = Cfg::Intermediate;
+  using OutputState = Cfg::OutputState;
+  using Args = Cfg::Args;
 
-  for (int g = 0; g < ss_d.NS; ++g) {
-    for (int a = 0; a < ss_d.pAG; ++a) {
-      state.dp.p_total_pop(a, g) = p_dm.base_pop(a, g);
+  static OutputState run_model(
+    const Pars& pars,
+    const Options<real_type>& opts,
+    const std::vector<int> output_years
+  ) {
+    int start_from_year = opts.proj_start_year;
+
+    State initial_state = {};
+    initial_state.reset();
+    if constexpr (ModelVariant::run_demographic_projection) {
+      initial_state.dp.p_total_pop = pars.dp.base_pop;
     }
-  }
-}
 
-/**
- * @brief Run a simulation model over a specified number of time steps.
- *
- * @tparam ModelVariant The variant of the model to be run, used for compile time switching.
- * @tparam real_type The data type used for real numbers in the simulation, usually a double.
- * @param time_steps The total number of time steps to run the simulation for.
- * @param save_steps A vector containing step intervals at which to save states.
- * @param pars The parameters required for running the simulation.
- * @return An OutputState object containing output from every save_step in the simulation.
- */
-template<typename ModelVariant, typename real_type>
-OutputState<ModelVariant, real_type> run_model(int time_steps,
-                                               std::vector<int> save_steps,
-                                               const Parameters<ModelVariant, real_type> &pars) {
-  const auto& p_op = pars.options;
+    return run_model_from_state(pars, opts, initial_state, start_from_year, output_years);
+  };
 
-  auto state = State<ModelVariant, real_type>();
-  auto state_next = state;
-  set_initial_state<ModelVariant, real_type>(state, pars);
-
-  internal::IntermediateData<ModelVariant, real_type> intermediate(p_op.hAG_15plus);
-
-  intermediate.reset();
-
-  StateSaver<ModelVariant, real_type> state_output(time_steps, save_steps);
-  // Save initial state
-  state_output.save_state(state, 0);
-
-  // Each time step is mid-point of the year
-  for (int step = 1; step < time_steps; ++step) {
-    internal::project_year(step, pars, state, state_next, intermediate);
-    state_output.save_state(state_next, step);
-    std::swap(state, state_next);
+  static OutputState run_model_from_state(
+    const Pars& pars,
+    const Options<real_type>& opts,
+    const State& initial_state,
+    const int start_from_year,
+    const std::vector<int> output_years
+  ) {
+    auto state = initial_state;
+    auto state_next = state;
     state_next.reset();
+
+    Intermediate intermediate;
     intermediate.reset();
-  }
-  return state_output.get_full_state();
-}
+
+    OutputState output_state(output_years.size());
+    save_state(opts.proj_start_year, state, output_state, output_years);
+
+    // Each time step is mid-point of the year
+    for (int step = start_from_year - opts.proj_start_year + 1; step < opts.proj_time_steps; ++step) {
+      Args args = { step, pars, state, state_next, intermediate, opts };
+      project_year(args);
+      save_state(opts.proj_start_year + step, state_next,
+                 output_state, output_years);
+      std::swap(state, state_next);
+      state_next.reset();
+      intermediate.reset();
+    }
+    return output_state;
+  };
+
+  static State run_model_single_year(
+    const Pars& pars,
+    const Options<real_type>& opts,
+    const State& initial_state,
+    const int start_from_year
+  ) {
+    auto state = initial_state;
+    auto state_next = state;
+    state_next.reset();
+
+    Intermediate intermediate;
+    intermediate.reset();
+
+    Args args = { start_from_year - opts.proj_start_year + 1, pars, state, state_next, intermediate, opts };
+    project_year(args);
+
+    return args.state_next;
+  };
+
+  private:
+  static void save_state(
+    const int step,
+    State& state_next,
+    OutputState& output_state,
+    const std::vector<int>& output_years
+  ) {
+    for (size_t i = 0; i < output_years.size(); ++i) {
+      if (step == output_years[i]) {
+        output_state.save_state(i, state_next);
+      }
+    }
+  };
+
+  static void project_year(Args& args) {
+    internal::GeneralDemographicProjection<Cfg> general_dp(args);
+    internal::HivDemographicProjection<Cfg> hiv_dp(args);
+    internal::AdultHivModelSimulation<Cfg> hiv_sim(args);
+    internal::ChildModelSimulation<Cfg> child_sim(args);
+
+    if constexpr (ModelVariant::run_demographic_projection) {
+      general_dp.run_general_pop_demographic_projection();
+
+      if constexpr (ModelVariant::run_hiv_simulation) {
+        hiv_dp.run_hiv_pop_demographic_projection();
+        hiv_sim.run_hiv_model_simulation();
+      }
+
+      if constexpr (ModelVariant::run_child_model) {
+        child_sim.run_child_model_simulation();
+      }
+
+      if (args.opts.proj_period_int == SS::PROJPERIOD_CALENDAR) {
+        general_dp.run_end_year_migration();
+
+        if constexpr (ModelVariant::run_hiv_simulation) {
+          hiv_dp.run_hiv_pop_end_year_migration();
+        }
+      }
+    }
+  };
+};
 
 }

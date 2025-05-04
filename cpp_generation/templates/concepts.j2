@@ -1,0 +1,21 @@
+{% include "header.j2" %}
+
+#pragma once
+
+namespace leapfrog {
+namespace internal {
+
+template<typename ModelVariant>
+concept MV = requires (ModelVariant mv) {
+  {% for name in get_flags(variants) %}
+  { mv.{{ name }} } -> std::convertible_to<bool>;
+  {% endfor %}
+};
+
+{% for name in get_flags(variants) +%}
+template<typename Config>
+concept {{ name.replace("_", " ").title().replace(" ", "") }} = MV<typename Config::ModelVariant> && Config::ModelVariant::{{ name }};
+{% endfor %}
+
+} // namespace internal
+} // namespace leapfrog

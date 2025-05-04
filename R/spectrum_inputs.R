@@ -1,3 +1,17 @@
+read_start_year <- function(pjnz, use_ep5 = FALSE) {
+  if(use_ep5) {
+    dpfile <- grep(".ep5$", utils::unzip(pjnz, list = TRUE)$Name, value = TRUE)
+  } else {
+    dpfile <- grep(".DP$", utils::unzip(pjnz, list = TRUE)$Name, value = TRUE)
+  }
+
+  dp <- utils::read.csv(unz(pjnz, dpfile), as.is = TRUE)
+  dpsub <- function(tag, rows, cols, tagcol =1 ) {
+    dp[which(dp[, tagcol] == tag) + rows, cols]
+  }
+  as.integer(dpsub("<FirstYear MV2>",2,4))
+}
+
 read_sx <- function(pjnz, use_ep5=FALSE) {
 
   if(use_ep5) {
@@ -100,6 +114,27 @@ adjust_spectrum_netmigr <- function(netmigr) {
   netmigr_adj
 }
 
+#' Prepare leapfrog input parameters from Spectrum PJNZ
+#'
+#' @param pjnz path to PJNZ file
+#'
+#' @return list of demographic and HIV projection input parameters
+#'
+#' @examples
+#' pjnz <- system.file(
+#'   "pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ",
+#'   package = "frogger")
+#' parameters <- prepare_leapfrog_parameters(pjnz)
+#'
+#' @export
+prepare_leapfrog_parameters <- function(pjnz) {
+  ## TODO: We're reading the PJNZ file several times below, revisit this,
+  ## we should only have to read this in once
+  dp <- prepare_leapfrog_demp(pjnz)
+  proj <- prepare_leapfrog_projp(pjnz)
+  c(dp, proj)
+}
+
 #' Prepare demographic inputs from Spectrum PJNZ
 #'
 #' @param pjnz path to PJNZ file
@@ -117,14 +152,16 @@ prepare_leapfrog_demp <- function(pjnz) {
 
   demp <- eppasm::read_specdp_demog_param(pjnz)
 
+  demp$projection_start_year <- read_start_year(pjnz)
   demp$Sx <- read_sx(pjnz)
   demp$netmigr <- read_netmigr(pjnz, sx = demp$Sx)
 
-  demp$births_sex_prop <- rbind(male = demp$srb, female = 100) / (demp$srb + 100)
+  births_sex_prop_male <- demp$srb / (demp$srb + 100)
+  demp$births_sex_prop <- rbind(male = births_sex_prop_male,
+                                female = 1 - births_sex_prop_male)
 
   ## normalise ASFR distribution
   demp$asfr <- sweep(demp$asfr, 2, demp$tfr / colSums(demp$asfr), "*")
-
 
   ## NOTE: Reading this to obtain the Spectrum version number
   ##       This is a lot of redundant effort.
@@ -187,7 +224,7 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   adult_cd4_dist[5:7,6] <- c(0.35, 0.21, 0.44)
 
 
-  adult_cd4_dist_array <-adult_cd4_dist
+  adult_cd4_dist_array <- adult_cd4_dist
 
   v$adult_cd4_dist <- adult_cd4_dist_array
 
@@ -270,35 +307,4 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
 
 
   v
-}
-
-# Used for testing
-setup_childmodel <- function(testinput) {
-  input <- readRDS(testinput)
-  demp <- input$demp
-  parameters <- input$proj
-
-  parameters$ctx_effect <- 0.33
-  parameters$laf <- 1
-  parameters$paed_art_elig_age <- as.integer(parameters$paed_art_elig_age)
-  parameters$mat_prev_input <- rep(TRUE, 61)
-  pmtct_new <- array(0, dim = c(7, 61), dimnames = list(pmtct = c("Option A", "Option B", "SDNVP", "Dual ARV", "Option B+: before pregnancy", "Option B+: >4 weeks", "Option B+: <4 weeks")))
-  ## pick out which ones were inserted as numbers
-  pmtct_new[, which(colSums(parameters$pmtct)[, 1] > 0)] <- parameters$pmtct[, (which(colSums(parameters$pmtct)[, 1] > 0)), 1]
-  ## pick out which ones were inserted as percent
-  pmtct_new[, which(colSums(parameters$pmtct)[, 1] == 0)] <- parameters$pmtct[, which(colSums(parameters$pmtct)[, 1] == 0), 2]
-  parameters$pmtct <- pmtct_new
-
-  return(list(
-    dp = input$dp,
-    demp = demp,
-    parameters = parameters,
-    pjnz = input$pjnz,
-    timedat.idx = input$timedat.idx,
-    pop1 = input$pop1_outputs,
-    ontrt = input$on_treatment,
-    offtrt = input$off_trt,
-    deaths_noart = input$deaths_noart,
-    deaths_art = input$deaths_art
-  ))
 }
