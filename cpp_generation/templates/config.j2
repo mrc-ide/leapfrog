@@ -15,7 +15,7 @@ struct {{ config.name }}Config {
   using SS = SSMixed<ModelVariant>;
 
   struct Pars {
-    {% for name, cfg in config.pars.items() %}
+    {% for name, cfg in config.pars.default.items() %}
     {{ get_member_type(cfg) }} {{ name }};
     {% endfor %}
   };

@@ -75,20 +75,6 @@ run_model_single_year <- function(parameters,
 
 
 process_parameters <- function(parameters, configuration) {
-  if (configuration == "HivCoarseAgeStratification") {
-    parameters$hAG_SPAN <- parameters[["hAG_SPAN_coarse"]]
-    parameters$cd4_initdist <- parameters[["cd4_initdist_coarse"]]
-    parameters$cd4_prog <- parameters[["cd4_prog_coarse"]]
-    parameters$cd4_mort <- parameters[["cd4_mort_coarse"]]
-    parameters$art_mort <- parameters[["art_mort_coarse"]]
-  } else if (configuration %in% c("HivFullAgeStratification", "ChildModel")) {
-    parameters$hAG_SPAN <- parameters[["hAG_SPAN_full"]]
-    parameters$cd4_initdist <- parameters[["cd4_initdist_full"]]
-    parameters$cd4_prog <- parameters[["cd4_prog_full"]]
-    parameters$cd4_mort <- parameters[["cd4_mort_full"]]
-    parameters$art_mort <- parameters[["art_mort_full"]]
-  }
-
   # convert indices to 0 based
   if ("artcd4elig_idx" %in% names(parameters)) {
     # integer type
@@ -103,7 +89,7 @@ process_parameters <- function(parameters, configuration) {
   }
 
   if (is_run_hiv_simulation(configuration)) {
-    hTS <- dim(parameters[["art_mort"]])[[1]]
+    hTS <- dim(parameters[["artmx_timerr"]])[[1]]
     parameters[["h_art_stage_dur"]] <- rep(0.5, hTS - 1)
   }
   if (is.null(parameters[["hts_per_year"]])) {

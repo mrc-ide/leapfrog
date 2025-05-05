@@ -228,7 +228,7 @@ test_that("error thrown if size of stratified data does not match expected", {
 
   expect_error(
     run_model(parameters, "HivFullAgeStratification", 2030L),
-    "Invalid size of data for 'cd4_mort', expected 924 got 3"
+    "Invalid size of data for 'cd4_mort_full', expected 924 got 3"
   )
 })
 

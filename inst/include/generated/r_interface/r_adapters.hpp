@@ -59,7 +59,7 @@ struct DpAdapter<Language::R, real_type, ModelVariant> {
       .base_pop = parse_data<real_type>(data, "basepop", SS::pAG, SS::NS),
       .survival_probability = parse_data<real_type>(data, "Sx", SS::pAG + 1, SS::NS, opts.proj_time_steps),
       .net_migration = parse_data<real_type>(data, "netmigr_adj", SS::pAG, SS::NS, opts.proj_time_steps),
-      .age_specific_fertility_rate = parse_data<real_type>(data, "asfr", opts.p_fertility_age_groups, opts.proj_time_steps),
+      .age_specific_fertility_rate = parse_data<real_type>(data, "asfr", SS::p_fertility_age_groups, opts.proj_time_steps),
       .births_sex_prop = parse_data<real_type>(data, "births_sex_prop", SS::NS, opts.proj_time_steps)
     };
   };
@@ -134,21 +134,21 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
   ) {
     return {
       .total_rate = parse_data<real_type>(data, "incidinput", opts.proj_time_steps),
-      .relative_risk_age = parse_data<real_type>(data, "incrr_age", SS::pAG - opts.p_idx_hiv_first_adult, SS::NS, opts.proj_time_steps),
+      .relative_risk_age = parse_data<real_type>(data, "incrr_age", SS::pAG - SS::p_idx_hiv_first_adult, SS::NS, opts.proj_time_steps),
       .relative_risk_sex = parse_data<real_type>(data, "incrr_sex", opts.proj_time_steps),
-      .cd4_mortality = parse_data<real_type>(data, "cd4_mort", SS::hDS, SS::hAG, SS::NS),
-      .cd4_progression = parse_data<real_type>(data, "cd4_prog", SS::hDS - 1, SS::hAG, SS::NS),
-      .cd4_initial_distribution = parse_data<real_type>(data, "cd4_initdist", SS::hDS, SS::hAG, SS::NS),
+      .cd4_mortality = parse_data<real_type>(data, "cd4_mort_full", SS::hDS, SS::hAG, SS::NS),
+      .cd4_progression = parse_data<real_type>(data, "cd4_prog_full", SS::hDS - 1, SS::hAG, SS::NS),
+      .cd4_initial_distribution = parse_data<real_type>(data, "cd4_initdist_full", SS::hDS, SS::hAG, SS::NS),
       .scale_cd4_mortality = Rcpp::as<int>(data["scale_cd4_mort"]),
       .idx_hm_elig = parse_data<int>(data, "artcd4elig_idx", opts.proj_time_steps),
-      .mortality = parse_data<real_type>(data, "art_mort", SS::hTS, SS::hDS, SS::hAG, SS::NS),
+      .mortality = parse_data<real_type>(data, "art_mort_full", SS::hTS, SS::hDS, SS::hAG, SS::NS),
       .mortality_time_rate_ratio = parse_data<real_type>(data, "artmx_timerr", SS::hTS, opts.proj_time_steps),
       .dropout_recover_cd4 = Rcpp::as<int>(data["art_dropout_recover_cd4"]),
       .dropout_rate = parse_data<real_type>(data, "art_dropout_rate", opts.proj_time_steps),
       .adults_on_art = parse_data<real_type>(data, "art15plus_num", SS::NS, opts.proj_time_steps),
       .adults_on_art_is_percent = parse_data<int>(data, "art15plus_isperc", SS::NS, opts.proj_time_steps),
-      .h_art_stage_dur = parse_data<real_type>(data, "h_art_stage_dur", SS::hTS - 1),
-      .initiation_mortality_weight = Rcpp::as<real_type>(data["art_alloc_mxweight"])
+      .initiation_mortality_weight = Rcpp::as<real_type>(data["art_alloc_mxweight"]),
+      .h_art_stage_dur = parse_data<real_type>(data, "h_art_stage_dur", SS::hTS - 1)
     };
   };
 
@@ -299,17 +299,17 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
       .hc2_cd4_prog = parse_data<real_type>(data, "adol_cd4_prog", SS::hc2DS, SS::hc2AG_c, SS::NS),
       .ctx_val = parse_data<real_type>(data, "ctx_val", opts.proj_time_steps),
       .hc_art_elig_age = parse_data<int>(data, "paed_art_elig_age", opts.proj_time_steps),
-      .hc_art_elig_cd4 = parse_data<real_type>(data, "paed_art_elig_cd4", opts.p_idx_hiv_first_adult, opts.proj_time_steps),
-      .hc_art_mort_rr = parse_data<real_type>(data, "mort_art_rr", SS::hTS, opts.p_idx_hiv_first_adult, opts.proj_time_steps),
+      .hc_art_elig_cd4 = parse_data<real_type>(data, "paed_art_elig_cd4", SS::p_idx_hiv_first_adult, opts.proj_time_steps),
+      .hc_art_mort_rr = parse_data<real_type>(data, "mort_art_rr", SS::hTS, SS::p_idx_hiv_first_adult, opts.proj_time_steps),
       .hc1_art_mort = parse_data<real_type>(data, "paed_art_mort", SS::hc1DS, SS::hTS, SS::hc1AG),
       .hc2_art_mort = parse_data<real_type>(data, "adol_art_mort", SS::hc2DS, SS::hTS, SS::hc2AG),
       .hc_art_isperc = parse_data<int>(data, "artpaeds_isperc", opts.proj_time_steps),
       .hc_art_val = parse_data<real_type>(data, "paed_art_val", SS::hcAG_coarse, opts.proj_time_steps),
-      .hc_art_init_dist = parse_data<real_type>(data, "init_art_dist", opts.p_idx_hiv_first_adult, opts.proj_time_steps),
+      .hc_art_init_dist = parse_data<real_type>(data, "init_art_dist", SS::p_idx_hiv_first_adult, opts.proj_time_steps),
       .adult_cd4_dist = parse_data<real_type>(data, "adult_cd4_dist", SS::hDS, SS::hc2DS),
-      .fert_mult_by_age = parse_data<real_type>(data, "fert_mult_by_age", opts.p_fertility_age_groups),
+      .fert_mult_by_age = parse_data<real_type>(data, "fert_mult_by_age", SS::p_fertility_age_groups),
       .fert_mult_off_art = parse_data<real_type>(data, "fert_mult_offart", SS::hDS),
-      .fert_mult_on_art = parse_data<real_type>(data, "fert_mult_onart", opts.p_fertility_age_groups),
+      .fert_mult_on_art = parse_data<real_type>(data, "fert_mult_onart", SS::p_fertility_age_groups),
       .total_fertility_rate = parse_data<real_type>(data, "tfr", opts.proj_time_steps),
       .PMTCT = parse_data<real_type>(data, "pmtct", SS::hPS, opts.proj_time_steps),
       .vertical_transmission_rate = parse_data<real_type>(data, "mtct", SS::hDS + 1, SS::hVT),
@@ -329,9 +329,9 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
       .abortion = parse_data<real_type>(data, "abortion", SS::hAB_ind, opts.proj_time_steps),
       .patients_reallocated = parse_data<real_type>(data, "patients_reallocated", opts.proj_time_steps),
       .hc_art_ltfu = parse_data<real_type>(data, "paed_art_ltfu", opts.proj_time_steps),
-      .hc_age_coarse_cd4 = parse_data<int>(data, "hc_age_coarse_cd4", opts.p_idx_hiv_first_adult),
-      .adult_female_infections = parse_data<real_type>(data, "adult_female_infections", opts.p_fertility_age_groups, opts.proj_time_steps),
-      .adult_female_hivnpop = parse_data<real_type>(data, "hivnpop", opts.p_fertility_age_groups, opts.proj_time_steps),
+      .hc_age_coarse_cd4 = parse_data<int>(data, "hc_age_coarse_cd4", SS::p_idx_hiv_first_adult),
+      .adult_female_infections = parse_data<real_type>(data, "adult_female_infections", SS::p_fertility_age_groups, opts.proj_time_steps),
+      .adult_female_hivnpop = parse_data<real_type>(data, "hivnpop", SS::p_fertility_age_groups, opts.proj_time_steps),
       .total_births = parse_data<real_type>(data, "total_births", opts.proj_time_steps),
       .ctx_effect = parse_data<real_type>(data, "ctx_effect", 3),
       .hc_art_start = Rcpp::as<real_type>(data["hc_art_start"]),
@@ -501,6 +501,165 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
     std::copy_n(state.infection_by_type.data(), state.infection_by_type.size(), REAL(r_infection_by_type));
     names[index + 12] = "infection_by_type";
     ret[index + 12] = r_infection_by_type;
+    return index + output_count;
+  };
+};
+
+
+template<typename real_type, MV ModelVariant>
+requires(ModelVariant::use_coarse_stratification)
+struct HaAdapter<Language::R, real_type, ModelVariant> {
+  using SS = SSMixed<ModelVariant>;
+  using Config = HaConfig<real_type, ModelVariant>;
+
+  static Config::Pars get_pars(
+    const Rcpp::List &data,
+    const Options<real_type> &opts
+  ) {
+    return {
+      .total_rate = parse_data<real_type>(data, "incidinput", opts.proj_time_steps),
+      .relative_risk_age = parse_data<real_type>(data, "incrr_age", SS::pAG - SS::p_idx_hiv_first_adult, SS::NS, opts.proj_time_steps),
+      .relative_risk_sex = parse_data<real_type>(data, "incrr_sex", opts.proj_time_steps),
+      .cd4_mortality = parse_data<real_type>(data, "cd4_mort_coarse", SS::hDS, SS::hAG, SS::NS),
+      .cd4_progression = parse_data<real_type>(data, "cd4_prog_coarse", SS::hDS - 1, SS::hAG, SS::NS),
+      .cd4_initial_distribution = parse_data<real_type>(data, "cd4_initdist_coarse", SS::hDS, SS::hAG, SS::NS),
+      .scale_cd4_mortality = Rcpp::as<int>(data["scale_cd4_mort"]),
+      .idx_hm_elig = parse_data<int>(data, "artcd4elig_idx", opts.proj_time_steps),
+      .mortality = parse_data<real_type>(data, "art_mort_coarse", SS::hTS, SS::hDS, SS::hAG, SS::NS),
+      .mortality_time_rate_ratio = parse_data<real_type>(data, "artmx_timerr", SS::hTS, opts.proj_time_steps),
+      .dropout_recover_cd4 = Rcpp::as<int>(data["art_dropout_recover_cd4"]),
+      .dropout_rate = parse_data<real_type>(data, "art_dropout_rate", opts.proj_time_steps),
+      .adults_on_art = parse_data<real_type>(data, "art15plus_num", SS::NS, opts.proj_time_steps),
+      .adults_on_art_is_percent = parse_data<int>(data, "art15plus_isperc", SS::NS, opts.proj_time_steps),
+      .initiation_mortality_weight = Rcpp::as<real_type>(data["art_alloc_mxweight"]),
+      .h_art_stage_dur = parse_data<real_type>(data, "h_art_stage_dur", SS::hTS - 1)
+    };
+  };
+
+  static Config::State get_initial_state(
+    const Rcpp::List &data
+  ) {
+    return {
+      .p_hiv_pop = parse_data<real_type>(data, "p_hiv_pop", SS::pAG, SS::NS),
+      .p_hiv_pop_background_deaths = parse_data<real_type>(data, "p_hiv_pop_background_deaths", SS::pAG, SS::NS),
+      .h_hiv_adult = parse_data<real_type>(data, "h_hiv_adult", SS::hDS, SS::hAG, SS::NS),
+      .h_art_adult = parse_data<real_type>(data, "h_art_adult", SS::hTS, SS::hDS, SS::hAG, SS::NS),
+      .h_hiv_deaths_no_art = parse_data<real_type>(data, "h_hiv_deaths_no_art", SS::hDS, SS::hAG, SS::NS),
+      .p_infections = parse_data<real_type>(data, "p_infections", SS::pAG, SS::NS),
+      .h_hiv_deaths_art = parse_data<real_type>(data, "h_hiv_deaths_art", SS::hTS, SS::hDS, SS::hAG, SS::NS),
+      .h_art_initiation = parse_data<real_type>(data, "h_art_initiation", SS::hDS, SS::hAG, SS::NS),
+      .p_hiv_deaths = parse_data<real_type>(data, "p_hiv_deaths", SS::pAG, SS::NS)
+    };
+  };
+
+  static constexpr int output_count = 9;
+
+  static int build_output(
+    int index,
+    const Config::OutputState& state,
+    Rcpp::List& ret,
+    Rcpp::CharacterVector& names,
+    const size_t& output_years
+  ) {
+    Rcpp::NumericVector r_p_hiv_pop(SS::pAG * SS::NS * output_years);
+    r_p_hiv_pop.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS, output_years);
+    std::copy_n(state.p_hiv_pop.data(), state.p_hiv_pop.size(), REAL(r_p_hiv_pop));
+    names[index + 0] = "p_hiv_pop";
+    ret[index + 0] = r_p_hiv_pop;
+    Rcpp::NumericVector r_p_hiv_pop_background_deaths(SS::pAG * SS::NS * output_years);
+    r_p_hiv_pop_background_deaths.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS, output_years);
+    std::copy_n(state.p_hiv_pop_background_deaths.data(), state.p_hiv_pop_background_deaths.size(), REAL(r_p_hiv_pop_background_deaths));
+    names[index + 1] = "p_hiv_pop_background_deaths";
+    ret[index + 1] = r_p_hiv_pop_background_deaths;
+    Rcpp::NumericVector r_h_hiv_adult(SS::hDS * SS::hAG * SS::NS * output_years);
+    r_h_hiv_adult.attr("dim") = Rcpp::IntegerVector::create(SS::hDS, SS::hAG, SS::NS, output_years);
+    std::copy_n(state.h_hiv_adult.data(), state.h_hiv_adult.size(), REAL(r_h_hiv_adult));
+    names[index + 2] = "h_hiv_adult";
+    ret[index + 2] = r_h_hiv_adult;
+    Rcpp::NumericVector r_h_art_adult(SS::hTS * SS::hDS * SS::hAG * SS::NS * output_years);
+    r_h_art_adult.attr("dim") = Rcpp::IntegerVector::create(SS::hTS, SS::hDS, SS::hAG, SS::NS, output_years);
+    std::copy_n(state.h_art_adult.data(), state.h_art_adult.size(), REAL(r_h_art_adult));
+    names[index + 3] = "h_art_adult";
+    ret[index + 3] = r_h_art_adult;
+    Rcpp::NumericVector r_h_hiv_deaths_no_art(SS::hDS * SS::hAG * SS::NS * output_years);
+    r_h_hiv_deaths_no_art.attr("dim") = Rcpp::IntegerVector::create(SS::hDS, SS::hAG, SS::NS, output_years);
+    std::copy_n(state.h_hiv_deaths_no_art.data(), state.h_hiv_deaths_no_art.size(), REAL(r_h_hiv_deaths_no_art));
+    names[index + 4] = "h_hiv_deaths_no_art";
+    ret[index + 4] = r_h_hiv_deaths_no_art;
+    Rcpp::NumericVector r_p_infections(SS::pAG * SS::NS * output_years);
+    r_p_infections.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS, output_years);
+    std::copy_n(state.p_infections.data(), state.p_infections.size(), REAL(r_p_infections));
+    names[index + 5] = "p_infections";
+    ret[index + 5] = r_p_infections;
+    Rcpp::NumericVector r_h_hiv_deaths_art(SS::hTS * SS::hDS * SS::hAG * SS::NS * output_years);
+    r_h_hiv_deaths_art.attr("dim") = Rcpp::IntegerVector::create(SS::hTS, SS::hDS, SS::hAG, SS::NS, output_years);
+    std::copy_n(state.h_hiv_deaths_art.data(), state.h_hiv_deaths_art.size(), REAL(r_h_hiv_deaths_art));
+    names[index + 6] = "h_hiv_deaths_art";
+    ret[index + 6] = r_h_hiv_deaths_art;
+    Rcpp::NumericVector r_h_art_initiation(SS::hDS * SS::hAG * SS::NS * output_years);
+    r_h_art_initiation.attr("dim") = Rcpp::IntegerVector::create(SS::hDS, SS::hAG, SS::NS, output_years);
+    std::copy_n(state.h_art_initiation.data(), state.h_art_initiation.size(), REAL(r_h_art_initiation));
+    names[index + 7] = "h_art_initiation";
+    ret[index + 7] = r_h_art_initiation;
+    Rcpp::NumericVector r_p_hiv_deaths(SS::pAG * SS::NS * output_years);
+    r_p_hiv_deaths.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS, output_years);
+    std::copy_n(state.p_hiv_deaths.data(), state.p_hiv_deaths.size(), REAL(r_p_hiv_deaths));
+    names[index + 8] = "p_hiv_deaths";
+    ret[index + 8] = r_p_hiv_deaths;
+    return index + output_count;
+  };
+
+  static int build_output_single_year(
+    int index,
+    const Config::State& state,
+    Rcpp::List& ret,
+    Rcpp::CharacterVector& names
+  ) {
+    Rcpp::NumericVector r_p_hiv_pop(SS::pAG * SS::NS);
+    r_p_hiv_pop.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS);
+    std::copy_n(state.p_hiv_pop.data(), state.p_hiv_pop.size(), REAL(r_p_hiv_pop));
+    names[index + 0] = "p_hiv_pop";
+    ret[index + 0] = r_p_hiv_pop;
+    Rcpp::NumericVector r_p_hiv_pop_background_deaths(SS::pAG * SS::NS);
+    r_p_hiv_pop_background_deaths.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS);
+    std::copy_n(state.p_hiv_pop_background_deaths.data(), state.p_hiv_pop_background_deaths.size(), REAL(r_p_hiv_pop_background_deaths));
+    names[index + 1] = "p_hiv_pop_background_deaths";
+    ret[index + 1] = r_p_hiv_pop_background_deaths;
+    Rcpp::NumericVector r_h_hiv_adult(SS::hDS * SS::hAG * SS::NS);
+    r_h_hiv_adult.attr("dim") = Rcpp::IntegerVector::create(SS::hDS, SS::hAG, SS::NS);
+    std::copy_n(state.h_hiv_adult.data(), state.h_hiv_adult.size(), REAL(r_h_hiv_adult));
+    names[index + 2] = "h_hiv_adult";
+    ret[index + 2] = r_h_hiv_adult;
+    Rcpp::NumericVector r_h_art_adult(SS::hTS * SS::hDS * SS::hAG * SS::NS);
+    r_h_art_adult.attr("dim") = Rcpp::IntegerVector::create(SS::hTS, SS::hDS, SS::hAG, SS::NS);
+    std::copy_n(state.h_art_adult.data(), state.h_art_adult.size(), REAL(r_h_art_adult));
+    names[index + 3] = "h_art_adult";
+    ret[index + 3] = r_h_art_adult;
+    Rcpp::NumericVector r_h_hiv_deaths_no_art(SS::hDS * SS::hAG * SS::NS);
+    r_h_hiv_deaths_no_art.attr("dim") = Rcpp::IntegerVector::create(SS::hDS, SS::hAG, SS::NS);
+    std::copy_n(state.h_hiv_deaths_no_art.data(), state.h_hiv_deaths_no_art.size(), REAL(r_h_hiv_deaths_no_art));
+    names[index + 4] = "h_hiv_deaths_no_art";
+    ret[index + 4] = r_h_hiv_deaths_no_art;
+    Rcpp::NumericVector r_p_infections(SS::pAG * SS::NS);
+    r_p_infections.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS);
+    std::copy_n(state.p_infections.data(), state.p_infections.size(), REAL(r_p_infections));
+    names[index + 5] = "p_infections";
+    ret[index + 5] = r_p_infections;
+    Rcpp::NumericVector r_h_hiv_deaths_art(SS::hTS * SS::hDS * SS::hAG * SS::NS);
+    r_h_hiv_deaths_art.attr("dim") = Rcpp::IntegerVector::create(SS::hTS, SS::hDS, SS::hAG, SS::NS);
+    std::copy_n(state.h_hiv_deaths_art.data(), state.h_hiv_deaths_art.size(), REAL(r_h_hiv_deaths_art));
+    names[index + 6] = "h_hiv_deaths_art";
+    ret[index + 6] = r_h_hiv_deaths_art;
+    Rcpp::NumericVector r_h_art_initiation(SS::hDS * SS::hAG * SS::NS);
+    r_h_art_initiation.attr("dim") = Rcpp::IntegerVector::create(SS::hDS, SS::hAG, SS::NS);
+    std::copy_n(state.h_art_initiation.data(), state.h_art_initiation.size(), REAL(r_h_art_initiation));
+    names[index + 7] = "h_art_initiation";
+    ret[index + 7] = r_h_art_initiation;
+    Rcpp::NumericVector r_p_hiv_deaths(SS::pAG * SS::NS);
+    r_p_hiv_deaths.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS);
+    std::copy_n(state.p_hiv_deaths.data(), state.p_hiv_deaths.size(), REAL(r_p_hiv_deaths));
+    names[index + 8] = "p_hiv_deaths";
+    ret[index + 8] = r_p_hiv_deaths;
     return index + output_count;
   };
 };

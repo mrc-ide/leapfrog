@@ -32,8 +32,20 @@ def generate_hpp(template_name, *args, **kwargs):
     f.write(output)
 
 
+def apply_default_vars_to_overrides(dat, section):
+  overrides = dat[section].get("overrides")
+  if not overrides: return
+  
+  default_vars = dat[section]["default"]
+  for override in overrides:
+    override["vars"] = default_vars | override["vars"]
+
+
 dat = load_json("..", "modelSchemas", "FullModel.json")
 dat = { k: load_children_model_schemas(v) for k, v in dat.items() }
+for cfg in dat["configs"]:
+  apply_default_vars_to_overrides(cfg, "state_space")
+  apply_default_vars_to_overrides(cfg, "pars")
 
 file_loader = FileSystemLoader(relative_file_path("..", "templates"))
 env = Environment(
