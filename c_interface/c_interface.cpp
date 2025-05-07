@@ -12,7 +12,7 @@
 
 typedef void (WINAPI *CallbackFunction)(const char*);
 
-DllExport HRESULT WINAPI run_dp(leapfrog::internal::DpParams& data, leapfrog::internal::DpOut& out, CallbackFunction logger) {
+DllExport HRESULT WINAPI run_dp(leapfrog::internal::DpParams& data, leapfrog::internal::DpOut& out, CallbackFunction error_handler) {
   #pragma EXPORT
 
   using LF = leapfrog::Leapfrog<leapfrog::C, double, leapfrog::DemographicProjection>;
@@ -27,10 +27,10 @@ DllExport HRESULT WINAPI run_dp(leapfrog::internal::DpParams& data, leapfrog::in
     auto state = LF::run_model(pars, opts, output_years);
     LF::Cfg::build_output(0, state, out);
   } catch (const std::invalid_argument& e) {
-    logger(e.what());
+    error_handler(e.what());
     return E_INVALIDARG;
   } catch (...) {
-    logger("Caught unhandled exception");
+    error_handler("Caught unhandled exception");
     return E_FAIL;
   }
 
