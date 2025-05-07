@@ -22,7 +22,7 @@ auto read_data(T* data, int length, std::string_view name, Args... dims) {
   constexpr std::size_t rank = sizeof...(dims);
   const auto size = (dims * ...);
   if (length != size) {
-    throw std::invalid_argument(std::format("Input data '{}' is the wrong size. Received {}, expected {}.", name, size, length));
+    throw std::invalid_argument(std::format("Input data '{}' is the wrong size. Received array of length '{}', expected '{}'.", name, size, length));
   }
   return Eigen::TensorMap<Eigen::Tensor<T, rank>>(data, dims...);
 }
@@ -33,7 +33,7 @@ void write_data(const Eigen::Tensor<T, Rank>& tensor, T* output, int length, std
   std::size_t totalSize = tensor.size();
 
   if (length != totalSize) {
-    throw std::invalid_argument(std::format("Output data '{}' is the wrong size. Received {}, expected {}.", name, totalSize, length));
+    throw std::invalid_argument(std::format("Output data '{}' is the wrong size. Received array of length '{}', expected '{}'.", name, totalSize, length));
   }
 
   for (std::size_t i = 0; i < totalSize; ++i) {
