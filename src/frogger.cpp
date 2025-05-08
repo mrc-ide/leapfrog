@@ -7,6 +7,7 @@
 #include "generated/r_interface/r_adapters.hpp"
 
 
+
 //' List the avaialble model configurations
 //'
 //' @return List of available model configurations

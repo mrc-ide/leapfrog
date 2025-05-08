@@ -10,7 +10,6 @@
 #include <array/array.h>
 
 #include "state_space_mixer.hpp"
-#include "tensor_types.hpp"
 
 namespace leapfrog {
 namespace internal {
