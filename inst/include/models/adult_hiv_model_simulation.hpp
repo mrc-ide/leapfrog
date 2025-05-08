@@ -66,9 +66,9 @@ struct AdultHivModelSimulation<Config> {
     run_calculate_incidence_rate();
 
     for (int hiv_step = 0; hiv_step < opts.hts_per_year; ++hiv_step) {
-      i_ha.grad.setZero();
-      i_ha.gradART.setZero();
-      i_ha.p_hiv_deaths_age_sex.setZero();
+      i_ha.grad.for_each_value([](real_type& x) { x = 0; });
+      i_ha.gradART.for_each_value([](real_type& x) { x = 0; });
+      i_ha.p_hiv_deaths_age_sex.for_each_value([](real_type& x) { x = 0; });
 
       run_disease_progression_and_mortality(hiv_step);
       run_new_p_infections(hiv_step);
@@ -159,7 +159,7 @@ struct AdultHivModelSimulation<Config> {
     const auto adult_incid_last_age_group = adult_incid_first_age_group + opts.pAG_INCIDPOP;
 
     for (int g = 0; g < NS; ++g) {
-      i_ha.hiv_negative_pop.setZero();
+      i_ha.hiv_negative_pop.for_each_value([](real_type& x) { x = 0; });
       i_ha.Xhivn_incagerr = 0.0;
 
       for (int a = adult_incid_first_age_group; a < pAG; ++a) {
@@ -256,10 +256,10 @@ struct AdultHivModelSimulation<Config> {
     for (int g = 0; g < NS; ++g) {
       i_ha.Xart_15plus = 0.0;
 
-      i_ha.artelig_hm.setZero();
+      i_ha.artelig_hm.for_each_value([](real_type& x) { x = 0; });
       i_ha.Xartelig_15plus = 0.0;
 
-      i_ha.expect_mort_artelig_hm.setZero();
+      i_ha.expect_mort_artelig_hm.for_each_value([](real_type& x) { x = 0; });
       i_ha.expect_mort_artelig15plus = 0.0;
 
       for (int ha = opts.hIDX_15PLUS; ha < hAG; ++ha) {

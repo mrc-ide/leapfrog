@@ -30,7 +30,9 @@ struct Leapfrog {
     State initial_state = {};
     initial_state.reset();
     if constexpr (ModelVariant::run_demographic_projection) {
-      initial_state.dp.p_total_pop = pars.dp.base_pop;
+      nda::for_all_indices(pars.dp.base_pop.shape(), [&](int i, int j) {
+        initial_state.dp.p_total_pop(i, j) = pars.dp.base_pop(i, j);
+      });
     }
 
     return run_model_from_state(pars, opts, initial_state, start_from_year, output_years);

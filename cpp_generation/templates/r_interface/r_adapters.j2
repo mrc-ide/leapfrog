@@ -61,15 +61,15 @@ struct {{ config.name }}Adapter<Language::R, real_type, ModelVariant> {
     };
   };
 
-  static Config::State get_initial_state(
-    const Rcpp::List &data
-  ) {
-    return {
-      {% for name, cfg in config.state.items() %}
-      .{{ name }} = {{ get_r_parse_data(cfg, name) }}{{ comma_except_last(loop) }}
-      {% endfor %}
-    };
-  };
+  // static Config::State get_initial_state(
+  //   const Rcpp::List &data
+  // ) {
+  //   return {
+  //     {% for name, cfg in config.state.items() %}
+  //     .{{ name }} = {{ get_r_parse_data(cfg, name) }}{{ comma_except_last(loop) }}
+  //     {% endfor %}
+  //   };
+  // };
 
   static constexpr int output_count = {{ dict_len(config.state) }};
 
