@@ -169,13 +169,14 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
     };
   };
 
-  static constexpr int output_count = 13;
+  static constexpr int output_count = 14;
 
   static int build_output(
     int index,
     const Config::OutputState& state,
     std::filesystem::path& output_dir
   ) {
+    serialize::serialize_tensor<real_type, 5>(state.hc_infections_coarse, output_dir / "hc_infections_coarse");
     serialize::serialize_tensor<real_type, 5>(state.hc1_hiv_pop, output_dir / "hc1_hiv_pop");
     serialize::serialize_tensor<real_type, 5>(state.hc2_hiv_pop, output_dir / "hc2_hiv_pop");
     serialize::serialize_tensor<real_type, 5>(state.hc1_art_pop, output_dir / "hc1_art_pop");

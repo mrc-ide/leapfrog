@@ -442,6 +442,7 @@ struct HcConfig {
   };
 
   struct State {
+    TFS<real_type, SS::hPS_agg, SS::hcTT, SS::hc1AG, SS::NS> hc_infections_coarse;
     TFS<real_type, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS> hc1_hiv_pop;
     TFS<real_type, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS> hc2_hiv_pop;
     TFS<real_type, SS::hTS, SS::hc1DS, SS::hc1AG, SS::NS> hc1_art_pop;
@@ -457,6 +458,7 @@ struct HcConfig {
     TFS<real_type, SS::hcTT, SS::hc1AG, SS::NS> infection_by_type;
 
     void reset() {
+      hc_infections_coarse.setZero();
       hc1_hiv_pop.setZero();
       hc2_hiv_pop.setZero();
       hc1_art_pop.setZero();
@@ -474,6 +476,7 @@ struct HcConfig {
   };
 
   struct OutputState {
+    T5<real_type> hc_infections_coarse;
     T5<real_type> hc1_hiv_pop;
     T5<real_type> hc2_hiv_pop;
     T5<real_type> hc1_art_pop;
@@ -489,6 +492,7 @@ struct HcConfig {
     T4<real_type> infection_by_type;
 
     OutputState(int output_years):
+      hc_infections_coarse(SS::hPS_agg, SS::hcTT, SS::hc1AG, SS::NS, output_years),
       hc1_hiv_pop(SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, output_years),
       hc2_hiv_pop(SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS, output_years),
       hc1_art_pop(SS::hTS, SS::hc1DS, SS::hc1AG, SS::NS, output_years),
@@ -503,6 +507,7 @@ struct HcConfig {
       ctx_need(output_years),
       infection_by_type(SS::hcTT, SS::hc1AG, SS::NS, output_years)
     {
+      hc_infections_coarse.setZero();
       hc1_hiv_pop.setZero();
       hc2_hiv_pop.setZero();
       hc1_art_pop.setZero();
@@ -519,6 +524,7 @@ struct HcConfig {
     };
 
     void save_state(const size_t i, const State &state) {
+      hc_infections_coarse.chip(i, hc_infections_coarse.NumDimensions - 1) = state.hc_infections_coarse;
       hc1_hiv_pop.chip(i, hc1_hiv_pop.NumDimensions - 1) = state.hc1_hiv_pop;
       hc2_hiv_pop.chip(i, hc2_hiv_pop.NumDimensions - 1) = state.hc2_hiv_pop;
       hc1_art_pop.chip(i, hc1_art_pop.NumDimensions - 1) = state.hc1_art_pop;
@@ -535,7 +541,7 @@ struct HcConfig {
     };
   };
 
-  static constexpr int output_count = 13;
+  static constexpr int output_count = 14;
   static int get_build_output_size(int prev_size) {
     return prev_size + output_count;
   };

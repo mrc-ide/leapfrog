@@ -86,7 +86,12 @@ In `StateSpace` struct
 | hTM      | hcTT     | Number of transmission types for the paediatric population     |
 | NA       | hc1AG    | Number of age groups in the 0-4 population                     |
 | NA       | hc2AG    | Number of age groups in the 5-14 population                    |
-| hBF       | hBF      | Number of 2 month breastfeeding durations                     |
+| hBF      | hBF      | Number of 2 month breastfeeding durations                      |
+|          | hPS_agg  | Number of maternal infection categories (6): Never on ART,     |
+|                        seroconversion during pregnancy,                              |
+|                        seroconversion during breastfeeding,                          |
+|                        on ART (LTFU by delivery),                                    | 
+|                        on ART (LTFU during breastfeeding), on ART (retained)         |
 
 ### Loop variable convention
 
@@ -200,6 +205,7 @@ In 5 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 |                  | hiv_births                 | Number of births to WLHIV by year                                                          |
 |                  | hc_art_need_init           | Children who are eligible for ART by CD4, transmsission, age, sex, and year                |
 |                  | hc_art_init                | Number of new ART initiates by five year age group.                                        |
+|                  | hc_infections_coarse       | Number of paediatric infections stratified by coarse maternal treatment category, timing of transmission, age, sex, and year
 
 
 ## Intermediate data

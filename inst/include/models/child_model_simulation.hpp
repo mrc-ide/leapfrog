@@ -501,6 +501,68 @@ struct ChildModelSimulation<Config> {
     }
   };
 
+  void perinatal_inf_by_source() {
+    const auto& p_hc = pars.hc;
+    auto& n_dp = state_next.dp;
+    auto& i_hc = intermediate.hc;
+    auto& n_hc = state_next.hc;
+
+    i_hc.births_sum = n_dp.births;
+
+    convert_PMTCT_num_to_perc();
+    adjust_option_A_B_tr();
+    calc_hiv_negative_pop();
+    i_hc.retained_on_ART = i_hc.PMTCT_coverage(4);
+    i_hc.retained_started_ART = i_hc.PMTCT_coverage(5);
+    i_hc.receiving_PMTCT = i_hc.PMTCT_coverage(0) + i_hc.PMTCT_coverage(1) +
+      i_hc.PMTCT_coverage(2) + i_hc.PMTCT_coverage(3) +
+      i_hc.retained_on_ART + i_hc.retained_started_ART +
+      i_hc.PMTCT_coverage(6);
+    i_hc.no_PMTCT = 1 - i_hc.receiving_PMTCT +
+      (i_hc.retained_on_ART / p_hc.PMTCT_dropout(0, t)) +
+      (i_hc.retained_started_ART / p_hc.PMTCT_dropout(1, t));
+    i_hc.no_PMTCT = std::max(i_hc.no_PMTCT, 0.0);
+
+    for (int s = 0; s < NS; ++s) {
+      //Never on ART
+      if (i_hc.num_wlhiv > 0) {
+        auto untreated_vertical_tr = i_hc.prop_wlhiv_lt200 * p_hc.vertical_transmission_rate(4, 0) +
+          i_hc.prop_wlhiv_200to350 * p_hc.vertical_transmission_rate(2, 0) +
+          i_hc.prop_wlhiv_gte350 * p_hc.vertical_transmission_rate(0, 0);
+
+        n_hc.hc_infections_coarse(0,0,0,s) = i_hc.no_PMTCT *  untreated_vertical_tr ;
+      }
+
+      //Transmission among women who seroconverted during pregnancy
+      if(i_hc.need_PMTCT > 0) {
+        n_hc.hc_infections_coarse(1,0,0,s)  += i_hc.perinatal_transmission_from_incidence / i_hc.need_PMTCT;
+      }
+
+      //on ART and LTFU by delivery
+      if (i_hc.num_wlhiv > 0) {
+        auto untreated_vertical_tr = i_hc.prop_wlhiv_lt200 * p_hc.vertical_transmission_rate(4, 0) +
+          i_hc.prop_wlhiv_200to350 * p_hc.vertical_transmission_rate(2, 0) +
+          i_hc.prop_wlhiv_gte350 * p_hc.vertical_transmission_rate(0, 0);
+
+        n_hc.hc_infections_coarse(3,0,0,s) =
+          ((i_hc.retained_on_ART / p_hc.PMTCT_dropout(0, t)) +
+          (i_hc.retained_started_ART / p_hc.PMTCT_dropout(1, t))) *
+          untreated_vertical_tr ;
+      }
+
+      //on ART and retained, including short-course ARVs as well
+      n_hc.hc_infections_coarse(5,0,0,s) = i_hc.PMTCT_coverage(0) * i_hc.optA_transmission_rate +
+                                           i_hc.PMTCT_coverage(1) * i_hc.optB_transmission_rate +
+                                           i_hc.PMTCT_coverage(2) * p_hc.PMTCT_transmission_rate(0, 2, 0) + // SDNVP
+                                           i_hc.PMTCT_coverage(3) * p_hc.PMTCT_transmission_rate(0, 3, 0) + //dual ARV
+                                           i_hc.retained_on_ART * p_hc.PMTCT_transmission_rate(0, 4, 0) +
+                                           i_hc.retained_started_ART * p_hc.PMTCT_transmission_rate(0, 5, 0) +
+                                           i_hc.PMTCT_coverage(6) * p_hc.PMTCT_transmission_rate(0, 6, 0);
+    } // end NS
+
+  };
+
+
   void maternal_incidence_in_bf_tr() {
     const auto& p_hc = pars.hc;
     auto& i_hc = intermediate.hc;
