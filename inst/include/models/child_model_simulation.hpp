@@ -501,7 +501,7 @@ struct ChildModelSimulation<Config> {
     }
   };
 
-  void perinatal_inf_by_source() {
+  void perinatal_inf_coarse() {
     const auto& p_hc = pars.hc;
     auto& n_dp = state_next.dp;
     auto& i_hc = intermediate.hc;
@@ -679,6 +679,9 @@ struct ChildModelSimulation<Config> {
         auto perinatal_births_by_sex = perinatal_transmission_births * p_dp.births_sex_prop(s, t);
         n_ha.p_infections(0, s) += perinatal_births_by_sex;
         n_hc.infection_by_type(0, 0, s) += perinatal_births_by_sex;
+        for (int hd = 0; hd < hPS_agg; ++hd) {
+          // n_hc.hc_infections_coarse(hp_agg,0,0,s) *= n_hc.hiv_births * p_dp.births_sex_prop(s, t);
+        }
       } // end NS
 
       // Breastfeeding transmission

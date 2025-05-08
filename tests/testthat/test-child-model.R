@@ -42,6 +42,13 @@ test_that("Model outputs are consistent", {
   expect_equal(strat, pop)
 
   ###############################
+  ##Infections stratified by infection type and maternal treatment are the same
+  ###############################
+  strat <- apply(out$infection_by_type, c(2,3,4), sum)
+  pop <- out$p_infections[1:5,,]
+  expect_equal(strat, pop)
+
+  ###############################
   ##Stratified deaths and population deaths should be the same
   ###############################
   ##p_hiv_deaths & hc1_art_aids_deaths, hc1_noart_aids_deaths, hc2_art_aids_deaths, hc2_noart_aids_deaths
