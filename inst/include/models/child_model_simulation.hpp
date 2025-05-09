@@ -571,6 +571,10 @@ struct ChildModelSimulation<Config> {
     auto& n_hc = state_next.hc;
 
     perinatal_inf_coarse();
+    convert_PMTCT_num_to_perc();
+    adjust_option_A_B_tr();
+    adjust_option_A_B_bf_tr();
+    convert_PMTCT_pre_bf();
     bf_inf_coarse(0,3,0);
 
   };
@@ -603,7 +607,6 @@ struct ChildModelSimulation<Config> {
   void run_bf_transmission_rate(int bf_start, int bf_end, int index) {
     const auto& p_hc = pars.hc;
     auto& i_hc = intermediate.hc;
-
     for (int bf = bf_start; bf < bf_end; bf++) {
       if (bf == 0) {
         // Perinatal transmission accounts for transmission up to 6 weeks, so we only use 1/4 of
@@ -659,8 +662,7 @@ struct ChildModelSimulation<Config> {
     const auto hPS_dropout_idx = (bf < 6) ? 4 : 5;
     const auto PMTCT_retention = 1 - p_hc.PMTCT_dropout(hPS_dropout_idx, t) * 2;
 
-    i_hc.percent_no_treatment_coarse(2) += 1 -
-      (1 - PMTCT_retention) *
+    i_hc.percent_no_treatment_coarse(2) += (1 - PMTCT_retention) *
       (i_hc.PMTCT_coverage(0) + //opt A
       i_hc.PMTCT_coverage(1) + //opt B
       i_hc.PMTCT_coverage(4) + //before pregnancy
@@ -678,9 +680,6 @@ struct ChildModelSimulation<Config> {
     const auto& p_hc = pars.hc;
     auto& i_hc = intermediate.hc;
     auto& n_hc = state_next.hc;
-
-    convert_PMTCT_num_to_perc();
-    convert_PMTCT_pre_bf();
 
     if(index == 0){
       i_hc.tt_idx = 1;
@@ -713,23 +712,23 @@ struct ChildModelSimulation<Config> {
       // i_hc.percent_no_treatment is the percentage of women who are still vulnerable to HIV transmission to their babies
       i_hc.percent_no_treatment_coarse(0) = 1 - i_hc.perinatal_transmission_rate_bf_calc;
       //Remove women who have already transmitted during pregnancy or earlier in breastfeeding
-      i_hc.percent_no_treatment_coarse(1) = i_hc.women_ltfu_preg;
-      i_hc.percent_no_treatment_coarse(1) -= (n_hc.hc_infections_coarse(3,0,0,0) + n_hc.hc_infections_coarse(3,0,0,1));
-      for (int bf = 1; bf < (i_hc.tt_idx + 1); ++bf) {
+      i_hc.percent_no_treatment_coarse(1) = i_hc.women_ltfu_preg - (n_hc.hc_infections_coarse(3,0,0,0) +
+                                                                    n_hc.hc_infections_coarse(3,0,0,1));
+      //only need to remove the VTR for one sex (here, males: 0)
+       for (int bfidx = 1; bfidx < (i_hc.tt_idx + 1); ++bfidx) {
         for (int a = 0; a < hc2_agestart; ++a) {
-          for (int s = 0; s < NS; ++s) {
-            for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
-              i_hc.percent_no_treatment_coarse(0) -= n_hc.hc_infections_coarse(hp_agg,bf,a,s);
-            }
-            i_hc.percent_no_treatment_coarse(2) -= n_hc.hc_infections_coarse(4,bf,a,s);
+            i_hc.percent_no_treatment_coarse(0) -= n_hc.hc_infections_coarse(0,bfidx,a,0);
+            i_hc.percent_no_treatment_coarse(0) -= n_hc.hc_infections_coarse(3,bfidx,a,0);
+            i_hc.percent_no_treatment_coarse(0) -= n_hc.hc_infections_coarse(4,bfidx,a,0);
+            i_hc.percent_no_treatment_coarse(0) -= n_hc.hc_infections_coarse(5,bfidx,a,0);
+            i_hc.percent_no_treatment_coarse(1) -= n_hc.hc_infections_coarse(3,bfidx,a,0);
+            i_hc.percent_no_treatment_coarse(2) -= n_hc.hc_infections_coarse(4,bfidx,a,0);
           }
         }
-      }
 
       for (int hp = 0; hp < hPS; hp++) {
         i_hc.percent_on_treatment = 0;
         i_hc.percent_no_treatment_coarse(0) -=  i_hc.PMTCT_coverage(hp);
-
         if (hp <= 1) continue;
 
         // sdnvp stratifies transmission by CD4, but spectrum only uses one
@@ -740,11 +739,13 @@ struct ChildModelSimulation<Config> {
         for (int s = 0; s < NS; ++s) {
           n_hc.hc_infections_coarse(5,i_hc.tt_idx,i_hc.age_idx,s)  += tr;
         }
+
       }
 
       // No treatment
       if (p_hc.breastfeeding_duration_no_art(bf, t) < 1) {
         i_hc.percent_no_treatment_coarse(0) = std::max(i_hc.percent_no_treatment_coarse(0), 0.0);
+
         //Remove the proportion of women that dropped out during pregnancy
         i_hc.percent_no_treatment_coarse(0) -= i_hc.percent_no_treatment_coarse(1);
         //Remove the proportion of women that dropped out during breastfeeding
@@ -767,7 +768,7 @@ struct ChildModelSimulation<Config> {
             2 * (1 - p_hc.breastfeeding_duration_no_art(bf, t));
           //women who dropped off ART during breastfeeding
           n_hc.hc_infections_coarse(4,i_hc.tt_idx,i_hc.age_idx,s) += i_hc.bf_scalar *
-            i_hc.percent_no_treatment_coarse(1) *
+            i_hc.percent_no_treatment_coarse(2) *
             untreated_vertical_bf_tr *
             2 * (1 - p_hc.breastfeeding_duration_no_art(bf, t));
         }
@@ -824,6 +825,8 @@ struct ChildModelSimulation<Config> {
       // Breastfeeding transmission
       // 0-6
       maternal_incidence_in_bf_tr();
+      convert_PMTCT_num_to_perc();
+      adjust_option_A_B_tr();
       adjust_option_A_B_bf_tr();
       convert_PMTCT_pre_bf();
       run_bf_transmission_rate(0, 3, 0);
@@ -847,6 +850,14 @@ struct ChildModelSimulation<Config> {
         } // end hc1DS
         n_ha.p_infections(0, s) += bf_hiv_by_sex;
         n_hc.infection_by_type(1, 0, s) += bf_hiv_by_sex;
+        for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+          if(hp_agg == 2){
+            n_hc.hc_infections_coarse(hp_agg,1,0,s) = (total_births - n_hc.hiv_births) * p_dp.births_sex_prop(s, t) *
+              i_hc.bf_incident_hiv_transmission_rate;
+          }else{
+            n_hc.hc_infections_coarse(hp_agg,1,0,s) *= n_hc.hiv_births * p_dp.births_sex_prop(s, t);
+          }
+        }
       } // end NS
 
       // 6-12

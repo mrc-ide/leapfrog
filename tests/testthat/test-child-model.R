@@ -50,6 +50,11 @@ test_that("Model outputs are consistent", {
   pop <- apply(out$hc_infections_coarse[,1,,,], c(3,4), sum)
   expect_equal(strat, pop)
 
+  ##BF 0-6
+  strat <- apply(out$infection_by_type[2,,,], c(2,3), sum)
+  pop <- apply(out$hc_infections_coarse[,2,,,], c(3,4), sum)
+  expect_equal(strat, pop)
+
   ###############################
   ##Stratified deaths and population deaths should be the same
   ###############################
