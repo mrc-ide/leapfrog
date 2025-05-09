@@ -44,8 +44,9 @@ test_that("Model outputs are consistent", {
   ###############################
   ##Infections stratified by infection type and maternal treatment are the same
   ###############################
-  strat <- apply(out$infection_by_type, c(2,3,4), sum)
-  pop <- out$p_infections[1:5,,]
+  ##Perinatal
+  strat <- apply(out$infection_by_type[1,,,], c(2,3), sum)
+  pop <- apply(out$hc_infections_coarse[,1,,,], c(3,4), sum)
   expect_equal(strat, pop)
 
   ###############################
