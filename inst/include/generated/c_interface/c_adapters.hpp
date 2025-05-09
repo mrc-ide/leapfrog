@@ -36,9 +36,7 @@ void write_data(const Eigen::Tensor<T, Rank>& tensor, T* output, int length, std
     throw std::invalid_argument(std::format("Output data '{}' is the wrong size. Received array of length '{}', expected '{}'.", name, totalSize, length));
   }
 
-  for (std::size_t i = 0; i < totalSize; ++i) {
-    output[i] = dataPtr[i];
-  }
+  std::copy(dataPtr, dataPtr + totalSize, output);
 }
 
 template<typename real_type, MV ModelVariant>
