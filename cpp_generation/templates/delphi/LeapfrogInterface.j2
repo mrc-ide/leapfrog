@@ -1,0 +1,63 @@
+{% include "header.j2" %}
+
+unit LeapfrogInterface;
+
+interface
+
+uses GBFixedArray;
+
+{% for config in configs %}
+{$ALIGN 8}
+type
+  Leapfrog{{ config.name }}Params = record
+  private
+    {% for name, cfg in config.pars.items() %}
+    {{ to_lower_camel_case(name) }}: {{ get_delphi_ptr_type(cfg) }};
+    {{ to_lower_camel_case(name) }}Length: Integer;
+    {% endfor %}
+  public
+    {% for name, cfg in config.pars.items() %}
+    procedure Set{{ to_camel_case(name) }}(var in{{ to_camel_case(name) }}: TGBFixedArray<{{ get_delphi_num_type(cfg) }}>);
+    {% endfor %}
+end;
+
+{$ALIGN 8}
+type
+  Leapfrog{{ config.name }}Out = record
+  private
+    {% for name, cfg in config.state.items() %}
+    {{ to_lower_camel_case(name) }}: {{ get_delphi_ptr_type(cfg) }};
+    {{ to_lower_camel_case(name) }}Length: Integer;
+    {% endfor %}
+  public
+    {% for name, cfg in config.state.items() %}
+    procedure Set{{ to_camel_case(name) }}(var in{{ to_camel_case(name) }}: TGBFixedArray<{{get_delphi_num_type(cfg)}}>);
+    {% endfor %}
+end;
+
+{% endfor %}
+type TCallbackFunction = procedure(Msg: PAnsiChar); stdcall;
+
+procedure LeapfrogRunDp(var params: LeapfrogDPParams; var leapfrogOut: LeapfrogDpOut; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_dp';
+
+implementation
+
+{% for config in configs %}
+{% for name, cfg in config.pars.items() %}
+procedure Leapfrog{{ config.name }}Params.Set{{ to_camel_case(name) }}(var in{{ to_camel_case(name) }}: TGBFixedArray<{{ get_delphi_num_type(cfg) }}>);
+begin
+  {{ to_lower_camel_case(name) }} := {{ get_delphi_ptr_type(cfg) }}(in{{ to_camel_case(name) }}.data);
+  {{ to_lower_camel_case(name) }}Length := in{{ to_camel_case(name) }}.GetLength();
+end;
+
+{% endfor %}
+{% for name, cfg in config.state.items() %}
+procedure Leapfrog{{ config.name }}Out.Set{{ to_camel_case(name) }}(var in{{ to_camel_case(name) }}: TGBFixedArray<{{ get_delphi_num_type(cfg) }}>);
+begin
+  {{ to_lower_camel_case(name) }} := {{ get_delphi_ptr_type(cfg) }}(in{{ to_camel_case(name) }}.data);
+  {{ to_lower_camel_case(name) }}Length := in{{ to_camel_case(name) }}.GetLength();
+end;
+
+{% endfor %}
+{% endfor %}
+end.

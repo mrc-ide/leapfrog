@@ -83,3 +83,25 @@ def get_num_type(cfg):
 
 def dict_len(dict):
   return len(dict.keys())
+
+
+def to_camel_case(snake_str):
+  return "".join(x.capitalize() for x in snake_str.lower().split("_"))
+
+
+def to_lower_camel_case(snake_str):
+  camel_string = to_camel_case(snake_str)
+  return snake_str[0].lower() + camel_string[1:]
+
+
+def get_delphi_ptr_type(cfg):
+  return 'P' + get_delphi_num_type(cfg)
+
+
+def get_delphi_num_type(cfg):
+  if cfg["num_type"] == 'real_type':
+    return 'Double'
+  elif cfg["num_type"] == 'int':
+    return 'Integer'
+  else:
+    raise Exception(f'Unknown type {cfg["num_type"]}, must be one of "real_type" or "int".')
