@@ -577,7 +577,8 @@ struct ChildModelSimulation<Config> {
     convert_PMTCT_pre_bf();
     bf_inf_coarse(0,3,0);
     bf_inf_coarse(3,6,1);
-
+    bf_inf_coarse(6,12,2);
+    bf_inf_coarse(12,hBF,3);
   };
 
   void maternal_incidence_in_bf_tr() {
@@ -906,6 +907,10 @@ struct ChildModelSimulation<Config> {
           n_ha.p_infections(2, s) += p_hc.hc1_cd4_dist(hd) * bf_hiv_transmission_24_plus;
           n_hc.infection_by_type(3, 2, s) += p_hc.hc1_cd4_dist(hd) * bf_hiv_transmission_24_plus;
         } // end hc1DS
+        for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+          n_hc.hc_infections_coarse(hp_agg,3,1,s) *= n_hc.hiv_births *  uninfected_prop_12_24;
+          n_hc.hc_infections_coarse(hp_agg,3,2,s) *= n_hc.hiv_births *  uninfected_prop_24_plus;
+        }
       } // end NS
     }
   };
