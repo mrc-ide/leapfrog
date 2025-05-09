@@ -38,7 +38,7 @@ struct {{ config.name }}Adapter<Language::Cpp, real_type, ModelVariant> {
     const Options<real_type> &opts
   ) {
     return {
-      {% for name, cfg in config.pars.items() %}
+      {% for name, cfg in config.pars.default.items() %}
       .{{ name }} = {{ get_cpp_read_data(name, cfg) }}{{ comma_except_last(loop) }}
       {% endfor %}
     };

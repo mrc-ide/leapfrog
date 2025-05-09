@@ -8,7 +8,10 @@
 #'   the simulation is run for. If output only 2030, simulation will be run
 #'   from `projection_start_year` passed in the `parameters` list.
 #'
-#' @return List of model outputs
+#' @return List of model outputs, where the last dimension of each element is
+#'   time, e.g. `p_total_pop` state variable has dimensions 81 x 2. If
+#'   `output_years` specified has length 61 then the `p_total_pop` output
+#'   will have dimensions 81 x 2 x 61.
 #' @export
 run_model <- function(parameters,
                       configuration = "HivFullAgeStratification",
@@ -30,7 +33,10 @@ run_model <- function(parameters,
 #'   the simulation is run for. If output only 2030, simulation will be run
 #'   from `projection_start_year` passed in the `parameters` list.
 #'
-#' @return List of model outputs
+#' @return List of model outputs, where the last dimension of each element is
+#'   time, e.g. `p_total_pop` state variable has dimensions 81 x 2. If
+#'   `output_years` specified has length 61 then the `p_total_pop` output
+#'   will have dimensions 81 x 2 x 61.
 #' @export
 run_model_from_state <- function(parameters,
                                  configuration,
@@ -50,7 +56,13 @@ run_model_from_state <- function(parameters,
 #' @param initial_state The model will run from this initial state
 #' @param start_from_year Start the model simulation from this year
 #'
-#' @return List of model outputs
+#' @return List of model outputs without the last time dimension.
+#'   This is different from [run_model_from_state()] and [run_model()]
+#'   that do include the last time dimension. Since only the next time
+#'   step is returned, dropping the time dimensions makes it easier to
+#'   feed the returned list into the next single year model run. In
+#'   contrast to [run_model_from_state()] the `p_total_pop` output will
+#'   have dimensions 81 x 2 not 81 x 2 x 61.
 #' @export
 run_model_single_year <- function(parameters,
                                   configuration,
@@ -63,20 +75,6 @@ run_model_single_year <- function(parameters,
 
 
 process_parameters <- function(parameters, configuration) {
-  if (configuration == "HivCoarseAgeStratification") {
-    parameters$hAG_SPAN <- parameters[["hAG_SPAN_coarse"]]
-    parameters$cd4_initdist <- parameters[["cd4_initdist_coarse"]]
-    parameters$cd4_prog <- parameters[["cd4_prog_coarse"]]
-    parameters$cd4_mort <- parameters[["cd4_mort_coarse"]]
-    parameters$art_mort <- parameters[["art_mort_coarse"]]
-  } else if (configuration %in% c("HivFullAgeStratification", "ChildModel")) {
-    parameters$hAG_SPAN <- parameters[["hAG_SPAN_full"]]
-    parameters$cd4_initdist <- parameters[["cd4_initdist_full"]]
-    parameters$cd4_prog <- parameters[["cd4_prog_full"]]
-    parameters$cd4_mort <- parameters[["cd4_mort_full"]]
-    parameters$art_mort <- parameters[["art_mort_full"]]
-  }
-
   # convert indices to 0 based
   if ("artcd4elig_idx" %in% names(parameters)) {
     # integer type
@@ -91,7 +89,7 @@ process_parameters <- function(parameters, configuration) {
   }
 
   if (is_run_hiv_simulation(configuration)) {
-    hTS <- dim(parameters[["art_mort"]])[[1]]
+    hTS <- dim(parameters[["artmx_timerr"]])[[1]]
     parameters[["h_art_stage_dur"]] <- rep(0.5, hTS - 1)
   }
   if (is.null(parameters[["hts_per_year"]])) {

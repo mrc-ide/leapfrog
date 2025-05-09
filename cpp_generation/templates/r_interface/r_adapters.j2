@@ -25,24 +25,6 @@ int* r_data(SEXP x) {
   return INTEGER(x);
 }
 
-template<typename T, typename... Args>
-auto parse_data(const Rcpp::List data, const std::string& key, Args... dims) {
-  constexpr std::size_t rank = sizeof...(dims);
-  Eigen::array<int, rank> dimensions{ static_cast<int>(dims)... };
-
-  int length = std::accumulate(dimensions.begin(), dimensions.end(), 1, std::multiplies<int>());
-  SEXP array_data = data[key];
-  // In cases where the input data has project years we might not use all of it model fit
-  // So we can take create a Map over a smaller slice of the data
-  // As long as this is true we can be confident we're not referencing invalid memory
-  if (LENGTH(array_data) < length) {
-    Rcpp::stop("Invalid size of data for '%s', expected %d got %d",
-               key,
-               length,
-               LENGTH(array_data));
-  }
-  return Eigen::TensorMap<Eigen::Tensor<T, rank>>(r_data<T>(array_data), static_cast<int>(dims)...);
-}
 
 {% for config in configs %}
 template<typename real_type, MV ModelVariant>
@@ -55,7 +37,7 @@ struct {{ config.name }}Adapter<Language::R, real_type, ModelVariant> {
     const Options<real_type> &opts
   ) {
     return {
-      {% for name, cfg in config.pars.items() %}
+      {% for name, cfg in config.pars.default.items() %}
       .{{ name }} = {{ get_r_parse_data(cfg) }}{{ comma_except_last(loop) }}
       {% endfor %}
     };
@@ -112,6 +94,79 @@ struct {{ config.name }}Adapter<Language::R, real_type, ModelVariant> {
   };
 };
 
+{% endfor %}
+
+{% for config in configs %}
+{% for override in config.pars.overrides %}
+template<typename real_type, MV ModelVariant>
+requires(ModelVariant::{{ override.applies_if }})
+struct {{ config.name }}Adapter<Language::R, real_type, ModelVariant> {
+  using SS = SSMixed<ModelVariant>;
+  using Config = {{ config.name }}Config<real_type, ModelVariant>;
+
+  static Config::Pars get_pars(
+    const Rcpp::List &data,
+    const Options<real_type> &opts
+  ) {
+    return {
+      {% for name, cfg in override.vars.items() %}
+      .{{ name }} = {{ get_r_parse_data(cfg) }}{{ comma_except_last(loop) }}
+      {% endfor %}
+    };
+  };
+
+  // static Config::State get_initial_state(
+  //  const Rcpp::List &data
+  //  {
+  //  return {
+  //    {% for name, cfg in config.state.items() %}
+  //    .{{ name }} = {{ get_r_parse_data(cfg, name) }}{{ comma_except_last(loop) }}
+  //    {% endfor %}
+  //  };
+  // };
+
+  static constexpr int output_count = {{ dict_len(config.state) }};
+
+  static int build_output(
+    int index,
+    const Config::OutputState& state,
+    Rcpp::List& ret,
+    Rcpp::CharacterVector& names,
+    const size_t& output_years
+  ) {
+    {% for name, cfg in config.state.items() %}
+    Rcpp::NumericVector r_{{ name }}({{ collapse_dims_with_trailing_sep(cfg, " * ") }}output_years);
+    r_{{ name }}.attr("dim") = Rcpp::IntegerVector::create({{ collapse_dims_with_trailing_sep(cfg) }}output_years);
+    std::copy_n(state.{{ name }}.data(), state.{{ name }}.size(), {{ get_r_internal_data_pointer(cfg) }}(r_{{ name }}));
+    names[index + {{ loop.index0 }}] = "{{ name }}";
+    ret[index + {{ loop.index0 }}] = r_{{ name }};
+    {% endfor %}
+    return index + output_count;
+  };
+
+  static int build_output_single_year(
+    int index,
+    const Config::State& state,
+    Rcpp::List& ret,
+    Rcpp::CharacterVector& names
+  ) {
+    {% for name, cfg in config.state.items() %}
+    {% if cfg.type == "scalar" %}
+    names[index + {{ loop.index0 }}] = "{{ name }}";
+    ret[index + {{ loop.index0 }}] = state.{{ name }};
+    {% else %}
+    Rcpp::NumericVector r_{{ name }}({{ collapse_dims(cfg, " * ") }});
+    r_{{ name }}.attr("dim") = Rcpp::IntegerVector::create({{ collapse_dims(cfg) }});
+    std::copy_n(state.{{ name }}.data(), state.{{ name }}.size(), {{ get_r_internal_data_pointer(cfg) }}(r_{{ name }}));
+    names[index + {{ loop.index0 }}] = "{{ name }}";
+    ret[index + {{ loop.index0 }}] = r_{{ name }};
+    {% endif %}
+    {% endfor %}
+    return index + output_count;
+  };
+};
+
+{% endfor %}
 {% endfor %}
 } // namespace internal
 } // namespace leapfrog

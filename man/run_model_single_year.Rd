@@ -22,7 +22,13 @@ run_model_single_year(
 \item{start_from_year}{Start the model simulation from this year}
 }
 \value{
-List of model outputs
+List of model outputs without the last time dimension.
+This is different from \code{\link[=run_model_from_state]{run_model_from_state()}} and \code{\link[=run_model]{run_model()}}
+that do include the last time dimension. Since only the next time
+step is returned, dropping the time dimensions makes it easier to
+feed the returned list into the next single year model run. In
+contrast to \code{\link[=run_model_from_state]{run_model_from_state()}} the \code{p_total_pop} output will
+have dimensions 81 x 2 not 81 x 2 x 61.
 }
 \description{
 Run leapfrog model fit for a single year

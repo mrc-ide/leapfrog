@@ -70,20 +70,41 @@ def add_output_year_dim(cfg):
     cfg["dims"].append("output_years")
 
 
+def apply_default_vars_to_overrides(dat, section):
+  overrides = dat[section].get("overrides")
+  if not overrides: return
+  
+  default_vars = dat[section]["default"]
+  for override in overrides:
+    override["vars"] = default_vars | override["vars"]
+
+
 dat = load_json("..", "modelSchemas", "FullModel.json")
 dat = { k: load_children_model_schemas(v) for k, v in dat.items() }
+for cfg in dat["configs"]:
+  apply_default_vars_to_overrides(cfg, "state_space")
+  apply_default_vars_to_overrides(cfg, "pars")
+
 
 for config in dat["configs"]:
   config["output_state"] = copy.deepcopy(config["state"])
-  for name, cfg in config["pars"].items():
+  for name, cfg in config["pars"]["default"].items():
     process_var_config(name, cfg, True)
+  if config["pars"].get("overrides"):
+      for override in config["pars"]["overrides"]:
+          for name, cfg in override["vars"].items():
+              process_var_config(name, cfg, True)
+
   for name, cfg in config["intermediate"].items():
     process_var_config(name, cfg)
+
   for name, cfg in config["state"].items():
     process_var_config(name, cfg)
+
   for name, cfg in config["output_state"].items():
     add_output_year_dim(cfg)
     process_var_config(name, cfg)
+
 
 
 file_loader = FileSystemLoader(relative_file_path("..", "templates"))

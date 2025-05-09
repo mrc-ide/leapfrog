@@ -37,6 +37,10 @@ struct AdultHivModelSimulation<Config> {
   static constexpr int MALE = SS::MALE;
   static constexpr int FEMALE = SS::FEMALE;
   static constexpr int ART0MOS = SS::ART0MOS;
+  static constexpr int p_idx_hiv_first_adult = SS::p_idx_hiv_first_adult;
+  static constexpr int adult_incidence_first_age_group = SS::adult_incidence_first_age_group;
+  static constexpr int pAG_INCIDPOP = SS::pAG_INCIDPOP;
+  static constexpr int hIDX_15PLUS = SS::hIDX_15PLUS;
 
   // function args
   int t;
@@ -103,8 +107,8 @@ struct AdultHivModelSimulation<Config> {
     const auto& c_ha = state_curr.ha;
     auto& i_ha = intermediate.ha;
 
-    const auto adult_incid_first_age_group = opts.adult_incidence_first_age_group;
-    const auto adult_incid_last_age_group = adult_incid_first_age_group + opts.pAG_INCIDPOP;
+    const auto adult_incid_first_age_group = adult_incidence_first_age_group;
+    const auto adult_incid_last_age_group = adult_incid_first_age_group + pAG_INCIDPOP;
 
     for (int g = 0; g < NS; ++g) {
       for (int a = adult_incid_first_age_group; a < adult_incid_last_age_group; ++a) {
@@ -155,8 +159,8 @@ struct AdultHivModelSimulation<Config> {
     auto& n_dp = state_next.dp;
     auto& i_ha = intermediate.ha;
 
-    const auto adult_incid_first_age_group = opts.adult_incidence_first_age_group;
-    const auto adult_incid_last_age_group = adult_incid_first_age_group + opts.pAG_INCIDPOP;
+    const auto adult_incid_first_age_group = adult_incidence_first_age_group;
+    const auto adult_incid_last_age_group = adult_incid_first_age_group + pAG_INCIDPOP;
 
     for (int g = 0; g < NS; ++g) {
       i_ha.hiv_negative_pop.for_each_value([](real_type& x) { x = 0; });
@@ -187,7 +191,7 @@ struct AdultHivModelSimulation<Config> {
     auto& i_ha = intermediate.ha;
 
     for (int g = 0; g < NS; g++) {
-      int a = opts.p_idx_hiv_first_adult;
+      int a = p_idx_hiv_first_adult;
       for (int ha = 0; ha < hAG; ++ha) {
         i_ha.p_infections_ha = 0.0;
         for (int i = 0; i < hAG_span[ha]; i++, a++) {
@@ -262,17 +266,17 @@ struct AdultHivModelSimulation<Config> {
       i_ha.expect_mort_artelig_hm.for_each_value([](real_type& x) { x = 0; });
       i_ha.expect_mort_artelig15plus = 0.0;
 
-      for (int ha = opts.hIDX_15PLUS; ha < hAG; ++ha) {
+      for (int ha = hIDX_15PLUS; ha < hAG; ++ha) {
         for (int hm = i_ha.everARTelig_idx; hm < hDS; ++hm) {
           if (hm >= i_ha.anyelig_idx) {
             // TODO: Implement special population ART eligibility
             real_type prop_elig = 1.0;
             real_type tmp_artelig = prop_elig * n_ha.h_hiv_adult(hm, ha, g);
-            i_ha.artelig_hahm(hm, ha - opts.hIDX_15PLUS) = tmp_artelig;
+            i_ha.artelig_hahm(hm, ha - hIDX_15PLUS) = tmp_artelig;
             i_ha.artelig_hm(hm) += tmp_artelig;
             i_ha.Xartelig_15plus += tmp_artelig;
 
-            real_type tmp_expect_mort = p_ha.cd4_mortality(hm, ha, g) * i_ha.artelig_hahm(hm, ha - opts.hIDX_15PLUS);
+            real_type tmp_expect_mort = p_ha.cd4_mortality(hm, ha, g) * i_ha.artelig_hahm(hm, ha - hIDX_15PLUS);
             i_ha.expect_mort_artelig_hm(hm) += tmp_expect_mort;
             i_ha.expect_mort_artelig15plus += tmp_expect_mort;
           }
@@ -362,13 +366,13 @@ struct AdultHivModelSimulation<Config> {
 
       // Step 2: within CD4 category, allocate ART by age proportional to
       // eligibility
-      for (int ha = opts.hIDX_15PLUS; ha < hAG; ++ha) {
+      for (int ha = hIDX_15PLUS; ha < hAG; ++ha) {
         for (int hm = i_ha.anyelig_idx; hm < hDS; ++hm) {
           if (i_ha.artelig_hm(hm) > 0.0) {
             i_ha.artinit_hahm = i_ha.artinit_hm(hm) *
-                                i_ha.artelig_hahm(hm, ha - opts.hIDX_15PLUS) /
+                                i_ha.artelig_hahm(hm, ha - hIDX_15PLUS) /
                                 i_ha.artelig_hm(hm);
-            i_ha.artinit_hahm = std::min(i_ha.artinit_hahm, i_ha.artelig_hahm(hm, ha - opts.hIDX_15PLUS));
+            i_ha.artinit_hahm = std::min(i_ha.artinit_hahm, i_ha.artelig_hahm(hm, ha - hIDX_15PLUS));
             i_ha.artinit_hahm = std::min(i_ha.artinit_hahm,
                                         n_ha.h_hiv_adult(hm, ha, g) + opts.dt * i_ha.grad(hm, ha, g));
             i_ha.grad(hm, ha, g) -= i_ha.artinit_hahm / opts.dt;
@@ -415,7 +419,7 @@ struct AdultHivModelSimulation<Config> {
 
     for (int g = 0; g < NS; ++g) {
       // sum HIV+ population size in each hivpop age group
-      int a = opts.p_idx_hiv_first_adult;
+      int a = p_idx_hiv_first_adult;
       for (int ha = 0; ha < hAG; ++ha) {
         i_ha.hivpop_ha(ha) = 0.0;
         for (int i = 0; i < hAG_span[ha]; ++i, ++a) {
@@ -424,7 +428,7 @@ struct AdultHivModelSimulation<Config> {
       }
 
       // remove hivdeaths proportionally to age-distribution within each age group
-      a = opts.p_idx_hiv_first_adult;
+      a = p_idx_hiv_first_adult;
       for (int ha = 0; ha < hAG; ++ha) {
         if (i_ha.hivpop_ha(ha) > 0) {
           i_ha.hivqx_ha = i_ha.p_hiv_deaths_age_sex(ha, g) / i_ha.hivpop_ha(ha);

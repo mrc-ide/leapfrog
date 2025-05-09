@@ -31,7 +31,6 @@ nda::array_ref<{{ cfg.num_type }}, shape_{{ name }}> {{ name }};
 #include <array/array.h>
 
 #include "state_space_mixer.hpp"
-#include "tensor_types.hpp"
 
 namespace leapfrog {
 namespace internal {
@@ -42,7 +41,7 @@ struct {{ config.name }}Config {
   using SS = SSMixed<ModelVariant>;
 
   struct Pars {
-    {% for name, cfg in config.pars.items() %}
+    {% for name, cfg in config.pars.default.items() %}
     {{ get_struct_member_def(name, cfg, False)|indent(4) }}
     {%- endfor %}
   };

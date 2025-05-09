@@ -87,6 +87,9 @@ In `StateSpace` struct
 | NA       | hc1AG    | Number of age groups in the 0-4 population                     |
 | NA       | hc2AG    | Number of age groups in the 5-14 population                    |
 | hBF       | hBF      | Number of 2 month breastfeeding durations                     |
+| pIDX_FERT | p_idx_fertility_first  | First age group index eligible for fertility    |
+| pAG_FERT  | p_fertility_age_groups | Number of ages eligible for fertility           |
+| pIDX_HIVADULT | p_idx_hiv_first_adult  | Index of the first age group to be considered an adult |
 
 ### Loop variable convention
 
@@ -106,9 +109,6 @@ In `Options` struct. Some of these come from data, some are static, some are an 
 | Leapfrog           | Frogger                | Details                                                |
 |--------------------|------------------------|--------------------------------------------------------|
 | hiv_steps_per_year | hts_per_year           | Number of HIV model time steps per year                |
-| pIDX_FERT          | p_idx_fertility_first  | First age group index eligible for fertility           |
-| pAG_FERT           | p_fertility_age_groups | Number of ages eligible for fertility                  |
-| pIDX_HIVADULT      | p_idx_hiv_first_adult  | Index of the first age group to be considered an adult |
 | t_ART_start        | ts_art_start           | Time step to start modelling ART                       |
 | NA                 | run_child_model        | Whether the paediatric model should be run             |
 

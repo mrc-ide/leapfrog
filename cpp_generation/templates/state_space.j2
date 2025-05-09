@@ -13,7 +13,7 @@ namespace internal {
 
 template<MV ModelVariant>
 struct {{ config.name }}SS {
-  {% for name, val in config.state_space.default.vars.items() %}
+  {% for name, val in config.state_space.default.items() %}
   static constexpr {{ get_member_type(val) }} {{ name }} = {{ get_member_value(val) }};
   {% endfor %}
 };

@@ -4,39 +4,39 @@
   "enable_if": "run_demographic_projection",
   "state_space": {
     "default": {
-      "vars": {
-        "NS": 2,
-        "pAG": 81
-      }
+      "NS": 2,
+      "pAG": 81
     }
   },
   "pars": {
-    "base_pop": {
-      "dims": ["SS::pAG", "SS::NS"],
-      "alias": {
-        "r": "basepop"
+    "default": {
+      "base_pop": {
+        "dims": ["SS::pAG", "SS::NS"],
+        "alias": {
+          "r": "basepop"
+        }
+      },
+      "survival_probability": {
+        "dims": ["SS::pAG + 1", "SS::NS", "opts.proj_time_steps"],
+        "alias": {
+          "r": "Sx"
+        }
+      },
+      "net_migration": {
+        "dims": ["SS::pAG", "SS::NS", "opts.proj_time_steps"],
+        "alias": {
+          "r": "netmigr_adj"
+        }
+      },
+      "age_specific_fertility_rate": {
+        "dims": ["SS::p_fertility_age_groups", "opts.proj_time_steps"],
+        "alias": {
+          "r": "asfr"
+        }
+      },
+      "births_sex_prop": {
+        "dims": ["SS::NS", "opts.proj_time_steps"]
       }
-    },
-    "survival_probability": {
-      "dims": ["SS::pAG + 1", "SS::NS", "opts.proj_time_steps"],
-      "alias": {
-        "r": "Sx"
-      }
-    },
-    "net_migration": {
-      "dims": ["SS::pAG", "SS::NS", "opts.proj_time_steps"],
-      "alias": {
-        "r": "netmigr_adj"
-      }
-    },
-    "age_specific_fertility_rate": {
-      "dims": ["opts.p_fertility_age_groups", "opts.proj_time_steps"],
-      "alias": {
-        "r": "asfr"
-      }
-    },
-    "births_sex_prop": {
-      "dims": ["SS::NS", "opts.proj_time_steps"]
     }
   },
   "intermediate": {
