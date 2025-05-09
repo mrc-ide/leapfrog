@@ -576,6 +576,7 @@ struct ChildModelSimulation<Config> {
     adjust_option_A_B_bf_tr();
     convert_PMTCT_pre_bf();
     bf_inf_coarse(0,3,0);
+    bf_inf_coarse(3,6,1);
 
   };
 
@@ -869,6 +870,9 @@ struct ChildModelSimulation<Config> {
         } // end hc1DS
         n_ha.p_infections(0, s) += bf_hiv_by_sex;
         n_hc.infection_by_type(2, 0, s) += bf_hiv_by_sex;
+        for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+          n_hc.hc_infections_coarse(hp_agg,2,0,s) *= n_hc.hiv_births * p_dp.births_sex_prop(s, t);
+        }
       } // end NS
 
       // 12 plus
