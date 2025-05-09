@@ -1,3 +1,5 @@
+testthat::skip("standalone model disabled until new file format is in frogger")
+
 test_that("We can compile the standalone program", {
   skip_for_compilation()
   skip_on_os("windows")
