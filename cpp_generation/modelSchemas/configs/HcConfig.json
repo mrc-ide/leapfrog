@@ -668,6 +668,11 @@
       "type": "scalar",
       "num_type": "real_type"
     },
+    "percent_no_treatment_coarse": {
+      "type": "TFS",
+      "num_type": "real_type",
+      "dims": ["3"]
+    },
     "bf_scalar": {
       "type": "scalar",
       "num_type": "real_type"
@@ -676,6 +681,22 @@
       "type": "TFS",
       "num_type": "real_type",
       "dims": ["3"]
+    },
+    "women_never_art": {
+      "type": "scalar",
+      "num_type": "real_type"
+    },
+    "women_ltfu_preg": {
+      "type": "scalar",
+      "num_type": "real_type"
+    },
+    "age_idx": {
+      "type": "scalar",
+      "num_type": "real_type"
+    },
+    "tt_idx": {
+      "type": "scalar",
+      "num_type": "real_type"
     }
   },
   "state": {

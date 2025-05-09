@@ -367,8 +367,13 @@ struct HcConfig {
     real_type bf_incident_hiv_transmission_rate;
     real_type percent_no_treatment;
     real_type percent_on_treatment;
+    TFS<real_type, 3> percent_no_treatment_coarse;
     real_type bf_scalar;
     TFS<real_type, 3> ctx_mean;
+    real_type women_never_art;
+    real_type women_ltfu_preg;
+    real_type age_idx;
+    real_type tt_idx;
 
     Intermediate() {};
 
@@ -436,8 +441,13 @@ struct HcConfig {
       bf_incident_hiv_transmission_rate = 0;
       percent_no_treatment = 0;
       percent_on_treatment = 0;
+      percent_no_treatment_coarse.setZero();
       bf_scalar = 0;
       ctx_mean.setZero();
+      women_never_art = 0;
+      women_ltfu_preg = 0;
+      age_idx = 0;
+      tt_idx = 0;
     };
   };
 

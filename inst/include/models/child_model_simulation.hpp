@@ -521,6 +521,9 @@ struct ChildModelSimulation<Config> {
       (((i_hc.retained_on_ART / p_hc.PMTCT_dropout(0, t)) - i_hc.retained_on_ART) +
       ((i_hc.retained_started_ART / p_hc.PMTCT_dropout(1, t)) - i_hc.retained_started_ART));
     i_hc.no_PMTCT = std::max(i_hc.no_PMTCT, 0.0);
+    i_hc.women_never_art = i_hc.no_PMTCT;
+    i_hc.women_ltfu_preg =  (((i_hc.retained_on_ART / p_hc.PMTCT_dropout(0, t)) - i_hc.retained_on_ART) +
+      ((i_hc.retained_started_ART / p_hc.PMTCT_dropout(1, t)) - i_hc.retained_started_ART));
 
     for (int s = 0; s < NS; ++s) {
       //Never on ART
@@ -568,6 +571,7 @@ struct ChildModelSimulation<Config> {
     auto& n_hc = state_next.hc;
 
     perinatal_inf_coarse();
+    bf_inf_coarse(0,3,0);
 
   };
 
@@ -647,6 +651,130 @@ struct ChildModelSimulation<Config> {
       }
     }
   };
+
+  void bf_dropout_coarse(int bf) {
+    const auto& p_hc = pars.hc;
+    auto& i_hc = intermediate.hc;
+
+    const auto hPS_dropout_idx = (bf < 6) ? 4 : 5;
+    const auto PMTCT_retention = 1 - p_hc.PMTCT_dropout(hPS_dropout_idx, t) * 2;
+
+    i_hc.percent_no_treatment_coarse(2) += 1 -
+      (1 - PMTCT_retention) *
+      (i_hc.PMTCT_coverage(0) + //opt A
+      i_hc.PMTCT_coverage(1) + //opt B
+      i_hc.PMTCT_coverage(4) + //before pregnancy
+      i_hc.PMTCT_coverage(5) + //>4 weeks
+      i_hc.PMTCT_coverage(6)); //<4 weeks
+
+    i_hc.PMTCT_coverage(0) *= PMTCT_retention; //opt A
+    i_hc.PMTCT_coverage(1) *= PMTCT_retention; //opt B
+    i_hc.PMTCT_coverage(4) *= PMTCT_retention; //before pregnancy
+    i_hc.PMTCT_coverage(5) *= PMTCT_retention; //>4 weeks
+    i_hc.PMTCT_coverage(6) *= PMTCT_retention; //<4 weeks
+  };
+
+  void bf_inf_coarse(int bf_start, int bf_end, int index) {
+    const auto& p_hc = pars.hc;
+    auto& i_hc = intermediate.hc;
+    auto& n_hc = state_next.hc;
+
+    convert_PMTCT_num_to_perc();
+    convert_PMTCT_pre_bf();
+
+    if(index == 0){
+      i_hc.tt_idx = 1;
+      i_hc.age_idx = 0;
+    }
+    if(index == 1){
+      i_hc.tt_idx = 2;
+      i_hc.age_idx = 0;
+    }
+    if(index == 2){
+      i_hc.tt_idx = 3;
+      i_hc.age_idx = 1;
+    }
+    if(index == 3){
+      i_hc.tt_idx = 3;
+      i_hc.age_idx = 2;
+    }
+    for (int bf = bf_start; bf < bf_end; bf++) {
+      if (bf == 0) {
+        // Perinatal transmission accounts for transmission up to 6 weeks, so we only use 1/4 of
+        // transmission from the first breastfeeding period
+        i_hc.bf_scalar = 0.25;
+      } else {
+        i_hc.bf_scalar = 1.0;
+        // dropout only occurs after the first month of breastfeeding
+        bf_dropout_coarse(bf);
+      }
+
+      // i_hc.perinatal_transmission_rate_bf_calc is the transmission that has already occurred due to perinatal transmission
+      // i_hc.percent_no_treatment is the percentage of women who are still vulnerable to HIV transmission to their babies
+      i_hc.percent_no_treatment_coarse(0) = 1 - i_hc.perinatal_transmission_rate_bf_calc;
+      //Remove women who have already transmitted during pregnancy or earlier in breastfeeding
+      i_hc.percent_no_treatment_coarse(1) = i_hc.women_ltfu_preg;
+      i_hc.percent_no_treatment_coarse(1) -= (n_hc.hc_infections_coarse(3,0,0,0) + n_hc.hc_infections_coarse(3,0,0,1));
+      for (int bf = 1; bf < (i_hc.tt_idx + 1); ++bf) {
+        for (int a = 0; a < hc2_agestart; ++a) {
+          for (int s = 0; s < NS; ++s) {
+            for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+              i_hc.percent_no_treatment_coarse(0) -= n_hc.hc_infections_coarse(hp_agg,bf,a,s);
+            }
+            i_hc.percent_no_treatment_coarse(2) -= n_hc.hc_infections_coarse(4,bf,a,s);
+          }
+        }
+      }
+
+      for (int hp = 0; hp < hPS; hp++) {
+        i_hc.percent_on_treatment = 0;
+        i_hc.percent_no_treatment_coarse(0) -=  i_hc.PMTCT_coverage(hp);
+
+        if (hp <= 1) continue;
+
+        // sdnvp stratifies transmission by CD4, but spectrum only uses one
+        const auto hDS_idx = (hp == 2) ? 0 : 4;
+        auto tr = i_hc.PMTCT_coverage(hp) * p_hc.PMTCT_transmission_rate(hDS_idx, hp, 1) *
+          2 * (1 - p_hc.breastfeeding_duration_art(bf, t)) * i_hc.bf_scalar;
+        i_hc.PMTCT_coverage(hp) -= tr;
+        for (int s = 0; s < NS; ++s) {
+          n_hc.hc_infections_coarse(5,i_hc.tt_idx,i_hc.age_idx,s)  += tr;
+        }
+      }
+
+      // No treatment
+      if (p_hc.breastfeeding_duration_no_art(bf, t) < 1) {
+        i_hc.percent_no_treatment_coarse(0) = std::max(i_hc.percent_no_treatment_coarse(0), 0.0);
+        //Remove the proportion of women that dropped out during pregnancy
+        i_hc.percent_no_treatment_coarse(0) -= i_hc.percent_no_treatment_coarse(1);
+        //Remove the proportion of women that dropped out during breastfeeding
+        i_hc.percent_no_treatment_coarse(0) -= i_hc.percent_no_treatment_coarse(2);
+
+        for (int s = 0; s < NS; ++s) {
+          auto untreated_vertical_bf_tr = i_hc.prop_wlhiv_lt200 * p_hc.vertical_transmission_rate(4, 1) +
+            i_hc.prop_wlhiv_200to350 * p_hc.vertical_transmission_rate(2, 1) +
+            i_hc.prop_wlhiv_gte350 * p_hc.vertical_transmission_rate(0, 1);
+
+          //women who have never been on ART
+          n_hc.hc_infections_coarse(0,i_hc.tt_idx,i_hc.age_idx,s) += i_hc.bf_scalar *
+            i_hc.percent_no_treatment_coarse(0) *
+            untreated_vertical_bf_tr *
+            2 * (1 - p_hc.breastfeeding_duration_no_art(bf, t));
+          //women who dropped off ART during pregnancy
+          n_hc.hc_infections_coarse(3,i_hc.tt_idx,i_hc.age_idx,s) += i_hc.bf_scalar *
+            i_hc.percent_no_treatment_coarse(1) *
+            untreated_vertical_bf_tr *
+            2 * (1 - p_hc.breastfeeding_duration_no_art(bf, t));
+          //women who dropped off ART during breastfeeding
+          n_hc.hc_infections_coarse(4,i_hc.tt_idx,i_hc.age_idx,s) += i_hc.bf_scalar *
+            i_hc.percent_no_treatment_coarse(1) *
+            untreated_vertical_bf_tr *
+            2 * (1 - p_hc.breastfeeding_duration_no_art(bf, t));
+        }
+      }
+    }
+  };
+
 
   void nosocomial_infections() {
     const auto& p_hc = pars.hc;
