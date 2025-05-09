@@ -1,0 +1,32 @@
+{% from "template_utils.j2" import comma_except_last %}
+{% include "header.j2" %}
+
+#pragma once
+
+namespace leapfrog {
+namespace internal {
+
+#pragma pack(push, 8)
+
+{% for config in configs %}
+template<typename real_type>
+struct {{ config.name }}Params {
+  {% for name, cfg in config.pars.items() %}
+  {{ get_num_type(cfg) }}* {{ name }};
+  int {{ name }}_length;
+  {% endfor %}
+};
+
+template<typename real_type>
+struct {{ config.name }}Out {
+  {% for name, cfg in config.state.items() %}
+  {{ get_num_type(cfg) }}* {{ name }};
+  int {{ name }}_length;
+  {% endfor %}
+};
+
+{% endfor %}
+#pragma pack(pop)
+
+} // namespace internal
+} // namespace leapfrog

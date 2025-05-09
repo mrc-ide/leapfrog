@@ -20,11 +20,15 @@ namespace internal {
 template<typename T, typename... Args>
 auto read_data(T* data, int length, std::string_view name, Args... dims) {
   constexpr std::size_t rank = sizeof...(dims);
-  const auto size = (dims * ...);
-  if (length != size) {
-    throw std::invalid_argument(std::format("Input data '{}' is the wrong size. Received array of length '{}', expected '{}'.", name, size, length));
+  if constexpr (rank == 0) {
+    return data;
+  } else {
+    const auto size = (dims * ...);
+    if (length != size) {
+        throw std::invalid_argument(std::format("Input data '{}' is the wrong size. Received array of length '{}', expected '{}'.", name, size, length));
+    }
+    return Eigen::TensorMap<Eigen::Tensor<T, rank>>(data, dims...);
   }
-  return Eigen::TensorMap<Eigen::Tensor<T, rank>>(data, dims...);
 }
 
 template<typename T, int Rank>
@@ -45,7 +49,7 @@ struct DpAdapter<Language::C, real_type, ModelVariant> {
   using Config = DpConfig<real_type, ModelVariant>;
 
   static Config::Pars get_pars(
-    const DpParams &params,
+    const DpParams<real_type> &params,
     const Options<real_type> &opts
   ) {
     return {
@@ -62,7 +66,7 @@ struct DpAdapter<Language::C, real_type, ModelVariant> {
   static int build_output(
     int index,
     const Config::OutputState& state,
-    DpOut& out
+    DpOut<real_type>& out
   ) {
     write_data<real_type, 3>(state.p_total_pop, out.p_total_pop, out.p_total_pop_length, "p_total_pop");
     write_data<real_type, 3>(state.p_total_pop_natural_deaths, out.p_total_pop_natural_deaths, out.p_total_pop_natural_deaths_length, "p_total_pop_natural_deaths");
@@ -76,37 +80,46 @@ struct HaAdapter<Language::C, real_type, ModelVariant> {
   using SS = SSMixed<ModelVariant>;
   using Config = HaConfig<real_type, ModelVariant>;
 
-  // static Config::Pars get_pars(
-  //   const DpParams &params,
-  //   const Options<real_type> &opts
-  // ) {
-  //   return {
-  //     .total_rate = read_data<real_type>(params.total_rate, opts.proj_time_steps),
-  //     .relative_risk_age = read_data<real_type>(params.relative_risk_age, SS::pAG - opts.p_idx_hiv_first_adult, SS::NS, opts.proj_time_steps),
-  //     .relative_risk_sex = read_data<real_type>(params.relative_risk_sex, opts.proj_time_steps),
-  //     .cd4_mortality = read_data<real_type>(params.cd4_mortality, SS::hDS, SS::hAG, SS::NS),
-  //     .cd4_progression = read_data<real_type>(params.cd4_progression, SS::hDS - 1, SS::hAG, SS::NS),
-  //     .cd4_initial_distribution = read_data<real_type>(params.cd4_initial_distribution, SS::hDS, SS::hAG, SS::NS),
-  //     .scale_cd4_mortality = read_data<int>(params.scale_cd4_mortality),
-  //     .idx_hm_elig = read_data<int>(params.idx_hm_elig, opts.proj_time_steps),
-  //     .mortality = read_data<real_type>(params.mortality, SS::hTS, SS::hDS, SS::hAG, SS::NS),
-  //     .mortality_time_rate_ratio = read_data<real_type>(params.mortality_time_rate_ratio, SS::hTS, opts.proj_time_steps),
-  //     .dropout_recover_cd4 = read_data<int>(params.dropout_recover_cd4),
-  //     .dropout_rate = read_data<real_type>(params.dropout_rate, opts.proj_time_steps),
-  //     .adults_on_art = read_data<real_type>(params.adults_on_art, SS::NS, opts.proj_time_steps),
-  //     .adults_on_art_is_percent = read_data<int>(params.adults_on_art_is_percent, SS::NS, opts.proj_time_steps),
-  //     .h_art_stage_dur = read_data<real_type>(params.h_art_stage_dur, SS::hTS - 1),
-  //     .initiation_mortality_weight = read_data<real_type>(params.initiation_mortality_weight)
-  //   };
-  // };
+  static Config::Pars get_pars(
+    const HaParams<real_type> &params,
+    const Options<real_type> &opts
+  ) {
+    return {
+      .total_rate = read_data<real_type>(params.total_rate, params.total_rate_length, "total_rate", opts.proj_time_steps),
+      .relative_risk_age = read_data<real_type>(params.relative_risk_age, params.relative_risk_age_length, "relative_risk_age", SS::pAG - opts.p_idx_hiv_first_adult, SS::NS, opts.proj_time_steps),
+      .relative_risk_sex = read_data<real_type>(params.relative_risk_sex, params.relative_risk_sex_length, "relative_risk_sex", opts.proj_time_steps),
+      .cd4_mortality = read_data<real_type>(params.cd4_mortality, params.cd4_mortality_length, "cd4_mortality", SS::hDS, SS::hAG, SS::NS),
+      .cd4_progression = read_data<real_type>(params.cd4_progression, params.cd4_progression_length, "cd4_progression", SS::hDS - 1, SS::hAG, SS::NS),
+      .cd4_initial_distribution = read_data<real_type>(params.cd4_initial_distribution, params.cd4_initial_distribution_length, "cd4_initial_distribution", SS::hDS, SS::hAG, SS::NS),
+      .scale_cd4_mortality = read_data<int>(params.scale_cd4_mortality, params.scale_cd4_mortality_length, "scale_cd4_mortality"),
+      .idx_hm_elig = read_data<int>(params.idx_hm_elig, params.idx_hm_elig_length, "idx_hm_elig", opts.proj_time_steps),
+      .mortality = read_data<real_type>(params.mortality, params.mortality_length, "mortality", SS::hTS, SS::hDS, SS::hAG, SS::NS),
+      .mortality_time_rate_ratio = read_data<real_type>(params.mortality_time_rate_ratio, params.mortality_time_rate_ratio_length, "mortality_time_rate_ratio", SS::hTS, opts.proj_time_steps),
+      .dropout_recover_cd4 = read_data<int>(params.dropout_recover_cd4, params.dropout_recover_cd4_length, "dropout_recover_cd4"),
+      .dropout_rate = read_data<real_type>(params.dropout_rate, params.dropout_rate_length, "dropout_rate", opts.proj_time_steps),
+      .adults_on_art = read_data<real_type>(params.adults_on_art, params.adults_on_art_length, "adults_on_art", SS::NS, opts.proj_time_steps),
+      .adults_on_art_is_percent = read_data<int>(params.adults_on_art_is_percent, params.adults_on_art_is_percent_length, "adults_on_art_is_percent", SS::NS, opts.proj_time_steps),
+      .h_art_stage_dur = read_data<real_type>(params.h_art_stage_dur, params.h_art_stage_dur_length, "h_art_stage_dur", SS::hTS - 1),
+      .initiation_mortality_weight = read_data<real_type>(params.initiation_mortality_weight, params.initiation_mortality_weight_length, "initiation_mortality_weight")
+    };
+  };
 
   static constexpr int output_count = 9;
 
   static int build_output(
     int index,
     const Config::OutputState& state,
-    DpOut& out
+    HaOut<real_type>& out
   ) {
+    write_data<real_type, 3>(state.p_hiv_pop, out.p_hiv_pop, out.p_hiv_pop_length, "p_hiv_pop");
+    write_data<real_type, 3>(state.p_hiv_pop_natural_deaths, out.p_hiv_pop_natural_deaths, out.p_hiv_pop_natural_deaths_length, "p_hiv_pop_natural_deaths");
+    write_data<real_type, 4>(state.h_hiv_adult, out.h_hiv_adult, out.h_hiv_adult_length, "h_hiv_adult");
+    write_data<real_type, 5>(state.h_art_adult, out.h_art_adult, out.h_art_adult_length, "h_art_adult");
+    write_data<real_type, 4>(state.h_hiv_deaths_no_art, out.h_hiv_deaths_no_art, out.h_hiv_deaths_no_art_length, "h_hiv_deaths_no_art");
+    write_data<real_type, 3>(state.p_infections, out.p_infections, out.p_infections_length, "p_infections");
+    write_data<real_type, 5>(state.h_hiv_deaths_art, out.h_hiv_deaths_art, out.h_hiv_deaths_art_length, "h_hiv_deaths_art");
+    write_data<real_type, 4>(state.h_art_initiation, out.h_art_initiation, out.h_art_initiation_length, "h_art_initiation");
+    write_data<real_type, 3>(state.p_hiv_deaths, out.p_hiv_deaths, out.p_hiv_deaths_length, "p_hiv_deaths");
     return index + output_count;
   };
 };
@@ -116,67 +129,80 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
   using SS = SSMixed<ModelVariant>;
   using Config = HcConfig<real_type, ModelVariant>;
 
-  // static Config::Pars get_pars(
-  //   const DpParams &params,
-  //   const Options<real_type> &opts
-  // ) {
-  //   return {
-  //     .hc_nosocomial = read_data<real_type>(params.hc_nosocomial, opts.proj_time_steps),
-  //     .hc1_cd4_dist = read_data<real_type>(params.hc1_cd4_dist, SS::hc2DS),
-  //     .hc_cd4_transition = read_data<real_type>(params.hc_cd4_transition, SS::hc2DS, SS::hc1DS),
-  //     .hc1_cd4_mort = read_data<real_type>(params.hc1_cd4_mort, SS::hc1DS, SS::hcTT, SS::hc1AG),
-  //     .hc2_cd4_mort = read_data<real_type>(params.hc2_cd4_mort, SS::hc2DS, SS::hcTT, SS::hc2AG),
-  //     .hc1_cd4_prog = read_data<real_type>(params.hc1_cd4_prog, SS::hc1DS, SS::hc1AG_c, SS::NS),
-  //     .hc2_cd4_prog = read_data<real_type>(params.hc2_cd4_prog, SS::hc2DS, SS::hc2AG_c, SS::NS),
-  //     .ctx_val = read_data<real_type>(params.ctx_val, opts.proj_time_steps),
-  //     .hc_art_elig_age = read_data<int>(params.hc_art_elig_age, opts.proj_time_steps),
-  //     .hc_art_elig_cd4 = read_data<real_type>(params.hc_art_elig_cd4, opts.p_idx_hiv_first_adult, opts.proj_time_steps),
-  //     .hc_art_mort_rr = read_data<real_type>(params.hc_art_mort_rr, SS::hTS, opts.p_idx_hiv_first_adult, opts.proj_time_steps),
-  //     .hc1_art_mort = read_data<real_type>(params.hc1_art_mort, SS::hc1DS, SS::hTS, SS::hc1AG),
-  //     .hc2_art_mort = read_data<real_type>(params.hc2_art_mort, SS::hc2DS, SS::hTS, SS::hc2AG),
-  //     .hc_art_isperc = read_data<int>(params.hc_art_isperc, opts.proj_time_steps),
-  //     .hc_art_val = read_data<real_type>(params.hc_art_val, SS::hcAG_coarse, opts.proj_time_steps),
-  //     .hc_art_init_dist = read_data<real_type>(params.hc_art_init_dist, opts.p_idx_hiv_first_adult, opts.proj_time_steps),
-  //     .adult_cd4_dist = read_data<real_type>(params.adult_cd4_dist, SS::hDS, SS::hc2DS),
-  //     .fert_mult_by_age = read_data<real_type>(params.fert_mult_by_age, opts.p_fertility_age_groups),
-  //     .fert_mult_off_art = read_data<real_type>(params.fert_mult_off_art, SS::hDS),
-  //     .fert_mult_on_art = read_data<real_type>(params.fert_mult_on_art, opts.p_fertility_age_groups),
-  //     .total_fertility_rate = read_data<real_type>(params.total_fertility_rate, opts.proj_time_steps),
-  //     .PMTCT = read_data<real_type>(params.PMTCT, SS::hPS, opts.proj_time_steps),
-  //     .vertical_transmission_rate = read_data<real_type>(params.vertical_transmission_rate, SS::hDS + 1, SS::hVT),
-  //     .PMTCT_transmission_rate = read_data<real_type>(params.PMTCT_transmission_rate, SS::hDS, SS::hPS, SS::hVT),
-  //     .PMTCT_dropout = read_data<real_type>(params.PMTCT_dropout, SS::hPS_dropout, opts.proj_time_steps),
-  //     .PMTCT_input_is_percent = read_data<int>(params.PMTCT_input_is_percent, opts.proj_time_steps),
-  //     .breastfeeding_duration_art = read_data<real_type>(params.breastfeeding_duration_art, SS::hBF, opts.proj_time_steps),
-  //     .breastfeeding_duration_no_art = read_data<real_type>(params.breastfeeding_duration_no_art, SS::hBF, opts.proj_time_steps),
-  //     .mat_hiv_births = read_data<real_type>(params.mat_hiv_births, opts.proj_time_steps),
-  //     .mat_prev_input = read_data<int>(params.mat_prev_input, opts.proj_time_steps),
-  //     .prop_lt200 = read_data<real_type>(params.prop_lt200, opts.proj_time_steps),
-  //     .prop_gte350 = read_data<real_type>(params.prop_gte350, opts.proj_time_steps),
-  //     .incrate = read_data<real_type>(params.incrate, opts.proj_time_steps),
-  //     .ctx_val_is_percent = read_data<int>(params.ctx_val_is_percent, opts.proj_time_steps),
-  //     .hc_art_is_age_spec = read_data<int>(params.hc_art_is_age_spec, opts.proj_time_steps),
-  //     .hc_age_coarse = read_data<real_type>(params.hc_age_coarse, SS::hcAG_end),
-  //     .abortion = read_data<real_type>(params.abortion, SS::hAB_ind, opts.proj_time_steps),
-  //     .patients_reallocated = read_data<real_type>(params.patients_reallocated, opts.proj_time_steps),
-  //     .hc_art_ltfu = read_data<real_type>(params.hc_art_ltfu, opts.proj_time_steps),
-  //     .hc_age_coarse_cd4 = read_data<int>(params.hc_age_coarse_cd4, opts.p_idx_hiv_first_adult),
-  //     .adult_female_infections = read_data<real_type>(params.adult_female_infections, opts.p_fertility_age_groups, opts.proj_time_steps),
-  //     .adult_female_hivnpop = read_data<real_type>(params.adult_female_hivnpop, opts.p_fertility_age_groups, opts.proj_time_steps),
-  //     .total_births = read_data<real_type>(params.total_births, opts.proj_time_steps),
-  //     .ctx_effect = read_data<real_type>(params.ctx_effect, 3),
-  //     .hc_art_start = read_data<real_type>(params.hc_art_start),
-  //     .local_adj_factor = read_data<real_type>(params.local_adj_factor)
-  //   };
-  // };
+  static Config::Pars get_pars(
+    const HcParams<real_type> &params,
+    const Options<real_type> &opts
+  ) {
+    return {
+      .hc_nosocomial = read_data<real_type>(params.hc_nosocomial, params.hc_nosocomial_length, "hc_nosocomial", opts.proj_time_steps),
+      .hc1_cd4_dist = read_data<real_type>(params.hc1_cd4_dist, params.hc1_cd4_dist_length, "hc1_cd4_dist", SS::hc2DS),
+      .hc_cd4_transition = read_data<real_type>(params.hc_cd4_transition, params.hc_cd4_transition_length, "hc_cd4_transition", SS::hc2DS, SS::hc1DS),
+      .hc1_cd4_mort = read_data<real_type>(params.hc1_cd4_mort, params.hc1_cd4_mort_length, "hc1_cd4_mort", SS::hc1DS, SS::hcTT, SS::hc1AG),
+      .hc2_cd4_mort = read_data<real_type>(params.hc2_cd4_mort, params.hc2_cd4_mort_length, "hc2_cd4_mort", SS::hc2DS, SS::hcTT, SS::hc2AG),
+      .hc1_cd4_prog = read_data<real_type>(params.hc1_cd4_prog, params.hc1_cd4_prog_length, "hc1_cd4_prog", SS::hc1DS, SS::hc1AG_c, SS::NS),
+      .hc2_cd4_prog = read_data<real_type>(params.hc2_cd4_prog, params.hc2_cd4_prog_length, "hc2_cd4_prog", SS::hc2DS, SS::hc2AG_c, SS::NS),
+      .ctx_val = read_data<real_type>(params.ctx_val, params.ctx_val_length, "ctx_val", opts.proj_time_steps),
+      .hc_art_elig_age = read_data<int>(params.hc_art_elig_age, params.hc_art_elig_age_length, "hc_art_elig_age", opts.proj_time_steps),
+      .hc_art_elig_cd4 = read_data<real_type>(params.hc_art_elig_cd4, params.hc_art_elig_cd4_length, "hc_art_elig_cd4", opts.p_idx_hiv_first_adult, opts.proj_time_steps),
+      .hc_art_mort_rr = read_data<real_type>(params.hc_art_mort_rr, params.hc_art_mort_rr_length, "hc_art_mort_rr", SS::hTS, opts.p_idx_hiv_first_adult, opts.proj_time_steps),
+      .hc1_art_mort = read_data<real_type>(params.hc1_art_mort, params.hc1_art_mort_length, "hc1_art_mort", SS::hc1DS, SS::hTS, SS::hc1AG),
+      .hc2_art_mort = read_data<real_type>(params.hc2_art_mort, params.hc2_art_mort_length, "hc2_art_mort", SS::hc2DS, SS::hTS, SS::hc2AG),
+      .hc_art_isperc = read_data<int>(params.hc_art_isperc, params.hc_art_isperc_length, "hc_art_isperc", opts.proj_time_steps),
+      .hc_art_val = read_data<real_type>(params.hc_art_val, params.hc_art_val_length, "hc_art_val", SS::hcAG_coarse, opts.proj_time_steps),
+      .hc_art_init_dist = read_data<real_type>(params.hc_art_init_dist, params.hc_art_init_dist_length, "hc_art_init_dist", opts.p_idx_hiv_first_adult, opts.proj_time_steps),
+      .adult_cd4_dist = read_data<real_type>(params.adult_cd4_dist, params.adult_cd4_dist_length, "adult_cd4_dist", SS::hDS, SS::hc2DS),
+      .fert_mult_by_age = read_data<real_type>(params.fert_mult_by_age, params.fert_mult_by_age_length, "fert_mult_by_age", opts.p_fertility_age_groups),
+      .fert_mult_off_art = read_data<real_type>(params.fert_mult_off_art, params.fert_mult_off_art_length, "fert_mult_off_art", SS::hDS),
+      .fert_mult_on_art = read_data<real_type>(params.fert_mult_on_art, params.fert_mult_on_art_length, "fert_mult_on_art", opts.p_fertility_age_groups),
+      .total_fertility_rate = read_data<real_type>(params.total_fertility_rate, params.total_fertility_rate_length, "total_fertility_rate", opts.proj_time_steps),
+      .PMTCT = read_data<real_type>(params.PMTCT, params.PMTCT_length, "PMTCT", SS::hPS, opts.proj_time_steps),
+      .vertical_transmission_rate = read_data<real_type>(params.vertical_transmission_rate, params.vertical_transmission_rate_length, "vertical_transmission_rate", SS::hDS + 1, SS::hVT),
+      .PMTCT_transmission_rate = read_data<real_type>(params.PMTCT_transmission_rate, params.PMTCT_transmission_rate_length, "PMTCT_transmission_rate", SS::hDS, SS::hPS, SS::hVT),
+      .PMTCT_dropout = read_data<real_type>(params.PMTCT_dropout, params.PMTCT_dropout_length, "PMTCT_dropout", SS::hPS_dropout, opts.proj_time_steps),
+      .PMTCT_input_is_percent = read_data<int>(params.PMTCT_input_is_percent, params.PMTCT_input_is_percent_length, "PMTCT_input_is_percent", opts.proj_time_steps),
+      .breastfeeding_duration_art = read_data<real_type>(params.breastfeeding_duration_art, params.breastfeeding_duration_art_length, "breastfeeding_duration_art", SS::hBF, opts.proj_time_steps),
+      .breastfeeding_duration_no_art = read_data<real_type>(params.breastfeeding_duration_no_art, params.breastfeeding_duration_no_art_length, "breastfeeding_duration_no_art", SS::hBF, opts.proj_time_steps),
+      .mat_hiv_births = read_data<real_type>(params.mat_hiv_births, params.mat_hiv_births_length, "mat_hiv_births", opts.proj_time_steps),
+      .mat_prev_input = read_data<int>(params.mat_prev_input, params.mat_prev_input_length, "mat_prev_input", opts.proj_time_steps),
+      .prop_lt200 = read_data<real_type>(params.prop_lt200, params.prop_lt200_length, "prop_lt200", opts.proj_time_steps),
+      .prop_gte350 = read_data<real_type>(params.prop_gte350, params.prop_gte350_length, "prop_gte350", opts.proj_time_steps),
+      .incrate = read_data<real_type>(params.incrate, params.incrate_length, "incrate", opts.proj_time_steps),
+      .ctx_val_is_percent = read_data<int>(params.ctx_val_is_percent, params.ctx_val_is_percent_length, "ctx_val_is_percent", opts.proj_time_steps),
+      .hc_art_is_age_spec = read_data<int>(params.hc_art_is_age_spec, params.hc_art_is_age_spec_length, "hc_art_is_age_spec", opts.proj_time_steps),
+      .hc_age_coarse = read_data<real_type>(params.hc_age_coarse, params.hc_age_coarse_length, "hc_age_coarse", SS::hcAG_end),
+      .abortion = read_data<real_type>(params.abortion, params.abortion_length, "abortion", SS::hAB_ind, opts.proj_time_steps),
+      .patients_reallocated = read_data<real_type>(params.patients_reallocated, params.patients_reallocated_length, "patients_reallocated", opts.proj_time_steps),
+      .hc_art_ltfu = read_data<real_type>(params.hc_art_ltfu, params.hc_art_ltfu_length, "hc_art_ltfu", opts.proj_time_steps),
+      .hc_age_coarse_cd4 = read_data<int>(params.hc_age_coarse_cd4, params.hc_age_coarse_cd4_length, "hc_age_coarse_cd4", opts.p_idx_hiv_first_adult),
+      .adult_female_infections = read_data<real_type>(params.adult_female_infections, params.adult_female_infections_length, "adult_female_infections", opts.p_fertility_age_groups, opts.proj_time_steps),
+      .adult_female_hivnpop = read_data<real_type>(params.adult_female_hivnpop, params.adult_female_hivnpop_length, "adult_female_hivnpop", opts.p_fertility_age_groups, opts.proj_time_steps),
+      .total_births = read_data<real_type>(params.total_births, params.total_births_length, "total_births", opts.proj_time_steps),
+      .ctx_effect = read_data<real_type>(params.ctx_effect, params.ctx_effect_length, "ctx_effect", 3),
+      .hc_art_start = read_data<real_type>(params.hc_art_start, params.hc_art_start_length, "hc_art_start"),
+      .local_adj_factor = read_data<real_type>(params.local_adj_factor, params.local_adj_factor_length, "local_adj_factor")
+    };
+  };
 
   static constexpr int output_count = 13;
 
   static int build_output(
     int index,
     const Config::OutputState& state,
-    DpOut& out
+    HcOut<real_type>& out
   ) {
+    write_data<real_type, 5>(state.hc1_hiv_pop, out.hc1_hiv_pop, out.hc1_hiv_pop_length, "hc1_hiv_pop");
+    write_data<real_type, 5>(state.hc2_hiv_pop, out.hc2_hiv_pop, out.hc2_hiv_pop_length, "hc2_hiv_pop");
+    write_data<real_type, 5>(state.hc1_art_pop, out.hc1_art_pop, out.hc1_art_pop_length, "hc1_art_pop");
+    write_data<real_type, 5>(state.hc2_art_pop, out.hc2_art_pop, out.hc2_art_pop_length, "hc2_art_pop");
+    write_data<real_type, 5>(state.hc1_noart_aids_deaths, out.hc1_noart_aids_deaths, out.hc1_noart_aids_deaths_length, "hc1_noart_aids_deaths");
+    write_data<real_type, 5>(state.hc2_noart_aids_deaths, out.hc2_noart_aids_deaths, out.hc2_noart_aids_deaths_length, "hc2_noart_aids_deaths");
+    write_data<real_type, 5>(state.hc1_art_aids_deaths, out.hc1_art_aids_deaths, out.hc1_art_aids_deaths_length, "hc1_art_aids_deaths");
+    write_data<real_type, 5>(state.hc2_art_aids_deaths, out.hc2_art_aids_deaths, out.hc2_art_aids_deaths_length, "hc2_art_aids_deaths");
+    write_data<real_type, 2>(state.hc_art_init, out.hc_art_init, out.hc_art_init_length, "hc_art_init");
+    write_data<real_type, 5>(state.hc_art_need_init, out.hc_art_need_init, out.hc_art_need_init_length, "hc_art_need_init");
+    write_data<real_type, 1>(state.hiv_births, out.hiv_births, out.hiv_births_length, "hiv_births");
+    write_data<real_type, 1>(state.ctx_need, out.ctx_need, out.ctx_need_length, "ctx_need");
+    write_data<real_type, 4>(state.infection_by_type, out.infection_by_type, out.infection_by_type_length, "infection_by_type");
     return index + output_count;
   };
 };

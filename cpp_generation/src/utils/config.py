@@ -47,6 +47,17 @@ def get_cpp_read_data(name, cfg):
     return f'read_data<{cfg["num_type"]}>(input_dir, "{name}", {collapse_dims(cfg)})'
 
 
+def get_c_read_data(name, cfg):
+  if cfg["type"] == "scalar":
+    return f'read_data<{cfg["num_type"]}>(params.{name}, params.{name}_length, "{name}")'
+  else:
+    return f'read_data<{cfg["num_type"]}>(params.{name}, params.{name}_length, "{name}", {collapse_dims(cfg)})'
+
+
+def get_c_write_data(name, cfg):
+  return f'write_data<{cfg["num_type"]}, {dim_len(cfg) + 1}>(state.{name}, out.{name}, out.{name}_length, "{name}");'
+
+
 def get_reset(name, cfg):
   if cfg["type"] == "scalar":
     return f'{name} = {cfg.get("default") or 0}'

@@ -12,7 +12,7 @@
 
 typedef void (WINAPI *CallbackFunction)(const char*);
 
-DllExport HRESULT WINAPI run_dp(leapfrog::internal::DpParams& data, leapfrog::internal::DpOut& out, CallbackFunction error_handler) {
+DllExport HRESULT WINAPI run_dp(leapfrog::internal::DpParams<double>& data, leapfrog::internal::DpOut<double>& out, CallbackFunction error_handler) {
   #pragma EXPORT
 
   using LF = leapfrog::Leapfrog<leapfrog::C, double, leapfrog::DemographicProjection>;
