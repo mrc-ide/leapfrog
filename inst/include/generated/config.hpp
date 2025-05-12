@@ -323,8 +323,11 @@ struct HcConfig {
     TFS<real_type, SS::hcAG_coarse> hc_adj;
     TFS<real_type, SS::hcAG_coarse> hc_art_deaths;
     TFS<real_type, SS::hDS, SS::hcTT, SS::hcAG_end, SS::NS> hc_hiv_dist;
+    TFS<real_type, SS::hPS_agg, SS::hDS, SS::hcTT, SS::hcAG_end, SS::NS> hc_hiv_dist_strat;
     TFS<real_type, SS::hDS,  SS::hcAG_end, SS::NS> hc_hiv_total;
+    TFS<real_type, SS::hPS_agg, SS::hDS,  SS::hcAG_end, SS::NS> hc_hiv_total_strat;
     TFS<real_type, SS::hDS, SS::hcTT, SS::hcAG_end, SS::NS> art_ltfu_grad;
+    TFS<real_type, SS::hPS_agg, SS::hDS, SS::hcTT, SS::hcAG_end, SS::NS> art_ltfu_grad_strat;
     TFS<real_type, SS::hAG, SS::NS> p_hiv_neg_pop;
     TFS<real_type, SS::hPS> PMTCT_coverage;
     TFS<real_type, SS::hBF_coarse> bf_transmission_rate;
@@ -400,8 +403,11 @@ struct HcConfig {
       hc_adj.setZero();
       hc_art_deaths.setZero();
       hc_hiv_dist.setZero();
+      hc_hiv_dist_strat.setZero();
       hc_hiv_total.setZero();
+      hc_hiv_total_strat.setZero();
       art_ltfu_grad.setZero();
+      art_ltfu_grad_strat.setZero();
       p_hiv_neg_pop.setZero();
       PMTCT_coverage.setZero();
       bf_transmission_rate.setZero();
@@ -464,7 +470,9 @@ struct HcConfig {
     TFS<real_type, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS> hc2_hiv_pop;
     TFS<real_type, SS::hPS_agg, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS> hc2_hiv_pop_strat;
     TFS<real_type, SS::hTS, SS::hc1DS, SS::hc1AG, SS::NS> hc1_art_pop;
+    TFS<real_type, SS::hPS_agg, SS::hTS, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS> hc1_art_pop_strat;
     TFS<real_type, SS::hTS, SS::hc2DS, SS::hc2AG, SS::NS> hc2_art_pop;
+    TFS<real_type, SS::hPS_agg, SS::hTS, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS> hc2_art_pop_strat;
     TFS<real_type, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS> hc1_noart_aids_deaths;
     TFS<real_type, SS::hPS_agg, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS> hc1_noart_aids_deaths_strat;
     TFS<real_type, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS> hc2_noart_aids_deaths;
@@ -485,7 +493,9 @@ struct HcConfig {
       hc2_hiv_pop.setZero();
       hc2_hiv_pop_strat.setZero();
       hc1_art_pop.setZero();
+      hc1_art_pop_strat.setZero();
       hc2_art_pop.setZero();
+      hc2_art_pop_strat.setZero();
       hc1_noart_aids_deaths.setZero();
       hc1_noart_aids_deaths_strat.setZero();
       hc2_noart_aids_deaths.setZero();
@@ -508,7 +518,9 @@ struct HcConfig {
     T5<real_type> hc2_hiv_pop;
     T6<real_type> hc2_hiv_pop_strat;
     T5<real_type> hc1_art_pop;
+    T7<real_type> hc1_art_pop_strat;
     T5<real_type> hc2_art_pop;
+    T7<real_type> hc2_art_pop_strat;
     T5<real_type> hc1_noart_aids_deaths;
     T6<real_type> hc1_noart_aids_deaths_strat;
     T5<real_type> hc2_noart_aids_deaths;
@@ -529,7 +541,9 @@ struct HcConfig {
       hc2_hiv_pop(SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS, output_years),
       hc2_hiv_pop_strat(SS::hPS_agg, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS, output_years),
       hc1_art_pop(SS::hTS, SS::hc1DS, SS::hc1AG, SS::NS, output_years),
+      hc1_art_pop_strat(SS::hPS_agg, SS::hTS, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, output_years),
       hc2_art_pop(SS::hTS, SS::hc2DS, SS::hc2AG, SS::NS, output_years),
+      hc2_art_pop_strat(SS::hPS_agg, SS::hTS, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS, output_years),
       hc1_noart_aids_deaths(SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, output_years),
       hc1_noart_aids_deaths_strat(SS::hPS_agg, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, output_years),
       hc2_noart_aids_deaths(SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS, output_years),
@@ -549,7 +563,9 @@ struct HcConfig {
       hc2_hiv_pop.setZero();
       hc2_hiv_pop_strat.setZero();
       hc1_art_pop.setZero();
+      hc1_art_pop_strat.setZero();
       hc2_art_pop.setZero();
+      hc2_art_pop_strat.setZero();
       hc1_noart_aids_deaths.setZero();
       hc1_noart_aids_deaths_strat.setZero();
       hc2_noart_aids_deaths.setZero();
@@ -571,7 +587,9 @@ struct HcConfig {
       hc2_hiv_pop.chip(i, hc2_hiv_pop.NumDimensions - 1) = state.hc2_hiv_pop;
       hc2_hiv_pop_strat.chip(i, hc2_hiv_pop_strat.NumDimensions - 1) = state.hc2_hiv_pop_strat;
       hc1_art_pop.chip(i, hc1_art_pop.NumDimensions - 1) = state.hc1_art_pop;
+      hc1_art_pop_strat.chip(i, hc1_art_pop_strat.NumDimensions - 1) = state.hc1_art_pop_strat;
       hc2_art_pop.chip(i, hc2_art_pop.NumDimensions - 1) = state.hc2_art_pop;
+      hc2_art_pop_strat.chip(i, hc2_art_pop_strat.NumDimensions - 1) = state.hc2_art_pop_strat;
       hc1_noart_aids_deaths.chip(i, hc1_noart_aids_deaths.NumDimensions - 1) = state.hc1_noart_aids_deaths;
       hc1_noart_aids_deaths_strat.chip(i, hc1_noart_aids_deaths_strat.NumDimensions - 1) = state.hc1_noart_aids_deaths_strat;
       hc2_noart_aids_deaths.chip(i, hc2_noart_aids_deaths.NumDimensions - 1) = state.hc2_noart_aids_deaths;
@@ -587,7 +605,7 @@ struct HcConfig {
     };
   };
 
-  static constexpr int output_count = 19;
+  static constexpr int output_count = 21;
   static int get_build_output_size(int prev_size) {
     return prev_size + output_count;
   };

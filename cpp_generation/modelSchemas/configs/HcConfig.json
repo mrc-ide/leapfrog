@@ -490,15 +490,30 @@
       "num_type": "real_type",
       "dims": ["SS::hDS", "SS::hcTT", "SS::hcAG_end", "SS::NS"]
     },
+    "hc_hiv_dist_strat": {
+      "type": "TFS",
+      "num_type": "real_type",
+      "dims": ["SS::hPS_agg", "SS::hDS", "SS::hcTT", "SS::hcAG_end", "SS::NS"]
+    },
     "hc_hiv_total": {
       "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hDS", " SS::hcAG_end", "SS::NS"]
     },
+    "hc_hiv_total_strat": {
+      "type": "TFS",
+      "num_type": "real_type",
+      "dims": ["SS::hPS_agg", "SS::hDS", " SS::hcAG_end", "SS::NS"]
+    },
     "art_ltfu_grad": {
       "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hDS", "SS::hcTT", "SS::hcAG_end", "SS::NS"]
+    },
+    "art_ltfu_grad_strat": {
+      "type": "TFS",
+      "num_type": "real_type",
+      "dims": ["SS::hPS_agg", "SS::hDS", "SS::hcTT", "SS::hcAG_end", "SS::NS"]
     },
     "p_hiv_neg_pop": {
       "type": "TFS",
@@ -745,10 +760,20 @@
       "num_type": "real_type",
       "dims": ["SS::hTS", "SS::hc1DS", "SS::hc1AG", "SS::NS"]
     },
+    "hc1_art_pop_strat": {
+      "type": "TFS",
+      "num_type": "real_type",
+      "dims": ["SS::hPS_agg", "SS::hTS", "SS::hc1DS", "SS::hcTT", "SS::hc1AG", "SS::NS"]
+    },
     "hc2_art_pop": {
       "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hTS", "SS::hc2DS", "SS::hc2AG", "SS::NS"]
+    },
+    "hc2_art_pop_strat": {
+      "type": "TFS",
+      "num_type": "real_type",
+      "dims": ["SS::hPS_agg", "SS::hTS", "SS::hc2DS", "SS::hcTT", "SS::hc2AG", "SS::NS"]
     },
     "hc1_noart_aids_deaths": {
       "type": "TFS",

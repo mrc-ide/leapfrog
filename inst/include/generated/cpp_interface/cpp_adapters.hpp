@@ -169,7 +169,7 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
     };
   };
 
-  static constexpr int output_count = 19;
+  static constexpr int output_count = 21;
 
   static int build_output(
     int index,
@@ -182,7 +182,9 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
     serialize::serialize_tensor<real_type, 5>(state.hc2_hiv_pop, output_dir / "hc2_hiv_pop");
     serialize::serialize_tensor<real_type, 6>(state.hc2_hiv_pop_strat, output_dir / "hc2_hiv_pop_strat");
     serialize::serialize_tensor<real_type, 5>(state.hc1_art_pop, output_dir / "hc1_art_pop");
+    serialize::serialize_tensor<real_type, 7>(state.hc1_art_pop_strat, output_dir / "hc1_art_pop_strat");
     serialize::serialize_tensor<real_type, 5>(state.hc2_art_pop, output_dir / "hc2_art_pop");
+    serialize::serialize_tensor<real_type, 7>(state.hc2_art_pop_strat, output_dir / "hc2_art_pop_strat");
     serialize::serialize_tensor<real_type, 5>(state.hc1_noart_aids_deaths, output_dir / "hc1_noart_aids_deaths");
     serialize::serialize_tensor<real_type, 6>(state.hc1_noart_aids_deaths_strat, output_dir / "hc1_noart_aids_deaths_strat");
     serialize::serialize_tensor<real_type, 5>(state.hc2_noart_aids_deaths, output_dir / "hc2_noart_aids_deaths");

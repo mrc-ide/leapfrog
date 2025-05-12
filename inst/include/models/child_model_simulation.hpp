@@ -1590,7 +1590,78 @@ struct ChildModelSimulation<Config> {
         } // end hc1DS
       } // end a
     } // end NS
+
+    art_ltfu_strat();
+
   };
+
+  void art_ltfu_strat() {
+    const auto& p_hc = pars.hc;
+    auto& n_hc = state_next.hc;
+    auto& i_hc = intermediate.hc;
+    //Note: this could just be done by using the distribution that is
+    //now explicit in the hc1/2_art_pop, however I want to retain an exact match to spectrum
+    for (int s = 0; s < NS; ++s) {
+      for (int a = 0; a < opts.p_idx_fertility_first; ++a) {
+        for (int hd = 0; hd < hc1DS; ++hd) {
+          for (int cat = 0; cat < hcTT; ++cat) {
+            for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+              if (a < hc2_agestart) {
+                i_hc.hc_hiv_total_strat(hp_agg, hd, a, s) += n_hc.hc1_hiv_pop_strat(hp_agg, hd, cat, a, s);
+              } else if (hd < hc2DS) {
+                i_hc.hc_hiv_total_strat(hp_agg, hd, a, s) += n_hc.hc2_hiv_pop_strat(hp_agg, hd, cat, a - hc2_agestart, s);
+              }
+            }
+          } // end hcTT
+        } // end hc1DS
+      } // end a
+    } // end NS
+
+    for (int s = 0; s <NS; ++s) {
+      for (int a = 0; a < opts.p_idx_fertility_first; ++a) {
+        for (int hd = 0; hd < hc1DS; ++hd) {
+          for (int cat = 0; cat < hcTT; ++cat) {
+            for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+            if (a < hc2_agestart) {
+              i_hc.hc_hiv_dist_strat(hp_agg, hd, cat, a, s) += n_hc.hc1_hiv_pop_strat(hp_agg, hd, cat, a, s) / i_hc.hc_hiv_total_strat(hp_agg, hd, a, s);
+            } else if (hd < hc2DS) {
+              i_hc.hc_hiv_dist_strat(hp_agg, hd, cat, a, s) += n_hc.hc2_hiv_pop_strat(hp_agg, hd, cat, a - hc2_agestart, s) / i_hc.hc_hiv_total_strat(hp_agg, hd, a, s);
+            }
+            }
+          } // end hcTT
+        } // end hc1DS
+      } // end a
+    } // end NS
+
+    for (int s = 0; s < NS; ++s) {
+      for (int a = 0; a < opts.p_idx_fertility_first; ++a) {
+        for (int hd = 0; hd < hc1DS; ++hd) {
+          for (int cat = 0; cat < hcTT; ++cat) {
+            for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+            if (a < hc2_agestart) {
+              auto ltfu_grad = (n_hc.hc1_art_pop_strat(hp_agg, 2, hd, cat, a, s) + n_hc.hc1_art_pop_strat(hp_agg, 0, hd, cat, a, s)) *
+                p_hc.hc_art_ltfu(t);
+              if (i_hc.hc_hiv_total(hd, a, s) > 0) {
+                i_hc.art_ltfu_grad_strat(hp_agg, hd, cat, a, s) += ltfu_grad * i_hc.hc_hiv_dist_strat(hp_agg, hd, cat, a, s);
+              } else {
+                i_hc.art_ltfu_grad_strat(hp_agg, hd, cat, a, s) += ltfu_grad * 0.25;
+              }
+            } else if (hd < hc2DS) {
+              auto ltfu_grad = (n_hc.hc2_art_pop_strat(hp_agg, 2, hd, cat, a - hc2_agestart, s) + n_hc.hc2_art_pop_strat(hp_agg, 0, cat, hd, a - hc2_agestart, s)) *
+                p_hc.hc_art_ltfu(t);
+              if (i_hc.hc_hiv_total(hd, a, s) > 0) {
+                i_hc.art_ltfu_grad_strat(hp_agg, hd, cat, a, s) += ltfu_grad * i_hc.hc_hiv_dist_strat(hp_agg, hd, cat, a, s);
+              } else {
+                i_hc.art_ltfu_grad_strat(hp_agg, hd, cat, a, s) += ltfu_grad * 0.25;
+              }
+            }
+            }
+          } // end hcTT
+        } // end hc1DS
+      } // end a
+    } // end NS
+  };
+
 
   void apply_ltfu_to_hivpop() {
     auto& n_hc = state_next.hc;
