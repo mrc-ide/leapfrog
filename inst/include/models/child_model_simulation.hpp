@@ -1193,6 +1193,10 @@ struct ChildModelSimulation<Config> {
         for (int cat = 0; cat < hcTT; ++cat) {
           for (int hd = 0; hd < hc1DS; ++hd) {
             n_hc.hc1_hiv_pop(hd, cat, a, s) += i_hc.hc_grad(hd, cat, a, s);
+
+            for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+              n_hc.hc1_hiv_pop_strat(hp_agg, hd, cat, a, s) += i_hc.hc_grad_strat(hp_agg, hd, cat, a, s);
+            }
           } // end hc1DS
         } // end cat
       } // end a
@@ -1203,6 +1207,10 @@ struct ChildModelSimulation<Config> {
         for (int cat = 0; cat < hcTT; ++cat) {
           for (int hd = 0; hd < hc2DS; ++hd) {
             n_hc.hc2_hiv_pop(hd, cat, a - hc2_agestart, s) += i_hc.hc_grad(hd, cat, a, s);
+
+            for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+              n_hc.hc2_hiv_pop_strat(hp_agg, hd, cat, a - hc2_agestart, s) += i_hc.hc_grad_strat(hp_agg, hd, cat, a, s);
+            }
           } //end hc2DS
         } //end cat
       } //end a
