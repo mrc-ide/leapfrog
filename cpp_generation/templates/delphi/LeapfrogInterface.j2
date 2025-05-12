@@ -44,9 +44,36 @@ type
 end;
 
 {% endfor %}
+{$ALIGN 8}
+type
+  LeapfrogParams = record
+  private
+    {% for config in configs %}
+    {{ config.name.lower() }}: ^Leapfrog{{ config.name }}Params;
+    {% endfor %}
+  public
+    {% for config in configs %}
+    procedure Set{{ config.name }}Params(var {{ config.name.lower() }}Params: Leapfrog{{ config.name }}Params);
+    {% endfor %}
+end;
+
+{$ALIGN 8}
+type
+  LeapfrogOut = record
+  private
+    {% for config in configs %}
+    {{ config.name.lower() }}: ^Leapfrog{{ config.name }}Out;
+    {% endfor %}
+  public
+    {% for config in configs %}
+    procedure Set{{ config.name }}Out(var {{ config.name.lower() }}Out: Leapfrog{{ config.name }}Out);
+    {% endfor %}
+end;
+
 type TCallbackFunction = procedure(Msg: PAnsiChar); stdcall;
 
-procedure LeapfrogRunDp(var opts: LeapfrogOptions; var params: LeapfrogDPParams; var leapfrogOut: LeapfrogDpOut; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_dp';
+procedure LeapfrogRunDp(var opts: LeapfrogOptions; var params: LeapfrogParams; var leapfrogOut: LeapfrogOut; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_dp';
+procedure LeapfrogRunAim(var opts: LeapfrogOptions; var params: LeapfrogParams; var leapfrogOut: LeapfrogOut; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_aim';
 
 implementation
 
@@ -67,5 +94,17 @@ begin
 end;
 
 {% endfor %}
+{% endfor %}
+{% for config in configs %}
+procedure LeapfrogParams.Set{{ config.name }}Params(var {{ config.name.lower() }}Params: Leapfrog{{ config.name }}Params);
+begin
+  {{ config.name.lower() }} := @{{ config.name.lower() }}Params;
+end;
+
+procedure LeapfrogOut.Set{{ config.name }}Out(var {{ config.name.lower() }}Out: Leapfrog{{ config.name }}Out);
+begin
+  {{ config.name.lower() }} := @{{ config.name.lower() }}Out;
+end;
+
 {% endfor %}
 end.

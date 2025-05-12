@@ -17,7 +17,7 @@ struct COptions {
 template<typename real_type>
 struct {{ config.name }}Params {
   {% for name, cfg in config.pars.items() %}
-  {{ get_num_type(cfg) }}* {{ name }};
+  {{ get_num_type_delphi(cfg) }} {{ name }};
   int {{ name }}_length;
   {% endfor %}
 };
@@ -31,6 +31,20 @@ struct {{ config.name }}Out {
 };
 
 {% endfor %}
+template<typename real_type>
+struct CParams {
+  {% for config in configs %}
+  {{ config.name }}Params<real_type>* {{ config.name.lower() }};
+  {% endfor %}
+};
+
+template<typename real_type>
+struct COutput {
+  {% for config in configs %}
+  {{ config.name }}Out<real_type>* {{ config.name.lower() }};
+  {% endfor %}
+};
+
 #pragma pack(pop)
 
 } // namespace internal

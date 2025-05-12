@@ -925,24 +925,24 @@ begin
   dp := @dpParams;
 end;
 
-procedure LeapfrogParams.SetHaParams(var haParams: LeapfrogHaParams);
-begin
-  ha := @haParams;
-end;
-
-procedure LeapfrogParams.SetHcParams(var hcParams: LeapfrogHcParams);
-begin
-  hc := @hcParams;
-end;
-
 procedure LeapfrogOut.SetDpOut(var dpOut: LeapfrogDpOut);
 begin
   dp := @dpOut;
 end;
 
+procedure LeapfrogParams.SetHaParams(var haParams: LeapfrogHaParams);
+begin
+  ha := @haParams;
+end;
+
 procedure LeapfrogOut.SetHaOut(var haOut: LeapfrogHaOut);
 begin
   ha := @haOut;
+end;
+
+procedure LeapfrogParams.SetHcParams(var hcParams: LeapfrogHcParams);
+begin
+  hc := @hcParams;
 end;
 
 procedure LeapfrogOut.SetHcOut(var hcOut: LeapfrogHcOut);

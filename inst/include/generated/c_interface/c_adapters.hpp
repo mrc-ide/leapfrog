@@ -49,8 +49,8 @@ struct DpAdapter<Language::C, real_type, ModelVariant> {
   using Config = DpConfig<real_type, ModelVariant>;
 
   static Config::Pars get_pars(
-    const Options<real_type>& opts,
-    const CParams<real_type>& params
+    const Options<real_type> &opts,
+    const CParams<real_type> &params
   ) {
     return {
       .base_pop = read_data<real_type>(params.dp->base_pop, params.dp->base_pop_length, "base_pop", SS::pAG, SS::NS),
@@ -81,8 +81,8 @@ struct HaAdapter<Language::C, real_type, ModelVariant> {
   using Config = HaConfig<real_type, ModelVariant>;
 
   static Config::Pars get_pars(
-    const Options<real_type>& opts,
-    const CParams<real_type>& params
+    const Options<real_type> &opts,
+    const CParams<real_type> &params
   ) {
     return {
       .total_rate = read_data<real_type>(params.ha->total_rate, params.ha->total_rate_length, "total_rate", opts.proj_time_steps),
@@ -120,7 +120,6 @@ struct HaAdapter<Language::C, real_type, ModelVariant> {
     write_data<real_type, 5>(state.h_hiv_deaths_art, out.ha->h_hiv_deaths_art, out.ha->h_hiv_deaths_art_length, "h_hiv_deaths_art");
     write_data<real_type, 4>(state.h_art_initiation, out.ha->h_art_initiation, out.ha->h_art_initiation_length, "h_art_initiation");
     write_data<real_type, 3>(state.p_hiv_deaths, out.ha->p_hiv_deaths, out.ha->p_hiv_deaths_length, "p_hiv_deaths");
-
     return index + output_count;
   };
 };
@@ -131,8 +130,8 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
   using Config = HcConfig<real_type, ModelVariant>;
 
   static Config::Pars get_pars(
-    const Options<real_type>& opts,
-    const CParams<real_type>& params
+    const Options<real_type> &opts,
+    const CParams<real_type> &params
   ) {
     return {
       .hc_nosocomial = read_data<real_type>(params.hc->hc_nosocomial, params.hc->hc_nosocomial_length, "hc_nosocomial", opts.proj_time_steps),
@@ -179,8 +178,8 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
       .adult_female_hivnpop = read_data<real_type>(params.hc->adult_female_hivnpop, params.hc->adult_female_hivnpop_length, "adult_female_hivnpop", opts.p_fertility_age_groups, opts.proj_time_steps),
       .total_births = read_data<real_type>(params.hc->total_births, params.hc->total_births_length, "total_births", opts.proj_time_steps),
       .ctx_effect = read_data<real_type>(params.hc->ctx_effect, params.hc->ctx_effect_length, "ctx_effect", 3),
-      .hc_art_start = read_data<real_type>(params.hc->hc_art_start, params.hc->hc_art_start_length, "hc_art_start"),
-      .local_adj_factor = read_data<real_type>(params.hc->local_adj_factor, params.hc->local_adj_factor_length, "local_adj_factor")
+      .hc_art_start = params.hc->hc_art_start,
+      .local_adj_factor = params.hc->local_adj_factor
     };
   };
 

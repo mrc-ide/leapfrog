@@ -19,11 +19,11 @@ template<typename T, typename... Args>
 auto read_data(T* data, int length, std::string_view name, Args... dims) {
   constexpr std::size_t rank = sizeof...(dims);
   if constexpr (rank == 0) {
-    return data;
+    return *data;
   } else {
     const auto size = (dims * ...);
     if (length != size) {
-        throw std::invalid_argument(std::format("Input data '{}' is the wrong size. Received array of length '{}', expected '{}'.", name, size, length));
+        throw std::invalid_argument(std::format("Input data '{}' is the wrong size. Received array of length '{}', expected '{}'.", name, length, size));
     }
     return Eigen::TensorMap<Eigen::Tensor<T, rank>>(data, dims...);
   }
@@ -35,7 +35,7 @@ void write_data(const Eigen::Tensor<T, Rank>& tensor, T* output, int length, std
   std::size_t totalSize = tensor.size();
 
   if (length != totalSize) {
-    throw std::invalid_argument(std::format("Output data '{}' is the wrong size. Received array of length '{}', expected '{}'.", name, totalSize, length));
+    throw std::invalid_argument(std::format("Output data '{}' is the wrong size. Received array of length '{}', expected '{}'.", name, length, totalSize));
   }
 
   std::copy(dataPtr, dataPtr + totalSize, output);
@@ -48,12 +48,12 @@ struct {{ config.name }}Adapter<Language::C, real_type, ModelVariant> {
   using Config = {{ config.name }}Config<real_type, ModelVariant>;
 
   static Config::Pars get_pars(
-    const {{ config.name }}Params<real_type> &params,
-    const Options<real_type> &opts
+    const Options<real_type> &opts,
+    const CParams<real_type> &params
   ) {
     return {
       {% for name, cfg in config.pars.items() %}
-      .{{ name }} = {{ get_c_read_data(name, cfg) }}{{ comma_except_last(loop) }}
+      .{{ name }} = {{ get_c_read_data(config.name, name, cfg) }}{{ comma_except_last(loop) }}
       {% endfor %}
     };
   };
@@ -63,10 +63,10 @@ struct {{ config.name }}Adapter<Language::C, real_type, ModelVariant> {
   static int build_output(
     int index,
     const Config::OutputState& state,
-    {{ config.name }}Out<real_type>& out
+    COutput<real_type>& out
   ) {
     {% for name, cfg in config.state.items() %}
-    {{ get_c_write_data(name, cfg) }}
+    {{ get_c_write_data(config.name, name, cfg) }}
     {% endfor %}
     return index + output_count;
   };

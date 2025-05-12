@@ -187,9 +187,9 @@ struct HcParams {
   int total_births_length;
   real_type* ctx_effect;
   int ctx_effect_length;
-  real_type* hc_art_start;
+  real_type hc_art_start;
   int hc_art_start_length;
-  real_type* local_adj_factor;
+  real_type local_adj_factor;
   int local_adj_factor_length;
 };
 

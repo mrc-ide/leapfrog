@@ -47,15 +47,17 @@ def get_cpp_read_data(name, cfg):
     return f'read_data<{cfg["num_type"]}>(input_dir, "{name}", {collapse_dims(cfg)})'
 
 
-def get_c_read_data(name, cfg):
+def get_c_read_data(config_name, name, cfg):
+  config_name = config_name.lower()
   if cfg["type"] == "scalar":
-    return f'read_data<{cfg["num_type"]}>(params.{name}, params.{name}_length, "{name}")'
+    return f'params.{config_name}->{name}'
   else:
-    return f'read_data<{cfg["num_type"]}>(params.{name}, params.{name}_length, "{name}", {collapse_dims(cfg)})'
+    return f'read_data<{cfg["num_type"]}>(params.{config_name}->{name}, params.{config_name}->{name}_length, "{name}", {collapse_dims(cfg)})'
 
 
-def get_c_write_data(name, cfg):
-  return f'write_data<{cfg["num_type"]}, {dim_len(cfg) + 1}>(state.{name}, out.{name}, out.{name}_length, "{name}");'
+def get_c_write_data(config_name, name, cfg):
+  config_name = config_name.lower()
+  return f'write_data<{cfg["num_type"]}, {dim_len(cfg) + 1}>(state.{name}, out.{config_name}->{name}, out.{config_name}->{name}_length, "{name}");'
 
 
 def get_reset(name, cfg):
@@ -80,6 +82,13 @@ def get_output_state_chip(name, cfg):
 def get_num_type(cfg):
   return cfg["num_type"]
 
+
+def get_num_type_delphi(cfg):
+  n_dim = dim_len(cfg)
+  if n_dim == 0:
+    return cfg["num_type"]
+  else:
+    return f'{cfg["num_type"]}*'
 
 def dict_len(dict):
   return len(dict.keys())
