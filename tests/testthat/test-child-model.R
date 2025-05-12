@@ -16,7 +16,8 @@ test_that("Child model can be run for all years", {
       "hc_art_init", "hc_art_need_init", "ctx_need", "infection_by_type",
       "hc_infections_coarse",
       "hc1_hiv_pop_strat", "hc2_hiv_pop_strat",
-      "hc1_noart_aids_deaths_strat", "hc2_noart_aids_deaths_strat")
+      "hc1_noart_aids_deaths_strat", "hc2_noart_aids_deaths_strat",
+      "hc_art_need_init_strat")
   )
 
   ## Nothing should ever be negative
@@ -33,7 +34,7 @@ test_that("Child model can be run for all years", {
 
 test_that("Model outputs are consistent", {
   input <- readRDS(test_path("testdata/child_parms.rds"))
-
+  input$parameters$paed_art_ltfu[] = 0
   out <- run_model(input$parameters, "ChildModel", 1970:2030)
 
   ###############################

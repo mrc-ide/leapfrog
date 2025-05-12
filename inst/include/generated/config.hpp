@@ -311,6 +311,7 @@ struct HcConfig {
     TFS<real_type, SS::hDS, SS::hcTT, SS::hAG, SS::NS> hc_grad;
     TFS<real_type, SS::hPS_agg, SS::hDS, SS::hcTT, SS::hAG, SS::NS> hc_grad_strat;
     TFS<real_type, SS::hDS, SS::hAG, SS::NS> eligible;
+    TFS<real_type, SS::hPS_agg, SS::hDS, SS::hcTT, SS::hAG, SS::NS> eligible_strat;
     TFS<real_type, SS::hcAG_coarse> unmet_need;
     TFS<real_type, SS::hcAG_coarse> total_need;
     TFS<real_type, SS::hcAG_coarse> on_art;
@@ -387,6 +388,7 @@ struct HcConfig {
       hc_grad.setZero();
       hc_grad_strat.setZero();
       eligible.setZero();
+      eligible_strat.setZero();
       unmet_need.setZero();
       total_need.setZero();
       on_art.setZero();
@@ -471,6 +473,7 @@ struct HcConfig {
     TFS<real_type, SS::hTS, SS::hc2DS, SS::hc2AG, SS::NS> hc2_art_aids_deaths;
     TFS<real_type, SS::hcAG_coarse> hc_art_init;
     TFS<real_type, SS::hc1DS, SS::hcTT, SS::hcAG_end, SS::NS> hc_art_need_init;
+    TFS<real_type, SS::hPS_agg, SS::hc1DS, SS::hcTT, SS::hcAG_end, SS::NS> hc_art_need_init_strat;
     real_type hiv_births;
     real_type ctx_need;
     TFS<real_type, SS::hcTT, SS::hc1AG, SS::NS> infection_by_type;
@@ -491,6 +494,7 @@ struct HcConfig {
       hc2_art_aids_deaths.setZero();
       hc_art_init.setZero();
       hc_art_need_init.setZero();
+      hc_art_need_init_strat.setZero();
       hiv_births = 0;
       ctx_need = 0;
       infection_by_type.setZero();
@@ -513,6 +517,7 @@ struct HcConfig {
     T5<real_type> hc2_art_aids_deaths;
     T2<real_type> hc_art_init;
     T5<real_type> hc_art_need_init;
+    T6<real_type> hc_art_need_init_strat;
     T1<real_type> hiv_births;
     T1<real_type> ctx_need;
     T4<real_type> infection_by_type;
@@ -533,6 +538,7 @@ struct HcConfig {
       hc2_art_aids_deaths(SS::hTS, SS::hc2DS, SS::hc2AG, SS::NS, output_years),
       hc_art_init(SS::hcAG_coarse, output_years),
       hc_art_need_init(SS::hc1DS, SS::hcTT, SS::hcAG_end, SS::NS, output_years),
+      hc_art_need_init_strat(SS::hPS_agg, SS::hc1DS, SS::hcTT, SS::hcAG_end, SS::NS, output_years),
       hiv_births(output_years),
       ctx_need(output_years),
       infection_by_type(SS::hcTT, SS::hc1AG, SS::NS, output_years)
@@ -552,6 +558,7 @@ struct HcConfig {
       hc2_art_aids_deaths.setZero();
       hc_art_init.setZero();
       hc_art_need_init.setZero();
+      hc_art_need_init_strat.setZero();
       hiv_births.setZero();
       ctx_need.setZero();
       infection_by_type.setZero();
@@ -573,13 +580,14 @@ struct HcConfig {
       hc2_art_aids_deaths.chip(i, hc2_art_aids_deaths.NumDimensions - 1) = state.hc2_art_aids_deaths;
       hc_art_init.chip(i, hc_art_init.NumDimensions - 1) = state.hc_art_init;
       hc_art_need_init.chip(i, hc_art_need_init.NumDimensions - 1) = state.hc_art_need_init;
+      hc_art_need_init_strat.chip(i, hc_art_need_init_strat.NumDimensions - 1) = state.hc_art_need_init_strat;
       hiv_births(i) = state.hiv_births;
       ctx_need(i) = state.ctx_need;
       infection_by_type.chip(i, infection_by_type.NumDimensions - 1) = state.infection_by_type;
     };
   };
 
-  static constexpr int output_count = 18;
+  static constexpr int output_count = 19;
   static int get_build_output_size(int prev_size) {
     return prev_size + output_count;
   };

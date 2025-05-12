@@ -959,6 +959,14 @@ struct ChildModelSimulation<Config> {
             } else if (hd < hc2DS) {
               n_hc.hc_art_need_init(hd, cat, a, s) += n_hc.hc2_hiv_pop(hd, cat, a - hc2_agestart, s);
             }
+
+            for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+              if (a < hc2_agestart) {
+                n_hc.hc_art_need_init_strat(hp_agg, hd, cat, a, s) += n_hc.hc1_hiv_pop_strat(hp_agg, hd, cat, a, s);
+              } else if (hd < hc2DS) {
+                n_hc.hc_art_need_init_strat(hp_agg, hd, cat, a, s) += n_hc.hc2_hiv_pop_strat(hp_agg, hd, cat, a - hc2_agestart, s);
+              }
+            }
           } // end hc1DS
         } // end a
       } // end hcTT
@@ -979,6 +987,14 @@ struct ChildModelSimulation<Config> {
                 n_hc.hc_art_need_init(hd, cat, a, s) += n_hc.hc1_hiv_pop(hd, cat, a, s);
               } else if (hd < hc2DS) {
                 n_hc.hc_art_need_init(hd, cat, a, s) += n_hc.hc2_hiv_pop(hd, cat, a - hc2_agestart, s);
+              }
+            }
+
+            for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+              if (a < hc2_agestart) {
+                n_hc.hc_art_need_init_strat(hp_agg, hd, cat, a, s) += n_hc.hc1_hiv_pop_strat(hp_agg, hd, cat, a, s);
+              } else if (hd < hc2DS) {
+                n_hc.hc_art_need_init_strat(hp_agg, hd, cat, a, s) += n_hc.hc2_hiv_pop_strat(hp_agg, hd, cat, a - hc2_agestart, s);
               }
             }
           } // end hc1DS
@@ -1247,6 +1263,11 @@ struct ChildModelSimulation<Config> {
         for (int a = 0; a < opts.p_idx_fertility_first; ++a) {
           for (int hd = 0; hd < hc1DS; ++hd) {
             i_hc.eligible(hd, a, s) += n_hc.hc_art_need_init(hd, cat, a, s);
+
+            //Note: stratifying eligilbity by transmission category makes it so that it is the same as hc_art_need_init
+            for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+               i_hc.eligible_strat(hp_agg, hd, cat, a, s) += n_hc.hc_art_need_init_strat(hp_agg, hd, cat, a, s);
+            }
           } // end hc1DS
         } // end a
       } // end hcTT

@@ -430,6 +430,11 @@
       "num_type": "real_type",
       "dims": ["SS::hDS", "SS::hAG", "SS::NS"]
     },
+    "eligible_strat": {
+      "type": "TFS",
+      "num_type": "real_type",
+      "dims": ["SS::hPS_agg", "SS::hDS", "SS::hcTT", "SS::hAG", "SS::NS"]
+    },
     "unmet_need": {
       "type": "TFS",
       "num_type": "real_type",
@@ -784,6 +789,11 @@
       "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hc1DS", "SS::hcTT", "SS::hcAG_end", "SS::NS"]
+    },
+    "hc_art_need_init_strat": {
+      "type": "TFS",
+      "num_type": "real_type",
+      "dims": ["SS::hPS_agg", "SS::hc1DS", "SS::hcTT", "SS::hcAG_end", "SS::NS"]
     },
     "hiv_births": {
       "type": "scalar",
