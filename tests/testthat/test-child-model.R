@@ -106,6 +106,11 @@ test_that("Model outputs are consistent", {
     dplyr::mutate(diff = strat - pop)
   expect_true(all(abs(c2$diff) < 1e-5))
 
+  ##Stratfied by maternal treatment status
+  hc1_hiv <- out$hc1_noart_aids_deaths
+  hc1_hiv_strat <- apply(out$hc1_noart_aids_deaths_strat, 2:6, sum)
+  ##should be equal before ART is introduced
+  expect_equal(hc1_hiv[,,,,1:30], hc1_hiv_strat[,,,,1:30])
 
   ###############################
   ##Stratified hiv pop and population hiv pop should be the same
@@ -144,8 +149,8 @@ test_that("Model outputs are consistent", {
   ##Stratfied by maternal treatment status
   input <- readRDS(test_path("testdata/child_parms.rds"))
   out <- run_model(input$parameters, "ChildModel", 1970:2030)
-  hc1_hiv <- out$hc1_noart_aids_deaths
-  hc1_hiv_strat <- apply(out$hc1_noart_aids_deaths_strat, 2:6, sum)
+  hc1_hiv <- out$hc1_hiv_pop
+  hc1_hiv_strat <- apply(out$hc1_hiv_pop_strat, 2:6, sum)
   ##should be equal before ART is introduced
   expect_equal(hc1_hiv[,,,,1:30], hc1_hiv_strat[,,,,1:30])
 
