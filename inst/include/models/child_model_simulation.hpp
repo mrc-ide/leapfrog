@@ -127,9 +127,14 @@ struct ChildModelSimulation<Config> {
         for (int hd = 0; hd < hc1DS; ++hd) {
           for (int cat = 0; cat < hcTT; ++cat) {
             n_hc.hc1_hiv_pop(hd, cat, a, s) += c_hc.hc1_hiv_pop(hd, cat, a - 1, s) * p_dp.survival_probability(a, s, t);
+            for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+              n_hc.hc1_hiv_pop_strat(hp_agg, hd, cat, a, s) += c_hc.hc1_hiv_pop_strat(hp_agg, hd, cat, a - 1, s) * p_dp.survival_probability(a, s, t);
+            }
           }
           for (int dur = 0; dur < hTS; ++dur) {
             n_hc.hc1_art_pop(dur, hd, a, s) += c_hc.hc1_art_pop(dur, hd, a - 1, s) * p_dp.survival_probability(a, s, t);
+            // for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+            // }
           }
         }
       }
@@ -142,11 +147,18 @@ struct ChildModelSimulation<Config> {
             n_hc.hc2_hiv_pop(hd_alt, cat, 0, s) += c_hc.hc1_hiv_pop(hd, cat, hc1_ageend, s) *
                                                    p_dp.survival_probability(hc2_agestart, s, t) *
                                                    p_hc.hc_cd4_transition(hd_alt, hd);
+            for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+              n_hc.hc2_hiv_pop_strat(hp_agg, hd_alt, cat, 0, s) += c_hc.hc1_hiv_pop_strat(hp_agg, hd, cat, hc1_ageend, s) *
+                p_dp.survival_probability(hc2_agestart, s, t) *
+                p_hc.hc_cd4_transition(hd_alt, hd);
+            }
           }
           for (int dur = 0; dur < hTS; ++dur) {
             n_hc.hc2_art_pop(dur, hd_alt, 0, s) += c_hc.hc1_art_pop(dur, hd, hc1_ageend, s) *
                                                    p_dp.survival_probability(hc2_agestart, s, t) *
                                                    p_hc.hc_cd4_transition(hd_alt, hd);
+            // for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+            // }
           }
         }
       }
@@ -158,10 +170,16 @@ struct ChildModelSimulation<Config> {
           for (int cat = 0; cat < hcTT; ++cat) {
             n_hc.hc2_hiv_pop(hd, cat, a - hc2_agestart, s) += c_hc.hc2_hiv_pop(hd, cat, a - hc2_agestart - 1, s) *
                                                               p_dp.survival_probability(a, s, t);
+            for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+              n_hc.hc2_hiv_pop_strat(hp_agg, hd, cat, a - hc2_agestart, s) += c_hc.hc2_hiv_pop_strat(hp_agg, hd, cat, a - hc2_agestart - 1, s) *
+                p_dp.survival_probability(a, s, t);
+            }
           }
           for (int dur = 0; dur < hTS; ++dur) {
             n_hc.hc2_art_pop(dur, hd, a - hc2_agestart, s) += c_hc.hc2_art_pop(dur, hd, a - hc2_agestart - 1, s) *
                                                               p_dp.survival_probability(a, s, t);
+            // for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+            // }
           }
         }
       }
