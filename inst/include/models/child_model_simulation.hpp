@@ -1320,6 +1320,22 @@ struct ChildModelSimulation<Config> {
             n_hc.hc2_art_pop(t_art_idx, hd,  a-hc2_agestart, s) += i_hc.hc_art_grad(t_art_idx, hd, a, s);
             n_hc.hc2_art_aids_deaths(t_art_idx, hd, a-hc2_agestart, s) -= i_hc.hc_art_grad(t_art_idx, hd, a, s);
           }
+
+          for (int cat = 0; cat < hcTT; ++cat) {
+          for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+            if (a < hc2_agestart && any_hc1_art_deaths) {
+              i_hc.hc_art_grad_strat(hp_agg,t_art_idx,hd,cat, a, s) -= i_hc.hc_death_rate *
+                n_hc.hc1_art_pop_strat(hp_agg,t_art_idx, hd, cat, a, s);
+              n_hc.hc1_art_pop_strat(hp_agg, t_art_idx, hd, cat, a, s) += i_hc.hc_art_grad_strat(hp_agg, t_art_idx, hd, cat, a, s);
+              n_hc.hc1_art_aids_deaths_strat(hp_agg, t_art_idx, hd, cat, a, s) -=  i_hc.hc_art_grad_strat(hp_agg,t_art_idx,hd,cat, a, s);
+            } else if (hd < hc2DS && any_hc2_art_deaths) {
+              i_hc.hc_art_grad_strat(hp_agg,t_art_idx, hd,cat, a, s) -= i_hc.hc_death_rate *
+                n_hc.hc2_art_pop_strat(hp_agg,t_art_idx, hd, cat, a - hc2_agestart, s);
+              n_hc.hc2_art_pop_strat(hp_agg,t_art_idx, hd, cat, a-hc2_agestart, s) += i_hc.hc_art_grad_strat(hp_agg, t_art_idx, hd, cat, a, s);
+              n_hc.hc2_art_aids_deaths_strat(hp_agg, t_art_idx, hd, cat, a-hc2_agestart, s) -= i_hc.hc_art_grad_strat(hp_agg, t_art_idx, hd, cat, a, s);
+            }
+          }
+          }
         } // end a
       } // end hc1DS
     } // end NS
@@ -1390,6 +1406,21 @@ struct ChildModelSimulation<Config> {
             n_hc.hc2_art_pop(end_t_idx, hd, a - hc2_agestart, s) += n_hc.hc2_art_pop(curr_t_idx, hd, a - hc2_agestart, s);
             n_hc.hc2_art_pop(curr_t_idx, hd, a - hc2_agestart, s) -= n_hc.hc2_art_pop(curr_t_idx, hd, a - hc2_agestart, s);
           }
+
+          for (int cat = 0; cat < hcTT; ++cat) {
+            for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+              if (a < hc2_agestart) {
+                if (n_hc.hc1_art_pop_strat(hp_agg, curr_t_idx, hd, cat, a, s) > 0) {
+                  n_hc.hc1_art_pop_strat(hp_agg, end_t_idx, hd, cat, a, s) += n_hc.hc1_art_pop_strat(hp_agg, curr_t_idx, hd, cat, a, s);
+                  n_hc.hc1_art_pop_strat(hp_agg, curr_t_idx, hd, cat, a, s) -= n_hc.hc1_art_pop_strat(hp_agg, curr_t_idx, hd, cat, a, s);
+                }
+              } else if (hd < hc2DS) {
+                n_hc.hc2_art_pop_strat(hp_agg, end_t_idx, hd, cat, a - hc2_agestart, s) += n_hc.hc2_art_pop_strat(hp_agg, curr_t_idx, hd, cat, a - hc2_agestart, s);
+                n_hc.hc2_art_pop_strat(hp_agg, curr_t_idx, hd, cat, a - hc2_agestart, s) -= n_hc.hc2_art_pop_strat(hp_agg, curr_t_idx, hd, cat, a - hc2_agestart, s);
+              }
+            }
+          }
+
         } // end NS
       } // end a
     } // end hc1DS

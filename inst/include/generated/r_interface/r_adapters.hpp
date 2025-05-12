@@ -357,7 +357,9 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
       .hc2_noart_aids_deaths = parse_data<real_type>(data, "hc2_noart_aids_deaths", SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS),
       .hc2_noart_aids_deaths_strat = parse_data<real_type>(data, "hc2_noart_aids_deaths_strat", SS::hPS_agg, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS),
       .hc1_art_aids_deaths = parse_data<real_type>(data, "hc1_art_aids_deaths", SS::hTS, SS::hc1DS, SS::hc1AG, SS::NS),
+      .hc1_art_aids_deaths_strat = parse_data<real_type>(data, "hc1_art_aids_deaths_strat", SS::hPS_agg, SS::hTS, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS),
       .hc2_art_aids_deaths = parse_data<real_type>(data, "hc2_art_aids_deaths", SS::hTS, SS::hc2DS, SS::hc2AG, SS::NS),
+      .hc2_art_aids_deaths_strat = parse_data<real_type>(data, "hc2_art_aids_deaths_strat", SS::hPS_agg, SS::hTS, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS),
       .hc_art_init = parse_data<real_type>(data, "hc_art_init", SS::hcAG_coarse),
       .hc_art_need_init = parse_data<real_type>(data, "hc_art_need_init", SS::hc1DS, SS::hcTT, SS::hcAG_end, SS::NS),
       .hc_art_need_init_strat = parse_data<real_type>(data, "hc_art_need_init_strat", SS::hPS_agg, SS::hc1DS, SS::hcTT, SS::hcAG_end, SS::NS),
@@ -367,7 +369,7 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
     };
   };
 
-  static constexpr int output_count = 21;
+  static constexpr int output_count = 23;
 
   static int build_output(
     int index,
@@ -446,41 +448,51 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
     std::copy_n(state.hc1_art_aids_deaths.data(), state.hc1_art_aids_deaths.size(), REAL(r_hc1_art_aids_deaths));
     names[index + 13] = "hc1_art_aids_deaths";
     ret[index + 13] = r_hc1_art_aids_deaths;
+    Rcpp::NumericVector r_hc1_art_aids_deaths_strat(SS::hPS_agg * SS::hTS * SS::hc1DS * SS::hcTT * SS::hc1AG * SS::NS * output_years);
+    r_hc1_art_aids_deaths_strat.attr("dim") = Rcpp::IntegerVector::create(SS::hPS_agg, SS::hTS, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, output_years);
+    std::copy_n(state.hc1_art_aids_deaths_strat.data(), state.hc1_art_aids_deaths_strat.size(), REAL(r_hc1_art_aids_deaths_strat));
+    names[index + 14] = "hc1_art_aids_deaths_strat";
+    ret[index + 14] = r_hc1_art_aids_deaths_strat;
     Rcpp::NumericVector r_hc2_art_aids_deaths(SS::hTS * SS::hc2DS * SS::hc2AG * SS::NS * output_years);
     r_hc2_art_aids_deaths.attr("dim") = Rcpp::IntegerVector::create(SS::hTS, SS::hc2DS, SS::hc2AG, SS::NS, output_years);
     std::copy_n(state.hc2_art_aids_deaths.data(), state.hc2_art_aids_deaths.size(), REAL(r_hc2_art_aids_deaths));
-    names[index + 14] = "hc2_art_aids_deaths";
-    ret[index + 14] = r_hc2_art_aids_deaths;
+    names[index + 15] = "hc2_art_aids_deaths";
+    ret[index + 15] = r_hc2_art_aids_deaths;
+    Rcpp::NumericVector r_hc2_art_aids_deaths_strat(SS::hPS_agg * SS::hTS * SS::hc2DS * SS::hcTT * SS::hc2AG * SS::NS * output_years);
+    r_hc2_art_aids_deaths_strat.attr("dim") = Rcpp::IntegerVector::create(SS::hPS_agg, SS::hTS, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS, output_years);
+    std::copy_n(state.hc2_art_aids_deaths_strat.data(), state.hc2_art_aids_deaths_strat.size(), REAL(r_hc2_art_aids_deaths_strat));
+    names[index + 16] = "hc2_art_aids_deaths_strat";
+    ret[index + 16] = r_hc2_art_aids_deaths_strat;
     Rcpp::NumericVector r_hc_art_init(SS::hcAG_coarse * output_years);
     r_hc_art_init.attr("dim") = Rcpp::IntegerVector::create(SS::hcAG_coarse, output_years);
     std::copy_n(state.hc_art_init.data(), state.hc_art_init.size(), REAL(r_hc_art_init));
-    names[index + 15] = "hc_art_init";
-    ret[index + 15] = r_hc_art_init;
+    names[index + 17] = "hc_art_init";
+    ret[index + 17] = r_hc_art_init;
     Rcpp::NumericVector r_hc_art_need_init(SS::hc1DS * SS::hcTT * SS::hcAG_end * SS::NS * output_years);
     r_hc_art_need_init.attr("dim") = Rcpp::IntegerVector::create(SS::hc1DS, SS::hcTT, SS::hcAG_end, SS::NS, output_years);
     std::copy_n(state.hc_art_need_init.data(), state.hc_art_need_init.size(), REAL(r_hc_art_need_init));
-    names[index + 16] = "hc_art_need_init";
-    ret[index + 16] = r_hc_art_need_init;
+    names[index + 18] = "hc_art_need_init";
+    ret[index + 18] = r_hc_art_need_init;
     Rcpp::NumericVector r_hc_art_need_init_strat(SS::hPS_agg * SS::hc1DS * SS::hcTT * SS::hcAG_end * SS::NS * output_years);
     r_hc_art_need_init_strat.attr("dim") = Rcpp::IntegerVector::create(SS::hPS_agg, SS::hc1DS, SS::hcTT, SS::hcAG_end, SS::NS, output_years);
     std::copy_n(state.hc_art_need_init_strat.data(), state.hc_art_need_init_strat.size(), REAL(r_hc_art_need_init_strat));
-    names[index + 17] = "hc_art_need_init_strat";
-    ret[index + 17] = r_hc_art_need_init_strat;
+    names[index + 19] = "hc_art_need_init_strat";
+    ret[index + 19] = r_hc_art_need_init_strat;
     Rcpp::NumericVector r_hiv_births(output_years);
     r_hiv_births.attr("dim") = Rcpp::IntegerVector::create(output_years);
     std::copy_n(state.hiv_births.data(), state.hiv_births.size(), REAL(r_hiv_births));
-    names[index + 18] = "hiv_births";
-    ret[index + 18] = r_hiv_births;
+    names[index + 20] = "hiv_births";
+    ret[index + 20] = r_hiv_births;
     Rcpp::NumericVector r_ctx_need(output_years);
     r_ctx_need.attr("dim") = Rcpp::IntegerVector::create(output_years);
     std::copy_n(state.ctx_need.data(), state.ctx_need.size(), REAL(r_ctx_need));
-    names[index + 19] = "ctx_need";
-    ret[index + 19] = r_ctx_need;
+    names[index + 21] = "ctx_need";
+    ret[index + 21] = r_ctx_need;
     Rcpp::NumericVector r_infection_by_type(SS::hcTT * SS::hc1AG * SS::NS * output_years);
     r_infection_by_type.attr("dim") = Rcpp::IntegerVector::create(SS::hcTT, SS::hc1AG, SS::NS, output_years);
     std::copy_n(state.infection_by_type.data(), state.infection_by_type.size(), REAL(r_infection_by_type));
-    names[index + 20] = "infection_by_type";
-    ret[index + 20] = r_infection_by_type;
+    names[index + 22] = "infection_by_type";
+    ret[index + 22] = r_infection_by_type;
     return index + output_count;
   };
 
@@ -560,35 +572,45 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
     std::copy_n(state.hc1_art_aids_deaths.data(), state.hc1_art_aids_deaths.size(), REAL(r_hc1_art_aids_deaths));
     names[index + 13] = "hc1_art_aids_deaths";
     ret[index + 13] = r_hc1_art_aids_deaths;
+    Rcpp::NumericVector r_hc1_art_aids_deaths_strat(SS::hPS_agg * SS::hTS * SS::hc1DS * SS::hcTT * SS::hc1AG * SS::NS);
+    r_hc1_art_aids_deaths_strat.attr("dim") = Rcpp::IntegerVector::create(SS::hPS_agg, SS::hTS, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS);
+    std::copy_n(state.hc1_art_aids_deaths_strat.data(), state.hc1_art_aids_deaths_strat.size(), REAL(r_hc1_art_aids_deaths_strat));
+    names[index + 14] = "hc1_art_aids_deaths_strat";
+    ret[index + 14] = r_hc1_art_aids_deaths_strat;
     Rcpp::NumericVector r_hc2_art_aids_deaths(SS::hTS * SS::hc2DS * SS::hc2AG * SS::NS);
     r_hc2_art_aids_deaths.attr("dim") = Rcpp::IntegerVector::create(SS::hTS, SS::hc2DS, SS::hc2AG, SS::NS);
     std::copy_n(state.hc2_art_aids_deaths.data(), state.hc2_art_aids_deaths.size(), REAL(r_hc2_art_aids_deaths));
-    names[index + 14] = "hc2_art_aids_deaths";
-    ret[index + 14] = r_hc2_art_aids_deaths;
+    names[index + 15] = "hc2_art_aids_deaths";
+    ret[index + 15] = r_hc2_art_aids_deaths;
+    Rcpp::NumericVector r_hc2_art_aids_deaths_strat(SS::hPS_agg * SS::hTS * SS::hc2DS * SS::hcTT * SS::hc2AG * SS::NS);
+    r_hc2_art_aids_deaths_strat.attr("dim") = Rcpp::IntegerVector::create(SS::hPS_agg, SS::hTS, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS);
+    std::copy_n(state.hc2_art_aids_deaths_strat.data(), state.hc2_art_aids_deaths_strat.size(), REAL(r_hc2_art_aids_deaths_strat));
+    names[index + 16] = "hc2_art_aids_deaths_strat";
+    ret[index + 16] = r_hc2_art_aids_deaths_strat;
     Rcpp::NumericVector r_hc_art_init(SS::hcAG_coarse);
     r_hc_art_init.attr("dim") = Rcpp::IntegerVector::create(SS::hcAG_coarse);
     std::copy_n(state.hc_art_init.data(), state.hc_art_init.size(), REAL(r_hc_art_init));
-    names[index + 15] = "hc_art_init";
-    ret[index + 15] = r_hc_art_init;
+    names[index + 17] = "hc_art_init";
+    ret[index + 17] = r_hc_art_init;
     Rcpp::NumericVector r_hc_art_need_init(SS::hc1DS * SS::hcTT * SS::hcAG_end * SS::NS);
     r_hc_art_need_init.attr("dim") = Rcpp::IntegerVector::create(SS::hc1DS, SS::hcTT, SS::hcAG_end, SS::NS);
     std::copy_n(state.hc_art_need_init.data(), state.hc_art_need_init.size(), REAL(r_hc_art_need_init));
-    names[index + 16] = "hc_art_need_init";
-    ret[index + 16] = r_hc_art_need_init;
+    names[index + 18] = "hc_art_need_init";
+    ret[index + 18] = r_hc_art_need_init;
     Rcpp::NumericVector r_hc_art_need_init_strat(SS::hPS_agg * SS::hc1DS * SS::hcTT * SS::hcAG_end * SS::NS);
     r_hc_art_need_init_strat.attr("dim") = Rcpp::IntegerVector::create(SS::hPS_agg, SS::hc1DS, SS::hcTT, SS::hcAG_end, SS::NS);
     std::copy_n(state.hc_art_need_init_strat.data(), state.hc_art_need_init_strat.size(), REAL(r_hc_art_need_init_strat));
-    names[index + 17] = "hc_art_need_init_strat";
-    ret[index + 17] = r_hc_art_need_init_strat;
-    names[index + 18] = "hiv_births";
-    ret[index + 18] = state.hiv_births;
-    names[index + 19] = "ctx_need";
-    ret[index + 19] = state.ctx_need;
+    names[index + 19] = "hc_art_need_init_strat";
+    ret[index + 19] = r_hc_art_need_init_strat;
+    names[index + 20] = "hiv_births";
+    ret[index + 20] = state.hiv_births;
+    names[index + 21] = "ctx_need";
+    ret[index + 21] = state.ctx_need;
     Rcpp::NumericVector r_infection_by_type(SS::hcTT * SS::hc1AG * SS::NS);
     r_infection_by_type.attr("dim") = Rcpp::IntegerVector::create(SS::hcTT, SS::hc1AG, SS::NS);
     std::copy_n(state.infection_by_type.data(), state.infection_by_type.size(), REAL(r_infection_by_type));
-    names[index + 20] = "infection_by_type";
-    ret[index + 20] = r_infection_by_type;
+    names[index + 22] = "infection_by_type";
+    ret[index + 22] = r_infection_by_type;
     return index + output_count;
   };
 };

@@ -318,6 +318,7 @@ struct HcConfig {
     TFS<real_type, SS::hcAG_coarse> total_art_last_year;
     TFS<real_type, SS::hcAG_coarse> total_art_this_year;
     TFS<real_type, SS::hTS, SS::hDS, SS::hAG, SS::NS> hc_art_grad;
+    TFS<real_type, SS::hPS_agg, SS::hTS, SS::hDS, SS::hcTT, SS::hAG, SS::NS> hc_art_grad_strat;
     TFS<real_type, SS::hcAG_coarse> hc_art_scalar;
     TFS<real_type, SS::hcAG_coarse> hc_initByAge;
     TFS<real_type, SS::hcAG_coarse> hc_adj;
@@ -398,6 +399,7 @@ struct HcConfig {
       total_art_last_year.setZero();
       total_art_this_year.setZero();
       hc_art_grad.setZero();
+      hc_art_grad_strat.setZero();
       hc_art_scalar.setZero();
       hc_initByAge.setZero();
       hc_adj.setZero();
@@ -478,7 +480,9 @@ struct HcConfig {
     TFS<real_type, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS> hc2_noart_aids_deaths;
     TFS<real_type, SS::hPS_agg, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS> hc2_noart_aids_deaths_strat;
     TFS<real_type, SS::hTS, SS::hc1DS, SS::hc1AG, SS::NS> hc1_art_aids_deaths;
+    TFS<real_type, SS::hPS_agg, SS::hTS, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS> hc1_art_aids_deaths_strat;
     TFS<real_type, SS::hTS, SS::hc2DS, SS::hc2AG, SS::NS> hc2_art_aids_deaths;
+    TFS<real_type, SS::hPS_agg, SS::hTS, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS> hc2_art_aids_deaths_strat;
     TFS<real_type, SS::hcAG_coarse> hc_art_init;
     TFS<real_type, SS::hc1DS, SS::hcTT, SS::hcAG_end, SS::NS> hc_art_need_init;
     TFS<real_type, SS::hPS_agg, SS::hc1DS, SS::hcTT, SS::hcAG_end, SS::NS> hc_art_need_init_strat;
@@ -501,7 +505,9 @@ struct HcConfig {
       hc2_noart_aids_deaths.setZero();
       hc2_noart_aids_deaths_strat.setZero();
       hc1_art_aids_deaths.setZero();
+      hc1_art_aids_deaths_strat.setZero();
       hc2_art_aids_deaths.setZero();
+      hc2_art_aids_deaths_strat.setZero();
       hc_art_init.setZero();
       hc_art_need_init.setZero();
       hc_art_need_init_strat.setZero();
@@ -526,7 +532,9 @@ struct HcConfig {
     T5<real_type> hc2_noart_aids_deaths;
     T6<real_type> hc2_noart_aids_deaths_strat;
     T5<real_type> hc1_art_aids_deaths;
+    T7<real_type> hc1_art_aids_deaths_strat;
     T5<real_type> hc2_art_aids_deaths;
+    T7<real_type> hc2_art_aids_deaths_strat;
     T2<real_type> hc_art_init;
     T5<real_type> hc_art_need_init;
     T6<real_type> hc_art_need_init_strat;
@@ -549,7 +557,9 @@ struct HcConfig {
       hc2_noart_aids_deaths(SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS, output_years),
       hc2_noart_aids_deaths_strat(SS::hPS_agg, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS, output_years),
       hc1_art_aids_deaths(SS::hTS, SS::hc1DS, SS::hc1AG, SS::NS, output_years),
+      hc1_art_aids_deaths_strat(SS::hPS_agg, SS::hTS, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, output_years),
       hc2_art_aids_deaths(SS::hTS, SS::hc2DS, SS::hc2AG, SS::NS, output_years),
+      hc2_art_aids_deaths_strat(SS::hPS_agg, SS::hTS, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS, output_years),
       hc_art_init(SS::hcAG_coarse, output_years),
       hc_art_need_init(SS::hc1DS, SS::hcTT, SS::hcAG_end, SS::NS, output_years),
       hc_art_need_init_strat(SS::hPS_agg, SS::hc1DS, SS::hcTT, SS::hcAG_end, SS::NS, output_years),
@@ -571,7 +581,9 @@ struct HcConfig {
       hc2_noart_aids_deaths.setZero();
       hc2_noart_aids_deaths_strat.setZero();
       hc1_art_aids_deaths.setZero();
+      hc1_art_aids_deaths_strat.setZero();
       hc2_art_aids_deaths.setZero();
+      hc2_art_aids_deaths_strat.setZero();
       hc_art_init.setZero();
       hc_art_need_init.setZero();
       hc_art_need_init_strat.setZero();
@@ -595,7 +607,9 @@ struct HcConfig {
       hc2_noart_aids_deaths.chip(i, hc2_noart_aids_deaths.NumDimensions - 1) = state.hc2_noart_aids_deaths;
       hc2_noart_aids_deaths_strat.chip(i, hc2_noart_aids_deaths_strat.NumDimensions - 1) = state.hc2_noart_aids_deaths_strat;
       hc1_art_aids_deaths.chip(i, hc1_art_aids_deaths.NumDimensions - 1) = state.hc1_art_aids_deaths;
+      hc1_art_aids_deaths_strat.chip(i, hc1_art_aids_deaths_strat.NumDimensions - 1) = state.hc1_art_aids_deaths_strat;
       hc2_art_aids_deaths.chip(i, hc2_art_aids_deaths.NumDimensions - 1) = state.hc2_art_aids_deaths;
+      hc2_art_aids_deaths_strat.chip(i, hc2_art_aids_deaths_strat.NumDimensions - 1) = state.hc2_art_aids_deaths_strat;
       hc_art_init.chip(i, hc_art_init.NumDimensions - 1) = state.hc_art_init;
       hc_art_need_init.chip(i, hc_art_need_init.NumDimensions - 1) = state.hc_art_need_init;
       hc_art_need_init_strat.chip(i, hc_art_need_init_strat.NumDimensions - 1) = state.hc_art_need_init_strat;
@@ -605,7 +619,7 @@ struct HcConfig {
     };
   };
 
-  static constexpr int output_count = 21;
+  static constexpr int output_count = 23;
   static int get_build_output_size(int prev_size) {
     return prev_size + output_count;
   };

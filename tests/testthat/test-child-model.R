@@ -18,6 +18,7 @@ test_that("Child model can be run for all years", {
       "hc1_hiv_pop_strat", "hc2_hiv_pop_strat",
       "hc1_art_pop_strat", "hc2_art_pop_strat",
       "hc1_noart_aids_deaths_strat", "hc2_noart_aids_deaths_strat",
+      "hc1_art_aids_deaths_strat", "hc2_art_aids_deaths_strat",
       "hc_art_need_init_strat")
   )
 

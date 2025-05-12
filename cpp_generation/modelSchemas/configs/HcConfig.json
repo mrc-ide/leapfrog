@@ -465,6 +465,11 @@
       "num_type": "real_type",
       "dims": ["SS::hTS", "SS::hDS", "SS::hAG", "SS::NS"]
     },
+    "hc_art_grad_strat": {
+      "type": "TFS",
+      "num_type": "real_type",
+      "dims": ["SS::hPS_agg", "SS::hTS", "SS::hDS","SS::hcTT",  "SS::hAG", "SS::NS"]
+    },
     "hc_art_scalar": {
       "type": "TFS",
       "num_type": "real_type",
@@ -800,10 +805,20 @@
       "num_type": "real_type",
       "dims": ["SS::hTS", "SS::hc1DS", "SS::hc1AG", "SS::NS"]
     },
+    "hc1_art_aids_deaths_strat": {
+      "type": "TFS",
+      "num_type": "real_type",
+      "dims": ["SS::hPS_agg", "SS::hTS", "SS::hc1DS", "SS::hcTT","SS::hc1AG", "SS::NS"]
+    },
     "hc2_art_aids_deaths": {
       "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hTS", "SS::hc2DS", "SS::hc2AG", "SS::NS"]
+    },
+    "hc2_art_aids_deaths_strat": {
+      "type": "TFS",
+      "num_type": "real_type",
+      "dims": ["SS::hPS_agg","SS::hTS", "SS::hc2DS", "SS::hcTT", "SS::hc2AG", "SS::NS"]
     },
     "hc_art_init": {
       "type": "TFS",
