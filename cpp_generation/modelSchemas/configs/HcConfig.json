@@ -410,10 +410,20 @@
       "num_type": "real_type",
       "dims": ["SS::hDS", "SS::hcTT", "SS::hAG", "SS::NS"]
     },
+    "hc_posthivmort_strat": {
+      "type": "TFS",
+      "num_type": "real_type",
+      "dims": ["SS::hPS_agg", "SS::hDS", "SS::hcTT", "SS::hAG", "SS::NS"]
+    },
     "hc_grad": {
       "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hDS", "SS::hcTT", "SS::hAG", "SS::NS"]
+    },
+    "hc_grad_strat": {
+      "type": "TFS",
+      "num_type": "real_type",
+      "dims": ["SS::hPS_agg", "SS::hDS", "SS::hcTT", "SS::hAG", "SS::NS"]
     },
     "eligible": {
       "type": "TFS",
@@ -710,10 +720,20 @@
       "num_type": "real_type",
       "dims": ["SS::hc1DS", "SS::hcTT", "SS::hc1AG", "SS::NS"]
     },
+    "hc1_hiv_pop_strat": {
+      "type": "TFS",
+      "num_type": "real_type",
+      "dims": ["SS::hPS_agg", "SS::hc1DS", "SS::hcTT", "SS::hc1AG", "SS::NS"]
+    },
     "hc2_hiv_pop": {
       "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hc2DS", "SS::hcTT", "SS::hc2AG", "SS::NS"]
+    },
+    "hc2_hiv_pop_strat": {
+      "type": "TFS",
+      "num_type": "real_type",
+      "dims": ["SS::hPS_agg", "SS::hc2DS", "SS::hcTT", "SS::hc2AG", "SS::NS"]
     },
     "hc1_art_pop": {
       "type": "TFS",
@@ -730,10 +750,20 @@
       "num_type": "real_type",
       "dims": ["SS::hc1DS", "SS::hcTT", "SS::hc1AG", "SS::NS"]
     },
+    "hc1_noart_aids_deaths_strat": {
+      "type": "TFS",
+      "num_type": "real_type",
+      "dims": ["SS::hPS_agg", "SS::hc1DS", "SS::hcTT", "SS::hc1AG", "SS::NS"]
+    },
     "hc2_noart_aids_deaths": {
       "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hc2DS", "SS::hcTT", "SS::hc2AG", "SS::NS"]
+    },
+    "hc2_noart_aids_deaths_strat": {
+      "type": "TFS",
+      "num_type": "real_type",
+      "dims": ["SS::hPS_agg", "SS::hc2DS", "SS::hcTT", "SS::hc2AG", "SS::NS"]
     },
     "hc1_art_aids_deaths": {
       "type": "TFS",

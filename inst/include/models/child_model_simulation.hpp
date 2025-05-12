@@ -812,6 +812,9 @@ struct ChildModelSimulation<Config> {
       // Perinatal transmission
       auto perinatal_transmission_births = n_hc.hiv_births * i_hc.perinatal_transmission_rate;
       for (int s = 0; s < NS; ++s) {
+        for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+          n_hc.hc_infections_coarse(hp_agg,0,0,s) *= n_hc.hiv_births * p_dp.births_sex_prop(s, t);
+        }
         for (int hd = 0; hd < hc1DS; ++hd) {
           n_hc.hc1_hiv_pop(hd, 0, 0, s) += perinatal_transmission_births *
                                            p_dp.births_sex_prop(s, t) * p_hc.hc1_cd4_dist(hd);
@@ -819,9 +822,6 @@ struct ChildModelSimulation<Config> {
         auto perinatal_births_by_sex = perinatal_transmission_births * p_dp.births_sex_prop(s, t);
         n_ha.p_infections(0, s) += perinatal_births_by_sex;
         n_hc.infection_by_type(0, 0, s) += perinatal_births_by_sex;
-        for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
-          n_hc.hc_infections_coarse(hp_agg,0,0,s) *= n_hc.hiv_births * p_dp.births_sex_prop(s, t);
-        }
       } // end NS
 
       // Breastfeeding transmission
@@ -842,6 +842,14 @@ struct ChildModelSimulation<Config> {
 
       // 0-6
       for (int s = 0; s < NS; ++s) {
+        for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+          if(hp_agg == 2){
+            n_hc.hc_infections_coarse(hp_agg,1,0,s) = (total_births - n_hc.hiv_births) * p_dp.births_sex_prop(s, t) *
+              i_hc.bf_incident_hiv_transmission_rate;
+          }else{
+            n_hc.hc_infections_coarse(hp_agg,1,0,s) *= n_hc.hiv_births * p_dp.births_sex_prop(s, t);
+          }
+        }
         auto bf_hiv_by_sex = n_hc.hiv_births * p_dp.births_sex_prop(s, t) *
                              i_hc.bf_transmission_rate(0);
         // vertical infection from maternal infection during breastfeeding
@@ -852,28 +860,20 @@ struct ChildModelSimulation<Config> {
         } // end hc1DS
         n_ha.p_infections(0, s) += bf_hiv_by_sex;
         n_hc.infection_by_type(1, 0, s) += bf_hiv_by_sex;
-        for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
-          if(hp_agg == 2){
-            n_hc.hc_infections_coarse(hp_agg,1,0,s) = (total_births - n_hc.hiv_births) * p_dp.births_sex_prop(s, t) *
-              i_hc.bf_incident_hiv_transmission_rate;
-          }else{
-            n_hc.hc_infections_coarse(hp_agg,1,0,s) *= n_hc.hiv_births * p_dp.births_sex_prop(s, t);
-          }
-        }
       } // end NS
 
       // 6-12
       run_bf_transmission_rate(3, 6, 1);
       for (int s = 0; s < NS; ++s) {
+        for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+          n_hc.hc_infections_coarse(hp_agg,2,0,s) *= n_hc.hiv_births * p_dp.births_sex_prop(s, t);
+        }
         auto bf_hiv_by_sex = n_hc.hiv_births * p_dp.births_sex_prop(s, t) * i_hc.bf_transmission_rate(1);
         for (int hd = 0; hd < hc1DS; ++hd) {
           n_hc.hc1_hiv_pop(hd, 2, 0, s) += p_hc.hc1_cd4_dist(hd) * bf_hiv_by_sex;
         } // end hc1DS
         n_ha.p_infections(0, s) += bf_hiv_by_sex;
         n_hc.infection_by_type(2, 0, s) += bf_hiv_by_sex;
-        for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
-          n_hc.hc_infections_coarse(hp_agg,2,0,s) *= n_hc.hiv_births * p_dp.births_sex_prop(s, t);
-        }
       } // end NS
 
       // 12 plus
@@ -893,7 +893,10 @@ struct ChildModelSimulation<Config> {
           total_pop_24_plus -= n_ha.p_infections(2, 0);
         }
         auto uninfected_prop_24_plus = (n_dp.p_total_pop(2, s) - n_ha.p_hiv_pop(2, s)) / total_pop_24_plus;
-
+        for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+          n_hc.hc_infections_coarse(hp_agg,3,1,s) *= n_hc.hiv_births *  uninfected_prop_12_24;
+          n_hc.hc_infections_coarse(hp_agg,3,2,s) *= n_hc.hiv_births *  uninfected_prop_24_plus;
+        }
         for (int hd = 0; hd < hc1DS; ++hd) {
           auto bf_hiv_transmission_12_24 = n_hc.hiv_births * i_hc.bf_transmission_rate(2) * uninfected_prop_12_24;
           auto bf_hiv_transmission_24_plus = n_hc.hiv_births * i_hc.bf_transmission_rate(3) * uninfected_prop_24_plus;
@@ -907,10 +910,6 @@ struct ChildModelSimulation<Config> {
           n_ha.p_infections(2, s) += p_hc.hc1_cd4_dist(hd) * bf_hiv_transmission_24_plus;
           n_hc.infection_by_type(3, 2, s) += p_hc.hc1_cd4_dist(hd) * bf_hiv_transmission_24_plus;
         } // end hc1DS
-        for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
-          n_hc.hc_infections_coarse(hp_agg,3,1,s) *= n_hc.hiv_births *  uninfected_prop_12_24;
-          n_hc.hc_infections_coarse(hp_agg,3,2,s) *= n_hc.hiv_births *  uninfected_prop_24_plus;
-        }
       } // end NS
     }
   };
