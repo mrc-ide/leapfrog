@@ -11,6 +11,14 @@ uses GBFixedArray;
 
 {$ALIGN 8}
 type
+  LeapfrogOptions = record
+  public
+    projStartYear: Integer;
+    projEndYear: Integer;
+end;
+
+{$ALIGN 8}
+type
   LeapfrogDpParams = record
   private
     basePop: PDouble;
@@ -329,7 +337,7 @@ end;
 
 type TCallbackFunction = procedure(Msg: PAnsiChar); stdcall;
 
-procedure LeapfrogRunDp(var params: LeapfrogDPParams; var leapfrogOut: LeapfrogDpOut; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_dp';
+procedure LeapfrogRunDp(var opts: LeapfrogOptions; var params: LeapfrogDPParams; var leapfrogOut: LeapfrogDpOut; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_dp';
 
 implementation
 

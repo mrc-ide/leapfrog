@@ -8,6 +8,11 @@ namespace internal {
 
 #pragma pack(push, 8)
 
+struct COptions {
+  int proj_start_year;
+  int proj_end_year;
+};
+
 {% for config in configs %}
 template<typename real_type>
 struct {{ config.name }}Params {

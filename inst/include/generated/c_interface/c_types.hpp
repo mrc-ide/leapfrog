@@ -10,6 +10,11 @@ namespace internal {
 
 #pragma pack(push, 8)
 
+struct COptions {
+  int proj_start_year;
+  int proj_end_year;
+};
+
 template<typename real_type>
 struct DpParams {
   real_type* base_pop;

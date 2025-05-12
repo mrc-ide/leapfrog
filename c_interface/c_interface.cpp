@@ -12,16 +12,22 @@
 
 typedef void (WINAPI *CallbackFunction)(const char*);
 
-DllExport HRESULT WINAPI run_dp(leapfrog::internal::DpParams<double>& data, leapfrog::internal::DpOut<double>& out, CallbackFunction error_handler) {
+DllExport HRESULT WINAPI run_dp(leapfrog::internal::COptions& options, leapfrog::internal::DpParams<double>& data, leapfrog::internal::DpOut<double>& out, CallbackFunction error_handler) {
   #pragma EXPORT
 
   using LF = leapfrog::Leapfrog<leapfrog::C, double, leapfrog::DemographicProjection>;
 
   try {
-    std::vector<int> output_years(61);
-    std::iota(output_years.begin(), output_years.end(), 1970);
+    std::vector<int> output_years((options.proj_end_year - options.proj_start_year) + 1);
+    std::iota(output_years.begin(), output_years.end(), options.proj_start_year);
 
-    const auto opts = leapfrog::get_opts<double>(10, 34, std::string_view{"calendar"}, 1970, output_years);
+    const leapfrog::Options<double> opts =  {
+      10,
+      34,
+      leapfrog::internal::BaseSS::PROJPERIOD_CALENDAR,
+      options.proj_start_year,
+      options.proj_end_year
+    };
     const auto pars = LF::Cfg::get_pars(data, opts);
 
     auto state = LF::run_model(pars, opts, output_years);
