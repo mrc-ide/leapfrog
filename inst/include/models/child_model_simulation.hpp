@@ -1147,6 +1147,14 @@ struct ChildModelSimulation<Config> {
                                    p_hc.hc1_cd4_mort(hd, cat, a);
             i_hc.hc_grad(hd, cat, a, s) -= cd4_deaths_grad;
             n_hc.hc1_noart_aids_deaths(hd, cat, a, s) += cd4_deaths_grad;
+
+            for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+              auto cd4_deaths_grad = i_hc.ctx_mean(art_flag) *
+                n_hc.hc1_hiv_pop_strat(hp_agg, hd, cat, a, s) *
+                p_hc.hc1_cd4_mort(hd, cat, a);
+              i_hc.hc_grad_strat(hp_agg, hd, cat, a, s) -= cd4_deaths_grad;
+              n_hc.hc1_noart_aids_deaths_strat(hp_agg, hd, cat, a, s) += cd4_deaths_grad;
+            }
           }
         }
       }
@@ -1161,6 +1169,14 @@ struct ChildModelSimulation<Config> {
                                  p_hc.hc2_cd4_mort(hd, cat, a - hc2_agestart);
             i_hc.hc_grad(hd, cat, a, s) -= cd4_mort_grad;
             n_hc.hc2_noart_aids_deaths(hd, cat, a - hc2_agestart, s) += cd4_mort_grad;
+
+            for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+                auto cd4_mort_grad = i_hc.ctx_mean(art_flag) *
+                 n_hc.hc2_hiv_pop_strat(hp_agg, hd, cat, a - hc2_agestart, s) *
+                 p_hc.hc2_cd4_mort(hd, cat, a - hc2_agestart);
+                 i_hc.hc_grad_strat(hp_agg, hd, cat, a, s) -= cd4_mort_grad;
+                    n_hc.hc2_noart_aids_deaths_strat(hp_agg, hd, cat, a - hc2_agestart, s) += cd4_mort_grad;
+           }
           }
         }
       }
