@@ -335,9 +335,36 @@ type
     procedure SetInfectionByType(var inInfectionByType: TGBFixedArray<Double>);
 end;
 
+{$ALIGN 8}
+type
+  LeapfrogParams = record
+  private
+    dp: ^LeapfrogDpParams;
+    ha: ^LeapfrogHaParams;
+    hc: ^LeapfrogHcParams;
+  public
+    procedure SetDpParams(var dpParams: LeapfrogDpParams);
+    procedure SetHaParams(var haParams: LeapfrogHaParams);
+    procedure SetHcParams(var hcParams: LeapfrogHcParams);
+end;
+
+{$ALIGN 8}
+type
+  LeapfrogOut = record
+  private
+    dp: ^LeapfrogDpOut;
+    ha: ^LeapfrogHaOut;
+    hc: ^LeapfrogHcOut;
+  public
+    procedure SetDpOut(var dpOut: LeapfrogDpOut);
+    procedure SetHaOut(var haOut: LeapfrogHaOut);
+    procedure SetHcOut(var hcOut: LeapfrogHcOut);
+end;
+
 type TCallbackFunction = procedure(Msg: PAnsiChar); stdcall;
 
-procedure LeapfrogRunDp(var opts: LeapfrogOptions; var params: LeapfrogDPParams; var leapfrogOut: LeapfrogDpOut; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_dp';
+procedure LeapfrogRunDp(var opts: LeapfrogOptions; var params: LeapfrogParams; var leapfrogOut: LeapfrogOut; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_dp';
+procedure LeapfrogRunAim(var opts: LeapfrogOptions; var params: LeapfrogParams; var leapfrogOut: LeapfrogOut; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_aim';
 
 implementation
 
@@ -891,6 +918,36 @@ procedure LeapfrogHcOut.SetInfectionByType(var inInfectionByType: TGBFixedArray<
 begin
   infectionByType := PDouble(inInfectionByType.data);
   infectionByTypeLength := inInfectionByType.GetLength();
+end;
+
+procedure LeapfrogParams.SetDpParams(var dpParams: LeapfrogDpParams);
+begin
+  dp := @dpParams;
+end;
+
+procedure LeapfrogParams.SetHaParams(var haParams: LeapfrogHaParams);
+begin
+  ha := @haParams;
+end;
+
+procedure LeapfrogParams.SetHcParams(var hcParams: LeapfrogHcParams);
+begin
+  hc := @hcParams;
+end;
+
+procedure LeapfrogOut.SetDpOut(var dpOut: LeapfrogDpOut);
+begin
+  dp := @dpOut;
+end;
+
+procedure LeapfrogOut.SetHaOut(var haOut: LeapfrogHaOut);
+begin
+  ha := @haOut;
+end;
+
+procedure LeapfrogOut.SetHcOut(var hcOut: LeapfrogHcOut);
+begin
+  hc := @hcOut;
 end;
 
 end.

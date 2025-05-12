@@ -12,10 +12,13 @@
 
 typedef void (WINAPI *CallbackFunction)(const char*);
 
-DllExport HRESULT WINAPI run_dp(leapfrog::internal::COptions& options, leapfrog::internal::DpParams<double>& data, leapfrog::internal::DpOut<double>& out, CallbackFunction error_handler) {
-  #pragma EXPORT
+template <typename ModelVariant>
+HRESULT fit_model(leapfrog::internal::COptions &options,
+                  leapfrog::internal::CParams<double> &data,
+                  leapfrog::internal::COutput<double> &out,
+                  CallbackFunction error_handler) {
 
-  using LF = leapfrog::Leapfrog<leapfrog::C, double, leapfrog::DemographicProjection>;
+  using LF = leapfrog::Leapfrog<leapfrog::C, double, ModelVariant>;
 
   try {
     std::vector<int> output_years((options.proj_end_year - options.proj_start_year) + 1);
@@ -28,7 +31,7 @@ DllExport HRESULT WINAPI run_dp(leapfrog::internal::COptions& options, leapfrog:
       options.proj_start_year,
       options.proj_end_year
     };
-    const auto pars = LF::Cfg::get_pars(data, opts);
+    const auto pars = LF::Cfg::get_pars(opts, data);
 
     auto state = LF::run_model(pars, opts, output_years);
     LF::Cfg::build_output(0, state, out);
@@ -42,3 +45,20 @@ DllExport HRESULT WINAPI run_dp(leapfrog::internal::COptions& options, leapfrog:
 
   return S_OK;
 }
+
+DllExport HRESULT WINAPI run_dp(leapfrog::internal::COptions &options,
+                                leapfrog::internal::CParams<double> &data,
+                                leapfrog::internal::COutput<double> &out,
+                                CallbackFunction error_handler) {
+  #pragma EXPORT
+  return fit_model<leapfrog::DemographicProjection>(options, data, out, error_handler);
+}
+
+DllExport HRESULT WINAPI run_aim(leapfrog::internal::COptions &options,
+                                 leapfrog::internal::CParams<double> &data,
+                                 leapfrog::internal::COutput<double> &out,
+                                 CallbackFunction error_handler) {
+  #pragma EXPORT
+  return fit_model<leapfrog::ChildModel>(options, data, out, error_handler);
+}
+

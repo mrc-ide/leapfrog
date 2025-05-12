@@ -53,7 +53,7 @@ struct HaParams {
   int cd4_progression_length;
   real_type* cd4_initial_distribution;
   int cd4_initial_distribution_length;
-  int* scale_cd4_mortality;
+  int scale_cd4_mortality;
   int scale_cd4_mortality_length;
   int* idx_hm_elig;
   int idx_hm_elig_length;
@@ -61,7 +61,7 @@ struct HaParams {
   int mortality_length;
   real_type* mortality_time_rate_ratio;
   int mortality_time_rate_ratio_length;
-  int* dropout_recover_cd4;
+  int dropout_recover_cd4;
   int dropout_recover_cd4_length;
   real_type* dropout_rate;
   int dropout_rate_length;
@@ -71,7 +71,7 @@ struct HaParams {
   int adults_on_art_is_percent_length;
   real_type* h_art_stage_dur;
   int h_art_stage_dur_length;
-  real_type* initiation_mortality_weight;
+  real_type initiation_mortality_weight;
   int initiation_mortality_weight_length;
 };
 
@@ -221,6 +221,20 @@ struct HcOut {
   int ctx_need_length;
   real_type* infection_by_type;
   int infection_by_type_length;
+};
+
+template<typename real_type>
+struct CParams {
+  DpParams<real_type>* dp;
+  HaParams<real_type>* ha;
+  HcParams<real_type>* hc;
+};
+
+template<typename real_type>
+struct COutput {
+  DpOut<real_type>* dp;
+  HaOut<real_type>* ha;
+  HcOut<real_type>* hc;
 };
 
 #pragma pack(pop)
