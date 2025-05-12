@@ -463,7 +463,7 @@
     "hc_art_grad": {
       "type": "TFS",
       "num_type": "real_type",
-      "dims": ["SS::hDS", "SS::hcTT", "SS::hAG", "SS::NS"]
+      "dims": ["SS::hTS", "SS::hDS", "SS::hAG", "SS::NS"]
     },
     "hc_art_scalar": {
       "type": "TFS",

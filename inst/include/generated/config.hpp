@@ -317,7 +317,7 @@ struct HcConfig {
     TFS<real_type, SS::hcAG_coarse> on_art;
     TFS<real_type, SS::hcAG_coarse> total_art_last_year;
     TFS<real_type, SS::hcAG_coarse> total_art_this_year;
-    TFS<real_type, SS::hDS, SS::hcTT, SS::hAG, SS::NS> hc_art_grad;
+    TFS<real_type, SS::hTS, SS::hDS, SS::hAG, SS::NS> hc_art_grad;
     TFS<real_type, SS::hcAG_coarse> hc_art_scalar;
     TFS<real_type, SS::hcAG_coarse> hc_initByAge;
     TFS<real_type, SS::hcAG_coarse> hc_adj;
