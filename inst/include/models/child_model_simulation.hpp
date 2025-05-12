@@ -1048,6 +1048,14 @@ struct ChildModelSimulation<Config> {
           for (int hd = 0; hd < hc1DS; ++hd) {
             auto hiv_deaths_strat = i_hc.ctx_mean(art_flag) * n_hc.hc1_hiv_pop(hd, cat, a, s) * p_hc.hc1_cd4_mort(hd, cat, a);
             i_hc.hc_posthivmort(hd, cat, a, s) = n_hc.hc1_hiv_pop(hd, cat, a, s) - hiv_deaths_strat;
+
+            for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+              auto hiv_deaths_strat = i_hc.ctx_mean(art_flag) *
+                n_hc.hc1_hiv_pop_strat(hp_agg, hd, cat, a, s) *
+                p_hc.hc1_cd4_mort(hd, cat, a);
+              i_hc.hc_posthivmort_strat(hp_agg, hd, cat, a, s) =
+                n_hc.hc1_hiv_pop_strat(hp_agg, hd, cat, a, s) - hiv_deaths_strat;
+            }
           }
         }
       }
@@ -1061,6 +1069,15 @@ struct ChildModelSimulation<Config> {
                                     p_hc.hc2_cd4_mort(hd, cat, a - hc2_agestart);
             i_hc.hc_posthivmort(hd, cat, a, s) = n_hc.hc2_hiv_pop(hd, cat, a - hc2_agestart, s) -
                                                 hiv_deaths_strat;
+
+
+            for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+              auto hiv_deaths_strat = i_hc.ctx_mean(art_flag) *
+                n_hc.hc2_hiv_pop_strat(hp_agg, hd, cat, a - hc2_agestart, s) *
+                p_hc.hc2_cd4_mort(hd, cat, a - hc2_agestart);
+              i_hc.hc_posthivmort_strat(hp_agg, hd, cat, a, s) =
+                n_hc.hc2_hiv_pop_strat(hp_agg, hd, cat, a - hc2_agestart, s) - hiv_deaths_strat;
+            }
           }
         }
       }
@@ -1077,6 +1094,15 @@ struct ChildModelSimulation<Config> {
                             2.0;
             i_hc.hc_grad(hd - 1, cat, a, s) -= cd4_grad; // moving to next cd4 category
             i_hc.hc_grad(hd, cat, a, s) += cd4_grad; // moving into this cd4 category
+
+              for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+                const auto& coarse_hc1_cd4_prog = p_hc.hc1_cd4_prog(hd - 1, p_hc.hc_age_coarse_cd4(a), s);
+                auto cd4_grad = coarse_hc1_cd4_prog *
+                  (i_hc.hc_posthivmort_strat(hp_agg, hd - 1, cat, a, s) + n_hc.hc1_hiv_pop_strat(hp_agg, hd - 1, cat, a, s)) /
+                    2.0;
+                i_hc.hc_grad_strat(hp_agg, hd - 1, cat, a, s) -= cd4_grad; // moving to next cd4 category
+                i_hc.hc_grad_strat(hp_agg, hd, cat, a, s) += cd4_grad; // moving into this cd4 category
+            }
           }
         }
       }
@@ -1092,6 +1118,15 @@ struct ChildModelSimulation<Config> {
                             2.0;
             i_hc.hc_grad(hd - 1, cat, a, s) -= cd4_grad; // moving to next cd4 category
             i_hc.hc_grad(hd, cat, a, s) += cd4_grad; // moving into this cd4 category
+
+            for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+              auto cd4_grad = p_hc.hc2_cd4_prog(hd - 1, 0, s) *
+                (i_hc.hc_posthivmort_strat(hp_agg, hd - 1, cat, a, s) +
+                n_hc.hc2_hiv_pop_strat(hp_agg, hd - 1, cat, a - hc2_agestart, s)) /
+                  2.0;
+              i_hc.hc_grad_strat(hp_agg, hd - 1, cat, a, s) -= cd4_grad; // moving to next cd4 category
+              i_hc.hc_grad_strat(hp_agg, hd, cat, a, s) += cd4_grad; // moving into this cd4 category
+            }
           }
         }
       }
