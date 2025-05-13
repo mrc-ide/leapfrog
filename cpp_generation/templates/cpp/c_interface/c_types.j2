@@ -39,7 +39,7 @@ struct CParams {
 };
 
 template<typename real_type>
-struct COutput {
+struct CState {
   {% for config in configs %}
   {{ config.name }}Out<real_type>* {{ config.name.lower() }};
   {% endfor %}

@@ -62,7 +62,7 @@ struct DpAdapter<Language::C, real_type, ModelVariant> {
   };
 
   static Config::State get_initial_state(
-    const COutput<real_type>& state
+    const CState<real_type>& state
   ){
     return {
       .p_total_pop = read_data<real_type>(state.dp->p_total_pop, state.dp->p_total_pop_length, "p_total_pop", SS::pAG, SS::NS),
@@ -76,7 +76,7 @@ struct DpAdapter<Language::C, real_type, ModelVariant> {
   static int build_output(
     int index,
     const Config::OutputState& state,
-    COutput<real_type>& out
+    CState<real_type>& out
   ) {
     write_data<real_type, 3>(state.p_total_pop, out.dp->p_total_pop, out.dp->p_total_pop_length, "p_total_pop");
     write_data<real_type, 3>(state.p_total_pop_background_deaths, out.dp->p_total_pop_background_deaths, out.dp->p_total_pop_background_deaths_length, "p_total_pop_background_deaths");
@@ -87,7 +87,7 @@ struct DpAdapter<Language::C, real_type, ModelVariant> {
   static int build_output_single_year(
     int index,
     const Config::State& state,
-    COutput<real_type>& out
+    CState<real_type>& out
   ) {
     write_data<real_type, 2>(state.p_total_pop, out.dp->p_total_pop, out.dp->p_total_pop_length, "p_total_pop");
     write_data<real_type, 2>(state.p_total_pop_background_deaths, out.dp->p_total_pop_background_deaths, out.dp->p_total_pop_background_deaths_length, "p_total_pop_background_deaths");
@@ -126,7 +126,7 @@ struct HaAdapter<Language::C, real_type, ModelVariant> {
   };
 
   static Config::State get_initial_state(
-    const COutput<real_type>& state
+    const CState<real_type>& state
   ){
     return {
       .p_hiv_pop = read_data<real_type>(state.ha->p_hiv_pop, state.ha->p_hiv_pop_length, "p_hiv_pop", SS::pAG, SS::NS),
@@ -146,7 +146,7 @@ struct HaAdapter<Language::C, real_type, ModelVariant> {
   static int build_output(
     int index,
     const Config::OutputState& state,
-    COutput<real_type>& out
+    CState<real_type>& out
   ) {
     write_data<real_type, 3>(state.p_hiv_pop, out.ha->p_hiv_pop, out.ha->p_hiv_pop_length, "p_hiv_pop");
     write_data<real_type, 3>(state.p_hiv_pop_background_deaths, out.ha->p_hiv_pop_background_deaths, out.ha->p_hiv_pop_background_deaths_length, "p_hiv_pop_background_deaths");
@@ -163,7 +163,7 @@ struct HaAdapter<Language::C, real_type, ModelVariant> {
   static int build_output_single_year(
     int index,
     const Config::State& state,
-    COutput<real_type>& out
+    CState<real_type>& out
   ) {
     write_data<real_type, 2>(state.p_hiv_pop, out.ha->p_hiv_pop, out.ha->p_hiv_pop_length, "p_hiv_pop");
     write_data<real_type, 2>(state.p_hiv_pop_background_deaths, out.ha->p_hiv_pop_background_deaths, out.ha->p_hiv_pop_background_deaths_length, "p_hiv_pop_background_deaths");
@@ -238,7 +238,7 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
   };
 
   static Config::State get_initial_state(
-    const COutput<real_type>& state
+    const CState<real_type>& state
   ){
     return {
       .hc1_hiv_pop = read_data<real_type>(state.hc->hc1_hiv_pop, state.hc->hc1_hiv_pop_length, "hc1_hiv_pop", SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS),
@@ -262,7 +262,7 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
   static int build_output(
     int index,
     const Config::OutputState& state,
-    COutput<real_type>& out
+    CState<real_type>& out
   ) {
     write_data<real_type, 5>(state.hc1_hiv_pop, out.hc->hc1_hiv_pop, out.hc->hc1_hiv_pop_length, "hc1_hiv_pop");
     write_data<real_type, 5>(state.hc2_hiv_pop, out.hc->hc2_hiv_pop, out.hc->hc2_hiv_pop_length, "hc2_hiv_pop");
@@ -283,7 +283,7 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
   static int build_output_single_year(
     int index,
     const Config::State& state,
-    COutput<real_type>& out
+    CState<real_type>& out
   ) {
     write_data<real_type, 4>(state.hc1_hiv_pop, out.hc->hc1_hiv_pop, out.hc->hc1_hiv_pop_length, "hc1_hiv_pop");
     write_data<real_type, 4>(state.hc2_hiv_pop, out.hc->hc2_hiv_pop, out.hc->hc2_hiv_pop_length, "hc2_hiv_pop");

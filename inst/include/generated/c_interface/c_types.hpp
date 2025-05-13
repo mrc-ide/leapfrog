@@ -231,7 +231,7 @@ struct CParams {
 };
 
 template<typename real_type>
-struct COutput {
+struct CState {
   DpOut<real_type>* dp;
   HaOut<real_type>* ha;
   HcOut<real_type>* hc;

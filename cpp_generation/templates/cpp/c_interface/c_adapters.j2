@@ -59,7 +59,7 @@ struct {{ config.name }}Adapter<Language::C, real_type, ModelVariant> {
   };
 
   static Config::State get_initial_state(
-    const COutput<real_type>& state
+    const CState<real_type>& state
   ){
     return {
       {% for name, cfg in config.state.items() %}
@@ -73,7 +73,7 @@ struct {{ config.name }}Adapter<Language::C, real_type, ModelVariant> {
   static int build_output(
     int index,
     const Config::OutputState& state,
-    COutput<real_type>& out
+    CState<real_type>& out
   ) {
     {% for name, cfg in config.state.items() %}
     {{ get_c_write_data(config.name, name, cfg) }}
@@ -84,7 +84,7 @@ struct {{ config.name }}Adapter<Language::C, real_type, ModelVariant> {
   static int build_output_single_year(
     int index,
     const Config::State& state,
-    COutput<real_type>& out
+    CState<real_type>& out
   ) {
     {% for name, cfg in config.state.items() %}
     {{ get_c_write_data_single_year(config.name, name, cfg) }}

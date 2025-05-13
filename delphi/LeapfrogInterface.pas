@@ -350,7 +350,7 @@ end;
 
 {$ALIGN 8}
 type
-  LeapfrogOut = record
+  LeapfrogState = record
   private
     dp: ^LeapfrogDpOut;
     ha: ^LeapfrogHaOut;
@@ -363,11 +363,10 @@ end;
 
 type TCallbackFunction = procedure(Msg: PAnsiChar); stdcall;
 
-procedure LeapfrogRunDp(var params: LeapfrogParams; var opts: LeapfrogOptions; var leapfrogOut: LeapfrogOut; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_dp';
-procedure LeapfrogRunAim(var params: LeapfrogParams; var opts: LeapfrogOptions; var leapfrogOut: LeapfrogOut; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_aim';
-procedure LeapfrogRunDpSingleYear(var params: LeapfrogParams; var opts: LeapfrogOptions; var initial_state: LeapfrogOut; start_year: Integer; var leapfrogOut: LeapfrogOut; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_dp_single_year';
-procedure LeapfrogRunAimSingleYear(var params: LeapfrogParams; var opts: LeapfrogOptions; var initial_state: LeapfrogOut; start_year: Integer; var leapfrogOut: LeapfrogOut; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_aim_single_year';
-
+procedure LeapfrogRunDp(var params: LeapfrogParams; var opts: LeapfrogOptions; var outputState: LeapfrogState; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_dp';
+procedure LeapfrogRunAim(var params: LeapfrogParams; var opts: LeapfrogOptions; var outputState: LeapfrogState; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_aim';
+procedure LeapfrogRunDpSingleYear(var params: LeapfrogParams; var opts: LeapfrogOptions; var initial_state: LeapfrogState; start_year: Integer; var state: LeapfrogState; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_dp_single_year';
+procedure LeapfrogRunAimSingleYear(var params: LeapfrogParams; var opts: LeapfrogOptions; var initial_state: LeapfrogState; start_year: Integer; var state: LeapfrogState; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_aim_single_year';
 
 implementation
 
@@ -928,7 +927,7 @@ begin
   dp := @dpParams;
 end;
 
-procedure LeapfrogOut.SetDpOut(var dpOut: LeapfrogDpOut);
+procedure LeapfrogState.SetDpOut(var dpOut: LeapfrogDpOut);
 begin
   dp := @dpOut;
 end;
@@ -938,7 +937,7 @@ begin
   ha := @haParams;
 end;
 
-procedure LeapfrogOut.SetHaOut(var haOut: LeapfrogHaOut);
+procedure LeapfrogState.SetHaOut(var haOut: LeapfrogHaOut);
 begin
   ha := @haOut;
 end;
@@ -948,7 +947,7 @@ begin
   hc := @hcParams;
 end;
 
-procedure LeapfrogOut.SetHcOut(var hcOut: LeapfrogHcOut);
+procedure LeapfrogState.SetHcOut(var hcOut: LeapfrogHcOut);
 begin
   hc := @hcOut;
 end;
