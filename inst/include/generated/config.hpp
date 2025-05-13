@@ -381,6 +381,7 @@ struct HcConfig {
     real_type women_ltfu_preg;
     real_type age_idx;
     real_type tt_idx;
+    real_type temp;
 
     Intermediate() {};
 
@@ -462,6 +463,7 @@ struct HcConfig {
       women_ltfu_preg = 0;
       age_idx = 0;
       tt_idx = 0;
+      temp = 0;
     };
   };
 

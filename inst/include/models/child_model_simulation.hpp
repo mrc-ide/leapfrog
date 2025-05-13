@@ -115,6 +115,25 @@ struct ChildModelSimulation<Config> {
 
   // private methods that we don't want people to call
   private:
+  void print_output() {
+      const auto& p_hc = pars.hc;
+      auto& n_hc = state_next.hc;
+      auto& i_hc = intermediate.hc;
+
+
+        for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+          for (int cat = 0; cat < hcTT; ++cat) {
+           i_hc.temp += n_hc.hc1_art_pop_strat(hp_agg, 0, 2, cat, 1, 0);
+          }
+        }
+
+  if(t == 34){
+    std::cout<< n_hc.hc1_art_pop(0, 2, 1, 0);
+    std::cout<< i_hc.temp;
+  }
+
+  };
+
   void run_child_ageing() {
     const auto& p_dp = pars.dp;
     const auto& p_hc = pars.hc;
@@ -133,8 +152,11 @@ struct ChildModelSimulation<Config> {
           }
           for (int dur = 0; dur < hTS; ++dur) {
             n_hc.hc1_art_pop(dur, hd, a, s) += c_hc.hc1_art_pop(dur, hd, a - 1, s) * p_dp.survival_probability(a, s, t);
-            // for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
-            // }
+            for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+              for (int cat = 0; cat < hcTT; ++cat) {
+                n_hc.hc1_art_pop_strat(hp_agg, dur, hd, cat, a, s) += c_hc.hc1_art_pop_strat(hp_agg, dur, hd, cat, a - 1, s) * p_dp.survival_probability(a, s, t);
+              }
+            }
           }
         }
       }
@@ -157,8 +179,13 @@ struct ChildModelSimulation<Config> {
             n_hc.hc2_art_pop(dur, hd_alt, 0, s) += c_hc.hc1_art_pop(dur, hd, hc1_ageend, s) *
                                                    p_dp.survival_probability(hc2_agestart, s, t) *
                                                    p_hc.hc_cd4_transition(hd_alt, hd);
-            // for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
-            // }
+            for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+              for (int cat = 0; cat < hcTT; ++cat) {
+                n_hc.hc2_art_pop_strat(hp_agg, dur, hd_alt, cat, 0, s) += c_hc.hc1_art_pop_strat(hp_agg, dur, hd, cat, hc1_ageend, s) *
+                  p_dp.survival_probability(hc2_agestart, s, t) *
+                  p_hc.hc_cd4_transition(hd_alt, hd);
+                }
+            }
           }
         }
       }
@@ -178,8 +205,12 @@ struct ChildModelSimulation<Config> {
           for (int dur = 0; dur < hTS; ++dur) {
             n_hc.hc2_art_pop(dur, hd, a - hc2_agestart, s) += c_hc.hc2_art_pop(dur, hd, a - hc2_agestart - 1, s) *
                                                               p_dp.survival_probability(a, s, t);
-            // for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
-            // }
+            for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+              for (int cat = 0; cat < hcTT; ++cat) {
+                n_hc.hc2_art_pop_strat(hp_agg, dur, hd, cat, a - hc2_agestart, s) += c_hc.hc2_art_pop_strat(hp_agg, dur, hd, cat, a - hc2_agestart - 1, s) *
+                  p_dp.survival_probability(a, s, t);
+                }
+            }
           }
         }
       }
@@ -988,13 +1019,13 @@ struct ChildModelSimulation<Config> {
               } else if (hd < hc2DS) {
                 n_hc.hc_art_need_init(hd, cat, a, s) += n_hc.hc2_hiv_pop(hd, cat, a - hc2_agestart, s);
               }
-            }
 
-            for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
-              if (a < hc2_agestart) {
-                n_hc.hc_art_need_init_strat(hp_agg, hd, cat, a, s) += n_hc.hc1_hiv_pop_strat(hp_agg, hd, cat, a, s);
-              } else if (hd < hc2DS) {
-                n_hc.hc_art_need_init_strat(hp_agg, hd, cat, a, s) += n_hc.hc2_hiv_pop_strat(hp_agg, hd, cat, a - hc2_agestart, s);
+              for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+                if (a < hc2_agestart) {
+                  n_hc.hc_art_need_init_strat(hp_agg, hd, cat, a, s) += n_hc.hc1_hiv_pop_strat(hp_agg, hd, cat, a, s);
+                } else if (hd < hc2DS) {
+                  n_hc.hc_art_need_init_strat(hp_agg, hd, cat, a, s) += n_hc.hc2_hiv_pop_strat(hp_agg, hd, cat, a - hc2_agestart, s);
+                }
               }
             }
           } // end hc1DS
@@ -1307,7 +1338,6 @@ struct ChildModelSimulation<Config> {
 
           // ctx reduction on mortality for those on ART
           i_hc.hc_death_rate *= i_hc.ctx_mean(art_flag);
-
           bool any_hc1_art_deaths = i_hc.hc_death_rate * n_hc.hc1_art_pop(t_art_idx, hd, a, s) >= 0;
           bool any_hc2_art_deaths = i_hc.hc_death_rate * n_hc.hc2_art_pop(t_art_idx, hd, a - hc2_agestart, s) >= 0;
           if (a < hc2_agestart && any_hc1_art_deaths) {
@@ -1323,6 +1353,7 @@ struct ChildModelSimulation<Config> {
 
           for (int cat = 0; cat < hcTT; ++cat) {
           for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+            i_hc.hc_art_grad_strat(hp_agg,t_art_idx,hd,cat, a, s) = 0.0;
             if (a < hc2_agestart && any_hc1_art_deaths) {
               i_hc.hc_art_grad_strat(hp_agg,t_art_idx,hd,cat, a, s) -= i_hc.hc_death_rate *
                 n_hc.hc1_art_pop_strat(hp_agg,t_art_idx, hd, cat, a, s);
@@ -1392,7 +1423,6 @@ struct ChildModelSimulation<Config> {
 
   void progress_time_on_art(int curr_t_idx, int end_t_idx) {
     auto& n_hc = state_next.hc;
-
     // Progress ART to the correct time on ART
     for (int hd = 0; hd < hc1DS; ++hd) {
       for (int a = 0; a < opts.p_idx_fertility_first; ++a) {
@@ -1819,10 +1849,25 @@ struct ChildModelSimulation<Config> {
               if (a < hc2_agestart) {
                 n_hc.hc1_art_pop(0, hd, a, s) += art_initiates;
                 n_hc.hc1_hiv_pop(hd, cat, a, s) -= art_initiates;
+
+                for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+                  auto art_initiates_strat = i_hc.hc_art_scalar(0) * n_hc.hc_art_need_init_strat(hp_agg, hd, cat, a, s);
+                  n_hc.hc1_art_pop_strat(hp_agg, 0, hd, cat, a, s) += art_initiates_strat;
+                  n_hc.hc1_hiv_pop_strat(hp_agg, hd, cat, a, s) -= art_initiates_strat;
+                }
               } else if (hd < (hc2DS)) {
                 n_hc.hc2_art_pop(0, hd, a - hc2_agestart, s) += art_initiates;
                 n_hc.hc2_hiv_pop(hd, cat, a - hc2_agestart, s) -= art_initiates;
+
+                for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+                  auto art_initiates_strat = i_hc.hc_art_scalar(0) * n_hc.hc_art_need_init_strat(hp_agg, hd, cat, a, s);
+                  n_hc.hc2_art_pop_strat(hp_agg, 0, hd, cat, a - hc2_agestart, s) += art_initiates_strat;
+                  n_hc.hc2_hiv_pop_strat(hp_agg, hd, cat, a - hc2_agestart, s) -= art_initiates_strat;
+                }
               }
+
+
+
             } // end hc1DS
           } // end a
         } // end hcTT

@@ -732,6 +732,10 @@
     "tt_idx": {
       "type": "scalar",
       "num_type": "real_type"
+    },
+     "temp": {
+      "type": "scalar",
+      "num_type": "real_type"
     }
   },
   "state": {

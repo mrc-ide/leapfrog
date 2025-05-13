@@ -109,11 +109,18 @@ test_that("Model outputs are consistent", {
     dplyr::mutate(diff = strat - pop)
   expect_true(all(abs(c2$diff) < 1e-5))
 
-  ##Stratfied by maternal treatment status
+  ##Stratfied by maternal treatment status- NO ART
   hc1_hiv <- out$hc1_noart_aids_deaths
   hc1_hiv_strat <- apply(out$hc1_noart_aids_deaths_strat, 2:6, sum)
   ##should be equal before ART is introduced
   expect_equal(hc1_hiv[,,,,1:30], hc1_hiv_strat[,,,,1:30])
+
+  ##Stratfied by maternal treatment status- ART
+  hc1_hiv <- out$hc1_art_aids_deaths
+  hc1_hiv_strat <- apply(out$hc1_art_aids_deaths_strat, c(2,3,5:7), sum)
+  ##should be equal when ART is entered as all ages
+  expect_equal(hc1_hiv[,,,,1:50], hc1_hiv_strat[,,,,1:50])
+
 
   ###############################
   ##Stratified hiv pop and population hiv pop should be the same
@@ -149,14 +156,35 @@ test_that("Model outputs are consistent", {
     dplyr::mutate(diff = strat - pop)
   expect_true(all(abs(c2$diff) < 1e-5))
 
-  ##Stratfied by maternal treatment status
-  input <- readRDS(test_path("testdata/child_parms.rds"))
-  out <- run_model(input$parameters, "ChildModel", 1970:2030)
+  ##Stratfied by maternal treatment status- NO ART
   hc1_hiv <- out$hc1_hiv_pop
   hc1_hiv_strat <- apply(out$hc1_hiv_pop_strat, 2:6, sum)
   ##should be equal before ART is introduced
   expect_equal(hc1_hiv[,,,,1:30], hc1_hiv_strat[,,,,1:30])
 
+  ##Stratfied by maternal treatment status- ART
+  hc1_hiv <- out$hc1_art_pop
+  hc1_hiv_strat <- apply(out$hc1_art_pop_strat, c(2,3,5:7), sum)
+  ##should be equal when ART is entered as all ages
+  expect_equal(hc1_hiv[,,,,1:50], hc1_hiv_strat[,,,,1:50])
+
+  # x <- data.table::data.table(reshape2::melt(hc1_hiv))
+  # setnames(x, 'value', 'base')
+  # y <- data.table::data.table(reshape2::melt(hc1_hiv_strat))
+  # setnames(y, 'value', 'strat')
+  # dt <- merge(x, y)
+  # dt[,diff := base - strat]
+  # pop = dt
+  # ##not all the way aligned here
+  # pop[Var5 == 35 & base > 0 & abs(diff) > 1e-5]
+  # deaths[Var5 == 35 & base > 0 & abs(diff) > 1e-5]
+
+  ###############################
+  ##Stratified ART need init should be the same
+  ###############################
+  art_need_init <- out$hc_art_need_init
+  art_need_init_strat <- apply(out$hc_art_need_init_strat, 2:6, sum)
+  expect_equal(art_need_init[,,,,1:50], art_need_init_strat[,,,,1:50])
 
 })
 
