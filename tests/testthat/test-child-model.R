@@ -1,3 +1,6 @@
+##########NOTE: ART ltfu is implemented but tests are now failing lol
+
+
 test_that("Child model can be run for all years", {
   input <- readRDS(test_path("testdata/child_parms.rds"))
 
@@ -36,7 +39,7 @@ test_that("Child model can be run for all years", {
 
 test_that("Model outputs are consistent", {
   input <- readRDS(test_path("testdata/child_parms.rds"))
-  input$parameters$paed_art_ltfu[] = 0
+  #input$parameters$paed_art_ltfu[] = 0
   out <- run_model(input$parameters, "ChildModel", 1970:2030)
 
   ###############################
@@ -155,25 +158,16 @@ test_that("Model outputs are consistent", {
   expect_true(all(abs(c2$diff) < 1e-5))
 
   ##Stratfied by maternal treatment status- NO ART
+  out <- run_model(input$parameters, "ChildModel", 1970:2030)
   hc1_hiv <- out$hc1_hiv_pop
   hc1_hiv_strat <- apply(out$hc1_hiv_pop_strat, 2:6, sum)
   expect_equal(hc1_hiv, hc1_hiv_strat)
 
   ##Stratfied by maternal treatment status- ART
+  out <- run_model(input$parameters, "ChildModel", 1970:2030)
   hc1_hiv <- out$hc1_art_pop
   hc1_hiv_strat <- apply(out$hc1_art_pop_strat, c(2,3,5:7), sum)
   expect_equal(hc1_hiv, hc1_hiv_strat)
-
-  # x <- data.table::data.table(reshape2::melt(hc1_hiv))
-  # setnames(x, 'value', 'base')
-  # y <- data.table::data.table(reshape2::melt(hc1_hiv_strat))
-  # setnames(y, 'value', 'strat')
-  # dt <- merge(x, y)
-  # dt[,diff := base - strat]
-  # pop = dt
-  # ##not all the way aligned here
-  # pop[Var5 == 35 & base > 0 & abs(diff) > 1e-5]
-  # deaths[Var5 == 35 & base > 0 & abs(diff) > 1e-5]
 
   ###############################
   ##Stratified ART need init should be the same
