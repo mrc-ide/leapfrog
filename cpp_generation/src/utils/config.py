@@ -82,11 +82,11 @@ def get_delphi_setter(name, cfg):
 
 
 def get_delphi_param_setter(config_name):
-  return f'Set{ config_name }Params(var { config_name.lower() }Params: Leapfrog{ config_name }Params)'
+  return f'Set{ config_name }Params(var { config_name.lower() }Params: Leapfrog{ config_name }Params);'
 
 
 def get_delphi_state_setter(config_name):
-  return f'Set{ config_name }State(var { config_name.lower() }State: Leapfrog{ config_name }State)'
+  return f'Set{ config_name }State(var { config_name.lower() }State: Leapfrog{ config_name }State);'
 
 
 def get_reset(name, cfg):

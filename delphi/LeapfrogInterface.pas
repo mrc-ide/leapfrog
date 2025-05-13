@@ -343,9 +343,9 @@ type
     ha: ^LeapfrogHaParams;
     hc: ^LeapfrogHcParams;
   public
-    procedure SetDpParams(var dpParams: LeapfrogDpParams)
-    procedure SetHaParams(var haParams: LeapfrogHaParams)
-    procedure SetHcParams(var hcParams: LeapfrogHcParams)
+    procedure SetDpParams(var dpParams: LeapfrogDpParams);
+    procedure SetHaParams(var haParams: LeapfrogHaParams);
+    procedure SetHcParams(var hcParams: LeapfrogHcParams);
 end;
 
 {$ALIGN 8}
@@ -356,9 +356,9 @@ type
     ha: ^LeapfrogHaState;
     hc: ^LeapfrogHcState;
   public
-    procedure SetDpState(var dpState: LeapfrogDpState)
-    procedure SetHaState(var haState: LeapfrogHaState)
-    procedure SetHcState(var hcState: LeapfrogHcState)
+    procedure SetDpState(var dpState: LeapfrogDpState);
+    procedure SetHaState(var haState: LeapfrogHaState);
+    procedure SetHcState(var hcState: LeapfrogHcState);
 end;
 
 type TCallbackFunction = procedure(Msg: PAnsiChar); stdcall;
@@ -922,32 +922,32 @@ begin
   infectionByTypeLength := inInfectionByType.GetLength();
 end;
 
-procedure LeapfrogParams.SetDpParams(var dpParams: LeapfrogDpParams)
+procedure LeapfrogParams.SetDpParams(var dpParams: LeapfrogDpParams);
 begin
   dp := @dpParams;
 end;
 
-procedure LeapfrogState.SetDpState(var dpState: LeapfrogDpState)
+procedure LeapfrogState.SetDpState(var dpState: LeapfrogDpState);
 begin
   dp := @dpState;
 end;
 
-procedure LeapfrogParams.SetHaParams(var haParams: LeapfrogHaParams)
+procedure LeapfrogParams.SetHaParams(var haParams: LeapfrogHaParams);
 begin
   ha := @haParams;
 end;
 
-procedure LeapfrogState.SetHaState(var haState: LeapfrogHaState)
+procedure LeapfrogState.SetHaState(var haState: LeapfrogHaState);
 begin
   ha := @haState;
 end;
 
-procedure LeapfrogParams.SetHcParams(var hcParams: LeapfrogHcParams)
+procedure LeapfrogParams.SetHcParams(var hcParams: LeapfrogHcParams);
 begin
   hc := @hcParams;
 end;
 
-procedure LeapfrogState.SetHcState(var hcState: LeapfrogHcState)
+procedure LeapfrogState.SetHcState(var hcState: LeapfrogHcState);
 begin
   hc := @hcState;
 end;
