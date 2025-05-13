@@ -41,7 +41,7 @@ end;
 
 {$ALIGN 8}
 type
-  LeapfrogDpOut = record
+  LeapfrogDpState = record
   private
     pTotalPop: PDouble;
     pTotalPopLength: Integer;
@@ -112,7 +112,7 @@ end;
 
 {$ALIGN 8}
 type
-  LeapfrogHaOut = record
+  LeapfrogHaState = record
   private
     pHivPop: PDouble;
     pHivPopLength: Integer;
@@ -291,7 +291,7 @@ end;
 
 {$ALIGN 8}
 type
-  LeapfrogHcOut = record
+  LeapfrogHcState = record
   private
     hc1HivPop: PDouble;
     hc1HivPopLength: Integer;
@@ -343,22 +343,22 @@ type
     ha: ^LeapfrogHaParams;
     hc: ^LeapfrogHcParams;
   public
-    procedure SetDpParams(var dpParams: LeapfrogDpParams);
-    procedure SetHaParams(var haParams: LeapfrogHaParams);
-    procedure SetHcParams(var hcParams: LeapfrogHcParams);
+    procedure SetDpParams(var dpParams: LeapfrogDpParams)
+    procedure SetHaParams(var haParams: LeapfrogHaParams)
+    procedure SetHcParams(var hcParams: LeapfrogHcParams)
 end;
 
 {$ALIGN 8}
 type
   LeapfrogState = record
   private
-    dp: ^LeapfrogDpOut;
-    ha: ^LeapfrogHaOut;
-    hc: ^LeapfrogHcOut;
+    dp: ^LeapfrogDpState;
+    ha: ^LeapfrogHaState;
+    hc: ^LeapfrogHcState;
   public
-    procedure SetDpOut(var dpOut: LeapfrogDpOut);
-    procedure SetHaOut(var haOut: LeapfrogHaOut);
-    procedure SetHcOut(var hcOut: LeapfrogHcOut);
+    procedure SetDpState(var dpState: LeapfrogDpState)
+    procedure SetHaState(var haState: LeapfrogHaState)
+    procedure SetHcState(var hcState: LeapfrogHcState)
 end;
 
 type TCallbackFunction = procedure(Msg: PAnsiChar); stdcall;
@@ -400,19 +400,19 @@ begin
   birthsSexPropLength := inBirthsSexProp.GetLength();
 end;
 
-procedure LeapfrogDpOut.SetPTotalPop(var inPTotalPop: TGBFixedArray<Double>);
+procedure LeapfrogDpState.SetPTotalPop(var inPTotalPop: TGBFixedArray<Double>);
 begin
   pTotalPop := PDouble(inPTotalPop.data);
   pTotalPopLength := inPTotalPop.GetLength();
 end;
 
-procedure LeapfrogDpOut.SetPTotalPopBackgroundDeaths(var inPTotalPopBackgroundDeaths: TGBFixedArray<Double>);
+procedure LeapfrogDpState.SetPTotalPopBackgroundDeaths(var inPTotalPopBackgroundDeaths: TGBFixedArray<Double>);
 begin
   pTotalPopBackgroundDeaths := PDouble(inPTotalPopBackgroundDeaths.data);
   pTotalPopBackgroundDeathsLength := inPTotalPopBackgroundDeaths.GetLength();
 end;
 
-procedure LeapfrogDpOut.SetBirths(var inBirths: TGBFixedArray<Double>);
+procedure LeapfrogDpState.SetBirths(var inBirths: TGBFixedArray<Double>);
 begin
   births := PDouble(inBirths.data);
   birthsLength := inBirths.GetLength();
@@ -514,55 +514,55 @@ begin
   hArtStageDurLength := inHArtStageDur.GetLength();
 end;
 
-procedure LeapfrogHaOut.SetPHivPop(var inPHivPop: TGBFixedArray<Double>);
+procedure LeapfrogHaState.SetPHivPop(var inPHivPop: TGBFixedArray<Double>);
 begin
   pHivPop := PDouble(inPHivPop.data);
   pHivPopLength := inPHivPop.GetLength();
 end;
 
-procedure LeapfrogHaOut.SetPHivPopBackgroundDeaths(var inPHivPopBackgroundDeaths: TGBFixedArray<Double>);
+procedure LeapfrogHaState.SetPHivPopBackgroundDeaths(var inPHivPopBackgroundDeaths: TGBFixedArray<Double>);
 begin
   pHivPopBackgroundDeaths := PDouble(inPHivPopBackgroundDeaths.data);
   pHivPopBackgroundDeathsLength := inPHivPopBackgroundDeaths.GetLength();
 end;
 
-procedure LeapfrogHaOut.SetHHivAdult(var inHHivAdult: TGBFixedArray<Double>);
+procedure LeapfrogHaState.SetHHivAdult(var inHHivAdult: TGBFixedArray<Double>);
 begin
   hHivAdult := PDouble(inHHivAdult.data);
   hHivAdultLength := inHHivAdult.GetLength();
 end;
 
-procedure LeapfrogHaOut.SetHArtAdult(var inHArtAdult: TGBFixedArray<Double>);
+procedure LeapfrogHaState.SetHArtAdult(var inHArtAdult: TGBFixedArray<Double>);
 begin
   hArtAdult := PDouble(inHArtAdult.data);
   hArtAdultLength := inHArtAdult.GetLength();
 end;
 
-procedure LeapfrogHaOut.SetHHivDeathsNoArt(var inHHivDeathsNoArt: TGBFixedArray<Double>);
+procedure LeapfrogHaState.SetHHivDeathsNoArt(var inHHivDeathsNoArt: TGBFixedArray<Double>);
 begin
   hHivDeathsNoArt := PDouble(inHHivDeathsNoArt.data);
   hHivDeathsNoArtLength := inHHivDeathsNoArt.GetLength();
 end;
 
-procedure LeapfrogHaOut.SetPInfections(var inPInfections: TGBFixedArray<Double>);
+procedure LeapfrogHaState.SetPInfections(var inPInfections: TGBFixedArray<Double>);
 begin
   pInfections := PDouble(inPInfections.data);
   pInfectionsLength := inPInfections.GetLength();
 end;
 
-procedure LeapfrogHaOut.SetHHivDeathsArt(var inHHivDeathsArt: TGBFixedArray<Double>);
+procedure LeapfrogHaState.SetHHivDeathsArt(var inHHivDeathsArt: TGBFixedArray<Double>);
 begin
   hHivDeathsArt := PDouble(inHHivDeathsArt.data);
   hHivDeathsArtLength := inHHivDeathsArt.GetLength();
 end;
 
-procedure LeapfrogHaOut.SetHArtInitiation(var inHArtInitiation: TGBFixedArray<Double>);
+procedure LeapfrogHaState.SetHArtInitiation(var inHArtInitiation: TGBFixedArray<Double>);
 begin
   hArtInitiation := PDouble(inHArtInitiation.data);
   hArtInitiationLength := inHArtInitiation.GetLength();
 end;
 
-procedure LeapfrogHaOut.SetPHivDeaths(var inPHivDeaths: TGBFixedArray<Double>);
+procedure LeapfrogHaState.SetPHivDeaths(var inPHivDeaths: TGBFixedArray<Double>);
 begin
   pHivDeaths := PDouble(inPHivDeaths.data);
   pHivDeathsLength := inPHivDeaths.GetLength();
@@ -844,112 +844,112 @@ begin
   localAdjFactorLength := inLocalAdjFactor.GetLength();
 end;
 
-procedure LeapfrogHcOut.SetHc1HivPop(var inHc1HivPop: TGBFixedArray<Double>);
+procedure LeapfrogHcState.SetHc1HivPop(var inHc1HivPop: TGBFixedArray<Double>);
 begin
   hc1HivPop := PDouble(inHc1HivPop.data);
   hc1HivPopLength := inHc1HivPop.GetLength();
 end;
 
-procedure LeapfrogHcOut.SetHc2HivPop(var inHc2HivPop: TGBFixedArray<Double>);
+procedure LeapfrogHcState.SetHc2HivPop(var inHc2HivPop: TGBFixedArray<Double>);
 begin
   hc2HivPop := PDouble(inHc2HivPop.data);
   hc2HivPopLength := inHc2HivPop.GetLength();
 end;
 
-procedure LeapfrogHcOut.SetHc1ArtPop(var inHc1ArtPop: TGBFixedArray<Double>);
+procedure LeapfrogHcState.SetHc1ArtPop(var inHc1ArtPop: TGBFixedArray<Double>);
 begin
   hc1ArtPop := PDouble(inHc1ArtPop.data);
   hc1ArtPopLength := inHc1ArtPop.GetLength();
 end;
 
-procedure LeapfrogHcOut.SetHc2ArtPop(var inHc2ArtPop: TGBFixedArray<Double>);
+procedure LeapfrogHcState.SetHc2ArtPop(var inHc2ArtPop: TGBFixedArray<Double>);
 begin
   hc2ArtPop := PDouble(inHc2ArtPop.data);
   hc2ArtPopLength := inHc2ArtPop.GetLength();
 end;
 
-procedure LeapfrogHcOut.SetHc1NoartAidsDeaths(var inHc1NoartAidsDeaths: TGBFixedArray<Double>);
+procedure LeapfrogHcState.SetHc1NoartAidsDeaths(var inHc1NoartAidsDeaths: TGBFixedArray<Double>);
 begin
   hc1NoartAidsDeaths := PDouble(inHc1NoartAidsDeaths.data);
   hc1NoartAidsDeathsLength := inHc1NoartAidsDeaths.GetLength();
 end;
 
-procedure LeapfrogHcOut.SetHc2NoartAidsDeaths(var inHc2NoartAidsDeaths: TGBFixedArray<Double>);
+procedure LeapfrogHcState.SetHc2NoartAidsDeaths(var inHc2NoartAidsDeaths: TGBFixedArray<Double>);
 begin
   hc2NoartAidsDeaths := PDouble(inHc2NoartAidsDeaths.data);
   hc2NoartAidsDeathsLength := inHc2NoartAidsDeaths.GetLength();
 end;
 
-procedure LeapfrogHcOut.SetHc1ArtAidsDeaths(var inHc1ArtAidsDeaths: TGBFixedArray<Double>);
+procedure LeapfrogHcState.SetHc1ArtAidsDeaths(var inHc1ArtAidsDeaths: TGBFixedArray<Double>);
 begin
   hc1ArtAidsDeaths := PDouble(inHc1ArtAidsDeaths.data);
   hc1ArtAidsDeathsLength := inHc1ArtAidsDeaths.GetLength();
 end;
 
-procedure LeapfrogHcOut.SetHc2ArtAidsDeaths(var inHc2ArtAidsDeaths: TGBFixedArray<Double>);
+procedure LeapfrogHcState.SetHc2ArtAidsDeaths(var inHc2ArtAidsDeaths: TGBFixedArray<Double>);
 begin
   hc2ArtAidsDeaths := PDouble(inHc2ArtAidsDeaths.data);
   hc2ArtAidsDeathsLength := inHc2ArtAidsDeaths.GetLength();
 end;
 
-procedure LeapfrogHcOut.SetHcArtInit(var inHcArtInit: TGBFixedArray<Double>);
+procedure LeapfrogHcState.SetHcArtInit(var inHcArtInit: TGBFixedArray<Double>);
 begin
   hcArtInit := PDouble(inHcArtInit.data);
   hcArtInitLength := inHcArtInit.GetLength();
 end;
 
-procedure LeapfrogHcOut.SetHcArtNeedInit(var inHcArtNeedInit: TGBFixedArray<Double>);
+procedure LeapfrogHcState.SetHcArtNeedInit(var inHcArtNeedInit: TGBFixedArray<Double>);
 begin
   hcArtNeedInit := PDouble(inHcArtNeedInit.data);
   hcArtNeedInitLength := inHcArtNeedInit.GetLength();
 end;
 
-procedure LeapfrogHcOut.SetHivBirths(var inHivBirths: TGBFixedArray<Double>);
+procedure LeapfrogHcState.SetHivBirths(var inHivBirths: TGBFixedArray<Double>);
 begin
   hivBirths := PDouble(inHivBirths.data);
   hivBirthsLength := inHivBirths.GetLength();
 end;
 
-procedure LeapfrogHcOut.SetCtxNeed(var inCtxNeed: TGBFixedArray<Double>);
+procedure LeapfrogHcState.SetCtxNeed(var inCtxNeed: TGBFixedArray<Double>);
 begin
   ctxNeed := PDouble(inCtxNeed.data);
   ctxNeedLength := inCtxNeed.GetLength();
 end;
 
-procedure LeapfrogHcOut.SetInfectionByType(var inInfectionByType: TGBFixedArray<Double>);
+procedure LeapfrogHcState.SetInfectionByType(var inInfectionByType: TGBFixedArray<Double>);
 begin
   infectionByType := PDouble(inInfectionByType.data);
   infectionByTypeLength := inInfectionByType.GetLength();
 end;
 
-procedure LeapfrogParams.SetDpParams(var dpParams: LeapfrogDpParams);
+procedure LeapfrogParams.SetDpParams(var dpParams: LeapfrogDpParams)
 begin
   dp := @dpParams;
 end;
 
-procedure LeapfrogState.SetDpOut(var dpOut: LeapfrogDpOut);
+procedure LeapfrogState.SetDpState(var dpState: LeapfrogDpState)
 begin
-  dp := @dpOut;
+  dp := @dpState;
 end;
 
-procedure LeapfrogParams.SetHaParams(var haParams: LeapfrogHaParams);
+procedure LeapfrogParams.SetHaParams(var haParams: LeapfrogHaParams)
 begin
   ha := @haParams;
 end;
 
-procedure LeapfrogState.SetHaOut(var haOut: LeapfrogHaOut);
+procedure LeapfrogState.SetHaState(var haState: LeapfrogHaState)
 begin
-  ha := @haOut;
+  ha := @haState;
 end;
 
-procedure LeapfrogParams.SetHcParams(var hcParams: LeapfrogHcParams);
+procedure LeapfrogParams.SetHcParams(var hcParams: LeapfrogHcParams)
 begin
   hc := @hcParams;
 end;
 
-procedure LeapfrogState.SetHcOut(var hcOut: LeapfrogHcOut);
+procedure LeapfrogState.SetHcState(var hcState: LeapfrogHcState)
 begin
-  hc := @hcOut;
+  hc := @hcState;
 end;
 
 end.

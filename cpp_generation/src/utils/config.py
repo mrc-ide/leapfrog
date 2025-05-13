@@ -76,6 +76,19 @@ def get_c_write_data_single_year(config_name, name, cfg):
     return f'write_data<{cfg["num_type"]}, {dim_len(cfg)}>(state.{name}, out.{config_name}->{name}, out.{config_name}->{name}_length, "{name}");'
 
 
+def get_delphi_setter(name, cfg):
+  name = to_camel_case(name)
+  return f'Set{ name }(var in{ name }: TGBFixedArray<{get_delphi_num_type(cfg)}>);'
+
+
+def get_delphi_param_setter(config_name):
+  return f'Set{ config_name }Params(var { config_name.lower() }Params: Leapfrog{ config_name }Params)'
+
+
+def get_delphi_state_setter(config_name):
+  return f'Set{ config_name }State(var { config_name.lower() }State: Leapfrog{ config_name }State)'
+
+
 def get_reset(name, cfg):
   if cfg["type"] == "scalar":
     return f'{name} = {cfg.get("default") or 0}'

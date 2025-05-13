@@ -25,13 +25,13 @@ type
     {% endfor %}
   public
     {% for name, cfg in config.pars.default.items() %}
-    procedure Set{{ to_camel_case(name) }}(var in{{ to_camel_case(name) }}: TGBFixedArray<{{ get_delphi_num_type(cfg) }}>);
+    procedure {{ get_delphi_setter(name, cfg) }}
     {% endfor %}
 end;
 
 {$ALIGN 8}
 type
-  Leapfrog{{ config.name }}Out = record
+  Leapfrog{{ config.name }}State = record
   private
     {% for name, cfg in config.state.items() %}
     {{ to_lower_camel_case(name) }}: {{ get_delphi_ptr_type(cfg) }};
@@ -39,7 +39,7 @@ type
     {% endfor %}
   public
     {% for name, cfg in config.state.items() %}
-    procedure Set{{ to_camel_case(name) }}(var in{{ to_camel_case(name) }}: TGBFixedArray<{{get_delphi_num_type(cfg)}}>);
+    procedure {{ get_delphi_setter(name, cfg) }}
     {% endfor %}
 end;
 
@@ -53,7 +53,7 @@ type
     {% endfor %}
   public
     {% for config in configs %}
-    procedure Set{{ config.name }}Params(var {{ config.name.lower() }}Params: Leapfrog{{ config.name }}Params);
+    procedure {{ get_delphi_param_setter(config.name) }}
     {% endfor %}
 end;
 
@@ -62,11 +62,11 @@ type
   LeapfrogState = record
   private
     {% for config in configs %}
-    {{ config.name.lower() }}: ^Leapfrog{{ config.name }}Out;
+    {{ config.name.lower() }}: ^Leapfrog{{ config.name }}State;
     {% endfor %}
   public
     {% for config in configs %}
-    procedure Set{{ config.name }}Out(var {{ config.name.lower() }}Out: Leapfrog{{ config.name }}Out);
+    procedure {{ get_delphi_state_setter(config.name) }}
     {% endfor %}
 end;
 
@@ -81,7 +81,7 @@ implementation
 
 {% for config in configs %}
 {% for name, cfg in config.pars.default.items() %}
-procedure Leapfrog{{ config.name }}Params.Set{{ to_camel_case(name) }}(var in{{ to_camel_case(name) }}: TGBFixedArray<{{ get_delphi_num_type(cfg) }}>);
+procedure Leapfrog{{ config.name }}Params.{{ get_delphi_setter(name, cfg) }}
 begin
   {{ to_lower_camel_case(name) }} := {{ get_delphi_ptr_type(cfg) }}(in{{ to_camel_case(name) }}.data);
   {{ to_lower_camel_case(name) }}Length := in{{ to_camel_case(name) }}.GetLength();
@@ -89,7 +89,7 @@ end;
 
 {% endfor %}
 {% for name, cfg in config.state.items() %}
-procedure Leapfrog{{ config.name }}Out.Set{{ to_camel_case(name) }}(var in{{ to_camel_case(name) }}: TGBFixedArray<{{ get_delphi_num_type(cfg) }}>);
+procedure Leapfrog{{ config.name }}State.{{ get_delphi_setter(name, cfg) }}
 begin
   {{ to_lower_camel_case(name) }} := {{ get_delphi_ptr_type(cfg) }}(in{{ to_camel_case(name) }}.data);
   {{ to_lower_camel_case(name) }}Length := in{{ to_camel_case(name) }}.GetLength();
@@ -98,14 +98,14 @@ end;
 {% endfor %}
 {% endfor %}
 {% for config in configs %}
-procedure LeapfrogParams.Set{{ config.name }}Params(var {{ config.name.lower() }}Params: Leapfrog{{ config.name }}Params);
+procedure LeapfrogParams.{{ get_delphi_param_setter(config.name) }}
 begin
   {{ config.name.lower() }} := @{{ config.name.lower() }}Params;
 end;
 
-procedure LeapfrogState.Set{{ config.name }}Out(var {{ config.name.lower() }}Out: Leapfrog{{ config.name }}Out);
+procedure LeapfrogState.{{ get_delphi_state_setter(config.name) }}
 begin
-  {{ config.name.lower() }} := @{{ config.name.lower() }}Out;
+  {{ config.name.lower() }} := @{{ config.name.lower() }}State;
 end;
 
 {% endfor %}
