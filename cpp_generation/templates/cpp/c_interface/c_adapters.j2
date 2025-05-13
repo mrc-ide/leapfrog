@@ -48,12 +48,22 @@ struct {{ config.name }}Adapter<Language::C, real_type, ModelVariant> {
   using Config = {{ config.name }}Config<real_type, ModelVariant>;
 
   static Config::Pars get_pars(
-    const Options<real_type> &opts,
-    const CParams<real_type> &params
+    const CParams<real_type> &params,
+    const Options<real_type> &opts
   ) {
     return {
-      {% for name, cfg in config.pars.items() %}
+      {% for name, cfg in config.pars.default.items() %}
       .{{ name }} = {{ get_c_read_data(config.name, name, cfg) }}{{ comma_except_last(loop) }}
+      {% endfor %}
+    };
+  };
+
+  static Config::State get_initial_state(
+    const COutput<real_type>& state
+  ){
+    return {
+      {% for name, cfg in config.state.items() %}
+      .{{ name }} = {{ get_c_initial_state(config.name, name, cfg) }}{{ comma_except_last(loop) }}
       {% endfor %}
     };
   };
@@ -67,6 +77,17 @@ struct {{ config.name }}Adapter<Language::C, real_type, ModelVariant> {
   ) {
     {% for name, cfg in config.state.items() %}
     {{ get_c_write_data(config.name, name, cfg) }}
+    {% endfor %}
+    return index + output_count;
+  };
+
+  static int build_output_single_year(
+    int index,
+    const Config::State& state,
+    COutput<real_type>& out
+  ) {
+    {% for name, cfg in config.state.items() %}
+    {{ get_c_write_data_single_year(config.name, name, cfg) }}
     {% endfor %}
     return index + output_count;
   };

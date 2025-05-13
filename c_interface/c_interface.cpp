@@ -13,8 +13,8 @@
 typedef void (WINAPI *CallbackFunction)(const char*);
 
 template <typename ModelVariant>
-HRESULT fit_model(leapfrog::internal::COptions &options,
-                  leapfrog::internal::CParams<double> &data,
+HRESULT fit_model(leapfrog::internal::CParams<double> &data,
+                  leapfrog::internal::COptions &options,
                   leapfrog::internal::COutput<double> &out,
                   CallbackFunction error_handler) {
 
@@ -31,7 +31,7 @@ HRESULT fit_model(leapfrog::internal::COptions &options,
       options.proj_start_year,
       options.proj_end_year
     };
-    const auto pars = LF::Cfg::get_pars(opts, data);
+    const auto pars = LF::Cfg::get_pars(data, opts);
 
     auto state = LF::run_model(pars, opts, output_years);
     LF::Cfg::build_output(0, state, out);
@@ -46,19 +46,73 @@ HRESULT fit_model(leapfrog::internal::COptions &options,
   return S_OK;
 }
 
-DllExport HRESULT WINAPI run_dp(leapfrog::internal::COptions &options,
-                                leapfrog::internal::CParams<double> &data,
-                                leapfrog::internal::COutput<double> &out,
-                                CallbackFunction error_handler) {
-  #pragma EXPORT
-  return fit_model<leapfrog::DemographicProjection>(options, data, out, error_handler);
+DllExport HRESULT WINAPI run_dp(leapfrog::internal::CParams<double> &data,
+  leapfrog::internal::COptions &options,
+  leapfrog::internal::COutput<double> &out,
+  CallbackFunction error_handler) {
+#pragma EXPORT
+return fit_model<leapfrog::DemographicProjection>(data, options, out, error_handler);
 }
 
-DllExport HRESULT WINAPI run_aim(leapfrog::internal::COptions &options,
-                                 leapfrog::internal::CParams<double> &data,
-                                 leapfrog::internal::COutput<double> &out,
-                                 CallbackFunction error_handler) {
+DllExport HRESULT WINAPI run_aim(leapfrog::internal::CParams<double> &data,
+   leapfrog::internal::COptions &options,
+   leapfrog::internal::COutput<double> &out,
+   CallbackFunction error_handler) {
+#pragma EXPORT
+return fit_model<leapfrog::ChildModel>(data, options, out, error_handler);
+}
+
+template <typename ModelVariant>
+HRESULT fit_model_single_year(leapfrog::internal::CParams<double> &data,
+                              leapfrog::internal::COptions &options,
+                              leapfrog::internal::COutput<double> &initial_state_data,
+                              int start_from_year,
+                              leapfrog::internal::COutput<double> &out,
+                              CallbackFunction error_handler) {
+
+  using LF = leapfrog::Leapfrog<leapfrog::C, double, ModelVariant>;
+
+  try {
+    const leapfrog::Options<double> opts =  {
+      10,
+      34,
+      leapfrog::internal::BaseSS::PROJPERIOD_CALENDAR,
+      options.proj_start_year,
+      options.proj_end_year
+    };
+    const auto pars = LF::Cfg::get_pars(data, opts);
+    const auto initial_state = LF::Cfg::get_initial_state(initial_state_data);
+
+    auto state = LF::run_model_single_year(pars, opts, initial_state, start_from_year);
+    LF::Cfg::build_output_single_year(0, state, out);
+  } catch (const std::invalid_argument& e) {
+    error_handler(e.what());
+    return E_INVALIDARG;
+  } catch (...) {
+    error_handler("Caught unhandled exception");
+    return E_FAIL;
+  }
+
+  return S_OK;
+}
+
+DllExport HRESULT WINAPI run_dp_single_year(leapfrog::internal::CParams<double> &data,
+                                            leapfrog::internal::COptions &options,
+                                            leapfrog::internal::COutput<double> &initial_state,
+                                            int start_from_year,
+                                            leapfrog::internal::COutput<double> &out,
+                                            CallbackFunction error_handler) {
   #pragma EXPORT
-  return fit_model<leapfrog::ChildModel>(options, data, out, error_handler);
+  return fit_model_single_year<leapfrog::DemographicProjection>(data, options, initial_state, start_from_year, out, error_handler);
+}
+
+DllExport HRESULT WINAPI run_aim_single_year(leapfrog::internal::CParams<double> &data,
+                                             leapfrog::internal::COptions &options,
+                                             leapfrog::internal::COutput<double> &initial_state,
+                                             int start_from_year,
+                                             leapfrog::internal::COutput<double> &out,
+                                             CallbackFunction error_handler) {
+  #pragma EXPORT
+  return fit_model_single_year<leapfrog::ChildModel>(data, options, initial_state, start_from_year, out, error_handler);
 }
 

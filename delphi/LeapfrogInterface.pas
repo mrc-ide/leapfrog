@@ -45,13 +45,13 @@ type
   private
     pTotalPop: PDouble;
     pTotalPopLength: Integer;
-    pTotalPopNaturalDeaths: PDouble;
-    pTotalPopNaturalDeathsLength: Integer;
+    pTotalPopBackgroundDeaths: PDouble;
+    pTotalPopBackgroundDeathsLength: Integer;
     births: PDouble;
     birthsLength: Integer;
   public
     procedure SetPTotalPop(var inPTotalPop: TGBFixedArray<Double>);
-    procedure SetPTotalPopNaturalDeaths(var inPTotalPopNaturalDeaths: TGBFixedArray<Double>);
+    procedure SetPTotalPopBackgroundDeaths(var inPTotalPopBackgroundDeaths: TGBFixedArray<Double>);
     procedure SetBirths(var inBirths: TGBFixedArray<Double>);
 end;
 
@@ -87,10 +87,10 @@ type
     adultsOnArtLength: Integer;
     adultsOnArtIsPercent: PInteger;
     adultsOnArtIsPercentLength: Integer;
-    hArtStageDur: PDouble;
-    hArtStageDurLength: Integer;
     initiationMortalityWeight: PDouble;
     initiationMortalityWeightLength: Integer;
+    hArtStageDur: PDouble;
+    hArtStageDurLength: Integer;
   public
     procedure SetTotalRate(var inTotalRate: TGBFixedArray<Double>);
     procedure SetRelativeRiskAge(var inRelativeRiskAge: TGBFixedArray<Double>);
@@ -106,8 +106,8 @@ type
     procedure SetDropoutRate(var inDropoutRate: TGBFixedArray<Double>);
     procedure SetAdultsOnArt(var inAdultsOnArt: TGBFixedArray<Double>);
     procedure SetAdultsOnArtIsPercent(var inAdultsOnArtIsPercent: TGBFixedArray<Integer>);
-    procedure SetHArtStageDur(var inHArtStageDur: TGBFixedArray<Double>);
     procedure SetInitiationMortalityWeight(var inInitiationMortalityWeight: TGBFixedArray<Double>);
+    procedure SetHArtStageDur(var inHArtStageDur: TGBFixedArray<Double>);
 end;
 
 {$ALIGN 8}
@@ -116,8 +116,8 @@ type
   private
     pHivPop: PDouble;
     pHivPopLength: Integer;
-    pHivPopNaturalDeaths: PDouble;
-    pHivPopNaturalDeathsLength: Integer;
+    pHivPopBackgroundDeaths: PDouble;
+    pHivPopBackgroundDeathsLength: Integer;
     hHivAdult: PDouble;
     hHivAdultLength: Integer;
     hArtAdult: PDouble;
@@ -134,7 +134,7 @@ type
     pHivDeathsLength: Integer;
   public
     procedure SetPHivPop(var inPHivPop: TGBFixedArray<Double>);
-    procedure SetPHivPopNaturalDeaths(var inPHivPopNaturalDeaths: TGBFixedArray<Double>);
+    procedure SetPHivPopBackgroundDeaths(var inPHivPopBackgroundDeaths: TGBFixedArray<Double>);
     procedure SetHHivAdult(var inHHivAdult: TGBFixedArray<Double>);
     procedure SetHArtAdult(var inHArtAdult: TGBFixedArray<Double>);
     procedure SetHHivDeathsNoArt(var inHHivDeathsNoArt: TGBFixedArray<Double>);
@@ -363,8 +363,11 @@ end;
 
 type TCallbackFunction = procedure(Msg: PAnsiChar); stdcall;
 
-procedure LeapfrogRunDp(var opts: LeapfrogOptions; var params: LeapfrogParams; var leapfrogOut: LeapfrogOut; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_dp';
-procedure LeapfrogRunAim(var opts: LeapfrogOptions; var params: LeapfrogParams; var leapfrogOut: LeapfrogOut; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_aim';
+procedure LeapfrogRunDp(var params: LeapfrogParams; var opts: LeapfrogOptions; var leapfrogOut: LeapfrogOut; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_dp';
+procedure LeapfrogRunAim(var params: LeapfrogParams; var opts: LeapfrogOptions; var leapfrogOut: LeapfrogOut; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_aim';
+procedure LeapfrogRunDpSingleYear(var params: LeapfrogParams; var opts: LeapfrogOptions; var initial_state: LeapfrogOut; start_year: Integer; var leapfrogOut: LeapfrogOut; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_dp_single_year';
+procedure LeapfrogRunAimSingleYear(var params: LeapfrogParams; var opts: LeapfrogOptions; var initial_state: LeapfrogOut; start_year: Integer; var leapfrogOut: LeapfrogOut; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_aim_single_year';
+
 
 implementation
 
@@ -404,10 +407,10 @@ begin
   pTotalPopLength := inPTotalPop.GetLength();
 end;
 
-procedure LeapfrogDpOut.SetPTotalPopNaturalDeaths(var inPTotalPopNaturalDeaths: TGBFixedArray<Double>);
+procedure LeapfrogDpOut.SetPTotalPopBackgroundDeaths(var inPTotalPopBackgroundDeaths: TGBFixedArray<Double>);
 begin
-  pTotalPopNaturalDeaths := PDouble(inPTotalPopNaturalDeaths.data);
-  pTotalPopNaturalDeathsLength := inPTotalPopNaturalDeaths.GetLength();
+  pTotalPopBackgroundDeaths := PDouble(inPTotalPopBackgroundDeaths.data);
+  pTotalPopBackgroundDeathsLength := inPTotalPopBackgroundDeaths.GetLength();
 end;
 
 procedure LeapfrogDpOut.SetBirths(var inBirths: TGBFixedArray<Double>);
@@ -500,16 +503,16 @@ begin
   adultsOnArtIsPercentLength := inAdultsOnArtIsPercent.GetLength();
 end;
 
-procedure LeapfrogHaParams.SetHArtStageDur(var inHArtStageDur: TGBFixedArray<Double>);
-begin
-  hArtStageDur := PDouble(inHArtStageDur.data);
-  hArtStageDurLength := inHArtStageDur.GetLength();
-end;
-
 procedure LeapfrogHaParams.SetInitiationMortalityWeight(var inInitiationMortalityWeight: TGBFixedArray<Double>);
 begin
   initiationMortalityWeight := PDouble(inInitiationMortalityWeight.data);
   initiationMortalityWeightLength := inInitiationMortalityWeight.GetLength();
+end;
+
+procedure LeapfrogHaParams.SetHArtStageDur(var inHArtStageDur: TGBFixedArray<Double>);
+begin
+  hArtStageDur := PDouble(inHArtStageDur.data);
+  hArtStageDurLength := inHArtStageDur.GetLength();
 end;
 
 procedure LeapfrogHaOut.SetPHivPop(var inPHivPop: TGBFixedArray<Double>);
@@ -518,10 +521,10 @@ begin
   pHivPopLength := inPHivPop.GetLength();
 end;
 
-procedure LeapfrogHaOut.SetPHivPopNaturalDeaths(var inPHivPopNaturalDeaths: TGBFixedArray<Double>);
+procedure LeapfrogHaOut.SetPHivPopBackgroundDeaths(var inPHivPopBackgroundDeaths: TGBFixedArray<Double>);
 begin
-  pHivPopNaturalDeaths := PDouble(inPHivPopNaturalDeaths.data);
-  pHivPopNaturalDeathsLength := inPHivPopNaturalDeaths.GetLength();
+  pHivPopBackgroundDeaths := PDouble(inPHivPopBackgroundDeaths.data);
+  pHivPopBackgroundDeathsLength := inPHivPopBackgroundDeaths.GetLength();
 end;
 
 procedure LeapfrogHaOut.SetHHivAdult(var inHHivAdult: TGBFixedArray<Double>);

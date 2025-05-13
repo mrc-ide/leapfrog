@@ -19,12 +19,12 @@ end;
 type
   Leapfrog{{ config.name }}Params = record
   private
-    {% for name, cfg in config.pars.items() %}
+    {% for name, cfg in config.pars.default.items() %}
     {{ to_lower_camel_case(name) }}: {{ get_delphi_ptr_type(cfg) }};
     {{ to_lower_camel_case(name) }}Length: Integer;
     {% endfor %}
   public
-    {% for name, cfg in config.pars.items() %}
+    {% for name, cfg in config.pars.default.items() %}
     procedure Set{{ to_camel_case(name) }}(var in{{ to_camel_case(name) }}: TGBFixedArray<{{ get_delphi_num_type(cfg) }}>);
     {% endfor %}
 end;
@@ -72,13 +72,16 @@ end;
 
 type TCallbackFunction = procedure(Msg: PAnsiChar); stdcall;
 
-procedure LeapfrogRunDp(var opts: LeapfrogOptions; var params: LeapfrogParams; var leapfrogOut: LeapfrogOut; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_dp';
-procedure LeapfrogRunAim(var opts: LeapfrogOptions; var params: LeapfrogParams; var leapfrogOut: LeapfrogOut; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_aim';
+procedure LeapfrogRunDp(var params: LeapfrogParams; var opts: LeapfrogOptions; var leapfrogOut: LeapfrogOut; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_dp';
+procedure LeapfrogRunAim(var params: LeapfrogParams; var opts: LeapfrogOptions; var leapfrogOut: LeapfrogOut; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_aim';
+procedure LeapfrogRunDpSingleYear(var params: LeapfrogParams; var opts: LeapfrogOptions; var initial_state: LeapfrogOut; start_year: Integer; var leapfrogOut: LeapfrogOut; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_dp_single_year';
+procedure LeapfrogRunAimSingleYear(var params: LeapfrogParams; var opts: LeapfrogOptions; var initial_state: LeapfrogOut; start_year: Integer; var leapfrogOut: LeapfrogOut; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_aim_single_year';
+
 
 implementation
 
 {% for config in configs %}
-{% for name, cfg in config.pars.items() %}
+{% for name, cfg in config.pars.default.items() %}
 procedure Leapfrog{{ config.name }}Params.Set{{ to_camel_case(name) }}(var in{{ to_camel_case(name) }}: TGBFixedArray<{{ get_delphi_num_type(cfg) }}>);
 begin
   {{ to_lower_camel_case(name) }} := {{ get_delphi_ptr_type(cfg) }}(in{{ to_camel_case(name) }}.data);

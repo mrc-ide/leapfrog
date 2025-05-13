@@ -55,9 +55,25 @@ def get_c_read_data(config_name, name, cfg):
     return f'read_data<{cfg["num_type"]}>(params.{config_name}->{name}, params.{config_name}->{name}_length, "{name}", {collapse_dims(cfg)})'
 
 
+def get_c_initial_state(config_name, name, cfg):
+  config_name = config_name.lower()
+  if cfg["type"] == "scalar":
+    return f'*(state.{config_name}->{name})'
+  else:
+    return f'read_data<{cfg["num_type"]}>(state.{config_name}->{name}, state.{config_name}->{name}_length, "{name}", {collapse_dims(cfg)})'
+
+
 def get_c_write_data(config_name, name, cfg):
   config_name = config_name.lower()
   return f'write_data<{cfg["num_type"]}, {dim_len(cfg) + 1}>(state.{name}, out.{config_name}->{name}, out.{config_name}->{name}_length, "{name}");'
+
+
+def get_c_write_data_single_year(config_name, name, cfg):
+  config_name = config_name.lower()
+  if dim_len(cfg) == 0:
+    return f'*(out.{config_name}->{name}) = state.{name};'
+  else:
+    return f'write_data<{cfg["num_type"]}, {dim_len(cfg)}>(state.{name}, out.{config_name}->{name}, out.{config_name}->{name}_length, "{name}");'
 
 
 def get_reset(name, cfg):

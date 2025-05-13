@@ -33,8 +33,8 @@ template<typename real_type>
 struct DpOut {
   real_type* p_total_pop;
   int p_total_pop_length;
-  real_type* p_total_pop_natural_deaths;
-  int p_total_pop_natural_deaths_length;
+  real_type* p_total_pop_background_deaths;
+  int p_total_pop_background_deaths_length;
   real_type* births;
   int births_length;
 };
@@ -69,18 +69,18 @@ struct HaParams {
   int adults_on_art_length;
   int* adults_on_art_is_percent;
   int adults_on_art_is_percent_length;
-  real_type* h_art_stage_dur;
-  int h_art_stage_dur_length;
   real_type initiation_mortality_weight;
   int initiation_mortality_weight_length;
+  real_type* h_art_stage_dur;
+  int h_art_stage_dur_length;
 };
 
 template<typename real_type>
 struct HaOut {
   real_type* p_hiv_pop;
   int p_hiv_pop_length;
-  real_type* p_hiv_pop_natural_deaths;
-  int p_hiv_pop_natural_deaths_length;
+  real_type* p_hiv_pop_background_deaths;
+  int p_hiv_pop_background_deaths_length;
   real_type* h_hiv_adult;
   int h_hiv_adult_length;
   real_type* h_art_adult;
