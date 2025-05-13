@@ -112,14 +112,12 @@ test_that("Model outputs are consistent", {
   ##Stratfied by maternal treatment status- NO ART
   hc1_hiv <- out$hc1_noart_aids_deaths
   hc1_hiv_strat <- apply(out$hc1_noart_aids_deaths_strat, 2:6, sum)
-  ##should be equal before ART is introduced
-  expect_equal(hc1_hiv[,,,,1:30], hc1_hiv_strat[,,,,1:30])
+  expect_equal(hc1_hiv, hc1_hiv_strat)
 
   ##Stratfied by maternal treatment status- ART
   hc1_hiv <- out$hc1_art_aids_deaths
   hc1_hiv_strat <- apply(out$hc1_art_aids_deaths_strat, c(2,3,5:7), sum)
-  ##should be equal when ART is entered as all ages
-  expect_equal(hc1_hiv[,,,,1:50], hc1_hiv_strat[,,,,1:50])
+  expect_equal(hc1_hiv, hc1_hiv_strat)
 
 
   ###############################
@@ -159,14 +157,12 @@ test_that("Model outputs are consistent", {
   ##Stratfied by maternal treatment status- NO ART
   hc1_hiv <- out$hc1_hiv_pop
   hc1_hiv_strat <- apply(out$hc1_hiv_pop_strat, 2:6, sum)
-  ##should be equal before ART is introduced
-  expect_equal(hc1_hiv[,,,,1:30], hc1_hiv_strat[,,,,1:30])
+  expect_equal(hc1_hiv, hc1_hiv_strat)
 
   ##Stratfied by maternal treatment status- ART
   hc1_hiv <- out$hc1_art_pop
   hc1_hiv_strat <- apply(out$hc1_art_pop_strat, c(2,3,5:7), sum)
-  ##should be equal when ART is entered as all ages
-  expect_equal(hc1_hiv[,,,,1:50], hc1_hiv_strat[,,,,1:50])
+  expect_equal(hc1_hiv, hc1_hiv_strat)
 
   # x <- data.table::data.table(reshape2::melt(hc1_hiv))
   # setnames(x, 'value', 'base')

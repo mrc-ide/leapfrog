@@ -1809,9 +1809,21 @@ struct ChildModelSimulation<Config> {
               if (a < hc2_agestart) {
                 n_hc.hc1_art_pop(0, hd, a, s) += art_initiates;
                 n_hc.hc1_hiv_pop(hd, cat, a, s) -= art_initiates;
+
+                for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+                  auto art_initiates_strat = coarse_hc_art_scalar * n_hc.hc_art_need_init_strat(hp_agg, hd, cat, a, s);
+                  n_hc.hc1_art_pop_strat(hp_agg, 0, hd, cat, a, s) += art_initiates_strat;
+                  n_hc.hc1_hiv_pop_strat(hp_agg, hd, cat, a, s) -= art_initiates_strat;
+                }
               } else if (hd < (hc2DS)) {
                 n_hc.hc2_art_pop(0, hd, a - hc2_agestart, s) += art_initiates;
                 n_hc.hc2_hiv_pop(hd, cat, a - hc2_agestart, s) -=  art_initiates;
+
+                for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
+                  auto art_initiates_strat = coarse_hc_art_scalar * n_hc.hc_art_need_init_strat(hp_agg, hd, cat, a, s);
+                  n_hc.hc2_art_pop_strat(hp_agg, 0, hd, cat, a - hc2_agestart, s) += art_initiates_strat;
+                  n_hc.hc2_hiv_pop_strat(hp_agg, hd, cat, a - hc2_agestart, s) -= art_initiates_strat;
+                }
               }
             } // end hc1DS
           } // end a
