@@ -46,6 +46,8 @@ struct ChildModelSimulation<Config> {
   static constexpr int hBF = SS::hBF;
   static constexpr int hcAG_coarse = SS::hcAG_coarse;
   static constexpr int hPS_agg = SS::hPS_agg;
+  static constexpr int hTH = SS::hTH;
+
 
   // function args
   int t;
@@ -1663,36 +1665,6 @@ struct ChildModelSimulation<Config> {
     auto& i_hc = intermediate.hc;
     //Note: this could just be done by using the distribution that is
     //now explicit in the hc1/2_art_pop, however I want to retain an exact match to spectrum
-    // for (int s = 0; s < NS; ++s) {
-    //   for (int a = 0; a < opts.p_idx_fertility_first; ++a) {
-    //     for (int hd = 0; hd < hc1DS; ++hd) {
-    //       for (int cat = 0; cat < hcTT; ++cat) {
-    //         for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
-    //           if (a < hc2_agestart) {
-    //             i_hc.hc_hiv_total_strat(hp_agg, hd, a, s) += n_hc.hc1_hiv_pop_strat(hp_agg, hd, cat, a, s);
-    //           } else if (hd < hc2DS) {
-    //             i_hc.hc_hiv_total_strat(hp_agg, hd, a, s) += n_hc.hc2_hiv_pop_strat(hp_agg, hd, cat, a - hc2_agestart, s);
-    //           }
-    //         }
-    //       } // end hcTT
-    //     } // end hc1DS
-    //   } // end a
-    // } // end NS
-
-    // i_hc.temp = 0.0;
-    //
-    //       for (int cat = 0; cat < hcTT; ++cat) {
-    //         for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
-    //             i_hc.temp += n_hc.hc1_hiv_pop_strat(hp_agg, 2, cat, 2, 0);
-    //         }
-    //       } // end hcTT
-    //
-    //
-    // if(t == 34){
-    //   // std::cout << i_hc.temp;//155.323
-    //   // std::cout << i_hc.hc_hiv_total(2, 2, 0); // 155.323
-    // }
-
     for (int s = 0; s <NS; ++s) {
       for (int a = 0; a < opts.p_idx_fertility_first; ++a) {
         for (int hd = 0; hd < hc1DS; ++hd) {
