@@ -1723,18 +1723,20 @@ private:
             for (int htn = 0; htn < hTN; ++htn) {
               for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
                 if (a < hc2_agestart) {
-                  auto ltfu_grad = (n_hc.hc1_art_pop(2, hd, a, s) + n_hc.hc1_art_pop(0, hd, a, s)) *
-                    p_hc.hc_art_ltfu(t);
+                  auto ltfu_grad = (n_hc.hc1_art_pop_strat(hp_agg, 2, hd, cat, a, s, htn) +
+                                    n_hc.hc1_art_pop_strat(hp_agg, 0, hd, cat, a, s, htn)) *
+                                    p_hc.hc_art_ltfu(t);
                   if (i_hc.hc_hiv_total(hd, a, s) > 0) {
-                    i_hc.art_ltfu_grad_strat(hp_agg, hd, cat, a, s, htn) += ltfu_grad * i_hc.hc_hiv_dist_strat(hp_agg, hd, cat, a, s, htn);
+                    i_hc.art_ltfu_grad_strat(hp_agg, hd, cat, a, s, htn) += ltfu_grad;
                   } else {
                     i_hc.art_ltfu_grad_strat(hp_agg, hd, cat, a, s, htn) += ltfu_grad * 0.25;
                   }
                 } else if (hd < hc2DS) {
-                  auto ltfu_grad = (n_hc.hc2_art_pop(2, hd, a - hc2_agestart, s) + n_hc.hc2_art_pop(0, hd, a - hc2_agestart, s)) *
+                  auto ltfu_grad = (n_hc.hc2_art_pop_strat(hp_agg, 2, hd, cat, a - hc2_agestart, s, htn) +
+                                    n_hc.hc2_art_pop_strat(hp_agg, 0, hd, cat, a - hc2_agestart, s, htn)) *
                     p_hc.hc_art_ltfu(t);
                   if (i_hc.hc_hiv_total(hd, a, s) > 0) {
-                    i_hc.art_ltfu_grad_strat(hp_agg, hd, cat, a, s, htn) += ltfu_grad * i_hc.hc_hiv_dist_strat(hp_agg, hd, cat, a, s, htn);
+                    i_hc.art_ltfu_grad_strat(hp_agg, hd, cat, a, s, htn) += ltfu_grad;
                   } else {
                     i_hc.art_ltfu_grad_strat(hp_agg, hd, cat, a, s, htn) += ltfu_grad * 0.25;
                   }

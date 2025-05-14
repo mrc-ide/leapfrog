@@ -32,6 +32,16 @@ test_that("Child model can be run for all years", {
   expect_true(all(out$hc1_art_aids_deaths[, , , , ] >= 0))
   expect_true(all(out$hc2_art_aids_deaths[, , , , ] >= 0))
   expect_true(all(out$hiv_births >= 0))
+
+  expect_true(all(out$hc1_hiv_pop_strat[, , , , , , ] >= 0))
+  expect_true(all(out$hc2_hiv_pop_strat[, , , , , , ] >= 0))
+  expect_true(all(out$hc1_art_pop_strat[, , , , , , , ] >= 0))
+  expect_true(all(out$hc2_art_pop_strat[, , , , , , , ] >= 0))
+  expect_true(all(out$hc1_noart_aids_deaths_strat[, , , , , , ] >= 0))
+  expect_true(all(out$hc2_noart_aids_deaths_strat[, , , , , , ] >= 0))
+  expect_true(all(out$hc1_art_aids_deaths_strat[, , , , , , , ] >= 0))
+  expect_true(all(out$hc2_art_aids_deaths_strat[, , , , , , , ] >= 0))
+
 })
 
 test_that("Model outputs are consistent", {
