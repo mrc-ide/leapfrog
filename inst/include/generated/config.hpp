@@ -307,28 +307,28 @@ struct HcConfig {
     TFS<real_type, SS::hDS, SS::NS> age15_hiv_pop;
     TFS<real_type, SS::hTS, SS::hDS, SS::NS> age15_art_pop;
     TFS<real_type, SS::hDS, SS::hcTT, SS::hAG, SS::NS> hc_posthivmort;
-    TFS<real_type, SS::hPS_agg, SS::hDS, SS::hcTT, SS::hAG, SS::NS> hc_posthivmort_strat;
+    TFS<real_type, SS::hPS_agg, SS::hDS, SS::hcTT, SS::hAG, SS::NS, SS::hTN> hc_posthivmort_strat;
     TFS<real_type, SS::hDS, SS::hcTT, SS::hAG, SS::NS> hc_grad;
-    TFS<real_type, SS::hPS_agg, SS::hDS, SS::hcTT, SS::hAG, SS::NS> hc_grad_strat;
+    TFS<real_type, SS::hPS_agg, SS::hDS, SS::hcTT, SS::hAG, SS::NS, SS::hTN> hc_grad_strat;
     TFS<real_type, SS::hDS, SS::hAG, SS::NS> eligible;
-    TFS<real_type, SS::hPS_agg, SS::hDS, SS::hcTT, SS::hAG, SS::NS> eligible_strat;
+    TFS<real_type, SS::hPS_agg, SS::hDS, SS::hcTT, SS::hAG, SS::NS, SS::hTN> eligible_strat;
     TFS<real_type, SS::hcAG_coarse> unmet_need;
     TFS<real_type, SS::hcAG_coarse> total_need;
     TFS<real_type, SS::hcAG_coarse> on_art;
     TFS<real_type, SS::hcAG_coarse> total_art_last_year;
     TFS<real_type, SS::hcAG_coarse> total_art_this_year;
     TFS<real_type, SS::hTS, SS::hDS, SS::hAG, SS::NS> hc_art_grad;
-    TFS<real_type, SS::hPS_agg, SS::hTS, SS::hDS, SS::hcTT, SS::hAG, SS::NS> hc_art_grad_strat;
+    TFS<real_type, SS::hPS_agg, SS::hTS, SS::hDS, SS::hcTT, SS::hAG, SS::NS, SS::hTN> hc_art_grad_strat;
     TFS<real_type, SS::hcAG_coarse> hc_art_scalar;
     TFS<real_type, SS::hcAG_coarse> hc_initByAge;
     TFS<real_type, SS::hcAG_coarse> hc_adj;
     TFS<real_type, SS::hcAG_coarse> hc_art_deaths;
     TFS<real_type, SS::hDS, SS::hcTT, SS::hcAG_end, SS::NS> hc_hiv_dist;
-    TFS<real_type, SS::hPS_agg, SS::hDS, SS::hcTT, SS::hcAG_end, SS::NS> hc_hiv_dist_strat;
+    TFS<real_type, SS::hPS_agg, SS::hDS, SS::hcTT, SS::hcAG_end, SS::NS, SS::hTN> hc_hiv_dist_strat;
     TFS<real_type, SS::hDS,  SS::hcAG_end, SS::NS> hc_hiv_total;
     TFS<real_type, SS::hPS_agg, SS::hDS,  SS::hcAG_end, SS::NS> hc_hiv_total_strat;
     TFS<real_type, SS::hDS, SS::hcTT, SS::hcAG_end, SS::NS> art_ltfu_grad;
-    TFS<real_type, SS::hPS_agg, SS::hDS, SS::hcTT, SS::hcAG_end, SS::NS> art_ltfu_grad_strat;
+    TFS<real_type, SS::hPS_agg, SS::hDS, SS::hcTT, SS::hcAG_end, SS::NS, SS::hTN> art_ltfu_grad_strat;
     TFS<real_type, SS::hAG, SS::NS> p_hiv_neg_pop;
     TFS<real_type, SS::hPS> PMTCT_coverage;
     TFS<real_type, SS::hBF_coarse> bf_transmission_rate;
@@ -470,24 +470,24 @@ struct HcConfig {
   struct State {
     TFS<real_type, SS::hPS_agg, SS::hcTT, SS::hc1AG, SS::NS> hc_infections_coarse;
     TFS<real_type, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS> hc1_hiv_pop;
-    TFS<real_type, SS::hPS_agg, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS> hc1_hiv_pop_strat;
+    TFS<real_type, SS::hPS_agg, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, SS::hTN> hc1_hiv_pop_strat;
     TFS<real_type, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS> hc2_hiv_pop;
-    TFS<real_type, SS::hPS_agg, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS> hc2_hiv_pop_strat;
+    TFS<real_type, SS::hPS_agg, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS, SS::hTN> hc2_hiv_pop_strat;
     TFS<real_type, SS::hTS, SS::hc1DS, SS::hc1AG, SS::NS> hc1_art_pop;
-    TFS<real_type, SS::hPS_agg, SS::hTS, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS> hc1_art_pop_strat;
+    TFS<real_type, SS::hPS_agg, SS::hTS, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, SS::hTN> hc1_art_pop_strat;
     TFS<real_type, SS::hTS, SS::hc2DS, SS::hc2AG, SS::NS> hc2_art_pop;
-    TFS<real_type, SS::hPS_agg, SS::hTS, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS> hc2_art_pop_strat;
+    TFS<real_type, SS::hPS_agg, SS::hTS, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS, SS::hTN> hc2_art_pop_strat;
     TFS<real_type, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS> hc1_noart_aids_deaths;
-    TFS<real_type, SS::hPS_agg, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS> hc1_noart_aids_deaths_strat;
+    TFS<real_type, SS::hPS_agg, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, SS::hTN> hc1_noart_aids_deaths_strat;
     TFS<real_type, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS> hc2_noart_aids_deaths;
-    TFS<real_type, SS::hPS_agg, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS> hc2_noart_aids_deaths_strat;
+    TFS<real_type, SS::hPS_agg, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS, SS::hTN> hc2_noart_aids_deaths_strat;
     TFS<real_type, SS::hTS, SS::hc1DS, SS::hc1AG, SS::NS> hc1_art_aids_deaths;
-    TFS<real_type, SS::hPS_agg, SS::hTS, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS> hc1_art_aids_deaths_strat;
+    TFS<real_type, SS::hPS_agg, SS::hTS, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, SS::hTN> hc1_art_aids_deaths_strat;
     TFS<real_type, SS::hTS, SS::hc2DS, SS::hc2AG, SS::NS> hc2_art_aids_deaths;
-    TFS<real_type, SS::hPS_agg, SS::hTS, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS> hc2_art_aids_deaths_strat;
+    TFS<real_type, SS::hPS_agg, SS::hTS, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS, SS::hTN> hc2_art_aids_deaths_strat;
     TFS<real_type, SS::hcAG_coarse> hc_art_init;
     TFS<real_type, SS::hc1DS, SS::hcTT, SS::hcAG_end, SS::NS> hc_art_need_init;
-    TFS<real_type, SS::hPS_agg, SS::hc1DS, SS::hcTT, SS::hcAG_end, SS::NS> hc_art_need_init_strat;
+    TFS<real_type, SS::hPS_agg, SS::hc1DS, SS::hcTT, SS::hcAG_end, SS::NS, SS::hTN> hc_art_need_init_strat;
     real_type hiv_births;
     real_type ctx_need;
     TFS<real_type, SS::hcTT, SS::hc1AG, SS::NS> infection_by_type;
@@ -522,24 +522,24 @@ struct HcConfig {
   struct OutputState {
     T5<real_type> hc_infections_coarse;
     T5<real_type> hc1_hiv_pop;
-    T6<real_type> hc1_hiv_pop_strat;
+    T7<real_type> hc1_hiv_pop_strat;
     T5<real_type> hc2_hiv_pop;
-    T6<real_type> hc2_hiv_pop_strat;
+    T7<real_type> hc2_hiv_pop_strat;
     T5<real_type> hc1_art_pop;
-    T7<real_type> hc1_art_pop_strat;
+    T8<real_type> hc1_art_pop_strat;
     T5<real_type> hc2_art_pop;
-    T7<real_type> hc2_art_pop_strat;
+    T8<real_type> hc2_art_pop_strat;
     T5<real_type> hc1_noart_aids_deaths;
-    T6<real_type> hc1_noart_aids_deaths_strat;
+    T7<real_type> hc1_noart_aids_deaths_strat;
     T5<real_type> hc2_noart_aids_deaths;
-    T6<real_type> hc2_noart_aids_deaths_strat;
+    T7<real_type> hc2_noart_aids_deaths_strat;
     T5<real_type> hc1_art_aids_deaths;
-    T7<real_type> hc1_art_aids_deaths_strat;
+    T8<real_type> hc1_art_aids_deaths_strat;
     T5<real_type> hc2_art_aids_deaths;
-    T7<real_type> hc2_art_aids_deaths_strat;
+    T8<real_type> hc2_art_aids_deaths_strat;
     T2<real_type> hc_art_init;
     T5<real_type> hc_art_need_init;
-    T6<real_type> hc_art_need_init_strat;
+    T7<real_type> hc_art_need_init_strat;
     T1<real_type> hiv_births;
     T1<real_type> ctx_need;
     T4<real_type> infection_by_type;
@@ -547,24 +547,24 @@ struct HcConfig {
     OutputState(int output_years):
       hc_infections_coarse(SS::hPS_agg, SS::hcTT, SS::hc1AG, SS::NS, output_years),
       hc1_hiv_pop(SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, output_years),
-      hc1_hiv_pop_strat(SS::hPS_agg, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, output_years),
+      hc1_hiv_pop_strat(SS::hPS_agg, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, SS::hTN, output_years),
       hc2_hiv_pop(SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS, output_years),
-      hc2_hiv_pop_strat(SS::hPS_agg, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS, output_years),
+      hc2_hiv_pop_strat(SS::hPS_agg, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS, SS::hTN, output_years),
       hc1_art_pop(SS::hTS, SS::hc1DS, SS::hc1AG, SS::NS, output_years),
-      hc1_art_pop_strat(SS::hPS_agg, SS::hTS, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, output_years),
+      hc1_art_pop_strat(SS::hPS_agg, SS::hTS, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, SS::hTN, output_years),
       hc2_art_pop(SS::hTS, SS::hc2DS, SS::hc2AG, SS::NS, output_years),
-      hc2_art_pop_strat(SS::hPS_agg, SS::hTS, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS, output_years),
+      hc2_art_pop_strat(SS::hPS_agg, SS::hTS, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS, SS::hTN, output_years),
       hc1_noart_aids_deaths(SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, output_years),
-      hc1_noart_aids_deaths_strat(SS::hPS_agg, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, output_years),
+      hc1_noart_aids_deaths_strat(SS::hPS_agg, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, SS::hTN, output_years),
       hc2_noart_aids_deaths(SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS, output_years),
-      hc2_noart_aids_deaths_strat(SS::hPS_agg, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS, output_years),
+      hc2_noart_aids_deaths_strat(SS::hPS_agg, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS, SS::hTN, output_years),
       hc1_art_aids_deaths(SS::hTS, SS::hc1DS, SS::hc1AG, SS::NS, output_years),
-      hc1_art_aids_deaths_strat(SS::hPS_agg, SS::hTS, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, output_years),
+      hc1_art_aids_deaths_strat(SS::hPS_agg, SS::hTS, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, SS::hTN, output_years),
       hc2_art_aids_deaths(SS::hTS, SS::hc2DS, SS::hc2AG, SS::NS, output_years),
-      hc2_art_aids_deaths_strat(SS::hPS_agg, SS::hTS, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS, output_years),
+      hc2_art_aids_deaths_strat(SS::hPS_agg, SS::hTS, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS, SS::hTN, output_years),
       hc_art_init(SS::hcAG_coarse, output_years),
       hc_art_need_init(SS::hc1DS, SS::hcTT, SS::hcAG_end, SS::NS, output_years),
-      hc_art_need_init_strat(SS::hPS_agg, SS::hc1DS, SS::hcTT, SS::hcAG_end, SS::NS, output_years),
+      hc_art_need_init_strat(SS::hPS_agg, SS::hc1DS, SS::hcTT, SS::hcAG_end, SS::NS, SS::hTN, output_years),
       hiv_births(output_years),
       ctx_need(output_years),
       infection_by_type(SS::hcTT, SS::hc1AG, SS::NS, output_years)

@@ -66,6 +66,9 @@ using T6 = Eigen::Tensor<real_type, 6>;
 template<typename real_type>
 using T7 = Eigen::Tensor<real_type, 7>;
 
+template<typename real_type>
+using T8 = Eigen::Tensor<real_type, 8>;
+
 template<typename real_type, typename std::ptrdiff_t... Dims>
 using TFS = Eigen::TensorFixedSize<real_type, Eigen::Sizes<Dims...>>;
 

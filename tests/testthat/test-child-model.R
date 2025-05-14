@@ -1,6 +1,3 @@
-##########NOTE: ART ltfu is implemented but tests are now failing lol
-
-
 test_that("Child model can be run for all years", {
   input <- readRDS(test_path("testdata/child_parms.rds"))
 
@@ -114,12 +111,12 @@ test_that("Model outputs are consistent", {
 
   ##Stratfied by maternal treatment status- NO ART
   hc1_hiv <- out$hc1_noart_aids_deaths
-  hc1_hiv_strat <- apply(out$hc1_noart_aids_deaths_strat, 2:6, sum)
+  hc1_hiv_strat <- apply(out$hc1_noart_aids_deaths_strat, c(2:5,7), sum)
   expect_equal(hc1_hiv, hc1_hiv_strat)
 
   ##Stratfied by maternal treatment status- ART
   hc1_hiv <- out$hc1_art_aids_deaths
-  hc1_hiv_strat <- apply(out$hc1_art_aids_deaths_strat, c(2,3,5:7), sum)
+  hc1_hiv_strat <- apply(out$hc1_art_aids_deaths_strat, c(2,3,5:6,8), sum)
   expect_equal(hc1_hiv, hc1_hiv_strat)
 
 
@@ -160,21 +157,21 @@ test_that("Model outputs are consistent", {
   ##Stratfied by maternal treatment status- NO ART
   out <- run_model(input$parameters, "ChildModel", 1970:2030)
   hc1_hiv <- out$hc1_hiv_pop
-  hc1_hiv_strat <- apply(out$hc1_hiv_pop_strat, 2:6, sum)
+  hc1_hiv_strat <- apply(out$hc1_hiv_pop_strat, c(2:5,7), sum)
   expect_equal(hc1_hiv, hc1_hiv_strat)
 
   ##Stratfied by maternal treatment status- ART
   out <- run_model(input$parameters, "ChildModel", 1970:2030)
   hc1_hiv <- out$hc1_art_pop
-  hc1_hiv_strat <- apply(out$hc1_art_pop_strat, c(2,3,5:7), sum)
+  hc1_hiv_strat <- apply(out$hc1_art_pop_strat, c(2,3,5:6,8), sum)
   expect_equal(hc1_hiv, hc1_hiv_strat)
 
   ###############################
   ##Stratified ART need init should be the same
   ###############################
   art_need_init <- out$hc_art_need_init
-  art_need_init_strat <- apply(out$hc_art_need_init_strat, 2:6, sum)
-  expect_equal(art_need_init[,,,,1:50], art_need_init_strat[,,,,1:50])
+  art_need_init_strat <- apply(out$hc_art_need_init_strat, c(2:5,7), sum)
+  expect_equal(art_need_init, art_need_init_strat)
 
 })
 

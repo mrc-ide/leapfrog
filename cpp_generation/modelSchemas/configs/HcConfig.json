@@ -19,11 +19,11 @@
         "hPS_dropout": 6,
         "hPS_agg": 6,
         "hVT": 2,
+        "hTN": 2,
         "hBF": 18,
         "hBF_coarse": 4,
         "hcAG_coarse": 4,
-        "hAB_ind": 2,
-        "hTN": 2
+        "hAB_ind": 2
       }
     }
   },
@@ -414,7 +414,7 @@
     "hc_posthivmort_strat": {
       "type": "TFS",
       "num_type": "real_type",
-      "dims": ["SS::hPS_agg", "SS::hDS", "SS::hcTT", "SS::hAG", "SS::NS"]
+      "dims": ["SS::hPS_agg", "SS::hDS", "SS::hcTT", "SS::hAG", "SS::NS", "SS::hTN"]
     },
     "hc_grad": {
       "type": "TFS",
@@ -424,7 +424,7 @@
     "hc_grad_strat": {
       "type": "TFS",
       "num_type": "real_type",
-      "dims": ["SS::hPS_agg", "SS::hDS", "SS::hcTT", "SS::hAG", "SS::NS"]
+      "dims": ["SS::hPS_agg", "SS::hDS", "SS::hcTT", "SS::hAG", "SS::NS", "SS::hTN"]
     },
     "eligible": {
       "type": "TFS",
@@ -434,7 +434,7 @@
     "eligible_strat": {
       "type": "TFS",
       "num_type": "real_type",
-      "dims": ["SS::hPS_agg", "SS::hDS", "SS::hcTT", "SS::hAG", "SS::NS"]
+      "dims": ["SS::hPS_agg", "SS::hDS", "SS::hcTT", "SS::hAG", "SS::NS", "SS::hTN"]
     },
     "unmet_need": {
       "type": "TFS",
@@ -469,7 +469,7 @@
     "hc_art_grad_strat": {
       "type": "TFS",
       "num_type": "real_type",
-      "dims": ["SS::hPS_agg", "SS::hTS", "SS::hDS","SS::hcTT",  "SS::hAG", "SS::NS"]
+      "dims": ["SS::hPS_agg", "SS::hTS", "SS::hDS","SS::hcTT",  "SS::hAG", "SS::NS", "SS::hTN"]
     },
     "hc_art_scalar": {
       "type": "TFS",
@@ -499,7 +499,7 @@
     "hc_hiv_dist_strat": {
       "type": "TFS",
       "num_type": "real_type",
-      "dims": ["SS::hPS_agg", "SS::hDS", "SS::hcTT", "SS::hcAG_end", "SS::NS"]
+      "dims": ["SS::hPS_agg", "SS::hDS", "SS::hcTT", "SS::hcAG_end", "SS::NS", "SS::hTN"]
     },
     "hc_hiv_total": {
       "type": "TFS",
@@ -519,7 +519,7 @@
     "art_ltfu_grad_strat": {
       "type": "TFS",
       "num_type": "real_type",
-      "dims": ["SS::hPS_agg", "SS::hDS", "SS::hcTT", "SS::hcAG_end", "SS::NS"]
+      "dims": ["SS::hPS_agg", "SS::hDS", "SS::hcTT", "SS::hcAG_end", "SS::NS", "SS::hTN"]
     },
     "p_hiv_neg_pop": {
       "type": "TFS",
@@ -753,7 +753,7 @@
     "hc1_hiv_pop_strat": {
       "type": "TFS",
       "num_type": "real_type",
-      "dims": ["SS::hPS_agg", "SS::hc1DS", "SS::hcTT", "SS::hc1AG", "SS::NS"]
+      "dims": ["SS::hPS_agg", "SS::hc1DS", "SS::hcTT", "SS::hc1AG", "SS::NS", "SS::hTN"]
     },
     "hc2_hiv_pop": {
       "type": "TFS",
@@ -763,7 +763,7 @@
     "hc2_hiv_pop_strat": {
       "type": "TFS",
       "num_type": "real_type",
-      "dims": ["SS::hPS_agg", "SS::hc2DS", "SS::hcTT", "SS::hc2AG", "SS::NS"]
+      "dims": ["SS::hPS_agg", "SS::hc2DS", "SS::hcTT", "SS::hc2AG", "SS::NS", "SS::hTN"]
     },
     "hc1_art_pop": {
       "type": "TFS",
@@ -773,7 +773,7 @@
     "hc1_art_pop_strat": {
       "type": "TFS",
       "num_type": "real_type",
-      "dims": ["SS::hPS_agg", "SS::hTS", "SS::hc1DS", "SS::hcTT", "SS::hc1AG", "SS::NS"]
+      "dims": ["SS::hPS_agg", "SS::hTS", "SS::hc1DS", "SS::hcTT", "SS::hc1AG", "SS::NS", "SS::hTN"]
     },
     "hc2_art_pop": {
       "type": "TFS",
@@ -783,7 +783,7 @@
     "hc2_art_pop_strat": {
       "type": "TFS",
       "num_type": "real_type",
-      "dims": ["SS::hPS_agg", "SS::hTS", "SS::hc2DS", "SS::hcTT", "SS::hc2AG", "SS::NS"]
+      "dims": ["SS::hPS_agg", "SS::hTS", "SS::hc2DS", "SS::hcTT", "SS::hc2AG", "SS::NS", "SS::hTN"]
     },
     "hc1_noart_aids_deaths": {
       "type": "TFS",
@@ -793,7 +793,7 @@
     "hc1_noart_aids_deaths_strat": {
       "type": "TFS",
       "num_type": "real_type",
-      "dims": ["SS::hPS_agg", "SS::hc1DS", "SS::hcTT", "SS::hc1AG", "SS::NS"]
+      "dims": ["SS::hPS_agg", "SS::hc1DS", "SS::hcTT", "SS::hc1AG", "SS::NS", "SS::hTN"]
     },
     "hc2_noart_aids_deaths": {
       "type": "TFS",
@@ -803,7 +803,7 @@
     "hc2_noart_aids_deaths_strat": {
       "type": "TFS",
       "num_type": "real_type",
-      "dims": ["SS::hPS_agg", "SS::hc2DS", "SS::hcTT", "SS::hc2AG", "SS::NS"]
+      "dims": ["SS::hPS_agg", "SS::hc2DS", "SS::hcTT", "SS::hc2AG", "SS::NS", "SS::hTN"]
     },
     "hc1_art_aids_deaths": {
       "type": "TFS",
@@ -813,7 +813,7 @@
     "hc1_art_aids_deaths_strat": {
       "type": "TFS",
       "num_type": "real_type",
-      "dims": ["SS::hPS_agg", "SS::hTS", "SS::hc1DS", "SS::hcTT","SS::hc1AG", "SS::NS"]
+      "dims": ["SS::hPS_agg", "SS::hTS", "SS::hc1DS", "SS::hcTT","SS::hc1AG", "SS::NS", "SS::hTN"]
     },
     "hc2_art_aids_deaths": {
       "type": "TFS",
@@ -823,7 +823,7 @@
     "hc2_art_aids_deaths_strat": {
       "type": "TFS",
       "num_type": "real_type",
-      "dims": ["SS::hPS_agg","SS::hTS", "SS::hc2DS", "SS::hcTT", "SS::hc2AG", "SS::NS"]
+      "dims": ["SS::hPS_agg","SS::hTS", "SS::hc2DS", "SS::hcTT", "SS::hc2AG", "SS::NS", "SS::hTN"]
     },
     "hc_art_init": {
       "type": "TFS",
@@ -838,7 +838,7 @@
     "hc_art_need_init_strat": {
       "type": "TFS",
       "num_type": "real_type",
-      "dims": ["SS::hPS_agg", "SS::hc1DS", "SS::hcTT", "SS::hcAG_end", "SS::NS"]
+      "dims": ["SS::hPS_agg", "SS::hc1DS", "SS::hcTT", "SS::hcAG_end", "SS::NS", "SS::hTN"]
     },
     "hiv_births": {
       "type": "scalar",
