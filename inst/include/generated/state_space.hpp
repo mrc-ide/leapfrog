@@ -49,7 +49,7 @@ struct HcSS {
   static constexpr int hc2AG = 10;
   static constexpr int hc2AG_c = 1;
   static constexpr int hcAG_end = 15;
-  static constexpr int hcTT = 4;
+  static constexpr int hcTT = 5;
   static constexpr int hPS = 7;
   static constexpr int hPS_dropout = 6;
   static constexpr int hPS_agg = 6;
@@ -58,6 +58,7 @@ struct HcSS {
   static constexpr int hBF_coarse = 4;
   static constexpr int hcAG_coarse = 4;
   static constexpr int hAB_ind = 2;
+  static constexpr int hTN = 2;
 };
 
 

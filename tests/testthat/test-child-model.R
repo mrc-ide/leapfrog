@@ -73,8 +73,8 @@ test_that("Model outputs are consistent", {
   expect_equal(strat, pop)
 
   ##BF 24-36
-  strat <- out$infection_by_type[4,3,,]
-  pop <- apply(out$hc_infections_coarse[,4,3,,], c(2,3), sum)
+  strat <- out$infection_by_type[5,3,,]
+  pop <- apply(out$hc_infections_coarse[,5,3,,], c(2,3), sum)
   expect_equal(strat, pop)
 
   ###############################
@@ -281,8 +281,8 @@ test_that("CLHIV align", {
 
   hc1 <- dplyr::right_join((reshape2::melt(out$hc1_hiv_pop)), data.frame(Var1 = 1:7, cd4_cat = c("gte30", "26-30", "21-25", "16-20", "11-15", "5-10", "lte5")), by = "Var1")
   hc2 <- dplyr::right_join(data.frame(reshape2::melt(out$hc2_hiv_pop)), data.frame(Var1 = 1:6, cd4_cat = c("gte1000", "750-999", "500-749", "350-499", "200-349", "lte200")), by = "Var1")
-  hc1 <- dplyr::right_join(hc1, data.frame(Var2 = 1:4, transmission = c("perinatal", "bf0-6", "bf7-12", "bf12+")), by = "Var2")
-  hc2 <- dplyr::right_join(hc2, data.frame(Var2 = 1:4, transmission = c("perinatal", "bf0-6", "bf7-12", "bf12+")), by = "Var2")
+  hc1 <- dplyr::right_join(hc1, data.frame(Var2 = 1:5, transmission = c("perinatal", "bf0-6", "bf7-12", "bf12+", "bf12+")), by = "Var2")
+  hc2 <- dplyr::right_join(hc2, data.frame(Var2 = 1:5, transmission = c("perinatal", "bf0-6", "bf7-12", "bf12+", "bf12+")), by = "Var2")
   hc1 <- hc1 %>%
     dplyr::mutate(
       age = Var3 - 1,

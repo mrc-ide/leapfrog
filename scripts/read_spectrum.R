@@ -692,30 +692,33 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   v$adol_cd4_prog <- adol_cd4_prog
 
   mort <- dp_read_paed_cd4_mort(dp.x)
-  paed_cd4_mort <- array(data = 0, dim = c(7, 4, 5), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'),
-                                                                     transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'),
+  paed_cd4_mort <- array(data = 0, dim = c(7, 5, 5), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'),
+                                                                     transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12-24', 'bf24-36'),
                                                                      age = c(0:4)))
   ## 0-2
   paed_cd4_mort[,1,1:3] <- mort[1,]
   paed_cd4_mort[,2,1:3] <- mort[2,]
   paed_cd4_mort[,3,1:3] <- mort[3,]
   paed_cd4_mort[,4,1:3] <- mort[4,]
+  paed_cd4_mort[,5,1:3] <- mort[4,]
 
   ## 3-4
   paed_cd4_mort[,1,4:5] <- mort[5,]
   paed_cd4_mort[,2,4:5] <- mort[6,]
   paed_cd4_mort[,3,4:5] <- mort[7,]
   paed_cd4_mort[,4,4:5] <- mort[8,]
+  paed_cd4_mort[,5,4:5] <- mort[8,]
 
-  adol_cd4_mort <- array(data = 0, dim = c(6, 4, 10), dimnames = list(cd4 = c('>1000', '750-999', '500-749', '350-499', '200-349', '<200'),
-                                                                      transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'),
+
+  adol_cd4_mort <- array(data = 0, dim = c(6, 5, 10), dimnames = list(cd4 = c('>1000', '750-999', '500-749', '350-499', '200-349', '<200'),
+                                                                      transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12-24', 'bf24-36'),
                                                                       age =5:14))
   ## 5 - 14
   adol_cd4_mort[,1,] <- mort[9,2:7]
   adol_cd4_mort[,2,] <- mort[10,2:7]
   adol_cd4_mort[,3,] <- mort[11,2:7]
   adol_cd4_mort[,4,] <- mort[12,2:7]
-
+  adol_cd4_mort[,5,] <- mort[12,2:7]
 
   mort <- dp_read_paed_art_mort(dp.x)
   paed_art_mort <- array(data = 0, dim = c(7, 3, 5), dimnames = list(cd4 = c('30plus', '26-30', '21-25', '16-20', '11-15', '5-10', '<5'),

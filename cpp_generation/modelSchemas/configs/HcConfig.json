@@ -14,7 +14,7 @@
         "hc2AG": 10,
         "hc2AG_c": 1,
         "hcAG_end": 15,
-        "hcTT": 4,
+        "hcTT": 5,
         "hPS": 7,
         "hPS_dropout": 6,
         "hPS_agg": 6,
@@ -22,7 +22,7 @@
         "hBF": 18,
         "hBF_coarse": 4,
         "hcAG_coarse": 4,
-        "hAB_ind": 2
+        "hAB_ind": 2,
         "hTN": 2
       }
     }
