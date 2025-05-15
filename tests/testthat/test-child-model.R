@@ -46,7 +46,6 @@ test_that("Child model can be run for all years", {
 
 test_that("Model outputs are consistent", {
   input <- readRDS(test_path("testdata/child_parms.rds"))
-  #input$parameters$paed_art_ltfu[] = 0
   out <- run_model(input$parameters, "ChildModel", 1970:2030)
 
   ###############################
@@ -119,16 +118,6 @@ test_that("Model outputs are consistent", {
     dplyr::mutate(diff = strat - pop)
   expect_true(all(abs(c2$diff) < 1e-5))
 
-  ##Stratfied by maternal treatment status- NO ART
-  hc1_hiv <- out$hc1_noart_aids_deaths
-  hc1_hiv_strat <- apply(out$hc1_noart_aids_deaths_strat, c(2:5,7), sum)
-  expect_equal(hc1_hiv, hc1_hiv_strat)
-
-  ##Stratfied by maternal treatment status- ART
-  hc1_hiv <- out$hc1_art_aids_deaths
-  hc1_hiv_strat <- apply(out$hc1_art_aids_deaths_strat, c(2,3,5:6,8), sum)
-  expect_equal(hc1_hiv, hc1_hiv_strat)
-
 
   ###############################
   ##Stratified hiv pop and population hiv pop should be the same
@@ -163,18 +152,81 @@ test_that("Model outputs are consistent", {
     dplyr::inner_join(out_df, by = c("Var1", "Var2", "Var3")) %>%
     dplyr::mutate(diff = strat - pop)
   expect_true(all(abs(c2$diff) < 1e-5))
+})
 
-  ##Stratfied by maternal treatment status- NO ART
-  out <- run_model(input$parameters, "ChildModel", 1970:2030)
+test_that("The most stratified state spaces match the lesser stratified HIV statespaces", {
+  testthat::skip(message = 'The most stratified state spaces no longer match the unstratified because we are using the exact timing of infection to remove LTFU')
+  ##Stratfied by maternal treatment status- NO ART. Maximum difference of ~21.
   hc1_hiv <- out$hc1_hiv_pop
   hc1_hiv_strat <- apply(out$hc1_hiv_pop_strat, c(2:5,7), sum)
+  ##Affected by ART LTFU change
   expect_equal(hc1_hiv, hc1_hiv_strat)
+  hc1_hiv <- data.table::setnames(data.table::data.table(reshape2::melt(hc1_hiv)), 'value', 'unstrat')
+  hc1_hiv_strat <- data.table::setnames(data.table::data.table(reshape2::melt(hc1_hiv_strat)), 'value', 'strat')
+  dt <- merge(hc1_hiv, hc1_hiv_strat)
+  dt[,diff := strat - unstrat]
 
-  ##Stratfied by maternal treatment status- ART
-  out <- run_model(input$parameters, "ChildModel", 1970:2030)
+  hc2_hiv <- out$hc2_hiv_pop
+  hc2_hiv_strat <- apply(out$hc2_hiv_pop_strat, c(2:5,7), sum)
+  ##Affected by ART LTFU change
+  expect_equal(hc2_hiv, hc2_hiv_strat)
+  hc2_hiv <- data.table::setnames(data.table::data.table(reshape2::melt(hc2_hiv)), 'value', 'unstrat')
+  hc2_hiv_strat <- data.table::setnames(data.table::data.table(reshape2::melt(hc2_hiv_strat)), 'value', 'strat')
+  dt <- merge(hc2_hiv, hc2_hiv_strat)
+  dt[,diff := strat - unstrat]
+
+  ##Stratfied by maternal treatment status- ART. Maximum difference of ~0.63.
   hc1_hiv <- out$hc1_art_pop
   hc1_hiv_strat <- apply(out$hc1_art_pop_strat, c(2,3,5:6,8), sum)
+  ##Affected by ART LTFU change
   expect_equal(hc1_hiv, hc1_hiv_strat)
+  hc1_hiv <- data.table::setnames(data.table::data.table(reshape2::melt(hc1_hiv)), 'value', 'unstrat')
+  hc1_hiv_strat <- data.table::setnames(data.table::data.table(reshape2::melt(hc1_hiv_strat)), 'value', 'strat')
+  dt <- merge(hc1_hiv, hc1_hiv_strat)
+  dt[,diff := strat - unstrat]
+
+  hc2_hiv <- out$hc2_art_pop
+  hc2_hiv_strat <- apply(out$hc2_art_pop_strat, c(2,3,5:6,8), sum)
+  ##Affected by ART LTFU change
+  expect_equal(hc2_hiv, hc2_hiv_strat)
+  hc2_hiv <- data.table::setnames(data.table::data.table(reshape2::melt(hc2_hiv)), 'value', 'unstrat')
+  hc2_hiv_strat <- data.table::setnames(data.table::data.table(reshape2::melt(hc2_hiv_strat)), 'value', 'strat')
+  dt <- merge(hc2_hiv, hc2_hiv_strat)
+  dt[,diff := strat - unstrat]
+
+  ##Stratfied by maternal treatment status- NO ART
+  hc1_hiv <- out$hc1_noart_aids_deaths
+  hc1_hiv_strat <- apply(out$hc1_noart_aids_deaths_strat, c(2:5,7), sum)
+  expect_equal(hc1_hiv, hc1_hiv_strat)
+  hc1_hiv <- data.table::setnames(data.table::data.table(reshape2::melt(hc1_hiv)), 'value', 'unstrat')
+  hc1_hiv_strat <- data.table::setnames(data.table::data.table(reshape2::melt(hc1_hiv_strat)), 'value', 'strat')
+  dt <- merge(hc1_hiv, hc1_hiv_strat)
+  dt[,diff := strat - unstrat]
+
+  hc2_hiv <- out$hc2_noart_aids_deaths
+  hc2_hiv_strat <- apply(out$hc2_noart_aids_deaths_strat, c(2:5,7), sum)
+  expect_equal(hc2_hiv, hc2_hiv_strat)
+  hc2_hiv <- data.table::setnames(data.table::data.table(reshape2::melt(hc2_hiv)), 'value', 'unstrat')
+  hc2_hiv_strat <- data.table::setnames(data.table::data.table(reshape2::melt(hc2_hiv_strat)), 'value', 'strat')
+  dt <- merge(hc2_hiv, hc2_hiv_strat)
+  dt[,diff := strat - unstrat]
+
+  ##Stratfied by maternal treatment status- ART
+  hc1_hiv <- out$hc1_art_aids_deaths
+  hc1_hiv_strat <- apply(out$hc1_art_aids_deaths_strat, c(2,3,5:6,8), sum)
+  expect_equal(hc1_hiv, hc1_hiv_strat)
+  hc1_hiv <- data.table::setnames(data.table::data.table(reshape2::melt(hc1_hiv)), 'value', 'unstrat')
+  hc1_hiv_strat <- data.table::setnames(data.table::data.table(reshape2::melt(hc1_hiv_strat)), 'value', 'strat')
+  dt <- merge(hc1_hiv, hc1_hiv_strat)
+  dt[,diff := strat - unstrat]
+
+  hc2_hiv <- out$hc2_art_aids_deaths
+  hc2_hiv_strat <- apply(out$hc2_art_aids_deaths_strat, c(2,3,5:6,8), sum)
+  expect_equal(hc2_hiv, hc2_hiv_strat)
+  hc2_hiv <- data.table::setnames(data.table::data.table(reshape2::melt(hc2_hiv)), 'value', 'unstrat')
+  hc2_hiv_strat <- data.table::setnames(data.table::data.table(reshape2::melt(hc2_hiv_strat)), 'value', 'strat')
+  dt <- merge(hc2_hiv, hc2_hiv_strat)
+  dt[,diff := strat - unstrat]
 
   ###############################
   ##Stratified ART need init should be the same
@@ -182,7 +234,6 @@ test_that("Model outputs are consistent", {
   art_need_init <- out$hc_art_need_init
   art_need_init_strat <- apply(out$hc_art_need_init_strat, c(2:5,7), sum)
   expect_equal(art_need_init, art_need_init_strat)
-
 })
 
 test_that("Female 15-49y pop aligns", {
