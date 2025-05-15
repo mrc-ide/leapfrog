@@ -19,7 +19,7 @@ end;
 
 {$ALIGN 8}
 type
-  LeapfrogDpParams = record
+  LeapfrogDpParamsView = record
   private
     basePop: PDouble;
     basePopLength: Integer;
@@ -31,17 +31,23 @@ type
     ageSpecificFertilityRateLength: Integer;
     birthsSexProp: PDouble;
     birthsSexPropLength: Integer;
+end;
+
+type
+  LeapfrogDpParams = class
   public
-    procedure SetBasePop(var inBasePop: TGBFixedArray<Double>);
-    procedure SetSurvivalProbability(var inSurvivalProbability: TGBFixedArray<Double>);
-    procedure SetNetMigration(var inNetMigration: TGBFixedArray<Double>);
-    procedure SetAgeSpecificFertilityRate(var inAgeSpecificFertilityRate: TGBFixedArray<Double>);
-    procedure SetBirthsSexProp(var inBirthsSexProp: TGBFixedArray<Double>);
+    basePop: TGBFixedArray<Double>;
+    survivalProbability: TGBFixedArray<Double>;
+    netMigration: TGBFixedArray<Double>;
+    ageSpecificFertilityRate: TGBFixedArray<Double>;
+    birthsSexProp: TGBFixedArray<Double>;
+    function getView(): LeapfrogDpParamsView;
+    Destructor Destroy; override;
 end;
 
 {$ALIGN 8}
 type
-  LeapfrogDpState = record
+  LeapfrogDpStateView = record
   private
     pTotalPop: PDouble;
     pTotalPopLength: Integer;
@@ -49,15 +55,21 @@ type
     pTotalPopBackgroundDeathsLength: Integer;
     births: PDouble;
     birthsLength: Integer;
+end;
+
+type
+  LeapfrogDpState = class
   public
-    procedure SetPTotalPop(var inPTotalPop: TGBFixedArray<Double>);
-    procedure SetPTotalPopBackgroundDeaths(var inPTotalPopBackgroundDeaths: TGBFixedArray<Double>);
-    procedure SetBirths(var inBirths: TGBFixedArray<Double>);
+    pTotalPop: TGBFixedArray<Double>;
+    pTotalPopBackgroundDeaths: TGBFixedArray<Double>;
+    births: TGBFixedArray<Double>;
+    function getView(): LeapfrogDpStateView;
+    Destructor Destroy; override;
 end;
 
 {$ALIGN 8}
 type
-  LeapfrogHaParams = record
+  LeapfrogHaParamsView = record
   private
     totalRate: PDouble;
     totalRateLength: Integer;
@@ -91,28 +103,34 @@ type
     initiationMortalityWeightLength: Integer;
     hArtStageDur: PDouble;
     hArtStageDurLength: Integer;
+end;
+
+type
+  LeapfrogHaParams = class
   public
-    procedure SetTotalRate(var inTotalRate: TGBFixedArray<Double>);
-    procedure SetRelativeRiskAge(var inRelativeRiskAge: TGBFixedArray<Double>);
-    procedure SetRelativeRiskSex(var inRelativeRiskSex: TGBFixedArray<Double>);
-    procedure SetCd4Mortality(var inCd4Mortality: TGBFixedArray<Double>);
-    procedure SetCd4Progression(var inCd4Progression: TGBFixedArray<Double>);
-    procedure SetCd4InitialDistribution(var inCd4InitialDistribution: TGBFixedArray<Double>);
-    procedure SetScaleCd4Mortality(var inScaleCd4Mortality: TGBFixedArray<Integer>);
-    procedure SetIdxHmElig(var inIdxHmElig: TGBFixedArray<Integer>);
-    procedure SetMortality(var inMortality: TGBFixedArray<Double>);
-    procedure SetMortalityTimeRateRatio(var inMortalityTimeRateRatio: TGBFixedArray<Double>);
-    procedure SetDropoutRecoverCd4(var inDropoutRecoverCd4: TGBFixedArray<Integer>);
-    procedure SetDropoutRate(var inDropoutRate: TGBFixedArray<Double>);
-    procedure SetAdultsOnArt(var inAdultsOnArt: TGBFixedArray<Double>);
-    procedure SetAdultsOnArtIsPercent(var inAdultsOnArtIsPercent: TGBFixedArray<Integer>);
-    procedure SetInitiationMortalityWeight(var inInitiationMortalityWeight: TGBFixedArray<Double>);
-    procedure SetHArtStageDur(var inHArtStageDur: TGBFixedArray<Double>);
+    totalRate: TGBFixedArray<Double>;
+    relativeRiskAge: TGBFixedArray<Double>;
+    relativeRiskSex: TGBFixedArray<Double>;
+    cd4Mortality: TGBFixedArray<Double>;
+    cd4Progression: TGBFixedArray<Double>;
+    cd4InitialDistribution: TGBFixedArray<Double>;
+    scaleCd4Mortality: TGBFixedArray<Integer>;
+    idxHmElig: TGBFixedArray<Integer>;
+    mortality: TGBFixedArray<Double>;
+    mortalityTimeRateRatio: TGBFixedArray<Double>;
+    dropoutRecoverCd4: TGBFixedArray<Integer>;
+    dropoutRate: TGBFixedArray<Double>;
+    adultsOnArt: TGBFixedArray<Double>;
+    adultsOnArtIsPercent: TGBFixedArray<Integer>;
+    initiationMortalityWeight: TGBFixedArray<Double>;
+    hArtStageDur: TGBFixedArray<Double>;
+    function getView(): LeapfrogHaParamsView;
+    Destructor Destroy; override;
 end;
 
 {$ALIGN 8}
 type
-  LeapfrogHaState = record
+  LeapfrogHaStateView = record
   private
     pHivPop: PDouble;
     pHivPopLength: Integer;
@@ -132,21 +150,27 @@ type
     hArtInitiationLength: Integer;
     pHivDeaths: PDouble;
     pHivDeathsLength: Integer;
+end;
+
+type
+  LeapfrogHaState = class
   public
-    procedure SetPHivPop(var inPHivPop: TGBFixedArray<Double>);
-    procedure SetPHivPopBackgroundDeaths(var inPHivPopBackgroundDeaths: TGBFixedArray<Double>);
-    procedure SetHHivAdult(var inHHivAdult: TGBFixedArray<Double>);
-    procedure SetHArtAdult(var inHArtAdult: TGBFixedArray<Double>);
-    procedure SetHHivDeathsNoArt(var inHHivDeathsNoArt: TGBFixedArray<Double>);
-    procedure SetPInfections(var inPInfections: TGBFixedArray<Double>);
-    procedure SetHHivDeathsArt(var inHHivDeathsArt: TGBFixedArray<Double>);
-    procedure SetHArtInitiation(var inHArtInitiation: TGBFixedArray<Double>);
-    procedure SetPHivDeaths(var inPHivDeaths: TGBFixedArray<Double>);
+    pHivPop: TGBFixedArray<Double>;
+    pHivPopBackgroundDeaths: TGBFixedArray<Double>;
+    hHivAdult: TGBFixedArray<Double>;
+    hArtAdult: TGBFixedArray<Double>;
+    hHivDeathsNoArt: TGBFixedArray<Double>;
+    pInfections: TGBFixedArray<Double>;
+    hHivDeathsArt: TGBFixedArray<Double>;
+    hArtInitiation: TGBFixedArray<Double>;
+    pHivDeaths: TGBFixedArray<Double>;
+    function getView(): LeapfrogHaStateView;
+    Destructor Destroy; override;
 end;
 
 {$ALIGN 8}
 type
-  LeapfrogHcParams = record
+  LeapfrogHcParamsView = record
   private
     hcNosocomial: PDouble;
     hcNosocomialLength: Integer;
@@ -240,58 +264,64 @@ type
     hcArtStartLength: Integer;
     localAdjFactor: PDouble;
     localAdjFactorLength: Integer;
+end;
+
+type
+  LeapfrogHcParams = class
   public
-    procedure SetHcNosocomial(var inHcNosocomial: TGBFixedArray<Double>);
-    procedure SetHc1Cd4Dist(var inHc1Cd4Dist: TGBFixedArray<Double>);
-    procedure SetHcCd4Transition(var inHcCd4Transition: TGBFixedArray<Double>);
-    procedure SetHc1Cd4Mort(var inHc1Cd4Mort: TGBFixedArray<Double>);
-    procedure SetHc2Cd4Mort(var inHc2Cd4Mort: TGBFixedArray<Double>);
-    procedure SetHc1Cd4Prog(var inHc1Cd4Prog: TGBFixedArray<Double>);
-    procedure SetHc2Cd4Prog(var inHc2Cd4Prog: TGBFixedArray<Double>);
-    procedure SetCtxVal(var inCtxVal: TGBFixedArray<Double>);
-    procedure SetHcArtEligAge(var inHcArtEligAge: TGBFixedArray<Integer>);
-    procedure SetHcArtEligCd4(var inHcArtEligCd4: TGBFixedArray<Double>);
-    procedure SetHcArtMortRr(var inHcArtMortRr: TGBFixedArray<Double>);
-    procedure SetHc1ArtMort(var inHc1ArtMort: TGBFixedArray<Double>);
-    procedure SetHc2ArtMort(var inHc2ArtMort: TGBFixedArray<Double>);
-    procedure SetHcArtIsperc(var inHcArtIsperc: TGBFixedArray<Integer>);
-    procedure SetHcArtVal(var inHcArtVal: TGBFixedArray<Double>);
-    procedure SetHcArtInitDist(var inHcArtInitDist: TGBFixedArray<Double>);
-    procedure SetAdultCd4Dist(var inAdultCd4Dist: TGBFixedArray<Double>);
-    procedure SetFertMultByAge(var inFertMultByAge: TGBFixedArray<Double>);
-    procedure SetFertMultOffArt(var inFertMultOffArt: TGBFixedArray<Double>);
-    procedure SetFertMultOnArt(var inFertMultOnArt: TGBFixedArray<Double>);
-    procedure SetTotalFertilityRate(var inTotalFertilityRate: TGBFixedArray<Double>);
-    procedure SetPmtct(var inPmtct: TGBFixedArray<Double>);
-    procedure SetVerticalTransmissionRate(var inVerticalTransmissionRate: TGBFixedArray<Double>);
-    procedure SetPmtctTransmissionRate(var inPmtctTransmissionRate: TGBFixedArray<Double>);
-    procedure SetPmtctDropout(var inPmtctDropout: TGBFixedArray<Double>);
-    procedure SetPmtctInputIsPercent(var inPmtctInputIsPercent: TGBFixedArray<Integer>);
-    procedure SetBreastfeedingDurationArt(var inBreastfeedingDurationArt: TGBFixedArray<Double>);
-    procedure SetBreastfeedingDurationNoArt(var inBreastfeedingDurationNoArt: TGBFixedArray<Double>);
-    procedure SetMatHivBirths(var inMatHivBirths: TGBFixedArray<Double>);
-    procedure SetMatPrevInput(var inMatPrevInput: TGBFixedArray<Integer>);
-    procedure SetPropLt200(var inPropLt200: TGBFixedArray<Double>);
-    procedure SetPropGte350(var inPropGte350: TGBFixedArray<Double>);
-    procedure SetIncrate(var inIncrate: TGBFixedArray<Double>);
-    procedure SetCtxValIsPercent(var inCtxValIsPercent: TGBFixedArray<Integer>);
-    procedure SetHcArtIsAgeSpec(var inHcArtIsAgeSpec: TGBFixedArray<Integer>);
-    procedure SetHcAgeCoarse(var inHcAgeCoarse: TGBFixedArray<Double>);
-    procedure SetAbortion(var inAbortion: TGBFixedArray<Double>);
-    procedure SetPatientsReallocated(var inPatientsReallocated: TGBFixedArray<Double>);
-    procedure SetHcArtLtfu(var inHcArtLtfu: TGBFixedArray<Double>);
-    procedure SetHcAgeCoarseCd4(var inHcAgeCoarseCd4: TGBFixedArray<Integer>);
-    procedure SetAdultFemaleInfections(var inAdultFemaleInfections: TGBFixedArray<Double>);
-    procedure SetAdultFemaleHivnpop(var inAdultFemaleHivnpop: TGBFixedArray<Double>);
-    procedure SetTotalBirths(var inTotalBirths: TGBFixedArray<Double>);
-    procedure SetCtxEffect(var inCtxEffect: TGBFixedArray<Double>);
-    procedure SetHcArtStart(var inHcArtStart: TGBFixedArray<Double>);
-    procedure SetLocalAdjFactor(var inLocalAdjFactor: TGBFixedArray<Double>);
+    hcNosocomial: TGBFixedArray<Double>;
+    hc1Cd4Dist: TGBFixedArray<Double>;
+    hcCd4Transition: TGBFixedArray<Double>;
+    hc1Cd4Mort: TGBFixedArray<Double>;
+    hc2Cd4Mort: TGBFixedArray<Double>;
+    hc1Cd4Prog: TGBFixedArray<Double>;
+    hc2Cd4Prog: TGBFixedArray<Double>;
+    ctxVal: TGBFixedArray<Double>;
+    hcArtEligAge: TGBFixedArray<Integer>;
+    hcArtEligCd4: TGBFixedArray<Double>;
+    hcArtMortRr: TGBFixedArray<Double>;
+    hc1ArtMort: TGBFixedArray<Double>;
+    hc2ArtMort: TGBFixedArray<Double>;
+    hcArtIsperc: TGBFixedArray<Integer>;
+    hcArtVal: TGBFixedArray<Double>;
+    hcArtInitDist: TGBFixedArray<Double>;
+    adultCd4Dist: TGBFixedArray<Double>;
+    fertMultByAge: TGBFixedArray<Double>;
+    fertMultOffArt: TGBFixedArray<Double>;
+    fertMultOnArt: TGBFixedArray<Double>;
+    totalFertilityRate: TGBFixedArray<Double>;
+    pmtct: TGBFixedArray<Double>;
+    verticalTransmissionRate: TGBFixedArray<Double>;
+    pmtctTransmissionRate: TGBFixedArray<Double>;
+    pmtctDropout: TGBFixedArray<Double>;
+    pmtctInputIsPercent: TGBFixedArray<Integer>;
+    breastfeedingDurationArt: TGBFixedArray<Double>;
+    breastfeedingDurationNoArt: TGBFixedArray<Double>;
+    matHivBirths: TGBFixedArray<Double>;
+    matPrevInput: TGBFixedArray<Integer>;
+    propLt200: TGBFixedArray<Double>;
+    propGte350: TGBFixedArray<Double>;
+    incrate: TGBFixedArray<Double>;
+    ctxValIsPercent: TGBFixedArray<Integer>;
+    hcArtIsAgeSpec: TGBFixedArray<Integer>;
+    hcAgeCoarse: TGBFixedArray<Double>;
+    abortion: TGBFixedArray<Double>;
+    patientsReallocated: TGBFixedArray<Double>;
+    hcArtLtfu: TGBFixedArray<Double>;
+    hcAgeCoarseCd4: TGBFixedArray<Integer>;
+    adultFemaleInfections: TGBFixedArray<Double>;
+    adultFemaleHivnpop: TGBFixedArray<Double>;
+    totalBirths: TGBFixedArray<Double>;
+    ctxEffect: TGBFixedArray<Double>;
+    hcArtStart: TGBFixedArray<Double>;
+    localAdjFactor: TGBFixedArray<Double>;
+    function getView(): LeapfrogHcParamsView;
+    Destructor Destroy; override;
 end;
 
 {$ALIGN 8}
 type
-  LeapfrogHcState = record
+  LeapfrogHcStateView = record
   private
     hc1HivPop: PDouble;
     hc1HivPopLength: Integer;
@@ -319,635 +349,425 @@ type
     ctxNeedLength: Integer;
     infectionByType: PDouble;
     infectionByTypeLength: Integer;
+end;
+
+type
+  LeapfrogHcState = class
   public
-    procedure SetHc1HivPop(var inHc1HivPop: TGBFixedArray<Double>);
-    procedure SetHc2HivPop(var inHc2HivPop: TGBFixedArray<Double>);
-    procedure SetHc1ArtPop(var inHc1ArtPop: TGBFixedArray<Double>);
-    procedure SetHc2ArtPop(var inHc2ArtPop: TGBFixedArray<Double>);
-    procedure SetHc1NoartAidsDeaths(var inHc1NoartAidsDeaths: TGBFixedArray<Double>);
-    procedure SetHc2NoartAidsDeaths(var inHc2NoartAidsDeaths: TGBFixedArray<Double>);
-    procedure SetHc1ArtAidsDeaths(var inHc1ArtAidsDeaths: TGBFixedArray<Double>);
-    procedure SetHc2ArtAidsDeaths(var inHc2ArtAidsDeaths: TGBFixedArray<Double>);
-    procedure SetHcArtInit(var inHcArtInit: TGBFixedArray<Double>);
-    procedure SetHcArtNeedInit(var inHcArtNeedInit: TGBFixedArray<Double>);
-    procedure SetHivBirths(var inHivBirths: TGBFixedArray<Double>);
-    procedure SetCtxNeed(var inCtxNeed: TGBFixedArray<Double>);
-    procedure SetInfectionByType(var inInfectionByType: TGBFixedArray<Double>);
+    hc1HivPop: TGBFixedArray<Double>;
+    hc2HivPop: TGBFixedArray<Double>;
+    hc1ArtPop: TGBFixedArray<Double>;
+    hc2ArtPop: TGBFixedArray<Double>;
+    hc1NoartAidsDeaths: TGBFixedArray<Double>;
+    hc2NoartAidsDeaths: TGBFixedArray<Double>;
+    hc1ArtAidsDeaths: TGBFixedArray<Double>;
+    hc2ArtAidsDeaths: TGBFixedArray<Double>;
+    hcArtInit: TGBFixedArray<Double>;
+    hcArtNeedInit: TGBFixedArray<Double>;
+    hivBirths: TGBFixedArray<Double>;
+    ctxNeed: TGBFixedArray<Double>;
+    infectionByType: TGBFixedArray<Double>;
+    function getView(): LeapfrogHcStateView;
+    Destructor Destroy; override;
 end;
 
 {$ALIGN 8}
 type
   LeapfrogParams = record
   private
-    dp: ^LeapfrogDpParams;
-    ha: ^LeapfrogHaParams;
-    hc: ^LeapfrogHcParams;
+    dp: ^LeapfrogDpParamsView;
+    ha: ^LeapfrogHaParamsView;
+    hc: ^LeapfrogHcParamsView;
   public
-    procedure SetDpParams(var dpParams: LeapfrogDpParams);
-    procedure SetHaParams(var haParams: LeapfrogHaParams);
-    procedure SetHcParams(var hcParams: LeapfrogHcParams);
+    procedure SetDpParams(const dpParams: LeapfrogDpParamsView);
+    procedure SetHaParams(const haParams: LeapfrogHaParamsView);
+    procedure SetHcParams(const hcParams: LeapfrogHcParamsView);
 end;
 
 {$ALIGN 8}
 type
   LeapfrogState = record
   private
-    dp: ^LeapfrogDpState;
-    ha: ^LeapfrogHaState;
-    hc: ^LeapfrogHcState;
+    dp: ^LeapfrogDpStateView;
+    ha: ^LeapfrogHaStateView;
+    hc: ^LeapfrogHcStateView;
   public
-    procedure SetDpState(var dpState: LeapfrogDpState);
-    procedure SetHaState(var haState: LeapfrogHaState);
-    procedure SetHcState(var hcState: LeapfrogHcState);
+    procedure SetDpState(const dpState: LeapfrogDpStateView);
+    procedure SetHaState(const haState: LeapfrogHaStateView);
+    procedure SetHcState(const hcState: LeapfrogHcStateView);
 end;
 
 type TCallbackFunction = procedure(Msg: PAnsiChar); stdcall;
 
-procedure LeapfrogRunDp(var params: LeapfrogParams; var opts: LeapfrogOptions; var outputState: LeapfrogState; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_dp';
-procedure LeapfrogRunAim(var params: LeapfrogParams; var opts: LeapfrogOptions; var outputState: LeapfrogState; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_aim';
-procedure LeapfrogRunDpSingleYear(var params: LeapfrogParams; var opts: LeapfrogOptions; var initial_state: LeapfrogState; start_year: Integer; var state: LeapfrogState; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_dp_single_year';
-procedure LeapfrogRunAimSingleYear(var params: LeapfrogParams; var opts: LeapfrogOptions; var initial_state: LeapfrogState; start_year: Integer; var state: LeapfrogState; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_aim_single_year';
+procedure LeapfrogRunDp(const params: LeapfrogParams; const opts: LeapfrogOptions; const outputState: LeapfrogState; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_dp';
+procedure LeapfrogRunAim(const params: LeapfrogParams; const opts: LeapfrogOptions; const outputState: LeapfrogState; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_aim';
+procedure LeapfrogRunDpSingleYear(const params: LeapfrogParams; const opts: LeapfrogOptions; const initial_state: LeapfrogState; start_year: Integer; const state: LeapfrogState; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_dp_single_year';
+procedure LeapfrogRunAimSingleYear(const params: LeapfrogParams; const opts: LeapfrogOptions; const initial_state: LeapfrogState; start_year: Integer; const state: LeapfrogState; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_aim_single_year';
 
 implementation
 
-procedure LeapfrogDpParams.SetBasePop(var inBasePop: TGBFixedArray<Double>);
-begin
-  basePop := PDouble(inBasePop.data);
-  basePopLength := inBasePop.GetLength();
-end;
-
-procedure LeapfrogDpParams.SetSurvivalProbability(var inSurvivalProbability: TGBFixedArray<Double>);
-begin
-  survivalProbability := PDouble(inSurvivalProbability.data);
-  survivalProbabilityLength := inSurvivalProbability.GetLength();
-end;
-
-procedure LeapfrogDpParams.SetNetMigration(var inNetMigration: TGBFixedArray<Double>);
-begin
-  netMigration := PDouble(inNetMigration.data);
-  netMigrationLength := inNetMigration.GetLength();
-end;
-
-procedure LeapfrogDpParams.SetAgeSpecificFertilityRate(var inAgeSpecificFertilityRate: TGBFixedArray<Double>);
-begin
-  ageSpecificFertilityRate := PDouble(inAgeSpecificFertilityRate.data);
-  ageSpecificFertilityRateLength := inAgeSpecificFertilityRate.GetLength();
-end;
-
-procedure LeapfrogDpParams.SetBirthsSexProp(var inBirthsSexProp: TGBFixedArray<Double>);
-begin
-  birthsSexProp := PDouble(inBirthsSexProp.data);
-  birthsSexPropLength := inBirthsSexProp.GetLength();
-end;
-
-procedure LeapfrogDpState.SetPTotalPop(var inPTotalPop: TGBFixedArray<Double>);
-begin
-  pTotalPop := PDouble(inPTotalPop.data);
-  pTotalPopLength := inPTotalPop.GetLength();
-end;
-
-procedure LeapfrogDpState.SetPTotalPopBackgroundDeaths(var inPTotalPopBackgroundDeaths: TGBFixedArray<Double>);
-begin
-  pTotalPopBackgroundDeaths := PDouble(inPTotalPopBackgroundDeaths.data);
-  pTotalPopBackgroundDeathsLength := inPTotalPopBackgroundDeaths.GetLength();
-end;
-
-procedure LeapfrogDpState.SetBirths(var inBirths: TGBFixedArray<Double>);
-begin
-  births := PDouble(inBirths.data);
-  birthsLength := inBirths.GetLength();
-end;
-
-procedure LeapfrogHaParams.SetTotalRate(var inTotalRate: TGBFixedArray<Double>);
-begin
-  totalRate := PDouble(inTotalRate.data);
-  totalRateLength := inTotalRate.GetLength();
-end;
-
-procedure LeapfrogHaParams.SetRelativeRiskAge(var inRelativeRiskAge: TGBFixedArray<Double>);
-begin
-  relativeRiskAge := PDouble(inRelativeRiskAge.data);
-  relativeRiskAgeLength := inRelativeRiskAge.GetLength();
-end;
-
-procedure LeapfrogHaParams.SetRelativeRiskSex(var inRelativeRiskSex: TGBFixedArray<Double>);
-begin
-  relativeRiskSex := PDouble(inRelativeRiskSex.data);
-  relativeRiskSexLength := inRelativeRiskSex.GetLength();
-end;
-
-procedure LeapfrogHaParams.SetCd4Mortality(var inCd4Mortality: TGBFixedArray<Double>);
-begin
-  cd4Mortality := PDouble(inCd4Mortality.data);
-  cd4MortalityLength := inCd4Mortality.GetLength();
-end;
-
-procedure LeapfrogHaParams.SetCd4Progression(var inCd4Progression: TGBFixedArray<Double>);
-begin
-  cd4Progression := PDouble(inCd4Progression.data);
-  cd4ProgressionLength := inCd4Progression.GetLength();
-end;
-
-procedure LeapfrogHaParams.SetCd4InitialDistribution(var inCd4InitialDistribution: TGBFixedArray<Double>);
-begin
-  cd4InitialDistribution := PDouble(inCd4InitialDistribution.data);
-  cd4InitialDistributionLength := inCd4InitialDistribution.GetLength();
-end;
-
-procedure LeapfrogHaParams.SetScaleCd4Mortality(var inScaleCd4Mortality: TGBFixedArray<Integer>);
-begin
-  scaleCd4Mortality := PInteger(inScaleCd4Mortality.data);
-  scaleCd4MortalityLength := inScaleCd4Mortality.GetLength();
-end;
-
-procedure LeapfrogHaParams.SetIdxHmElig(var inIdxHmElig: TGBFixedArray<Integer>);
-begin
-  idxHmElig := PInteger(inIdxHmElig.data);
-  idxHmEligLength := inIdxHmElig.GetLength();
-end;
-
-procedure LeapfrogHaParams.SetMortality(var inMortality: TGBFixedArray<Double>);
-begin
-  mortality := PDouble(inMortality.data);
-  mortalityLength := inMortality.GetLength();
-end;
-
-procedure LeapfrogHaParams.SetMortalityTimeRateRatio(var inMortalityTimeRateRatio: TGBFixedArray<Double>);
-begin
-  mortalityTimeRateRatio := PDouble(inMortalityTimeRateRatio.data);
-  mortalityTimeRateRatioLength := inMortalityTimeRateRatio.GetLength();
-end;
-
-procedure LeapfrogHaParams.SetDropoutRecoverCd4(var inDropoutRecoverCd4: TGBFixedArray<Integer>);
-begin
-  dropoutRecoverCd4 := PInteger(inDropoutRecoverCd4.data);
-  dropoutRecoverCd4Length := inDropoutRecoverCd4.GetLength();
-end;
-
-procedure LeapfrogHaParams.SetDropoutRate(var inDropoutRate: TGBFixedArray<Double>);
-begin
-  dropoutRate := PDouble(inDropoutRate.data);
-  dropoutRateLength := inDropoutRate.GetLength();
-end;
-
-procedure LeapfrogHaParams.SetAdultsOnArt(var inAdultsOnArt: TGBFixedArray<Double>);
-begin
-  adultsOnArt := PDouble(inAdultsOnArt.data);
-  adultsOnArtLength := inAdultsOnArt.GetLength();
-end;
-
-procedure LeapfrogHaParams.SetAdultsOnArtIsPercent(var inAdultsOnArtIsPercent: TGBFixedArray<Integer>);
-begin
-  adultsOnArtIsPercent := PInteger(inAdultsOnArtIsPercent.data);
-  adultsOnArtIsPercentLength := inAdultsOnArtIsPercent.GetLength();
-end;
-
-procedure LeapfrogHaParams.SetInitiationMortalityWeight(var inInitiationMortalityWeight: TGBFixedArray<Double>);
-begin
-  initiationMortalityWeight := PDouble(inInitiationMortalityWeight.data);
-  initiationMortalityWeightLength := inInitiationMortalityWeight.GetLength();
-end;
-
-procedure LeapfrogHaParams.SetHArtStageDur(var inHArtStageDur: TGBFixedArray<Double>);
-begin
-  hArtStageDur := PDouble(inHArtStageDur.data);
-  hArtStageDurLength := inHArtStageDur.GetLength();
-end;
-
-procedure LeapfrogHaState.SetPHivPop(var inPHivPop: TGBFixedArray<Double>);
-begin
-  pHivPop := PDouble(inPHivPop.data);
-  pHivPopLength := inPHivPop.GetLength();
-end;
-
-procedure LeapfrogHaState.SetPHivPopBackgroundDeaths(var inPHivPopBackgroundDeaths: TGBFixedArray<Double>);
-begin
-  pHivPopBackgroundDeaths := PDouble(inPHivPopBackgroundDeaths.data);
-  pHivPopBackgroundDeathsLength := inPHivPopBackgroundDeaths.GetLength();
-end;
-
-procedure LeapfrogHaState.SetHHivAdult(var inHHivAdult: TGBFixedArray<Double>);
-begin
-  hHivAdult := PDouble(inHHivAdult.data);
-  hHivAdultLength := inHHivAdult.GetLength();
-end;
-
-procedure LeapfrogHaState.SetHArtAdult(var inHArtAdult: TGBFixedArray<Double>);
-begin
-  hArtAdult := PDouble(inHArtAdult.data);
-  hArtAdultLength := inHArtAdult.GetLength();
-end;
-
-procedure LeapfrogHaState.SetHHivDeathsNoArt(var inHHivDeathsNoArt: TGBFixedArray<Double>);
-begin
-  hHivDeathsNoArt := PDouble(inHHivDeathsNoArt.data);
-  hHivDeathsNoArtLength := inHHivDeathsNoArt.GetLength();
-end;
-
-procedure LeapfrogHaState.SetPInfections(var inPInfections: TGBFixedArray<Double>);
-begin
-  pInfections := PDouble(inPInfections.data);
-  pInfectionsLength := inPInfections.GetLength();
-end;
-
-procedure LeapfrogHaState.SetHHivDeathsArt(var inHHivDeathsArt: TGBFixedArray<Double>);
-begin
-  hHivDeathsArt := PDouble(inHHivDeathsArt.data);
-  hHivDeathsArtLength := inHHivDeathsArt.GetLength();
-end;
-
-procedure LeapfrogHaState.SetHArtInitiation(var inHArtInitiation: TGBFixedArray<Double>);
-begin
-  hArtInitiation := PDouble(inHArtInitiation.data);
-  hArtInitiationLength := inHArtInitiation.GetLength();
-end;
-
-procedure LeapfrogHaState.SetPHivDeaths(var inPHivDeaths: TGBFixedArray<Double>);
-begin
-  pHivDeaths := PDouble(inPHivDeaths.data);
-  pHivDeathsLength := inPHivDeaths.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetHcNosocomial(var inHcNosocomial: TGBFixedArray<Double>);
-begin
-  hcNosocomial := PDouble(inHcNosocomial.data);
-  hcNosocomialLength := inHcNosocomial.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetHc1Cd4Dist(var inHc1Cd4Dist: TGBFixedArray<Double>);
-begin
-  hc1Cd4Dist := PDouble(inHc1Cd4Dist.data);
-  hc1Cd4DistLength := inHc1Cd4Dist.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetHcCd4Transition(var inHcCd4Transition: TGBFixedArray<Double>);
-begin
-  hcCd4Transition := PDouble(inHcCd4Transition.data);
-  hcCd4TransitionLength := inHcCd4Transition.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetHc1Cd4Mort(var inHc1Cd4Mort: TGBFixedArray<Double>);
-begin
-  hc1Cd4Mort := PDouble(inHc1Cd4Mort.data);
-  hc1Cd4MortLength := inHc1Cd4Mort.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetHc2Cd4Mort(var inHc2Cd4Mort: TGBFixedArray<Double>);
-begin
-  hc2Cd4Mort := PDouble(inHc2Cd4Mort.data);
-  hc2Cd4MortLength := inHc2Cd4Mort.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetHc1Cd4Prog(var inHc1Cd4Prog: TGBFixedArray<Double>);
-begin
-  hc1Cd4Prog := PDouble(inHc1Cd4Prog.data);
-  hc1Cd4ProgLength := inHc1Cd4Prog.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetHc2Cd4Prog(var inHc2Cd4Prog: TGBFixedArray<Double>);
-begin
-  hc2Cd4Prog := PDouble(inHc2Cd4Prog.data);
-  hc2Cd4ProgLength := inHc2Cd4Prog.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetCtxVal(var inCtxVal: TGBFixedArray<Double>);
-begin
-  ctxVal := PDouble(inCtxVal.data);
-  ctxValLength := inCtxVal.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetHcArtEligAge(var inHcArtEligAge: TGBFixedArray<Integer>);
-begin
-  hcArtEligAge := PInteger(inHcArtEligAge.data);
-  hcArtEligAgeLength := inHcArtEligAge.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetHcArtEligCd4(var inHcArtEligCd4: TGBFixedArray<Double>);
-begin
-  hcArtEligCd4 := PDouble(inHcArtEligCd4.data);
-  hcArtEligCd4Length := inHcArtEligCd4.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetHcArtMortRr(var inHcArtMortRr: TGBFixedArray<Double>);
-begin
-  hcArtMortRr := PDouble(inHcArtMortRr.data);
-  hcArtMortRrLength := inHcArtMortRr.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetHc1ArtMort(var inHc1ArtMort: TGBFixedArray<Double>);
-begin
-  hc1ArtMort := PDouble(inHc1ArtMort.data);
-  hc1ArtMortLength := inHc1ArtMort.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetHc2ArtMort(var inHc2ArtMort: TGBFixedArray<Double>);
-begin
-  hc2ArtMort := PDouble(inHc2ArtMort.data);
-  hc2ArtMortLength := inHc2ArtMort.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetHcArtIsperc(var inHcArtIsperc: TGBFixedArray<Integer>);
-begin
-  hcArtIsperc := PInteger(inHcArtIsperc.data);
-  hcArtIspercLength := inHcArtIsperc.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetHcArtVal(var inHcArtVal: TGBFixedArray<Double>);
-begin
-  hcArtVal := PDouble(inHcArtVal.data);
-  hcArtValLength := inHcArtVal.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetHcArtInitDist(var inHcArtInitDist: TGBFixedArray<Double>);
-begin
-  hcArtInitDist := PDouble(inHcArtInitDist.data);
-  hcArtInitDistLength := inHcArtInitDist.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetAdultCd4Dist(var inAdultCd4Dist: TGBFixedArray<Double>);
-begin
-  adultCd4Dist := PDouble(inAdultCd4Dist.data);
-  adultCd4DistLength := inAdultCd4Dist.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetFertMultByAge(var inFertMultByAge: TGBFixedArray<Double>);
-begin
-  fertMultByAge := PDouble(inFertMultByAge.data);
-  fertMultByAgeLength := inFertMultByAge.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetFertMultOffArt(var inFertMultOffArt: TGBFixedArray<Double>);
-begin
-  fertMultOffArt := PDouble(inFertMultOffArt.data);
-  fertMultOffArtLength := inFertMultOffArt.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetFertMultOnArt(var inFertMultOnArt: TGBFixedArray<Double>);
-begin
-  fertMultOnArt := PDouble(inFertMultOnArt.data);
-  fertMultOnArtLength := inFertMultOnArt.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetTotalFertilityRate(var inTotalFertilityRate: TGBFixedArray<Double>);
-begin
-  totalFertilityRate := PDouble(inTotalFertilityRate.data);
-  totalFertilityRateLength := inTotalFertilityRate.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetPmtct(var inPmtct: TGBFixedArray<Double>);
-begin
-  pmtct := PDouble(inPmtct.data);
-  pmtctLength := inPmtct.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetVerticalTransmissionRate(var inVerticalTransmissionRate: TGBFixedArray<Double>);
-begin
-  verticalTransmissionRate := PDouble(inVerticalTransmissionRate.data);
-  verticalTransmissionRateLength := inVerticalTransmissionRate.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetPmtctTransmissionRate(var inPmtctTransmissionRate: TGBFixedArray<Double>);
-begin
-  pmtctTransmissionRate := PDouble(inPmtctTransmissionRate.data);
-  pmtctTransmissionRateLength := inPmtctTransmissionRate.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetPmtctDropout(var inPmtctDropout: TGBFixedArray<Double>);
-begin
-  pmtctDropout := PDouble(inPmtctDropout.data);
-  pmtctDropoutLength := inPmtctDropout.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetPmtctInputIsPercent(var inPmtctInputIsPercent: TGBFixedArray<Integer>);
-begin
-  pmtctInputIsPercent := PInteger(inPmtctInputIsPercent.data);
-  pmtctInputIsPercentLength := inPmtctInputIsPercent.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetBreastfeedingDurationArt(var inBreastfeedingDurationArt: TGBFixedArray<Double>);
-begin
-  breastfeedingDurationArt := PDouble(inBreastfeedingDurationArt.data);
-  breastfeedingDurationArtLength := inBreastfeedingDurationArt.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetBreastfeedingDurationNoArt(var inBreastfeedingDurationNoArt: TGBFixedArray<Double>);
-begin
-  breastfeedingDurationNoArt := PDouble(inBreastfeedingDurationNoArt.data);
-  breastfeedingDurationNoArtLength := inBreastfeedingDurationNoArt.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetMatHivBirths(var inMatHivBirths: TGBFixedArray<Double>);
-begin
-  matHivBirths := PDouble(inMatHivBirths.data);
-  matHivBirthsLength := inMatHivBirths.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetMatPrevInput(var inMatPrevInput: TGBFixedArray<Integer>);
-begin
-  matPrevInput := PInteger(inMatPrevInput.data);
-  matPrevInputLength := inMatPrevInput.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetPropLt200(var inPropLt200: TGBFixedArray<Double>);
-begin
-  propLt200 := PDouble(inPropLt200.data);
-  propLt200Length := inPropLt200.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetPropGte350(var inPropGte350: TGBFixedArray<Double>);
-begin
-  propGte350 := PDouble(inPropGte350.data);
-  propGte350Length := inPropGte350.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetIncrate(var inIncrate: TGBFixedArray<Double>);
-begin
-  incrate := PDouble(inIncrate.data);
-  incrateLength := inIncrate.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetCtxValIsPercent(var inCtxValIsPercent: TGBFixedArray<Integer>);
-begin
-  ctxValIsPercent := PInteger(inCtxValIsPercent.data);
-  ctxValIsPercentLength := inCtxValIsPercent.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetHcArtIsAgeSpec(var inHcArtIsAgeSpec: TGBFixedArray<Integer>);
-begin
-  hcArtIsAgeSpec := PInteger(inHcArtIsAgeSpec.data);
-  hcArtIsAgeSpecLength := inHcArtIsAgeSpec.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetHcAgeCoarse(var inHcAgeCoarse: TGBFixedArray<Double>);
-begin
-  hcAgeCoarse := PDouble(inHcAgeCoarse.data);
-  hcAgeCoarseLength := inHcAgeCoarse.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetAbortion(var inAbortion: TGBFixedArray<Double>);
-begin
-  abortion := PDouble(inAbortion.data);
-  abortionLength := inAbortion.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetPatientsReallocated(var inPatientsReallocated: TGBFixedArray<Double>);
-begin
-  patientsReallocated := PDouble(inPatientsReallocated.data);
-  patientsReallocatedLength := inPatientsReallocated.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetHcArtLtfu(var inHcArtLtfu: TGBFixedArray<Double>);
-begin
-  hcArtLtfu := PDouble(inHcArtLtfu.data);
-  hcArtLtfuLength := inHcArtLtfu.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetHcAgeCoarseCd4(var inHcAgeCoarseCd4: TGBFixedArray<Integer>);
-begin
-  hcAgeCoarseCd4 := PInteger(inHcAgeCoarseCd4.data);
-  hcAgeCoarseCd4Length := inHcAgeCoarseCd4.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetAdultFemaleInfections(var inAdultFemaleInfections: TGBFixedArray<Double>);
-begin
-  adultFemaleInfections := PDouble(inAdultFemaleInfections.data);
-  adultFemaleInfectionsLength := inAdultFemaleInfections.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetAdultFemaleHivnpop(var inAdultFemaleHivnpop: TGBFixedArray<Double>);
-begin
-  adultFemaleHivnpop := PDouble(inAdultFemaleHivnpop.data);
-  adultFemaleHivnpopLength := inAdultFemaleHivnpop.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetTotalBirths(var inTotalBirths: TGBFixedArray<Double>);
-begin
-  totalBirths := PDouble(inTotalBirths.data);
-  totalBirthsLength := inTotalBirths.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetCtxEffect(var inCtxEffect: TGBFixedArray<Double>);
-begin
-  ctxEffect := PDouble(inCtxEffect.data);
-  ctxEffectLength := inCtxEffect.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetHcArtStart(var inHcArtStart: TGBFixedArray<Double>);
-begin
-  hcArtStart := PDouble(inHcArtStart.data);
-  hcArtStartLength := inHcArtStart.GetLength();
-end;
-
-procedure LeapfrogHcParams.SetLocalAdjFactor(var inLocalAdjFactor: TGBFixedArray<Double>);
-begin
-  localAdjFactor := PDouble(inLocalAdjFactor.data);
-  localAdjFactorLength := inLocalAdjFactor.GetLength();
-end;
-
-procedure LeapfrogHcState.SetHc1HivPop(var inHc1HivPop: TGBFixedArray<Double>);
-begin
-  hc1HivPop := PDouble(inHc1HivPop.data);
-  hc1HivPopLength := inHc1HivPop.GetLength();
-end;
-
-procedure LeapfrogHcState.SetHc2HivPop(var inHc2HivPop: TGBFixedArray<Double>);
-begin
-  hc2HivPop := PDouble(inHc2HivPop.data);
-  hc2HivPopLength := inHc2HivPop.GetLength();
-end;
-
-procedure LeapfrogHcState.SetHc1ArtPop(var inHc1ArtPop: TGBFixedArray<Double>);
-begin
-  hc1ArtPop := PDouble(inHc1ArtPop.data);
-  hc1ArtPopLength := inHc1ArtPop.GetLength();
-end;
-
-procedure LeapfrogHcState.SetHc2ArtPop(var inHc2ArtPop: TGBFixedArray<Double>);
-begin
-  hc2ArtPop := PDouble(inHc2ArtPop.data);
-  hc2ArtPopLength := inHc2ArtPop.GetLength();
-end;
-
-procedure LeapfrogHcState.SetHc1NoartAidsDeaths(var inHc1NoartAidsDeaths: TGBFixedArray<Double>);
-begin
-  hc1NoartAidsDeaths := PDouble(inHc1NoartAidsDeaths.data);
-  hc1NoartAidsDeathsLength := inHc1NoartAidsDeaths.GetLength();
-end;
-
-procedure LeapfrogHcState.SetHc2NoartAidsDeaths(var inHc2NoartAidsDeaths: TGBFixedArray<Double>);
-begin
-  hc2NoartAidsDeaths := PDouble(inHc2NoartAidsDeaths.data);
-  hc2NoartAidsDeathsLength := inHc2NoartAidsDeaths.GetLength();
-end;
-
-procedure LeapfrogHcState.SetHc1ArtAidsDeaths(var inHc1ArtAidsDeaths: TGBFixedArray<Double>);
-begin
-  hc1ArtAidsDeaths := PDouble(inHc1ArtAidsDeaths.data);
-  hc1ArtAidsDeathsLength := inHc1ArtAidsDeaths.GetLength();
-end;
-
-procedure LeapfrogHcState.SetHc2ArtAidsDeaths(var inHc2ArtAidsDeaths: TGBFixedArray<Double>);
-begin
-  hc2ArtAidsDeaths := PDouble(inHc2ArtAidsDeaths.data);
-  hc2ArtAidsDeathsLength := inHc2ArtAidsDeaths.GetLength();
-end;
-
-procedure LeapfrogHcState.SetHcArtInit(var inHcArtInit: TGBFixedArray<Double>);
-begin
-  hcArtInit := PDouble(inHcArtInit.data);
-  hcArtInitLength := inHcArtInit.GetLength();
-end;
-
-procedure LeapfrogHcState.SetHcArtNeedInit(var inHcArtNeedInit: TGBFixedArray<Double>);
-begin
-  hcArtNeedInit := PDouble(inHcArtNeedInit.data);
-  hcArtNeedInitLength := inHcArtNeedInit.GetLength();
-end;
-
-procedure LeapfrogHcState.SetHivBirths(var inHivBirths: TGBFixedArray<Double>);
-begin
-  hivBirths := PDouble(inHivBirths.data);
-  hivBirthsLength := inHivBirths.GetLength();
-end;
-
-procedure LeapfrogHcState.SetCtxNeed(var inCtxNeed: TGBFixedArray<Double>);
-begin
-  ctxNeed := PDouble(inCtxNeed.data);
-  ctxNeedLength := inCtxNeed.GetLength();
-end;
-
-procedure LeapfrogHcState.SetInfectionByType(var inInfectionByType: TGBFixedArray<Double>);
-begin
-  infectionByType := PDouble(inInfectionByType.data);
-  infectionByTypeLength := inInfectionByType.GetLength();
-end;
-
-procedure LeapfrogParams.SetDpParams(var dpParams: LeapfrogDpParams);
+destructor LeapfrogDpParams.Destroy;
+begin;
+  basePop.Free;
+  survivalProbability.Free;
+  netMigration.Free;
+  ageSpecificFertilityRate.Free;
+  birthsSexProp.Free;
+  inherited;
+end;
+
+destructor LeapfrogDpState.Destroy;
+begin;
+  pTotalPop.Free;
+  pTotalPopBackgroundDeaths.Free;
+  births.Free;
+  inherited;
+end;
+
+function LeapfrogDpParams.getView(): LeapfrogDpParamsView;
+begin;
+  Result.basePop := PDouble(basePop.data);
+  Result.basePopLength := basePop.GetLength();
+  Result.survivalProbability := PDouble(survivalProbability.data);
+  Result.survivalProbabilityLength := survivalProbability.GetLength();
+  Result.netMigration := PDouble(netMigration.data);
+  Result.netMigrationLength := netMigration.GetLength();
+  Result.ageSpecificFertilityRate := PDouble(ageSpecificFertilityRate.data);
+  Result.ageSpecificFertilityRateLength := ageSpecificFertilityRate.GetLength();
+  Result.birthsSexProp := PDouble(birthsSexProp.data);
+  Result.birthsSexPropLength := birthsSexProp.GetLength();
+  inherited;
+end;
+
+function LeapfrogDpState.getView(): LeapfrogDpStateView;
+begin;
+  Result.pTotalPop := PDouble(pTotalPop.data);
+  Result.pTotalPopLength := pTotalPop.GetLength();
+  Result.pTotalPopBackgroundDeaths := PDouble(pTotalPopBackgroundDeaths.data);
+  Result.pTotalPopBackgroundDeathsLength := pTotalPopBackgroundDeaths.GetLength();
+  Result.births := PDouble(births.data);
+  Result.birthsLength := births.GetLength();
+  inherited;
+end;
+
+destructor LeapfrogHaParams.Destroy;
+begin;
+  totalRate.Free;
+  relativeRiskAge.Free;
+  relativeRiskSex.Free;
+  cd4Mortality.Free;
+  cd4Progression.Free;
+  cd4InitialDistribution.Free;
+  scaleCd4Mortality.Free;
+  idxHmElig.Free;
+  mortality.Free;
+  mortalityTimeRateRatio.Free;
+  dropoutRecoverCd4.Free;
+  dropoutRate.Free;
+  adultsOnArt.Free;
+  adultsOnArtIsPercent.Free;
+  initiationMortalityWeight.Free;
+  hArtStageDur.Free;
+  inherited;
+end;
+
+destructor LeapfrogHaState.Destroy;
+begin;
+  pHivPop.Free;
+  pHivPopBackgroundDeaths.Free;
+  hHivAdult.Free;
+  hArtAdult.Free;
+  hHivDeathsNoArt.Free;
+  pInfections.Free;
+  hHivDeathsArt.Free;
+  hArtInitiation.Free;
+  pHivDeaths.Free;
+  inherited;
+end;
+
+function LeapfrogHaParams.getView(): LeapfrogHaParamsView;
+begin;
+  Result.totalRate := PDouble(totalRate.data);
+  Result.totalRateLength := totalRate.GetLength();
+  Result.relativeRiskAge := PDouble(relativeRiskAge.data);
+  Result.relativeRiskAgeLength := relativeRiskAge.GetLength();
+  Result.relativeRiskSex := PDouble(relativeRiskSex.data);
+  Result.relativeRiskSexLength := relativeRiskSex.GetLength();
+  Result.cd4Mortality := PDouble(cd4Mortality.data);
+  Result.cd4MortalityLength := cd4Mortality.GetLength();
+  Result.cd4Progression := PDouble(cd4Progression.data);
+  Result.cd4ProgressionLength := cd4Progression.GetLength();
+  Result.cd4InitialDistribution := PDouble(cd4InitialDistribution.data);
+  Result.cd4InitialDistributionLength := cd4InitialDistribution.GetLength();
+  Result.scaleCd4Mortality := PInteger(scaleCd4Mortality.data);
+  Result.scaleCd4MortalityLength := scaleCd4Mortality.GetLength();
+  Result.idxHmElig := PInteger(idxHmElig.data);
+  Result.idxHmEligLength := idxHmElig.GetLength();
+  Result.mortality := PDouble(mortality.data);
+  Result.mortalityLength := mortality.GetLength();
+  Result.mortalityTimeRateRatio := PDouble(mortalityTimeRateRatio.data);
+  Result.mortalityTimeRateRatioLength := mortalityTimeRateRatio.GetLength();
+  Result.dropoutRecoverCd4 := PInteger(dropoutRecoverCd4.data);
+  Result.dropoutRecoverCd4Length := dropoutRecoverCd4.GetLength();
+  Result.dropoutRate := PDouble(dropoutRate.data);
+  Result.dropoutRateLength := dropoutRate.GetLength();
+  Result.adultsOnArt := PDouble(adultsOnArt.data);
+  Result.adultsOnArtLength := adultsOnArt.GetLength();
+  Result.adultsOnArtIsPercent := PInteger(adultsOnArtIsPercent.data);
+  Result.adultsOnArtIsPercentLength := adultsOnArtIsPercent.GetLength();
+  Result.initiationMortalityWeight := PDouble(initiationMortalityWeight.data);
+  Result.initiationMortalityWeightLength := initiationMortalityWeight.GetLength();
+  Result.hArtStageDur := PDouble(hArtStageDur.data);
+  Result.hArtStageDurLength := hArtStageDur.GetLength();
+  inherited;
+end;
+
+function LeapfrogHaState.getView(): LeapfrogHaStateView;
+begin;
+  Result.pHivPop := PDouble(pHivPop.data);
+  Result.pHivPopLength := pHivPop.GetLength();
+  Result.pHivPopBackgroundDeaths := PDouble(pHivPopBackgroundDeaths.data);
+  Result.pHivPopBackgroundDeathsLength := pHivPopBackgroundDeaths.GetLength();
+  Result.hHivAdult := PDouble(hHivAdult.data);
+  Result.hHivAdultLength := hHivAdult.GetLength();
+  Result.hArtAdult := PDouble(hArtAdult.data);
+  Result.hArtAdultLength := hArtAdult.GetLength();
+  Result.hHivDeathsNoArt := PDouble(hHivDeathsNoArt.data);
+  Result.hHivDeathsNoArtLength := hHivDeathsNoArt.GetLength();
+  Result.pInfections := PDouble(pInfections.data);
+  Result.pInfectionsLength := pInfections.GetLength();
+  Result.hHivDeathsArt := PDouble(hHivDeathsArt.data);
+  Result.hHivDeathsArtLength := hHivDeathsArt.GetLength();
+  Result.hArtInitiation := PDouble(hArtInitiation.data);
+  Result.hArtInitiationLength := hArtInitiation.GetLength();
+  Result.pHivDeaths := PDouble(pHivDeaths.data);
+  Result.pHivDeathsLength := pHivDeaths.GetLength();
+  inherited;
+end;
+
+destructor LeapfrogHcParams.Destroy;
+begin;
+  hcNosocomial.Free;
+  hc1Cd4Dist.Free;
+  hcCd4Transition.Free;
+  hc1Cd4Mort.Free;
+  hc2Cd4Mort.Free;
+  hc1Cd4Prog.Free;
+  hc2Cd4Prog.Free;
+  ctxVal.Free;
+  hcArtEligAge.Free;
+  hcArtEligCd4.Free;
+  hcArtMortRr.Free;
+  hc1ArtMort.Free;
+  hc2ArtMort.Free;
+  hcArtIsperc.Free;
+  hcArtVal.Free;
+  hcArtInitDist.Free;
+  adultCd4Dist.Free;
+  fertMultByAge.Free;
+  fertMultOffArt.Free;
+  fertMultOnArt.Free;
+  totalFertilityRate.Free;
+  pmtct.Free;
+  verticalTransmissionRate.Free;
+  pmtctTransmissionRate.Free;
+  pmtctDropout.Free;
+  pmtctInputIsPercent.Free;
+  breastfeedingDurationArt.Free;
+  breastfeedingDurationNoArt.Free;
+  matHivBirths.Free;
+  matPrevInput.Free;
+  propLt200.Free;
+  propGte350.Free;
+  incrate.Free;
+  ctxValIsPercent.Free;
+  hcArtIsAgeSpec.Free;
+  hcAgeCoarse.Free;
+  abortion.Free;
+  patientsReallocated.Free;
+  hcArtLtfu.Free;
+  hcAgeCoarseCd4.Free;
+  adultFemaleInfections.Free;
+  adultFemaleHivnpop.Free;
+  totalBirths.Free;
+  ctxEffect.Free;
+  hcArtStart.Free;
+  localAdjFactor.Free;
+  inherited;
+end;
+
+destructor LeapfrogHcState.Destroy;
+begin;
+  hc1HivPop.Free;
+  hc2HivPop.Free;
+  hc1ArtPop.Free;
+  hc2ArtPop.Free;
+  hc1NoartAidsDeaths.Free;
+  hc2NoartAidsDeaths.Free;
+  hc1ArtAidsDeaths.Free;
+  hc2ArtAidsDeaths.Free;
+  hcArtInit.Free;
+  hcArtNeedInit.Free;
+  hivBirths.Free;
+  ctxNeed.Free;
+  infectionByType.Free;
+  inherited;
+end;
+
+function LeapfrogHcParams.getView(): LeapfrogHcParamsView;
+begin;
+  Result.hcNosocomial := PDouble(hcNosocomial.data);
+  Result.hcNosocomialLength := hcNosocomial.GetLength();
+  Result.hc1Cd4Dist := PDouble(hc1Cd4Dist.data);
+  Result.hc1Cd4DistLength := hc1Cd4Dist.GetLength();
+  Result.hcCd4Transition := PDouble(hcCd4Transition.data);
+  Result.hcCd4TransitionLength := hcCd4Transition.GetLength();
+  Result.hc1Cd4Mort := PDouble(hc1Cd4Mort.data);
+  Result.hc1Cd4MortLength := hc1Cd4Mort.GetLength();
+  Result.hc2Cd4Mort := PDouble(hc2Cd4Mort.data);
+  Result.hc2Cd4MortLength := hc2Cd4Mort.GetLength();
+  Result.hc1Cd4Prog := PDouble(hc1Cd4Prog.data);
+  Result.hc1Cd4ProgLength := hc1Cd4Prog.GetLength();
+  Result.hc2Cd4Prog := PDouble(hc2Cd4Prog.data);
+  Result.hc2Cd4ProgLength := hc2Cd4Prog.GetLength();
+  Result.ctxVal := PDouble(ctxVal.data);
+  Result.ctxValLength := ctxVal.GetLength();
+  Result.hcArtEligAge := PInteger(hcArtEligAge.data);
+  Result.hcArtEligAgeLength := hcArtEligAge.GetLength();
+  Result.hcArtEligCd4 := PDouble(hcArtEligCd4.data);
+  Result.hcArtEligCd4Length := hcArtEligCd4.GetLength();
+  Result.hcArtMortRr := PDouble(hcArtMortRr.data);
+  Result.hcArtMortRrLength := hcArtMortRr.GetLength();
+  Result.hc1ArtMort := PDouble(hc1ArtMort.data);
+  Result.hc1ArtMortLength := hc1ArtMort.GetLength();
+  Result.hc2ArtMort := PDouble(hc2ArtMort.data);
+  Result.hc2ArtMortLength := hc2ArtMort.GetLength();
+  Result.hcArtIsperc := PInteger(hcArtIsperc.data);
+  Result.hcArtIspercLength := hcArtIsperc.GetLength();
+  Result.hcArtVal := PDouble(hcArtVal.data);
+  Result.hcArtValLength := hcArtVal.GetLength();
+  Result.hcArtInitDist := PDouble(hcArtInitDist.data);
+  Result.hcArtInitDistLength := hcArtInitDist.GetLength();
+  Result.adultCd4Dist := PDouble(adultCd4Dist.data);
+  Result.adultCd4DistLength := adultCd4Dist.GetLength();
+  Result.fertMultByAge := PDouble(fertMultByAge.data);
+  Result.fertMultByAgeLength := fertMultByAge.GetLength();
+  Result.fertMultOffArt := PDouble(fertMultOffArt.data);
+  Result.fertMultOffArtLength := fertMultOffArt.GetLength();
+  Result.fertMultOnArt := PDouble(fertMultOnArt.data);
+  Result.fertMultOnArtLength := fertMultOnArt.GetLength();
+  Result.totalFertilityRate := PDouble(totalFertilityRate.data);
+  Result.totalFertilityRateLength := totalFertilityRate.GetLength();
+  Result.pmtct := PDouble(pmtct.data);
+  Result.pmtctLength := pmtct.GetLength();
+  Result.verticalTransmissionRate := PDouble(verticalTransmissionRate.data);
+  Result.verticalTransmissionRateLength := verticalTransmissionRate.GetLength();
+  Result.pmtctTransmissionRate := PDouble(pmtctTransmissionRate.data);
+  Result.pmtctTransmissionRateLength := pmtctTransmissionRate.GetLength();
+  Result.pmtctDropout := PDouble(pmtctDropout.data);
+  Result.pmtctDropoutLength := pmtctDropout.GetLength();
+  Result.pmtctInputIsPercent := PInteger(pmtctInputIsPercent.data);
+  Result.pmtctInputIsPercentLength := pmtctInputIsPercent.GetLength();
+  Result.breastfeedingDurationArt := PDouble(breastfeedingDurationArt.data);
+  Result.breastfeedingDurationArtLength := breastfeedingDurationArt.GetLength();
+  Result.breastfeedingDurationNoArt := PDouble(breastfeedingDurationNoArt.data);
+  Result.breastfeedingDurationNoArtLength := breastfeedingDurationNoArt.GetLength();
+  Result.matHivBirths := PDouble(matHivBirths.data);
+  Result.matHivBirthsLength := matHivBirths.GetLength();
+  Result.matPrevInput := PInteger(matPrevInput.data);
+  Result.matPrevInputLength := matPrevInput.GetLength();
+  Result.propLt200 := PDouble(propLt200.data);
+  Result.propLt200Length := propLt200.GetLength();
+  Result.propGte350 := PDouble(propGte350.data);
+  Result.propGte350Length := propGte350.GetLength();
+  Result.incrate := PDouble(incrate.data);
+  Result.incrateLength := incrate.GetLength();
+  Result.ctxValIsPercent := PInteger(ctxValIsPercent.data);
+  Result.ctxValIsPercentLength := ctxValIsPercent.GetLength();
+  Result.hcArtIsAgeSpec := PInteger(hcArtIsAgeSpec.data);
+  Result.hcArtIsAgeSpecLength := hcArtIsAgeSpec.GetLength();
+  Result.hcAgeCoarse := PDouble(hcAgeCoarse.data);
+  Result.hcAgeCoarseLength := hcAgeCoarse.GetLength();
+  Result.abortion := PDouble(abortion.data);
+  Result.abortionLength := abortion.GetLength();
+  Result.patientsReallocated := PDouble(patientsReallocated.data);
+  Result.patientsReallocatedLength := patientsReallocated.GetLength();
+  Result.hcArtLtfu := PDouble(hcArtLtfu.data);
+  Result.hcArtLtfuLength := hcArtLtfu.GetLength();
+  Result.hcAgeCoarseCd4 := PInteger(hcAgeCoarseCd4.data);
+  Result.hcAgeCoarseCd4Length := hcAgeCoarseCd4.GetLength();
+  Result.adultFemaleInfections := PDouble(adultFemaleInfections.data);
+  Result.adultFemaleInfectionsLength := adultFemaleInfections.GetLength();
+  Result.adultFemaleHivnpop := PDouble(adultFemaleHivnpop.data);
+  Result.adultFemaleHivnpopLength := adultFemaleHivnpop.GetLength();
+  Result.totalBirths := PDouble(totalBirths.data);
+  Result.totalBirthsLength := totalBirths.GetLength();
+  Result.ctxEffect := PDouble(ctxEffect.data);
+  Result.ctxEffectLength := ctxEffect.GetLength();
+  Result.hcArtStart := PDouble(hcArtStart.data);
+  Result.hcArtStartLength := hcArtStart.GetLength();
+  Result.localAdjFactor := PDouble(localAdjFactor.data);
+  Result.localAdjFactorLength := localAdjFactor.GetLength();
+  inherited;
+end;
+
+function LeapfrogHcState.getView(): LeapfrogHcStateView;
+begin;
+  Result.hc1HivPop := PDouble(hc1HivPop.data);
+  Result.hc1HivPopLength := hc1HivPop.GetLength();
+  Result.hc2HivPop := PDouble(hc2HivPop.data);
+  Result.hc2HivPopLength := hc2HivPop.GetLength();
+  Result.hc1ArtPop := PDouble(hc1ArtPop.data);
+  Result.hc1ArtPopLength := hc1ArtPop.GetLength();
+  Result.hc2ArtPop := PDouble(hc2ArtPop.data);
+  Result.hc2ArtPopLength := hc2ArtPop.GetLength();
+  Result.hc1NoartAidsDeaths := PDouble(hc1NoartAidsDeaths.data);
+  Result.hc1NoartAidsDeathsLength := hc1NoartAidsDeaths.GetLength();
+  Result.hc2NoartAidsDeaths := PDouble(hc2NoartAidsDeaths.data);
+  Result.hc2NoartAidsDeathsLength := hc2NoartAidsDeaths.GetLength();
+  Result.hc1ArtAidsDeaths := PDouble(hc1ArtAidsDeaths.data);
+  Result.hc1ArtAidsDeathsLength := hc1ArtAidsDeaths.GetLength();
+  Result.hc2ArtAidsDeaths := PDouble(hc2ArtAidsDeaths.data);
+  Result.hc2ArtAidsDeathsLength := hc2ArtAidsDeaths.GetLength();
+  Result.hcArtInit := PDouble(hcArtInit.data);
+  Result.hcArtInitLength := hcArtInit.GetLength();
+  Result.hcArtNeedInit := PDouble(hcArtNeedInit.data);
+  Result.hcArtNeedInitLength := hcArtNeedInit.GetLength();
+  Result.hivBirths := PDouble(hivBirths.data);
+  Result.hivBirthsLength := hivBirths.GetLength();
+  Result.ctxNeed := PDouble(ctxNeed.data);
+  Result.ctxNeedLength := ctxNeed.GetLength();
+  Result.infectionByType := PDouble(infectionByType.data);
+  Result.infectionByTypeLength := infectionByType.GetLength();
+  inherited;
+end;
+
+procedure LeapfrogParams.SetDpParams(const dpParams: LeapfrogDpParamsView);
 begin
   dp := @dpParams;
 end;
 
-procedure LeapfrogState.SetDpState(var dpState: LeapfrogDpState);
+procedure LeapfrogState.SetDpState(const dpState: LeapfrogDpStateView);
 begin
   dp := @dpState;
 end;
 
-procedure LeapfrogParams.SetHaParams(var haParams: LeapfrogHaParams);
+procedure LeapfrogParams.SetHaParams(const haParams: LeapfrogHaParamsView);
 begin
   ha := @haParams;
 end;
 
-procedure LeapfrogState.SetHaState(var haState: LeapfrogHaState);
+procedure LeapfrogState.SetHaState(const haState: LeapfrogHaStateView);
 begin
   ha := @haState;
 end;
 
-procedure LeapfrogParams.SetHcParams(var hcParams: LeapfrogHcParams);
+procedure LeapfrogParams.SetHcParams(const hcParams: LeapfrogHcParamsView);
 begin
   hc := @hcParams;
 end;
 
-procedure LeapfrogState.SetHcState(var hcState: LeapfrogHcState);
+procedure LeapfrogState.SetHcState(const hcState: LeapfrogHcStateView);
 begin
   hc := @hcState;
 end;

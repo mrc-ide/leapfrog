@@ -78,15 +78,15 @@ def get_c_write_data_single_year(config_name, name, cfg):
 
 def get_delphi_setter(name, cfg):
   name = to_camel_case(name)
-  return f'Set{ name }(var in{ name }: TGBFixedArray<{get_delphi_num_type(cfg)}>);'
+  return f'Set{ name }(const in{ name }: TGBFixedArray<{get_delphi_num_type(cfg)}>);'
 
 
 def get_delphi_param_setter(config_name):
-  return f'Set{ config_name }Params(var { config_name.lower() }Params: Leapfrog{ config_name }Params);'
+  return f'Set{ config_name }Params(const { config_name.lower() }Params: Leapfrog{ config_name }ParamsView);'
 
 
 def get_delphi_state_setter(config_name):
-  return f'Set{ config_name }State(var { config_name.lower() }State: Leapfrog{ config_name }State);'
+  return f'Set{ config_name }State(const { config_name.lower() }State: Leapfrog{ config_name }StateView);'
 
 
 def get_reset(name, cfg):
