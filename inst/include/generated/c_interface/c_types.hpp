@@ -13,6 +13,8 @@ namespace internal {
 struct COptions {
   int proj_start_year;
   int proj_end_year;
+  int ts_art_start;
+  int proj_period;
 };
 
 template<typename real_type>
