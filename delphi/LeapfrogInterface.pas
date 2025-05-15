@@ -13,8 +13,14 @@ uses GBFixedArray;
 type
   LeapfrogOptions = record
   public
+    // Year projection started e.g. 1970
     projStartYear: Integer;
+    // Year projection end e.g. 2030
     projEndYear: Integer;
+    // Time index to start ART initiation e.g. 34 would mean in 2004
+    tsArtStart: Integer;
+    // Projection period 0 for calendar year, 1 for mid year
+    projPeriod: Integer;
 end;
 
 {$ALIGN 8}

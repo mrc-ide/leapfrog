@@ -26,8 +26,8 @@ HRESULT fit_model(leapfrog::internal::CParams<double> &data,
 
     const leapfrog::Options<double> opts =  {
       10,
-      34,
-      leapfrog::internal::BaseSS::PROJPERIOD_CALENDAR,
+      options.ts_art_start,
+      options.proj_period,
       options.proj_start_year,
       options.proj_end_year
     };
