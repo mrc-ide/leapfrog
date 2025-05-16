@@ -1,5 +1,6 @@
 {
   "name": "Dp",
+  "delphi_name": "DemProj",
   "namespace": "dp",
   "enable_if": "run_demographic_projection",
   "state_space": {

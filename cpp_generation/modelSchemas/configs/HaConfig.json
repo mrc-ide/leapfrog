@@ -1,5 +1,6 @@
 {
   "name": "Ha",
+  "delphi_name": "HivAdult",
   "namespace": "ha",
   "enable_if": "run_hiv_simulation",
   "state_space": {

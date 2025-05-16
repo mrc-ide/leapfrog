@@ -25,7 +25,7 @@ end;
 
 {$ALIGN 8}
 type
-  LeapfrogDpParamsView = record
+  LeapfrogDemProjParamsView = record
   private
     basePop: PDouble;
     basePopLength: Integer;
@@ -40,20 +40,20 @@ type
 end;
 
 type
-  LeapfrogDpParams = class
+  LeapfrogDemProjParams = class
   public
     basePop: TGBFixedArray<Double>;
     survivalProbability: TGBFixedArray<Double>;
     netMigration: TGBFixedArray<Double>;
     ageSpecificFertilityRate: TGBFixedArray<Double>;
     birthsSexProp: TGBFixedArray<Double>;
-    function getView(): LeapfrogDpParamsView;
+    function getView(): LeapfrogDemProjParamsView;
     Destructor Destroy; override;
 end;
 
 {$ALIGN 8}
 type
-  LeapfrogDpStateView = record
+  LeapfrogDemProjStateView = record
   private
     pTotalPop: PDouble;
     pTotalPopLength: Integer;
@@ -64,18 +64,18 @@ type
 end;
 
 type
-  LeapfrogDpState = class
+  LeapfrogDemProjState = class
   public
     pTotalPop: TGBFixedArray<Double>;
     pTotalPopBackgroundDeaths: TGBFixedArray<Double>;
     births: TGBFixedArray<Double>;
-    function getView(): LeapfrogDpStateView;
+    function getView(): LeapfrogDemProjStateView;
     Destructor Destroy; override;
 end;
 
 {$ALIGN 8}
 type
-  LeapfrogHaParamsView = record
+  LeapfrogHivAdultParamsView = record
   private
     totalRate: PDouble;
     totalRateLength: Integer;
@@ -112,7 +112,7 @@ type
 end;
 
 type
-  LeapfrogHaParams = class
+  LeapfrogHivAdultParams = class
   public
     totalRate: TGBFixedArray<Double>;
     relativeRiskAge: TGBFixedArray<Double>;
@@ -130,13 +130,13 @@ type
     adultsOnArtIsPercent: TGBFixedArray<Integer>;
     initiationMortalityWeight: TGBFixedArray<Double>;
     hArtStageDur: TGBFixedArray<Double>;
-    function getView(): LeapfrogHaParamsView;
+    function getView(): LeapfrogHivAdultParamsView;
     Destructor Destroy; override;
 end;
 
 {$ALIGN 8}
 type
-  LeapfrogHaStateView = record
+  LeapfrogHivAdultStateView = record
   private
     pHivPop: PDouble;
     pHivPopLength: Integer;
@@ -159,7 +159,7 @@ type
 end;
 
 type
-  LeapfrogHaState = class
+  LeapfrogHivAdultState = class
   public
     pHivPop: TGBFixedArray<Double>;
     pHivPopBackgroundDeaths: TGBFixedArray<Double>;
@@ -170,13 +170,13 @@ type
     hHivDeathsArt: TGBFixedArray<Double>;
     hArtInitiation: TGBFixedArray<Double>;
     pHivDeaths: TGBFixedArray<Double>;
-    function getView(): LeapfrogHaStateView;
+    function getView(): LeapfrogHivAdultStateView;
     Destructor Destroy; override;
 end;
 
 {$ALIGN 8}
 type
-  LeapfrogHcParamsView = record
+  LeapfrogHivChildParamsView = record
   private
     hcNosocomial: PDouble;
     hcNosocomialLength: Integer;
@@ -273,7 +273,7 @@ type
 end;
 
 type
-  LeapfrogHcParams = class
+  LeapfrogHivChildParams = class
   public
     hcNosocomial: TGBFixedArray<Double>;
     hc1Cd4Dist: TGBFixedArray<Double>;
@@ -321,13 +321,13 @@ type
     ctxEffect: TGBFixedArray<Double>;
     hcArtStart: TGBFixedArray<Double>;
     localAdjFactor: TGBFixedArray<Double>;
-    function getView(): LeapfrogHcParamsView;
+    function getView(): LeapfrogHivChildParamsView;
     Destructor Destroy; override;
 end;
 
 {$ALIGN 8}
 type
-  LeapfrogHcStateView = record
+  LeapfrogHivChildStateView = record
   private
     hc1HivPop: PDouble;
     hc1HivPopLength: Integer;
@@ -358,7 +358,7 @@ type
 end;
 
 type
-  LeapfrogHcState = class
+  LeapfrogHivChildState = class
   public
     hc1HivPop: TGBFixedArray<Double>;
     hc2HivPop: TGBFixedArray<Double>;
@@ -373,7 +373,7 @@ type
     hivBirths: TGBFixedArray<Double>;
     ctxNeed: TGBFixedArray<Double>;
     infectionByType: TGBFixedArray<Double>;
-    function getView(): LeapfrogHcStateView;
+    function getView(): LeapfrogHivChildStateView;
     Destructor Destroy; override;
 end;
 
@@ -381,26 +381,26 @@ end;
 type
   LeapfrogParams = record
   private
-    dp: ^LeapfrogDpParamsView;
-    ha: ^LeapfrogHaParamsView;
-    hc: ^LeapfrogHcParamsView;
+    demproj: ^LeapfrogDemProjParamsView;
+    hivadult: ^LeapfrogHivAdultParamsView;
+    hivchild: ^LeapfrogHivChildParamsView;
   public
-    procedure SetDpParams(const dpParams: LeapfrogDpParamsView);
-    procedure SetHaParams(const haParams: LeapfrogHaParamsView);
-    procedure SetHcParams(const hcParams: LeapfrogHcParamsView);
+    procedure SetDemProjParams(const demprojParams: LeapfrogDemProjParamsView);
+    procedure SetHivAdultParams(const hivadultParams: LeapfrogHivAdultParamsView);
+    procedure SetHivChildParams(const hivchildParams: LeapfrogHivChildParamsView);
 end;
 
 {$ALIGN 8}
 type
   LeapfrogState = record
   private
-    dp: ^LeapfrogDpStateView;
-    ha: ^LeapfrogHaStateView;
-    hc: ^LeapfrogHcStateView;
+    demproj: ^LeapfrogDemProjStateView;
+    hivadult: ^LeapfrogHivAdultStateView;
+    hivchild: ^LeapfrogHivChildStateView;
   public
-    procedure SetDpState(const dpState: LeapfrogDpStateView);
-    procedure SetHaState(const haState: LeapfrogHaStateView);
-    procedure SetHcState(const hcState: LeapfrogHcStateView);
+    procedure SetDemProjState(const demprojState: LeapfrogDemProjStateView);
+    procedure SetHivAdultState(const hivadultState: LeapfrogHivAdultStateView);
+    procedure SetHivChildState(const hivchildState: LeapfrogHivChildStateView);
 end;
 
 type TCallbackFunction = procedure(Msg: PAnsiChar); stdcall;
@@ -412,7 +412,7 @@ procedure LeapfrogRunAimSingleYear(const params: LeapfrogParams; const opts: Lea
 
 implementation
 
-destructor LeapfrogDpParams.Destroy;
+destructor LeapfrogDemProjParams.Destroy;
 begin;
   basePop.Free;
   survivalProbability.Free;
@@ -422,7 +422,7 @@ begin;
   inherited;
 end;
 
-destructor LeapfrogDpState.Destroy;
+destructor LeapfrogDemProjState.Destroy;
 begin;
   pTotalPop.Free;
   pTotalPopBackgroundDeaths.Free;
@@ -430,7 +430,7 @@ begin;
   inherited;
 end;
 
-function LeapfrogDpParams.getView(): LeapfrogDpParamsView;
+function LeapfrogDemProjParams.getView(): LeapfrogDemProjParamsView;
 begin;
   Result.basePop := PDouble(basePop.data);
   Result.basePopLength := basePop.GetLength();
@@ -445,7 +445,7 @@ begin;
   inherited;
 end;
 
-function LeapfrogDpState.getView(): LeapfrogDpStateView;
+function LeapfrogDemProjState.getView(): LeapfrogDemProjStateView;
 begin;
   Result.pTotalPop := PDouble(pTotalPop.data);
   Result.pTotalPopLength := pTotalPop.GetLength();
@@ -456,7 +456,7 @@ begin;
   inherited;
 end;
 
-destructor LeapfrogHaParams.Destroy;
+destructor LeapfrogHivAdultParams.Destroy;
 begin;
   totalRate.Free;
   relativeRiskAge.Free;
@@ -477,7 +477,7 @@ begin;
   inherited;
 end;
 
-destructor LeapfrogHaState.Destroy;
+destructor LeapfrogHivAdultState.Destroy;
 begin;
   pHivPop.Free;
   pHivPopBackgroundDeaths.Free;
@@ -491,7 +491,7 @@ begin;
   inherited;
 end;
 
-function LeapfrogHaParams.getView(): LeapfrogHaParamsView;
+function LeapfrogHivAdultParams.getView(): LeapfrogHivAdultParamsView;
 begin;
   Result.totalRate := PDouble(totalRate.data);
   Result.totalRateLength := totalRate.GetLength();
@@ -528,7 +528,7 @@ begin;
   inherited;
 end;
 
-function LeapfrogHaState.getView(): LeapfrogHaStateView;
+function LeapfrogHivAdultState.getView(): LeapfrogHivAdultStateView;
 begin;
   Result.pHivPop := PDouble(pHivPop.data);
   Result.pHivPopLength := pHivPop.GetLength();
@@ -551,7 +551,7 @@ begin;
   inherited;
 end;
 
-destructor LeapfrogHcParams.Destroy;
+destructor LeapfrogHivChildParams.Destroy;
 begin;
   hcNosocomial.Free;
   hc1Cd4Dist.Free;
@@ -602,7 +602,7 @@ begin;
   inherited;
 end;
 
-destructor LeapfrogHcState.Destroy;
+destructor LeapfrogHivChildState.Destroy;
 begin;
   hc1HivPop.Free;
   hc2HivPop.Free;
@@ -620,7 +620,7 @@ begin;
   inherited;
 end;
 
-function LeapfrogHcParams.getView(): LeapfrogHcParamsView;
+function LeapfrogHivChildParams.getView(): LeapfrogHivChildParamsView;
 begin;
   Result.hcNosocomial := PDouble(hcNosocomial.data);
   Result.hcNosocomialLength := hcNosocomial.GetLength();
@@ -717,7 +717,7 @@ begin;
   inherited;
 end;
 
-function LeapfrogHcState.getView(): LeapfrogHcStateView;
+function LeapfrogHivChildState.getView(): LeapfrogHivChildStateView;
 begin;
   Result.hc1HivPop := PDouble(hc1HivPop.data);
   Result.hc1HivPopLength := hc1HivPop.GetLength();
@@ -748,34 +748,34 @@ begin;
   inherited;
 end;
 
-procedure LeapfrogParams.SetDpParams(const dpParams: LeapfrogDpParamsView);
+procedure LeapfrogParams.SetDemProjParams(const demprojParams: LeapfrogDemProjParamsView);
 begin
-  dp := @dpParams;
+  demproj := @demprojParams;
 end;
 
-procedure LeapfrogState.SetDpState(const dpState: LeapfrogDpStateView);
+procedure LeapfrogState.SetDemProjState(const demprojState: LeapfrogDemProjStateView);
 begin
-  dp := @dpState;
+  demproj := @demprojState;
 end;
 
-procedure LeapfrogParams.SetHaParams(const haParams: LeapfrogHaParamsView);
+procedure LeapfrogParams.SetHivAdultParams(const hivadultParams: LeapfrogHivAdultParamsView);
 begin
-  ha := @haParams;
+  hivadult := @hivadultParams;
 end;
 
-procedure LeapfrogState.SetHaState(const haState: LeapfrogHaStateView);
+procedure LeapfrogState.SetHivAdultState(const hivadultState: LeapfrogHivAdultStateView);
 begin
-  ha := @haState;
+  hivadult := @hivadultState;
 end;
 
-procedure LeapfrogParams.SetHcParams(const hcParams: LeapfrogHcParamsView);
+procedure LeapfrogParams.SetHivChildParams(const hivchildParams: LeapfrogHivChildParamsView);
 begin
-  hc := @hcParams;
+  hivchild := @hivchildParams;
 end;
 
-procedure LeapfrogState.SetHcState(const hcState: LeapfrogHcStateView);
+procedure LeapfrogState.SetHivChildState(const hivchildState: LeapfrogHivChildStateView);
 begin
-  hc := @hcState;
+  hivchild := @hivchildState;
 end;
 
 end.
