@@ -27,7 +27,7 @@ saveRDS(lmod, testthat::test_path("testdata/leapfrog_fit.rds"))
 lmod <- leapfrog::leapfrogR(demp, proj, hiv_strat = "coarse")
 saveRDS(lmod, testthat::test_path("testdata/leapfrog_fit_coarse.rds"))
 
-mod <- leapfrog::leapfrogR(demp, proj, hiv_steps_per_year = 0L)
+lmod <- leapfrog::leapfrogR(demp, proj, hiv_steps_per_year = 0L)
 saveRDS(lmod, testthat::test_path("testdata/fit_demography.rds"))
 
 #Create paeds parameters
