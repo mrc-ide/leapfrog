@@ -1,0 +1,148 @@
+{% include "header.j2" %}
+
+unit LeapfrogInterface;
+
+interface
+
+uses GBFixedArray;
+
+{$ALIGN 8}
+type
+  LeapfrogOptions = record
+  public
+    // Year projection started e.g. 1970
+    projStartYear: Integer;
+    // Year projection end e.g. 2030
+    projEndYear: Integer;
+    // Time index to start ART initiation e.g. 34 would mean in 2004
+    tsArtStart: Integer;
+    // Projection period 0 for calendar year, 1 for mid year
+    projPeriod: Integer;
+end;
+
+{% for config in configs %}
+{$ALIGN 8}
+type
+  Leapfrog{{ config.long_name }}ParamsView = record
+  private
+    {% for name, cfg in config.pars.default.items() %}
+    {{ to_lower_camel_case(name) }}: {{ get_delphi_ptr_type(cfg) }};
+    {{ to_lower_camel_case(name) }}Length: Integer;
+    {% endfor %}
+end;
+
+type
+  Leapfrog{{ config.long_name }}Params = class
+  public
+    {% for name, cfg in config.pars.default.items() %}
+    {{ to_lower_camel_case(name) }}: TGBFixedArray<{{ get_delphi_num_type(cfg) }}>;
+    {% endfor %}
+    function getView(): Leapfrog{{ config.long_name }}ParamsView;
+    Destructor Destroy; override;
+end;
+
+{$ALIGN 8}
+type
+  Leapfrog{{ config.long_name }}StateView = record
+  private
+    {% for name, cfg in config.state.items() %}
+    {{ to_lower_camel_case(name) }}: {{ get_delphi_ptr_type(cfg) }};
+    {{ to_lower_camel_case(name) }}Length: Integer;
+    {% endfor %}
+end;
+
+type
+  Leapfrog{{ config.long_name }}State = class
+  public
+    {% for name, cfg in config.state.items() %}
+    {{ to_lower_camel_case(name) }}: TGBFixedArray<{{ get_delphi_num_type(cfg) }}>;
+    {% endfor %}
+    function getView(): Leapfrog{{ config.long_name }}StateView;
+    Destructor Destroy; override;
+end;
+
+{% endfor %}
+{$ALIGN 8}
+type
+  LeapfrogParams = record
+  private
+    {% for config in configs %}
+    {{ to_lower_camel_case(config.long_name) }}: ^Leapfrog{{ config.long_name }}ParamsView;
+    {% endfor %}
+  public
+    {% for config in configs %}
+    procedure {{ get_delphi_param_setter(config.long_name) }}
+    {% endfor %}
+end;
+
+{$ALIGN 8}
+type
+  LeapfrogState = record
+  private
+    {% for config in configs %}
+    {{ to_lower_camel_case(config.long_name) }}: ^Leapfrog{{ config.long_name }}StateView;
+    {% endfor %}
+  public
+    {% for config in configs %}
+    procedure {{ get_delphi_state_setter(config.long_name) }}
+    {% endfor %}
+end;
+
+type TCallbackFunction = procedure(Msg: PAnsiChar); stdcall;
+
+procedure LeapfrogRunDp(const params: LeapfrogParams; const opts: LeapfrogOptions; const outputState: LeapfrogState; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_dp';
+procedure LeapfrogRunAim(const params: LeapfrogParams; const opts: LeapfrogOptions; const outputState: LeapfrogState; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_aim';
+procedure LeapfrogRunDpSingleYear(const params: LeapfrogParams; const opts: LeapfrogOptions; const initial_state: LeapfrogState; start_year: Integer; const state: LeapfrogState; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_dp_single_year';
+procedure LeapfrogRunAimSingleYear(const params: LeapfrogParams; const opts: LeapfrogOptions; const initial_state: LeapfrogState; start_year: Integer; const state: LeapfrogState; errorHandler: TCallbackFunction); safecall; external 'leapfrog.dll' name 'run_aim_single_year';
+
+implementation
+
+{% for config in configs %}
+destructor Leapfrog{{ config.long_name }}Params.Destroy;
+begin;
+  {% for name, cfg in config.pars.default.items() %}
+  {{ to_lower_camel_case(name) }}.Free;
+  {% endfor %}
+  inherited;
+end;
+
+destructor Leapfrog{{ config.long_name }}State.Destroy;
+begin;
+  {% for name, cfg in config.state.items() %}
+  {{ to_lower_camel_case(name) }}.Free;
+  {% endfor %}
+  inherited;
+end;
+
+function Leapfrog{{ config.long_name }}Params.getView(): Leapfrog{{ config.long_name }}ParamsView;
+begin;
+  {% for name, cfg in config.pars.default.items() %}
+  Result.{{ to_lower_camel_case(name) }} := {{ get_delphi_ptr_type(cfg) }}({{ to_lower_camel_case(name) }}.data);
+  Result.{{ to_lower_camel_case(name) }}Length := {{ to_lower_camel_case(name) }}.GetLength();
+  {% endfor %}
+  inherited;
+end;
+
+function Leapfrog{{ config.long_name }}State.getView(): Leapfrog{{ config.long_name }}StateView;
+begin;
+  {% for name, cfg in config.state.items() %}
+  Result.{{ to_lower_camel_case(name) }} := {{ get_delphi_ptr_type(cfg) }}({{ to_lower_camel_case(name) }}.data);
+  Result.{{ to_lower_camel_case(name) }}Length := {{ to_lower_camel_case(name) }}.GetLength();
+  {% endfor %}
+  inherited;
+end;
+
+{% endfor %}
+{% for config in configs %}
+procedure LeapfrogParams.{{ get_delphi_param_setter(config.long_name) }}
+begin
+  {{ to_lower_camel_case(config.long_name) }} := @{{ to_lower_camel_case(config.long_name) }}Params;
+end;
+
+procedure LeapfrogState.{{ get_delphi_state_setter(config.long_name) }}
+begin
+  {{ to_lower_camel_case(config.long_name) }} := @{{ to_lower_camel_case(config.long_name) }}State;
+end;
+
+{% endfor %}
+end.

@@ -1,0 +1,53 @@
+{% from "template_utils.j2" import comma_except_last %}
+{% include "header.j2" %}
+
+#pragma once
+
+namespace leapfrog {
+namespace internal {
+
+#pragma pack(push, 8)
+
+struct COptions {
+  int proj_start_year;
+  int proj_end_year;
+  int ts_art_start;
+  int proj_period;
+};
+
+{% for config in configs %}
+template<typename real_type>
+struct {{ config.name }}Params {
+  {% for name, cfg in config.pars.default.items() %}
+  {{ get_num_type_delphi(cfg) }} {{ name }};
+  int {{ name }}_length;
+  {% endfor %}
+};
+
+template<typename real_type>
+struct {{ config.name }}Out {
+  {% for name, cfg in config.state.items() %}
+  {{ get_num_type(cfg) }}* {{ name }};
+  int {{ name }}_length;
+  {% endfor %}
+};
+
+{% endfor %}
+template<typename real_type>
+struct CParams {
+  {% for config in configs %}
+  {{ config.name }}Params<real_type>* {{ config.name.lower() }};
+  {% endfor %}
+};
+
+template<typename real_type>
+struct CState {
+  {% for config in configs %}
+  {{ config.name }}Out<real_type>* {{ config.name.lower() }};
+  {% endfor %}
+};
+
+#pragma pack(pop)
+
+} // namespace internal
+} // namespace leapfrog

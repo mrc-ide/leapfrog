@@ -1,0 +1,98 @@
+{% from "template_utils.j2" import comma_except_last %}
+{% include "header.j2" %}
+
+#pragma once
+
+#include <filesystem>
+#include <string_view>
+#include <format>
+#include <unsupported/Eigen/CXX11/Tensor>
+#include <stdexcept>
+
+#include "../config_mixer.hpp"
+#include "c_types.hpp"
+
+namespace leapfrog {
+namespace internal {
+
+template<typename T, typename... Args>
+auto read_data(T* data, int length, std::string_view name, Args... dims) {
+  constexpr std::size_t rank = sizeof...(dims);
+  if constexpr (rank == 0) {
+    return *data;
+  } else {
+    const auto size = (dims * ...);
+    if (length != size) {
+        throw std::invalid_argument(std::format("Input data '{}' is the wrong size. Received array of length '{}', expected '{}'.", name, length, size));
+    }
+    return Eigen::TensorMap<Eigen::Tensor<T, rank>>(data, dims...);
+  }
+}
+
+template<typename T, int Rank>
+void write_data(const Eigen::Tensor<T, Rank>& tensor, T* output, int length, std::string_view name) {
+  const auto* dataPtr = tensor.data();
+  std::size_t totalSize = tensor.size();
+
+  if (length != totalSize) {
+    throw std::invalid_argument(std::format("Output data '{}' is the wrong size. Received array of length '{}', expected '{}'.", name, length, totalSize));
+  }
+
+  std::copy(dataPtr, dataPtr + totalSize, output);
+}
+
+{% for config in configs %}
+template<typename real_type, MV ModelVariant>
+struct {{ config.name }}Adapter<Language::C, real_type, ModelVariant> {
+  using SS = SSMixed<ModelVariant>;
+  using Config = {{ config.name }}Config<real_type, ModelVariant>;
+
+  static Config::Pars get_pars(
+    const CParams<real_type> &params,
+    const Options<real_type> &opts
+  ) {
+    return {
+      {% for name, cfg in config.pars.default.items() %}
+      .{{ name }} = {{ get_c_read_data(config.name, name, cfg) }}{{ comma_except_last(loop) }}
+      {% endfor %}
+    };
+  };
+
+  static Config::State get_initial_state(
+    const CState<real_type>& state
+  ){
+    return {
+      {% for name, cfg in config.state.items() %}
+      .{{ name }} = {{ get_c_initial_state(config.name, name, cfg) }}{{ comma_except_last(loop) }}
+      {% endfor %}
+    };
+  };
+
+  static constexpr int output_count = {{ dict_len(config.state) }};
+
+  static int build_output(
+    int index,
+    const Config::OutputState& state,
+    CState<real_type>& out
+  ) {
+    {% for name, cfg in config.state.items() %}
+    {{ get_c_write_data(config.name, name, cfg) }}
+    {% endfor %}
+    return index + output_count;
+  };
+
+  static int build_output_single_year(
+    int index,
+    const Config::State& state,
+    CState<real_type>& out
+  ) {
+    {% for name, cfg in config.state.items() %}
+    {{ get_c_write_data_single_year(config.name, name, cfg) }}
+    {% endfor %}
+    return index + output_count;
+  };
+};
+
+{% endfor %}
+} // namespace internal
+} // namespace leapfrog
