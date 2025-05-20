@@ -1,6 +1,6 @@
 {
   "name": "Hc",
-  "delphi_name": "HivChild",
+  "long_name": "HivChild",
   "namespace": "hc",
   "enable_if": "run_child_model",
   "state_space": {
