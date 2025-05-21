@@ -469,6 +469,7 @@ struct HcConfig {
 
   struct State {
     TFS<real_type, SS::hPS_agg, SS::hcTT, SS::hc1AG, SS::NS> hc_infections_coarse;
+    TFS<real_type, SS::hPS_agg, SS::hcTT, SS::hc1AG, SS::NS> hc_tr_coarse;
     TFS<real_type, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS> hc1_hiv_pop;
     TFS<real_type, SS::hPS_agg, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, SS::hTN> hc1_hiv_pop_strat;
     TFS<real_type, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS> hc2_hiv_pop;
@@ -494,6 +495,7 @@ struct HcConfig {
 
     void reset() {
       hc_infections_coarse.setZero();
+      hc_tr_coarse.setZero();
       hc1_hiv_pop.setZero();
       hc1_hiv_pop_strat.setZero();
       hc2_hiv_pop.setZero();
@@ -521,6 +523,7 @@ struct HcConfig {
 
   struct OutputState {
     T5<real_type> hc_infections_coarse;
+    T5<real_type> hc_tr_coarse;
     T5<real_type> hc1_hiv_pop;
     T7<real_type> hc1_hiv_pop_strat;
     T5<real_type> hc2_hiv_pop;
@@ -546,6 +549,7 @@ struct HcConfig {
 
     OutputState(int output_years):
       hc_infections_coarse(SS::hPS_agg, SS::hcTT, SS::hc1AG, SS::NS, output_years),
+      hc_tr_coarse(SS::hPS_agg, SS::hcTT, SS::hc1AG, SS::NS, output_years),
       hc1_hiv_pop(SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, output_years),
       hc1_hiv_pop_strat(SS::hPS_agg, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, SS::hTN, output_years),
       hc2_hiv_pop(SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS, output_years),
@@ -570,6 +574,7 @@ struct HcConfig {
       infection_by_type(SS::hcTT, SS::hc1AG, SS::NS, output_years)
     {
       hc_infections_coarse.setZero();
+      hc_tr_coarse.setZero();
       hc1_hiv_pop.setZero();
       hc1_hiv_pop_strat.setZero();
       hc2_hiv_pop.setZero();
@@ -596,6 +601,7 @@ struct HcConfig {
 
     void save_state(const size_t i, const State &state) {
       hc_infections_coarse.chip(i, hc_infections_coarse.NumDimensions - 1) = state.hc_infections_coarse;
+      hc_tr_coarse.chip(i, hc_tr_coarse.NumDimensions - 1) = state.hc_tr_coarse;
       hc1_hiv_pop.chip(i, hc1_hiv_pop.NumDimensions - 1) = state.hc1_hiv_pop;
       hc1_hiv_pop_strat.chip(i, hc1_hiv_pop_strat.NumDimensions - 1) = state.hc1_hiv_pop_strat;
       hc2_hiv_pop.chip(i, hc2_hiv_pop.NumDimensions - 1) = state.hc2_hiv_pop;
@@ -621,7 +627,7 @@ struct HcConfig {
     };
   };
 
-  static constexpr int output_count = 23;
+  static constexpr int output_count = 24;
   static int get_build_output_size(int prev_size) {
     return prev_size + output_count;
   };

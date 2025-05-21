@@ -591,12 +591,12 @@ private:
           i_hc.prop_wlhiv_200to350 * p_hc.vertical_transmission_rate(2, 0) +
           i_hc.prop_wlhiv_gte350 * p_hc.vertical_transmission_rate(0, 0);
 
-        n_hc.hc_infections_coarse(0,0,0,s) = i_hc.no_PMTCT *  untreated_vertical_tr ;
+         n_hc.hc_tr_coarse(0,0,0,s) = i_hc.no_PMTCT *  untreated_vertical_tr ;
       }
 
       //Transmission among women who seroconverted during pregnancy
       if(i_hc.need_PMTCT > 0) {
-        n_hc.hc_infections_coarse(1,0,0,s)  += i_hc.perinatal_transmission_from_incidence / i_hc.need_PMTCT;
+         n_hc.hc_tr_coarse(1,0,0,s)  += i_hc.perinatal_transmission_from_incidence / i_hc.need_PMTCT;
       }
 
       //on ART and LTFU by delivery
@@ -605,14 +605,14 @@ private:
           i_hc.prop_wlhiv_200to350 * p_hc.vertical_transmission_rate(2, 0) +
           i_hc.prop_wlhiv_gte350 * p_hc.vertical_transmission_rate(0, 0);
 
-        n_hc.hc_infections_coarse(3,0,0,s) =
+         n_hc.hc_tr_coarse(3,0,0,s) =
           (((i_hc.retained_on_ART / p_hc.PMTCT_dropout(0, t)) - i_hc.retained_on_ART) +
           ((i_hc.retained_started_ART / p_hc.PMTCT_dropout(1, t)) - i_hc.retained_started_ART)) *
           untreated_vertical_tr ;
       }
 
       //on ART and retained, including short-course ARVs as well
-      n_hc.hc_infections_coarse(5,0,0,s) = i_hc.PMTCT_coverage(0) * i_hc.optA_transmission_rate +
+       n_hc.hc_tr_coarse(5,0,0,s) = i_hc.PMTCT_coverage(0) * i_hc.optA_transmission_rate +
         i_hc.PMTCT_coverage(1) * i_hc.optB_transmission_rate +
         i_hc.PMTCT_coverage(2) * p_hc.PMTCT_transmission_rate(0, 2, 0) + // SDNVP
         i_hc.PMTCT_coverage(3) * p_hc.PMTCT_transmission_rate(0, 3, 0) + //dual ARV
@@ -773,17 +773,17 @@ private:
       // i_hc.percent_no_treatment is the percentage of women who are still vulnerable to HIV transmission to their babies
       i_hc.percent_no_treatment_coarse(0) = 1 - i_hc.perinatal_transmission_rate_bf_calc;
       //Remove women who have already transmitted during pregnancy or earlier in breastfeeding
-      i_hc.percent_no_treatment_coarse(1) = i_hc.women_ltfu_preg - (n_hc.hc_infections_coarse(3,0,0,0) +
-        n_hc.hc_infections_coarse(3,0,0,1));
+      i_hc.percent_no_treatment_coarse(1) = i_hc.women_ltfu_preg - ( n_hc.hc_tr_coarse(3,0,0,0) +
+         n_hc.hc_tr_coarse(3,0,0,1));
       //only need to remove the VTR for one sex (here, males: 0)
       for (int bfidx = 1; bfidx < (i_hc.tt_idx + 1); ++bfidx) {
         for (int a = 0; a < hc2_agestart; ++a) {
-          i_hc.percent_no_treatment_coarse(0) -= n_hc.hc_infections_coarse(0,bfidx,a,0);
-          i_hc.percent_no_treatment_coarse(0) -= n_hc.hc_infections_coarse(3,bfidx,a,0);
-          i_hc.percent_no_treatment_coarse(0) -= n_hc.hc_infections_coarse(4,bfidx,a,0);
-          i_hc.percent_no_treatment_coarse(0) -= n_hc.hc_infections_coarse(5,bfidx,a,0);
-          i_hc.percent_no_treatment_coarse(1) -= n_hc.hc_infections_coarse(3,bfidx,a,0);
-          i_hc.percent_no_treatment_coarse(2) -= n_hc.hc_infections_coarse(4,bfidx,a,0);
+          i_hc.percent_no_treatment_coarse(0) -=  n_hc.hc_tr_coarse(0,bfidx,a,0);
+          i_hc.percent_no_treatment_coarse(0) -=  n_hc.hc_tr_coarse(3,bfidx,a,0);
+          i_hc.percent_no_treatment_coarse(0) -=  n_hc.hc_tr_coarse(4,bfidx,a,0);
+          i_hc.percent_no_treatment_coarse(0) -=  n_hc.hc_tr_coarse(5,bfidx,a,0);
+          i_hc.percent_no_treatment_coarse(1) -=  n_hc.hc_tr_coarse(3,bfidx,a,0);
+          i_hc.percent_no_treatment_coarse(2) -=  n_hc.hc_tr_coarse(4,bfidx,a,0);
         }
       }
 
@@ -798,7 +798,7 @@ private:
           2 * (1 - p_hc.breastfeeding_duration_art(bf, t)) * i_hc.bf_scalar;
         i_hc.PMTCT_coverage(hp) -= tr;
         for (int s = 0; s < NS; ++s) {
-          n_hc.hc_infections_coarse(5,i_hc.tt_idx,i_hc.age_idx,s)  += tr;
+           n_hc.hc_tr_coarse(5,i_hc.tt_idx,i_hc.age_idx,s)  += tr;
         }
 
       }
@@ -818,17 +818,17 @@ private:
             i_hc.prop_wlhiv_gte350 * p_hc.vertical_transmission_rate(0, 1);
 
           //women who have never been on ART
-          n_hc.hc_infections_coarse(0,i_hc.tt_idx,i_hc.age_idx,s) += i_hc.bf_scalar *
+           n_hc.hc_tr_coarse(0,i_hc.tt_idx,i_hc.age_idx,s) += i_hc.bf_scalar *
             i_hc.percent_no_treatment_coarse(0) *
             untreated_vertical_bf_tr *
             2 * (1 - p_hc.breastfeeding_duration_no_art(bf, t));
           //women who dropped off ART during pregnancy
-          n_hc.hc_infections_coarse(3,i_hc.tt_idx,i_hc.age_idx,s) += i_hc.bf_scalar *
+           n_hc.hc_tr_coarse(3,i_hc.tt_idx,i_hc.age_idx,s) += i_hc.bf_scalar *
             i_hc.percent_no_treatment_coarse(1) *
             untreated_vertical_bf_tr *
             2 * (1 - p_hc.breastfeeding_duration_no_art(bf, t));
           //women who dropped off ART during breastfeeding
-          n_hc.hc_infections_coarse(4,i_hc.tt_idx,i_hc.age_idx,s) += i_hc.bf_scalar *
+           n_hc.hc_tr_coarse(4,i_hc.tt_idx,i_hc.age_idx,s) += i_hc.bf_scalar *
             i_hc.percent_no_treatment_coarse(2) *
             untreated_vertical_bf_tr *
             2 * (1 - p_hc.breastfeeding_duration_no_art(bf, t));
@@ -871,7 +871,7 @@ private:
       auto perinatal_transmission_births = n_hc.hiv_births * i_hc.perinatal_transmission_rate;
       for (int s = 0; s < NS; ++s) {
         for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
-          n_hc.hc_infections_coarse(hp_agg,0,0,s) *= n_hc.hiv_births * p_dp.births_sex_prop(s, t);
+          n_hc.hc_infections_coarse(hp_agg,0,0,s) =   n_hc.hc_tr_coarse(hp_agg,0,0,s) * n_hc.hiv_births * p_dp.births_sex_prop(s, t);
           for (int hd = 0; hd < hc1DS; ++hd) {
             n_hc.hc1_hiv_pop_strat(hp_agg, hd, 0, 0, s, 0) += n_hc.hc_infections_coarse(hp_agg,0,0,s) * p_hc.hc1_cd4_dist(hd);
           } // end hc1DS
@@ -907,8 +907,9 @@ private:
           if(hp_agg == 2){
             n_hc.hc_infections_coarse(hp_agg,1,0,s) = (total_births - n_hc.hiv_births) * p_dp.births_sex_prop(s, t) *
               i_hc.bf_incident_hiv_transmission_rate;
+            n_hc.hc_tr_coarse(hp_agg,1,0,s) =  i_hc.bf_incident_hiv_transmission_rate;
           }else{
-            n_hc.hc_infections_coarse(hp_agg,1,0,s) *= n_hc.hiv_births * p_dp.births_sex_prop(s, t);
+            n_hc.hc_infections_coarse(hp_agg,1,0,s) = n_hc.hc_tr_coarse(hp_agg,1,0,s) * n_hc.hiv_births * p_dp.births_sex_prop(s, t);
           }
           for (int hd = 0; hd < hc1DS; ++hd) {
             n_hc.hc1_hiv_pop_strat(hp_agg, hd, 1, 0, s, 0) += n_hc.hc_infections_coarse(hp_agg,1,0,s) * p_hc.hc1_cd4_dist(hd);
@@ -930,7 +931,7 @@ private:
       run_bf_transmission_rate(3, 6, 1);
       for (int s = 0; s < NS; ++s) {
         for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
-          n_hc.hc_infections_coarse(hp_agg,2,0,s) *= n_hc.hiv_births * p_dp.births_sex_prop(s, t);
+          n_hc.hc_infections_coarse(hp_agg,2,0,s) =  n_hc.hc_tr_coarse(hp_agg,2,0,s) * n_hc.hiv_births * p_dp.births_sex_prop(s, t);
           for (int hd = 0; hd < hc1DS; ++hd) {
             n_hc.hc1_hiv_pop_strat(hp_agg, hd, 2, 0, s, 0) += n_hc.hc_infections_coarse(hp_agg,2,0,s) * p_hc.hc1_cd4_dist(hd);
           } // end hc1DS
@@ -961,8 +962,8 @@ private:
         }
         auto uninfected_prop_24_plus = (n_dp.p_total_pop(2, s) - n_ha.p_hiv_pop(2, s)) / total_pop_24_plus;
         for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
-          n_hc.hc_infections_coarse(hp_agg,3,1,s) *= n_hc.hiv_births *  uninfected_prop_12_24;
-          n_hc.hc_infections_coarse(hp_agg,4,2,s) *= n_hc.hiv_births *  uninfected_prop_24_plus;
+          n_hc.hc_infections_coarse(hp_agg,3,1,s) = n_hc.hc_tr_coarse(hp_agg,3,1,s) * n_hc.hiv_births *  uninfected_prop_12_24;
+          n_hc.hc_infections_coarse(hp_agg,4,2,s) = n_hc.hc_tr_coarse(hp_agg,4,2,s) * n_hc.hiv_births *  uninfected_prop_24_plus;
           for (int hd = 0; hd < hc1DS; ++hd) {
             n_hc.hc1_hiv_pop_strat(hp_agg, hd, 3, 1, s, 0) += n_hc.hc_infections_coarse(hp_agg,3,1,s) * p_hc.hc1_cd4_dist(hd);
             n_hc.hc1_hiv_pop_strat(hp_agg, hd, 4, 2, s, 0) += n_hc.hc_infections_coarse(hp_agg,4,2,s) * p_hc.hc1_cd4_dist(hd);
