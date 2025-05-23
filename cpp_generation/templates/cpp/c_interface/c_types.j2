@@ -19,7 +19,7 @@ struct COptions {
 template<typename real_type>
 struct {{ config.name }}Params {
   {% for name, cfg in config.pars.default.items() %}
-  {{ get_num_type_delphi(cfg) }} {{ name }};
+  {{ get_num_type_c(cfg) }} {{ name }};
   int {{ name }}_length;
   {% endfor %}
 };
