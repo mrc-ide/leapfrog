@@ -6,6 +6,8 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 import utils.concepts
 import utils.config
 import utils.state_space
+import utils.delphi
+import utils.general
 
 
 def relative_file_path(*paths):
@@ -72,10 +74,10 @@ generate_hpp("model_variants", dat)
 generate_hpp("state_space", dat | vars(utils.state_space))
 generate_hpp("concepts", dat | vars(utils.concepts))
 generate_hpp("state_space_mixer", dat)
-generate_hpp("config", dat | vars(utils.config))
+generate_hpp("config", dat | vars(utils.config) | vars(utils.general))
 generate_hpp("config_mixer", dat)
-generate_hpp("cpp_interface/cpp_adapters", dat | vars(utils.config))
-generate_hpp("r_interface/r_adapters", dat | vars(utils.config))
-generate_hpp("c_interface/c_adapters", dat | vars(utils.config))
-generate_hpp("c_interface/c_types", dat | vars(utils.config))
-generate_delphi("LeapfrogInterface", dat | vars(utils.config))
+generate_hpp("cpp_interface/cpp_adapters", dat | vars(utils.config) | vars(utils.general))
+generate_hpp("r_interface/r_adapters", dat | vars(utils.config) | vars(utils.general))
+generate_hpp("c_interface/c_adapters", dat | vars(utils.config) | vars(utils.general))
+generate_hpp("c_interface/c_types", dat | vars(utils.config) | vars(utils.delphi) | vars(utils.general))
+generate_delphi("LeapfrogInterface", dat | vars(utils.delphi) | vars(utils.general))

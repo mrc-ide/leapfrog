@@ -26,7 +26,7 @@ type
   Leapfrog{{ config.long_name }}ParamsView = record
   private
     {% for name, cfg in config.pars.default.items() %}
-    {{ to_lower_camel_case(name) }}: {{ get_delphi_ptr_type(cfg) }};
+    {{ to_lower_camel_case(name) }}: {{ get_delphi_param_view_type(cfg) }};
     {{ to_lower_camel_case(name) }}Length: Integer;
     {% endfor %}
 end;
@@ -35,7 +35,7 @@ type
   Leapfrog{{ config.long_name }}Params = class
   public
     {% for name, cfg in config.pars.default.items() %}
-    {{ to_lower_camel_case(name) }}: TGBFixedArray<{{ get_delphi_num_type(cfg) }}>;
+    {{ to_lower_camel_case(name) }}: {{ get_delphi_param_type(cfg) }};
     {% endfor %}
     function getView(): Leapfrog{{ config.long_name }}ParamsView;
     Destructor Destroy; override;
@@ -46,7 +46,7 @@ type
   Leapfrog{{ config.long_name }}StateView = record
   private
     {% for name, cfg in config.state.items() %}
-    {{ to_lower_camel_case(name) }}: {{ get_delphi_ptr_type(cfg) }};
+    {{ to_lower_camel_case(name) }}: {{ get_delphi_state_view_type(cfg) }};
     {{ to_lower_camel_case(name) }}Length: Integer;
     {% endfor %}
 end;
@@ -55,7 +55,7 @@ type
   Leapfrog{{ config.long_name }}State = class
   public
     {% for name, cfg in config.state.items() %}
-    {{ to_lower_camel_case(name) }}: TGBFixedArray<{{ get_delphi_num_type(cfg) }}>;
+    {{ to_lower_camel_case(name) }}: {{ get_delphi_state_type(cfg) }};
     {% endfor %}
     function getView(): Leapfrog{{ config.long_name }}StateView;
     Destructor Destroy; override;
@@ -101,7 +101,9 @@ implementation
 destructor Leapfrog{{ config.long_name }}Params.Destroy;
 begin;
   {% for name, cfg in config.pars.default.items() %}
+  {% if dim_len(cfg) > 0 %}
   {{ to_lower_camel_case(name) }}.Free;
+  {% endif %}
   {% endfor %}
   inherited;
 end;
@@ -117,8 +119,13 @@ end;
 function Leapfrog{{ config.long_name }}Params.getView(): Leapfrog{{ config.long_name }}ParamsView;
 begin;
   {% for name, cfg in config.pars.default.items() %}
-  Result.{{ to_lower_camel_case(name) }} := {{ get_delphi_ptr_type(cfg) }}({{ to_lower_camel_case(name) }}.data);
+  {% if dim_len(cfg) > 0 %}
+  Result.{{ to_lower_camel_case(name) }} := {{ get_delphi_param_view_type(cfg) }}({{ to_lower_camel_case(name) }}.data);
   Result.{{ to_lower_camel_case(name) }}Length := {{ to_lower_camel_case(name) }}.GetLength();
+  {% else %}
+  Result.{{ to_lower_camel_case(name) }} := {{ to_lower_camel_case(name) }};
+  Result.{{ to_lower_camel_case(name) }}Length := 1;
+  {% endif %}
   {% endfor %}
   inherited;
 end;
@@ -126,7 +133,7 @@ end;
 function Leapfrog{{ config.long_name }}State.getView(): Leapfrog{{ config.long_name }}StateView;
 begin;
   {% for name, cfg in config.state.items() %}
-  Result.{{ to_lower_camel_case(name) }} := {{ get_delphi_ptr_type(cfg) }}({{ to_lower_camel_case(name) }}.data);
+  Result.{{ to_lower_camel_case(name) }} := {{ get_delphi_state_view_type(cfg) }}({{ to_lower_camel_case(name) }}.data);
   Result.{{ to_lower_camel_case(name) }}Length := {{ to_lower_camel_case(name) }}.GetLength();
   {% endfor %}
   inherited;
