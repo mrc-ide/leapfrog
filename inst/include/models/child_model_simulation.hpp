@@ -47,6 +47,8 @@ private:
   static constexpr int hcAG_coarse = SS::hcAG_coarse;
   static constexpr int hPS_agg = SS::hPS_agg;
   static constexpr int hTN = SS::hTN;
+  static constexpr int hc2AG = SS::hc2AG;
+
 
 
   // function args
@@ -469,6 +471,7 @@ private:
     auto& n_dp = state_next.dp;
     auto& n_ha = state_next.ha;
     auto& i_hc = intermediate.hc;
+    auto& n_hc = state_next.hc;
 
     // Transmission due to incident infections
     i_hc.asfr_sum = 0.0;
@@ -489,9 +492,12 @@ private:
         i_hc.perinatal_transmission_from_incidence = i_hc.incidence_rate_wlhiv * 0.75 *
           (p_hc.total_births(t) - i_hc.need_PMTCT) *
           p_hc.vertical_transmission_rate(7, 0);
+        n_hc.maternal_infections(0)  = i_hc.incidence_rate_wlhiv * 0.75 *
+          (p_hc.total_births(t) - i_hc.need_PMTCT);
       } else {
         i_hc.incidence_rate_wlhiv = 0.0;
         i_hc.perinatal_transmission_from_incidence = 0.0;
+        n_hc.maternal_infections(0)  = 0;
       }
     } else {
       for (int a = 0; a < opts.p_fertility_age_groups; ++a) {
@@ -506,9 +512,13 @@ private:
         i_hc.perinatal_transmission_from_incidence = i_hc.incidence_rate_wlhiv * 0.75 *
           (n_dp.births - i_hc.need_PMTCT) *
           p_hc.vertical_transmission_rate(7, 0);
+        n_hc.maternal_infections(0)  = i_hc.incidence_rate_wlhiv * 0.75 *
+          (n_dp.births - i_hc.need_PMTCT);
       } else {
         i_hc.incidence_rate_wlhiv = 0.0;
         i_hc.perinatal_transmission_from_incidence = 0.0;
+        n_hc.maternal_infections(0)  = 0;
+
       }
     }
   };
@@ -643,10 +653,18 @@ private:
   void maternal_incidence_in_bf_tr() {
     const auto& p_hc = pars.hc;
     auto& i_hc = intermediate.hc;
+    auto& n_hc = state_next.hc;
+    auto& n_dp = state_next.dp;
 
     for (int bf = 0; bf < hBF; ++bf) {
       i_hc.bf_at_risk += i_hc.incidence_rate_wlhiv / 12 * 2 *
         (1 - p_hc.breastfeeding_duration_no_art(bf, t));
+    }
+
+    if (p_hc.mat_prev_input(t)) {
+      n_hc.maternal_infections(1) =i_hc.bf_at_risk * (p_hc.total_births(t)- n_hc.hiv_births);
+    } else {
+      n_hc.maternal_infections(1) =i_hc.bf_at_risk  * (n_dp.births- n_hc.hiv_births);
     }
     i_hc.bf_incident_hiv_transmission_rate = i_hc.bf_at_risk * p_hc.vertical_transmission_rate(7, 1);
   };
@@ -1618,13 +1636,13 @@ private:
     art_last_year();
     art_this_year();
 
-    i_hc.retained = 1 - p_hc.hc_art_ltfu(t);
     for (int ag = 0; ag < hcAG_coarse; ++ag) {
+      i_hc.retained = 1 - p_hc.hc_art_ltfu(ag, t);
       auto average_art_by_year = (i_hc.total_art_last_year(ag) + i_hc.total_art_this_year(ag)) /
         2.0;
       n_hc.hc_art_init(ag) = std::max(i_hc.hc_art_deaths(ag) + average_art_by_year - i_hc.on_art(ag) * i_hc.retained, 0.0);
       n_hc.hc_art_init(ag) = std::min(n_hc.hc_art_init(ag),
-                       i_hc.unmet_need(ag) + i_hc.on_art(ag) * p_hc.hc_art_ltfu(t));
+                       i_hc.unmet_need(ag) + i_hc.on_art(ag) * p_hc.hc_art_ltfu(ag, t));
     } // end ag
   };
 
@@ -1667,15 +1685,21 @@ private:
           for (int cat = 0; cat < hcTT; ++cat) {
             if (a < hc2_agestart) {
               auto ltfu_grad = (n_hc.hc1_art_pop(2, hd, a, s) + n_hc.hc1_art_pop(0, hd, a, s)) *
-                p_hc.hc_art_ltfu(t);
+                p_hc.hc_art_ltfu(1, t);
               if (i_hc.hc_hiv_total(hd, a, s) > 0) {
                 i_hc.art_ltfu_grad(hd, cat, a, s) += ltfu_grad * i_hc.hc_hiv_dist(hd, cat, a, s);
               } else {
                 i_hc.art_ltfu_grad(hd, cat, a, s) += ltfu_grad * 0.25;
               }
             } else if (hd < hc2DS) {
+              if(a < 10){
+                i_hc.ltfu =  p_hc.hc_art_ltfu(2, t);
+              }else{
+                i_hc.ltfu = p_hc.hc_art_ltfu(3, t);
+              }
               auto ltfu_grad = (n_hc.hc2_art_pop(2, hd, a - hc2_agestart, s) + n_hc.hc2_art_pop(0, hd, a - hc2_agestart, s)) *
-                p_hc.hc_art_ltfu(t);
+                  i_hc.ltfu ;
+
               if (i_hc.hc_hiv_total(hd, a, s) > 0) {
                 i_hc.art_ltfu_grad(hd, cat, a, s) += ltfu_grad * i_hc.hc_hiv_dist(hd, cat, a, s);
               } else {
@@ -1726,16 +1750,23 @@ private:
                 if (a < hc2_agestart) {
                   auto ltfu_grad = (n_hc.hc1_art_pop_strat(hp_agg, 2, hd, cat, a, s, htn) +
                                     n_hc.hc1_art_pop_strat(hp_agg, 0, hd, cat, a, s, htn)) *
-                                    p_hc.hc_art_ltfu(t);
+                                    p_hc.hc_art_ltfu(1, t);
                   if (i_hc.hc_hiv_total(hd, a, s) > 0) {
                     i_hc.art_ltfu_grad_strat(hp_agg, hd, cat, a, s, htn) += ltfu_grad;
                   } else {
                     i_hc.art_ltfu_grad_strat(hp_agg, hd, cat, a, s, htn) += ltfu_grad * 0.25;
                   }
                 } else if (hd < hc2DS) {
+                   if(a < 10){
+                    i_hc.ltfu =  p_hc.hc_art_ltfu(2, t);
+                  }else{
+                    i_hc.ltfu = p_hc.hc_art_ltfu(3, t);
+                  }
+
                   auto ltfu_grad = (n_hc.hc2_art_pop_strat(hp_agg, 2, hd, cat, a - hc2_agestart, s, htn) +
                                     n_hc.hc2_art_pop_strat(hp_agg, 0, hd, cat, a - hc2_agestart, s, htn)) *
-                    p_hc.hc_art_ltfu(t);
+                                    i_hc.ltfu;
+
                   if (i_hc.hc_hiv_total(hd, a, s) > 0) {
                     i_hc.art_ltfu_grad_strat(hp_agg, hd, cat, a, s, htn) += ltfu_grad;
                   } else {

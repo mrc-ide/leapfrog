@@ -293,7 +293,7 @@ struct HcConfig {
     TM1<real_type> hc_age_coarse;
     TM2<real_type> abortion;
     TM1<real_type> patients_reallocated;
-    TM1<real_type> hc_art_ltfu;
+    TM2<real_type> hc_art_ltfu;
     TM1<int> hc_age_coarse_cd4;
     TM2<real_type> adult_female_infections;
     TM2<real_type> adult_female_hivnpop;
@@ -381,6 +381,7 @@ struct HcConfig {
     real_type women_ltfu_preg;
     real_type age_idx;
     real_type tt_idx;
+    real_type ltfu;
     real_type temp;
 
     Intermediate() {};
@@ -463,6 +464,7 @@ struct HcConfig {
       women_ltfu_preg = 0;
       age_idx = 0;
       tt_idx = 0;
+      ltfu = 0;
       temp = 0;
     };
   };
@@ -470,6 +472,7 @@ struct HcConfig {
   struct State {
     TFS<real_type, SS::hPS_agg, SS::hcTT, SS::hc1AG, SS::NS> hc_infections_coarse;
     TFS<real_type, SS::hPS_agg, SS::hcTT, SS::hc1AG, SS::NS> hc_tr_coarse;
+    TFS<real_type, SS::hVT> maternal_infections;
     TFS<real_type, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS> hc1_hiv_pop;
     TFS<real_type, SS::hPS_agg, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, SS::hTN> hc1_hiv_pop_strat;
     TFS<real_type, SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS> hc2_hiv_pop;
@@ -496,6 +499,7 @@ struct HcConfig {
     void reset() {
       hc_infections_coarse.setZero();
       hc_tr_coarse.setZero();
+      maternal_infections.setZero();
       hc1_hiv_pop.setZero();
       hc1_hiv_pop_strat.setZero();
       hc2_hiv_pop.setZero();
@@ -524,6 +528,7 @@ struct HcConfig {
   struct OutputState {
     T5<real_type> hc_infections_coarse;
     T5<real_type> hc_tr_coarse;
+    T2<real_type> maternal_infections;
     T5<real_type> hc1_hiv_pop;
     T7<real_type> hc1_hiv_pop_strat;
     T5<real_type> hc2_hiv_pop;
@@ -550,6 +555,7 @@ struct HcConfig {
     OutputState(int output_years):
       hc_infections_coarse(SS::hPS_agg, SS::hcTT, SS::hc1AG, SS::NS, output_years),
       hc_tr_coarse(SS::hPS_agg, SS::hcTT, SS::hc1AG, SS::NS, output_years),
+      maternal_infections(SS::hVT, output_years),
       hc1_hiv_pop(SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, output_years),
       hc1_hiv_pop_strat(SS::hPS_agg, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, SS::hTN, output_years),
       hc2_hiv_pop(SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS, output_years),
@@ -575,6 +581,7 @@ struct HcConfig {
     {
       hc_infections_coarse.setZero();
       hc_tr_coarse.setZero();
+      maternal_infections.setZero();
       hc1_hiv_pop.setZero();
       hc1_hiv_pop_strat.setZero();
       hc2_hiv_pop.setZero();
@@ -602,6 +609,7 @@ struct HcConfig {
     void save_state(const size_t i, const State &state) {
       hc_infections_coarse.chip(i, hc_infections_coarse.NumDimensions - 1) = state.hc_infections_coarse;
       hc_tr_coarse.chip(i, hc_tr_coarse.NumDimensions - 1) = state.hc_tr_coarse;
+      maternal_infections.chip(i, maternal_infections.NumDimensions - 1) = state.maternal_infections;
       hc1_hiv_pop.chip(i, hc1_hiv_pop.NumDimensions - 1) = state.hc1_hiv_pop;
       hc1_hiv_pop_strat.chip(i, hc1_hiv_pop_strat.NumDimensions - 1) = state.hc1_hiv_pop_strat;
       hc2_hiv_pop.chip(i, hc2_hiv_pop.NumDimensions - 1) = state.hc2_hiv_pop;
@@ -627,7 +635,7 @@ struct HcConfig {
     };
   };
 
-  static constexpr int output_count = 24;
+  static constexpr int output_count = 25;
   static int get_build_output_size(int prev_size) {
     return prev_size + output_count;
   };

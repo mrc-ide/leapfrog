@@ -158,7 +158,7 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
       .hc_age_coarse = read_data<real_type>(input_dir, "hc_age_coarse", SS::hcAG_end),
       .abortion = read_data<real_type>(input_dir, "abortion", SS::hAB_ind, opts.proj_time_steps),
       .patients_reallocated = read_data<real_type>(input_dir, "patients_reallocated", opts.proj_time_steps),
-      .hc_art_ltfu = read_data<real_type>(input_dir, "hc_art_ltfu", opts.proj_time_steps),
+      .hc_art_ltfu = read_data<real_type>(input_dir, "hc_art_ltfu", SS::hcAG_coarse, opts.proj_time_steps),
       .hc_age_coarse_cd4 = read_data<int>(input_dir, "hc_age_coarse_cd4", opts.p_idx_hiv_first_adult),
       .adult_female_infections = read_data<real_type>(input_dir, "adult_female_infections", opts.p_fertility_age_groups, opts.proj_time_steps),
       .adult_female_hivnpop = read_data<real_type>(input_dir, "adult_female_hivnpop", opts.p_fertility_age_groups, opts.proj_time_steps),
@@ -169,7 +169,7 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
     };
   };
 
-  static constexpr int output_count = 24;
+  static constexpr int output_count = 25;
 
   static int build_output(
     int index,
@@ -178,6 +178,7 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
   ) {
     serialize::serialize_tensor<real_type, 5>(state.hc_infections_coarse, output_dir / "hc_infections_coarse");
     serialize::serialize_tensor<real_type, 5>(state.hc_tr_coarse, output_dir / "hc_tr_coarse");
+    serialize::serialize_tensor<real_type, 2>(state.maternal_infections, output_dir / "maternal_infections");
     serialize::serialize_tensor<real_type, 5>(state.hc1_hiv_pop, output_dir / "hc1_hiv_pop");
     serialize::serialize_tensor<real_type, 7>(state.hc1_hiv_pop_strat, output_dir / "hc1_hiv_pop_strat");
     serialize::serialize_tensor<real_type, 5>(state.hc2_hiv_pop, output_dir / "hc2_hiv_pop");

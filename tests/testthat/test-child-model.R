@@ -16,6 +16,7 @@ test_that("Child model can be run for all years", {
       "hc_art_init", "hc_art_need_init", "ctx_need", "infection_by_type",
       "hc_infections_coarse",
       "hc_tr_coarse",
+      "maternal_infections",
       "hc1_hiv_pop_strat", "hc2_hiv_pop_strat",
       "hc1_art_pop_strat", "hc2_art_pop_strat",
       "hc1_noart_aids_deaths_strat", "hc2_noart_aids_deaths_strat",

@@ -921,7 +921,12 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   v$paed_art_elig_cd4 <- paed_art_elig_cd4
 
 
-  v$paed_art_ltfu <- input_childart_ltfu(dp.x) / 100
+  paed_art_ltfu <- array(0, dim = c(4, length(year.idx)), dimnames = list(age = c('all', '0-4', '5-9', '10-14')))
+  paed_art_ltfu[1,] <- input_childart_ltfu(dp.x) / 100
+  paed_art_ltfu[2,] <- input_childart_ltfu(dp.x) / 100
+  paed_art_ltfu[3,] <- input_childart_ltfu(dp.x) / 100
+  paed_art_ltfu[4,] <- input_childart_ltfu(dp.x) / 100
+  v$paed_art_ltfu <- paed_art_ltfu
 
   paed_cd4_transition <- array(0, dim = c(6,7), dimnames = list(cd4_count = c('gte1000', '750-1000', '500-749', '350-499', '200-349', 'lte200'), cd4_pct = c('gte30', '26-30', '21-25', '16-20', '11-15', '5-10', 'lte5')))
   paed_cd4_transition[1:6,1] <- c(0.608439, 0.185181, 0.105789, 0.055594, 0.018498, 0.026497)
