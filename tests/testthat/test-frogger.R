@@ -201,17 +201,6 @@ test_that("child model can be run twice on the same data", {
   expect_identical(out, out2)
 })
 
-test_that("error thrown if trying to run model for more than max years", {
-  ## Will error with size of input data not big enough, perhaps this is fine?
-  testthat::skip("TODO: ask science what we want to do here, should we have a limit on this?")
-  parameters <- readRDS(test_path("testdata/adult_parms.rds"))
-
-  expect_error(
-    run_model(parameters, output_years = 1970:2050),
-    "No of years > max years of 61"
-  )
-})
-
 test_that("error thrown if model run with invalid configuration", {
   parameters <- readRDS(test_path("testdata/adult_parms.rds"))
 
