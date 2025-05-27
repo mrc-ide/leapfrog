@@ -177,7 +177,7 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
     std::filesystem::path& output_dir
   ) {
     serialize::serialize_tensor<real_type, 5>(state.hc_infections_coarse, output_dir / "hc_infections_coarse");
-    serialize::serialize_tensor<real_type, 5>(state.hc_tr_coarse, output_dir / "hc_tr_coarse");
+    serialize::serialize_tensor<real_type, 4>(state.hc_tr_coarse, output_dir / "hc_tr_coarse");
     serialize::serialize_tensor<real_type, 2>(state.maternal_infections, output_dir / "maternal_infections");
     serialize::serialize_tensor<real_type, 5>(state.hc1_hiv_pop, output_dir / "hc1_hiv_pop");
     serialize::serialize_tensor<real_type, 7>(state.hc1_hiv_pop_strat, output_dir / "hc1_hiv_pop_strat");

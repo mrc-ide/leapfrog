@@ -471,7 +471,7 @@ struct HcConfig {
 
   struct State {
     TFS<real_type, SS::hPS_agg, SS::hcTT, SS::hc1AG, SS::NS> hc_infections_coarse;
-    TFS<real_type, SS::hPS_agg, SS::hcTT, SS::hc1AG, SS::NS> hc_tr_coarse;
+    TFS<real_type, SS::hPS_agg, SS::hcTT, SS::hc1AG> hc_tr_coarse;
     TFS<real_type, SS::hVT> maternal_infections;
     TFS<real_type, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS> hc1_hiv_pop;
     TFS<real_type, SS::hPS_agg, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, SS::hTN> hc1_hiv_pop_strat;
@@ -527,7 +527,7 @@ struct HcConfig {
 
   struct OutputState {
     T5<real_type> hc_infections_coarse;
-    T5<real_type> hc_tr_coarse;
+    T4<real_type> hc_tr_coarse;
     T2<real_type> maternal_infections;
     T5<real_type> hc1_hiv_pop;
     T7<real_type> hc1_hiv_pop_strat;
@@ -554,7 +554,7 @@ struct HcConfig {
 
     OutputState(int output_years):
       hc_infections_coarse(SS::hPS_agg, SS::hcTT, SS::hc1AG, SS::NS, output_years),
-      hc_tr_coarse(SS::hPS_agg, SS::hcTT, SS::hc1AG, SS::NS, output_years),
+      hc_tr_coarse(SS::hPS_agg, SS::hcTT, SS::hc1AG, output_years),
       maternal_infections(SS::hVT, output_years),
       hc1_hiv_pop(SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, output_years),
       hc1_hiv_pop_strat(SS::hPS_agg, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, SS::hTN, output_years),

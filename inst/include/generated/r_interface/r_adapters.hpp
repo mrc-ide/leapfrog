@@ -344,7 +344,7 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
   ) {
     return {
       .hc_infections_coarse = parse_data<real_type>(data, "hc_infections_coarse", SS::hPS_agg, SS::hcTT, SS::hc1AG, SS::NS),
-      .hc_tr_coarse = parse_data<real_type>(data, "hc_tr_coarse", SS::hPS_agg, SS::hcTT, SS::hc1AG, SS::NS),
+      .hc_tr_coarse = parse_data<real_type>(data, "hc_tr_coarse", SS::hPS_agg, SS::hcTT, SS::hc1AG),
       .maternal_infections = parse_data<real_type>(data, "maternal_infections", SS::hVT),
       .hc1_hiv_pop = parse_data<real_type>(data, "hc1_hiv_pop", SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS),
       .hc1_hiv_pop_strat = parse_data<real_type>(data, "hc1_hiv_pop_strat", SS::hPS_agg, SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, SS::hTN),
@@ -385,8 +385,8 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
     std::copy_n(state.hc_infections_coarse.data(), state.hc_infections_coarse.size(), REAL(r_hc_infections_coarse));
     names[index + 0] = "hc_infections_coarse";
     ret[index + 0] = r_hc_infections_coarse;
-    Rcpp::NumericVector r_hc_tr_coarse(SS::hPS_agg * SS::hcTT * SS::hc1AG * SS::NS * output_years);
-    r_hc_tr_coarse.attr("dim") = Rcpp::IntegerVector::create(SS::hPS_agg, SS::hcTT, SS::hc1AG, SS::NS, output_years);
+    Rcpp::NumericVector r_hc_tr_coarse(SS::hPS_agg * SS::hcTT * SS::hc1AG * output_years);
+    r_hc_tr_coarse.attr("dim") = Rcpp::IntegerVector::create(SS::hPS_agg, SS::hcTT, SS::hc1AG, output_years);
     std::copy_n(state.hc_tr_coarse.data(), state.hc_tr_coarse.size(), REAL(r_hc_tr_coarse));
     names[index + 1] = "hc_tr_coarse";
     ret[index + 1] = r_hc_tr_coarse;
@@ -519,8 +519,8 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
     std::copy_n(state.hc_infections_coarse.data(), state.hc_infections_coarse.size(), REAL(r_hc_infections_coarse));
     names[index + 0] = "hc_infections_coarse";
     ret[index + 0] = r_hc_infections_coarse;
-    Rcpp::NumericVector r_hc_tr_coarse(SS::hPS_agg * SS::hcTT * SS::hc1AG * SS::NS);
-    r_hc_tr_coarse.attr("dim") = Rcpp::IntegerVector::create(SS::hPS_agg, SS::hcTT, SS::hc1AG, SS::NS);
+    Rcpp::NumericVector r_hc_tr_coarse(SS::hPS_agg * SS::hcTT * SS::hc1AG);
+    r_hc_tr_coarse.attr("dim") = Rcpp::IntegerVector::create(SS::hPS_agg, SS::hcTT, SS::hc1AG);
     std::copy_n(state.hc_tr_coarse.data(), state.hc_tr_coarse.size(), REAL(r_hc_tr_coarse));
     names[index + 1] = "hc_tr_coarse";
     ret[index + 1] = r_hc_tr_coarse;
