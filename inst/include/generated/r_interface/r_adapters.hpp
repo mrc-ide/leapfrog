@@ -313,6 +313,7 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
       .total_fertility_rate = parse_data<real_type>(data, "tfr", opts.proj_time_steps),
       .PMTCT = parse_data<real_type>(data, "pmtct", SS::hPS, opts.proj_time_steps),
       .vertical_transmission_rate = parse_data<real_type>(data, "mtct", SS::hDS + 1, SS::hVT),
+      .engaged_in_care = parse_data<real_type>(data, "redist", SS::hVT),
       .PMTCT_transmission_rate = parse_data<real_type>(data, "pmtct_mtct", SS::hDS, SS::hPS, SS::hVT),
       .PMTCT_dropout = parse_data<real_type>(data, "pmtct_dropout", SS::hPS_dropout, opts.proj_time_steps),
       .PMTCT_input_is_percent = parse_data<int>(data, "pmtct_input_isperc", opts.proj_time_steps),

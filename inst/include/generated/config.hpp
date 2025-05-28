@@ -278,6 +278,7 @@ struct HcConfig {
     TM1<real_type> total_fertility_rate;
     TM2<real_type> PMTCT;
     TM2<real_type> vertical_transmission_rate;
+    TM1<real_type> engaged_in_care;
     TM3<real_type> PMTCT_transmission_rate;
     TM2<real_type> PMTCT_dropout;
     TM1<int> PMTCT_input_is_percent;

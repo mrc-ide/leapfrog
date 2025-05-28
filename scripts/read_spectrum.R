@@ -952,6 +952,8 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
 
   v$patients_reallocated <- input_mothers_reallocated(dp.x)
 
+  v$redist <- array(data = 0, dim = 2, dimnames = list(type = c('perinatal', 'bf')))
+
 
   ##extract needed outputs to just run paed model
   v$laf <- SpectrumUtils::dp.inputs.hiv.frr.location(dp.raw = dp.x)

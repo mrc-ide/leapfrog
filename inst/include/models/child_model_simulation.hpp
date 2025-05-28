@@ -650,9 +650,17 @@ private:
     bf_inf_coarse(12,hBF,3);
 
     //redistribute a certain proportion of the off ART infections into the on treatment category
-    // for (int a = 0; a < hc2_agestart; ++a) {
-    //
-    // n_hc.hc_tr_coarse(0,i_hc.tt_idx,a,s)
+    for (int hp_agg = 1; hp_agg < hPS_agg; ++hp_agg) {
+      for (int cat = 0; cat < hcTT; ++cat) {
+        for (int a = 0; a < hc2_agestart; ++a) {
+          if(cat == 0){
+            n_hc.hc_tr_coarse(0,cat,a) +=  n_hc.hc_tr_coarse(0,cat,a) * p_hc.engaged_in_care(0);
+          }else{
+            n_hc.hc_tr_coarse(0,cat,a) +=  n_hc.hc_tr_coarse(0,cat,a) * p_hc.engaged_in_care(1);
+          }
+        }
+      }
+    }
 
   };
 

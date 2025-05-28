@@ -143,6 +143,7 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
       .total_fertility_rate = read_data<real_type>(input_dir, "total_fertility_rate", opts.proj_time_steps),
       .PMTCT = read_data<real_type>(input_dir, "PMTCT", SS::hPS, opts.proj_time_steps),
       .vertical_transmission_rate = read_data<real_type>(input_dir, "vertical_transmission_rate", SS::hDS + 1, SS::hVT),
+      .engaged_in_care = read_data<real_type>(input_dir, "engaged_in_care", SS::hVT),
       .PMTCT_transmission_rate = read_data<real_type>(input_dir, "PMTCT_transmission_rate", SS::hDS, SS::hPS, SS::hVT),
       .PMTCT_dropout = read_data<real_type>(input_dir, "PMTCT_dropout", SS::hPS_dropout, opts.proj_time_steps),
       .PMTCT_input_is_percent = read_data<int>(input_dir, "PMTCT_input_is_percent", opts.proj_time_steps),
