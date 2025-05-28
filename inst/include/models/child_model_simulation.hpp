@@ -654,9 +654,11 @@ private:
       for (int cat = 0; cat < hcTT; ++cat) {
         for (int a = 0; a < hc2_agestart; ++a) {
           if(cat == 0){
-            n_hc.hc_tr_coarse(0,cat,a) +=  n_hc.hc_tr_coarse(0,cat,a) * p_hc.engaged_in_care(0);
+            n_hc.hc_tr_coarse(0,cat,a) +=  n_hc.hc_tr_coarse(hp_agg,cat,a) * p_hc.engaged_in_care(0);
+            n_hc.hc_tr_coarse(hp_agg,cat,a) *=  (1 - p_hc.engaged_in_care(0));
           }else{
             n_hc.hc_tr_coarse(0,cat,a) +=  n_hc.hc_tr_coarse(0,cat,a) * p_hc.engaged_in_care(1);
+            n_hc.hc_tr_coarse(hp_agg,cat,a) *=  (1 - p_hc.engaged_in_care(1));
           }
         }
       }
