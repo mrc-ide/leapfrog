@@ -956,16 +956,18 @@ struct ChildModelSimulation<Config> {
         for (int hd = 0; hd < hc1DS; ++hd) {
           i_hc.hc_death_rate = 0.0;
           i_hc.hc_art_grad(t_art_idx, hd, a, s) = 0.0;
-          bool is_hc2_art_pop = n_hc.hc2_art_pop(t_art_idx, hd, a - hc2_agestart, s) > 0;
           if (t_art_idx == 0) {
             if (a < hc2_agestart) {
               i_hc.hc_death_rate = p_hc.hc_art_mort_rr(t_art_idx, a, t) *
                                    (p_hc.hc1_art_mort(hd, 0, a) + p_hc.hc1_art_mort(hd, 1, a)) /
                                    2.0;
-            } else if (hd < hc2DS && is_hc2_art_pop) {
-              i_hc.hc_death_rate = p_hc.hc_art_mort_rr(t_art_idx, a, t) *
-                                   (p_hc.hc2_art_mort(hd, 0, a - hc2_agestart) + p_hc.hc2_art_mort(hd, 1, a - hc2_agestart)) /
-                                   2.0;
+            } else if (hd < hc2DS) {
+              bool is_hc2_art_pop = n_hc.hc2_art_pop(t_art_idx, hd, a - hc2_agestart, s) > 0;
+              if(is_hc2_art_pop){
+                i_hc.hc_death_rate = p_hc.hc_art_mort_rr(t_art_idx, a, t) *
+                  (p_hc.hc2_art_mort(hd, 0, a - hc2_agestart) + p_hc.hc2_art_mort(hd, 1, a - hc2_agestart)) /
+                    2.0;
+              }
             }
           } else {
             if (a < hc2_agestart) {
@@ -978,17 +980,21 @@ struct ChildModelSimulation<Config> {
           // ctx reduction on mortality for those on ART
           i_hc.hc_death_rate *= i_hc.ctx_mean(art_flag);
 
-          bool any_hc1_art_deaths = i_hc.hc_death_rate * n_hc.hc1_art_pop(t_art_idx, hd, a, s) >= 0;
-          bool any_hc2_art_deaths = i_hc.hc_death_rate * n_hc.hc2_art_pop(t_art_idx, hd, a - hc2_agestart, s) >= 0;
-          if (a < hc2_agestart && any_hc1_art_deaths) {
-            i_hc.hc_art_grad(t_art_idx,hd, a, s) -= i_hc.hc_death_rate * n_hc.hc1_art_pop(t_art_idx, hd, a, s);
-            n_hc.hc1_art_pop(t_art_idx, hd,  a, s) += i_hc.hc_art_grad(t_art_idx, hd, a, s);
-            n_hc.hc1_art_aids_deaths(t_art_idx,hd, a, s) -= i_hc.hc_art_grad(t_art_idx,hd, a, s);
-          } else if (hd < hc2DS && any_hc2_art_deaths) {
-            i_hc.hc_art_grad(t_art_idx, hd, a, s) -= i_hc.hc_death_rate *
-                                                     n_hc.hc2_art_pop(t_art_idx, hd, a - hc2_agestart, s);
-            n_hc.hc2_art_pop(t_art_idx, hd,  a-hc2_agestart, s) += i_hc.hc_art_grad(t_art_idx, hd, a, s);
-            n_hc.hc2_art_aids_deaths(t_art_idx, hd, a-hc2_agestart, s) -= i_hc.hc_art_grad(t_art_idx, hd, a, s);
+          if (a < hc2_agestart) {
+            bool any_hc1_art_deaths = i_hc.hc_death_rate * n_hc.hc1_art_pop(t_art_idx, hd, a, s) >= 0;
+            if(any_hc1_art_deaths){
+              i_hc.hc_art_grad(t_art_idx,hd, a, s) -= i_hc.hc_death_rate * n_hc.hc1_art_pop(t_art_idx, hd, a, s);
+              n_hc.hc1_art_pop(t_art_idx, hd,  a, s) += i_hc.hc_art_grad(t_art_idx, hd, a, s);
+              n_hc.hc1_art_aids_deaths(t_art_idx,hd, a, s) -= i_hc.hc_art_grad(t_art_idx,hd, a, s);
+            }
+          } else if (hd < hc2DS) {
+            bool any_hc2_art_deaths = i_hc.hc_death_rate * n_hc.hc2_art_pop(t_art_idx, hd, a - hc2_agestart, s) >= 0;
+            if(any_hc2_art_deaths){
+              i_hc.hc_art_grad(t_art_idx, hd, a, s) -= i_hc.hc_death_rate *
+                n_hc.hc2_art_pop(t_art_idx, hd, a - hc2_agestart, s);
+              n_hc.hc2_art_pop(t_art_idx, hd,  a-hc2_agestart, s) += i_hc.hc_art_grad(t_art_idx, hd, a, s);
+              n_hc.hc2_art_aids_deaths(t_art_idx, hd, a-hc2_agestart, s) -= i_hc.hc_art_grad(t_art_idx, hd, a, s);
+            }
           }
         } // end a
       } // end hc1DS
@@ -1005,17 +1011,19 @@ struct ChildModelSimulation<Config> {
         for (int hd = 0; hd < hc1DS; ++hd) {
           for (int a = 0; a < p_idx_fertility_first; ++a) {
             i_hc.hc_death_rate = 0.0;
-            bool is_hc2_art_pop = n_hc.hc2_art_pop(dur, hd, a - hc2_agestart, s) > 0;
 
             if (dur == 0) {
               if (a < hc2_agestart) {
                 i_hc.hc_death_rate = p_hc.hc_art_mort_rr(dur, a, t) *
                                      (p_hc.hc1_art_mort(hd, 0, a) + p_hc.hc1_art_mort(hd, 1, a)) /
                                      2.0;
-              } else if (hd < hc2DS && is_hc2_art_pop) {
-                i_hc.hc_death_rate = p_hc.hc_art_mort_rr(dur, a, t) *
-                                     (p_hc.hc2_art_mort(hd, 0, a - hc2_agestart) + p_hc.hc2_art_mort(hd, 1, a - hc2_agestart)) /
-                                     2.0;
+              } else if (hd < hc2DS) {
+                bool is_hc2_art_pop = n_hc.hc2_art_pop(dur, hd, a - hc2_agestart, s) > 0;
+                if(is_hc2_art_pop){
+                  i_hc.hc_death_rate = p_hc.hc_art_mort_rr(dur, a, t) *
+                    (p_hc.hc2_art_mort(hd, 0, a - hc2_agestart) + p_hc.hc2_art_mort(hd, 1, a - hc2_agestart)) /
+                      2.0;
+                }
               }
             } else {
               if (a < hc2_agestart) {
@@ -1028,14 +1036,17 @@ struct ChildModelSimulation<Config> {
             // ctx reduction on mortality for those on ART
             // NOTE: ART initiation calculations don't include the effect of cotrim (TODO: verify)
             // i_hc.hc_death_rate *= i_hc.ctx_mean(art_flag);
-
-            bool any_hc1_art_deaths = i_hc.hc_death_rate * n_hc.hc1_art_pop(dur, hd, a, s) >= 0;
-            bool any_hc2_art_deaths = i_hc.hc_death_rate * n_hc.hc2_art_pop(dur, hd, a - hc2_agestart, s) >= 0;
-            if (a < hc2_agestart && any_hc1_art_deaths) {
-              i_hc.hc_art_deaths(p_hc.hc_age_coarse(a)) += i_hc.hc_death_rate * n_hc.hc1_art_pop(dur, hd, a, s);
-            } else if (hd < hc2DS && any_hc2_art_deaths) {
-              i_hc.hc_art_deaths(p_hc.hc_age_coarse(a)) += i_hc.hc_death_rate *
-                                                           n_hc.hc2_art_pop(dur, hd, a - hc2_agestart, s);
+            if (a < hc2_agestart) {
+              bool any_hc1_art_deaths = i_hc.hc_death_rate * n_hc.hc1_art_pop(dur, hd, a, s) >= 0;
+              if(any_hc1_art_deaths){
+                i_hc.hc_art_deaths(p_hc.hc_age_coarse(a)) += i_hc.hc_death_rate * n_hc.hc1_art_pop(dur, hd, a, s);
+              }
+            } else if (hd < hc2DS) {
+              bool any_hc2_art_deaths = i_hc.hc_death_rate * n_hc.hc2_art_pop(dur, hd, a - hc2_agestart, s) >= 0;
+              if(any_hc2_art_deaths){
+                i_hc.hc_art_deaths(p_hc.hc_age_coarse(a)) += i_hc.hc_death_rate *
+                  n_hc.hc2_art_pop(dur, hd, a - hc2_agestart, s);
+              }
             }
           } // end a
         } // end hc1DS

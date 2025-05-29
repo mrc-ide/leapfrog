@@ -139,7 +139,7 @@ struct HivDemographicProjection<Config> {
     auto& i_hc = intermediate.hc;
 
     for (int g = 0; g < NS; ++g) {
-      for (int hm = 0; hm < hDS; ++hm) {
+      for (int hm = 0; hm < hc2DS; ++hm) {
         for (int htm = 0; htm < hcTT; ++htm) {
           i_hc.age15_hiv_pop(hm, g) += c_hc.hc2_hiv_pop(hm, htm, (hc2AG - 1), g);
         }
