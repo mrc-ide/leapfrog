@@ -63,7 +63,7 @@ test_that("Model outputs are consistent", {
   ##Perinatal
   strat <- apply(out$infection_by_type[1,,,], c(2,3), sum)
   pop <- apply(out$hc_infections_coarse[,1,,,], c(3,4), sum)
-  expect_equal(strat, pop) #these align but are failing the test
+  expect_equal(strat, pop)
 
   ##BF 0-6
   strat <- apply(out$infection_by_type[2,,,], c(2,3), sum)
