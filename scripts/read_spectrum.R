@@ -757,16 +757,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   v$paed_art_mort <- paed_art_mort
   v$adol_art_mort <- adol_art_mort
 
-  mtct_rates_input <- dp_read_mtct_rates(dp.x)
-  art_mtct <- array(0, dim = c(7,3,2), dimnames = list(cd4 = c('>500', '350-500', '250-349', '200-249', '100-199', '50-99', '<50'),
-                                                       time = c('ART <4 weeks before delivery', 'ART >4 weeks before delivery', 'ART before pregnancy'), trans_type = c('perinatal', 'bf')))
-  art_mtct[,1,1] <- mtct_rates_input[11,1] / 100
-  art_mtct[,2,1] <- mtct_rates_input[10,1] / 100
-  art_mtct[,3,1] <- mtct_rates_input[9,1] / 100
-  art_mtct[5:7,1,2] <- mtct_rates_input[11,2] / 100
-  art_mtct[5:7,2,2] <- mtct_rates_input[10,2] / 100
-  art_mtct[5:7,3,2] <- mtct_rates_input[9,2] / 100
-  v$art_mtct <- art_mtct
+
 
   art_dist_paed <- dp_read_art_dist(dp.x)
   v$art_dist_paed <- art_dist_paed
@@ -821,6 +812,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   v$pmtct_dropout <- input_pmtct_retained(dp.x)
 
   ##rates of MTCT
+  mtct_rates_input <- dp_read_mtct_rates(dp.x)
   mtct_trt <- array(data = 0, dim = c(7,7,2), dimnames = list(cd4 = c('>500', '350-500', '250-349', '200-249', '100-199', '50-99', '<50'),
                                                               pmtct_reg = c('option A', 'option B', 'single dose nevirapine', 'WHO 2006 dual ARV regimen', 'ART before pregnancy',
                                                                             'ART >4 weeks before delivery', 'ART <4 weeks before delivery'),
