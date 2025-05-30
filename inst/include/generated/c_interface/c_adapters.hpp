@@ -203,9 +203,12 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
       .hc_art_isperc = read_data<int>(params.hc->hc_art_isperc, params.hc->hc_art_isperc_length, "hc_art_isperc", opts.proj_time_steps),
       .hc_art_val = read_data<real_type>(params.hc->hc_art_val, params.hc->hc_art_val_length, "hc_art_val", SS::hcAG_coarse, opts.proj_time_steps),
       .hc_art_init_dist = read_data<real_type>(params.hc->hc_art_init_dist, params.hc->hc_art_init_dist_length, "hc_art_init_dist", SS::p_idx_hiv_first_adult, opts.proj_time_steps),
+<<<<<<< HEAD
       .fert_mult_by_age = read_data<real_type>(params.hc->fert_mult_by_age, params.hc->fert_mult_by_age_length, "fert_mult_by_age", SS::hAG_fert, opts.proj_time_steps),
       .fert_mult_off_art = read_data<real_type>(params.hc->fert_mult_off_art, params.hc->fert_mult_off_art_length, "fert_mult_off_art", SS::hDS),
       .fert_mult_on_art = read_data<real_type>(params.hc->fert_mult_on_art, params.hc->fert_mult_on_art_length, "fert_mult_on_art", SS::hAG_fert),
+=======
+>>>>>>> 1a966f4 (Move static parameters into C++ code instead of requiring it to be passed in)
       .total_fertility_rate = read_data<real_type>(params.hc->total_fertility_rate, params.hc->total_fertility_rate_length, "total_fertility_rate", opts.proj_time_steps),
       .PMTCT = read_data<real_type>(params.hc->PMTCT, params.hc->PMTCT_length, "PMTCT", SS::hPS, opts.proj_time_steps),
       .vertical_transmission_rate = read_data<real_type>(params.hc->vertical_transmission_rate, params.hc->vertical_transmission_rate_length, "vertical_transmission_rate", SS::hDS + 1, SS::hVT),

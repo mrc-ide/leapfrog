@@ -270,9 +270,12 @@ struct HcConfig {
     TM1<int> hc_art_isperc;
     TM2<real_type> hc_art_val;
     TM2<real_type> hc_art_init_dist;
+<<<<<<< HEAD
     TM2<real_type> fert_mult_by_age;
     TM1<real_type> fert_mult_off_art;
     TM1<real_type> fert_mult_on_art;
+=======
+>>>>>>> 1a966f4 (Move static parameters into C++ code instead of requiring it to be passed in)
     TM1<real_type> total_fertility_rate;
     TM2<real_type> PMTCT;
     TM2<real_type> vertical_transmission_rate;

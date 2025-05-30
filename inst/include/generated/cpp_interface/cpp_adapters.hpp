@@ -135,9 +135,12 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
       .hc_art_isperc = read_data<int>(input_dir, "hc_art_isperc", opts.proj_time_steps),
       .hc_art_val = read_data<real_type>(input_dir, "hc_art_val", SS::hcAG_coarse, opts.proj_time_steps),
       .hc_art_init_dist = read_data<real_type>(input_dir, "hc_art_init_dist", SS::p_idx_hiv_first_adult, opts.proj_time_steps),
+<<<<<<< HEAD
       .fert_mult_by_age = read_data<real_type>(input_dir, "fert_mult_by_age", SS::hAG_fert, opts.proj_time_steps),
       .fert_mult_off_art = read_data<real_type>(input_dir, "fert_mult_off_art", SS::hDS),
       .fert_mult_on_art = read_data<real_type>(input_dir, "fert_mult_on_art", SS::hAG_fert),
+=======
+>>>>>>> 1a966f4 (Move static parameters into C++ code instead of requiring it to be passed in)
       .total_fertility_rate = read_data<real_type>(input_dir, "total_fertility_rate", opts.proj_time_steps),
       .PMTCT = read_data<real_type>(input_dir, "PMTCT", SS::hPS, opts.proj_time_steps),
       .vertical_transmission_rate = read_data<real_type>(input_dir, "vertical_transmission_rate", SS::hDS + 1, SS::hVT),
