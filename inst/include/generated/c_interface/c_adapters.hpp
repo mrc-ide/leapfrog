@@ -197,7 +197,7 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
       .hc2_cd4_prog = read_data<real_type>(params.hc->hc2_cd4_prog, params.hc->hc2_cd4_prog_length, "hc2_cd4_prog", SS::hc2DS, SS::hc2AG_c, SS::NS),
       .ctx_val = read_data<real_type>(params.hc->ctx_val, params.hc->ctx_val_length, "ctx_val", opts.proj_time_steps),
       .hc_art_elig_age = read_data<int>(params.hc->hc_art_elig_age, params.hc->hc_art_elig_age_length, "hc_art_elig_age", opts.proj_time_steps),
-      .hc_art_elig_cd4 = read_data<real_type>(params.hc->hc_art_elig_cd4, params.hc->hc_art_elig_cd4_length, "hc_art_elig_cd4", SS::p_idx_hiv_first_adult, opts.proj_time_steps),
+      .hc_art_elig_cd4 = read_data<int>(params.hc->hc_art_elig_cd4, params.hc->hc_art_elig_cd4_length, "hc_art_elig_cd4", SS::p_idx_hiv_first_adult, opts.proj_time_steps),
       .hc_art_mort_rr = read_data<real_type>(params.hc->hc_art_mort_rr, params.hc->hc_art_mort_rr_length, "hc_art_mort_rr", SS::hTS, SS::p_idx_hiv_first_adult, opts.proj_time_steps),
       .hc1_art_mort = read_data<real_type>(params.hc->hc1_art_mort, params.hc->hc1_art_mort_length, "hc1_art_mort", SS::hc1DS, SS::hTS, SS::hc1AG),
       .hc2_art_mort = read_data<real_type>(params.hc->hc2_art_mort, params.hc->hc2_art_mort_length, "hc2_art_mort", SS::hc2DS, SS::hTS, SS::hc2AG),

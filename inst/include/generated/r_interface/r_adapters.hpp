@@ -299,7 +299,7 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
       .hc2_cd4_prog = parse_data<real_type>(data, "adol_cd4_prog", SS::hc2DS, SS::hc2AG_c, SS::NS),
       .ctx_val = parse_data<real_type>(data, "ctx_val", opts.proj_time_steps),
       .hc_art_elig_age = parse_data<int>(data, "paed_art_elig_age", opts.proj_time_steps),
-      .hc_art_elig_cd4 = parse_data<real_type>(data, "paed_art_elig_cd4", SS::p_idx_hiv_first_adult, opts.proj_time_steps),
+      .hc_art_elig_cd4 = parse_data<int>(data, "paed_art_elig_cd4", SS::p_idx_hiv_first_adult, opts.proj_time_steps),
       .hc_art_mort_rr = parse_data<real_type>(data, "mort_art_rr", SS::hTS, SS::p_idx_hiv_first_adult, opts.proj_time_steps),
       .hc1_art_mort = parse_data<real_type>(data, "paed_art_mort", SS::hc1DS, SS::hTS, SS::hc1AG),
       .hc2_art_mort = parse_data<real_type>(data, "adol_art_mort", SS::hc2DS, SS::hTS, SS::hc2AG),
@@ -334,7 +334,7 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
       .adult_female_hivnpop = parse_data<real_type>(data, "hivnpop", SS::p_fertility_age_groups, opts.proj_time_steps),
       .total_births = parse_data<real_type>(data, "total_births", opts.proj_time_steps),
       .ctx_effect = parse_data<real_type>(data, "ctx_effect", 3),
-      .hc_art_start = Rcpp::as<real_type>(data["hc_art_start"]),
+      .hc_art_start = Rcpp::as<int>(data["hc_art_start"]),
       .local_adj_factor = Rcpp::as<real_type>(data["laf"])
     };
   };

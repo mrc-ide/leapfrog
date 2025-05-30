@@ -129,7 +129,7 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
       .hc2_cd4_prog = read_data<real_type>(input_dir, "hc2_cd4_prog", SS::hc2DS, SS::hc2AG_c, SS::NS),
       .ctx_val = read_data<real_type>(input_dir, "ctx_val", opts.proj_time_steps),
       .hc_art_elig_age = read_data<int>(input_dir, "hc_art_elig_age", opts.proj_time_steps),
-      .hc_art_elig_cd4 = read_data<real_type>(input_dir, "hc_art_elig_cd4", SS::p_idx_hiv_first_adult, opts.proj_time_steps),
+      .hc_art_elig_cd4 = read_data<int>(input_dir, "hc_art_elig_cd4", SS::p_idx_hiv_first_adult, opts.proj_time_steps),
       .hc_art_mort_rr = read_data<real_type>(input_dir, "hc_art_mort_rr", SS::hTS, SS::p_idx_hiv_first_adult, opts.proj_time_steps),
       .hc1_art_mort = read_data<real_type>(input_dir, "hc1_art_mort", SS::hc1DS, SS::hTS, SS::hc1AG),
       .hc2_art_mort = read_data<real_type>(input_dir, "hc2_art_mort", SS::hc2DS, SS::hTS, SS::hc2AG),
@@ -164,7 +164,7 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
       .adult_female_hivnpop = read_data<real_type>(input_dir, "adult_female_hivnpop", SS::p_fertility_age_groups, opts.proj_time_steps),
       .total_births = read_data<real_type>(input_dir, "total_births", opts.proj_time_steps),
       .ctx_effect = read_data<real_type>(input_dir, "ctx_effect", 3),
-      .hc_art_start = read_data<real_type>(input_dir, "hc_art_start"),
+      .hc_art_start = read_data<int>(input_dir, "hc_art_start"),
       .local_adj_factor = read_data<real_type>(input_dir, "local_adj_factor")
     };
   };

@@ -119,7 +119,7 @@ struct HcParams {
   int ctx_val_length;
   int* hc_art_elig_age;
   int hc_art_elig_age_length;
-  real_type* hc_art_elig_cd4;
+  int* hc_art_elig_cd4;
   int hc_art_elig_cd4_length;
   real_type* hc_art_mort_rr;
   int hc_art_mort_rr_length;
@@ -189,7 +189,7 @@ struct HcParams {
   int total_births_length;
   real_type* ctx_effect;
   int ctx_effect_length;
-  real_type hc_art_start;
+  int hc_art_start;
   int hc_art_start_length;
   real_type local_adj_factor;
   int local_adj_factor_length;

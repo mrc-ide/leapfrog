@@ -196,7 +196,7 @@ type
     ctxValLength: Integer;
     hcArtEligAge: PInteger;
     hcArtEligAgeLength: Integer;
-    hcArtEligCd4: PDouble;
+    hcArtEligCd4: PInteger;
     hcArtEligCd4Length: Integer;
     hcArtMortRr: PDouble;
     hcArtMortRrLength: Integer;
@@ -266,7 +266,7 @@ type
     totalBirthsLength: Integer;
     ctxEffect: PDouble;
     ctxEffectLength: Integer;
-    hcArtStart: Double;
+    hcArtStart: Integer;
     hcArtStartLength: Integer;
     localAdjFactor: Double;
     localAdjFactorLength: Integer;
@@ -284,7 +284,7 @@ type
     hc2Cd4Prog: TGBFixedArray<Double>;
     ctxVal: TGBFixedArray<Double>;
     hcArtEligAge: TGBFixedArray<Integer>;
-    hcArtEligCd4: TGBFixedArray<Double>;
+    hcArtEligCd4: TGBFixedArray<Integer>;
     hcArtMortRr: TGBFixedArray<Double>;
     hc1ArtMort: TGBFixedArray<Double>;
     hc2ArtMort: TGBFixedArray<Double>;
@@ -319,7 +319,7 @@ type
     adultFemaleHivnpop: TGBFixedArray<Double>;
     totalBirths: TGBFixedArray<Double>;
     ctxEffect: TGBFixedArray<Double>;
-    hcArtStart: Double;
+    hcArtStart: Integer;
     localAdjFactor: Double;
     function getView(): LeapfrogHivChildParamsView;
     Destructor Destroy; override;
@@ -635,7 +635,7 @@ begin;
   Result.ctxValLength := ctxVal.GetLength();
   Result.hcArtEligAge := PInteger(hcArtEligAge.data);
   Result.hcArtEligAgeLength := hcArtEligAge.GetLength();
-  Result.hcArtEligCd4 := PDouble(hcArtEligCd4.data);
+  Result.hcArtEligCd4 := PInteger(hcArtEligCd4.data);
   Result.hcArtEligCd4Length := hcArtEligCd4.GetLength();
   Result.hcArtMortRr := PDouble(hcArtMortRr.data);
   Result.hcArtMortRrLength := hcArtMortRr.GetLength();

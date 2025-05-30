@@ -101,7 +101,7 @@
       },
       "hc_art_elig_cd4": {
         "type": "TM",
-        "num_type": "real_type",
+        "num_type": "int",
         "dims": ["SS::p_idx_hiv_first_adult", "opts.proj_time_steps"],
         "alias": {
           "r": "paed_art_elig_cd4"
@@ -381,7 +381,7 @@
       },
       "hc_art_start": {
         "type": "scalar",
-        "num_type": "real_type",
+        "num_type": "int",
         "alias": {
           "r": "hc_art_start"
         }

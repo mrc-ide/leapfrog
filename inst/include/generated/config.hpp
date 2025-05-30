@@ -264,7 +264,7 @@ struct HcConfig {
     TM3<real_type> hc2_cd4_prog;
     TM1<real_type> ctx_val;
     TM1<int> hc_art_elig_age;
-    TM2<real_type> hc_art_elig_cd4;
+    TM2<int> hc_art_elig_cd4;
     TM3<real_type> hc_art_mort_rr;
     TM3<real_type> hc1_art_mort;
     TM3<real_type> hc2_art_mort;
@@ -299,7 +299,7 @@ struct HcConfig {
     TM2<real_type> adult_female_hivnpop;
     TM1<real_type> total_births;
     TM1<real_type> ctx_effect;
-    real_type hc_art_start;
+    int hc_art_start;
     real_type local_adj_factor;
   };
 
