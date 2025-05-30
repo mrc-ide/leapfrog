@@ -29,7 +29,7 @@ write_standalone_data <- function(input_data, data_map, dest) {
 build_name_mapping <- function() {
   cfgs <- list.files(configs_dir, full.names = TRUE)
   all_params <- lapply(cfgs, function(cfg) {
-    params <- jsonlite::read_json(cfg)$pars
+    params <- jsonlite::read_json(cfg)$pars$default
     lapply(params, function(param) {
       param$alias$r
     })
