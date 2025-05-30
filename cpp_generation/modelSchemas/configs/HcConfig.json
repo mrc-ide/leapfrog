@@ -43,14 +43,6 @@
           "r": "paed_cd4_dist"
         }
       },
-      "hc_cd4_transition": {
-        "type": "TM",
-        "num_type": "real_type",
-        "dims": ["SS::hc2DS", "SS::hc1DS"],
-        "alias": {
-          "r": "paed_cd4_transition"
-        }
-      },
       "hc1_cd4_mort": {
         "type": "TM",
         "num_type": "real_type",
@@ -153,14 +145,6 @@
         "dims": ["SS::p_idx_hiv_first_adult", "opts.proj_time_steps"],
         "alias": {
           "r": "init_art_dist"
-        }
-      },
-      "adult_cd4_dist": {
-        "type": "TM",
-        "num_type": "real_type",
-        "dims": ["SS::hDS", "SS::hc2DS"],
-        "alias": {
-          "r": "adult_cd4_dist"
         }
       },
       "fert_mult_by_age": {
@@ -307,14 +291,6 @@
           "r": "paed_art_age_spec"
         }
       },
-      "hc_age_coarse": {
-        "type": "TM",
-        "num_type": "real_type",
-        "dims": ["SS::hcAG_end"],
-        "alias": {
-          "r": "hc_age_coarse"
-        }
-      },
       "abortion": {
         "type": "TM",
         "num_type": "real_type",
@@ -337,14 +313,6 @@
         "dims": ["opts.proj_time_steps"],
         "alias": {
           "r": "paed_art_ltfu"
-        }
-      },
-      "hc_age_coarse_cd4": {
-        "type": "TM",
-        "num_type": "int",
-        "dims": ["SS::p_idx_hiv_first_adult"],
-        "alias": {
-          "r": "hc_age_coarse_cd4"
         }
       },
       "adult_female_infections": {

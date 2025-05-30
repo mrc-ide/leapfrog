@@ -257,7 +257,6 @@ struct HcConfig {
   struct Pars {
     TM1<real_type> hc_nosocomial;
     TM1<real_type> hc1_cd4_dist;
-    TM2<real_type> hc_cd4_transition;
     TM3<real_type> hc1_cd4_mort;
     TM3<real_type> hc2_cd4_mort;
     TM3<real_type> hc1_cd4_prog;
@@ -271,7 +270,6 @@ struct HcConfig {
     TM1<int> hc_art_isperc;
     TM2<real_type> hc_art_val;
     TM2<real_type> hc_art_init_dist;
-    TM2<real_type> adult_cd4_dist;
     TM2<real_type> fert_mult_by_age;
     TM1<real_type> fert_mult_off_art;
     TM1<real_type> fert_mult_on_art;
@@ -290,11 +288,9 @@ struct HcConfig {
     TM1<real_type> incrate;
     TM1<int> ctx_val_is_percent;
     TM1<int> hc_art_is_age_spec;
-    TM1<real_type> hc_age_coarse;
     TM2<real_type> abortion;
     TM1<real_type> patients_reallocated;
     TM1<real_type> hc_art_ltfu;
-    TM1<int> hc_age_coarse_cd4;
     TM2<real_type> adult_female_infections;
     TM2<real_type> adult_female_hivnpop;
     TM1<real_type> total_births;

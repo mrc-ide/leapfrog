@@ -105,8 +105,6 @@ struct HcParams {
   int hc_nosocomial_length;
   real_type* hc1_cd4_dist;
   int hc1_cd4_dist_length;
-  real_type* hc_cd4_transition;
-  int hc_cd4_transition_length;
   real_type* hc1_cd4_mort;
   int hc1_cd4_mort_length;
   real_type* hc2_cd4_mort;
@@ -133,8 +131,6 @@ struct HcParams {
   int hc_art_val_length;
   real_type* hc_art_init_dist;
   int hc_art_init_dist_length;
-  real_type* adult_cd4_dist;
-  int adult_cd4_dist_length;
   real_type* fert_mult_by_age;
   int fert_mult_by_age_length;
   real_type* fert_mult_off_art;
@@ -171,16 +167,12 @@ struct HcParams {
   int ctx_val_is_percent_length;
   int* hc_art_is_age_spec;
   int hc_art_is_age_spec_length;
-  real_type* hc_age_coarse;
-  int hc_age_coarse_length;
   real_type* abortion;
   int abortion_length;
   real_type* patients_reallocated;
   int patients_reallocated_length;
   real_type* hc_art_ltfu;
   int hc_art_ltfu_length;
-  int* hc_age_coarse_cd4;
-  int hc_age_coarse_cd4_length;
   real_type* adult_female_infections;
   int adult_female_infections_length;
   real_type* adult_female_hivnpop;
