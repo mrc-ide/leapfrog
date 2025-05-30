@@ -216,28 +216,6 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   v$incidpopage <- attr(v$incidinput, "incidpopage")
   v$incrr_sex <- projp$incrr_sex
 
-  adult_cd4_dist <- array(data = 0, dim = c(7,6), dimnames = list(adult_cd4_categories = c('>500', '350-500', '250-349', '200-249', '100-199', '50-99','<50'),
-                                                                   hc2_cd4_categories = c('>1000', '750-999', '500-749', '350-499', '200-349', '<200')))
-  adult_cd4_dist[1,1:3] <- 1
-  adult_cd4_dist[2,4] <- 1
-  adult_cd4_dist[3:4,5] <- c(0.6665589, 1-0.6665589)
-  adult_cd4_dist[5:7,6] <- c(0.35, 0.21, 0.44)
-
-
-  adult_cd4_dist_array <- adult_cd4_dist
-
-  v$adult_cd4_dist <- adult_cd4_dist_array
-
-
-  v$mtct_trans <- (c(0.15, 0.15, 0.27, 0.27, 0.37, 0.37, 0.37))
-
-  v$fert_mult_by_age <- rep(c(1.153260, 1.001870, 0.909590,0.912760, 0.883990, 0.883990, 0.883990), each = 5)
-
-  v$fert_mult_offart <- c(1, 0.96, 0.88, 0.78, 0.61, 0.38, 0.30)
-
-  v$fert_mult_onart <- rep(c(1.094460, 1.006870, 0.916170, 0.810910, 0.637220, 0.637220, 0.637220), each = 5)
-
-
   v$artmx_timerr <- projp$artmx_timerr[c(1, 2, rep(3, hTS - 2)), ]
 
   ## ## ART eligibility and numbers on treatment
