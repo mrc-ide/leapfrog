@@ -161,8 +161,6 @@ struct HcParams {
   int prop_lt200_length;
   real_type* prop_gte350;
   int prop_gte350_length;
-  real_type* incrate;
-  int incrate_length;
   int* ctx_val_is_percent;
   int ctx_val_is_percent_length;
   int* hc_art_is_age_spec;

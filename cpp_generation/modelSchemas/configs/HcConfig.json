@@ -267,14 +267,6 @@
           "r": "prop_gte350"
         }
       },
-      "incrate": {
-        "type": "TM",
-        "num_type": "real_type",
-        "dims": ["opts.proj_time_steps"],
-        "alias": {
-          "r": "incrate"
-        }
-      },
       "ctx_val_is_percent": {
         "type": "TM",
         "num_type": "int",

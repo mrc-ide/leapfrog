@@ -150,7 +150,6 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
       .mat_prev_input = read_data<int>(input_dir, "mat_prev_input", opts.proj_time_steps),
       .prop_lt200 = read_data<real_type>(input_dir, "prop_lt200", opts.proj_time_steps),
       .prop_gte350 = read_data<real_type>(input_dir, "prop_gte350", opts.proj_time_steps),
-      .incrate = read_data<real_type>(input_dir, "incrate", opts.proj_time_steps),
       .ctx_val_is_percent = read_data<int>(input_dir, "ctx_val_is_percent", opts.proj_time_steps),
       .hc_art_is_age_spec = read_data<int>(input_dir, "hc_art_is_age_spec", opts.proj_time_steps),
       .abortion = read_data<real_type>(input_dir, "abortion", SS::hAB_ind, opts.proj_time_steps),

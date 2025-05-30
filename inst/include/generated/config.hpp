@@ -285,7 +285,6 @@ struct HcConfig {
     TM1<int> mat_prev_input;
     TM1<real_type> prop_lt200;
     TM1<real_type> prop_gte350;
-    TM1<real_type> incrate;
     TM1<int> ctx_val_is_percent;
     TM1<int> hc_art_is_age_spec;
     TM2<real_type> abortion;

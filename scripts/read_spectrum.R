@@ -921,7 +921,6 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   specres <- eppasm::read_hivproj_output(pjnz)
   newinf <- specres$newinf.f[4:10,] %>% colSums()
   newinf_rate <- newinf / colSums(specres$totpop.f[1:10,])
-  v$incrate <- as.array(as.numeric(unlist(newinf_rate)))
 
   fp1 <- eppasm::prepare_directincid(pjnz)
   fp1$tARTstart <- 61L

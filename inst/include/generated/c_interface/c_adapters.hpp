@@ -218,7 +218,6 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
       .mat_prev_input = read_data<int>(params.hc->mat_prev_input, params.hc->mat_prev_input_length, "mat_prev_input", opts.proj_time_steps),
       .prop_lt200 = read_data<real_type>(params.hc->prop_lt200, params.hc->prop_lt200_length, "prop_lt200", opts.proj_time_steps),
       .prop_gte350 = read_data<real_type>(params.hc->prop_gte350, params.hc->prop_gte350_length, "prop_gte350", opts.proj_time_steps),
-      .incrate = read_data<real_type>(params.hc->incrate, params.hc->incrate_length, "incrate", opts.proj_time_steps),
       .ctx_val_is_percent = read_data<int>(params.hc->ctx_val_is_percent, params.hc->ctx_val_is_percent_length, "ctx_val_is_percent", opts.proj_time_steps),
       .hc_art_is_age_spec = read_data<int>(params.hc->hc_art_is_age_spec, params.hc->hc_art_is_age_spec_length, "hc_art_is_age_spec", opts.proj_time_steps),
       .abortion = read_data<real_type>(params.hc->abortion, params.hc->abortion_length, "abortion", SS::hAB_ind, opts.proj_time_steps),

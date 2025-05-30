@@ -166,7 +166,6 @@ In 5 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 | mat_prev_input     | children.mat_prev_input                  | Boolean vector indicating if input mat_hiv_births should be used for vertical transmission rather than results from adult model                                       |
 | prop_lt200         | children.prop_lt200                      | Proportion of WLHIV with CD4 less than 200 by year                                                                                                                    |
 | prop_gte350        | children.prop_gte350                     | Proportion of WLHIV with CD4 greater than 350 by year                                                                                                                 |
-| incrate            | children.incrate                         | Incidence rate among women 15-49y by year                                                                                                                             |
 
 ## Outputs
 
@@ -224,8 +223,6 @@ In 5 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 | hivn_ag                   | hiv_negative_pop                | HIV negative population for a given age and sex                           |
 | Xhivn                     | hiv_neg_aggregate               |                                                                           |
 | Xhivn_incagerr            | ?                               |                                                                           |
-| incrate_i                 |                                 | Incidence rate input                                                      |
-| incrate_g                 | rate_sex                        | Incidence rate by sex                                                     |
 | hivdeaths_ha              | hiv_deaths_age_sex              |                                                                           |
 | grad                      | grad                            | Movement between cd4 categories at a given time step                      |
 | artpop_hahm               |                                 |                                                                           |

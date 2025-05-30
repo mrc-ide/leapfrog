@@ -320,7 +320,6 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
       .mat_prev_input = parse_data<int>(data, "mat_prev_input", opts.proj_time_steps),
       .prop_lt200 = parse_data<real_type>(data, "prop_lt200", opts.proj_time_steps),
       .prop_gte350 = parse_data<real_type>(data, "prop_gte350", opts.proj_time_steps),
-      .incrate = parse_data<real_type>(data, "incrate", opts.proj_time_steps),
       .ctx_val_is_percent = parse_data<int>(data, "ctx_val_ispercent", opts.proj_time_steps),
       .hc_art_is_age_spec = parse_data<int>(data, "paed_art_age_spec", opts.proj_time_steps),
       .abortion = parse_data<real_type>(data, "abortion", SS::hAB_ind, opts.proj_time_steps),
