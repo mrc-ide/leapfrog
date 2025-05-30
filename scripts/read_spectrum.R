@@ -821,17 +821,17 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   mtct_trt[,2,1] <-  mtct_rates_input[8,1]/100
   mtct_trt[,3,1] <- mtct_rates_input[5,1]/100
   mtct_trt[,4,1] <- mtct_rates_input[6,1]/100
-  mtct_trt[5:7,1,2] <- mtct_rates_input[7,3]/100
-  mtct_trt[5:7,2,2] <- mtct_rates_input[8,3]/100
-  mtct_trt[1:4,3,2] <- mtct_rates_input[5,2]/100
-  mtct_trt[5:7,3,2] <- mtct_rates_input[5,3]/100
+  mtct_trt[3:7,1,2] <- mtct_rates_input[7,3]/100
+  mtct_trt[3:7,2,2] <- mtct_rates_input[8,3]/100
+  mtct_trt[1:2,3,2] <- mtct_rates_input[5,2]/100
+  mtct_trt[3:7,3,2] <- mtct_rates_input[5,3]/100
   mtct_trt[,4,2] <- mtct_rates_input[6,3]/100
   mtct_trt[,5,1] <- mtct_rates_input[9,1]/100
   mtct_trt[,6,1] <- mtct_rates_input[10,1]/100
   mtct_trt[,7,1] <- mtct_rates_input[11,1]/100
-  mtct_trt[5:7,5,2] <- mtct_rates_input[9,2]/100
-  mtct_trt[5:7,6,2] <- mtct_rates_input[10,2]/100
-  mtct_trt[5:7,7,2] <- mtct_rates_input[11,2]/100
+  mtct_trt[3:7,5,2] <- mtct_rates_input[9,2]/100
+  mtct_trt[3:7,6,2] <- mtct_rates_input[10,2]/100
+  mtct_trt[3:7,7,2] <- mtct_rates_input[11,2]/100
   v$pmtct_mtct <- mtct_trt
 
   mtct <- array(data = NA, dim = c(8,2), dimnames = list(cd4 = c('>500', '350-500', '250-349', '200-249', '100-199', '50-99', '<50', 'INFECTION'), trans_type = c('perinatal', 'bf')))
