@@ -59,7 +59,7 @@ DllExport HRESULT WINAPI run_aim(leapfrog::internal::CParams<double> &data,
    leapfrog::internal::CState<double> &out,
    CallbackFunction error_handler) {
 #pragma EXPORT
-return fit_model<leapfrog::HivFullAgeStratification>(data, options, out, error_handler);
+return fit_model<leapfrog::ChildModel>(data, options, out, error_handler);
 }
 
 template <typename ModelVariant>
