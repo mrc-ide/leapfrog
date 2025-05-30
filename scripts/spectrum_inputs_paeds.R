@@ -78,10 +78,10 @@ input_abortion <- function(pjnz){
   abort$pregtermabortion_ispercent[is.na(abort$pregtermabortion_ispercent)] <- TRUE
   abort$pregtermabortion[abort$pregtermabortion_ispercent] <- abort$pregtermabortion[abort$pregtermabortion_ispercent] / 100
 
-  out <- array(data = NA, dim = c(1, length(abort$pregtermabortion), 2), dimnames = list(val = '', year = names(abort$pregtermabortion), type = c('value', 'ispercent')))
-  out[,,1] <- abort$pregtermabortion
+  out <- array(data = NA, dim = c(2, length(abort$pregtermabortion)), dimnames = list(type = c('value', 'ispercent'), year = names(abort$pregtermabortion)))
+  out[1,] <- abort$pregtermabortion
   ##this is changing to 0/1
-  out[,,2] <- abort$pregtermabortion_ispercent
+  out[2,] <- abort$pregtermabortion_ispercent
 
   out
 }

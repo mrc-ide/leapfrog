@@ -253,10 +253,10 @@ struct ChildModelSimulation<Config> {
     const auto& p_hc = pars.hc;
     auto& n_hc = state_next.hc;
 
-    if (p_hc.abortion(t, 1) == 1) {
-      n_hc.hiv_births -= n_hc.hiv_births * p_hc.abortion(t, 0);
+    if (p_hc.abortion(1, t) == 1) {
+      n_hc.hiv_births -= n_hc.hiv_births * p_hc.abortion(0, t);
     } else {
-      n_hc.hiv_births -=  p_hc.abortion(t, 0);
+      n_hc.hiv_births -=  p_hc.abortion(0, t);
     }
   };
 
