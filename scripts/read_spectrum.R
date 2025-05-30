@@ -863,50 +863,14 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   art_elig = dp_read_paed_art_eligibility(dp.x)
   v$paed_art_elig_age <- as.integer(art_elig$age_elig / 12) ##converts from months to years
 
-  ##MKW: stopped here
   cd4_elig <- art_elig$cd4_elig[c(5:7,4),]
   ##Changing the input from CD4 count or percentages to ordinal categories
   ###Easier to do it here than in the leapfrog code
-  get_ordinal <- function(vec){
-    out <- c()
-    for (i in 1:length(vec)) {
-      if(vec[i] >= 1000){
-        val = 1
-      }else if( vec[i] >= 750){
-        val = 2
-      }else if(vec[i] >= 500 ){
-        val = 3
-      }else if(vec[i] >= 350 ){
-        val = 4
-      }else if(vec[i] >= 200 ){
-        val = 5
-      }else if(vec[i] >= 50 ){
-        val = 6
-      }else if(vec[i] > 30 ){
-        val = 0
-      }else if(vec[i] >= 26 ){
-        val = 1
-      }else if(vec[i] >= 21 ){
-        val = 2
-      }else if(vec[i] >= 16 ){
-        val = 3
-      }else if(vec[i] >= 11 ){
-        val = 4
-      }else if(vec[i] >= 5 ){
-        val = 5
-      }else {
-        val = 6
-      }
-      out[i] <- val
-    }
-    out
-  }
-
   paed_art_elig_cd4 <- array(data = NA, dim = c(15, length(year.idx)), dimnames = list(age = c(0:14), year = c(proj.years)))
-  paed_art_elig_cd4[1,] <- get_ordinal(unname(cd4_elig[1,]))
-  paed_art_elig_cd4[2:3,] <- get_ordinal(unname(cd4_elig[2,]))
-  paed_art_elig_cd4[4:5,] <- get_ordinal(unname(cd4_elig[3,]))
-  paed_art_elig_cd4[6:15,] <- rep(get_ordinal(cd4_elig[4,]), each = length(6:15))
+  paed_art_elig_cd4[1,] <- findInterval(-unname(cd4_elig[1,]), -c(31, 30, 25, 20, 15, 10, 5))
+  paed_art_elig_cd4[2:3,] <- findInterval(-unname(cd4_elig[2,]), -c(31, 30, 25, 20, 15, 10, 5))
+  paed_art_elig_cd4[4:5,] <- findInterval(-unname(cd4_elig[3,]), -c(31, 30, 25, 20, 15, 10, 5))
+  paed_art_elig_cd4[6:15,] <- rep(findInterval(-unname(cd4_elig[4,]), -c(1001, 1000, 750, 500, 350, 200)), each = length(6:15))
   v$paed_art_elig_cd4 <- paed_art_elig_cd4
 
 
@@ -922,13 +886,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   paed_cd4_transition[1:6,7] <- c(0, 0.0014, 0.00990099, 0.00710071, 0.04960496, 0.931993199)
   paed_cd4_transition[6,1] <- 1 - sum(paed_cd4_transition[-6,1])
   paed_cd4_transition[6,7] <- 1 - sum(paed_cd4_transition[-6,7])
-  # paed_cd4_transition[1:2,1] <- c(0.71, 0.29)
-  # paed_cd4_transition[2:3,2] <- c(0.6, 0.4)
-  # paed_cd4_transition[3:4,3] <- c(0.83, 0.17)
-  # paed_cd4_transition[4:5,4] <- c(0.77, 0.23)
-  # paed_cd4_transition[5:6,5] <- c(0.89, 0.11)
-  # paed_cd4_transition[6,6] <- c(1)
-  # paed_cd4_transition[6,7] <- c(1)
+
 
   v$paed_cd4_transition <- paed_cd4_transition
 

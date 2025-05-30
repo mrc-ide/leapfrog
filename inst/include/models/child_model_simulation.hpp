@@ -724,7 +724,7 @@ struct ChildModelSimulation<Config> {
       for (int cat = 0; cat < hcTT; ++cat) {
         for (int a = p_hc.hc_art_elig_age(t); a < p_idx_fertility_first; ++a) {
           for (int hd = 0; hd < hc1DS; ++hd) {
-            if (hd > p_hc.hc_art_elig_cd4(a, t)) {
+            if (hd >= p_hc.hc_art_elig_cd4(a, t)) {
               if (a < hc2_agestart) {
                 n_hc.hc_art_need_init(hd, cat, a, s) += n_hc.hc1_hiv_pop(hd, cat, a, s);
               } else if (hd < hc2DS) {
@@ -781,7 +781,7 @@ struct ChildModelSimulation<Config> {
       for (int cat = 0; cat < hcTT; ++cat) {
         for (int a = hc2_agestart; a < p_idx_fertility_first; ++a) {
           for (int hd = 0; hd < hc2DS; ++hd) {
-            if (a < p_hc.hc_art_elig_age(t) || hd > p_hc.hc_art_elig_cd4(a, t - 1)) {
+            if (a < p_hc.hc_art_elig_age(t) || hd >= p_hc.hc_art_elig_cd4(a, t - 1)) {
               n_hc.ctx_need += c_hc.hc2_hiv_pop(hd, cat, a - hc2_agestart, s);
             }
           } // end hc1DS
