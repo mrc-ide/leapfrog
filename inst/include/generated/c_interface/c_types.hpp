@@ -131,15 +131,12 @@ struct HcParams {
   int hc_art_val_length;
   real_type* hc_art_init_dist;
   int hc_art_init_dist_length;
-<<<<<<< HEAD
   real_type* fert_mult_by_age;
   int fert_mult_by_age_length;
   real_type* fert_mult_off_art;
   int fert_mult_off_art_length;
   real_type* fert_mult_on_art;
   int fert_mult_on_art_length;
-=======
->>>>>>> 1a966f4 (Move static parameters into C++ code instead of requiring it to be passed in)
   real_type* total_fertility_rate;
   int total_fertility_rate_length;
   real_type* PMTCT;

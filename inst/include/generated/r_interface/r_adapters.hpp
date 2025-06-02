@@ -305,12 +305,9 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
       .hc_art_isperc = parse_data<int>(data, "artpaeds_isperc", opts.proj_time_steps),
       .hc_art_val = parse_data<real_type>(data, "paed_art_val", SS::hcAG_coarse, opts.proj_time_steps),
       .hc_art_init_dist = parse_data<real_type>(data, "init_art_dist", SS::p_idx_hiv_first_adult, opts.proj_time_steps),
-<<<<<<< HEAD
       .fert_mult_by_age = parse_data<real_type>(data, "fert_rat", SS::hAG_fert, opts.proj_time_steps),
       .fert_mult_off_art = parse_data<real_type>(data, "cd4fert_rat", SS::hDS),
       .fert_mult_on_art = parse_data<real_type>(data, "frr_art6mos", SS::hAG_fert),
-=======
->>>>>>> 1a966f4 (Move static parameters into C++ code instead of requiring it to be passed in)
       .total_fertility_rate = parse_data<real_type>(data, "tfr", opts.proj_time_steps),
       .PMTCT = parse_data<real_type>(data, "pmtct", SS::hPS, opts.proj_time_steps),
       .vertical_transmission_rate = parse_data<real_type>(data, "mtct", SS::hDS + 1, SS::hVT),

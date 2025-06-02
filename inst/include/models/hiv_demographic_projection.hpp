@@ -196,48 +196,15 @@ struct HivDemographicProjection<Config> {
       constexpr int hc2DS = SS::hc2DS;
       constexpr auto adult_cd4_dist = SS::adult_cd4_dist;
 
-<<<<<<< HEAD
-=======
-      // Transition matrix converting 5-14y CD4 categories to adult CD4 categories
-      const auto adult_cd4_dist = []() {
-        Eigen::TensorFixedSize<double, Eigen::Sizes<hDS, hc2DS>> tensor;
-
-        for (int i = 0; i < hDS; ++i) {
-          for (int j = 0; j < hc2DS; ++j) {
-            tensor(i, j) = 0.0;
-          }
-        }
-
-        tensor(0, 0) = 1.0;
-        tensor(0, 1) = 1.0;
-        tensor(0, 2) = 1.0;
-        tensor(1, 3) = 1.0;
-        tensor(2, 4) = 0.6665589;
-        tensor(3, 4) = 1.0 - 0.6665589;
-        tensor(4, 5) = 0.35;
-        tensor(5, 5) = 0.21;
-        tensor(6, 5) = 0.44;
-
-        return tensor;
-      }();
-
->>>>>>> 1a966f4 (Move static parameters into C++ code instead of requiring it to be passed in)
       auto& i_hc = intermediate.hc;
 
       for (int g = 0; g < NS; ++g) {
         for (int hm = 0; hm < hDS; ++hm) {
           for (int hm_adol = 0; hm_adol < hc2DS; ++hm_adol){
-<<<<<<< HEAD
             n_ha.h_hiv_adult(hm, 0, g) += i_hc.age15_hiv_pop(hm_adol, g) * adult_cd4_dist[hm][hm_adol];
             if ((t > opts.ts_art_start)) {
               for (int hu = 0; hu < hTS; ++hu) {
                 n_ha.h_art_adult(hu,hm, 0, g) += i_hc.age15_art_pop(hu, hm_adol, g) * adult_cd4_dist[hm][hm_adol];
-=======
-            n_ha.h_hiv_adult(hm, 0, g) += i_hc.age15_hiv_pop(hm_adol, g) * adult_cd4_dist(hm, hm_adol);
-            if ((t > opts.ts_art_start)) {
-              for (int hu = 0; hu < hTS; ++hu) {
-                n_ha.h_art_adult(hu,hm, 0, g) += i_hc.age15_art_pop(hu, hm_adol, g) * adult_cd4_dist(hm, hm_adol);
->>>>>>> 1a966f4 (Move static parameters into C++ code instead of requiring it to be passed in)
               }
             }
           }

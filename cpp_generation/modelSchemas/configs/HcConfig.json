@@ -166,7 +166,6 @@
           "r": "init_art_dist"
         }
       },
-<<<<<<< HEAD
       "fert_mult_by_age": {
         "type": "TM",
         "num_type": "real_type",
@@ -191,8 +190,6 @@
           "r": "frr_art6mos"
         }
       },
-=======
->>>>>>> 1a966f4 (Move static parameters into C++ code instead of requiring it to be passed in)
       "total_fertility_rate": {
         "type": "TM",
         "num_type": "real_type",

@@ -39,16 +39,15 @@ build_name_mapping <- function() {
 }
 
 prepare_input_data <- function(input_data) {
-  # convert indices to 0 based
-  if ("artcd4elig_idx" %in% names(input_data)) {
-    # integer type
-    input_data[["artcd4elig_idx"]] <- input_data[["artcd4elig_idx"]] - 1L
+  # Convert indices to 0 based
+  # TODO: Remove this in the future, we should -1 off
+  # before we serialize the data
+  if ("artcd4elig_idx" %in% names(parameters)) {
+    parameters[["artcd4elig_idx"]] <- parameters[["artcd4elig_idx"]] - 1L
   }
-  if ("paed_art_elig_cd4" %in% names(input_data)) {
-    # double type
-    input_data[["paed_art_elig_cd4"]] <- input_data[["paed_art_elig_cd4"]] - 1
+  if ("paed_art_elig_cd4" %in% names(parameters)) {
+    parameters[["paed_art_elig_cd4"]] <- parameters[["paed_art_elig_cd4"]] - 1L
   }
-
   hTS <- dim(input_data[["artmx_timerr"]])[[1]]
   input_data$h_art_stage_dur <- rep(0.5, hTS - 1)
   input_data

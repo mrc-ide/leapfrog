@@ -866,11 +866,13 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   cd4_elig <- art_elig$cd4_elig[c(5:7,4),]
   ##Changing the input from CD4 count or percentages to ordinal categories
   ###Easier to do it here than in the leapfrog code
+  paed_cd4_percent_intervals <- c(31, 30, 25, 20, 15, 10, 5)
+  paed_cd4_number_intervals <- c(1001, 1000, 750, 500, 350, 200)
   paed_art_elig_cd4 <- array(data = NA, dim = c(15, length(year.idx)), dimnames = list(age = c(0:14), year = c(proj.years)))
-  paed_art_elig_cd4[1,] <- findInterval(-unname(cd4_elig[1,]), -c(31, 30, 25, 20, 15, 10, 5))
-  paed_art_elig_cd4[2:3,] <- findInterval(-unname(cd4_elig[2,]), -c(31, 30, 25, 20, 15, 10, 5))
-  paed_art_elig_cd4[4:5,] <- findInterval(-unname(cd4_elig[3,]), -c(31, 30, 25, 20, 15, 10, 5))
-  paed_art_elig_cd4[6:15,] <- rep(findInterval(-unname(cd4_elig[4,]), -c(1001, 1000, 750, 500, 350, 200)), each = length(6:15))
+  paed_art_elig_cd4[1,] <- findInterval(-unname(cd4_elig[1,]), -paed_cd4_percent_intervals)
+  paed_art_elig_cd4[2:3,] <- findInterval(-unname(cd4_elig[2,]), -paed_cd4_percent_intervals)
+  paed_art_elig_cd4[4:5,] <- findInterval(-unname(cd4_elig[3,]), -paed_cd4_percent_intervals)
+  paed_art_elig_cd4[6:15,] <- rep(findInterval(-unname(cd4_elig[4,]), -paed_cd4_number_intervals), each = length(6:15))
   v$paed_art_elig_cd4 <- paed_art_elig_cd4
 
 

@@ -212,15 +212,12 @@ type
     hcArtValLength: Integer;
     hcArtInitDist: PDouble;
     hcArtInitDistLength: Integer;
-<<<<<<< HEAD
     fertMultByAge: PDouble;
     fertMultByAgeLength: Integer;
     fertMultOffArt: PDouble;
     fertMultOffArtLength: Integer;
     fertMultOnArt: PDouble;
     fertMultOnArtLength: Integer;
-=======
->>>>>>> 1a966f4 (Move static parameters into C++ code instead of requiring it to be passed in)
     totalFertilityRate: PDouble;
     totalFertilityRateLength: Integer;
     pmtct: PDouble;
@@ -287,12 +284,9 @@ type
     hcArtIsperc: TGBFixedArray<Integer>;
     hcArtVal: TGBFixedArray<Double>;
     hcArtInitDist: TGBFixedArray<Double>;
-<<<<<<< HEAD
     fertMultByAge: TGBFixedArray<Double>;
     fertMultOffArt: TGBFixedArray<Double>;
     fertMultOnArt: TGBFixedArray<Double>;
-=======
->>>>>>> 1a966f4 (Move static parameters into C++ code instead of requiring it to be passed in)
     totalFertilityRate: TGBFixedArray<Double>;
     pmtct: TGBFixedArray<Double>;
     verticalTransmissionRate: TGBFixedArray<Double>;
@@ -558,12 +552,9 @@ begin;
   hcArtIsperc.Free;
   hcArtVal.Free;
   hcArtInitDist.Free;
-<<<<<<< HEAD
   fertMultByAge.Free;
   fertMultOffArt.Free;
   fertMultOnArt.Free;
-=======
->>>>>>> 1a966f4 (Move static parameters into C++ code instead of requiring it to be passed in)
   totalFertilityRate.Free;
   pmtct.Free;
   verticalTransmissionRate.Free;
@@ -638,15 +629,12 @@ begin;
   Result.hcArtValLength := hcArtVal.GetLength();
   Result.hcArtInitDist := PDouble(hcArtInitDist.data);
   Result.hcArtInitDistLength := hcArtInitDist.GetLength();
-<<<<<<< HEAD
   Result.fertMultByAge := PDouble(fertMultByAge.data);
   Result.fertMultByAgeLength := fertMultByAge.GetLength();
   Result.fertMultOffArt := PDouble(fertMultOffArt.data);
   Result.fertMultOffArtLength := fertMultOffArt.GetLength();
   Result.fertMultOnArt := PDouble(fertMultOnArt.data);
   Result.fertMultOnArtLength := fertMultOnArt.GetLength();
-=======
->>>>>>> 1a966f4 (Move static parameters into C++ code instead of requiring it to be passed in)
   Result.totalFertilityRate := PDouble(totalFertilityRate.data);
   Result.totalFertilityRateLength := totalFertilityRate.GetLength();
   Result.pmtct := PDouble(pmtct.data);
@@ -797,6 +785,9 @@ begin;
   hcArtIsperc.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hcArtIsperc');
   hcArtVal.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hcArtVal');
   hcArtInitDist.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hcArtInitDist');
+  fertMultByAge.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'fertMultByAge');
+  fertMultOffArt.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'fertMultOffArt');
+  fertMultOnArt.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'fertMultOnArt');
   totalFertilityRate.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'totalFertilityRate');
   pmtct.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pmtct');
   verticalTransmissionRate.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'verticalTransmissionRate');
