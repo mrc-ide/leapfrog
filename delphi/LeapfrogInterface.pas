@@ -7,7 +7,7 @@ unit LeapfrogInterface;
 
 interface
 
-uses GBFixedArray;
+uses SysUtils, GBFixedArray;
 
 {$ALIGN 8}
 type
@@ -48,6 +48,7 @@ type
     ageSpecificFertilityRate: TGBFixedArray<Double>;
     birthsSexProp: TGBFixedArray<Double>;
     function getView(): LeapfrogDemProjParamsView;
+    procedure writeToDisk(dir: string);
     Destructor Destroy; override;
 end;
 
@@ -70,6 +71,7 @@ type
     pTotalPopBackgroundDeaths: TGBFixedArray<Double>;
     births: TGBFixedArray<Double>;
     function getView(): LeapfrogDemProjStateView;
+    procedure writeToDisk(dir: string);
     Destructor Destroy; override;
 end;
 
@@ -131,6 +133,7 @@ type
     initiationMortalityWeight: Double;
     hArtStageDur: TGBFixedArray<Double>;
     function getView(): LeapfrogHivAdultParamsView;
+    procedure writeToDisk(dir: string);
     Destructor Destroy; override;
 end;
 
@@ -171,6 +174,7 @@ type
     hArtInitiation: TGBFixedArray<Double>;
     pHivDeaths: TGBFixedArray<Double>;
     function getView(): LeapfrogHivAdultStateView;
+    procedure writeToDisk(dir: string);
     Destructor Destroy; override;
 end;
 
@@ -313,6 +317,7 @@ type
     hcArtStart: Integer;
     localAdjFactor: Double;
     function getView(): LeapfrogHivChildParamsView;
+    procedure writeToDisk(dir: string);
     Destructor Destroy; override;
 end;
 
@@ -365,6 +370,7 @@ type
     ctxNeed: TGBFixedArray<Double>;
     infectionByType: TGBFixedArray<Double>;
     function getView(): LeapfrogHivChildStateView;
+    procedure writeToDisk(dir: string);
     Destructor Destroy; override;
 end;
 
@@ -433,7 +439,6 @@ begin;
   Result.ageSpecificFertilityRateLength := ageSpecificFertilityRate.GetLength();
   Result.birthsSexProp := PDouble(birthsSexProp.data);
   Result.birthsSexPropLength := birthsSexProp.GetLength();
-  inherited;
 end;
 
 function LeapfrogDemProjState.getView(): LeapfrogDemProjStateView;
@@ -444,7 +449,6 @@ begin;
   Result.pTotalPopBackgroundDeathsLength := pTotalPopBackgroundDeaths.GetLength();
   Result.births := PDouble(births.data);
   Result.birthsLength := births.GetLength();
-  inherited;
 end;
 
 destructor LeapfrogHivAdultParams.Destroy;
@@ -513,7 +517,6 @@ begin;
   Result.initiationMortalityWeightLength := 1;
   Result.hArtStageDur := PDouble(hArtStageDur.data);
   Result.hArtStageDurLength := hArtStageDur.GetLength();
-  inherited;
 end;
 
 function LeapfrogHivAdultState.getView(): LeapfrogHivAdultStateView;
@@ -536,7 +539,6 @@ begin;
   Result.hArtInitiationLength := hArtInitiation.GetLength();
   Result.pHivDeaths := PDouble(pHivDeaths.data);
   Result.pHivDeathsLength := pHivDeaths.GetLength();
-  inherited;
 end;
 
 destructor LeapfrogHivChildParams.Destroy;
@@ -691,7 +693,6 @@ begin;
   Result.hcArtStartLength := 1;
   Result.localAdjFactor := localAdjFactor;
   Result.localAdjFactorLength := 1;
-  inherited;
 end;
 
 function LeapfrogHivChildState.getView(): LeapfrogHivChildStateView;
@@ -722,7 +723,118 @@ begin;
   Result.ctxNeedLength := ctxNeed.GetLength();
   Result.infectionByType := PDouble(infectionByType.data);
   Result.infectionByTypeLength := infectionByType.GetLength();
-  inherited;
+end;
+
+procedure LeapfrogDemProjParams.writeToDisk(dir: string);
+begin;
+  if not DirectoryExists(dir) then
+    ForceDirectories(dir);
+  basePop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'basePop');
+  survivalProbability.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'survivalProbability');
+  netMigration.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'netMigration');
+  ageSpecificFertilityRate.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'ageSpecificFertilityRate');
+  birthsSexProp.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'birthsSexProp');
+end;
+
+procedure LeapfrogDemProjState.writeToDisk(dir: string);
+begin;
+  if not DirectoryExists(dir) then
+    ForceDirectories(dir);
+  pTotalPop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pTotalPop');
+  pTotalPopBackgroundDeaths.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pTotalPopBackgroundDeaths');
+end;
+
+procedure LeapfrogHivAdultParams.writeToDisk(dir: string);
+begin;
+  if not DirectoryExists(dir) then
+    ForceDirectories(dir);
+  totalRate.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'totalRate');
+  relativeRiskAge.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'relativeRiskAge');
+  relativeRiskSex.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'relativeRiskSex');
+  cd4Mortality.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'cd4Mortality');
+  cd4Progression.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'cd4Progression');
+  cd4InitialDistribution.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'cd4InitialDistribution');
+  idxHmElig.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'idxHmElig');
+  mortality.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'mortality');
+  mortalityTimeRateRatio.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'mortalityTimeRateRatio');
+  dropoutRate.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'dropoutRate');
+  adultsOnArt.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'adultsOnArt');
+  adultsOnArtIsPercent.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'adultsOnArtIsPercent');
+  hArtStageDur.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hArtStageDur');
+end;
+
+procedure LeapfrogHivAdultState.writeToDisk(dir: string);
+begin;
+  if not DirectoryExists(dir) then
+    ForceDirectories(dir);
+  pHivPop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pHivPop');
+  pHivPopBackgroundDeaths.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pHivPopBackgroundDeaths');
+  hHivAdult.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hHivAdult');
+  hArtAdult.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hArtAdult');
+  hHivDeathsNoArt.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hHivDeathsNoArt');
+  pInfections.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pInfections');
+  hHivDeathsArt.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hHivDeathsArt');
+  hArtInitiation.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hArtInitiation');
+  pHivDeaths.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pHivDeaths');
+end;
+
+procedure LeapfrogHivChildParams.writeToDisk(dir: string);
+begin;
+  if not DirectoryExists(dir) then
+    ForceDirectories(dir);
+  hcNosocomial.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hcNosocomial');
+  hc1Cd4Dist.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hc1Cd4Dist');
+  hc1Cd4Mort.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hc1Cd4Mort');
+  hc2Cd4Mort.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hc2Cd4Mort');
+  hc1Cd4Prog.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hc1Cd4Prog');
+  hc2Cd4Prog.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hc2Cd4Prog');
+  ctxVal.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'ctxVal');
+  hcArtEligAge.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hcArtEligAge');
+  hcArtEligCd4.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hcArtEligCd4');
+  hcArtMortRr.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hcArtMortRr');
+  hc1ArtMort.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hc1ArtMort');
+  hc2ArtMort.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hc2ArtMort');
+  hcArtIsperc.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hcArtIsperc');
+  hcArtVal.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hcArtVal');
+  hcArtInitDist.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hcArtInitDist');
+  totalFertilityRate.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'totalFertilityRate');
+  pmtct.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pmtct');
+  verticalTransmissionRate.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'verticalTransmissionRate');
+  pmtctTransmissionRate.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pmtctTransmissionRate');
+  pmtctDropout.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pmtctDropout');
+  pmtctInputIsPercent.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pmtctInputIsPercent');
+  breastfeedingDurationArt.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'breastfeedingDurationArt');
+  breastfeedingDurationNoArt.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'breastfeedingDurationNoArt');
+  matHivBirths.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'matHivBirths');
+  matPrevInput.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'matPrevInput');
+  propLt200.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'propLt200');
+  propGte350.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'propGte350');
+  ctxValIsPercent.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'ctxValIsPercent');
+  hcArtIsAgeSpec.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hcArtIsAgeSpec');
+  abortion.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'abortion');
+  patientsReallocated.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'patientsReallocated');
+  hcArtLtfu.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hcArtLtfu');
+  adultFemaleInfections.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'adultFemaleInfections');
+  adultFemaleHivnpop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'adultFemaleHivnpop');
+  totalBirths.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'totalBirths');
+  ctxEffect.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'ctxEffect');
+end;
+
+procedure LeapfrogHivChildState.writeToDisk(dir: string);
+begin;
+  if not DirectoryExists(dir) then
+    ForceDirectories(dir);
+  hc1HivPop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hc1HivPop');
+  hc2HivPop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hc2HivPop');
+  hc1ArtPop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hc1ArtPop');
+  hc2ArtPop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hc2ArtPop');
+  hc1NoartAidsDeaths.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hc1NoartAidsDeaths');
+  hc2NoartAidsDeaths.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hc2NoartAidsDeaths');
+  hc1ArtAidsDeaths.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hc1ArtAidsDeaths');
+  hc2ArtAidsDeaths.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hc2ArtAidsDeaths');
+  hcArtInit.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hcArtInit');
+  hcArtNeedInit.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hcArtNeedInit');
+  infectionByType.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'infectionByType');
 end;
 
 procedure LeapfrogParams.SetDemProjParams(const demprojParams: LeapfrogDemProjParamsView);

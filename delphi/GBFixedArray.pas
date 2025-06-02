@@ -90,4 +90,42 @@ begin
     Result := @FData[0];
 end;
 
+procedure TGBFixedArray<T>.WriteToDisk(path: string);
+var
+  sl: TStringList;
+  typeName: string;
+  dimStr: string;
+  dataStr: string;
+  i: Integer;
+begin
+  sl := TStringList.Create();
+  try
+    typeName := GetTypeName(TypeInfo(T)).ToLower;
+
+    dimStr := '';
+    for i := 0 to Length(FDims) - 1 do
+    begin
+      dimStr := dimStr + FDims[i].ToString;
+      if i < Length(FDims) - 1 then
+        dimStr := dimStr + ',';
+    end;
+
+    dataStr := '';
+    for i := 0 to Length(FData) - 1 do
+    begin
+      dataStr := dataStr + TValue.From<T>(FData[i]).toString();
+      if i < Length(FData) - 1 then
+        dataStr := dataStr + ',';
+    end;
+
+    sl.Add(typeName);
+    sl.Add(dimStr);
+    sl.Add(dataStr);
+
+    sl.SaveToFile(path);
+  finally
+    sl.Free;
+  end;
+end;
+
 end.
