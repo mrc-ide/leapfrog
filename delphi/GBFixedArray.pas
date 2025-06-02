@@ -3,7 +3,8 @@ unit GBFixedArray;
 interface
 
 uses
-  System.SysUtils, System.Generics.Defaults, System.Generics.Collections;
+  System.SysUtils, System.Classes, System.TypInfo, System.Rtti,
+  System.Generics.Defaults, System.Generics.Collections;
 
 // This is a runtime fixed length array compared to the Delphi built-in
 // fixed-length array which must be known at compile time.
@@ -28,6 +29,7 @@ type
     property Values[Indices: array of Integer]: T read GetValue write SetValue; default;
 
     function GetLength(): Integer;
+    procedure WriteToDisk(path: string);
 
     function DataPointer: P;
     property Data: P read DataPointer;
