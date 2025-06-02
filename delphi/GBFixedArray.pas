@@ -104,6 +104,11 @@ begin
   try
     typeName := GetTypeName(TypeInfo(T)).ToLower;
 
+    // This data format gets deserialized in C++
+    // so use the C++ typename.
+    if typeName = 'integer' then
+      typeName := 'int';
+
     dimStr := '';
     for i := 0 to Length(FDims) - 1 do
     begin
