@@ -21,7 +21,8 @@
       "hBF": 18,
       "hBF_coarse": 4,
       "hcAG_coarse": 4,
-      "hAB_ind": 2
+      "hAB_ind": 2,
+      "hAG_fert": 7
     }
   },
   "pars": {
@@ -165,9 +166,9 @@
       "fert_mult_by_age": {
         "type": "TM",
         "num_type": "real_type",
-        "dims": ["SS::p_fertility_age_groups"],
+        "dims": ["SS::hAG_fert", "opts.proj_time_steps"],
         "alias": {
-          "r": "fert_mult_by_age"
+          "r": "fert_rat"
         }
       },
       "fert_mult_off_art": {
@@ -175,15 +176,15 @@
         "num_type": "real_type",
         "dims": ["SS::hDS"],
         "alias": {
-          "r": "fert_mult_offart"
+          "r": "cd4fert_rat"
         }
       },
       "fert_mult_on_art": {
         "type": "TM",
         "num_type": "real_type",
-        "dims": ["SS::p_fertility_age_groups"],
+        "dims": ["SS::hAG_fert"],
         "alias": {
-          "r": "fert_mult_onart"
+          "r": "frr_art6mos"
         }
       },
       "total_fertility_rate": {

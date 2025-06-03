@@ -57,6 +57,7 @@ struct HcSS {
   static constexpr int hBF_coarse = 4;
   static constexpr int hcAG_coarse = 4;
   static constexpr int hAB_ind = 2;
+  static constexpr int hAG_fert = 7;
 };
 
 
