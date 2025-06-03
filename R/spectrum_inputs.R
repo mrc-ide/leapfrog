@@ -131,8 +131,8 @@ prepare_leapfrog_parameters <- function(pjnz) {
   ## TODO: We're reading the PJNZ file several times below, revisit this,
   ## we should only have to read this in once
   dp <- prepare_leapfrog_demp(pjnz)
-  proj <- prepare_leapfrog_projp(pjnz)
-  c(dp, proj)
+  projp <- prepare_leapfrog_projp(pjnz)
+  c(dp, projp)
 }
 
 #' Prepare demographic inputs from Spectrum PJNZ
@@ -275,14 +275,12 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   v$cd4_initdist_full <- projp$cd4_initdist[ , idx_expand_full, ]
   v$cd4_prog_full <- (1-exp(-projp$cd4_prog[ , idx_expand_full, ] / hiv_steps_per_year)) * hiv_steps_per_year
   v$cd4_mort_full <- projp$cd4_mort[ ,idx_expand_full, ]
-  v$art_mort_full <- projp$art_mort[c(1, 2, rep(3, hTS - 2)), , idx_expand_full, ]
+  v$art_mort_full <- projp$artmx_multiplier * projp$art_mort[c(1, 2, rep(3, hTS - 2)), , idx_expand_full, ]
 
   v$cd4_initdist_coarse <- projp$cd4_initdist[ , idx_expand_coarse, ]
   v$cd4_prog_coarse <- (1-exp(-projp$cd4_prog[ , idx_expand_coarse, ] / hiv_steps_per_year)) * hiv_steps_per_year
   v$cd4_mort_coarse <- projp$cd4_mort[ ,idx_expand_coarse, ]
-  v$art_mort_coarse <- projp$art_mort[c(1, 2, rep(3, hTS - 2)), , idx_expand_coarse, ]
-
-
+  v$art_mort_coarse <- projp$artmx_multiplier * projp$art_mort[c(1, 2, rep(3, hTS - 2)), , idx_expand_coarse, ]
 
   v
 }
