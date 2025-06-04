@@ -272,7 +272,7 @@ struct HcConfig {
     TM2<real_type> hc_art_val;
     TM2<real_type> hc_art_init_dist;
     TM2<real_type> adult_cd4_dist;
-    TM1<real_type> fert_mult_by_age;
+    TM2<real_type> fert_mult_by_age;
     TM1<real_type> fert_mult_off_art;
     TM1<real_type> fert_mult_on_art;
     TM1<real_type> total_fertility_rate;

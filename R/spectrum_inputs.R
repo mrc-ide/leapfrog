@@ -228,16 +228,6 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
 
   v$adult_cd4_dist <- adult_cd4_dist_array
 
-
-  v$mtct_trans <- (c(0.15, 0.15, 0.27, 0.27, 0.37, 0.37, 0.37))
-
-  v$fert_mult_by_age <- rep(c(1.153260, 1.001870, 0.909590,0.912760, 0.883990, 0.883990, 0.883990), each = 5)
-
-  v$fert_mult_offart <- c(1, 0.96, 0.88, 0.78, 0.61, 0.38, 0.30)
-
-  v$fert_mult_onart <- rep(c(1.094460, 1.006870, 0.916170, 0.810910, 0.637220, 0.637220, 0.637220), each = 5)
-
-
   v$artmx_timerr <- projp$artmx_timerr[c(1, 2, rep(3, hTS - 2)), ]
 
   ## ## ART eligibility and numbers on treatment
@@ -247,7 +237,6 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
 
   ## convert percentage to proportion
   v$art15plus_num[v$art15plus_isperc] <- v$art15plus_num[v$art15plus_isperc] / 100
-
 
   ## eligibility starts in projection year idx
   ## ## !! NOTE: from EPP-ASM; not yet implemented
@@ -287,6 +276,7 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   v$cd4fert_rat <- projp$cd4fert_rat
   v$frr_art6mos <- projp$frr_art6mos
   v$frr_scalar <- projp$frr_scalar
+  v$fert_rat <- projp$fert_rat
   ## HIV positive entrants, right now just doing those without ART
   v$age15hivpop <- projp$age15hivpop
 
