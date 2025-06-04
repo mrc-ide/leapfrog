@@ -50,6 +50,9 @@ proj <- prepare_leapfrog_projp(pjnz)
 proj <- prepare_hc_leapfrog_projp(pjnz, proj)
 params <- c(demp, proj)
 params$mat_prev_input <- rep(FALSE, 61)
+params$basepop <- params$basepop[, , 1]
+# scale_cd4_mort is always true from Delphi so force true here
+params$scale_cd4_mort <- TRUE
 expected <- process_parameters(params, "ChildModel")
 
 delphi_params <- list.files(param_dirs, full.names = TRUE)
@@ -61,8 +64,7 @@ actual <- lapply(delphi_params, deserialize_tensor_to_r)
 ## the adult model, so we are expecting differences in these values
 dont_compare <- c("matPrevInput", "propLt200",
                   "propGte350", "matHivBirths",
-                  "adultFemaleInfections", "totalBirths",
-                  "basePop") ## basepop has additional dims from R
+                  "adultFemaleInfections", "totalBirths")
 
 compare <- names(actual)[!(names(actual) %in% dont_compare)]
 
@@ -83,11 +85,7 @@ delphi_output <- list.files(output_dirs, full.names = TRUE)
 delphi_output <- setNames(delphi_output, basename(delphi_output))
 actual_result <- lapply(delphi_output, deserialize_tensor_to_r)
 
-dont_compare <- c("pTotalPop", "pTotalPopBackgroundDeaths", "hArtAdult")
-
-compare <- names(actual_result)[!(names(actual_result) %in% dont_compare)]
-
-for (state in compare) {
+for (state in names(actual_result)) {
   message("Comparing ", state)
   r_name <- to_snake_case(state)
   compare_to <- expected_result[[r_name]]
