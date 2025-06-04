@@ -187,7 +187,8 @@ struct ChildModelSimulation<Config> {
       i_hc.nHIVcurr = 0.0;
       i_hc.nHIVlast = 0.0;
       i_hc.df = 0.0;
-      auto a_fert_idx = std::floor(a/5 - 3);
+      // Convert from single years to 5-year age group index
+      auto a_fert_idx = std::floor(a/5);
 
       for (int hd = 0; hd < hDS; ++hd) {
         i_hc.nHIVcurr += n_ha.h_hiv_adult(hd, a, 1);
