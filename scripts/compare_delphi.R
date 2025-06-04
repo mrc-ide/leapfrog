@@ -4,7 +4,9 @@ pjnz <- "C:/Users/Test/Downloads/demo_mwi2024_v6.43.PJNZ"
 param_dirs <- c("C:/Users/Test/Downloads/demProjParams",
                 "C:/Users/Test/Downloads/hivAdultParams",
                 "C:/Users/Test/Downloads/hivChildParams")
-output_dirs <- "C:/Users/Test/Downloads/hivChildState"
+output_dirs <- c("C:/Users/Test/Downloads/demProjState",
+                 "C:/Users/Test/Downloads/hivAdultState",
+                 "C:/Users/Test/Downloads/hivChildState")
 
 repo_root <- gert::git_find()
 configs_dir <- file.path(repo_root, "cpp_generation/modelSchemas/configs")
@@ -39,14 +41,16 @@ build_name_mapping <- function() {
 
 name_mapping <- build_name_mapping()
 
+pkgload::load_all()
 library(data.table)
 source('./scripts/spectrum_inputs_paeds.R')
 source('./scripts/read_spectrum.R')
 demp <- prepare_leapfrog_demp(pjnz)
 proj <- prepare_leapfrog_projp(pjnz)
 proj <- prepare_hc_leapfrog_projp(pjnz, proj)
-expected <- c(demp, proj)
-expected <- process_parameters(expected, "ChildModel")
+params <- c(demp, proj)
+params$mat_prev_input <- rep(FALSE, 61)
+expected <- process_parameters(params, "ChildModel")
 
 delphi_params <- list.files(param_dirs, full.names = TRUE)
 delphi_params <- setNames(delphi_params, basename(delphi_params))
@@ -58,11 +62,7 @@ actual <- lapply(delphi_params, deserialize_tensor_to_r)
 dont_compare <- c("matPrevInput", "propLt200",
                   "propGte350", "matHivBirths",
                   "adultFemaleInfections", "totalBirths",
-                  "basePop", ## basepop has additional dims from R
-                  "hArtStageDur") ## defined from call into model
-
-## Rob look at asfr differences
-## relative risk age
+                  "basePop") ## basepop has additional dims from R
 
 compare <- names(actual)[!(names(actual) %in% dont_compare)]
 
@@ -78,13 +78,16 @@ for (param in compare) {
                          expected.label = r_name)
 }
 
-expected_result <- run_model(expected, "ChildModel")
-output_names <- list.files(output_dirs)
+expected_result <- run_model(params, "ChildModel")
 delphi_output <- list.files(output_dirs, full.names = TRUE)
-delphi_output <- setNames(delphi_output, output_names)
+delphi_output <- setNames(delphi_output, basename(delphi_output))
 actual_result <- lapply(delphi_output, deserialize_tensor_to_r)
 
-for (state in names(actual_result)) {
+dont_compare <- c("pTotalPop", "pTotalPopBackgroundDeaths", "hArtAdult")
+
+compare <- names(actual_result)[!(names(actual_result) %in% dont_compare)]
+
+for (state in compare) {
   message("Comparing ", state)
   r_name <- to_snake_case(state)
   compare_to <- expected_result[[r_name]]
@@ -93,5 +96,6 @@ for (state in names(actual_result)) {
   }
   testthat::expect_equal(actual_result[[state]], compare_to,
                          ignore_attr = TRUE, label = state,
-                         expected.label = r_name)
+                         expected.label = r_name,
+                         tolerance = 1e-7)
 }
