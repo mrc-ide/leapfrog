@@ -216,21 +216,6 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   v$incidpopage <- attr(v$incidinput, "incidpopage")
   v$incrr_sex <- projp$incrr_sex
 
-<<<<<<< HEAD
-  adult_cd4_dist <- array(data = 0, dim = c(7,6), dimnames = list(adult_cd4_categories = c('>500', '350-500', '250-349', '200-249', '100-199', '50-99','<50'),
-                                                                   hc2_cd4_categories = c('>1000', '750-999', '500-749', '350-499', '200-349', '<200')))
-  adult_cd4_dist[1,1:3] <- 1
-  adult_cd4_dist[2,4] <- 1
-  adult_cd4_dist[3:4,5] <- c(0.6665589, 1-0.6665589)
-  adult_cd4_dist[5:7,6] <- c(0.35, 0.21, 0.44)
-
-
-  adult_cd4_dist_array <- adult_cd4_dist
-
-  v$adult_cd4_dist <- adult_cd4_dist_array
-
-=======
->>>>>>> 1a966f4 (Move static parameters into C++ code instead of requiring it to be passed in)
   v$artmx_timerr <- projp$artmx_timerr[c(1, 2, rep(3, hTS - 2)), ]
 
   ## ## ART eligibility and numbers on treatment

@@ -49,107 +49,9 @@ struct ChildModelSimulation<Config> {
   static constexpr int p_idx_fertility_first = SS::p_idx_fertility_first;
   static constexpr int p_fertility_age_groups = SS::p_fertility_age_groups;
   static constexpr int p_idx_hiv_first_adult = SS::p_idx_hiv_first_adult;
-
-  static constexpr std::array<int, hcAG_end> hc_age_coarse = {
-    1, 1, 1, 1, 1,
-    2, 2, 2, 2, 2,
-    3, 3, 3, 3, 3
-  };
-
-  static constexpr std::array<int, p_idx_hiv_first_adult> hc_age_coarse_cd4 = {
-    0, 0, 0,
-    1, 1,
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2
-  };
-
-  // CD4 mapping between 0-4 year olds and 5-14 year olds
-  const Eigen::TensorFixedSize<real_type, Eigen::Sizes<hc2DS, hc1DS>> hc_cd4_transition = []() {
-    Eigen::TensorFixedSize<real_type, Eigen::Sizes<hc2DS, hc1DS>> tensor;
-
-    tensor(0, 0) = 0.608439;
-    tensor(1, 0) = 0.185181;
-    tensor(2, 0) = 0.105789;
-    tensor(3, 0) = 0.055594;
-    tensor(4, 0) = 0.018498;
-    tensor(5, 0) = 0.026497;
-
-    tensor(0, 1) = 0.338733873;
-    tensor(1, 1) = 0.222622262;
-    tensor(2, 1) = 0.293529353;
-    tensor(3, 1) = 0.093509351;
-    tensor(4, 1) = 0.03550355;
-    tensor(5, 1) = 0.01610161;
-
-    tensor(0, 2) = 0.2004;
-    tensor(1, 2) = 0.2562;
-    tensor(2, 2) = 0.3636;
-    tensor(3, 2) = 0.1074;
-    tensor(4, 2) = 0.0579;
-    tensor(5, 2) = 0.0145;
-
-    tensor(0, 3) = 0.095;
-    tensor(1, 3) = 0.1693;
-    tensor(2, 3) = 0.3082;
-    tensor(3, 3) = 0.2497;
-    tensor(4, 3) = 0.1449;
-    tensor(5, 3) = 0.0329;
-
-    tensor(0, 4) = 0.03880388;
-    tensor(1, 4) = 0.090309031;
-    tensor(2, 4) = 0.275927593;
-    tensor(3, 4) = 0.259925993;
-    tensor(4, 4) = 0.255725573;
-    tensor(5, 4) = 0.079307931;
-
-    tensor(0, 5) = 0.018615705;
-    tensor(1, 5) = 0.018615705;
-    tensor(2, 5) = 0.099217744;
-    tensor(3, 5) = 0.165065848;
-    tensor(4, 5) = 0.363501337;
-    tensor(5, 5) = 0.334983662;
-
-    tensor(0, 6) = 0.0;
-    tensor(1, 6) = 0.0014;
-    tensor(2, 6) = 0.00990099;
-    tensor(3, 6) = 0.00710071;
-    tensor(4, 6) = 0.04960496;
-    tensor(5, 6) = 0.931993199;
-
-    real_type sum_col1 = tensor(0,0) + tensor(1,0) + tensor(2,0) + tensor(3,0) + tensor(4,0);
-    tensor(5, 0) = 1.0 - sum_col1;
-
-    real_type sum_col7 = tensor(0,6) + tensor(1,6) + tensor(2,6) + tensor(3,6) + tensor(4,6);
-    tensor(5, 6) = 1.0 - sum_col7;
-
-    return tensor;
-  }();
-
-  // Fertility ratio for WLHIV by age
-  static constexpr std::array<real_type, p_fertility_age_groups> fert_mult_by_age = {
-    1.153260, 1.153260, 1.153260, 1.153260, 1.153260,
-    1.001870, 1.001870, 1.001870, 1.001870, 1.001870,
-    0.909590, 0.909590, 0.909590, 0.909590, 0.909590,
-    0.912760, 0.912760, 0.912760, 0.912760, 0.912760,
-    0.883990, 0.883990, 0.883990, 0.883990, 0.883990,
-    0.883990, 0.883990, 0.883990, 0.883990, 0.883990,
-    0.883990, 0.883990, 0.883990, 0.883990, 0.883990
-};
-
-  // Fertility ratio for WLHIV not on treatment by CD4
-  static constexpr std::array<real_type, hDS> fert_mult_off_art = {
-    1.0, 0.96, 0.88, 0.78, 0.61, 0.38, 0.30
-  };
-
-  // Fertility ratio for WLHIV on treatment by age
-  static constexpr std::array<real_type, p_fertility_age_groups> fert_mult_on_art = {
-    1.094460, 1.094460, 1.094460, 1.094460, 1.094460,
-    1.006870, 1.006870, 1.006870, 1.006870, 1.006870,
-    0.916170, 0.916170, 0.916170, 0.916170, 0.916170,
-    0.810910, 0.810910, 0.810910, 0.810910, 0.810910,
-    0.637220, 0.637220, 0.637220, 0.637220, 0.637220,
-    0.637220, 0.637220, 0.637220, 0.637220, 0.637220,
-    0.637220, 0.637220, 0.637220, 0.637220, 0.637220
-  };
+  static constexpr auto hc_age_coarse = SS::hc_age_coarse;
+  static constexpr auto hc_age_coarse_cd4 = SS::hc_age_coarse_cd4;
+  static constexpr auto hc_cd4_transition = SS::hc_cd4_transition;
 
   // function args
   int t;
@@ -244,12 +146,12 @@ struct ChildModelSimulation<Config> {
           for (int cat = 0; cat < hcTT; ++cat) {
             n_hc.hc2_hiv_pop(hd_alt, cat, 0, s) += c_hc.hc1_hiv_pop(hd, cat, hc1_ageend, s) *
                                                    p_dp.survival_probability(hc2_agestart, s, t) *
-                                                   hc_cd4_transition(hd_alt, hd);
+                                                   hc_cd4_transition[hd_alt][hd];
           }
           for (int dur = 0; dur < hTS; ++dur) {
             n_hc.hc2_art_pop(dur, hd_alt, 0, s) += c_hc.hc1_art_pop(dur, hd, hc1_ageend, s) *
                                                    p_dp.survival_probability(hc2_agestart, s, t) *
-                                                   hc_cd4_transition(hd_alt, hd);
+                                                   hc_cd4_transition[hd_alt][hd];
           }
         }
       }
@@ -304,7 +206,6 @@ struct ChildModelSimulation<Config> {
       i_hc.prev = i_hc.nHIVcurr / n_dp.p_total_pop(a + 15, 1);
 
       for (int hd = 0; hd < hDS; ++hd) {
-<<<<<<< HEAD
         i_hc.df += p_hc.local_adj_factor * p_hc.fert_mult_by_age(a_fert_idx) * p_hc.fert_mult_off_art(hd) *
                    (n_ha.h_hiv_adult(hd, a, 1) + c_ha.h_hiv_adult(hd, a, 1)) / 2;
         // women on ART less than 6 months use the off art fertility multiplier
@@ -312,15 +213,6 @@ struct ChildModelSimulation<Config> {
                    (n_ha.h_art_adult(0, hd, a, 1) + c_ha.h_art_adult(0, hd, a, 1)) / 2;
         for (int ht = 1; ht < hTS; ++ht) {
           i_hc.df += p_hc.local_adj_factor * p_hc.fert_mult_on_art(a_fert_idx) *
-=======
-        i_hc.df += p_hc.local_adj_factor * fert_mult_by_age[a] * fert_mult_off_art[hd] *
-                   (n_ha.h_hiv_adult(hd, a, 1) + c_ha.h_hiv_adult(hd, a, 1)) / 2;
-        // women on ART less than 6 months use the off art fertility multiplier
-        i_hc.df += p_hc.local_adj_factor * fert_mult_by_age[a] * fert_mult_off_art[hd] *
-                   (n_ha.h_art_adult(0, hd, a, 1) + c_ha.h_art_adult(0, hd, a, 1)) / 2;
-        for (int ht = 1; ht < hTS; ++ht) {
-          i_hc.df += p_hc.local_adj_factor * fert_mult_on_art[a] *
->>>>>>> 1a966f4 (Move static parameters into C++ code instead of requiring it to be passed in)
                      (n_ha.h_art_adult(ht, hd, a, 1) + c_ha.h_art_adult(ht, hd, a, 1)) / 2;
         } // end hTS
       } // end hDS
