@@ -194,17 +194,17 @@ struct HivDemographicProjection<Config> {
 
     if constexpr (ModelVariant::run_child_model) {
       constexpr int hc2DS = SS::hc2DS;
+      constexpr auto adult_cd4_dist = SS::adult_cd4_dist;
 
-      const auto& p_hc = pars.hc;
       auto& i_hc = intermediate.hc;
 
       for (int g = 0; g < NS; ++g) {
         for (int hm = 0; hm < hDS; ++hm) {
           for (int hm_adol = 0; hm_adol < hc2DS; ++hm_adol){
-            n_ha.h_hiv_adult(hm, 0, g) += i_hc.age15_hiv_pop(hm_adol, g) * p_hc.adult_cd4_dist(hm, hm_adol);
+            n_ha.h_hiv_adult(hm, 0, g) += i_hc.age15_hiv_pop(hm_adol, g) * adult_cd4_dist[hm][hm_adol];
             if ((t > opts.ts_art_start)) {
               for (int hu = 0; hu < hTS; ++hu) {
-                n_ha.h_art_adult(hu,hm, 0, g) += i_hc.age15_art_pop(hu, hm_adol, g) * p_hc.adult_cd4_dist(hm, hm_adol);
+                n_ha.h_art_adult(hu,hm, 0, g) += i_hc.age15_art_pop(hu, hm_adol, g) * adult_cd4_dist[hm][hm_adol];
               }
             }
           }

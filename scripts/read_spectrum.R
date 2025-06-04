@@ -821,17 +821,17 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   mtct_trt[,2,1] <-  mtct_rates_input[8,1]/100
   mtct_trt[,3,1] <- mtct_rates_input[5,1]/100
   mtct_trt[,4,1] <- mtct_rates_input[6,1]/100
-  mtct_trt[5:7,1,2] <- mtct_rates_input[7,3]/100
-  mtct_trt[5:7,2,2] <- mtct_rates_input[8,3]/100
-  mtct_trt[1:4,3,2] <- mtct_rates_input[5,2]/100
-  mtct_trt[5:7,3,2] <- mtct_rates_input[5,3]/100
+  mtct_trt[3:7,1,2] <- mtct_rates_input[7,3]/100
+  mtct_trt[3:7,2,2] <- mtct_rates_input[8,3]/100
+  mtct_trt[1:2,3,2] <- mtct_rates_input[5,2]/100
+  mtct_trt[3:7,3,2] <- mtct_rates_input[5,3]/100
   mtct_trt[,4,2] <- mtct_rates_input[6,3]/100
   mtct_trt[,5,1] <- mtct_rates_input[9,1]/100
   mtct_trt[,6,1] <- mtct_rates_input[10,1]/100
   mtct_trt[,7,1] <- mtct_rates_input[11,1]/100
-  mtct_trt[5:7,5,2] <- mtct_rates_input[9,2]/100
-  mtct_trt[5:7,6,2] <- mtct_rates_input[10,2]/100
-  mtct_trt[5:7,7,2] <- mtct_rates_input[11,2]/100
+  mtct_trt[3:7,5,2] <- mtct_rates_input[9,2]/100
+  mtct_trt[3:7,6,2] <- mtct_rates_input[10,2]/100
+  mtct_trt[3:7,7,2] <- mtct_rates_input[11,2]/100
   v$pmtct_mtct <- mtct_trt
 
   mtct <- array(data = NA, dim = c(8,2), dimnames = list(cd4 = c('>500', '350-500', '250-349', '200-249', '100-199', '50-99', '<50', 'INFECTION'), trans_type = c('perinatal', 'bf')))
@@ -875,20 +875,6 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
 
 
   v$paed_art_ltfu <- input_childart_ltfu(dp.x) / 100
-
-  paed_cd4_transition <- array(0, dim = c(6,7), dimnames = list(cd4_count = c('gte1000', '750-1000', '500-749', '350-499', '200-349', 'lte200'), cd4_pct = c('gte30', '26-30', '21-25', '16-20', '11-15', '5-10', 'lte5')))
-  paed_cd4_transition[1:6,1] <- c(0.608439, 0.185181, 0.105789, 0.055594, 0.018498, 0.026497)
-  paed_cd4_transition[1:6,2] <- c(0.338733873, 0.222622262, 0.293529353, 0.093509351, 0.03550355, 0.01610161)
-  paed_cd4_transition[1:6,3] <- c(0.2004, 0.2562, 0.3636, 0.1074, 0.0579, 0.0145)
-  paed_cd4_transition[1:6,4] <- c(0.095, 0.1693, 0.3082, 0.2497, 0.1449, 0.0329)
-  paed_cd4_transition[1:6,5] <- c(0.03880388, 0.090309031, 0.275927593, 0.259925993, 0.255725573, 0.079307931)
-  paed_cd4_transition[1:6,6] <- c(0.018615705, 0.018615705, 0.099217744, 0.165065848, 0.363501337, 0.334983662)
-  paed_cd4_transition[1:6,7] <- c(0, 0.0014, 0.00990099, 0.00710071, 0.04960496, 0.931993199)
-  paed_cd4_transition[6,1] <- 1 - sum(paed_cd4_transition[-6,1])
-  paed_cd4_transition[6,7] <- 1 - sum(paed_cd4_transition[-6,7])
-
-
-  v$paed_cd4_transition <- paed_cd4_transition
 
   v$abortion <- input_abortion(dp.x)
 
@@ -935,7 +921,6 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   specres <- eppasm::read_hivproj_output(pjnz)
   newinf <- specres$newinf.f[4:10,] %>% colSums()
   newinf_rate <- newinf / colSums(specres$totpop.f[1:10,])
-  v$incrate <- as.array(as.numeric(unlist(newinf_rate)))
 
   fp1 <- eppasm::prepare_directincid(pjnz)
   fp1$tARTstart <- 61L
@@ -946,10 +931,6 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   wlhiv_cd4 <- array(as.numeric(unlist(dpsub(dp = dp.x, "<CD4Distribution15_49 MV2>", 19:25, timedat.idx))), dim = c(7,length(timedat.idx)))
   v$prop_gte350 <- colSums(wlhiv_cd4[1:2,]) / colSums(wlhiv_cd4)
   v$prop_lt200 <- colSums(wlhiv_cd4[5:7,]) / colSums(wlhiv_cd4)
-
-  v$hc_age_coarse <- rep(c(1,2,3), each = 5)
-  v$hc_age_coarse_cd4 <- rep(0:2, times = c(3, 2, 10))
-
 
   return(v)
 }

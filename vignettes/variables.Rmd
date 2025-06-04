@@ -139,7 +139,6 @@ In 5 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 | art_alloc_mxweight | art.initiation_mortality_weight          | Weighting for extent that expected mortality guides ART uptake                                                                                                        |
 | paed_incid_input   | chidlren.hc_nosocomial                   | Nosocomial infections occuring in 0-4 year olds                                                                                                                       |
 | paed_cd4_dist      | children.hc1_cd4_dist                    | Distribution of infections by CD4 category by infection type                                                                                                          |
-| paed_cd4_transition| children.hc_cd4_transition               | CD4 mapping between 0-4 year olds and 5-14 year olds                                                                                                                  |
 | paed_cd4_mort      | children.hc1_cd4_mort                    | Probability of mortality by CD4 stage, age, and sex for 0-4 year olds                                                                                                 |
 | adol_cd4_mort      | children.hc2_cd4_mort                    | Probability of mortality by CD4 stage, age, and sex for 5-14 year olds                                                                                                |
 | paed_cd4_prog      | children.hc1_cd4_prog                    | Probability of progressing to the subsequent CD4 stage for 0-4 year olds                                                                                              |
@@ -154,7 +153,6 @@ In 5 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 | artpaeds_isperc    | children.hc_art_isperc                   | Boolean vector indicating whether input is a percent                                                                                                                  |
 | paed_art_val       | children.hc_art_val                      | Percent or number of children on ART each year                                                                                                                        |
 | init_art_dist      | children.hc_art_init_dist                | ART initiation by age                                                                                                                                                 |
-| adult_cd4_dist     | children.adult_cd4_dist                  | Transition matrix converting 5-14y CD4 categories to adult CD4 categories                                                                                             |
 | fert_mult_by_age   | children.fert_mult_by_age                | Fertility ratio for WLHIV by age                                                                                                                                      |
 | fert_mult_offart   | children.fert_mult_offart                | Fertility ratio for WLHIV not on treatment by CD4                                                                                                                     |
 | fert_mult_onart    | children.fert_mult_onart                 | Fertility ratio for WLHIV on treatment by age                                                                                                                         |
@@ -171,7 +169,6 @@ In 5 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 | mat_prev_input     | children.mat_prev_input                  | Boolean vector indicating if input mat_hiv_births should be used for vertical transmission rather than results from adult model                                       |
 | prop_lt200         | children.prop_lt200                      | Proportion of WLHIV with CD4 less than 200 by year                                                                                                                    |
 | prop_gte350        | children.prop_gte350                     | Proportion of WLHIV with CD4 greater than 350 by year                                                                                                                 |
-| incrate            | children.incrate                         | Incidence rate among women 15-49y by year                                                                                                                             |
 
 ## Outputs
 
@@ -229,8 +226,6 @@ In 5 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 | hivn_ag                   | hiv_negative_pop                | HIV negative population for a given age and sex                           |
 | Xhivn                     | hiv_neg_aggregate               |                                                                           |
 | Xhivn_incagerr            | ?                               |                                                                           |
-| incrate_i                 |                                 | Incidence rate input                                                      |
-| incrate_g                 | rate_sex                        | Incidence rate by sex                                                     |
 | hivdeaths_ha              | hiv_deaths_age_sex              |                                                                           |
 | grad                      | grad                            | Movement between cd4 categories at a given time step                      |
 | artpop_hahm               |                                 |                                                                           |

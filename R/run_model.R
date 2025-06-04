@@ -77,12 +77,10 @@ run_model_single_year <- function(parameters,
 process_parameters <- function(parameters, configuration) {
   # convert indices to 0 based
   if ("artcd4elig_idx" %in% names(parameters)) {
-    # integer type
     parameters[["artcd4elig_idx"]] <- parameters[["artcd4elig_idx"]] - 1L
   }
   if ("paed_art_elig_cd4" %in% names(parameters)) {
-    # double type
-    parameters[["paed_art_elig_cd4"]] <- parameters[["paed_art_elig_cd4"]] - 1
+    parameters[["paed_art_elig_cd4"]] <- parameters[["paed_art_elig_cd4"]] - 1L
   }
   if ("t_ART_start" %in% names(parameters)) {
     parameters[["t_ART_start"]] <- parameters[["t_ART_start"]] - 1L
