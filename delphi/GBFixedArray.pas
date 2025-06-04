@@ -3,7 +3,8 @@ unit GBFixedArray;
 interface
 
 uses
-  System.SysUtils, System.Generics.Defaults, System.Generics.Collections;
+  System.SysUtils, System.Classes, System.TypInfo, System.Rtti,
+  System.Generics.Defaults, System.Generics.Collections;
 
 // This is a runtime fixed length array compared to the Delphi built-in
 // fixed-length array which must be known at compile time.
@@ -28,6 +29,7 @@ type
     property Values[Indices: array of Integer]: T read GetValue write SetValue; default;
 
     function GetLength(): Integer;
+    procedure WriteToDisk(path: string);
 
     function DataPointer: P;
     property Data: P read DataPointer;
@@ -88,6 +90,49 @@ begin
     Result := nil
   else
     Result := @FData[0];
+end;
+
+procedure TGBFixedArray<T>.WriteToDisk(path: string);
+var
+  sl: TStringList;
+  typeName: string;
+  dimStr: string;
+  dataStr: string;
+  i: Integer;
+begin
+  sl := TStringList.Create();
+  try
+    typeName := GetTypeName(TypeInfo(T)).ToLower;
+
+    // This data format gets deserialized in C++
+    // so use the C++ typename.
+    if typeName = 'integer' then
+      typeName := 'int';
+
+    dimStr := '';
+    for i := 0 to Length(FDims) - 1 do
+    begin
+      dimStr := dimStr + FDims[i].ToString;
+      if i < Length(FDims) - 1 then
+        dimStr := dimStr + ',';
+    end;
+
+    dataStr := '';
+    for i := 0 to Length(FData) - 1 do
+    begin
+      dataStr := dataStr + TValue.From<T>(FData[i]).toString();
+      if i < Length(FData) - 1 then
+        dataStr := dataStr + ',';
+    end;
+
+    sl.Add(typeName);
+    sl.Add(dimStr);
+    sl.Add(dataStr);
+
+    sl.SaveToFile(path);
+  finally
+    sl.Free;
+  end;
 end;
 
 end.

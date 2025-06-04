@@ -121,7 +121,7 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
   ) {
     return {
       .hc_nosocomial = read_data<real_type>(input_dir, "hc_nosocomial", opts.proj_time_steps),
-      .hc1_cd4_dist = read_data<real_type>(input_dir, "hc1_cd4_dist", SS::hc2DS),
+      .hc1_cd4_dist = read_data<real_type>(input_dir, "hc1_cd4_dist", SS::hc1DS),
       .hc1_cd4_mort = read_data<real_type>(input_dir, "hc1_cd4_mort", SS::hc1DS, SS::hcTT, SS::hc1AG),
       .hc2_cd4_mort = read_data<real_type>(input_dir, "hc2_cd4_mort", SS::hc2DS, SS::hcTT, SS::hc2AG),
       .hc1_cd4_prog = read_data<real_type>(input_dir, "hc1_cd4_prog", SS::hc1DS, SS::hc1AG_c, SS::NS),

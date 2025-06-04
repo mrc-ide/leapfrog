@@ -291,7 +291,7 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
   ) {
     return {
       .hc_nosocomial = parse_data<real_type>(data, "paed_incid_input", opts.proj_time_steps),
-      .hc1_cd4_dist = parse_data<real_type>(data, "paed_cd4_dist", SS::hc2DS),
+      .hc1_cd4_dist = parse_data<real_type>(data, "paed_cd4_dist", SS::hc1DS),
       .hc1_cd4_mort = parse_data<real_type>(data, "paed_cd4_mort", SS::hc1DS, SS::hcTT, SS::hc1AG),
       .hc2_cd4_mort = parse_data<real_type>(data, "adol_cd4_mort", SS::hc2DS, SS::hcTT, SS::hc2AG),
       .hc1_cd4_prog = parse_data<real_type>(data, "paed_cd4_prog", SS::hc1DS, SS::hc1AG_c, SS::NS),

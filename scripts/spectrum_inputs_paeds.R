@@ -108,7 +108,7 @@ input_breastfeeding_dur <- function(pjnz){
 input_childart <- function(pjnz){
   art <- dp_read_childart(pjnz)
 
-  cotrim <- array(art$childart[1,], dim = c(1, ncol(art$childart)), dimnames = list(val = '', year = colnames(art$childart)))
+  cotrim <- array(art$childart[1,], dim = c(ncol(art$childart)), dimnames = list(year = colnames(art$childart)))
   cotrim_pct <- array(art$childart_ispercent[1,], dim = c(1, ncol(art$childart)), dimnames = list(val = '', year = colnames(art$childart)))
   ######################
   ##Sort whether ART is being input by age or aggregate

@@ -4,7 +4,7 @@ unit LeapfrogInterface;
 
 interface
 
-uses GBFixedArray;
+uses SysUtils, GBFixedArray;
 
 {$ALIGN 8}
 type
@@ -38,6 +38,7 @@ type
     {{ to_lower_camel_case(name) }}: {{ get_delphi_param_type(cfg) }};
     {% endfor %}
     function getView(): Leapfrog{{ config.long_name }}ParamsView;
+    procedure writeToDisk(dir: string);
     Destructor Destroy; override;
 end;
 
@@ -58,6 +59,7 @@ type
     {{ to_lower_camel_case(name) }}: {{ get_delphi_state_type(cfg) }};
     {% endfor %}
     function getView(): Leapfrog{{ config.long_name }}StateView;
+    procedure writeToDisk(dir: string);
     Destructor Destroy; override;
 end;
 
@@ -127,7 +129,6 @@ begin;
   Result.{{ to_lower_camel_case(name) }}Length := 1;
   {% endif %}
   {% endfor %}
-  inherited;
 end;
 
 function Leapfrog{{ config.long_name }}State.getView(): Leapfrog{{ config.long_name }}StateView;
@@ -136,7 +137,30 @@ begin;
   Result.{{ to_lower_camel_case(name) }} := {{ get_delphi_state_view_type(cfg) }}({{ to_lower_camel_case(name) }}.data);
   Result.{{ to_lower_camel_case(name) }}Length := {{ to_lower_camel_case(name) }}.GetLength();
   {% endfor %}
-  inherited;
+end;
+
+{% endfor %}
+{% for config in configs %}
+procedure Leapfrog{{ config.long_name }}Params.writeToDisk(dir: string);
+begin;
+  if not DirectoryExists(dir) then
+    ForceDirectories(dir);
+  {% for name, cfg in config.pars.default.items() %}
+  {% if dim_len(cfg) > 0 %}
+  {{ to_lower_camel_case(name) }}.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  '{{ to_lower_camel_case(name) }}');
+  {% endif %}
+  {% endfor %}
+end;
+
+procedure Leapfrog{{ config.long_name }}State.writeToDisk(dir: string);
+begin;
+  if not DirectoryExists(dir) then
+    ForceDirectories(dir);
+  {% for name, cfg in config.state.items() %}
+  {% if dim_len(cfg) > 0 %}
+  {{ to_lower_camel_case(name) }}.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  '{{ to_lower_camel_case(name) }}');
+  {% endif %}
+  {% endfor %}
 end;
 
 {% endfor %}

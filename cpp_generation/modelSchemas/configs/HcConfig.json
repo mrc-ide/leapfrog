@@ -57,7 +57,7 @@
       "hc1_cd4_dist": {
         "type": "TM",
         "num_type": "real_type",
-        "dims": ["SS::hc2DS"],
+        "dims": ["SS::hc1DS"],
         "alias": {
           "r": "paed_cd4_dist"
         }
