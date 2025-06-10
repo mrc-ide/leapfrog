@@ -7,7 +7,6 @@
 
 # nolint start
 library(frogger)
-library(data.table)
 library(dplyr)
 source('./scripts/spectrum_inputs_paeds.R')
 source('./scripts/read_spectrum.R')

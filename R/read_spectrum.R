@@ -646,15 +646,6 @@ dp_read_paed_art_eligibility <- function(dp) {
 
 prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   dp.x <- get_dp_data(pjnz)
-  dpsub <- function(dp, tag, rows, cols, tagcol = 1) {
-
-    stopifnot(inherits(dp, "spectrum_dp"))
-    stopifnot(is.character(tag))
-    all.equal(rows, as.integer(rows))
-    all.equal(cols, as.integer(cols))
-
-    dp[which(dp[, tagcol] == tag) + rows, cols]
-  }
 
   ## projection parameters
   yr_start <- as.integer(dpsub(dp = dp.x, "<FirstYear MV2>",2,4))
@@ -892,21 +883,25 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   v$mat_hiv_births <- as.array(as.numeric(unlist(wlhiv_births)))
   v$mat_prev_input = rep(TRUE, length(year.idx))
 
-  hivpop <- SpectrumUtils::dp.output.hivpop(dp.raw = dp.x, direction = 'long') %>% data.table() %>% setnames(old = 'Value', new = 'hivpop')
-  totpop <- SpectrumUtils::dp.output.bigpop(dp.raw = dp.x, direction = 'long') %>% data.table()  %>% setnames(old = 'Value', new = 'totpop')
-  inc <- SpectrumUtils::dp.output.incident.hiv(dp.raw = dp.x, direction = 'long') %>% data.table() %>% setnames(old = 'Value', new = 'inc')
+  hivpop <- SpectrumUtils::dp.output.hivpop(dp.raw = dp.x, direction = 'long') %>% rename(hivpop = Value)
+  totpop <- SpectrumUtils::dp.output.bigpop(dp.raw = dp.x, direction = 'long') %>% rename(totpop = Value)
+  inc <- SpectrumUtils::dp.output.incident.hiv(dp.raw = dp.x, direction = 'long') %>% rename(inc = Value)
 
   dt <- merge(hivpop, totpop, by = c('Sex', 'Age', 'Year'))
-  dt[,hivnpop := totpop - hivpop]
-  dt <- dt[Sex == 'Female' & Age %in% 15:49,]
-  dt <- dcast(dt[,.(Age, Year, hivnpop)], Age ~ Year, value.var = 'hivnpop')
+  dt <- dt %>% mutate(hivnpop = totpop - hivpop) %>%
+    filter(Sex == 'Female' & Age %in% 15:49) %>%
+    select(Age, Year, hivnpop) %>%
+    tidyr::pivot_wider(names_from = Year, values_from = hivnpop)
 
   hivnpop <- array(NA, dim = c(length(15:49), length(year.idx)), dimnames = list(age = 15:49, year = proj.years))
   for(i in 1:length(year.idx)){
     hivnpop[,i] <- dt[[(i+1)]]
   }
 
-  inc <- dcast(inc[Sex == 'Female' & Age %in% 15:49,.(Age, Year, inc)], Age ~ Year, value.var = 'inc')
+  inc <- inc %>%
+    filter(Sex == 'Female' & Age %in% 15:49) %>%
+    select(Age, Year, inc) %>%
+    tidyr::pivot_wider(names_from = Year, values_from = inc)
 
   inc.array <- array(NA, dim = c(length(15:49), length(year.idx)), dimnames = list(age = 15:49, year = proj.years))
   for(i in 1:length(year.idx)){
