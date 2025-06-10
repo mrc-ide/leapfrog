@@ -646,15 +646,6 @@ dp_read_paed_art_eligibility <- function(dp) {
 
 prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   dp.x <- get_dp_data(pjnz)
-  dpsub <- function(dp, tag, rows, cols, tagcol = 1) {
-
-    stopifnot(inherits(dp, "spectrum_dp"))
-    stopifnot(is.character(tag))
-    all.equal(rows, as.integer(rows))
-    all.equal(cols, as.integer(cols))
-
-    dp[which(dp[, tagcol] == tag) + rows, cols]
-  }
 
   ## projection parameters
   yr_start <- as.integer(dpsub(dp = dp.x, "<FirstYear MV2>",2,4))

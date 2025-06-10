@@ -42,7 +42,6 @@ build_name_mapping <- function() {
 name_mapping <- build_name_mapping()
 
 pkgload::load_all()
-library(data.table)
 source('./scripts/spectrum_inputs_paeds.R')
 source('./scripts/read_spectrum.R')
 demp <- prepare_leapfrog_demp(pjnz)
