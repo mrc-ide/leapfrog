@@ -12,6 +12,14 @@
 #'   time, e.g. `p_total_pop` state variable has dimensions 81 x 2. If
 #'   `output_years` specified has length 61 then the `p_total_pop` output
 #'   will have dimensions 81 x 2 x 61.
+#' @examples
+#' pjnz <- system.file(
+#'   "pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ",
+#'   package = "frogger", mustWork = TRUE)
+#' demp <- prepare_leapfrog_demp(pjnz)
+#' proj <- prepare_leapfrog_projp(pjnz)
+#' parameters <- c(demp, proj)
+#' out <- run_model(parameters, "HivCoarseAgeStratification", 1970:2030)
 #' @export
 run_model <- function(parameters,
                       configuration = "HivFullAgeStratification",
@@ -37,6 +45,20 @@ run_model <- function(parameters,
 #'   time, e.g. `p_total_pop` state variable has dimensions 81 x 2. If
 #'   `output_years` specified has length 61 then the `p_total_pop` output
 #'   will have dimensions 81 x 2 x 61.
+#' @examples
+#' pjnz <- system.file(
+#'   "pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ",
+#'   package = "frogger", mustWork = TRUE)
+#' demp <- prepare_leapfrog_demp(pjnz)
+#' proj <- prepare_leapfrog_projp(pjnz)
+#' parameters <- c(demp, proj)
+#' out_first_half_years <- run_model(parameters, "HivCoarseAgeStratification", 1970:2000)
+#' out_second_half_years <- run_model_from_state(
+#'   parameters,
+#'   "HivCoarseAgeStratification",
+#'   get_time_slice(out_first_half_years, 31),
+#'   2000,
+#'   2001:2030)
 #' @export
 run_model_from_state <- function(parameters,
                                  configuration,
@@ -63,6 +85,20 @@ run_model_from_state <- function(parameters,
 #'   feed the returned list into the next single year model run. In
 #'   contrast to [run_model_from_state()] the `p_total_pop` output will
 #'   have dimensions 81 x 2 not 81 x 2 x 61.
+#' @examples
+#' pjnz <- system.file(
+#'   "pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ",
+#'   package = "frogger", mustWork = TRUE)
+#' demp <- prepare_leapfrog_demp(pjnz)
+#' proj <- prepare_leapfrog_projp(pjnz)
+#' parameters <- c(demp, proj)
+#' out_first_half_years <- run_model(parameters, "HivCoarseAgeStratification", 1970:2000)
+#' prev_state <- get_time_slice(out_first_half_years, 31)
+#' for (i in 2001:2029) {
+#'   new_state <- run_model_single_year(parameters, "HivCoarseAgeStratification", prev_state, i)
+#'   # Do things with new state, other processes, saving output etc.
+#'   prev_state <- new_state
+#' }
 #' @export
 run_model_single_year <- function(parameters,
                                   configuration,

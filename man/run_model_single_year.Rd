@@ -33,3 +33,18 @@ have dimensions 81 x 2 not 81 x 2 x 61.
 \description{
 Run leapfrog model fit for a single year
 }
+\examples{
+pjnz <- system.file(
+  "pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ",
+  package = "frogger", mustWork = TRUE)
+demp <- prepare_leapfrog_demp(pjnz)
+proj <- prepare_leapfrog_projp(pjnz)
+parameters <- c(demp, proj)
+out_first_half_years <- run_model(parameters, "HivCoarseAgeStratification", 1970:2000)
+prev_state <- get_time_slice(out_first_half_years, 31)
+for (i in 2001:2029) {
+  new_state <- run_model_single_year(parameters, "HivCoarseAgeStratification", prev_state, i)
+  # Do things with new state, other processes, saving output etc.
+  prev_state <- new_state
+}
+}

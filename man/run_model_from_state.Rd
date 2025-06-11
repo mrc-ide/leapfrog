@@ -36,3 +36,18 @@ will have dimensions 81 x 2 x 61.
 \description{
 Run leapfrog model fit from initial state
 }
+\examples{
+pjnz <- system.file(
+  "pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ",
+  package = "frogger", mustWork = TRUE)
+demp <- prepare_leapfrog_demp(pjnz)
+proj <- prepare_leapfrog_projp(pjnz)
+parameters <- c(demp, proj)
+out_first_half_years <- run_model(parameters, "HivCoarseAgeStratification", 1970:2000)
+out_second_half_years <- run_model_from_state(
+  parameters,
+  "HivCoarseAgeStratification",
+  get_time_slice(out_first_half_years, 31),
+  2000,
+  2001:2030)
+}
