@@ -388,3 +388,13 @@ test_that("Child model agrees when run through all years vs two parts vs single 
   }
 })
 
+test_that("error thrown if trying to output from years before simulation start year", {
+  input <- readRDS(test_path("testdata/child_parms.rds"))
+
+  out_first_half_years <- run_model(input$parameters, "ChildModel", 1970:2000)
+  expect_error(
+    run_model_from_state(input$parameters, "ChildModel", get_time_slice(out_first_half_years, 31), 2000, 2000:2030),
+    "Cannot output year '2000'. Output years must be later than simulation start year '2000'.",
+    fixed = TRUE
+  )
+})

@@ -8,6 +8,8 @@
 #include "models/child_model_simulation.hpp"
 #include "options.hpp"
 
+#include <format>
+
 namespace leapfrog {
 
 template<Language L, typename real_type, internal::MV ModelVariant>
@@ -43,6 +45,14 @@ struct Leapfrog {
     const int simulation_start_year,
     const std::vector<int> output_years
   ) {
+
+    const auto min_output_year = std::min_element(std::begin(output_years),
+                                                  std::end(output_years));
+    if (*min_output_year != opts.proj_start_year && *min_output_year <= simulation_start_year) {
+      throw std::invalid_argument(
+        std::format("Cannot output year '{}'. Output years must be later than simulation start year '{}'.",
+          *min_output_year, simulation_start_year));
+    }
     auto state = initial_state;
     auto state_next = state;
     state_next.reset();
