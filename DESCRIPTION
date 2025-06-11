@@ -34,12 +34,13 @@ LinkingTo:
     RcppEigen
 Imports:
     beers,
+    dplyr,
     eppasm (>= 0.8.5),
-    glue,
-    Rcpp
+    magrittr,
+    Rcpp,
+    tidyr
 Suggests:
     abind,
-    dplyr,
     knitr,
     RcppEigen,
     reshape2,

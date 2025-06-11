@@ -76,8 +76,10 @@ the same file, it will be most efficient to read it once and pass that to the
 functions.
 }
 \examples{
-
-pjnz <- system.file("pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ", package = "frogger")
+\dontrun{
+pjnz <- system.file(
+  "pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ",
+  package = "frogger")
 dp <- read_dp(pjnz)
 dp_anc_testing <- dp_read_anc_testing(dp)
 dp_pmtct <- dp_read_pmtct(dp)
@@ -93,3 +95,5 @@ anc_testing1 <- dp_read_anc_testing(pjnz)
 anc_testing2 <- dp_read_anc_testing(dp)
 all.equal(anc_testing1, anc_testing2)
 }
+}
+\keyword{internal}

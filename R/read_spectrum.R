@@ -12,14 +12,15 @@
 #' pjnz <- system.file("pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ", package = "frogger")
 #' dp <- read_dp(pjnz)
 #' class(dp)
+#' @noRd
 read_dp <- function(pjnz) {
 
   stopifnot(grepl("\\.(pjnz|zip)$", pjnz, ignore.case = TRUE))
 
-  dpfile <- grep("\\.DP$", unzip(pjnz, list = TRUE)$Name, value = TRUE)
+  dpfile <- grep("\\.DP$", utils::unzip(pjnz, list = TRUE)$Name, value = TRUE)
   stopifnot(length(dpfile) == 1)
 
-  dp <- read.csv(unz(pjnz, dpfile), as.is = TRUE)
+  dp <- utils::read.csv(unz(pjnz, dpfile), as.is = TRUE)
   class(dp) <- c(class(dp), "spectrum_dp")
 
   dp
@@ -119,9 +120,10 @@ get_dp_years <- function(dp.x) {
 #' the same file, it will be most efficient to read it once and pass that to the
 #' functions.
 #'
-#' @examples
-#'
-#' pjnz <- system.file("pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ", package = "frogger")
+#' @examples \dontrun{
+#' pjnz <- system.file(
+#'   "pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ",
+#'   package = "frogger")
 #' dp <- read_dp(pjnz)
 #' dp_anc_testing <- dp_read_anc_testing(dp)
 #' dp_pmtct <- dp_read_pmtct(dp)
@@ -136,6 +138,8 @@ get_dp_years <- function(dp.x) {
 #' anc_testing1 <- dp_read_anc_testing(pjnz)
 #' anc_testing2 <- dp_read_anc_testing(dp)
 #' all.equal(anc_testing1, anc_testing2)
+#' }
+#' @keywords internal
 dp_read_anc_testing <- function(dp) {
 
   dp <- get_dp_data(dp)
@@ -167,7 +171,7 @@ dp_read_anc_testing <- function(dp) {
 }
 
 #' @rdname dp_read_anc_testing
-#' @export
+#' @keywords internal
 dp_read_pmtct <- function(dp) {
 
   dp <- get_dp_data(dp)
@@ -219,7 +223,7 @@ dp_read_pmtct <- function(dp) {
 
 
 #' @rdname dp_read_anc_testing
-#' @export
+#' @keywords internal
 dp_read_pmtct_retained <- function(dp) {
 
   dp <- get_dp_data(dp)
@@ -240,7 +244,7 @@ dp_read_pmtct_retained <- function(dp) {
 }
 
 #' @rdname dp_read_anc_testing
-#' @export
+#' @keywords internal
 dp_read_abortion <- function(dp) {
 
   dp <- get_dp_data(dp)
@@ -259,15 +263,15 @@ dp_read_abortion <- function(dp) {
     stop("PregTermAbortionPerNum tag not found. Function probably needs update for this .DP file.")
   }
 
-  pregtermabortion <- setNames(as.numeric(pregtermabortion), dpy$proj_years)
-  pregtermabortion_ispercent <- setNames(as.logical(pregtermabortion_ispercent), dpy$proj_years)
+  pregtermabortion <- stats::setNames(as.numeric(pregtermabortion), dpy$proj_years)
+  pregtermabortion_ispercent <- stats::setNames(as.logical(pregtermabortion_ispercent), dpy$proj_years)
 
   list(pregtermabortion = pregtermabortion,
        pregtermabortion_ispercent = pregtermabortion_ispercent)
 }
 
 #' @rdname dp_read_anc_testing
-#' @export
+#' @keywords internal
 dp_read_mothers_reallocated <- function(dp) {
 
   dp <- get_dp_data(dp)
@@ -280,14 +284,14 @@ dp_read_mothers_reallocated <- function(dp) {
     stop("PatientsReallocated tag not found. Function probably needs update for this .DP file.")
   }
 
-  patients_reallocated <- setNames(as.numeric(patients_reallocated), dpy$proj_years)
+  patients_reallocated <- stats::setNames(as.numeric(patients_reallocated), dpy$proj_years)
 
   patients_reallocated
 }
 
 
 #' @rdname dp_read_anc_testing
-#' @export
+#' @keywords internal
 dp_read_breastfeeding <- function(dp) {
 
   dp <- get_dp_data(dp)
@@ -319,7 +323,7 @@ dp_read_breastfeeding <- function(dp) {
 
 
 #' @rdname dp_read_anc_testing
-#' @export
+#' @keywords internal
 dp_read_childart <- function(dp) {
 
   dp <- get_dp_data(dp)
@@ -355,7 +359,7 @@ dp_read_childart <- function(dp) {
 }
 
 #' @rdname dp_read_anc_testing
-#' @export
+#' @keywords internal
 dp_read_childltfu <- function(dp) {
 
   dp <- get_dp_data(dp)
@@ -375,7 +379,7 @@ dp_read_childltfu <- function(dp) {
 }
 
 #' @rdname dp_read_anc_testing
-#' @export
+#' @keywords internal
 dp_read_art_dist <- function(dp) {
 
   dp <- get_dp_data(dp)
@@ -393,7 +397,7 @@ dp_read_art_dist <- function(dp) {
 }
 
 #' @rdname dp_read_anc_testing
-#' @export
+#' @keywords internal
 dp_read_child_mort_mult <- function(dp) {
 
   dp <- get_dp_data(dp)
@@ -417,7 +421,7 @@ dp_read_child_mort_mult <- function(dp) {
 
 
 #' @rdname dp_read_anc_testing
-#' @export
+#' @keywords internal
 dp_read_nosocom_infections <- function(dp) {
 
   dp <- get_dp_data(dp)
@@ -437,7 +441,7 @@ dp_read_nosocom_infections <- function(dp) {
 }
 
 #' @rdname dp_read_anc_testing
-#' @export
+#' @keywords internal
 dp_read_mtct_rates <- function(dp) {
 
   dp <- get_dp_data(dp)
@@ -456,7 +460,7 @@ dp_read_mtct_rates <- function(dp) {
 }
 
 #' @rdname dp_read_anc_testing
-#' @export
+#' @keywords internal
 dp_read_paed_cd4_dist <- function(dp) {
 
   dp <- get_dp_data(dp)
@@ -468,7 +472,7 @@ dp_read_paed_cd4_dist <- function(dp) {
     cd4_dist <- dpdescription(dp, "Distribution of new infections by CD4 percent for Children" , 1, 4:10)
     cd4_dist <- df_as_numeric(cd4_dist)
   } else if(exists_dpdescription(dp, "Répartition des nouvelles infections par pourcentage de CD4 chez les enfants")) {
-    cd4_dist <- dpdescription(dp, "Répartition des nouvelles infections par pourcentage de CD4 chez les enfants" , 1, 4:10)
+    cd4_dist <- dpdescription(dp, "Répartition des nouvelles infections par pourcentage de CD4 chez les enfants", 1, 4:10)
     cd4_dist <- df_as_numeric(cd4_dist)
   } else {
     stop("CD4 distribution for paeds description not recognized. Function probably needs update for this .DP file.")
@@ -478,7 +482,7 @@ dp_read_paed_cd4_dist <- function(dp) {
 }
 
 #' @rdname dp_read_anc_testing
-#' @export
+#' @keywords internal
 dp_read_paed_cd4_prog <- function(dp) {
 
   dp <- get_dp_data(dp)
@@ -503,7 +507,7 @@ dp_read_paed_cd4_prog <- function(dp) {
 }
 
 #' @rdname dp_read_anc_testing
-#' @export
+#' @keywords internal
 dp_read_paed_cd4_mort <- function(dp) {
 
   dp <- get_dp_data(dp)
@@ -527,7 +531,7 @@ dp_read_paed_cd4_mort <- function(dp) {
 }
 
 #' @rdname dp_read_anc_testing
-#' @export
+#' @keywords internal
 dp_read_paed_art_mort <- function(dp) {
 
   dp <- get_dp_data(dp)
@@ -618,7 +622,7 @@ dp_read_paed_art_mort <- function(dp) {
 }
 
 #' @rdname dp_read_anc_testing
-#' @export
+#' @keywords internal
 dp_read_paed_art_eligibility <- function(dp) {
 
   dp <- get_dp_data(dp)
@@ -644,7 +648,8 @@ dp_read_paed_art_eligibility <- function(dp) {
   list(cd4_elig = art_elig, age_elig = art_elig_age)
 }
 
-prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
+
+prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1) {
   dp.x <- get_dp_data(pjnz)
 
   ## projection parameters
@@ -883,14 +888,14 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   v$mat_hiv_births <- as.array(as.numeric(unlist(wlhiv_births)))
   v$mat_prev_input = rep(TRUE, length(year.idx))
 
-  hivpop <- SpectrumUtils::dp.output.hivpop(dp.raw = dp.x, direction = 'long') %>% rename(hivpop = Value)
-  totpop <- SpectrumUtils::dp.output.bigpop(dp.raw = dp.x, direction = 'long') %>% rename(totpop = Value)
-  inc <- SpectrumUtils::dp.output.incident.hiv(dp.raw = dp.x, direction = 'long') %>% rename(inc = Value)
+  hivpop <- SpectrumUtils::dp.output.hivpop(dp.raw = dp.x, direction = 'long') %>% dplyr::rename(hivpop = Value)
+  totpop <- SpectrumUtils::dp.output.bigpop(dp.raw = dp.x, direction = 'long') %>% dplyr::rename(totpop = Value)
+  inc <- SpectrumUtils::dp.output.incident.hiv(dp.raw = dp.x, direction = 'long') %>% dplyr::rename(inc = Value)
 
   dt <- merge(hivpop, totpop, by = c('Sex', 'Age', 'Year'))
-  dt <- dt %>% mutate(hivnpop = totpop - hivpop) %>%
-    filter(Sex == 'Female' & Age %in% 15:49) %>%
-    select(Age, Year, hivnpop) %>%
+  dt <- dt %>% dplyr::mutate(hivnpop = totpop - hivpop) %>%
+    dplyr::filter(Sex == 'Female' & Age %in% 15:49) %>%
+    dplyr::select(Age, Year, hivnpop) %>%
     tidyr::pivot_wider(names_from = Year, values_from = hivnpop)
 
   hivnpop <- array(NA, dim = c(length(15:49), length(year.idx)), dimnames = list(age = 15:49, year = proj.years))
@@ -899,8 +904,8 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
   }
 
   inc <- inc %>%
-    filter(Sex == 'Female' & Age %in% 15:49) %>%
-    select(Age, Year, inc) %>%
+    dplyr::filter(Sex == 'Female' & Age %in% 15:49) %>%
+    dplyr::select(Age, Year, inc) %>%
     tidyr::pivot_wider(names_from = Year, values_from = inc)
 
   inc.array <- array(NA, dim = c(length(15:49), length(year.idx)), dimnames = list(age = 15:49, year = proj.years))

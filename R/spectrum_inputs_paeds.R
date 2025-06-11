@@ -1,28 +1,26 @@
 ###############################################
 ###Paediatric input formatting
 ###############################################
-library(dplyr)
-
 format_pmtct <- function(pjnz){
   pmtct_arv <- dp_read_pmtct(pjnz)
 
   ## remove all totals
-  pmtct_arv <- pmtct_arv %>% data.frame() %>% filter(!row_number() %in% which(rownames(pmtct_arv) %in% c('pmtct_noprophylaxis_percent', 'pmtct_total_number',
+  pmtct_arv <- pmtct_arv %>% data.frame() %>% dplyr::filter(!dplyr::row_number() %in% which(rownames(pmtct_arv) %in% c('pmtct_noprophylaxis_percent', 'pmtct_total_number',
                                                                                                          'pmtct_postnatal_noprophylaxis_percent', 'pmtct_postnatal_total_number',
                                                                                                          'pmtct_postnatal_total_number')))
 
   ##separate out dropouts
-  pmtct_dropout <- pmtct_arv %>% data.frame() %>% filter(row_number() %in% grep(pattern = 'dropout', rownames(pmtct_arv))) / 100
+  pmtct_dropout <- pmtct_arv %>% data.frame() %>% dplyr::filter(dplyr::row_number() %in% grep(pattern = 'dropout', rownames(pmtct_arv))) / 100
   pmtct_dropout[is.na(pmtct_dropout)] <- 0
-  pmtct_arv <- pmtct_arv %>% data.frame() %>% filter(!row_number() %in% grep(pattern = 'dropout', rownames(pmtct_arv)))
+  pmtct_arv <- pmtct_arv %>% data.frame() %>% dplyr::filter(!dplyr::row_number() %in% grep(pattern = 'dropout', rownames(pmtct_arv)))
 
   ## take out postnatal
-  pmtct_arv_postnatal <- pmtct_arv %>% data.frame() %>% filter(row_number() %in% grep(pattern = 'postnatal', rownames(pmtct_arv)))
-  pmtct_arv<- pmtct_arv %>% data.frame() %>% filter(!row_number() %in% grep(pattern = 'postnatal', rownames(pmtct_arv)))
+  pmtct_arv_postnatal <- pmtct_arv %>% data.frame() %>% dplyr::filter(dplyr::row_number() %in% grep(pattern = 'postnatal', rownames(pmtct_arv)))
+  pmtct_arv<- pmtct_arv %>% data.frame() %>% dplyr::filter(!dplyr::row_number() %in% grep(pattern = 'postnatal', rownames(pmtct_arv)))
 
   ## number v percents
-  pmtct_arv_number <- pmtct_arv %>% data.frame() %>% filter(row_number() %in% grep(pattern = 'number', rownames(pmtct_arv)))
-  pmtct_arv_percent <- pmtct_arv %>% data.frame() %>% filter(row_number() %in% grep(pattern = 'percent', rownames(pmtct_arv)))
+  pmtct_arv_number <- pmtct_arv %>% data.frame() %>% dplyr::filter(dplyr::row_number() %in% grep(pattern = 'number', rownames(pmtct_arv)))
+  pmtct_arv_percent <- pmtct_arv %>% data.frame() %>% dplyr::filter(dplyr::row_number() %in% grep(pattern = 'percent', rownames(pmtct_arv)))
 
 
   if(all(is.na(pmtct_arv_number))){

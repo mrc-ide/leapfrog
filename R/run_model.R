@@ -139,7 +139,16 @@ is_run_hiv_simulation <- function(configuration) {
                        "ChildModel")
 }
 
-get_time_slice <- function(dat, index) {
+#' Slice a single year from model state
+#'
+#' @param state The model state with time dimension
+#' @param index The index of the time step you want to extract
+#'
+#' @return List of model outputs for the specified time step. Can be used as
+#'   input state for [run_model_from_state()] and [run_model_single_year()].
+#'   All outputs will have 1 fewer dimension than input state.
+#' @export
+get_time_slice <- function(state, index) {
   last_ind <- function(x) {
     nd <- length(dim(x))
     inds <- rep(alist(,)[1], nd)
@@ -155,7 +164,7 @@ get_time_slice <- function(dat, index) {
     ret
   }
 
-  lapply(dat, last_ind)
+  lapply(state, last_ind)
 }
 
 concat_on_time_dim <- function(dat1, dat2) {

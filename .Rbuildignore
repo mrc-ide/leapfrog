@@ -16,3 +16,4 @@ docker
 ^cpp_generation$
 ^c_interface$
 ^delphi$
+^.pytest_cache$
