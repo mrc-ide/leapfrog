@@ -25,7 +25,7 @@ struct Leapfrog {
     const Options<real_type>& opts,
     const std::vector<int> output_years
   ) {
-    int start_from_year = opts.proj_start_year;
+    int simulation_start_year = opts.proj_start_year;
 
     State initial_state = {};
     initial_state.reset();
@@ -33,14 +33,14 @@ struct Leapfrog {
       initial_state.dp.p_total_pop = pars.dp.base_pop;
     }
 
-    return run_model_from_state(pars, opts, initial_state, start_from_year, output_years);
+    return run_model_from_state(pars, opts, initial_state, simulation_start_year, output_years);
   };
 
   static OutputState run_model_from_state(
     const Pars& pars,
     const Options<real_type>& opts,
     const State& initial_state,
-    const int start_from_year,
+    const int simulation_start_year,
     const std::vector<int> output_years
   ) {
     auto state = initial_state;
@@ -54,7 +54,7 @@ struct Leapfrog {
     save_state(opts.proj_start_year, state, output_state, output_years);
 
     // Each time step is mid-point of the year
-    for (int step = start_from_year - opts.proj_start_year + 1; step < opts.proj_time_steps; ++step) {
+    for (int step = simulation_start_year - opts.proj_start_year + 1; step < opts.proj_time_steps; ++step) {
       Args args = { step, pars, state, state_next, intermediate, opts };
       project_year(args);
       save_state(opts.proj_start_year + step, state_next,
@@ -70,7 +70,7 @@ struct Leapfrog {
     const Pars& pars,
     const Options<real_type>& opts,
     const State& initial_state,
-    const int start_from_year
+    const int simulation_start_year
   ) {
     auto state = initial_state;
     auto state_next = state;
@@ -79,7 +79,7 @@ struct Leapfrog {
     Intermediate intermediate;
     intermediate.reset();
 
-    Args args = { start_from_year - opts.proj_start_year + 1, pars, state, state_next, intermediate, opts };
+    Args args = { simulation_start_year - opts.proj_start_year + 1, pars, state, state_next, intermediate, opts };
     project_year(args);
 
     return args.state_next;

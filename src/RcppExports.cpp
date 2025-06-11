@@ -35,31 +35,31 @@ BEGIN_RCPP
 END_RCPP
 }
 // run_base_model_from_state
-Rcpp::List run_base_model_from_state(const Rcpp::List parameters, const std::string configuration, const Rcpp::List initial_state, int start_from_year, const std::vector<int> output_years);
-RcppExport SEXP _frogger_run_base_model_from_state(SEXP parametersSEXP, SEXP configurationSEXP, SEXP initial_stateSEXP, SEXP start_from_yearSEXP, SEXP output_yearsSEXP) {
+Rcpp::List run_base_model_from_state(const Rcpp::List parameters, const std::string configuration, const Rcpp::List initial_state, int simulation_start_year, const std::vector<int> output_years);
+RcppExport SEXP _frogger_run_base_model_from_state(SEXP parametersSEXP, SEXP configurationSEXP, SEXP initial_stateSEXP, SEXP simulation_start_yearSEXP, SEXP output_yearsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::List >::type parameters(parametersSEXP);
     Rcpp::traits::input_parameter< const std::string >::type configuration(configurationSEXP);
     Rcpp::traits::input_parameter< const Rcpp::List >::type initial_state(initial_stateSEXP);
-    Rcpp::traits::input_parameter< int >::type start_from_year(start_from_yearSEXP);
+    Rcpp::traits::input_parameter< int >::type simulation_start_year(simulation_start_yearSEXP);
     Rcpp::traits::input_parameter< const std::vector<int> >::type output_years(output_yearsSEXP);
-    rcpp_result_gen = Rcpp::wrap(run_base_model_from_state(parameters, configuration, initial_state, start_from_year, output_years));
+    rcpp_result_gen = Rcpp::wrap(run_base_model_from_state(parameters, configuration, initial_state, simulation_start_year, output_years));
     return rcpp_result_gen;
 END_RCPP
 }
 // run_base_model_single_year
-Rcpp::List run_base_model_single_year(const Rcpp::List parameters, const std::string configuration, const Rcpp::List initial_state, int start_from_year);
-RcppExport SEXP _frogger_run_base_model_single_year(SEXP parametersSEXP, SEXP configurationSEXP, SEXP initial_stateSEXP, SEXP start_from_yearSEXP) {
+Rcpp::List run_base_model_single_year(const Rcpp::List parameters, const std::string configuration, const Rcpp::List initial_state, int simulation_start_year);
+RcppExport SEXP _frogger_run_base_model_single_year(SEXP parametersSEXP, SEXP configurationSEXP, SEXP initial_stateSEXP, SEXP simulation_start_yearSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::List >::type parameters(parametersSEXP);
     Rcpp::traits::input_parameter< const std::string >::type configuration(configurationSEXP);
     Rcpp::traits::input_parameter< const Rcpp::List >::type initial_state(initial_stateSEXP);
-    Rcpp::traits::input_parameter< int >::type start_from_year(start_from_yearSEXP);
-    rcpp_result_gen = Rcpp::wrap(run_base_model_single_year(parameters, configuration, initial_state, start_from_year));
+    Rcpp::traits::input_parameter< int >::type simulation_start_year(simulation_start_yearSEXP);
+    rcpp_result_gen = Rcpp::wrap(run_base_model_single_year(parameters, configuration, initial_state, simulation_start_year));
     return rcpp_result_gen;
 END_RCPP
 }

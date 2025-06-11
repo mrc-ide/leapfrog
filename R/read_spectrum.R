@@ -266,7 +266,7 @@ dp_read_abortion <- function(dp) {
        pregtermabortion_ispercent = pregtermabortion_ispercent)
 }
 
-#' @rdname dp_read_mothers_reallocated
+#' @rdname dp_read_anc_testing
 #' @export
 dp_read_mothers_reallocated <- function(dp) {
 

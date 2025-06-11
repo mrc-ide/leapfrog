@@ -27,7 +27,7 @@ run_model <- function(parameters,
 #' @param configuration The model configuration to run, see
 #'   [list_model_configurations()] for available configurations
 #' @param initial_state The model will run from this initial state
-#' @param start_from_year Start the model simulation from a particular year
+#' @param simulation_start_year Start the model simulation from a particular year
 #' @param output_years Which years of the model to return from the simulation,
 #'   defaults to all years from 1970 to 2030. Also used to control what years
 #'   the simulation is run for. If output only 2030, simulation will be run
@@ -41,11 +41,11 @@ run_model <- function(parameters,
 run_model_from_state <- function(parameters,
                                  configuration,
                                  initial_state,
-                                 start_from_year,
+                                 simulation_start_year,
                                  output_years = seq(1970, 2030)) {
   parameters <- process_parameters(parameters, configuration)
 
-  run_base_model_from_state(parameters, configuration, initial_state, start_from_year, output_years)
+  run_base_model_from_state(parameters, configuration, initial_state, simulation_start_year, output_years)
 }
 
 #' Run leapfrog model fit for a single year
@@ -54,7 +54,7 @@ run_model_from_state <- function(parameters,
 #' @param configuration The model configuration to run, see
 #'   [list_model_configurations()] for available configurations
 #' @param initial_state The model will run from this initial state
-#' @param start_from_year Start the model simulation from this year
+#' @param simulation_start_year Start the model simulation from this year
 #'
 #' @return List of model outputs without the last time dimension.
 #'   This is different from [run_model_from_state()] and [run_model()]
@@ -67,10 +67,10 @@ run_model_from_state <- function(parameters,
 run_model_single_year <- function(parameters,
                                   configuration,
                                   initial_state,
-                                  start_from_year) {
+                                  simulation_start_year) {
   parameters <- process_parameters(parameters, configuration)
 
-  run_base_model_single_year(parameters, configuration, initial_state, start_from_year)
+  run_base_model_single_year(parameters, configuration, initial_state, simulation_start_year)
 }
 
 

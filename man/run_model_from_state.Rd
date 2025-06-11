@@ -8,7 +8,7 @@ run_model_from_state(
   parameters,
   configuration,
   initial_state,
-  start_from_year,
+  simulation_start_year,
   output_years = seq(1970, 2030)
 )
 }
@@ -20,7 +20,7 @@ run_model_from_state(
 
 \item{initial_state}{The model will run from this initial state}
 
-\item{start_from_year}{Start the model simulation from a particular year}
+\item{simulation_start_year}{Start the model simulation from a particular year}
 
 \item{output_years}{Which years of the model to return from the simulation,
 defaults to all years from 1970 to 2030. Also used to control what years

@@ -8,7 +8,7 @@ run_model_single_year(
   parameters,
   configuration,
   initial_state,
-  start_from_year
+  simulation_start_year
 )
 }
 \arguments{
@@ -19,7 +19,7 @@ run_model_single_year(
 
 \item{initial_state}{The model will run from this initial state}
 
-\item{start_from_year}{Start the model simulation from this year}
+\item{simulation_start_year}{Start the model simulation from this year}
 }
 \value{
 List of model outputs without the last time dimension.
