@@ -648,8 +648,21 @@ dp_read_paed_art_eligibility <- function(dp) {
   list(cd4_elig = art_elig, age_elig = art_elig_age)
 }
 
-
-prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1) {
+#' Prepare child HIV projection parameters from Spectrum PJNZ
+#'
+#' @param pjnz path to PJNZ file
+#' @param params The adult HIV projection parameters from [prepare_leapfrog_projp()]
+#'
+#' @return List of child HIV projection parameters
+#'
+#' @examples
+#' pjnz <- system.file(
+#'   "pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ",
+#'   package = "frogger", mustWork = TRUE)
+#' projp <- prepare_leapfrog_projp(pjnz)
+#' projp <- prepare_hc_leapfrog_projp(pjnz, projp)
+#' @export
+prepare_hc_leapfrog_projp <- function(pjnz, params) {
   dp.x <- get_dp_data(pjnz)
 
   ## projection parameters
