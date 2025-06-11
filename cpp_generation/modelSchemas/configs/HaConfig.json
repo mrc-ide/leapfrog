@@ -25,7 +25,7 @@
       "total_rate": {
         "type": "TM",
         "num_type": "real_type",
-        "dims": ["opts.proj_time_steps"],
+        "dims": ["opts.proj_steps"],
         "alias": {
           "r": "incidinput"
         }
@@ -33,7 +33,7 @@
       "relative_risk_age": {
         "type": "TM",
         "num_type": "real_type",
-        "dims": ["SS::pAG - SS::p_idx_hiv_first_adult", "SS::NS", "opts.proj_time_steps"],
+        "dims": ["SS::pAG - SS::p_idx_hiv_first_adult", "SS::NS", "opts.proj_steps"],
         "alias": {
           "r": "incrr_age"
         }
@@ -41,7 +41,7 @@
       "relative_risk_sex": {
         "type": "TM",
         "num_type": "real_type",
-        "dims": ["opts.proj_time_steps"],
+        "dims": ["opts.proj_steps"],
         "alias": {
           "r": "incrr_sex"
         }
@@ -80,7 +80,7 @@
       "idx_hm_elig": {
         "type": "TM",
         "num_type": "int",
-        "dims": ["opts.proj_time_steps"],
+        "dims": ["opts.proj_steps"],
         "alias": {
           "r": "artcd4elig_idx"
         }
@@ -96,7 +96,7 @@
       "mortality_time_rate_ratio": {
         "type": "TM",
         "num_type": "real_type",
-        "dims": ["SS::hTS", "opts.proj_time_steps"],
+        "dims": ["SS::hTS", "opts.proj_steps"],
         "alias": {
           "r": "artmx_timerr"
         }
@@ -111,7 +111,7 @@
       "dropout_rate": {
         "type": "TM",
         "num_type": "real_type",
-        "dims": ["opts.proj_time_steps"],
+        "dims": ["opts.proj_steps"],
         "alias": {
           "r": "art_dropout_rate"
         }
@@ -119,7 +119,7 @@
       "adults_on_art": {
         "type": "TM",
         "num_type": "real_type",
-        "dims": ["SS::NS", "opts.proj_time_steps"],
+        "dims": ["SS::NS", "opts.proj_steps"],
         "alias": {
           "r": "art15plus_num"
         }
@@ -127,7 +127,7 @@
       "adults_on_art_is_percent": {
         "type": "TM",
         "num_type": "int",
-        "dims": ["SS::NS", "opts.proj_time_steps"],
+        "dims": ["SS::NS", "opts.proj_steps"],
         "alias": {
           "r": "art15plus_isperc"
         }

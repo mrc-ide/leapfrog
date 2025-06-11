@@ -54,7 +54,7 @@ struct Leapfrog {
     save_state(opts.proj_start_year, state, output_state, output_years);
 
     // Each time step is mid-point of the year
-    for (int step = simulation_start_year - opts.proj_start_year + 1; step < opts.proj_time_steps; ++step) {
+    for (int step = simulation_start_year - opts.proj_start_year + 1; step < opts.proj_steps; ++step) {
       Args args = { step, pars, state, state_next, intermediate, opts };
       project_year(args);
       save_state(opts.proj_start_year + step, state_next,
