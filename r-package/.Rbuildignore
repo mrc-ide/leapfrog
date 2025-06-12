@@ -7,8 +7,8 @@ docker
 ^.vscode$
 ^.idea$
 ^scripts$
-^inst/standalone_model/simulate_model$
-^inst/standalone_model/model_gprofile$
+^r-package/int/standalone_model/simulate_model$
+^r-package/int/standalone_model/model_gprofile$
 ^tmp$
 ^README\.Rmd$
 ^CPPLINT\.cfg$

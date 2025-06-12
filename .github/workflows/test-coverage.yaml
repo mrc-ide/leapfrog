@@ -14,6 +14,10 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
+    defaults:
+      run:
+        working-directory: r-package
+
     steps:
       - uses: actions/checkout@v4
 
@@ -26,6 +30,7 @@ jobs:
         with:
           extra-packages: covr, any::here
           needs: coverage
+          working-directory: r-package
 
       - name: Test coverage
         run: |

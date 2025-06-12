@@ -57,6 +57,19 @@ test_that("We can compile the standalone program", {
   parameters <- readRDS(test_path("testdata/adult_parms.rds"))
   expected <- run_model(parameters, output_years = 1970:2030L)
 
+  # exclude <- c("base_pop", "h_art_stage_dur")
+  # for (r_name in names(name_mapping)) {
+  #   cpp_name <- name_mapping[[r_name]]
+  #   p <- parameters[[r_name]]
+  #   if (!(cpp_name %in% exclude) && !is.null(p)) {
+  #     p2 <- deserialize_tensor_to_r(file.path(input, cpp_name))
+  #     if (is.logical(p)) {
+  #       p <- as.numeric(p)
+  #     }
+  #     expect_equal(p, p2, tolerance = 1e-5, label = r_name, expected.label = cpp_name, ignore_attr = TRUE)
+  #   }
+  # }
+
   ## There is some precision loss in standalone data due to serialization
   ## so check up to appropriate tolerance
   expect_equal(deserialize_tensor_to_r(file.path(output, "p_total_pop")),

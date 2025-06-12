@@ -33,6 +33,7 @@ build_name_mapping <- function() {
     })
   })
   all_params <- unlist(all_params)
+  all_params
 }
 name_mapping <- build_name_mapping()
 

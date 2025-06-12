@@ -3,6 +3,6 @@
 .RData
 .Ruserdata
 .idea
-inst/doc
+r-package/int/doc
 .vscode
 README.html

@@ -22,7 +22,7 @@ The overall aim of this is to allow researchers to write these model extensions 
 
 ### Model variants
 
-Leapfrog has a set of `ModelVariant`s which can be run. See [`inst/include/model_variants.hpp`](https://github.com/mrc-ide/frogger/blob/main/inst/include/model_variants.hpp) for details of these. Each model variant is a collection of boolean switches or enums. These are used to turn on or off different parts of the code when it is run, so that leapfrog can have different extensions and we can compose these together in any way we want. These model variants are evaluated at compile time. When you compile the code, there will be an instance in the compiled binary for each variant your code will call. This will cause the binary to be larger but we chose to do it this way because we wanted the speed from the compile-time plymorphism. We still need to benchmark this to see how much of a gain it actually gives.
+Leapfrog has a set of `ModelVariant`s which can be run. See [`r-package/int/include/model_variants.hpp`](https://github.com/mrc-ide/frogger/blob/main/r-package/int/include/model_variants.hpp) for details of these. Each model variant is a collection of boolean switches or enums. These are used to turn on or off different parts of the code when it is run, so that leapfrog can have different extensions and we can compose these together in any way we want. These model variants are evaluated at compile time. When you compile the code, there will be an instance in the compiled binary for each variant your code will call. This will cause the binary to be larger but we chose to do it this way because we wanted the speed from the compile-time plymorphism. We still need to benchmark this to see how much of a gain it actually gives.
 
 All model functions are templated on the model variant, and any conditional behaviour based upon the model variant should be written as an [`if constexpr`](https://en.cppreference.com/w/cpp/language/if).
 
@@ -64,7 +64,7 @@ Leapfrog runs a top-level loop over the time step. At the end of each time step,
 run_model(data, parameters, 1970:2030, 10, 2030)
 ```
 
-This time output is managed by the state saver see [`inst/include/state_saver.hpp`](https://github.com/mrc-ide/frogger/blob/main/inst/include/state_saver.hpp)
+This time output is managed by the state saver see [`r-package/int/include/state_saver.hpp`](https://github.com/mrc-ide/frogger/blob/main/r-package/int/include/state_saver.hpp)
 
 ## Adding new input, output or intermediate data
 
@@ -75,7 +75,7 @@ Leapfrog uses code generation to write the code for wiring up the input and outp
 
 ### Input data
 
-Input data is generated from csv file in [`inst/include/model_input.hpp`](https://github.com/mrc-ide/frogger/blob/main/inst/include/model_input.hpp), the columns in this file are
+Input data is generated from csv file in [`r-package/int/include/model_input.hpp`](https://github.com/mrc-ide/frogger/blob/main/r-package/int/include/model_input.hpp), the columns in this file are
 
 1. `r_name` - The name of the data in R, from either `data` or `parameters` struct passed to `run_model`
 1. `cpp_name` - The name of the data in C++, the label you will use to refer to the data within the leapfrog model. Use a name which adheres to the naming convention rules in the README.
@@ -91,7 +91,7 @@ Input data is generated from csv file in [`inst/include/model_input.hpp`](https:
 
 Note that the dims can be any of the state space sizes or `proj_years` for the number of years in the projection. See the [README](https://mrc-ide.github.io/frogger/#state-space) for valid state space sizes.
 
-After making changes to the [`model_input.csv`](https://github.com/mrc-ide/frogger/blob/main/inst/cpp_generation/model_input.csv), run the generate script [`scripts/generate`](https://github.com/mrc-ide/frogger/blob/main/scripts/generate). This update file [`inst/include/model_input.hpp`](https://github.com/mrc-ide/frogger/blob/main/inst/include/model_input.hpp). Note that this file should never be changed manually as the generate script will completely rewrite it.
+After making changes to the [`model_input.csv`](https://github.com/mrc-ide/frogger/blob/main/inst/cpp_generation/model_input.csv), run the generate script [`scripts/generate`](https://github.com/mrc-ide/frogger/blob/main/scripts/generate). This update file [`r-package/int/include/model_input.hpp`](https://github.com/mrc-ide/frogger/blob/main/r-package/int/include/model_input.hpp). Note that this file should never be changed manually as the generate script will completely rewrite it.
 
 After regenerating the code, rebuild the project and you are ready to use the new input data in C++.
 
@@ -115,7 +115,7 @@ Note that the dims can be any of the state space sizes or `proj_years` for the n
 ### Intermediate data
 
 Intermediate data is used as a place to store
-The intermediate data is not handled by code generation as it only requires changes in one place. You can make modifications by adding new data into the struct in [`inst/include/types.hpp`](https://github.com/mrc-ide/frogger/blob/main/inst/include/types.hpp), making sure to set its default value in the `reset` function on the struct.
+The intermediate data is not handled by code generation as it only requires changes in one place. You can make modifications by adding new data into the struct in [`r-package/int/include/types.hpp`](https://github.com/mrc-ide/frogger/blob/main/r-package/int/include/types.hpp), making sure to set its default value in the `reset` function on the struct.
 
 ## Adding a new model variant
 
@@ -127,16 +127,16 @@ The required changes will be different depending on if your new variant is one o
 
 To add a new variant. Firstly, in the code generation:
 
-1. Add any new input or output data in [`inst/include/model_input.csv`](https://github.com/mrc-ide/frogger/blob/main/inst/cpp_generation/model_input.csv) or [`inst/include/model_output.csv`](https://github.com/mrc-ide/frogger/blob/main/inst/cpp_generation/model_output.csv)
+1. Add any new input or output data in [`r-package/int/include/model_input.csv`](https://github.com/mrc-ide/frogger/blob/main/inst/cpp_generation/model_input.csv) or [`r-package/int/include/model_output.csv`](https://github.com/mrc-ide/frogger/blob/main/inst/cpp_generation/model_output.csv)
 1. If you have new input data, add a specialism for the new variant into the state_types template in [`inst/cpp_generation/state_types.hpp.in`](https://github.com/mrc-ide/frogger/blob/main/inst/cpp_generation/state_types.hpp.in)
 1. Run the generate script
 
 In the C++ code:
 
-1. Add your new variant in [`inst/include/model_variants.hpp`](https://github.com/mrc-ide/frogger/blob/main/inst/include/model_variants.hpp)
-1. Add a struct for the new state space in [`inst/include/state_space.hpp`](https://github.com/mrc-ide/frogger/blob/main/inst/include/state_space.hpp)
-1. If your model has new input data, add parameters for this variant in [`inst/include/parameters.hpp`](https://github.com/mrc-ide/frogger/blob/main/inst/include/parameters.hpp). Parameter types will be generated, you need to add those types to the appropriate template specialisation
-1. If your model has new output data, add a new specialisation in [`inst/include/state_saver.hpp`](https://github.com/mrc-ide/frogger/blob/main/inst/include/state_saver.hpp)
+1. Add your new variant in [`r-package/int/include/model_variants.hpp`](https://github.com/mrc-ide/frogger/blob/main/r-package/int/include/model_variants.hpp)
+1. Add a struct for the new state space in [`r-package/int/include/state_space.hpp`](https://github.com/mrc-ide/frogger/blob/main/r-package/int/include/state_space.hpp)
+1. If your model has new input data, add parameters for this variant in [`r-package/int/include/parameters.hpp`](https://github.com/mrc-ide/frogger/blob/main/r-package/int/include/parameters.hpp). Parameter types will be generated, you need to add those types to the appropriate template specialisation
+1. If your model has new output data, add a new specialisation in [`r-package/int/include/state_saver.hpp`](https://github.com/mrc-ide/frogger/blob/main/r-package/int/include/state_saver.hpp)
 
 You now need to update the R wrapper to be able to call this new variant:
 

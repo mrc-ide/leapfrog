@@ -1,7 +1,7 @@
-#include "../inst/include/frogger.hpp"
-#include "../inst/include/generated/tensor_types.hpp"
-#include "../inst/include/generated/c_interface/c_types.hpp"
-#include "../inst/include/generated/c_interface/c_adapters.hpp"
+#include "../r-package/intage/int/include/frogger.hpp"
+#include "../r-package/int/include/generated/tensor_types.hpp"
+#include "../r-package/int/include/generated/c_interface/c_types.hpp"
+#include "../r-package/int/include/generated/c_interface/c_adapters.hpp"
 
 #include <windows.h>
 #include <numeric>

@@ -1,2 +1,2 @@
-inst/include/generated/** linguist-generated
+r-package/inst/include/generated/** linguist-generated
 delphi/LeapfrogInterface.pas linguist-generated
