@@ -12,7 +12,9 @@ library(dplyr)
 ## Create demographic and projection parameters for adults
 pjnz_adult <- system.file("pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ", package = "frogger", mustWork = TRUE)
 
-parameters <- prepare_leapfrog_parameters(pjnz)
+demp <- prepare_leapfrog_demp(pjnz_adult)
+proj <- prepare_leapfrog_projp(pjnz_adult)
+parameters <- c(demp, proj)
 saveRDS(parameters, testthat::test_path("testdata/adult_parms.rds"))
 
 # Used as reference data (Run from leapfrog/master)
