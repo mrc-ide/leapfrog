@@ -8,9 +8,13 @@
 <url><loc>/index.html</loc></url>
 <url><loc>/reference/beers_open_ended.html</loc></url>
 <url><loc>/reference/deserialize_tensor_to_r.html</loc></url>
+<url><loc>/reference/dp_read_anc_testing.html</loc></url>
+<url><loc>/reference/get_time_slice.html</loc></url>
 <url><loc>/reference/group_list_of_lists.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
 <url><loc>/reference/list_model_configurations.html</loc></url>
+<url><loc>/reference/pipe.html</loc></url>
+<url><loc>/reference/prepare_hc_leapfrog_projp.html</loc></url>
 <url><loc>/reference/prepare_leapfrog_demp.html</loc></url>
 <url><loc>/reference/prepare_leapfrog_parameters.html</loc></url>
 <url><loc>/reference/prepare_leapfrog_projp.html</loc></url>

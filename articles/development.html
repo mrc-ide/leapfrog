@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">frogger</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.2</span>
       </span>
     </div>
 
@@ -123,7 +123,7 @@ an <a href="https://en.cppreference.com/w/cpp/language/if" class="external-link"
 </h3>
 <p>All model functions should have the same signature e.g.</p>
 <pre><code>template&lt;typename ModelVariant, typename real_type&gt;
-void my_model_function(int time_step,
+void my_model_function(int proj_step,
                        const Parameters&lt;ModelVariant, real_type&gt; &amp;pars,
                        const State&lt;ModelVariant, real_type&gt; &amp;state_curr,
                        State&lt;ModelVariant, real_type&gt; &amp;state_next,
@@ -135,7 +135,7 @@ conditional behaviour based upon the variant being run see <a href="#model-varia
 <li>Templated on <code>real_type</code> - this is used by TMB during
 fitting. Under a normal fit this will be a <code>double</code>.</li>
 <li>
-<code>time_step</code> - the current time step of the model as an
+<code>proj_step</code> - the current time step of the model as an
 index, e.g. if running for 1970:2030, this will start at <code>1</code>
 and loop to <code>61</code>. Any input data you read based on time step
 index should have <code>1970</code> at the first index. Index
@@ -145,10 +145,10 @@ index should have <code>1970</code> at the first index. Index
 read-only values</li>
 <li>
 <code>state_curr</code> - the state at the current point in time
-i.e. at <code>t = time_step - 1</code>. This is read-only.</li>
+i.e. at <code>t = proj_step - 1</code>. This is read-only.</li>
 <li>
 <code>state_next</code> - the state at the next time point, i.e. at
-<code>t = time_step</code>. This is what we are currently populating
+<code>t = proj_step</code>. This is what we are currently populating
 from the previous time step and the parameters.</li>
 <li>
 <code>intermediate</code> - a palce for storing any data used within

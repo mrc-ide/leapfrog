@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">frogger</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.2</span>
       </span>
     </div>
 
@@ -98,6 +98,15 @@ time, e.g. <code>p_total_pop</code> state variable has dimensions 81 x 2. If
 will have dimensions 81 x 2 x 61.</p>
     </div>
 
+    <div id="ref-examples">
+    <h2>Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">pjnz</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ"</span>,</span></span>
+<span class="r-in"><span>  package <span class="op">=</span> <span class="st">"frogger"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="prepare_leapfrog_parameters.html">prepare_leapfrog_parameters</a></span><span class="op">(</span><span class="va">pjnz</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu">run_model</span><span class="op">(</span><span class="va">parameters</span>, <span class="st">"HivCoarseAgeStratification"</span>, <span class="fl">1970</span><span class="op">:</span><span class="fl">2030</span><span class="op">)</span></span></span>
+</code></pre></div>
+    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>
