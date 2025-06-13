@@ -95,7 +95,7 @@ Rcpp::List simulate_model(
   const Rcpp::List parameters,
   const std::vector<int> output_years,
   Rcpp::List initial_state_data,
-  int start_from_year
+  int simulation_start_year
 ) {
   using LF = LeapfrogR<ModelVariant>;
 
@@ -103,8 +103,8 @@ Rcpp::List simulate_model(
   const auto pars = LF::Cfg::get_pars(parameters, opts);
 
   typename LF::State initial_state = LF::Cfg::get_initial_state(initial_state_data);
-  auto state = LF::run_model_from_state(pars, opts, initial_state, start_from_year, output_years);
-  
+  auto state = LF::run_model_from_state(pars, opts, initial_state, simulation_start_year, output_years);
+
   return build_output_r<ModelVariant>(state, output_years);
 }
 
@@ -112,16 +112,16 @@ template<typename ModelVariant>
 Rcpp::List simulate_model(
   const Rcpp::List parameters,
   Rcpp::List initial_state_data,
-  int start_from_year
+  int simulation_start_year
 ) {
   using LF = LeapfrogR<ModelVariant>;
 
-  const auto opts = get_opts_r(parameters, { start_from_year + 1 });
+  const auto opts = get_opts_r(parameters, { simulation_start_year + 1 });
   const auto pars = LF::Cfg::get_pars(parameters, opts);
 
   typename LF::State initial_state = LF::Cfg::get_initial_state(initial_state_data);
-  auto state = LF::run_model_single_year(pars, opts, initial_state, start_from_year);
-  
+  auto state = LF::run_model_single_year(pars, opts, initial_state, simulation_start_year);
+
   return build_output_r<ModelVariant>(state);
 }
 
@@ -166,22 +166,22 @@ Rcpp::List run_base_model(
 }
 
 // [[Rcpp::export]]
-Rcpp::List run_base_model_from_state( 
+Rcpp::List run_base_model_from_state(
   const Rcpp::List parameters,
   const std::string configuration,
   const Rcpp::List initial_state,
-  int start_from_year,
+  int simulation_start_year,
   const std::vector<int> output_years
 ) {
-  return sim_model(configuration, parameters, output_years, initial_state, start_from_year);
+  return sim_model(configuration, parameters, output_years, initial_state, simulation_start_year);
 }
 
 // [[Rcpp::export]]
-Rcpp::List run_base_model_single_year( 
+Rcpp::List run_base_model_single_year(
   const Rcpp::List parameters,
   const std::string configuration,
   const Rcpp::List initial_state,
-  int start_from_year
+  int simulation_start_year
 ) {
-  return sim_model(configuration, parameters, initial_state, start_from_year);
+  return sim_model(configuration, parameters, initial_state, simulation_start_year);
 }

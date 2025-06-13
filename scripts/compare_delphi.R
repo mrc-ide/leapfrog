@@ -36,14 +36,12 @@ build_name_mapping <- function() {
     })
   })
   all_params <- unlist(all_params)
-  setNames(all_params, to_lower_camel(names(all_params)))
+  stats::setNames(all_params, to_lower_camel(names(all_params)))
 }
 
 name_mapping <- build_name_mapping()
 
 pkgload::load_all()
-source('./scripts/spectrum_inputs_paeds.R')
-source('./scripts/read_spectrum.R')
 demp <- prepare_leapfrog_demp(pjnz)
 proj <- prepare_leapfrog_projp(pjnz)
 proj <- prepare_hc_leapfrog_projp(pjnz, proj)
@@ -55,7 +53,7 @@ params$scale_cd4_mort <- TRUE
 expected <- process_parameters(params, "ChildModel")
 
 delphi_params <- list.files(param_dirs, full.names = TRUE)
-delphi_params <- setNames(delphi_params, basename(delphi_params))
+delphi_params <- stats::setNames(delphi_params, basename(delphi_params))
 actual <- lapply(delphi_params, deserialize_tensor_to_r)
 
 ## There are some inputs which you can supply from R to use direct input instead
@@ -81,7 +79,7 @@ for (param in compare) {
 
 expected_result <- run_model(params, "ChildModel")
 delphi_output <- list.files(output_dirs, full.names = TRUE)
-delphi_output <- setNames(delphi_output, basename(delphi_output))
+delphi_output <- stats::setNames(delphi_output, basename(delphi_output))
 actual_result <- lapply(delphi_output, deserialize_tensor_to_r)
 
 for (state in names(actual_result)) {

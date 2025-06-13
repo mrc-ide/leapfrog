@@ -52,7 +52,7 @@ struct Options {
   const int proj_period_int;
   const int proj_start_year;
   const int proj_end_year;
-  const int proj_time_steps;
+  const int proj_steps;
 
   Options(
     int hts_per_year,
@@ -67,7 +67,7 @@ struct Options {
     proj_period_int(proj_period_int),
     proj_start_year(proj_start_year),
     proj_end_year(proj_end_year),
-    proj_time_steps(proj_end_year - proj_start_year + 1) {}
+    proj_steps(proj_end_year - proj_start_year + 1) {}
 };
 
 template<typename real_type>

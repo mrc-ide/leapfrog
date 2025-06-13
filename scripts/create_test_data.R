@@ -8,8 +8,6 @@
 # nolint start
 library(frogger)
 library(dplyr)
-source('./scripts/spectrum_inputs_paeds.R')
-source('./scripts/read_spectrum.R')
 
 ## Create demographic and projection parameters for adults
 pjnz_adult <- system.file("pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ", package = "frogger", mustWork = TRUE)
@@ -87,8 +85,8 @@ spectrum_output <- function(file = "../testdata/spectrum/v6.13/bwa_aim-no-specia
 
 }
 df <- spectrum_output(pop1, ages = 0:80, 'country', years_in = 1970:2030)
-x = data.table(df$total)
-x[age <10 & year == 2001]
+x <- df$total
+x[x$age <10 & x$year == 2001, ]
 
 tag.x ="<AIDSDeathsNoARTSingleAge MV>"
 start.id = 20898

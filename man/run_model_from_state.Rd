@@ -8,7 +8,7 @@ run_model_from_state(
   parameters,
   configuration,
   initial_state,
-  start_from_year,
+  simulation_start_year,
   output_years = seq(1970, 2030)
 )
 }
@@ -20,7 +20,7 @@ run_model_from_state(
 
 \item{initial_state}{The model will run from this initial state}
 
-\item{start_from_year}{Start the model simulation from a particular year}
+\item{simulation_start_year}{Start the model simulation from a particular year}
 
 \item{output_years}{Which years of the model to return from the simulation,
 defaults to all years from 1970 to 2030. Also used to control what years
@@ -35,4 +35,17 @@ will have dimensions 81 x 2 x 61.
 }
 \description{
 Run leapfrog model fit from initial state
+}
+\examples{
+pjnz <- system.file(
+  "pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ",
+  package = "frogger", mustWork = TRUE)
+parameters <- prepare_leapfrog_parameters(pjnz)
+out_first_half_years <- run_model(parameters, "HivCoarseAgeStratification", 1970:2000)
+out_second_half_years <- run_model_from_state(
+  parameters,
+  "HivCoarseAgeStratification",
+  get_time_slice(out_first_half_years, 31),
+  2000,
+  2001:2030)
 }

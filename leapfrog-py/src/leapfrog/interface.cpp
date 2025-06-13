@@ -296,7 +296,7 @@ PYBIND11_MODULE(leapfrog, m) {
     m.def(
         "project_single_year_cpp",
         &leapfrog::project_single_year<leapfrog::ChildModel, double>,
-        py::arg("time_step"),
+        py::arg("proj_step"),
         py::arg("pars"),
         py::arg("state_curr"),
         py::arg("state_next"),

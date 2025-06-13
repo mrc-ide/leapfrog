@@ -12,6 +12,12 @@
 #'   time, e.g. `p_total_pop` state variable has dimensions 81 x 2. If
 #'   `output_years` specified has length 61 then the `p_total_pop` output
 #'   will have dimensions 81 x 2 x 61.
+#' @examples
+#' pjnz <- system.file(
+#'   "pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ",
+#'   package = "frogger", mustWork = TRUE)
+#' parameters <- prepare_leapfrog_parameters(pjnz)
+#' out <- run_model(parameters, "HivCoarseAgeStratification", 1970:2030)
 #' @export
 run_model <- function(parameters,
                       configuration = "HivFullAgeStratification",
@@ -27,7 +33,7 @@ run_model <- function(parameters,
 #' @param configuration The model configuration to run, see
 #'   [list_model_configurations()] for available configurations
 #' @param initial_state The model will run from this initial state
-#' @param start_from_year Start the model simulation from a particular year
+#' @param simulation_start_year Start the model simulation from a particular year
 #' @param output_years Which years of the model to return from the simulation,
 #'   defaults to all years from 1970 to 2030. Also used to control what years
 #'   the simulation is run for. If output only 2030, simulation will be run
@@ -37,15 +43,27 @@ run_model <- function(parameters,
 #'   time, e.g. `p_total_pop` state variable has dimensions 81 x 2. If
 #'   `output_years` specified has length 61 then the `p_total_pop` output
 #'   will have dimensions 81 x 2 x 61.
+#' @examples
+#' pjnz <- system.file(
+#'   "pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ",
+#'   package = "frogger", mustWork = TRUE)
+#' parameters <- prepare_leapfrog_parameters(pjnz)
+#' out_first_half_years <- run_model(parameters, "HivCoarseAgeStratification", 1970:2000)
+#' out_second_half_years <- run_model_from_state(
+#'   parameters,
+#'   "HivCoarseAgeStratification",
+#'   get_time_slice(out_first_half_years, 31),
+#'   2000,
+#'   2001:2030)
 #' @export
 run_model_from_state <- function(parameters,
                                  configuration,
                                  initial_state,
-                                 start_from_year,
+                                 simulation_start_year,
                                  output_years = seq(1970, 2030)) {
   parameters <- process_parameters(parameters, configuration)
 
-  run_base_model_from_state(parameters, configuration, initial_state, start_from_year, output_years)
+  run_base_model_from_state(parameters, configuration, initial_state, simulation_start_year, output_years)
 }
 
 #' Run leapfrog model fit for a single year
@@ -54,7 +72,7 @@ run_model_from_state <- function(parameters,
 #' @param configuration The model configuration to run, see
 #'   [list_model_configurations()] for available configurations
 #' @param initial_state The model will run from this initial state
-#' @param start_from_year Start the model simulation from this year
+#' @param simulation_start_year Start the model simulation from this year
 #'
 #' @return List of model outputs without the last time dimension.
 #'   This is different from [run_model_from_state()] and [run_model()]
@@ -63,14 +81,26 @@ run_model_from_state <- function(parameters,
 #'   feed the returned list into the next single year model run. In
 #'   contrast to [run_model_from_state()] the `p_total_pop` output will
 #'   have dimensions 81 x 2 not 81 x 2 x 61.
+#' @examples
+#' pjnz <- system.file(
+#'   "pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ",
+#'   package = "frogger", mustWork = TRUE)
+#' parameters <- prepare_leapfrog_parameters(pjnz)
+#' out_first_half_years <- run_model(parameters, "HivCoarseAgeStratification", 1970:2000)
+#' prev_state <- get_time_slice(out_first_half_years, 31)
+#' for (i in 2001:2029) {
+#'   new_state <- run_model_single_year(parameters, "HivCoarseAgeStratification", prev_state, i)
+#'   # Do things with new state, other processes, saving output etc.
+#'   prev_state <- new_state
+#' }
 #' @export
 run_model_single_year <- function(parameters,
                                   configuration,
                                   initial_state,
-                                  start_from_year) {
+                                  simulation_start_year) {
   parameters <- process_parameters(parameters, configuration)
 
-  run_base_model_single_year(parameters, configuration, initial_state, start_from_year)
+  run_base_model_single_year(parameters, configuration, initial_state, simulation_start_year)
 }
 
 
@@ -103,7 +133,16 @@ is_run_hiv_simulation <- function(configuration) {
                        "ChildModel")
 }
 
-get_time_slice <- function(dat, index) {
+#' Slice a single year from model state
+#'
+#' @param state The model state with time dimension
+#' @param index The index of the time step you want to extract
+#'
+#' @return List of model outputs for the specified time step. Can be used as
+#'   input state for [run_model_from_state()] and [run_model_single_year()].
+#'   All outputs will have 1 fewer dimension than input state.
+#' @export
+get_time_slice <- function(state, index) {
   last_ind <- function(x) {
     nd <- length(dim(x))
     inds <- rep(alist(,)[1], nd)
@@ -119,7 +158,7 @@ get_time_slice <- function(dat, index) {
     ret
   }
 
-  lapply(dat, last_ind)
+  lapply(state, last_ind)
 }
 
 concat_on_time_dim <- function(dat1, dat2) {

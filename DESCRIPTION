@@ -1,6 +1,6 @@
 Package: frogger
 Title: Multistate Population Projection Model for Demographic and HIV Estimation
-Version: 0.1.1
+Version: 0.1.2
 Authors@R: c(
     person(given = "Jeffrey",
            family = "Imai-Eaton",
@@ -34,12 +34,13 @@ LinkingTo:
     RcppEigen
 Imports:
     beers,
+    dplyr,
     eppasm (>= 0.8.5),
-    glue,
-    Rcpp
+    magrittr,
+    Rcpp,
+    tidyr
 Suggests:
     abind,
-    dplyr,
     knitr,
     RcppEigen,
     reshape2,

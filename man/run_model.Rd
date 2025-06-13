@@ -30,3 +30,10 @@ will have dimensions 81 x 2 x 61.
 \description{
 Run leapfrog model fit
 }
+\examples{
+pjnz <- system.file(
+  "pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ",
+  package = "frogger", mustWork = TRUE)
+parameters <- prepare_leapfrog_parameters(pjnz)
+out <- run_model(parameters, "HivCoarseAgeStratification", 1970:2030)
+}

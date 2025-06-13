@@ -8,7 +8,7 @@ run_model_single_year(
   parameters,
   configuration,
   initial_state,
-  start_from_year
+  simulation_start_year
 )
 }
 \arguments{
@@ -19,7 +19,7 @@ run_model_single_year(
 
 \item{initial_state}{The model will run from this initial state}
 
-\item{start_from_year}{Start the model simulation from this year}
+\item{simulation_start_year}{Start the model simulation from this year}
 }
 \value{
 List of model outputs without the last time dimension.
@@ -32,4 +32,17 @@ have dimensions 81 x 2 not 81 x 2 x 61.
 }
 \description{
 Run leapfrog model fit for a single year
+}
+\examples{
+pjnz <- system.file(
+  "pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ",
+  package = "frogger", mustWork = TRUE)
+parameters <- prepare_leapfrog_parameters(pjnz)
+out_first_half_years <- run_model(parameters, "HivCoarseAgeStratification", 1970:2000)
+prev_state <- get_time_slice(out_first_half_years, 31)
+for (i in 2001:2029) {
+  new_state <- run_model_single_year(parameters, "HivCoarseAgeStratification", prev_state, i)
+  # Do things with new state, other processes, saving output etc.
+  prev_state <- new_state
+}
 }

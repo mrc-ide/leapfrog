@@ -32,7 +32,7 @@ All model functions should have the same signature e.g.
 
 ```
 template<typename ModelVariant, typename real_type>
-void my_model_function(int time_step,
+void my_model_function(int proj_step,
                        const Parameters<ModelVariant, real_type> &pars,
                        const State<ModelVariant, real_type> &state_curr,
                        State<ModelVariant, real_type> &state_next,
@@ -43,10 +43,10 @@ To explain what is going on here
 
 * Templated on `ModelVariant` - this is used for any conditional behaviour based upon the variant being run see [Model variants] for details.
 * Templated on `real_type` - this is used by TMB during fitting. Under a normal fit this will be a `double`.
-* `time_step` - the current time step of the model as an index, e.g. if running for 1970:2030, this will start at `1` and loop to `61`. Any input data you read based on time step index should have `1970` at the first index. Index `1` in R and `0` in C++.
+* `proj_step` - the current time step of the model as an index, e.g. if running for 1970:2030, this will start at `1` and loop to `61`. Any input data you read based on time step index should have `1970` at the first index. Index `1` in R and `0` in C++.
 * `pars` - the parameters for this model, these are read-only values
-* `state_curr` - the state at the current point in time i.e. at `t = time_step - 1`. This is read-only.
-* `state_next` - the state at the next time point, i.e. at `t = time_step`. This is what we are currently populating from the previous time step and the parameters.
+* `state_curr` - the state at the current point in time i.e. at `t = proj_step - 1`. This is read-only.
+* `state_next` - the state at the next time point, i.e. at `t = proj_step`. This is what we are currently populating from the previous time step and the parameters.
 * `intermediate` - a palce for storing any data used within a single time step. Use this as a place to store intermediate values for use later in your code. This is reset to all 0s at the end of every time step.
 
 Note that after each time step the code will do the following

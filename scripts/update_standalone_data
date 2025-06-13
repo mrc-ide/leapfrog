@@ -35,7 +35,7 @@ build_name_mapping <- function() {
     })
   })
   all_params <- unlist(all_params)
-  setNames(names(all_params), all_params)
+  stats::setNames(names(all_params), all_params)
 }
 
 prepare_input_data <- function(input_data) {
