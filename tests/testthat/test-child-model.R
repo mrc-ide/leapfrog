@@ -163,6 +163,18 @@ test_that("Mothers that need ptmct align", {
   expect_true(all(abs(dt$diff) < 1e-3))
 })
 
+test_that('HIV and ART exposed uninfected children align', {
+  names_list <- list(sex = c('Both', 'Male', 'Female'), year = 1970:2030)
+  hivexp_uninf <- dpsub(dp, tag = "<HIVExpUninfChildren MV>", rows = 4:6, cols = 4:64)
+  hivexp_uninf <- array(as.numeric(unlist(hivexp_uninf)), dim = c(3,length(4:64)),
+                        dimnames = names_list)
+  artexp_uninf <- dpsub(dp, tag = "<ARTExpUninfChildren MV>", rows = 4:6, cols = 4:64)
+  artexp_uninf <- array(as.numeric(unlist(artexp_uninf)), dim = c(3,length(4:64)),
+                        dimnames = names_list)
+
+
+})
+
 test_that("Children in need of cotrim aligns", {
   input <- readRDS(test_path("testdata/child_parms.rds"))
   dp <- input$dp

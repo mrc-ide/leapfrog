@@ -300,6 +300,8 @@ struct ChildModelSimulation<Config> {
 
     i_hc.PMTCT_coverage(4) = i_hc.PMTCT_coverage(4) * p_hc.PMTCT_dropout(0, t);
     i_hc.PMTCT_coverage(5) = i_hc.PMTCT_coverage(5) * p_hc.PMTCT_dropout(1, t);
+
+
   };
 
   void convert_PMTCT_pre_bf() {
@@ -463,6 +465,7 @@ struct ChildModelSimulation<Config> {
   void perinatal_tr() {
     const auto& p_hc = pars.hc;
     auto& n_dp = state_next.dp;
+    auto& n_hc = state_next.hc;
     auto& i_hc = intermediate.hc;
 
     i_hc.births_sum = n_dp.births;
@@ -484,6 +487,13 @@ struct ChildModelSimulation<Config> {
                                        i_hc.retained_on_ART * p_hc.PMTCT_transmission_rate(0, 4, 0) +
                                        i_hc.retained_started_ART * p_hc.PMTCT_transmission_rate(0, 5, 0) +
                                        i_hc.PMTCT_coverage(6) * p_hc.PMTCT_transmission_rate(0, 6, 0);
+
+    for (int hp = 0; hp < hPS; ++hp) {
+      i_hc.total_PMTCT_coverage +=  i_hc.PMTCT_coverage(hp);
+    } // end hPS
+    //needed for calculation of ART exposed uninfected children
+    n_hc.ptr2 = i_hc.perinatal_transmission_rate / i_hc.total_PMTCT_coverage;
+
 
     i_hc.receiving_PMTCT = i_hc.PMTCT_coverage(0) + i_hc.PMTCT_coverage(1) +
                            i_hc.PMTCT_coverage(2) + i_hc.PMTCT_coverage(3) +
@@ -1400,6 +1410,38 @@ struct ChildModelSimulation<Config> {
         } // end hcTT
       } // end  NS
     } // end if
+  };
+
+  void hiv_art_exposed_uninfected() {
+    auto& n_ha = state_next.ha;
+    auto& n_hc = state_next.hc;
+
+    // n_hc.hiv_births * p_dp.births_sex_prop(s, t) - n_ha.p_infections(0, s)
+    //
+    // for (int hd = 0; hd < hDS; ++hd) {
+    //   for (int a = 0; a < p_idx_fertility_first; ++a) {
+    //     for (int s = 0; s < NS; ++s) {
+    //       for (int cat = 0; cat < hcTT; ++cat) {
+    //         if (a < hc2_agestart) {
+    //           n_ha.p_hiv_deaths(a,s) += n_hc.hc1_noart_aids_deaths(hd, cat, a, s);
+    //         } else if (hd < hc2DS) {
+    //           n_ha.p_hiv_deaths(a,s) += n_hc.hc2_noart_aids_deaths(hd, cat, a - hc2_agestart, s);
+    //         }
+    //       } // end hcTT
+    //
+    //       for (int dur = 0; dur < hTS; ++dur) {
+    //         if (a < hc2_agestart) {
+    //           n_ha.p_hiv_deaths(a,s) += n_hc.hc1_art_aids_deaths(dur, hd, a, s);
+    //         } else if (hd < hc2DS) {
+    //           n_ha.p_hiv_deaths(a,s) += n_hc.hc2_art_aids_deaths(dur, hd, a - hc2_agestart, s);
+    //         }
+    //       } // end dur
+    //     } // end NS
+    //   } // end a
+    // } // end hDS
+    //
+
+
   };
 
   void fill_total_pop_outputs() {
