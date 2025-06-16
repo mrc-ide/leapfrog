@@ -3,8 +3,8 @@
 #include <string>
 #include <sstream>
 
-#include "frogger.hpp"
-#include "generated/r_interface/r_adapters.hpp"
+#include "../inst/include/frogger.hpp"
+#include "../inst/include/generated/r_interface/r_adapters.hpp"
 
 
 //' List the avaialble model configurations
@@ -102,8 +102,9 @@ Rcpp::List simulate_model(
   const auto opts = get_opts_r(parameters, output_years);
   const auto pars = LF::Cfg::get_pars(parameters, opts);
 
-  typename LF::State initial_state = LF::Cfg::get_initial_state(initial_state_data);
-  auto state = LF::run_model_from_state(pars, opts, initial_state, simulation_start_year, output_years);
+  // TODO: NDA
+  // typename LF::State initial_state = LF::Cfg::get_initial_state(initial_state_data);
+  auto state = LF::run_model_from_state(pars, opts, {}, simulation_start_year, output_years);
 
   return build_output_r<ModelVariant>(state, output_years);
 }
@@ -119,8 +120,9 @@ Rcpp::List simulate_model(
   const auto opts = get_opts_r(parameters, { simulation_start_year + 1 });
   const auto pars = LF::Cfg::get_pars(parameters, opts);
 
-  typename LF::State initial_state = LF::Cfg::get_initial_state(initial_state_data);
-  auto state = LF::run_model_single_year(pars, opts, initial_state, simulation_start_year);
+  // TODO: NDA
+  // typename LF::State initial_state = LF::Cfg::get_initial_state(initial_state_data);
+  auto state = LF::run_model_single_year(pars, opts, {}, simulation_start_year);
 
   return build_output_r<ModelVariant>(state);
 }

@@ -1,6 +1,9 @@
 #pragma once
 
 #include <algorithm>
+#include <stdexcept>
+#include <string_view>
+#include <vector>
 
 #include "generated/state_space_mixer.hpp"
 
@@ -26,9 +29,6 @@ int get_proj_end_year(const std::vector<int>& output_years) {
                                           std::end(output_years));
   return *last_year;
 }
-
-#include <stdexcept>
-#include <string_view>
 
 int get_proj_period_enum(std::string_view projection_period) {
   if (projection_period == "midyear") {

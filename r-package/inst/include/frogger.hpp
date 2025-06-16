@@ -1,5 +1,6 @@
 #pragma once
 
+#include "array/array.h"
 #include "generated/model_variants.hpp"
 #include "generated/config_mixer.hpp"
 #include "models/general_demographic_projection.hpp"
@@ -32,7 +33,11 @@ struct Leapfrog {
     State initial_state = {};
     initial_state.reset();
     if constexpr (ModelVariant::run_demographic_projection) {
-      initial_state.dp.p_total_pop = pars.dp.base_pop;
+      for (int g = 0; g < SS::NS; ++g) {
+        for (int a = 0; a < SS::pAG; ++a) {
+          initial_state.dp.p_total_pop(a, g) = pars.dp.base_pop(a, g);
+        }
+      }
     }
 
     return run_model_from_state(pars, opts, initial_state, simulation_start_year, output_years);

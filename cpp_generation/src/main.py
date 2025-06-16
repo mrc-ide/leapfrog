@@ -1,5 +1,6 @@
 import json
 import os
+import copy
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
@@ -33,6 +34,40 @@ def generate(template_path, dest_path, *args, **kwargs):
   with open(dest_path, "w") as f:
     f.write(output)
 
+supported_languages = ["r", "python"]
+supported_num_types = ["real_type", "int"]
+
+def process_var_config(name, cfg, is_par = False):
+  if not cfg.get("num_type"):
+    unsupported_num_type_err_msg = f'num_type for {name} should be one of {" or ".join(supported_num_types)}'
+    assert cfg["num_type"] in supported_num_types, unsupported_num_type_err_msg
+
+  if not cfg.get("dims"):
+    cfg["type"] = "scalar"
+  else:
+    dims_not_list_err_msg = f'dims for {name} should be a list'
+    assert isinstance(cfg["dims"], list), dims_not_list_err_msg
+    cfg["type"] = "tensor"
+
+  if not is_par: return
+  if not cfg.get("alias"):
+    cfg["alias"] = { l: name for l in supported_languages }
+  else:
+    alias = cfg["alias"]
+    for l in supported_languages:
+      if not alias.get(l):
+        alias[l] = name
+      else:
+        alias_not_string_err_msg = f'{l} alias for {name} should be a string'
+        assert isinstance(alias[l], str), alias_not_string_err_msg
+
+
+def add_output_year_dim(cfg):
+  if not cfg.get("dims"):
+    cfg["dims"] = ["output_years"]
+  else:
+    cfg["dims"].append("output_years")
+
 
 def apply_default_vars_to_overrides(dat, section):
   overrides = dat[section].get("overrides")
@@ -61,6 +96,27 @@ for cfg in dat["configs"]:
   apply_default_vars_to_overrides(cfg, "state_space")
   apply_default_vars_to_overrides(cfg, "pars")
 
+
+for config in dat["configs"]:
+  config["output_state"] = copy.deepcopy(config["state"])
+  for name, cfg in config["pars"]["default"].items():
+    process_var_config(name, cfg, True)
+  if config["pars"].get("overrides"):
+      for override in config["pars"]["overrides"]:
+          for name, cfg in override["vars"].items():
+              process_var_config(name, cfg, True)
+
+  for name, cfg in config["intermediate"].items():
+    process_var_config(name, cfg)
+
+  for name, cfg in config["state"].items():
+    process_var_config(name, cfg)
+
+  for name, cfg in config["output_state"].items():
+    add_output_year_dim(cfg)
+    process_var_config(name, cfg)
+
+
 file_loader = FileSystemLoader(relative_file_path("..", "templates"))
 env = Environment(
   loader = file_loader,
@@ -76,8 +132,9 @@ generate_hpp("concepts", dat | vars(utils.concepts))
 generate_hpp("state_space_mixer", dat)
 generate_hpp("config", dat | vars(utils.config) | vars(utils.general))
 generate_hpp("config_mixer", dat)
-generate_hpp("cpp_interface/cpp_adapters", dat | vars(utils.config) | vars(utils.general))
+# TODO: NDA
+# generate_hpp("cpp_interface/cpp_adapters", dat | vars(utils.config) | vars(utils.general))
 generate_hpp("r_interface/r_adapters", dat | vars(utils.config) | vars(utils.general))
-generate_hpp("c_interface/c_adapters", dat | vars(utils.config) | vars(utils.general))
-generate_hpp("c_interface/c_types", dat | vars(utils.config) | vars(utils.delphi) | vars(utils.general))
+# generate_hpp("c_interface/c_adapters", dat | vars(utils.config) | vars(utils.general))
+# generate_hpp("c_interface/c_types", dat | vars(utils.config) | vars(utils.delphi) | vars(utils.general))
 generate_delphi("LeapfrogInterface", dat | vars(utils.delphi) | vars(utils.general))

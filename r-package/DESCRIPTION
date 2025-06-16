@@ -30,8 +30,7 @@ Depends: R (>= 4.3.0)
 Config/testthat/edition: 3
 Additional_repositories: https://mrc-ide.r-universe.dev
 LinkingTo:
-    Rcpp,
-    RcppEigen
+    Rcpp
 Imports:
     beers,
     dplyr,
