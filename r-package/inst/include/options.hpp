@@ -5,6 +5,7 @@
 #include <string_view>
 #include <vector>
 #include <cmath>
+#include <string>
 
 #include "generated/state_space_mixer.hpp"
 
