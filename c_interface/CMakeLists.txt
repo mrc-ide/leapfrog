@@ -18,7 +18,7 @@ message(CMAKE_CURRENT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 
 target_include_directories(leapfrog
     PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/../r-package/int/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/../r-package/inst/include
 )
 
 find_package(Eigen3 REQUIRED)

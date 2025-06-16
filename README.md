@@ -33,7 +33,7 @@ You can install the development version of frogger from
 
 ``` r
 # install.packages("remotes")
-remotes::install_github("mrc-ide/frogger", subdir = "R")
+remotes::install_github("mrc-ide/frogger", subdir = "r-package")
 ```
 
 ### Python
@@ -49,7 +49,7 @@ pip install leapfrog-py
 ## Simulation model
 
 The simulation model is implemented in a header-only C++ library located
-in [`r-package/int/include/frogger.hpp`](r-package/int/include/frogger.hpp). This location
+in [`r-package/inst/include/frogger.hpp`](r-package/inst/include/frogger.hpp). This location
 allows the C++ code to be imported in other R packages via specifying
 `LinkingTo: leapfrog` in the `DESCRIPTION` file.
 
@@ -63,7 +63,7 @@ See the [R README](r-package/README.md) for details of running the model from R.
 ### Simulation model
 
 The simulation model is implemented as templated C++ code in
-`r-package/int/include/frogger.hpp`. This is so the simulation model may be
+`r-package/inst/include/frogger.hpp`. This is so the simulation model may be
 developed as a standalone C++ library that can be called by other
 software without requiring R-specific code features. The code uses
 header-only open source libraries to maximize portability.
