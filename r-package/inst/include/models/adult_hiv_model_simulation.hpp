@@ -70,9 +70,9 @@ struct AdultHivModelSimulation<Config> {
     run_calculate_incidence_rate();
 
     for (int hiv_step = 0; hiv_step < opts.hts_per_year; ++hiv_step) {
-      nda::fill(i_ha.grad, 0);
-      nda::fill(i_ha.gradART, 0);
-      nda::fill(i_ha.p_hiv_deaths_age_sex, 0);
+      nda::fill(i_ha.grad, 0.0);
+      nda::fill(i_ha.gradART, 0.0);
+      nda::fill(i_ha.p_hiv_deaths_age_sex, 0.0);
 
       run_disease_progression_and_mortality(hiv_step);
       run_new_p_infections(hiv_step);
@@ -163,7 +163,7 @@ struct AdultHivModelSimulation<Config> {
     const auto adult_incid_last_age_group = adult_incid_first_age_group + pAG_INCIDPOP;
 
     for (int g = 0; g < NS; ++g) {
-      nda::fill(i_ha.hiv_negative_pop, 0);
+      nda::fill(i_ha.hiv_negative_pop, 0.0);
       i_ha.Xhivn_incagerr = 0.0;
 
       for (int a = adult_incid_first_age_group; a < pAG; ++a) {
@@ -260,10 +260,10 @@ struct AdultHivModelSimulation<Config> {
     for (int g = 0; g < NS; ++g) {
       i_ha.Xart_15plus = 0.0;
 
-      nda::fill(i_ha.artelig_hm, 0);
+      nda::fill(i_ha.artelig_hm, 0.0);
       i_ha.Xartelig_15plus = 0.0;
 
-      nda::fill(i_ha.expect_mort_artelig_hm, 0);
+      nda::fill(i_ha.expect_mort_artelig_hm, 0.0);
       i_ha.expect_mort_artelig15plus = 0.0;
 
       for (int ha = hIDX_15PLUS; ha < hAG; ++ha) {

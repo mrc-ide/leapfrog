@@ -206,10 +206,10 @@ struct ChildModelSimulation<Config> {
       i_hc.prev = i_hc.nHIVcurr / n_dp.p_total_pop(a + 15, 1);
 
       for (int hd = 0; hd < hDS; ++hd) {
-        i_hc.df += p_hc.local_adj_factor * p_hc.fert_mult_by_age(a_fert_idx) * p_hc.fert_mult_off_art(hd) *
+        i_hc.df += p_hc.local_adj_factor * p_hc.fert_mult_by_age(a_fert_idx, t) * p_hc.fert_mult_off_art(hd) *
                    (n_ha.h_hiv_adult(hd, a, 1) + c_ha.h_hiv_adult(hd, a, 1)) / 2;
         // women on ART less than 6 months use the off art fertility multiplier
-        i_hc.df += p_hc.local_adj_factor * p_hc.fert_mult_by_age(a_fert_idx) * p_hc.fert_mult_off_art(hd) *
+        i_hc.df += p_hc.local_adj_factor * p_hc.fert_mult_by_age(a_fert_idx, t) * p_hc.fert_mult_off_art(hd) *
                    (n_ha.h_art_adult(0, hd, a, 1) + c_ha.h_art_adult(0, hd, a, 1)) / 2;
         for (int ht = 1; ht < hTS; ++ht) {
           i_hc.df += p_hc.local_adj_factor * p_hc.fert_mult_on_art(a_fert_idx) *
