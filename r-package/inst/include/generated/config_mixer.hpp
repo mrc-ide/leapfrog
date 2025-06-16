@@ -6,7 +6,7 @@
 #pragma once
 
 #include "config.hpp"
-#include "../options.hpp"
+#include "options.hpp"
 
 namespace leapfrog {
 
