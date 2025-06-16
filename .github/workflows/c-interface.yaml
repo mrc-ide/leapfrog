@@ -1,0 +1,31 @@
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+name: c-interface
+
+jobs:
+  c-interface:
+    runs-on: windows-latest
+
+    name: windows-latest
+
+    timeout-minutes: 15
+
+    strategy:
+      fail-fast: false
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Eigen3
+        run: choco install eigen
+
+      - name: Compile DLL
+        shell: bash
+        run: ./c_interface/build_dll.sh --configure
