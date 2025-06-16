@@ -1,4 +1,4 @@
-#include "../r-package/intage/inst/include/frogger.hpp"
+#include "../r-package/inst/include/frogger.hpp"
 #include "../r-package/inst/include/generated/tensor_types.hpp"
 #include "../r-package/inst/include/generated/c_interface/c_types.hpp"
 #include "../r-package/inst/include/generated/c_interface/c_adapters.hpp"
