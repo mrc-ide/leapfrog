@@ -1051,12 +1051,12 @@ struct ChildModelSimulation<Config> {
             if (a < hc2_agestart) {
               bool any_hc1_art_deaths = i_hc.hc_death_rate * n_hc.hc1_art_pop(dur, hd, a, s) >= 0;
               if (any_hc1_art_deaths) {
-                i_hc.hc_art_deaths(p_hc.hc_age_coarse(a)) += i_hc.hc_death_rate * n_hc.hc1_art_pop(dur, hd, a, s);
+                i_hc.hc_art_deaths(hc_age_coarse[a]) += i_hc.hc_death_rate * n_hc.hc1_art_pop(dur, hd, a, s);
               }
             } else if (hd < hc2DS) {
               bool any_hc2_art_deaths = i_hc.hc_death_rate * n_hc.hc2_art_pop(dur, hd, a - hc2_agestart, s) >= 0;
               if (any_hc2_art_deaths) {
-                i_hc.hc_art_deaths(p_hc.hc_age_coarse(a)) += i_hc.hc_death_rate *
+                i_hc.hc_art_deaths(hc_age_coarse[a]) += i_hc.hc_death_rate *
                                                              n_hc.hc2_art_pop(dur, hd, a - hc2_agestart, s);
               }
             }
