@@ -863,6 +863,17 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, pop_1){
 
   art_dist_paed <- dp_read_art_dist(dp.x)
   v$init_art_dist <- art_dist_paed
+  init_art_dist_htn <- array(data = NA,
+                               dim = c(15,2),
+                               dimnames = list(age = 0:14, trt_hist = c('ART naive', 'Previously on ART')))
+  init_art_dist_htn[1,] <- c(1,0)
+  init_art_dist_htn[2:5,1] <- 0.6497048
+  init_art_dist_htn[2:5,2] <- 0.35029520
+  init_art_dist_htn[6:10,1] <- 0.3220689
+  init_art_dist_htn[6:10,2] <- 0.67793111
+  init_art_dist_htn[11:15,1] <- 0.2939364
+  init_art_dist_htn[11:15,2] <- 0.70606356
+  v$init_art_dist_htn <- init_art_dist_htn
 
   ##BF duration
   bf_duration <- input_breastfeeding_dur(dp.x)
