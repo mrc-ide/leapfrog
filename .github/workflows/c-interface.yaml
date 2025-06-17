@@ -23,9 +23,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Eigen3
-        run: choco install eigen
-
       - name: Compile DLL
         shell: bash
         run: ./c_interface/build_dll.sh --configure

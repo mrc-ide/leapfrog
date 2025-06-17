@@ -47,7 +47,6 @@
   "pars": {
     "default": {
       "hc_nosocomial": {
-        "type": "TM",
         "num_type": "real_type",
         "dims": ["opts.proj_steps"],
         "alias": {
@@ -55,7 +54,6 @@
         }
       },
       "hc1_cd4_dist": {
-        "type": "TM",
         "num_type": "real_type",
         "dims": ["SS::hc1DS"],
         "alias": {
@@ -63,7 +61,6 @@
         }
       },
       "hc1_cd4_mort": {
-        "type": "TM",
         "num_type": "real_type",
         "dims": ["SS::hc1DS", "SS::hcTT", "SS::hc1AG"],
         "alias": {
@@ -71,7 +68,6 @@
         }
       },
       "hc2_cd4_mort": {
-        "type": "TM",
         "num_type": "real_type",
         "dims": ["SS::hc2DS", "SS::hcTT", "SS::hc2AG"],
         "alias": {
@@ -79,7 +75,6 @@
         }
       },
       "hc1_cd4_prog": {
-        "type": "TM",
         "num_type": "real_type",
         "dims": ["SS::hc1DS", "SS::hc1AG_c", "SS::NS"],
         "alias": {
@@ -87,7 +82,6 @@
         }
       },
       "hc2_cd4_prog": {
-        "type": "TM",
         "num_type": "real_type",
         "dims": ["SS::hc2DS", "SS::hc2AG_c", "SS::NS"],
         "alias": {
@@ -95,15 +89,10 @@
         }
       },
       "ctx_val": {
-        "type": "TM",
         "num_type": "real_type",
-        "dims": ["opts.proj_steps"],
-        "alias": {
-          "r": "ctx_val"
-        }
+        "dims": ["opts.proj_steps"]
       },
       "hc_art_elig_age": {
-        "type": "TM",
         "num_type": "int",
         "dims": ["opts.proj_steps"],
         "alias": {
@@ -111,7 +100,6 @@
         }
       },
       "hc_art_elig_cd4": {
-        "type": "TM",
         "num_type": "int",
         "dims": ["SS::p_idx_hiv_first_adult", "opts.proj_steps"],
         "alias": {
@@ -119,7 +107,6 @@
         }
       },
       "hc_art_mort_rr": {
-        "type": "TM",
         "num_type": "real_type",
         "dims": ["SS::hTS", "SS::p_idx_hiv_first_adult", "opts.proj_steps"],
         "alias": {
@@ -127,7 +114,6 @@
         }
       },
       "hc1_art_mort": {
-        "type": "TM",
         "num_type": "real_type",
         "dims": ["SS::hc1DS", "SS::hTS", "SS::hc1AG"],
         "alias": {
@@ -135,7 +121,6 @@
         }
       },
       "hc2_art_mort": {
-        "type": "TM",
         "num_type": "real_type",
         "dims": ["SS::hc2DS", "SS::hTS", "SS::hc2AG"],
         "alias": {
@@ -143,7 +128,6 @@
         }
       },
       "hc_art_isperc": {
-        "type": "TM",
         "num_type": "int",
         "dims": ["opts.proj_steps"],
         "alias": {
@@ -151,7 +135,6 @@
         }
       },
       "hc_art_val": {
-        "type": "TM",
         "num_type": "real_type",
         "dims": ["SS::hcAG_coarse", "opts.proj_steps"],
         "alias": {
@@ -159,7 +142,6 @@
         }
       },
       "hc_art_init_dist": {
-        "type": "TM",
         "num_type": "real_type",
         "dims": ["SS::p_idx_hiv_first_adult", "opts.proj_steps"],
         "alias": {
@@ -167,7 +149,6 @@
         }
       },
       "fert_mult_by_age": {
-        "type": "TM",
         "num_type": "real_type",
         "dims": ["SS::hAG_fert", "opts.proj_steps"],
         "alias": {
@@ -175,7 +156,6 @@
         }
       },
       "fert_mult_off_art": {
-        "type": "TM",
         "num_type": "real_type",
         "dims": ["SS::hDS"],
         "alias": {
@@ -183,7 +163,6 @@
         }
       },
       "fert_mult_on_art": {
-        "type": "TM",
         "num_type": "real_type",
         "dims": ["SS::hAG_fert"],
         "alias": {
@@ -191,7 +170,6 @@
         }
       },
       "total_fertility_rate": {
-        "type": "TM",
         "num_type": "real_type",
         "dims": ["opts.proj_steps"],
         "alias": {
@@ -199,7 +177,6 @@
         }
       },
       "PMTCT": {
-        "type": "TM",
         "num_type": "real_type",
         "dims": ["SS::hPS", "opts.proj_steps"],
         "alias": {
@@ -207,7 +184,6 @@
         }
       },
       "vertical_transmission_rate": {
-        "type": "TM",
         "num_type": "real_type",
         "dims": ["SS::hDS + 1", "SS::hVT"],
         "alias": {
@@ -215,7 +191,6 @@
         }
       },
       "PMTCT_transmission_rate": {
-        "type": "TM",
         "num_type": "real_type",
         "dims": ["SS::hDS", "SS::hPS", "SS::hVT"],
         "alias": {
@@ -223,7 +198,6 @@
         }
       },
       "PMTCT_dropout": {
-        "type": "TM",
         "num_type": "real_type",
         "dims": ["SS::hPS_dropout", "opts.proj_steps"],
         "alias": {
@@ -231,7 +205,6 @@
         }
       },
       "PMTCT_input_is_percent": {
-        "type": "TM",
         "num_type": "int",
         "dims": ["opts.proj_steps"],
         "alias": {
@@ -239,7 +212,6 @@
         }
       },
       "breastfeeding_duration_art": {
-        "type": "TM",
         "num_type": "real_type",
         "dims": ["SS::hBF", "opts.proj_steps"],
         "alias": {
@@ -247,7 +219,6 @@
         }
       },
       "breastfeeding_duration_no_art": {
-        "type": "TM",
         "num_type": "real_type",
         "dims": ["SS::hBF", "opts.proj_steps"],
         "alias": {
@@ -255,39 +226,22 @@
         }
       },
       "mat_hiv_births": {
-        "type": "TM",
         "num_type": "real_type",
-        "dims": ["opts.proj_steps"],
-        "alias": {
-          "r": "mat_hiv_births"
-        }
+        "dims": ["opts.proj_steps"]
       },
       "mat_prev_input": {
-        "type": "TM",
         "num_type": "int",
-        "dims": ["opts.proj_steps"],
-        "alias": {
-          "r": "mat_prev_input"
-        }
+        "dims": ["opts.proj_steps"]
       },
       "prop_lt200": {
-        "type": "TM",
         "num_type": "real_type",
-        "dims": ["opts.proj_steps"],
-        "alias": {
-          "r": "prop_lt200"
-        }
+        "dims": ["opts.proj_steps"]
       },
       "prop_gte350": {
-        "type": "TM",
         "num_type": "real_type",
-        "dims": ["opts.proj_steps"],
-        "alias": {
-          "r": "prop_gte350"
-        }
+        "dims": ["opts.proj_steps"]
       },
       "ctx_val_is_percent": {
-        "type": "TM",
         "num_type": "int",
         "dims": ["opts.proj_steps"],
         "alias": {
@@ -295,7 +249,6 @@
         }
       },
       "hc_art_is_age_spec": {
-        "type": "TM",
         "num_type": "int",
         "dims": ["opts.proj_steps"],
         "alias": {
@@ -303,23 +256,14 @@
         }
       },
       "abortion": {
-        "type": "TM",
         "num_type": "real_type",
-        "dims": ["SS::hAB_ind", "opts.proj_steps"],
-        "alias": {
-          "r": "abortion"
-        }
+        "dims": ["SS::hAB_ind", "opts.proj_steps"]
       },
       "patients_reallocated": {
-        "type": "TM",
         "num_type": "real_type",
-        "dims": ["opts.proj_steps"],
-        "alias": {
-          "r": "patients_reallocated"
-        }
+        "dims": ["opts.proj_steps"]
       },
       "hc_art_ltfu": {
-        "type": "TM",
         "num_type": "real_type",
         "dims": ["opts.proj_steps"],
         "alias": {
@@ -327,15 +271,10 @@
         }
       },
       "adult_female_infections": {
-        "type": "TM",
         "num_type": "real_type",
-        "dims": ["SS::p_fertility_age_groups", "opts.proj_steps"],
-        "alias": {
-          "r": "adult_female_infections"
-        }
+        "dims": ["SS::p_fertility_age_groups", "opts.proj_steps"]
       },
       "adult_female_hivnpop": {
-        "type": "TM",
         "num_type": "real_type",
         "dims": ["SS::p_fertility_age_groups", "opts.proj_steps"],
         "alias": {
@@ -343,30 +282,17 @@
         }
       },
       "total_births": {
-        "type": "TM",
         "num_type": "real_type",
-        "dims": ["opts.proj_steps"],
-        "alias": {
-          "r": "total_births"
-        }
+        "dims": ["opts.proj_steps"]
       },
       "ctx_effect": {
-        "type": "TM",
         "num_type": "real_type",
-        "dims": ["3"],
-        "alias": {
-          "r": "ctx_effect"
-        }
+        "dims": ["3"]
       },
       "hc_art_start": {
-        "type": "scalar",
-        "num_type": "int",
-        "alias": {
-          "r": "hc_art_start"
-        }
+        "num_type": "int"
       },
       "local_adj_factor": {
-        "type": "scalar",
         "num_type": "real_type",
         "alias": {
           "r": "laf"
@@ -376,349 +302,271 @@
   },
   "intermediate": {
     "age15_hiv_pop": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hc2DS", "SS::NS"]
     },
     "age15_art_pop": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hTS", "SS::hDS", "SS::NS"]
     },
     "hc_posthivmort": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hDS", "SS::hcTT", "SS::hAG", "SS::NS"]
     },
     "hc_grad": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hDS", "SS::hcTT", "SS::hAG", "SS::NS"]
     },
     "eligible": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hDS", "SS::hAG", "SS::NS"]
     },
     "unmet_need": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hcAG_coarse"]
     },
     "total_need": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hcAG_coarse"]
     },
     "on_art": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hcAG_coarse"]
     },
     "total_art_last_year": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hcAG_coarse"]
     },
     "total_art_this_year": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hcAG_coarse"]
     },
     "hc_art_grad": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hDS", "SS::hcTT", "SS::hAG", "SS::NS"]
     },
     "hc_art_scalar": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hcAG_coarse"]
     },
     "hc_initByAge": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hcAG_coarse"]
     },
     "hc_adj": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hcAG_coarse"]
     },
     "hc_art_deaths": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hcAG_coarse"]
     },
     "hc_hiv_dist": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hDS", "SS::hcTT", "SS::hcAG_end", "SS::NS"]
     },
     "hc_hiv_total": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hDS", " SS::hcAG_end", "SS::NS"]
     },
     "art_ltfu_grad": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hDS", "SS::hcTT", "SS::hcAG_end", "SS::NS"]
     },
     "p_hiv_neg_pop": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hAG", "SS::NS"]
     },
     "PMTCT_coverage": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hPS"]
     },
     "bf_transmission_rate": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hBF_coarse"]
     },
     "retained": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "hc_death_rate": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "asfr_sum": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "births_sum": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "nHIVcurr": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "nHIVlast": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "df": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "prev": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "birthsCurrAge": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "birthsHE": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "births_HE_15_24": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "sumARV": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "need_PMTCT": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "on_PMTCT": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "num_wlhiv_lt200": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "num_wlhiv_200to350": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "num_wlhiv_gte350": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "num_wlhiv": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "prop_wlhiv_lt200": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "prop_wlhiv_200to350": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "prop_wlhiv_gte350": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "prop_wlhiv_lt350": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "excessratio": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "excessratio_bf": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "optA_transmission_rate": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "optB_transmission_rate": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "optA_bf_transmission_rate": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "optB_bf_transmission_rate": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "retained_on_ART": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "retained_started_ART": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "perinatal_transmission_rate": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "receiving_PMTCT": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "no_PMTCT": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "perinatal_transmission_rate_bf_calc": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "age_weighted_hivneg": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "age_weighted_infections": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "incidence_rate_wlhiv": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "perinatal_transmission_from_incidence": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "bf_at_risk": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "bf_incident_hiv_transmission_rate": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "percent_no_treatment": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "percent_on_treatment": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "bf_scalar": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "ctx_mean": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["3"]
     }
   },
   "state": {
     "hc1_hiv_pop": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hc1DS", "SS::hcTT", "SS::hc1AG", "SS::NS"]
     },
     "hc2_hiv_pop": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hc2DS", "SS::hcTT", "SS::hc2AG", "SS::NS"]
     },
     "hc1_art_pop": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hTS", "SS::hc1DS", "SS::hc1AG", "SS::NS"]
     },
     "hc2_art_pop": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hTS", "SS::hc2DS", "SS::hc2AG", "SS::NS"]
     },
     "hc1_noart_aids_deaths": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hc1DS", "SS::hcTT", "SS::hc1AG", "SS::NS"]
     },
     "hc2_noart_aids_deaths": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hc2DS", "SS::hcTT", "SS::hc2AG", "SS::NS"]
     },
     "hc1_art_aids_deaths": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hTS", "SS::hc1DS", "SS::hc1AG", "SS::NS"]
     },
     "hc2_art_aids_deaths": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hTS", "SS::hc2DS", "SS::hc2AG", "SS::NS"]
     },
     "hc_art_init": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hcAG_coarse"]
     },
     "hc_art_need_init": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hc1DS", "SS::hcTT", "SS::hcAG_end", "SS::NS"]
     },
     "hiv_births": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "ctx_need": {
-      "type": "scalar",
       "num_type": "real_type"
     },
     "infection_by_type": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hcTT", "SS::hc1AG", "SS::NS"]
     }

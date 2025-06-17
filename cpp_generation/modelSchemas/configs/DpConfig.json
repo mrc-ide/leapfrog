@@ -12,7 +12,6 @@
   "pars": {
     "default": {
       "base_pop": {
-        "type": "TM",
         "num_type": "real_type",
         "dims": ["SS::pAG", "SS::NS"],
         "alias": {
@@ -20,7 +19,6 @@
         }
       },
       "survival_probability": {
-        "type": "TM",
         "num_type": "real_type",
         "dims": ["SS::pAG + 1", "SS::NS", "opts.proj_steps"],
         "alias": {
@@ -28,7 +26,6 @@
         }
       },
       "net_migration": {
-        "type": "TM",
         "num_type": "real_type",
         "dims": ["SS::pAG", "SS::NS", "opts.proj_steps"],
         "alias": {
@@ -36,7 +33,6 @@
         }
       },
       "age_specific_fertility_rate": {
-        "type": "TM",
         "num_type": "real_type",
         "dims": ["SS::p_fertility_age_groups", "opts.proj_steps"],
         "alias": {
@@ -44,35 +40,27 @@
         }
       },
       "births_sex_prop": {
-        "type": "TM",
         "num_type": "real_type",
-        "dims": ["SS::NS", "opts.proj_steps"],
-        "alias": {
-          "r": "births_sex_prop"
-        }
+        "dims": ["SS::NS", "opts.proj_steps"]
       }
     }
   },
   "intermediate": {
     "migration_rate": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::pAG", "SS::NS"]
     }
   },
   "state": {
     "p_total_pop": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::pAG", "SS::NS"]
     },
     "p_total_pop_background_deaths": {
-      "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::pAG", "SS::NS"]
     },
     "births": {
-      "type": "scalar",
       "num_type": "real_type"
     }
   }
