@@ -78,7 +78,7 @@ struct {{ config.name }}Config {
 
     OutputState(int output_years):
       {% for name, cfg in config.output_state.items() %}
-      {{ name }}({ {{ collapse(cfg.dims) }} }){{ comma_except_last(loop) }}
+      {{ name }}(shape_{{ name }}({{ collapse(cfg.dims) }})){{ comma_except_last(loop) }}
       {% endfor %}
     {
       {% for name, cfg in config.output_state.items() %}

@@ -100,9 +100,9 @@ struct DpConfig {
     nda::array<real_type, shape_births> births;
 
     OutputState(int output_years):
-      p_total_pop({ SS::pAG, SS::NS, output_years }),
-      p_total_pop_background_deaths({ SS::pAG, SS::NS, output_years }),
-      births({ output_years })
+      p_total_pop(shape_p_total_pop(SS::pAG, SS::NS, output_years)),
+      p_total_pop_background_deaths(shape_p_total_pop_background_deaths(SS::pAG, SS::NS, output_years)),
+      births(shape_births(output_years))
     {
       p_total_pop.for_each_value([](real_type& x) { x = 0; });
       p_total_pop_background_deaths.for_each_value([](real_type& x) { x = 0; });
@@ -469,15 +469,15 @@ struct HaConfig {
     nda::array<real_type, shape_p_hiv_deaths> p_hiv_deaths;
 
     OutputState(int output_years):
-      p_hiv_pop({ SS::pAG, SS::NS, output_years }),
-      p_hiv_pop_background_deaths({ SS::pAG, SS::NS, output_years }),
-      h_hiv_adult({ SS::hDS, SS::hAG, SS::NS, output_years }),
-      h_art_adult({ SS::hTS, SS::hDS, SS::hAG, SS::NS, output_years }),
-      h_hiv_deaths_no_art({ SS::hDS, SS::hAG, SS::NS, output_years }),
-      p_infections({ SS::pAG, SS::NS, output_years }),
-      h_hiv_deaths_art({ SS::hTS, SS::hDS, SS::hAG, SS::NS, output_years }),
-      h_art_initiation({ SS::hDS, SS::hAG, SS::NS, output_years }),
-      p_hiv_deaths({ SS::pAG, SS::NS, output_years })
+      p_hiv_pop(shape_p_hiv_pop(SS::pAG, SS::NS, output_years)),
+      p_hiv_pop_background_deaths(shape_p_hiv_pop_background_deaths(SS::pAG, SS::NS, output_years)),
+      h_hiv_adult(shape_h_hiv_adult(SS::hDS, SS::hAG, SS::NS, output_years)),
+      h_art_adult(shape_h_art_adult(SS::hTS, SS::hDS, SS::hAG, SS::NS, output_years)),
+      h_hiv_deaths_no_art(shape_h_hiv_deaths_no_art(SS::hDS, SS::hAG, SS::NS, output_years)),
+      p_infections(shape_p_infections(SS::pAG, SS::NS, output_years)),
+      h_hiv_deaths_art(shape_h_hiv_deaths_art(SS::hTS, SS::hDS, SS::hAG, SS::NS, output_years)),
+      h_art_initiation(shape_h_art_initiation(SS::hDS, SS::hAG, SS::NS, output_years)),
+      p_hiv_deaths(shape_p_hiv_deaths(SS::pAG, SS::NS, output_years))
     {
       p_hiv_pop.for_each_value([](real_type& x) { x = 0; });
       p_hiv_pop_background_deaths.for_each_value([](real_type& x) { x = 0; });
@@ -1145,19 +1145,19 @@ struct HcConfig {
     nda::array<real_type, shape_infection_by_type> infection_by_type;
 
     OutputState(int output_years):
-      hc1_hiv_pop({ SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, output_years }),
-      hc2_hiv_pop({ SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS, output_years }),
-      hc1_art_pop({ SS::hTS, SS::hc1DS, SS::hc1AG, SS::NS, output_years }),
-      hc2_art_pop({ SS::hTS, SS::hc2DS, SS::hc2AG, SS::NS, output_years }),
-      hc1_noart_aids_deaths({ SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, output_years }),
-      hc2_noart_aids_deaths({ SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS, output_years }),
-      hc1_art_aids_deaths({ SS::hTS, SS::hc1DS, SS::hc1AG, SS::NS, output_years }),
-      hc2_art_aids_deaths({ SS::hTS, SS::hc2DS, SS::hc2AG, SS::NS, output_years }),
-      hc_art_init({ SS::hcAG_coarse, output_years }),
-      hc_art_need_init({ SS::hc1DS, SS::hcTT, SS::hcAG_end, SS::NS, output_years }),
-      hiv_births({ output_years }),
-      ctx_need({ output_years }),
-      infection_by_type({ SS::hcTT, SS::hc1AG, SS::NS, output_years })
+      hc1_hiv_pop(shape_hc1_hiv_pop(SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, output_years)),
+      hc2_hiv_pop(shape_hc2_hiv_pop(SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS, output_years)),
+      hc1_art_pop(shape_hc1_art_pop(SS::hTS, SS::hc1DS, SS::hc1AG, SS::NS, output_years)),
+      hc2_art_pop(shape_hc2_art_pop(SS::hTS, SS::hc2DS, SS::hc2AG, SS::NS, output_years)),
+      hc1_noart_aids_deaths(shape_hc1_noart_aids_deaths(SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, output_years)),
+      hc2_noart_aids_deaths(shape_hc2_noart_aids_deaths(SS::hc2DS, SS::hcTT, SS::hc2AG, SS::NS, output_years)),
+      hc1_art_aids_deaths(shape_hc1_art_aids_deaths(SS::hTS, SS::hc1DS, SS::hc1AG, SS::NS, output_years)),
+      hc2_art_aids_deaths(shape_hc2_art_aids_deaths(SS::hTS, SS::hc2DS, SS::hc2AG, SS::NS, output_years)),
+      hc_art_init(shape_hc_art_init(SS::hcAG_coarse, output_years)),
+      hc_art_need_init(shape_hc_art_need_init(SS::hc1DS, SS::hcTT, SS::hcAG_end, SS::NS, output_years)),
+      hiv_births(shape_hiv_births(output_years)),
+      ctx_need(shape_ctx_need(output_years)),
+      infection_by_type(shape_infection_by_type(SS::hcTT, SS::hc1AG, SS::NS, output_years))
     {
       hc1_hiv_pop.for_each_value([](real_type& x) { x = 0; });
       hc2_hiv_pop.for_each_value([](real_type& x) { x = 0; });
