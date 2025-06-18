@@ -6,7 +6,7 @@
 
 repo_root <- gert::git_find()
 configs_dir <- file.path(repo_root, "cpp_generation/modelSchemas/configs")
-save_root_dir <- file.path(repo_root, "inst/standalone_model/data")
+save_root_dir <- file.path(repo_root, "r-package/inst/standalone_model/data")
 
 write_standalone_data <- function(input_data, data_map, dest) {
   t <- tempfile()
@@ -16,7 +16,9 @@ write_standalone_data <- function(input_data, data_map, dest) {
   frogger:::serialize_r_to_tensor(input_data$basepop[, , 1],
                                   file.path(t, "base_pop"))
   for (r_name in setdiff(names(data_map), "basepop")) {
-    frogger:::serialize_r_to_tensor(input_data[[r_name]], file.path(t, data_map[[r_name]]))
+    if (!is.null(input_data[[r_name]])) {
+      frogger:::serialize_r_to_tensor(input_data[[r_name]], file.path(t, data_map[[r_name]]))
+    }
   }
   o <- zip::zip(dest,
                 list.files(t, full.names = TRUE),
@@ -40,14 +42,13 @@ build_name_mapping <- function() {
 
 prepare_input_data <- function(input_data) {
   # Convert indices to 0 based
-  # TODO: Remove this in the future, we should -1 off
-  # before we serialize the data
-  if ("artcd4elig_idx" %in% names(parameters)) {
-    parameters[["artcd4elig_idx"]] <- parameters[["artcd4elig_idx"]] - 1L
+  if ("artcd4elig_idx" %in% names(input_data)) {
+    input_data[["artcd4elig_idx"]] <- input_data[["artcd4elig_idx"]] - 1L
   }
-  if ("paed_art_elig_cd4" %in% names(parameters)) {
-    parameters[["paed_art_elig_cd4"]] <- parameters[["paed_art_elig_cd4"]] - 1L
+  if ("paed_art_elig_cd4" %in% names(input_data)) {
+    input_data[["paed_art_elig_cd4"]] <- input_data[["paed_art_elig_cd4"]] - 1L
   }
+
   hTS <- dim(input_data[["artmx_timerr"]])[[1]]
   input_data$h_art_stage_dur <- rep(0.5, hTS - 1)
   input_data

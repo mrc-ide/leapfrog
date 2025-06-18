@@ -30,6 +30,10 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
 
+    defaults:
+      run:
+        working-directory: r-package
+
     steps:
       - uses: actions/checkout@v4
 
@@ -46,6 +50,7 @@ jobs:
         with:
           extra-packages: any::rcmdcheck, any::here
           needs: check
+          working-directory: r-package
 
       - name: Extract test data
         run: ./inst/standalone_model/extract_data
@@ -54,3 +59,4 @@ jobs:
         with:
           error-on: '"error"'
           upload-snapshots: true
+          working-directory: r-package

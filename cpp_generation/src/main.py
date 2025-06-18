@@ -45,7 +45,7 @@ def apply_default_vars_to_overrides(dat, section):
 
 def generate_hpp(template_name, *args, **kwargs):
   template_path = f'cpp/{template_name}.j2'
-  dest_path = relative_file_path("..", "..", "inst", "include", "generated", f"{template_name}.hpp")
+  dest_path = relative_file_path("..", "..", "r-package", "inst", "include", "generated", f"{template_name}.hpp")
   generate(template_path, dest_path, *args, **kwargs)
 
 

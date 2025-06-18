@@ -43,7 +43,7 @@ jobs:
 
       - name: Extract test data
         shell: bash
-        run: ../inst/standalone_model/extract_data
+        run: ../r-package/int/standalone_model/extract_data
 
       # We need to install R to run the test to compare R and Python output
       - uses: r-lib/actions/setup-r@v2
