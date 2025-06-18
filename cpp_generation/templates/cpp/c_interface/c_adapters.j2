@@ -38,8 +38,8 @@ void fill_initial_state(T* data, int length, const std::string_view name, nda::a
   });
 }
 
-template<typename T, size_t Rank>
-void write_data(const nda::array_of_rank<T, Rank>& array, T* output, int length, std::string_view name) {
+template<typename T, typename Shape>
+void write_data(const nda::array<T, Shape>& array, T* output, int length, std::string_view name) {
   const auto* dataPtr = array.data();
   std::size_t totalSize = array.size();
 
