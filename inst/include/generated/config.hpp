@@ -271,7 +271,6 @@ struct HcConfig {
     TM1<int> hc_art_isperc;
     TM2<real_type> hc_art_val;
     TM2<real_type> hc_art_init_dist;
-    TM2<real_type> hc_art_init_dist_htn;
     TM2<real_type> adult_cd4_dist;
     TM1<real_type> fert_mult_by_age;
     TM1<real_type> fert_mult_off_art;
@@ -323,9 +322,7 @@ struct HcConfig {
     TFS<real_type, SS::hPS_agg, SS::hTS, SS::hDS, SS::hcTT, SS::hAG, SS::NS, SS::hTN> hc_art_grad_strat;
     TFS<real_type, SS::hcAG_coarse> hc_art_scalar;
     TFS<real_type, SS::hcAG_coarse> hc_initByAge;
-    TFS<real_type, SS::hcAG_coarse, SS::hTN> hc_initByAge_strat;
     TFS<real_type, SS::hcAG_coarse> hc_adj;
-    TFS<real_type, SS::hcAG_coarse, SS::hTN> hc_adj_strat;
     TFS<real_type, SS::hcAG_coarse> hc_art_deaths;
     TFS<real_type, SS::hDS, SS::hcTT, SS::hcAG_end, SS::NS> hc_hiv_dist;
     TFS<real_type, SS::hPS_agg, SS::hDS, SS::hcTT, SS::hcAG_end, SS::NS, SS::hTN> hc_hiv_dist_strat;
@@ -408,9 +405,7 @@ struct HcConfig {
       hc_art_grad_strat.setZero();
       hc_art_scalar.setZero();
       hc_initByAge.setZero();
-      hc_initByAge_strat.setZero();
       hc_adj.setZero();
-      hc_adj_strat.setZero();
       hc_art_deaths.setZero();
       hc_hiv_dist.setZero();
       hc_hiv_dist_strat.setZero();

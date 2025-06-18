@@ -1869,16 +1869,6 @@ private:
             for (int cat = 0; cat < hcTT; ++cat) {
               i_hc.hc_initByAge(p_hc.hc_age_coarse(a)) += n_hc.hc_art_need_init(hd, cat, a, s) *
                 p_hc.hc_art_init_dist(a, t);
-
-              for (int htn = 0; htn < hTN; ++htn) {
-                for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
-                  i_hc.hc_initByAge_strat(p_hc.hc_age_coarse(a), htn)  +=
-                    n_hc.hc_art_need_init_strat(hp_agg, hd, cat, a, s, htn) *
-                    p_hc.hc_art_init_dist(a, t) *
-                    p_hc.hc_art_init_dist_htn(a, htn);
-                }
-              }
-
             } // end hcTT
           } // end hc1DS
         } // end a
@@ -1889,15 +1879,8 @@ private:
           i_hc.hc_adj(ag) = 1.0;
         } else {
           i_hc.hc_adj(ag) = n_hc.hc_art_init(ag) / i_hc.hc_initByAge(ag);
-          for (int htn = 0; htn < hTN; ++htn) {
-            i_hc.hc_adj_strat(ag,htn) = n_hc.hc_art_init(ag) / i_hc.hc_initByAge_strat(ag, htn);
-            if(i_hc.hc_initByAge_strat(ag, htn) == 0.0){
-              i_hc.hc_adj_strat(ag,htn) = 1.0;
-            }
-          }
         }
       }
-
 
       for (int s = 0; s < NS; ++s) {
         for (int cat = 0; cat < hcTT; ++cat) {
@@ -1905,7 +1888,6 @@ private:
             for (int hd = 0; hd < hc1DS; ++hd) {
               auto& coarse_hc_adj = i_hc.hc_adj(p_hc.hc_age_coarse(a));
               auto& coarse_hc_art_scalar = i_hc.hc_art_scalar(p_hc.hc_age_coarse(a));
-
               auto hc_art_val_sum = p_hc.hc_art_val(0, t) + p_hc.hc_art_val(1, t) +
                 p_hc.hc_art_val(2, t) + p_hc.hc_art_val(3, t);
               auto hc_art_val_sum_last = p_hc.hc_art_val(0, t - 1) + p_hc.hc_art_val(1, t - 1) +
@@ -1916,22 +1898,13 @@ private:
                 coarse_hc_art_scalar = std::min(coarse_hc_adj * p_hc.hc_art_init_dist(a, t), 1.0);
               }
 
-
               auto art_initiates = coarse_hc_art_scalar * n_hc.hc_art_need_init(hd, cat, a, s);
+
               if (a < hc2_agestart) {
                 n_hc.hc1_art_pop(0, hd, a, s) += art_initiates;
                 n_hc.hc1_hiv_pop(hd, cat, a, s) -= art_initiates;
 
                 for (int htn = 0; htn < hTN; ++htn) {
-                  auto& coarse_hc_adj_strat = i_hc.hc_adj_strat(p_hc.hc_age_coarse(a),htn);
-                  auto& coarse_hc_art_scalar_strat = i_hc.hc_art_scalar(p_hc.hc_age_coarse(a));
-                  if (hc_art_val_sum + hc_art_val_sum_last <= 0.0) {
-                    coarse_hc_art_scalar_strat = 0.0;
-                  } else {
-                    coarse_hc_art_scalar_strat = std::min(coarse_hc_adj_strat *
-                      p_hc.hc_art_init_dist(a, t) *
-                      p_hc.hc_art_init_dist_htn(a, htn), 1.0);
-                  }
                   for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
                     auto art_initiates_strat = coarse_hc_art_scalar * n_hc.hc_art_need_init_strat(hp_agg, hd, cat, a, s, htn);
                     n_hc.hc1_art_pop_strat(hp_agg, 0, hd, cat, a, s, htn) += art_initiates_strat;
@@ -1943,15 +1916,6 @@ private:
                 n_hc.hc2_hiv_pop(hd, cat, a - hc2_agestart, s) -=  art_initiates;
 
                 for (int htn = 0; htn < hTN; ++htn) {
-                  auto& coarse_hc_adj_strat = i_hc.hc_adj_strat(p_hc.hc_age_coarse(a),htn);
-                  auto& coarse_hc_art_scalar_strat = i_hc.hc_art_scalar(p_hc.hc_age_coarse(a));
-                  if (hc_art_val_sum + hc_art_val_sum_last <= 0.0) {
-                    coarse_hc_art_scalar_strat = 0.0;
-                  } else {
-                    coarse_hc_art_scalar_strat = std::min(coarse_hc_adj_strat *
-                      p_hc.hc_art_init_dist(a, t) *
-                      p_hc.hc_art_init_dist_htn(a, htn), 1.0);
-                  }
                   for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
                     auto art_initiates_strat = coarse_hc_art_scalar * n_hc.hc_art_need_init_strat(hp_agg, hd, cat, a, s, htn);
                     n_hc.hc2_art_pop_strat(hp_agg, 0, hd, cat, a - hc2_agestart, s, htn) += art_initiates_strat;

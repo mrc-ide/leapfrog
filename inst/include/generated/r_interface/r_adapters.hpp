@@ -306,7 +306,6 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
       .hc_art_isperc = parse_data<int>(data, "artpaeds_isperc", opts.proj_time_steps),
       .hc_art_val = parse_data<real_type>(data, "paed_art_val", SS::hcAG_coarse, opts.proj_time_steps),
       .hc_art_init_dist = parse_data<real_type>(data, "init_art_dist", opts.p_idx_hiv_first_adult, opts.proj_time_steps),
-      .hc_art_init_dist_htn = parse_data<real_type>(data, "init_art_dist_htn", opts.p_idx_hiv_first_adult, SS::hTN),
       .adult_cd4_dist = parse_data<real_type>(data, "adult_cd4_dist", SS::hDS, SS::hc2DS),
       .fert_mult_by_age = parse_data<real_type>(data, "fert_mult_by_age", opts.p_fertility_age_groups),
       .fert_mult_off_art = parse_data<real_type>(data, "fert_mult_offart", SS::hDS),
