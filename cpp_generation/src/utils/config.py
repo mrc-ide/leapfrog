@@ -56,8 +56,8 @@ def get_r_internal_data_pointer(cfg):
   return "INTEGER" if cfg["num_type"] == "int" else "REAL"
 
 
-def get_r_parse_data(cfg, alias = None):
-  r_alias = alias or cfg["alias"]["r"]
+def get_r_parse_data(cfg):
+  r_alias = cfg["alias"]["r"]
   if cfg["type"] == "scalar":
     return f'Rcpp::as<{cfg["num_type"]}>(data["{r_alias}"])'
   else:
@@ -66,6 +66,14 @@ def get_r_parse_data(cfg, alias = None):
       prod_prev_dim = "1" if index == 0 else " * ".join([f"({d})" for d in cfg["dims"][:index]])
       dim_types.append(f'nda::dim<>(0, {dim}, {prod_prev_dim})')
     return f'parse_data<{cfg["num_type"]}, {len(cfg["dims"])}>(data, "{r_alias}", {{ {", ".join(dim_types)} }})'
+
+
+def get_r_initial_state(cfg, name):
+  if cfg["type"] == "scalar":
+    return f'state.{name} = Rcpp::as<{cfg["num_type"]}>(data["{name}"])'
+  else:
+    shape_path = f'Config::State::shape_{name}'
+    return f'fill_initial_state<{cfg["num_type"]}, typename {shape_path}>(data, "{name}", state.{name})'
 
 
 def get_cpp_read_data(name, cfg):

@@ -40,7 +40,18 @@ nda::array_ref_of_rank<T, Rank> parse_data(const Rcpp::List& data, const std::st
       key, expected_length, actual_length
     );
   }
-  return { r_data<T>(data[key]), shape };
+  return { r_data<T>(array_data), shape };
+}
+
+template <typename T, typename Shape>
+void fill_initial_state(const Rcpp::List& data, const std::string& key, nda::array<T, Shape>& array) {
+  SEXP array_data = data[key];
+
+  nda::array_ref<T, Shape> array_ref(r_data<T>(array_data));
+
+  nda::for_each_index(Shape(), [&](auto i) {
+    array[i] = array_ref[i];
+  });
 }
 
 template<typename real_type, MV ModelVariant>
@@ -61,16 +72,15 @@ struct DpAdapter<Language::R, real_type, ModelVariant> {
     };
   };
 
-  // TODO: NDA
-  // static Config::State get_initial_state(
-  //   const Rcpp::List &data
-  // ) {
-  //   return {
-  //       //     .p_total_pop = parse_data<real_type, 2>(data, "p_total_pop", { nda::dim<>(0, SS::pAG, 1), nda::dim<>(0, SS::NS, (SS::pAG)) }),
-  //       //     .p_total_pop_background_deaths = parse_data<real_type, 2>(data, "p_total_pop_background_deaths", { nda::dim<>(0, SS::pAG, 1), nda::dim<>(0, SS::NS, (SS::pAG)) }),
-  //       //     .births = Rcpp::as<real_type>(data["births"])
-  //       //   };
-  // };
+  static Config::State get_initial_state(
+    const Rcpp::List &data
+  ) {
+    typename Config::State state;
+    fill_initial_state<real_type, typename Config::State::shape_p_total_pop>(data, "p_total_pop", state.p_total_pop);
+    fill_initial_state<real_type, typename Config::State::shape_p_total_pop_background_deaths>(data, "p_total_pop_background_deaths", state.p_total_pop_background_deaths);
+    state.births = Rcpp::as<real_type>(data["births"]);
+    return state;
+  };
 
   static constexpr int output_count = 3;
 
@@ -150,22 +160,21 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
     };
   };
 
-  // TODO: NDA
-  // static Config::State get_initial_state(
-  //   const Rcpp::List &data
-  // ) {
-  //   return {
-  //       //     .p_hiv_pop = parse_data<real_type, 2>(data, "p_hiv_pop", { nda::dim<>(0, SS::pAG, 1), nda::dim<>(0, SS::NS, (SS::pAG)) }),
-  //       //     .p_hiv_pop_background_deaths = parse_data<real_type, 2>(data, "p_hiv_pop_background_deaths", { nda::dim<>(0, SS::pAG, 1), nda::dim<>(0, SS::NS, (SS::pAG)) }),
-  //       //     .h_hiv_adult = parse_data<real_type, 3>(data, "h_hiv_adult", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),
-  //       //     .h_art_adult = parse_data<real_type, 4>(data, "h_art_adult", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, SS::hDS, (SS::hTS)), nda::dim<>(0, SS::hAG, (SS::hTS) * (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hTS) * (SS::hDS) * (SS::hAG)) }),
-  //       //     .h_hiv_deaths_no_art = parse_data<real_type, 3>(data, "h_hiv_deaths_no_art", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),
-  //       //     .p_infections = parse_data<real_type, 2>(data, "p_infections", { nda::dim<>(0, SS::pAG, 1), nda::dim<>(0, SS::NS, (SS::pAG)) }),
-  //       //     .h_hiv_deaths_art = parse_data<real_type, 4>(data, "h_hiv_deaths_art", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, SS::hDS, (SS::hTS)), nda::dim<>(0, SS::hAG, (SS::hTS) * (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hTS) * (SS::hDS) * (SS::hAG)) }),
-  //       //     .h_art_initiation = parse_data<real_type, 3>(data, "h_art_initiation", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),
-  //       //     .p_hiv_deaths = parse_data<real_type, 2>(data, "p_hiv_deaths", { nda::dim<>(0, SS::pAG, 1), nda::dim<>(0, SS::NS, (SS::pAG)) })
-  //       //   };
-  // };
+  static Config::State get_initial_state(
+    const Rcpp::List &data
+  ) {
+    typename Config::State state;
+    fill_initial_state<real_type, typename Config::State::shape_p_hiv_pop>(data, "p_hiv_pop", state.p_hiv_pop);
+    fill_initial_state<real_type, typename Config::State::shape_p_hiv_pop_background_deaths>(data, "p_hiv_pop_background_deaths", state.p_hiv_pop_background_deaths);
+    fill_initial_state<real_type, typename Config::State::shape_h_hiv_adult>(data, "h_hiv_adult", state.h_hiv_adult);
+    fill_initial_state<real_type, typename Config::State::shape_h_art_adult>(data, "h_art_adult", state.h_art_adult);
+    fill_initial_state<real_type, typename Config::State::shape_h_hiv_deaths_no_art>(data, "h_hiv_deaths_no_art", state.h_hiv_deaths_no_art);
+    fill_initial_state<real_type, typename Config::State::shape_p_infections>(data, "p_infections", state.p_infections);
+    fill_initial_state<real_type, typename Config::State::shape_h_hiv_deaths_art>(data, "h_hiv_deaths_art", state.h_hiv_deaths_art);
+    fill_initial_state<real_type, typename Config::State::shape_h_art_initiation>(data, "h_art_initiation", state.h_art_initiation);
+    fill_initial_state<real_type, typename Config::State::shape_p_hiv_deaths>(data, "p_hiv_deaths", state.p_hiv_deaths);
+    return state;
+  };
 
   static constexpr int output_count = 9;
 
@@ -333,26 +342,25 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
     };
   };
 
-  // TODO: NDA
-  // static Config::State get_initial_state(
-  //   const Rcpp::List &data
-  // ) {
-  //   return {
-  //       //     .hc1_hiv_pop = parse_data<real_type, 4>(data, "hc1_hiv_pop", { nda::dim<>(0, SS::hc1DS, 1), nda::dim<>(0, SS::hcTT, (SS::hc1DS)), nda::dim<>(0, SS::hc1AG, (SS::hc1DS) * (SS::hcTT)), nda::dim<>(0, SS::NS, (SS::hc1DS) * (SS::hcTT) * (SS::hc1AG)) }),
-  //       //     .hc2_hiv_pop = parse_data<real_type, 4>(data, "hc2_hiv_pop", { nda::dim<>(0, SS::hc2DS, 1), nda::dim<>(0, SS::hcTT, (SS::hc2DS)), nda::dim<>(0, SS::hc2AG, (SS::hc2DS) * (SS::hcTT)), nda::dim<>(0, SS::NS, (SS::hc2DS) * (SS::hcTT) * (SS::hc2AG)) }),
-  //       //     .hc1_art_pop = parse_data<real_type, 4>(data, "hc1_art_pop", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, SS::hc1DS, (SS::hTS)), nda::dim<>(0, SS::hc1AG, (SS::hTS) * (SS::hc1DS)), nda::dim<>(0, SS::NS, (SS::hTS) * (SS::hc1DS) * (SS::hc1AG)) }),
-  //       //     .hc2_art_pop = parse_data<real_type, 4>(data, "hc2_art_pop", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, SS::hc2DS, (SS::hTS)), nda::dim<>(0, SS::hc2AG, (SS::hTS) * (SS::hc2DS)), nda::dim<>(0, SS::NS, (SS::hTS) * (SS::hc2DS) * (SS::hc2AG)) }),
-  //       //     .hc1_noart_aids_deaths = parse_data<real_type, 4>(data, "hc1_noart_aids_deaths", { nda::dim<>(0, SS::hc1DS, 1), nda::dim<>(0, SS::hcTT, (SS::hc1DS)), nda::dim<>(0, SS::hc1AG, (SS::hc1DS) * (SS::hcTT)), nda::dim<>(0, SS::NS, (SS::hc1DS) * (SS::hcTT) * (SS::hc1AG)) }),
-  //       //     .hc2_noart_aids_deaths = parse_data<real_type, 4>(data, "hc2_noart_aids_deaths", { nda::dim<>(0, SS::hc2DS, 1), nda::dim<>(0, SS::hcTT, (SS::hc2DS)), nda::dim<>(0, SS::hc2AG, (SS::hc2DS) * (SS::hcTT)), nda::dim<>(0, SS::NS, (SS::hc2DS) * (SS::hcTT) * (SS::hc2AG)) }),
-  //       //     .hc1_art_aids_deaths = parse_data<real_type, 4>(data, "hc1_art_aids_deaths", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, SS::hc1DS, (SS::hTS)), nda::dim<>(0, SS::hc1AG, (SS::hTS) * (SS::hc1DS)), nda::dim<>(0, SS::NS, (SS::hTS) * (SS::hc1DS) * (SS::hc1AG)) }),
-  //       //     .hc2_art_aids_deaths = parse_data<real_type, 4>(data, "hc2_art_aids_deaths", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, SS::hc2DS, (SS::hTS)), nda::dim<>(0, SS::hc2AG, (SS::hTS) * (SS::hc2DS)), nda::dim<>(0, SS::NS, (SS::hTS) * (SS::hc2DS) * (SS::hc2AG)) }),
-  //       //     .hc_art_init = parse_data<real_type, 1>(data, "hc_art_init", { nda::dim<>(0, SS::hcAG_coarse, 1) }),
-  //       //     .hc_art_need_init = parse_data<real_type, 4>(data, "hc_art_need_init", { nda::dim<>(0, SS::hc1DS, 1), nda::dim<>(0, SS::hcTT, (SS::hc1DS)), nda::dim<>(0, SS::hcAG_end, (SS::hc1DS) * (SS::hcTT)), nda::dim<>(0, SS::NS, (SS::hc1DS) * (SS::hcTT) * (SS::hcAG_end)) }),
-  //       //     .hiv_births = Rcpp::as<real_type>(data["hiv_births"]),
-  //       //     .ctx_need = Rcpp::as<real_type>(data["ctx_need"]),
-  //       //     .infection_by_type = parse_data<real_type, 3>(data, "infection_by_type", { nda::dim<>(0, SS::hcTT, 1), nda::dim<>(0, SS::hc1AG, (SS::hcTT)), nda::dim<>(0, SS::NS, (SS::hcTT) * (SS::hc1AG)) })
-  //       //   };
-  // };
+  static Config::State get_initial_state(
+    const Rcpp::List &data
+  ) {
+    typename Config::State state;
+    fill_initial_state<real_type, typename Config::State::shape_hc1_hiv_pop>(data, "hc1_hiv_pop", state.hc1_hiv_pop);
+    fill_initial_state<real_type, typename Config::State::shape_hc2_hiv_pop>(data, "hc2_hiv_pop", state.hc2_hiv_pop);
+    fill_initial_state<real_type, typename Config::State::shape_hc1_art_pop>(data, "hc1_art_pop", state.hc1_art_pop);
+    fill_initial_state<real_type, typename Config::State::shape_hc2_art_pop>(data, "hc2_art_pop", state.hc2_art_pop);
+    fill_initial_state<real_type, typename Config::State::shape_hc1_noart_aids_deaths>(data, "hc1_noart_aids_deaths", state.hc1_noart_aids_deaths);
+    fill_initial_state<real_type, typename Config::State::shape_hc2_noart_aids_deaths>(data, "hc2_noart_aids_deaths", state.hc2_noart_aids_deaths);
+    fill_initial_state<real_type, typename Config::State::shape_hc1_art_aids_deaths>(data, "hc1_art_aids_deaths", state.hc1_art_aids_deaths);
+    fill_initial_state<real_type, typename Config::State::shape_hc2_art_aids_deaths>(data, "hc2_art_aids_deaths", state.hc2_art_aids_deaths);
+    fill_initial_state<real_type, typename Config::State::shape_hc_art_init>(data, "hc_art_init", state.hc_art_init);
+    fill_initial_state<real_type, typename Config::State::shape_hc_art_need_init>(data, "hc_art_need_init", state.hc_art_need_init);
+    state.hiv_births = Rcpp::as<real_type>(data["hiv_births"]);
+    state.ctx_need = Rcpp::as<real_type>(data["ctx_need"]);
+    fill_initial_state<real_type, typename Config::State::shape_infection_by_type>(data, "infection_by_type", state.infection_by_type);
+    return state;
+  };
 
   static constexpr int output_count = 13;
 
@@ -531,22 +539,21 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
     };
   };
 
-  // TODO: NDA
-  // static Config::State get_initial_state(
-  //   const Rcpp::List &data
-  // ) {
-  //   return {
-  //       //     .p_hiv_pop = parse_data<real_type, 2>(data, "p_hiv_pop", { nda::dim<>(0, SS::pAG, 1), nda::dim<>(0, SS::NS, (SS::pAG)) }),
-  //       //     .p_hiv_pop_background_deaths = parse_data<real_type, 2>(data, "p_hiv_pop_background_deaths", { nda::dim<>(0, SS::pAG, 1), nda::dim<>(0, SS::NS, (SS::pAG)) }),
-  //       //     .h_hiv_adult = parse_data<real_type, 3>(data, "h_hiv_adult", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),
-  //       //     .h_art_adult = parse_data<real_type, 4>(data, "h_art_adult", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, SS::hDS, (SS::hTS)), nda::dim<>(0, SS::hAG, (SS::hTS) * (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hTS) * (SS::hDS) * (SS::hAG)) }),
-  //       //     .h_hiv_deaths_no_art = parse_data<real_type, 3>(data, "h_hiv_deaths_no_art", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),
-  //       //     .p_infections = parse_data<real_type, 2>(data, "p_infections", { nda::dim<>(0, SS::pAG, 1), nda::dim<>(0, SS::NS, (SS::pAG)) }),
-  //       //     .h_hiv_deaths_art = parse_data<real_type, 4>(data, "h_hiv_deaths_art", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, SS::hDS, (SS::hTS)), nda::dim<>(0, SS::hAG, (SS::hTS) * (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hTS) * (SS::hDS) * (SS::hAG)) }),
-  //       //     .h_art_initiation = parse_data<real_type, 3>(data, "h_art_initiation", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),
-  //       //     .p_hiv_deaths = parse_data<real_type, 2>(data, "p_hiv_deaths", { nda::dim<>(0, SS::pAG, 1), nda::dim<>(0, SS::NS, (SS::pAG)) })
-  //       //   };
-  // };
+  static Config::State get_initial_state(
+    const Rcpp::List &data
+  ) {
+    typename Config::State state;
+    fill_initial_state<real_type, typename Config::State::shape_p_hiv_pop>(data, "p_hiv_pop", state.p_hiv_pop);
+    fill_initial_state<real_type, typename Config::State::shape_p_hiv_pop_background_deaths>(data, "p_hiv_pop_background_deaths", state.p_hiv_pop_background_deaths);
+    fill_initial_state<real_type, typename Config::State::shape_h_hiv_adult>(data, "h_hiv_adult", state.h_hiv_adult);
+    fill_initial_state<real_type, typename Config::State::shape_h_art_adult>(data, "h_art_adult", state.h_art_adult);
+    fill_initial_state<real_type, typename Config::State::shape_h_hiv_deaths_no_art>(data, "h_hiv_deaths_no_art", state.h_hiv_deaths_no_art);
+    fill_initial_state<real_type, typename Config::State::shape_p_infections>(data, "p_infections", state.p_infections);
+    fill_initial_state<real_type, typename Config::State::shape_h_hiv_deaths_art>(data, "h_hiv_deaths_art", state.h_hiv_deaths_art);
+    fill_initial_state<real_type, typename Config::State::shape_h_art_initiation>(data, "h_art_initiation", state.h_art_initiation);
+    fill_initial_state<real_type, typename Config::State::shape_p_hiv_deaths>(data, "p_hiv_deaths", state.p_hiv_deaths);
+    return state;
+  };
 
   static constexpr int output_count = 9;
 

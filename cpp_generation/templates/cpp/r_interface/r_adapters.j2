@@ -38,7 +38,18 @@ nda::array_ref_of_rank<T, Rank> parse_data(const Rcpp::List& data, const std::st
       key, expected_length, actual_length
     );
   }
-  return { r_data<T>(data[key]), shape };
+  return { r_data<T>(array_data), shape };
+}
+
+template <typename T, typename Shape>
+void fill_initial_state(const Rcpp::List& data, const std::string& key, nda::array<T, Shape>& array) {
+  SEXP array_data = data[key];
+
+  nda::array_ref<T, Shape> array_ref(r_data<T>(array_data));
+
+  nda::for_each_index(Shape(), [&](auto i) {
+    array[i] = array_ref[i];
+  });
 }
 
 {% for config in configs %}
@@ -58,16 +69,15 @@ struct {{ config.name }}Adapter<Language::R, real_type, ModelVariant> {
     };
   };
 
-  // TODO: NDA
-  // static Config::State get_initial_state(
-  //   const Rcpp::List &data
-  // ) {
-  //   return {
-  //     {% for name, cfg in config.state.items() %}
-  //     .{{ name }} = {{ get_r_parse_data(cfg, name) }}{{ comma_except_last(loop) }}
-  //     {% endfor %}
-  //   };
-  // };
+  static Config::State get_initial_state(
+    const Rcpp::List &data
+  ) {
+    typename Config::State state;
+    {% for name, cfg in config.state.items() %}
+    {{ get_r_initial_state(cfg, name) }};
+    {% endfor %}
+    return state;
+  };
 
   static constexpr int output_count = {{ dict_len(config.state) }};
 
@@ -131,16 +141,15 @@ struct {{ config.name }}Adapter<Language::R, real_type, ModelVariant> {
     };
   };
 
-  // TODO: NDA
-  // static Config::State get_initial_state(
-  //   const Rcpp::List &data
-  // ) {
-  //   return {
-  //     {% for name, cfg in config.state.items() %}
-  //     .{{ name }} = {{ get_r_parse_data(cfg, name) }}{{ comma_except_last(loop) }}
-  //     {% endfor %}
-  //   };
-  // };
+  static Config::State get_initial_state(
+    const Rcpp::List &data
+  ) {
+    typename Config::State state;
+    {% for name, cfg in config.state.items() %}
+    {{ get_r_initial_state(cfg, name) }};
+    {% endfor %}
+    return state;
+  };
 
   static constexpr int output_count = {{ dict_len(config.state) }};
 

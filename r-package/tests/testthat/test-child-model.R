@@ -369,7 +369,6 @@ test_that("HIV related deaths among CLHIV on ART align", {
 })
 
 test_that("Child model agrees when run through all years vs two parts vs single year runs", {
-  testthat::skip("Initial state input not yet implemented with nda")
   input <- readRDS(test_path("testdata/child_parms.rds"))
 
   # All years
@@ -383,7 +382,7 @@ test_that("Child model agrees when run through all years vs two parts vs single 
 
   # Single years
   out_single_year <- get_time_slice(run_model(input$parameters, "ChildModel", 1970), 1)
-  for(year in 1971:2030) {
+  for (year in 1971:2030) {
     out_single_year <- run_model_single_year(input$parameters, "ChildModel", out_single_year, year - 1)
     expect_equal(out_single_year, get_time_slice(out_all_years, year - 1970 + 1))
   }
