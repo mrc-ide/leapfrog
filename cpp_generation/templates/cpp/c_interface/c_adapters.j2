@@ -6,38 +6,51 @@
 #include <filesystem>
 #include <string_view>
 #include <format>
-#include <unsupported/Eigen/CXX11/Tensor>
 #include <stdexcept>
 
+#include "../../array/array.h"
 #include "../config_mixer.hpp"
 #include "c_types.hpp"
 
 namespace leapfrog {
 namespace internal {
 
-template<typename T, typename... Args>
-auto read_data(T* data, int length, std::string_view name, Args... dims) {
-  constexpr std::size_t rank = sizeof...(dims);
-  if constexpr (rank == 0) {
-    return *data;
-  } else {
-    const auto size = (dims * ...);
-    if (length != size) {
-        throw std::invalid_argument(std::format("Input data '{}' is the wrong size. Received array of length '{}', expected '{}'.", name, length, size));
-    }
-    return Eigen::TensorMap<Eigen::Tensor<T, rank>>(data, dims...);
+template<typename T, size_t Rank>
+auto read_data(T* data, int length, std::string_view name, nda::shape_of_rank<Rank> shape) {
+  const auto size = shape.flat_max() + 1;
+  if (length != size) {
+    throw std::invalid_argument(
+      std::format(
+        "Input data '{}' is the wrong size. Received array of length '{}', expected '{}'.",
+        name, length, size
+      )
+    );
   }
+  return nda::array_ref_of_rank<T, Rank>(data, shape);
 }
 
-template<typename T, int Rank>
-void write_data(const Eigen::Tensor<T, Rank>& tensor, T* output, int length, std::string_view name) {
-  const auto* dataPtr = tensor.data();
-  std::size_t totalSize = tensor.size();
+template <typename T, typename Shape>
+void fill_initial_state(T* data, int length, const std::string_view name, nda::array<T, Shape> array) {
+  nda::array_ref<T, Shape> array_ref(data);
+
+  nda::for_each_index(Shape(), [&](auto i) {
+    array[i] = array_ref[i];
+  });
+}
+
+template<typename T, size_t Rank>
+void write_data(const nda::array_of_rank<T, Rank>& array, T* output, int length, std::string_view name) {
+  const auto* dataPtr = array.data();
+  std::size_t totalSize = array.size();
 
   if (length != totalSize) {
-    throw std::invalid_argument(std::format("Output data '{}' is the wrong size. Received array of length '{}', expected '{}'.", name, length, totalSize));
+    throw std::invalid_argument(
+      std::format(
+        "Output data '{}' is the wrong size. Received array of length '{}', expected '{}'.",
+        name, length, totalSize
+      )
+    );
   }
-
   std::copy(dataPtr, dataPtr + totalSize, output);
 }
 
@@ -61,11 +74,11 @@ struct {{ config.name }}Adapter<Language::C, real_type, ModelVariant> {
   static Config::State get_initial_state(
     const CState<real_type>& state
   ){
-    return {
-      {% for name, cfg in config.state.items() %}
-      .{{ name }} = {{ get_c_initial_state(config.name, name, cfg) }}{{ comma_except_last(loop) }}
-      {% endfor %}
-    };
+    typename Config::State initial_state;
+    {% for name, cfg in config.state.items() %}
+    {{ get_c_initial_state(config.name, name, cfg) }};
+    {% endfor %}
+    return initial_state;
   };
 
   static constexpr int output_count = {{ dict_len(config.state) }};
