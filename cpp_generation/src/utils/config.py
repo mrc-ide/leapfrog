@@ -115,7 +115,7 @@ def get_c_write_data_single_year(config_name, name, cfg):
   if dim_len(cfg) == 0:
     return f'*(out.{config_name}->{name}) = state.{name};'
   else:
-    shape_path = f'Config::OutputState::shape_{name}'
+    shape_path = f'Config::State::shape_{name}'
     return f'write_data<{cfg["num_type"]}, typename {shape_path}>(state.{name}, out.{config_name}->{name}, out.{config_name}->{name}_length, "{name}");'
 
 
