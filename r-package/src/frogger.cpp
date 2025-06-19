@@ -3,8 +3,8 @@
 #include <string>
 #include <sstream>
 
-#include "../inst/include/frogger.hpp"
-#include "../inst/include/generated/r_interface/r_adapters.hpp"
+#include "frogger.hpp"
+#include "generated/r_interface/r_adapters.hpp"
 
 
 //' List the avaialble model configurations
