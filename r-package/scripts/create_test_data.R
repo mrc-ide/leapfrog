@@ -110,8 +110,7 @@ aids_deathsart[,2,] <- f
 
 spec_ctx_need <- dpsub(dp, tag = '<ChildARTCalc MV2>', rows = 3, cols = timedat.idx)
 
-out <- list(parameters = c(proj, demp),
-            dp = dp,
+out <- list(dp = dp,
             timedat.idx = timedat.idx,
             pjnz = pjnz_child,
             pop1 = x,
@@ -119,9 +118,9 @@ out <- list(parameters = c(proj, demp),
             offtrt = df$off_treatment,
             deaths_noart = aids_deathsnoart,
             deaths_art = aids_deathsart,
-            ctx_need = spec_ctx_need)
+            ctx_need = as.numeric(unlist(spec_ctx_need)))
 
-save_hdf5_file(out, testthat::test_path("testdata/child_parms.h5"))
-# need this for spectrum utils functions in the child model tests
-saveRDS(dp, testthat::test_path("testdata/dp.rds"))
+save_hdf5_file(c(proj, demp), testthat::test_path("testdata/child_parms.h5"))
+# need this for child model tests
+saveRDS(out, testthat::test_path("testdata/child_test_utils.rds"))
 

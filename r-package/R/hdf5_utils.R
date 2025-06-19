@@ -11,12 +11,12 @@
 save_hdf5_file <- function(df, file_path) {
   file.create(file_path)
   h5f <- hdf5r::H5File$new(file_path, mode = "w")
-  tryCatch(
+  invisible(tryCatch(
     save_datasets(h5f, df),
     finally = {
       h5f$close_all()
     }
-  )
+  ))
 }
 
 save_datasets <- function(h5f, df, group = "") {

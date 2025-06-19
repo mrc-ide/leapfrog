@@ -194,10 +194,10 @@ test_that("child model can be run twice on the same data", {
   ## Regression test as we saw the 2nd run failing as the first fit
   ## was modifying the R stored data causing the 2nd run on the same
   ## data to read from an index of -1
-  input <- read_hdf5_file(test_path("testdata/child_parms.h5"))
+  parameters <- read_hdf5_file(test_path("testdata/child_parms.h5"))
 
-  out <- run_model(input$parameters, "ChildModel", 1970:2030)
-  out2 <- run_model(input$parameters, "ChildModel", 1970:2030)
+  out <- run_model(parameters, "ChildModel", 1970:2030)
+  out2 <- run_model(parameters, "ChildModel", 1970:2030)
   expect_identical(out, out2)
 })
 
@@ -222,10 +222,10 @@ test_that("error thrown if size of stratified data does not match expected", {
 })
 
 test_that("error if trying to save output from before projection start", {
-  input <- read_hdf5_file(test_path("testdata/child_parms.h5"))
+  parameters <- read_hdf5_file(test_path("testdata/child_parms.h5"))
 
   expect_error(
-    run_model(input$parameters, "ChildModel", 1965:2030),
+    run_model(parameters, "ChildModel", 1965:2030),
     paste("Trying to output for year: '1965' which",
           "is before the projection start year: '1970'.")
   )
