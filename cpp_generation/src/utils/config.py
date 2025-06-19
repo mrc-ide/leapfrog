@@ -61,13 +61,11 @@ def get_r_parse_data(cfg, alias = None):
   if cfg["type"] == "scalar":
     return f'Rcpp::as<{cfg["num_type"]}>(data["{r_alias}"])'
   else:
-    r_data = f'r_data<{cfg["num_type"]}>(data["{r_alias}"])'
     dim_types = []
     for index, dim in enumerate(cfg["dims"]):
       prod_prev_dim = "1" if index == 0 else " * ".join([f"({d})" for d in cfg["dims"][:index]])
       dim_types.append(f'nda::dim<>(0, {dim}, {prod_prev_dim})')
-    shape = f'nda::shape_of_rank<{len(cfg["dims"])}>({", ".join(dim_types)})'
-    return f'{{ {r_data}, {shape} }}'
+    return f'parse_data<{cfg["num_type"]}, {len(cfg["dims"])}>(data, "{r_alias}", {{ {", ".join(dim_types)} }})'
 
 
 def get_cpp_read_data(name, cfg):

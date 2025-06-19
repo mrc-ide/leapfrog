@@ -25,6 +25,22 @@ int* r_data(SEXP x) {
   return INTEGER(x);
 }
 
+template <typename T, size_t Rank>
+nda::array_ref_of_rank<T, Rank> parse_data(const Rcpp::List& data, const std::string& key, nda::shape_of_rank<Rank> shape) {
+  SEXP array_data = data[key];
+
+  int actual_length = LENGTH(array_data);
+  int expected_length = shape.flat_max() + 1;
+
+  if (actual_length < expected_length) {
+    Rcpp::stop(
+      "Invalid size of data for '%s', expected %d got %d",
+      key, expected_length, actual_length
+    );
+  }
+  return { r_data<T>(data[key]), shape };
+}
+
 {% for config in configs %}
 template<typename real_type, MV ModelVariant>
 struct {{ config.name }}Adapter<Language::R, real_type, ModelVariant> {
