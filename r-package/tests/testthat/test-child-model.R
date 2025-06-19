@@ -1,5 +1,5 @@
 test_that("Child model can be run for all years", {
-  input <- readRDS(test_path("testdata/child_parms.rds"))
+  input <- read_hdf5_file(test_path("testdata/child_parms.h5"))
 
   expect_silent(out <- run_model(input$parameters, "ChildModel", 1970:2030))
 
@@ -39,7 +39,7 @@ test_that("Child model can be run for all years", {
 })
 
 test_that("Model outputs are consistent", {
-  input <- readRDS(test_path("testdata/child_parms.rds"))
+  input <- read_hdf5_file(test_path("testdata/child_parms.h5"))
   out <- run_model(input$parameters, "ChildModel", 1970:2030)
 
   ###############################
@@ -122,7 +122,7 @@ test_that("Model outputs are consistent", {
 
 test_that("Female 15-49y pop aligns", {
   testthat::skip("Skipping this test because the adult populations currently do not align")
-  input <- readRDS(test_path("testdata/child_parms.rds"))
+  input <- read_hdf5_file(test_path("testdata/child_parms.h5"))
   dp <- input$dp
   pjnz <- input$pjnz
 
@@ -147,7 +147,7 @@ test_that("Female 15-49y pop aligns", {
 })
 
 test_that("Mothers that need ptmct align", {
-  input <- readRDS(test_path("testdata/child_parms.rds"))
+  input <- read_hdf5_file(test_path("testdata/child_parms.h5"))
   dp <- input$dp
   pjnz <- input$pjnz
 
@@ -164,7 +164,7 @@ test_that("Mothers that need ptmct align", {
 })
 
 test_that("Children in need of cotrim aligns", {
-  input <- readRDS(test_path("testdata/child_parms.rds"))
+  input <- read_hdf5_file(test_path("testdata/child_parms.h5"))
   dp <- input$dp
 
   out <- run_model(input$parameters, "ChildModel", 1970:2030)
@@ -180,7 +180,7 @@ test_that("Children in need of cotrim aligns", {
 })
 
 test_that("Infections among children align", {
-  input <- readRDS(test_path("testdata/child_parms.rds"))
+  input <- read_hdf5_file(test_path("testdata/child_parms.h5"))
   dp <- input$dp
   pjnz <- input$pjnz
 
@@ -213,7 +213,7 @@ test_that("Infections among children align", {
 })
 
 test_that("CLHIV align", {
-  input <- readRDS(test_path("testdata/child_parms.rds"))
+  input <- read_hdf5_file(test_path("testdata/child_parms.h5"))
   dp <- input$dp
   pjnz <- input$pjnz
 
@@ -262,7 +262,7 @@ test_that("CLHIV align", {
 })
 
 test_that("CLHIV on ART align", {
-  input <- readRDS(test_path("testdata/child_parms.rds"))
+  input <- read_hdf5_file(test_path("testdata/child_parms.h5"))
   dp <- input$dp
   pjnz <- input$pjnz
 
@@ -310,7 +310,7 @@ test_that("CLHIV on ART align", {
 })
 
 test_that("HIV related deaths among CLHIV not on ART align", {
-  input <- readRDS(test_path("testdata/child_parms.rds"))
+  input <- read_hdf5_file(test_path("testdata/child_parms.h5"))
   dp <- input$dp
   pjnz <- input$pjnz
   aids_deathsnoart <- input$deaths_noart
@@ -339,7 +339,7 @@ test_that("HIV related deaths among CLHIV not on ART align", {
 })
 
 test_that("HIV related deaths among CLHIV on ART align", {
-  input <- readRDS(test_path("testdata/child_parms.rds"))
+  input <- read_hdf5_file(test_path("testdata/child_parms.h5"))
   dp <- input$dp
   pjnz <- input$pjnz
   aids_deathsart <- input$deaths_art
@@ -369,7 +369,7 @@ test_that("HIV related deaths among CLHIV on ART align", {
 })
 
 test_that("Child model agrees when run through all years vs two parts vs single year runs", {
-  input <- readRDS(test_path("testdata/child_parms.rds"))
+  input <- read_hdf5_file(test_path("testdata/child_parms.h5"))
 
   # All years
   out_all_years <- run_model(input$parameters, "ChildModel", 1970:2030)
@@ -389,7 +389,7 @@ test_that("Child model agrees when run through all years vs two parts vs single 
 })
 
 test_that("error thrown if trying to output from years before simulation start year", {
-  input <- readRDS(test_path("testdata/child_parms.rds"))
+  input <- read_hdf5_file(test_path("testdata/child_parms.h5"))
 
   out_first_half_years <- run_model(input$parameters, "ChildModel", 1970:2000)
   expect_error(

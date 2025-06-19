@@ -57,14 +57,14 @@ prepare_input_data <- function(input_data) {
 ## Map from name in parameters to name expected in C++ code
 name_mapping <- build_name_mapping()
 
-parameters <- readRDS(testthat::test_path("testdata/adult_parms.rds"))
+parameters <- frogger::read_hdf5_file(testthat::test_path("testdata/adult_parms.h5"))
 input_data <- prepare_input_data(parameters)
 
 path <- write_standalone_data(input_data, name_mapping, "adult_data.zip")
 message(sprintf("Wrote adult test data to %s", path))
 
 source(file.path("R", "spectrum_inputs.R"))
-child <- readRDS(testthat::test_path("testdata/child_parms.rds"))
+child <- frogger::read_hdf5_file(testthat::test_path("testdata/child_parms.h5"))
 input_data <- prepare_input_data(child$parameters)
 
 path <- write_standalone_data(input_data, name_mapping, "child_data.zip")

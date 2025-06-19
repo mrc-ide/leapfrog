@@ -2,7 +2,7 @@
 
 root_dir <- here::here()
 
-parameters <- readRDS(testthat::test_path("testdata/adult_parms.rds"))
+parameters <- frogger::read_hdf5_file(testthat::test_path("testdata/adult_parms.h5"))
 
 message("Benchmarking demographic projection")
 bench::mark(
@@ -26,7 +26,7 @@ bench::mark(
 )
 
 source(file.path("R", "spectrum_inputs.R"))
-input <- readRDS(testthat::test_path("testdata/child_parms.rds"))
+input <- frogger::read_hdf5_file(testthat::test_path("testdata/child_parms.h5"))
 
 message("Benchmarking child model")
 bench::mark(

@@ -35,6 +35,7 @@ Imports:
     beers,
     dplyr,
     eppasm (>= 0.8.5),
+    hdf5r,
     magrittr,
     Rcpp,
     tidyr

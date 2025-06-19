@@ -15,17 +15,17 @@ pjnz_adult <- system.file("pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-
 demp <- prepare_leapfrog_demp(pjnz_adult)
 proj <- prepare_leapfrog_projp(pjnz_adult)
 parameters <- c(demp, proj)
-saveRDS(parameters, testthat::test_path("testdata/adult_parms.rds"))
+save_hdf5_file(parameters, testthat::test_path("testdata/adult_parms.h5"))
 
 # Used as reference data (Run from leapfrog/master)
 lmod <- leapfrog::leapfrogR(demp, proj)
-saveRDS(lmod, testthat::test_path("testdata/leapfrog_fit.rds"))
+save_hdf5_file(lmod, testthat::test_path("testdata/leapfrog_fit.h5"))
 
 lmod <- leapfrog::leapfrogR(demp, proj, hiv_strat = "coarse")
-saveRDS(lmod, testthat::test_path("testdata/leapfrog_fit_coarse.rds"))
+save_hdf5_file(lmod, testthat::test_path("testdata/leapfrog_fit_coarse.h5"))
 
 lmod <- leapfrog::leapfrogR(demp, proj, hiv_steps_per_year = 0L)
-saveRDS(lmod, testthat::test_path("testdata/fit_demography.rds"))
+save_hdf5_file(lmod, testthat::test_path("testdata/fit_demography.h5"))
 
 #Create paeds parameters
 pjnz_child <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct.PJNZ")
@@ -110,14 +110,17 @@ aids_deathsart[,2,] <- f
 
 spec_ctx_need <- dpsub(dp, tag = '<ChildARTCalc MV2>', rows = 3, cols = timedat.idx)
 
-saveRDS(list(parameters = c(proj, demp),
-             dp = dp,
-             timedat.idx = timedat.idx,
-             pjnz = pjnz_child,
-             pop1 = x,
-             ontrt = df$on_treatment,
-             offtrt = df$off_treatment,
-             deaths_noart = aids_deathsnoart,
-             deaths_art = aids_deathsart,
-             ctx_need = spec_ctx_need),
-        testthat::test_path("testdata/child_parms.rds"))
+out <- list(parameters = c(proj, demp),
+            dp = dp,
+            timedat.idx = timedat.idx,
+            pjnz = pjnz_child,
+            pop1 = x,
+            ontrt = df$on_treatment,
+            offtrt = df$off_treatment,
+            deaths_noart = aids_deathsnoart,
+            deaths_art = aids_deathsart,
+            ctx_need = spec_ctx_need)
+
+save_hdf5_file(out, testthat::test_path("testdata/child_parms.h5"))
+TRUE
+

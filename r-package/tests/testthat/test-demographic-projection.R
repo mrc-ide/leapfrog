@@ -1,5 +1,5 @@
 test_that("demographic projection can be run", {
-  parameters <- readRDS(test_path("testdata/adult_parms.rds"))
+  parameters <- read_hdf5_file(test_path("testdata/adult_parms.h5"))
 
   out <- run_model(parameters, "DemographicProjection", 1970:2030)
 
