@@ -122,5 +122,4 @@ out <- list(parameters = c(proj, demp),
             ctx_need = spec_ctx_need)
 
 save_hdf5_file(out, testthat::test_path("testdata/child_parms.h5"))
-TRUE
 
