@@ -125,9 +125,10 @@ test_that("Female 15-49y pop aligns", {
   input <- read_hdf5_file(test_path("testdata/child_parms.h5"))
   dp <- input$dp
   pjnz <- input$pjnz
+  dp_r <- readRDS(test_path("testdata/dp.rds"))
 
   out <- run_model(input$parameters, "ChildModel", 1970:2030)
-  spec <- SpectrumUtils::dp.output.hivpop(dp, direction = 'long')
+  spec <- SpectrumUtils::dp.output.hivpop(dp_r, direction = 'long')
   spec <- spec %>%
     dplyr::filter(Age %in% 15:49 & Sex == 'Female') %>%
     dplyr::group_by(Year)
@@ -150,9 +151,10 @@ test_that("Mothers that need ptmct align", {
   input <- read_hdf5_file(test_path("testdata/child_parms.h5"))
   dp <- input$dp
   pjnz <- input$pjnz
+  dp_r <- readRDS(test_path("testdata/dp.rds"))
 
   out <- run_model(input$parameters, "ChildModel", 1970:2030)
-  spec <- SpectrumUtils::dp.output.pmtct.need(dp, direction = 'long')
+  spec <- SpectrumUtils::dp.output.pmtct.need(dp_r, direction = 'long')
 
   lfrog <- data.frame(lfrog = out$hiv_births, Year = 1970:2030)
 
@@ -183,9 +185,10 @@ test_that("Infections among children align", {
   input <- read_hdf5_file(test_path("testdata/child_parms.h5"))
   dp <- input$dp
   pjnz <- input$pjnz
+  dp_r <- readRDS(test_path("testdata/dp.rds"))
 
   out <- run_model(input$parameters, "ChildModel", 1970:2030)
-  inf_spec <- SpectrumUtils::dp.output.incident.hiv(dp.raw = dp)
+  inf_spec <- SpectrumUtils::dp.output.incident.hiv(dp.raw = dp_r)
   inf_spec <- inf_spec %>%
     dplyr::filter(Sex != "Male+Female") %>%
     dplyr::filter(Age != "80+") %>%
