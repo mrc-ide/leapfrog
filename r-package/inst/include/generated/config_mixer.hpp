@@ -47,11 +47,10 @@ struct ConfigMixer<L, real_type, ModelVariant> {
     void reset() {};
   };
 
-  // TODO: NDA
-  // template<typename... Args>
-  // static State get_initial_state(Args&&... args) {
-  //   State s = {}; return s;
-  // }
+  template<typename... Args>
+  static State get_initial_state(Args&&... args) {
+    State s = {}; return s;
+  }
 
   struct OutputState {
     OutputState(int output_years) {};
@@ -121,14 +120,13 @@ struct ConfigMixer<L, real_type1, ModelVariant1, Pair<true, DpConfig<real_type1,
     };
   };
 
-  // TODO: NDA
-  // template<typename... Args>
-  // static State get_initial_state(Args&&... args) {
-  //   return {
-  //     NextConfigMixer::get_initial_state(std::forward<Args>(args)...),
-  //     Adapter::get_initial_state(std::forward<Args>(args)...)
-  //   };
-  // }
+  template<typename... Args>
+  static State get_initial_state(Args&&... args) {
+    return {
+      NextConfigMixer::get_initial_state(std::forward<Args>(args)...),
+      Adapter::get_initial_state(std::forward<Args>(args)...)
+    };
+  }
 
   struct OutputState: public NextConfigMixer::OutputState {
     typename CurrConfig::OutputState dp;
@@ -214,14 +212,13 @@ struct ConfigMixer<L, real_type1, ModelVariant1, Pair<true, HaConfig<real_type1,
     };
   };
 
-  // TODO: NDA
-  // template<typename... Args>
-  // static State get_initial_state(Args&&... args) {
-  //   return {
-  //     NextConfigMixer::get_initial_state(std::forward<Args>(args)...),
-  //     Adapter::get_initial_state(std::forward<Args>(args)...)
-  //   };
-  // }
+  template<typename... Args>
+  static State get_initial_state(Args&&... args) {
+    return {
+      NextConfigMixer::get_initial_state(std::forward<Args>(args)...),
+      Adapter::get_initial_state(std::forward<Args>(args)...)
+    };
+  }
 
   struct OutputState: public NextConfigMixer::OutputState {
     typename CurrConfig::OutputState ha;
@@ -307,14 +304,13 @@ struct ConfigMixer<L, real_type1, ModelVariant1, Pair<true, HcConfig<real_type1,
     };
   };
 
-  // TODO: NDA
-  // template<typename... Args>
-  // static State get_initial_state(Args&&... args) {
-  //   return {
-  //     NextConfigMixer::get_initial_state(std::forward<Args>(args)...),
-  //     Adapter::get_initial_state(std::forward<Args>(args)...)
-  //   };
-  // }
+  template<typename... Args>
+  static State get_initial_state(Args&&... args) {
+    return {
+      NextConfigMixer::get_initial_state(std::forward<Args>(args)...),
+      Adapter::get_initial_state(std::forward<Args>(args)...)
+    };
+  }
 
   struct OutputState: public NextConfigMixer::OutputState {
     typename CurrConfig::OutputState hc;

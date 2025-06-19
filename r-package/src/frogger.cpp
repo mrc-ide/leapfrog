@@ -102,9 +102,8 @@ Rcpp::List simulate_model(
   const auto opts = get_opts_r(parameters, output_years);
   const auto pars = LF::Cfg::get_pars(parameters, opts);
 
-  // TODO: NDA
-  // typename LF::State initial_state = LF::Cfg::get_initial_state(initial_state_data);
-  auto state = LF::run_model_from_state(pars, opts, {}, simulation_start_year, output_years);
+  typename LF::State initial_state = LF::Cfg::get_initial_state(initial_state_data);
+  auto state = LF::run_model_from_state(pars, opts, initial_state, simulation_start_year, output_years);
 
   return build_output_r<ModelVariant>(state, output_years);
 }
@@ -120,9 +119,8 @@ Rcpp::List simulate_model(
   const auto opts = get_opts_r(parameters, { simulation_start_year + 1 });
   const auto pars = LF::Cfg::get_pars(parameters, opts);
 
-  // TODO: NDA
-  // typename LF::State initial_state = LF::Cfg::get_initial_state(initial_state_data);
-  auto state = LF::run_model_single_year(pars, opts, {}, simulation_start_year);
+  typename LF::State initial_state = LF::Cfg::get_initial_state(initial_state_data);
+  auto state = LF::run_model_single_year(pars, opts, initial_state, simulation_start_year);
 
   return build_output_r<ModelVariant>(state);
 }
