@@ -1869,6 +1869,10 @@ private:
             for (int cat = 0; cat < hcTT; ++cat) {
               i_hc.hc_initByAge(p_hc.hc_age_coarse(a)) += n_hc.hc_art_need_init(hd, cat, a, s) *
                 p_hc.hc_art_init_dist(a, t);
+              for (int htn = 0; htn < hTN; ++htn) {
+                i_hc.hc_initByAge_strat(p_hc.hc_age_coarse(a), htn) += n_hc.hc_art_need_init(hd, cat, a, s) *
+                  p_hc.hc_art_init_dist(a, t) * p_hc.hc_art_reinit_dist(a, htn) ;
+                }
             } // end hcTT
           } // end hc1DS
         } // end a
@@ -1880,7 +1884,16 @@ private:
         } else {
           i_hc.hc_adj(ag) = n_hc.hc_art_init(ag) / i_hc.hc_initByAge(ag);
         }
+
+        for (int htn = 0; htn < hTN; ++htn) {
+          if (i_hc.hc_initByAge_strat(ag, htn) == 0.0) {
+            i_hc.hc_adj_strat(ag,htn) = 1.0;
+          } else {
+            i_hc.hc_adj_strat(ag,htn) = n_hc.hc_art_init(ag) / i_hc.hc_initByAge_strat(ag,htn);
+          }
+        }
       }
+
 
       for (int s = 0; s < NS; ++s) {
         for (int cat = 0; cat < hcTT; ++cat) {
@@ -1906,7 +1919,12 @@ private:
 
                 for (int htn = 0; htn < hTN; ++htn) {
                   for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
-                    auto art_initiates_strat = coarse_hc_art_scalar * n_hc.hc_art_need_init_strat(hp_agg, hd, cat, a, s, htn);
+                    coarse_hc_art_scalar = std::min(i_hc.hc_adj_strat(p_hc.hc_age_coarse(a),htn) *
+                      p_hc.hc_art_init_dist(a, t) *
+                      p_hc.hc_art_reinit_dist(a, htn), 1.0);
+
+                    auto art_initiates_strat = coarse_hc_art_scalar *
+                      n_hc.hc_art_need_init_strat(hp_agg, hd, cat, a, s, htn);
                     n_hc.hc1_art_pop_strat(hp_agg, 0, hd, cat, a, s, htn) += art_initiates_strat;
                     n_hc.hc1_hiv_pop_strat(hp_agg, hd, cat, a, s, htn) -= art_initiates_strat;
                   }
@@ -1917,7 +1935,12 @@ private:
 
                 for (int htn = 0; htn < hTN; ++htn) {
                   for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
-                    auto art_initiates_strat = coarse_hc_art_scalar * n_hc.hc_art_need_init_strat(hp_agg, hd, cat, a, s, htn);
+                    coarse_hc_art_scalar = std::min(i_hc.hc_adj_strat(p_hc.hc_age_coarse(a),htn) *
+                      p_hc.hc_art_init_dist(a, t) *
+                      p_hc.hc_art_reinit_dist(a, htn), 1.0);
+
+                    auto art_initiates_strat = coarse_hc_art_scalar *
+                      n_hc.hc_art_need_init_strat(hp_agg, hd, cat, a, s, htn);
                     n_hc.hc2_art_pop_strat(hp_agg, 0, hd, cat, a - hc2_agestart, s, htn) += art_initiates_strat;
                     n_hc.hc2_hiv_pop_strat(hp_agg, hd, cat, a - hc2_agestart, s, htn) -= art_initiates_strat;
                   }

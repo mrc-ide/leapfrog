@@ -136,6 +136,7 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
       .hc_art_isperc = read_data<int>(input_dir, "hc_art_isperc", opts.proj_time_steps),
       .hc_art_val = read_data<real_type>(input_dir, "hc_art_val", SS::hcAG_coarse, opts.proj_time_steps),
       .hc_art_init_dist = read_data<real_type>(input_dir, "hc_art_init_dist", opts.p_idx_hiv_first_adult, opts.proj_time_steps),
+      .hc_art_reinit_dist = read_data<real_type>(input_dir, "hc_art_reinit_dist", opts.p_idx_hiv_first_adult, SS::hTN),
       .adult_cd4_dist = read_data<real_type>(input_dir, "adult_cd4_dist", SS::hDS, SS::hc2DS),
       .fert_mult_by_age = read_data<real_type>(input_dir, "fert_mult_by_age", opts.p_fertility_age_groups),
       .fert_mult_off_art = read_data<real_type>(input_dir, "fert_mult_off_art", SS::hDS),

@@ -156,6 +156,14 @@
         "r": "init_art_dist"
       }
     },
+    "hc_art_reinit_dist": {
+      "type": "TM",
+      "num_type": "real_type",
+      "dims": ["opts.p_idx_hiv_first_adult", "SS::hTN"],
+      "alias": {
+        "r": "hc_art_reinit_dist"
+      }
+    },
     "adult_cd4_dist": {
       "type": "TM",
       "num_type": "real_type",
@@ -489,10 +497,20 @@
       "num_type": "real_type",
       "dims": ["SS::hcAG_coarse"]
     },
+    "hc_initByAge_strat": {
+      "type": "TFS",
+      "num_type": "real_type",
+      "dims": ["SS::hcAG_coarse", "SS::hTN"]
+    },
     "hc_adj": {
       "type": "TFS",
       "num_type": "real_type",
       "dims": ["SS::hcAG_coarse"]
+    },
+     "hc_adj_strat": {
+      "type": "TFS",
+      "num_type": "real_type",
+      "dims": ["SS::hcAG_coarse", "SS::hTN"]
     },
     "hc_art_deaths": {
       "type": "TFS",
