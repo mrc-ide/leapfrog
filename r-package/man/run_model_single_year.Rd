@@ -38,6 +38,7 @@ pjnz <- system.file(
   "pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ",
   package = "frogger", mustWork = TRUE)
 parameters <- prepare_leapfrog_parameters(pjnz)
+parameters <- process_parameters_to_cpp(parameters)
 out_first_half_years <- run_model(parameters, "HivCoarseAgeStratification", 1970:2000)
 prev_state <- get_time_slice(out_first_half_years, 31)
 for (i in 2001:2029) {
