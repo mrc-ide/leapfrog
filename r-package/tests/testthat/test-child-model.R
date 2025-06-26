@@ -1,7 +1,7 @@
 test_that("Child model can be run for all years", {
-  input <- readRDS(test_path("testdata/child_parms.rds"))
+  parameters <- read_hdf5_file(test_path("testdata/child_parms.h5"))
 
-  expect_silent(out <- run_model(input$parameters, "ChildModel", 1970:2030))
+  expect_silent(out <- run_model(parameters, "ChildModel", 1970:2030))
 
   expect_setequal(
     names(out),
@@ -39,8 +39,8 @@ test_that("Child model can be run for all years", {
 })
 
 test_that("Model outputs are consistent", {
-  input <- readRDS(test_path("testdata/child_parms.rds"))
-  out <- run_model(input$parameters, "ChildModel", 1970:2030)
+  parameters <- read_hdf5_file(test_path("testdata/child_parms.h5"))
+  out <- run_model(parameters, "ChildModel", 1970:2030)
 
   ###############################
   ##Infections stratified by infection type and population infections should be the same
@@ -122,11 +122,13 @@ test_that("Model outputs are consistent", {
 
 test_that("Female 15-49y pop aligns", {
   testthat::skip("Skipping this test because the adult populations currently do not align")
-  input <- readRDS(test_path("testdata/child_parms.rds"))
-  dp <- input$dp
-  pjnz <- input$pjnz
+  parameters <- read_hdf5_file(test_path("testdata/child_parms.h5"))
+  utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
-  out <- run_model(input$parameters, "ChildModel", 1970:2030)
+  dp <- utils$dp
+  pjnz <- utils$pjnz
+
+  out <- run_model(parameters, "ChildModel", 1970:2030)
   spec <- SpectrumUtils::dp.output.hivpop(dp, direction = 'long')
   spec <- spec %>%
     dplyr::filter(Age %in% 15:49 & Sex == 'Female') %>%
@@ -147,11 +149,13 @@ test_that("Female 15-49y pop aligns", {
 })
 
 test_that("Mothers that need ptmct align", {
-  input <- readRDS(test_path("testdata/child_parms.rds"))
-  dp <- input$dp
-  pjnz <- input$pjnz
+  parameters <- read_hdf5_file(test_path("testdata/child_parms.h5"))
+  utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
-  out <- run_model(input$parameters, "ChildModel", 1970:2030)
+  dp <- utils$dp
+  pjnz <- utils$pjnz
+
+  out <- run_model(parameters, "ChildModel", 1970:2030)
   spec <- SpectrumUtils::dp.output.pmtct.need(dp, direction = 'long')
 
   lfrog <- data.frame(lfrog = out$hiv_births, Year = 1970:2030)
@@ -164,12 +168,12 @@ test_that("Mothers that need ptmct align", {
 })
 
 test_that("Children in need of cotrim aligns", {
-  input <- readRDS(test_path("testdata/child_parms.rds"))
-  dp <- input$dp
+  parameters <- read_hdf5_file(test_path("testdata/child_parms.h5"))
+  utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
-  out <- run_model(input$parameters, "ChildModel", 1970:2030)
+  out <- run_model(parameters, "ChildModel", 1970:2030)
 
-  spec <- input$ctx_need
+  spec <- utils$ctx_need
   dt <- data.frame(year = 1970:2030,
                    spec = as.numeric(unlist(spec)),
                    lfrog = out$ctx_need)
@@ -180,11 +184,13 @@ test_that("Children in need of cotrim aligns", {
 })
 
 test_that("Infections among children align", {
-  input <- readRDS(test_path("testdata/child_parms.rds"))
-  dp <- input$dp
-  pjnz <- input$pjnz
+  parameters <- read_hdf5_file(test_path("testdata/child_parms.h5"))
+  utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
-  out <- run_model(input$parameters, "ChildModel", 1970:2030)
+  dp <- utils$dp
+  pjnz <- utils$pjnz
+
+  out <- run_model(parameters, "ChildModel", 1970:2030)
   inf_spec <- SpectrumUtils::dp.output.incident.hiv(dp.raw = dp)
   inf_spec <- inf_spec %>%
     dplyr::filter(Sex != "Male+Female") %>%
@@ -213,13 +219,15 @@ test_that("Infections among children align", {
 })
 
 test_that("CLHIV align", {
-  input <- readRDS(test_path("testdata/child_parms.rds"))
-  dp <- input$dp
-  pjnz <- input$pjnz
+  parameters <- read_hdf5_file(test_path("testdata/child_parms.h5"))
+  utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
-  out <- run_model(input$parameters, "ChildModel", 1970:2030)
+  dp <- utils$dp
+  pjnz <- utils$pjnz
 
-  spec_prev <- input$offtrt
+  out <- run_model(parameters, "ChildModel", 1970:2030)
+
+  spec_prev <- utils$offtrt
 
   hc1 <- dplyr::right_join((reshape2::melt(out$hc1_hiv_pop)), data.frame(Var1 = 1:7, cd4_cat = c("gte30", "26-30", "21-25", "16-20", "11-15", "5-10", "lte5")), by = "Var1")
   hc2 <- dplyr::right_join(data.frame(reshape2::melt(out$hc2_hiv_pop)), data.frame(Var1 = 1:6, cd4_cat = c("gte1000", "750-999", "500-749", "350-499", "200-349", "lte200")), by = "Var1")
@@ -262,13 +270,15 @@ test_that("CLHIV align", {
 })
 
 test_that("CLHIV on ART align", {
-  input <- readRDS(test_path("testdata/child_parms.rds"))
-  dp <- input$dp
-  pjnz <- input$pjnz
+  parameters <- read_hdf5_file(test_path("testdata/child_parms.h5"))
+  utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
-  out <- run_model(input$parameters, "ChildModel", 1970:2030)
+  dp <- utils$dp
+  pjnz <- utils$pjnz
 
-  spec_prev <- input$ontrt
+  out <- run_model(parameters, "ChildModel", 1970:2030)
+
+  spec_prev <- utils$ontrt
   spec_prev <- spec_prev %>%
     dplyr::rename(time_art = transmission)
   hc1 <- dplyr::right_join(data.frame(reshape2::melt(out$hc1_art_pop)), data.frame(Var2 = 1:7, cd4_cat = c("gte30", "26-30", "21-25", "16-20", "11-15", "5-10", "lte5")), by = ("Var2"))
@@ -310,12 +320,14 @@ test_that("CLHIV on ART align", {
 })
 
 test_that("HIV related deaths among CLHIV not on ART align", {
-  input <- readRDS(test_path("testdata/child_parms.rds"))
-  dp <- input$dp
-  pjnz <- input$pjnz
-  aids_deathsnoart <- input$deaths_noart
+  parameters <- read_hdf5_file(test_path("testdata/child_parms.h5"))
+  utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
-  out <- run_model(input$parameters, "ChildModel", 1970:2030)
+  dp <- utils$dp
+  pjnz <- utils$pjnz
+  aids_deathsnoart <- utils$deaths_noart
+
+  out <- run_model(parameters, "ChildModel", 1970:2030)
 
   hc1 <- apply(out$hc1_noart_aids_deaths, c(3:5), sum)
   hc2 <- apply(out$hc2_noart_aids_deaths, c(3:5), sum)
@@ -339,12 +351,14 @@ test_that("HIV related deaths among CLHIV not on ART align", {
 })
 
 test_that("HIV related deaths among CLHIV on ART align", {
-  input <- readRDS(test_path("testdata/child_parms.rds"))
-  dp <- input$dp
-  pjnz <- input$pjnz
-  aids_deathsart <- input$deaths_art
+  parameters <- read_hdf5_file(test_path("testdata/child_parms.h5"))
+  utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
-  out <- run_model(input$parameters, "ChildModel", 1970:2030)
+  dp <- utils$dp
+  pjnz <- utils$pjnz
+  aids_deathsart <- utils$deaths_art
+
+  out <- run_model(parameters, "ChildModel", 1970:2030)
 
   hc1 <- apply(out$hc1_art_aids_deaths, c(3:5), sum)
   hc2 <- apply(out$hc2_art_aids_deaths, c(3:5), sum)
@@ -369,31 +383,31 @@ test_that("HIV related deaths among CLHIV on ART align", {
 })
 
 test_that("Child model agrees when run through all years vs two parts vs single year runs", {
-  input <- readRDS(test_path("testdata/child_parms.rds"))
+  parameters <- read_hdf5_file(test_path("testdata/child_parms.h5"))
 
   # All years
-  out_all_years <- run_model(input$parameters, "ChildModel", 1970:2030)
+  out_all_years <- run_model(parameters, "ChildModel", 1970:2030)
 
   # In two parts
-  out_first_half_years <- run_model(input$parameters, "ChildModel", 1970:2000)
-  out_second_half_years <- run_model_from_state(input$parameters, "ChildModel", get_time_slice(out_first_half_years, 31), 2000, 2001:2030)
+  out_first_half_years <- run_model(parameters, "ChildModel", 1970:2000)
+  out_second_half_years <- run_model_from_state(parameters, "ChildModel", get_time_slice(out_first_half_years, 31), 2000, 2001:2030)
 
   expect_equal(out_all_years, concat_on_time_dim(out_first_half_years, out_second_half_years))
 
   # Single years
-  out_single_year <- get_time_slice(run_model(input$parameters, "ChildModel", 1970), 1)
+  out_single_year <- get_time_slice(run_model(parameters, "ChildModel", 1970), 1)
   for (year in 1971:2030) {
-    out_single_year <- run_model_single_year(input$parameters, "ChildModel", out_single_year, year - 1)
+    out_single_year <- run_model_single_year(parameters, "ChildModel", out_single_year, year - 1)
     expect_equal(out_single_year, get_time_slice(out_all_years, year - 1970 + 1))
   }
 })
 
 test_that("error thrown if trying to output from years before simulation start year", {
-  input <- readRDS(test_path("testdata/child_parms.rds"))
+  parameters <- read_hdf5_file(test_path("testdata/child_parms.h5"))
 
-  out_first_half_years <- run_model(input$parameters, "ChildModel", 1970:2000)
+  out_first_half_years <- run_model(parameters, "ChildModel", 1970:2000)
   expect_error(
-    run_model_from_state(input$parameters, "ChildModel", get_time_slice(out_first_half_years, 31), 2000, 2000:2030),
+    run_model_from_state(parameters, "ChildModel", get_time_slice(out_first_half_years, 31), 2000, 2000:2030),
     "Cannot output year '2000'. Output years must be later than simulation start year '2000'.",
     fixed = TRUE
   )

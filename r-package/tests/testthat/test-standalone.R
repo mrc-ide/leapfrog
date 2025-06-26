@@ -56,7 +56,7 @@ test_that("We can compile the standalone program", {
   expect_true(file.exists(file.path(output, "h_art_initiation")))
   expect_true(file.exists(file.path(output, "p_hiv_deaths")))
 
-  parameters <- readRDS(test_path("testdata/adult_parms.rds"))
+  parameters <- read_hdf5_file(test_path("testdata/adult_parms.h5"))
   expected <- run_model(parameters, output_years = 1970:2030L)
 
   # exclude <- c("base_pop", "h_art_stage_dur")

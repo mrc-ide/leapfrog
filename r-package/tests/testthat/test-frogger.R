@@ -1,5 +1,5 @@
 test_that("initial state set up works as expected", {
-  parameters <- readRDS(test_path("testdata/adult_parms.rds"))
+  parameters <- read_hdf5_file(test_path("testdata/adult_parms.h5"))
 
   out <- run_model(parameters, "HivFullAgeStratification", 1970L)
 
@@ -50,7 +50,7 @@ test_that("initial state set up works as expected", {
 })
 
 test_that("initial state set up with coarse stratified HIV works as expected", {
-  parameters <- readRDS(test_path("testdata/adult_parms.rds"))
+  parameters <- read_hdf5_file(test_path("testdata/adult_parms.h5"))
 
   out <- run_model(parameters, "HivCoarseAgeStratification", 1970L)
 
@@ -100,7 +100,7 @@ test_that("initial state set up with coarse stratified HIV works as expected", {
 })
 
 test_that("model for 1 time step has looped", {
-  parameters <- readRDS(test_path("testdata/adult_parms.rds"))
+  parameters <- read_hdf5_file(test_path("testdata/adult_parms.h5"))
 
   out <- run_model(parameters, "HivFullAgeStratification", 1971)
 
@@ -131,7 +131,7 @@ test_that("model for 1 time step has looped", {
 })
 
 test_that("model can be run for all years", {
-  parameters <- readRDS(test_path("testdata/adult_parms.rds"))
+  parameters <- read_hdf5_file(test_path("testdata/adult_parms.h5"))
 
   out <- run_model(parameters)
 
@@ -172,7 +172,7 @@ test_that("model can be run for all years", {
 })
 
 test_that("model can be run with ART initiation", {
-  parameters <- readRDS(test_path("testdata/adult_parms.rds"))
+  parameters <- read_hdf5_file(test_path("testdata/adult_parms.h5"))
   ## Set time ART start to some value lower than no of years in projection
   parameters[["t_ART_start"]] <- 20L
 
@@ -183,7 +183,7 @@ test_that("model can be run twice on the same data", {
   ## Regression test as we saw the 2nd run failing as the first fit
   ## was modifying the R stored data causing the 2nd run on the same
   ## data to read from an index of -1
-  parameters <- readRDS(test_path("testdata/adult_parms.rds"))
+  parameters <- read_hdf5_file(test_path("testdata/adult_parms.h5"))
 
   out <- run_model(parameters)
   out2 <- run_model(parameters)
@@ -194,15 +194,15 @@ test_that("child model can be run twice on the same data", {
   ## Regression test as we saw the 2nd run failing as the first fit
   ## was modifying the R stored data causing the 2nd run on the same
   ## data to read from an index of -1
-  input <- readRDS(test_path("testdata/child_parms.rds"))
+  parameters <- read_hdf5_file(test_path("testdata/child_parms.h5"))
 
-  out <- run_model(input$parameters, "ChildModel", 1970:2030)
-  out2 <- run_model(input$parameters, "ChildModel", 1970:2030)
+  out <- run_model(parameters, "ChildModel", 1970:2030)
+  out2 <- run_model(parameters, "ChildModel", 1970:2030)
   expect_identical(out, out2)
 })
 
 test_that("error thrown if model run with invalid configuration", {
-  parameters <- readRDS(test_path("testdata/adult_parms.rds"))
+  parameters <- read_hdf5_file(test_path("testdata/adult_parms.h5"))
 
   expect_error(
     run_model(parameters, "HivFineAgeStratification", 2030L),
@@ -212,7 +212,7 @@ test_that("error thrown if model run with invalid configuration", {
 })
 
 test_that("error thrown if size of stratified data does not match expected", {
-  parameters <- readRDS(test_path("testdata/adult_parms.rds"))
+  parameters <- read_hdf5_file(test_path("testdata/adult_parms.h5"))
   parameters[["cd4_mort_full"]] <- rep(1, 3)
 
   expect_error(
@@ -222,17 +222,17 @@ test_that("error thrown if size of stratified data does not match expected", {
 })
 
 test_that("error if trying to save output from before projection start", {
-  input <- readRDS(test_path("testdata/child_parms.rds"))
+  parameters <- read_hdf5_file(test_path("testdata/child_parms.h5"))
 
   expect_error(
-    run_model(input$parameters, "ChildModel", 1965:2030),
+    run_model(parameters, "ChildModel", 1965:2030),
     paste("Trying to output for year: '1965' which",
           "is before the projection start year: '1970'.")
   )
 })
 
 test_that("error thrown if invalid projection period set", {
-  parameters <- readRDS(test_path("testdata/adult_parms.rds"))
+  parameters <- read_hdf5_file(test_path("testdata/adult_parms.h5"))
   parameters$projection_period <- "unknown"
 
   expect_error(
