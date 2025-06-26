@@ -15,6 +15,8 @@ pjnz_adult <- system.file("pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-
 demp <- prepare_leapfrog_demp(pjnz_adult)
 proj <- prepare_leapfrog_projp(pjnz_adult)
 parameters <- c(demp, proj)
+
+parameters <- frogger::process_parameters_to_cpp(parameters)
 save_hdf5_file(parameters, testthat::test_path("testdata/adult_parms.h5"))
 
 # Used as reference data (Run from leapfrog/master)
@@ -120,7 +122,9 @@ out <- list(dp = dp,
             deaths_art = aids_deathsart,
             ctx_need = as.numeric(unlist(spec_ctx_need)))
 
-save_hdf5_file(c(proj, demp), testthat::test_path("testdata/child_parms.h5"))
+parameters <- c(proj, demp)
+parameters <- frogger::process_parameters_to_cpp(parameters)
+save_hdf5_file(parameters, testthat::test_path("testdata/child_parms.h5"))
 # need this for child model tests
 saveRDS(out, testthat::test_path("testdata/child_test_utils.rds"))
 

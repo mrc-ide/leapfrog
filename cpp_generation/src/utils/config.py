@@ -76,6 +76,27 @@ def get_r_initial_state(cfg, name):
     return f'fill_initial_state<{cfg["num_type"]}, typename {shape_path}>(data, "{name}", state.{name})'
 
 
+def get_parse_pars_cpp(name, cfg):
+  r_alias = cfg["alias"]["r"]
+  if cfg["type"] == "scalar":
+    return f'read_data_scalar<{cfg["num_type"]}>(params_file, "{r_alias}")'
+  else:
+    dim_types = []
+    for index, dim in enumerate(cfg["dims"]):
+      prod_prev_dim = "1" if index == 0 else " * ".join([f"({d})" for d in cfg["dims"][:index]])
+      dim_types.append(f'nda::dim<>(0, {dim}, {prod_prev_dim})')
+    shape = f'typename Pars::shape_{name}'
+    return f'read_data<{cfg["num_type"]}, {shape}>(params_file, "{r_alias}", {{ {", ".join(dim_types)} }})'
+
+
+def get_pars_cpp(name, cfg, ns):
+  el = f'owned_pars.{ns}.{name}'
+  if cfg["type"] == "scalar":
+    return el
+  else:
+    return f'{{ {el}.data(), {el}.shape() }}'
+
+
 def get_cpp_read_data(name, cfg):
   if cfg["type"] == "scalar":
     return f'read_data<{cfg["num_type"]}>(input_dir, "{name}")'

@@ -3,29 +3,11 @@
 
 #pragma once
 
-#include <filesystem>
-#include <string_view>
-#include <format>
-
+#include "hdf5_utils.hpp"
 #include "../config_mixer.hpp"
-#include "../../serialize_eigen.hpp"
 
 namespace leapfrog {
 namespace internal {
-
-template<typename T, typename... Args>
-auto read_data(const std::filesystem::path &input_dir, std::string_view key, Args... dims) {
-  if (!std::filesystem::exists(input_dir / key)) {
-    throw std::runtime_error(std::format("File '{}' in input dir '{}' does not exist.\n", key, input_dir.string()));
-  }
-
-  constexpr std::size_t rank = sizeof...(dims);
-  if constexpr (rank == 0) {
-    return serialize::deserialize_scalar<T>(input_dir / key);
-  } else {
-    return serialize::deserialize_tensor<T, rank>(input_dir / key);
-  }
-}
 
 {% for config in configs %}
 template<typename real_type, MV ModelVariant>
@@ -34,12 +16,11 @@ struct {{ config.name }}Adapter<Language::Cpp, real_type, ModelVariant> {
   using Config = {{ config.name }}Config<real_type, ModelVariant>;
 
   static Config::Pars get_pars(
-    const std::filesystem::path &input_dir,
-    const Options<real_type> &opts
+    OwnedParsMixed<real_type, ModelVariant>::Pars& owned_pars
   ) {
     return {
       {% for name, cfg in config.pars.default.items() %}
-      .{{ name }} = {{ get_cpp_read_data(name, cfg) }}{{ comma_except_last(loop) }}
+      .{{ name }} = {{ get_pars_cpp(name, cfg, config.namespace) }}{{ comma_except_last(loop) }}
       {% endfor %}
     };
   };
@@ -49,10 +30,10 @@ struct {{ config.name }}Adapter<Language::Cpp, real_type, ModelVariant> {
   static int build_output(
     int index,
     const Config::OutputState& state,
-    std::filesystem::path& output_dir
+    std::filesystem::path& output_file
   ) {
     {% for name, cfg in config.state.items() %}
-    serialize::serialize_tensor<{{ get_num_type(cfg) }}, {{ dim_len(cfg) + 1 }}>(state.{{ name }}, output_dir / "{{ name }}");
+    write_data<{{ cfg.num_type }}, typename Config::OutputState::shape_{{ name }}>(output_file, "{{ name }}", state.{{ name }});
     {% endfor %}
     return index + output_count;
   };

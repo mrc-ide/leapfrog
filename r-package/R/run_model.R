@@ -22,8 +22,6 @@
 run_model <- function(parameters,
                       configuration = "HivFullAgeStratification",
                       output_years = seq(1970, 2030)) {
-  parameters <- process_parameters(parameters, configuration)
-
   run_base_model(parameters, configuration, output_years)
 }
 
@@ -61,8 +59,6 @@ run_model_from_state <- function(parameters,
                                  initial_state,
                                  simulation_start_year,
                                  output_years = seq(1970, 2030)) {
-  parameters <- process_parameters(parameters, configuration)
-
   run_base_model_from_state(parameters, configuration, initial_state, simulation_start_year, output_years)
 }
 
@@ -98,13 +94,18 @@ run_model_single_year <- function(parameters,
                                   configuration,
                                   initial_state,
                                   simulation_start_year) {
-  parameters <- process_parameters(parameters, configuration)
-
   run_base_model_single_year(parameters, configuration, initial_state, simulation_start_year)
 }
 
-
-process_parameters <- function(parameters, configuration) {
+#' Process parameters and convert from 1 based indexing in R to
+#' 0 based indexing in C++. Also add in any defaults/extra parameters,
+#' e.g. `h_art_stage_dur`.
+#'
+#' @param parameters The list of parameters to feed into the model.
+#'
+#' @return List of parameters with 0 based indexing and defaults.
+#' @export
+process_parameters_to_cpp <- function(parameters) {
   # convert indices to 0 based
   if ("artcd4elig_idx" %in% names(parameters)) {
     parameters[["artcd4elig_idx"]] <- parameters[["artcd4elig_idx"]] - 1L
@@ -116,7 +117,7 @@ process_parameters <- function(parameters, configuration) {
     parameters[["t_ART_start"]] <- parameters[["t_ART_start"]] - 1L
   }
 
-  if (is_run_hiv_simulation(configuration)) {
+  if ("artmx_timerr" %in% names(parameters)) {
     hTS <- dim(parameters[["artmx_timerr"]])[[1]]
     parameters[["h_art_stage_dur"]] <- rep(0.5, hTS - 1)
   }
@@ -127,10 +128,26 @@ process_parameters <- function(parameters, configuration) {
   parameters
 }
 
-is_run_hiv_simulation <- function(configuration) {
-  configuration %in% c("HivCoarseAgeStratification",
-                       "HivFullAgeStratification",
-                       "ChildModel")
+#' Process parameters and convert from 0 based indexing for C++ to
+#' 1 based indexing in R.
+#'
+#' @param parameters List of parameters.
+#'
+#' @return List of parameters with 1 based indexing.
+#' @export
+process_parameters_to_r <- function(parameters) {
+  # convert indices to 0 based
+  if ("artcd4elig_idx" %in% names(parameters)) {
+    parameters[["artcd4elig_idx"]] <- parameters[["artcd4elig_idx"]] + 1L
+  }
+  if ("paed_art_elig_cd4" %in% names(parameters)) {
+    parameters[["paed_art_elig_cd4"]] <- parameters[["paed_art_elig_cd4"]] + 1L
+  }
+  if ("t_ART_start" %in% names(parameters)) {
+    parameters[["t_ART_start"]] <- parameters[["t_ART_start"]] + 1L
+  }
+
+  parameters
 }
 
 #' Slice a single year from model state
