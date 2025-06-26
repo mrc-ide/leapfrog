@@ -16,7 +16,7 @@ jobs:
       - name: Install hdf5 and compile standalone model
         shell: bash
         run: |
-          apt-get install libhdf5-dev
+          sudo apt-get install libhdf5-dev
           cd r-package/inst/standalone_model
           cmake -B build .
           cmake --build build
