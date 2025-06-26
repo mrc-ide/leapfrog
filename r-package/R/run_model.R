@@ -23,6 +23,7 @@
 run_model <- function(parameters,
                       configuration = "HivFullAgeStratification",
                       output_years = seq(1970, 2030)) {
+  parameters <- process_parameters_to_cpp(parameters)
   run_base_model(parameters, configuration, output_years)
 }
 
@@ -61,6 +62,7 @@ run_model_from_state <- function(parameters,
                                  initial_state,
                                  simulation_start_year,
                                  output_years = seq(1970, 2030)) {
+  parameters <- process_parameters_to_cpp(parameters)
   run_base_model_from_state(parameters, configuration, initial_state, simulation_start_year, output_years)
 }
 
@@ -97,6 +99,7 @@ run_model_single_year <- function(parameters,
                                   configuration,
                                   initial_state,
                                   simulation_start_year) {
+  parameters <- process_parameters_to_cpp(parameters)
   run_base_model_single_year(parameters, configuration, initial_state, simulation_start_year)
 }
 

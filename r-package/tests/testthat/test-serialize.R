@@ -13,4 +13,3 @@ test_that("can serialize and deserialize data", {
   deserialized_foo <- read_hdf5_file(t)
   expect_equal(deserialized_foo, foo)
 })
-
