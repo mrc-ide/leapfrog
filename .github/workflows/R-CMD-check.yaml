@@ -52,9 +52,6 @@ jobs:
           needs: check
           working-directory: r-package
 
-      - name: Extract test data
-        run: ./inst/standalone_model/extract_data
-
       - uses: r-lib/actions/check-r-package@v2
         with:
           error-on: '"error"'
