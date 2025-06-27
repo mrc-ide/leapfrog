@@ -15,17 +15,18 @@ pjnz_adult <- system.file("pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-
 demp <- prepare_leapfrog_demp(pjnz_adult)
 proj <- prepare_leapfrog_projp(pjnz_adult)
 parameters <- c(demp, proj)
-save_hdf5_file(parameters, testthat::test_path("testdata/adult_parms.h5"))
+
+save_parameters(parameters, testthat::test_path("testdata/adult_parms.h5"))
 
 # Used as reference data (Run from leapfrog/master)
 lmod <- leapfrog::leapfrogR(demp, proj)
-save_hdf5_file(lmod, testthat::test_path("testdata/leapfrog_fit.h5"))
+frogger:::save_hdf5_file(lmod, testthat::test_path("testdata/leapfrog_fit.h5"))
 
 lmod <- leapfrog::leapfrogR(demp, proj, hiv_strat = "coarse")
-save_hdf5_file(lmod, testthat::test_path("testdata/leapfrog_fit_coarse.h5"))
+frogger:::save_hdf5_file(lmod, testthat::test_path("testdata/leapfrog_fit_coarse.h5"))
 
 lmod <- leapfrog::leapfrogR(demp, proj, hiv_steps_per_year = 0L)
-save_hdf5_file(lmod, testthat::test_path("testdata/fit_demography.h5"))
+frogger:::save_hdf5_file(lmod, testthat::test_path("testdata/fit_demography.h5"))
 
 #Create paeds parameters
 pjnz_child <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct.PJNZ")
@@ -120,7 +121,8 @@ out <- list(dp = dp,
             deaths_art = aids_deathsart,
             ctx_need = as.numeric(unlist(spec_ctx_need)))
 
-save_hdf5_file(c(proj, demp), testthat::test_path("testdata/child_parms.h5"))
+parameters <- c(proj, demp)
+save_parameters(parameters, testthat::test_path("testdata/child_parms.h5"))
 # need this for child model tests
 saveRDS(out, testthat::test_path("testdata/child_test_utils.rds"))
 

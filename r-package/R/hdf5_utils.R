@@ -1,13 +1,15 @@
-#' This function saves an arbitrary list/dataframe to HDF5
-#' file format. Note that this file format can be used
-#' in any language we support which means some R specific
-#' features of the data are not guaranteed to be preserved,
-#' e.g. dimnames
+#' Save parameters to HDF5 file format. This implicitly
+#' processes the parameters to C++ 0 based indexing.
 #'
 #' @param df list/dataframe to serialize
 #' @param file_path where to save the HDF5 file
 #'
 #' @export
+save_parameters <- function(df, file_path) {
+  df <- process_parameters_to_cpp(df)
+  save_hdf5_file(df, file_path)
+}
+
 save_hdf5_file <- function(df, file_path) {
   file.create(file_path)
   h5f <- hdf5r::H5File$new(file_path, mode = "w")
@@ -32,13 +34,19 @@ save_datasets <- function(h5f, df, group = "") {
   })
 }
 
-#' This function reads an HDF5 file to an R dataframe.
+#' Read parameters from HDF5 file format. This implicitly
+#' processes the parameters from C++ 0 based indexing to
+#' R 1 based indexing.
 #'
-#' @param file_path where the HDF5 file is
-#'
-#' @return deserialized HDF5 file as a list
+#' @param file_path HDF5 file to read
 #'
 #' @export
+read_parameters <- function(file_path) {
+  df <- read_hdf5_file(file_path)
+  df <- process_parameters_to_r(df)
+  df
+}
+
 read_hdf5_file <- function(file_path) {
   h5f <- hdf5r::H5File$new(file_path, mode = "r+")
   groups <- hdf5r::list.groups(h5f, full.names = TRUE)

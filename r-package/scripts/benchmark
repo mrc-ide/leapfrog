@@ -2,7 +2,7 @@
 
 root_dir <- here::here()
 
-parameters <- frogger::read_hdf5_file(testthat::test_path("testdata/adult_parms.h5"))
+parameters <- frogger::read_parameters(testthat::test_path("testdata/adult_parms.h5"))
 
 message("Benchmarking demographic projection")
 bench::mark(
@@ -25,12 +25,10 @@ bench::mark(
   check = FALSE
 )
 
-source(file.path("R", "spectrum_inputs.R"))
-input <- frogger::read_hdf5_file(testthat::test_path("testdata/child_parms.h5"))
-
+parameters <- frogger::read_parameters(testthat::test_path("testdata/child_parms.h5"))
 message("Benchmarking child model")
 bench::mark(
-  frogger = frogger::run_model(input$parameters, "ChildModel", 1970:2030),
+  frogger = frogger::run_model(parameters, "ChildModel", 1970:2030),
   iterations = 10,
   check = FALSE
 )
