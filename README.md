@@ -94,7 +94,7 @@ Then to run code generation follow
       - They have good error handling. They have test suites that test that one
         error is being produced for common error in heavily templated C++ code.
       - Eigen had some compiler warnings when it was compiled.
-      - Column-major indexing in the same order as R.
+      - Column-major indexing in the same order as R (Eigen also has this).
 
 ## License
 
