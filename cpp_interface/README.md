@@ -41,7 +41,7 @@ See usage with
 Run as
 
 ```
-./build/simulate_model 61 ../../tests/testthat/testdata/adult_parms.h5 output
+./build/simulate_model 61 ../r-package/tests/testthat/testdata/adult_parms.h5 output
 ```
 
 Where
