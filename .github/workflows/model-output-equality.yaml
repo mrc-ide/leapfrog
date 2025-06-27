@@ -1,0 +1,72 @@
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+name: model-output-equality
+
+jobs:
+  model-outputs:
+    runs-on: ubuntu-latest
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ matrix.config.r }}
+          http-user-agent: ${{ matrix.config.http-user-agent }}
+          use-public-rspm: true
+          extra-repositories: https://mrc-ide.r-universe.dev
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck, any::here
+          needs: check
+          working-directory: r-package
+
+      - name: Install R Package
+        shell: bash
+        working-directory: r-package
+        run: |
+          R CMD INSTALL
+
+      - name: Generate test data
+        shell: bash
+        working-directory: r-package
+        run: |
+          ./scripts/create_test_data.R
+
+      - name: R Model Output
+        shell: bash
+        working-directory: r-package
+        run: |
+          ./scripts/create_model_output.R
+
+      - name: Install hdf5 and compile standalone model
+        shell: bash
+        working-directory: cpp_interface
+        run: |
+          sudo apt-get install libhdf5-dev
+          cmake -B build .
+          cmake --build build
+
+      - name: Cpp Model Output
+        shell: bash
+        working-directory: cpp_interface
+        run: |
+          ./build/simulate_model 61 ../r-package/tests/testthat/testdata/adult_parms.h5 ../model-outputs
+
+      - name: Check equality
+        shell: bash
+        working-directory: model-outputs
+        run: |
+          sudo apt install hdf5-tools
+          h5diff output.h5 r-output.h5
