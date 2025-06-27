@@ -5,7 +5,7 @@
 This standalone version of the model exists only as a proof of concept and
 should not actually be run this way. We
 anticipate that non-R users will want to build frogger as a library (e.g.
-using `pybind11`) and call directly from a
+using `nanobind`) and call directly from a
 program not from this CLI application. This standalone code just demonstrates
 one way that we can build frogger without
 any dependency on R.
@@ -41,7 +41,7 @@ See usage with
 Run as
 
 ```
-./build/simulate_model 61 ../../tests/testthat/testdata/adult_parms.h5 output
+./build/simulate_model 61 ../r-package/tests/testthat/testdata/adult_parms.h5 output
 ```
 
 Where
