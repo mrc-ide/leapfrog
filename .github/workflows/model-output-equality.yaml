@@ -34,7 +34,7 @@ jobs:
         shell: bash
         working-directory: r-package
         run: |
-          R CMD INSTALL
+          R CMD INSTALL .
 
       - name: Generate test data
         shell: bash
