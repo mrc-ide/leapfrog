@@ -10,16 +10,6 @@ save_parameters <- function(df, file_path) {
   save_hdf5_file(df, file_path)
 }
 
-#' This function saves an arbitrary list/dataframe to HDF5
-#' file format. Note that this file format can be used
-#' in any language we support which means some R specific
-#' features of the data are not guaranteed to be preserved,
-#' e.g. dimnames
-#'
-#' @param df list/dataframe to serialize
-#' @param file_path where to save the HDF5 file
-#'
-#' @export
 save_hdf5_file <- function(df, file_path) {
   file.create(file_path)
   h5f <- hdf5r::H5File$new(file_path, mode = "w")
@@ -57,13 +47,6 @@ read_parameters <- function(file_path) {
   df
 }
 
-#' This function reads an HDF5 file to an R dataframe.
-#'
-#' @param file_path where the HDF5 file is
-#'
-#' @return deserialized HDF5 file as a list
-#'
-#' @export
 read_hdf5_file <- function(file_path) {
   h5f <- hdf5r::H5File$new(file_path, mode = "r+")
   groups <- hdf5r::list.groups(h5f, full.names = TRUE)
