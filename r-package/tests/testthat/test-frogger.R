@@ -17,10 +17,10 @@ test_that("initial state set up works as expected", {
     ignore_attr = TRUE
   )
 
-  expect_equal(out$births[1], 0)
-  expect_equal(out$p_total_pop_background_deaths, array(rep(0, 81 * 2),
-    dim = c(81, 2, 1)
-  ))
+  ## Base year calculations will set values for
+  ## p_total_pop, births and p_total_pop_background_deaths
+  expect_true(out$births[1] != 0)
+  expect_true(all(out$p_total_pop_background_deaths != 0))
   expect_equal(out$p_hiv_pop, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
   expect_equal(out$p_hiv_pop_background_deaths, array(rep(0, 81 * 2),
     dim = c(81, 2, 1)
@@ -67,10 +67,10 @@ test_that("initial state set up with coarse stratified HIV works as expected", {
   expect_equal(out$p_total_pop[, , 1], parameters$basepop[, , 1],
                ignore_attr = TRUE)
 
-  expect_equal(out$births[1], 0)
-  expect_equal(out$p_total_pop_background_deaths, array(rep(0, 81 * 2),
-    dim = c(81, 2, 1)
-  ))
+  ## Base year calculations will set values for
+  ## p_total_pop, births and p_total_pop_background_deaths
+  expect_true(out$births[1] != 0)
+  expect_true(all(out$p_total_pop_background_deaths != 0))
   expect_equal(out$p_hiv_pop, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
   expect_equal(out$p_hiv_pop_background_deaths, array(rep(0, 81 * 2),
     dim = c(81, 2, 1)
