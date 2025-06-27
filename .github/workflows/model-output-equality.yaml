@@ -40,7 +40,7 @@ jobs:
         shell: bash
         working-directory: r-package
         run: |
-          ./scripts/create_model_output.R
+          ./scripts/create_model_output.R ../model-outputs
 
       - name: Install hdf5 and compile standalone model
         shell: bash
