@@ -1,0 +1,215 @@
+{% from "template_utils.j2" import comma_except_last %}
+{% include "header.j2" %}
+
+#include <filesystem>
+
+#include "H5Cpp.h"
+#include "../config_mixer.hpp"
+#include "array/array.h"
+
+{% macro get_struct_member_def(name, cfg) %}
+{% if cfg.type == "tensor" %}
+using shape_{{ name }} = nda::shape<
+  {% for dim_type in get_shape_dim_types(cfg) %}
+  {{ dim_type }}{{ comma_except_last(loop) }}
+  {% endfor %}
+>;
+nda::array<{{ cfg.num_type }}, shape_{{ name }}> {{ name }};
+{% else %}
+{{ cfg.num_type }} {{ name }};
+{% endif %}
+{% endmacro %}
+
+template <size_t TIndex, typename... Dims>
+requires(TIndex >= sizeof...(Dims))
+void copy_dim_to_dims_array(hsize_t* array, const std::tuple<Dims...>& tuple) {};
+
+template <size_t TIndex, typename... Dims>
+requires(TIndex >= 0 && TIndex < sizeof...(Dims))
+void copy_dim_to_dims_array(hsize_t* array, const std::tuple<Dims...>& tuple) {
+  *(array + TIndex) = std::get<sizeof...(Dims) - TIndex - 1>(tuple).extent();
+  copy_dim_to_dims_array<TIndex + 1>(array, tuple);
+};
+
+template <typename T, typename Shape>
+void write_data(
+  const std::filesystem::path &output_file,
+  const std::string_view key,
+  nda::array<T, Shape> array
+) {
+  const H5std_string FILE_NAME(output_file);
+  H5::H5File file(FILE_NAME, H5F_ACC_RDWR);
+
+  const H5std_string DATASET_NAME(key);
+
+  auto h5_type = H5::PredType::NATIVE_DOUBLE;
+  if (std::is_same_v<T, int>) {
+    h5_type = H5::PredType::NATIVE_INT;
+  }
+
+  constexpr hsize_t Rank = std::tuple_size_v<typename Shape::dims_type>;
+  hsize_t dims[Rank];
+  copy_dim_to_dims_array<0>(dims, array.shape().dims());
+  H5::DataSpace dataspace(Rank, dims);
+
+  H5::DataSet dataset = file.createDataSet(DATASET_NAME, h5_type, dataspace);
+  dataset.write(array.data(), h5_type);
+
+  dataset.close();
+  file.close();
+};
+
+template <typename T>
+T read_data_scalar(
+  const std::filesystem::path &params_file,
+  const std::string_view key
+) {
+  const H5std_string FILE_NAME(params_file);
+  H5::H5File file(FILE_NAME, H5F_ACC_RDONLY);
+
+  const H5std_string DATASET_NAME(key);
+  H5::DataSet dataset = file.openDataSet(DATASET_NAME);
+
+  std::vector<T> vec;
+  vec.resize(1);
+
+  auto h5_type = H5::PredType::NATIVE_DOUBLE;
+  if (std::is_same_v<T, int>) {
+    h5_type = H5::PredType::NATIVE_INT;
+  }
+  dataset.read(vec.data(), h5_type);
+
+  dataset.close();
+  file.close();
+
+  return vec[0];
+}
+
+template <typename T, typename Shape>
+nda::array<T, Shape> read_data(
+  const std::filesystem::path &params_file,
+  const std::string_view key,
+  Shape shape
+) {
+  const H5std_string FILE_NAME(params_file);
+  H5::H5File file(FILE_NAME, H5F_ACC_RDONLY);
+
+  const H5std_string DATASET_NAME(key);
+  H5::DataSet dataset = file.openDataSet(DATASET_NAME);
+
+  // get size of flat array
+  H5::DataSpace dataspace = dataset.getSpace();
+  int n_dim = dataspace.getSimpleExtentNdims();
+  std::vector<hsize_t> dims;
+  dims.resize(n_dim);
+  dataspace.getSimpleExtentDims(dims.data());
+  hsize_t prod = 1;
+  for (const auto& d: dims) {
+    prod *= d;
+  }
+
+  std::vector<T> vec;
+  vec.resize(prod);
+
+  auto h5_type = H5::PredType::NATIVE_DOUBLE;
+  if (std::is_same_v<T, int>) {
+    h5_type = H5::PredType::NATIVE_INT;
+  }
+  dataset.read(vec.data(), h5_type);
+
+  nda::array<T, Shape> ret(shape);
+  T* ret_data = ret.data();
+  for (int i = 0; i < shape.flat_max() + 1; i++) {
+    *(ret_data + i) = vec[i];
+  }
+
+  dataset.close();
+  file.close();
+
+  return ret;
+};
+
+namespace leapfrog {
+namespace internal {
+
+{% for config in configs %}
+template<typename real_type, MV ModelVariant>
+struct {{ config.name }}OwnedPars {
+  using SS = SSMixed<ModelVariant>;
+  
+  struct Pars {
+    {% for name, cfg in config.pars.default.items() %}
+    {{ get_struct_member_def(name, cfg)|indent(2) }}
+    {% endfor %}
+  };
+
+  static Pars parse_pars(
+    const std::filesystem::path &params_file,
+    const Options<real_type> &opts
+  ) {
+    return {
+      {% for name, cfg in config.pars.default.items() %}
+      .{{ name }} = {{ get_parse_pars_cpp(name, cfg) }}{{ comma_except_last(loop) }}
+      {% endfor %}
+    };
+  };
+};
+
+{% endfor %}
+
+template<bool enable, typename Mixin>
+struct Pair;
+
+template<typename ...Ts>
+struct OwnedParsMixer;
+
+template<typename real_type, MV ModelVariant>
+struct OwnedParsMixer<real_type, ModelVariant> {
+  struct Pars {};
+
+  static Pars parse_pars(
+    const std::filesystem::path &params_file,
+    const Options<real_type> &opts
+  ) {
+    Pars p = {}; return p;
+  }
+};
+
+template<typename real_type, MV ModelVariant, typename Mixin, typename ...Ts>
+struct OwnedParsMixer<real_type, ModelVariant, Pair<false, Mixin>, Ts...>: public OwnedParsMixer<real_type, ModelVariant, Ts...> {};
+
+{% for config in configs %}
+template<typename real_type, MV ModelVariant, typename ...Ts>
+struct OwnedParsMixer<real_type, ModelVariant, Pair<true, {{ config.name }}OwnedPars<real_type, ModelVariant>>, Ts...>: public OwnedParsMixer<real_type, ModelVariant, Ts...> {
+  using CurrOwnedPars = {{ config.name }}OwnedPars<real_type, ModelVariant>;
+  using NextOwnedParsMixer = OwnedParsMixer<real_type, ModelVariant, Ts...>;
+
+  struct Pars: public NextOwnedParsMixer::Pars {
+    typename CurrOwnedPars::Pars {{ config.namespace }};
+  };
+
+  static Pars parse_pars(
+    const std::filesystem::path &params_file,
+    const Options<real_type> &opts
+  ) {
+    Pars p = {
+      NextOwnedParsMixer::parse_pars(params_file, opts),
+      CurrOwnedPars::parse_pars(params_file, opts)
+    };
+    return p;
+  };
+};
+{% endfor %}
+
+template<typename real_type, MV ModelVariant>
+using OwnedParsMixed = OwnedParsMixer<
+  real_type,
+  ModelVariant,
+  {% for config in configs %}
+  Pair<ModelVariant::{{ config.enable_if }}, {{ config.name }}OwnedPars<real_type, ModelVariant>>{{ comma_except_last(loop) }}
+  {% endfor %}
+>;
+
+}
+}
+

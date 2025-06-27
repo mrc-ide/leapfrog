@@ -19,7 +19,11 @@ void run_initial_year_calculations(
   auto& is_dp = initial_state.dp;
   const int t0 = 0;
 
-  is_dp.p_total_pop = p_dp.base_pop;
+  for (int g = 0; g < SS::NS; ++g) {
+    for (int a = 0; a < SS::pAG; ++a) {
+      is_dp.p_total_pop(a, g) = p_dp.base_pop(a, g);
+    }
+  }
 
   // Initialise births and deaths in initial year. This involves some
   // approximations because the model does not conduct a full

@@ -25,5 +25,3 @@ target_include_directories(leapfrog
         ${CMAKE_CURRENT_SOURCE_DIR}/../r-package/inst/include
 )
 
-find_package(Eigen3 REQUIRED)
-target_link_libraries(leapfrog Eigen3::Eigen)

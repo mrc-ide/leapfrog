@@ -25,23 +25,31 @@ int* r_data(SEXP x) {
   return INTEGER(x);
 }
 
-template<typename T, typename... Args>
-auto parse_data(const Rcpp::List data, const std::string& key, Args... dims) {
-  constexpr std::size_t rank = sizeof...(dims);
-  Eigen::array<int, rank> dimensions{ static_cast<int>(dims)... };
-
-  int length = std::accumulate(dimensions.begin(), dimensions.end(), 1, std::multiplies<int>());
+template <typename T, size_t Rank>
+nda::array_ref_of_rank<T, Rank> parse_data(const Rcpp::List& data, const std::string& key, nda::shape_of_rank<Rank> shape) {
   SEXP array_data = data[key];
-  // In cases where the input data has project years we might not use all of it model fit
-  // So we can take create a Map over a smaller slice of the data
-  // As long as this is true we can be confident we're not referencing invalid memory
-  if (LENGTH(array_data) < length) {
-    Rcpp::stop("Invalid size of data for '%s', expected %d got %d",
-               key,
-               length,
-               LENGTH(array_data));
+
+  int actual_length = LENGTH(array_data);
+  int expected_length = shape.flat_max() + 1;
+
+  if (actual_length < expected_length) {
+    Rcpp::stop(
+      "Invalid size of data for '%s', expected %d got %d",
+      key, expected_length, actual_length
+    );
   }
-  return Eigen::TensorMap<Eigen::Tensor<T, rank>>(r_data<T>(array_data), static_cast<int>(dims)...);
+  return { r_data<T>(array_data), shape };
+}
+
+template <typename T, typename Shape>
+void fill_initial_state(const Rcpp::List& data, const std::string& key, nda::array<T, Shape>& array) {
+  SEXP array_data = data[key];
+
+  nda::array_ref<T, Shape> array_ref(r_data<T>(array_data));
+
+  nda::for_each_index(Shape(), [&](auto i) {
+    array[i] = array_ref[i];
+  });
 }
 
 {% for config in configs %}
@@ -64,11 +72,11 @@ struct {{ config.name }}Adapter<Language::R, real_type, ModelVariant> {
   static Config::State get_initial_state(
     const Rcpp::List &data
   ) {
-    return {
-      {% for name, cfg in config.state.items() %}
-      .{{ name }} = {{ get_r_parse_data(cfg, name) }}{{ comma_except_last(loop) }}
-      {% endfor %}
-    };
+    typename Config::State state;
+    {% for name, cfg in config.state.items() %}
+    {{ get_r_initial_state(cfg, name) }};
+    {% endfor %}
+    return state;
   };
 
   static constexpr int output_count = {{ dict_len(config.state) }};
@@ -136,11 +144,11 @@ struct {{ config.name }}Adapter<Language::R, real_type, ModelVariant> {
   static Config::State get_initial_state(
     const Rcpp::List &data
   ) {
-    return {
-      {% for name, cfg in config.state.items() %}
-      .{{ name }} = {{ get_r_parse_data(cfg, name) }}{{ comma_except_last(loop) }}
-      {% endfor %}
-    };
+    typename Config::State state;
+    {% for name, cfg in config.state.items() %}
+    {{ get_r_initial_state(cfg, name) }};
+    {% endfor %}
+    return state;
   };
 
   static constexpr int output_count = {{ dict_len(config.state) }};

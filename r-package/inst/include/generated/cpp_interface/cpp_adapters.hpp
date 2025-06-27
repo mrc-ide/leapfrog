@@ -5,29 +5,11 @@
 
 #pragma once
 
-#include <filesystem>
-#include <string_view>
-#include <format>
-
+#include "hdf5_utils.hpp"
 #include "../config_mixer.hpp"
-#include "../../serialize_eigen.hpp"
 
 namespace leapfrog {
 namespace internal {
-
-template<typename T, typename... Args>
-auto read_data(const std::filesystem::path &input_dir, std::string_view key, Args... dims) {
-  if (!std::filesystem::exists(input_dir / key)) {
-    throw std::runtime_error(std::format("File '{}' in input dir '{}' does not exist.\n", key, input_dir.string()));
-  }
-
-  constexpr std::size_t rank = sizeof...(dims);
-  if constexpr (rank == 0) {
-    return serialize::deserialize_scalar<T>(input_dir / key);
-  } else {
-    return serialize::deserialize_tensor<T, rank>(input_dir / key);
-  }
-}
 
 template<typename real_type, MV ModelVariant>
 struct DpAdapter<Language::Cpp, real_type, ModelVariant> {
@@ -35,15 +17,14 @@ struct DpAdapter<Language::Cpp, real_type, ModelVariant> {
   using Config = DpConfig<real_type, ModelVariant>;
 
   static Config::Pars get_pars(
-    const std::filesystem::path &input_dir,
-    const Options<real_type> &opts
+    OwnedParsMixed<real_type, ModelVariant>::Pars& owned_pars
   ) {
     return {
-      .base_pop = read_data<real_type>(input_dir, "base_pop", SS::pAG, SS::NS),
-      .survival_probability = read_data<real_type>(input_dir, "survival_probability", SS::pAG + 1, SS::NS, opts.proj_steps),
-      .net_migration = read_data<real_type>(input_dir, "net_migration", SS::pAG, SS::NS, opts.proj_steps),
-      .age_specific_fertility_rate = read_data<real_type>(input_dir, "age_specific_fertility_rate", SS::p_fertility_age_groups, opts.proj_steps),
-      .births_sex_prop = read_data<real_type>(input_dir, "births_sex_prop", SS::NS, opts.proj_steps)
+      .base_pop = { owned_pars.dp.base_pop.data(), owned_pars.dp.base_pop.shape() },
+      .survival_probability = { owned_pars.dp.survival_probability.data(), owned_pars.dp.survival_probability.shape() },
+      .net_migration = { owned_pars.dp.net_migration.data(), owned_pars.dp.net_migration.shape() },
+      .age_specific_fertility_rate = { owned_pars.dp.age_specific_fertility_rate.data(), owned_pars.dp.age_specific_fertility_rate.shape() },
+      .births_sex_prop = { owned_pars.dp.births_sex_prop.data(), owned_pars.dp.births_sex_prop.shape() }
     };
   };
 
@@ -52,11 +33,11 @@ struct DpAdapter<Language::Cpp, real_type, ModelVariant> {
   static int build_output(
     int index,
     const Config::OutputState& state,
-    std::filesystem::path& output_dir
+    std::filesystem::path& output_file
   ) {
-    serialize::serialize_tensor<real_type, 3>(state.p_total_pop, output_dir / "p_total_pop");
-    serialize::serialize_tensor<real_type, 3>(state.p_total_pop_background_deaths, output_dir / "p_total_pop_background_deaths");
-    serialize::serialize_tensor<real_type, 1>(state.births, output_dir / "births");
+    write_data<real_type, typename Config::OutputState::shape_p_total_pop>(output_file, "p_total_pop", state.p_total_pop);
+    write_data<real_type, typename Config::OutputState::shape_p_total_pop_background_deaths>(output_file, "p_total_pop_background_deaths", state.p_total_pop_background_deaths);
+    write_data<real_type, typename Config::OutputState::shape_births>(output_file, "births", state.births);
     return index + output_count;
   };
 };
@@ -67,26 +48,25 @@ struct HaAdapter<Language::Cpp, real_type, ModelVariant> {
   using Config = HaConfig<real_type, ModelVariant>;
 
   static Config::Pars get_pars(
-    const std::filesystem::path &input_dir,
-    const Options<real_type> &opts
+    OwnedParsMixed<real_type, ModelVariant>::Pars& owned_pars
   ) {
     return {
-      .total_rate = read_data<real_type>(input_dir, "total_rate", opts.proj_steps),
-      .relative_risk_age = read_data<real_type>(input_dir, "relative_risk_age", SS::pAG - SS::p_idx_hiv_first_adult, SS::NS, opts.proj_steps),
-      .relative_risk_sex = read_data<real_type>(input_dir, "relative_risk_sex", opts.proj_steps),
-      .cd4_mortality = read_data<real_type>(input_dir, "cd4_mortality", SS::hDS, SS::hAG, SS::NS),
-      .cd4_progression = read_data<real_type>(input_dir, "cd4_progression", SS::hDS - 1, SS::hAG, SS::NS),
-      .cd4_initial_distribution = read_data<real_type>(input_dir, "cd4_initial_distribution", SS::hDS, SS::hAG, SS::NS),
-      .scale_cd4_mortality = read_data<int>(input_dir, "scale_cd4_mortality"),
-      .idx_hm_elig = read_data<int>(input_dir, "idx_hm_elig", opts.proj_steps),
-      .mortality = read_data<real_type>(input_dir, "mortality", SS::hTS, SS::hDS, SS::hAG, SS::NS),
-      .mortality_time_rate_ratio = read_data<real_type>(input_dir, "mortality_time_rate_ratio", SS::hTS, opts.proj_steps),
-      .dropout_recover_cd4 = read_data<int>(input_dir, "dropout_recover_cd4"),
-      .dropout_rate = read_data<real_type>(input_dir, "dropout_rate", opts.proj_steps),
-      .adults_on_art = read_data<real_type>(input_dir, "adults_on_art", SS::NS, opts.proj_steps),
-      .adults_on_art_is_percent = read_data<int>(input_dir, "adults_on_art_is_percent", SS::NS, opts.proj_steps),
-      .initiation_mortality_weight = read_data<real_type>(input_dir, "initiation_mortality_weight"),
-      .h_art_stage_dur = read_data<real_type>(input_dir, "h_art_stage_dur", SS::hTS - 1)
+      .total_rate = { owned_pars.ha.total_rate.data(), owned_pars.ha.total_rate.shape() },
+      .relative_risk_age = { owned_pars.ha.relative_risk_age.data(), owned_pars.ha.relative_risk_age.shape() },
+      .relative_risk_sex = { owned_pars.ha.relative_risk_sex.data(), owned_pars.ha.relative_risk_sex.shape() },
+      .cd4_mortality = { owned_pars.ha.cd4_mortality.data(), owned_pars.ha.cd4_mortality.shape() },
+      .cd4_progression = { owned_pars.ha.cd4_progression.data(), owned_pars.ha.cd4_progression.shape() },
+      .cd4_initial_distribution = { owned_pars.ha.cd4_initial_distribution.data(), owned_pars.ha.cd4_initial_distribution.shape() },
+      .scale_cd4_mortality = owned_pars.ha.scale_cd4_mortality,
+      .idx_hm_elig = { owned_pars.ha.idx_hm_elig.data(), owned_pars.ha.idx_hm_elig.shape() },
+      .mortality = { owned_pars.ha.mortality.data(), owned_pars.ha.mortality.shape() },
+      .mortality_time_rate_ratio = { owned_pars.ha.mortality_time_rate_ratio.data(), owned_pars.ha.mortality_time_rate_ratio.shape() },
+      .dropout_recover_cd4 = owned_pars.ha.dropout_recover_cd4,
+      .dropout_rate = { owned_pars.ha.dropout_rate.data(), owned_pars.ha.dropout_rate.shape() },
+      .adults_on_art = { owned_pars.ha.adults_on_art.data(), owned_pars.ha.adults_on_art.shape() },
+      .adults_on_art_is_percent = { owned_pars.ha.adults_on_art_is_percent.data(), owned_pars.ha.adults_on_art_is_percent.shape() },
+      .initiation_mortality_weight = owned_pars.ha.initiation_mortality_weight,
+      .h_art_stage_dur = { owned_pars.ha.h_art_stage_dur.data(), owned_pars.ha.h_art_stage_dur.shape() }
     };
   };
 
@@ -95,17 +75,17 @@ struct HaAdapter<Language::Cpp, real_type, ModelVariant> {
   static int build_output(
     int index,
     const Config::OutputState& state,
-    std::filesystem::path& output_dir
+    std::filesystem::path& output_file
   ) {
-    serialize::serialize_tensor<real_type, 3>(state.p_hiv_pop, output_dir / "p_hiv_pop");
-    serialize::serialize_tensor<real_type, 3>(state.p_hiv_pop_background_deaths, output_dir / "p_hiv_pop_background_deaths");
-    serialize::serialize_tensor<real_type, 4>(state.h_hiv_adult, output_dir / "h_hiv_adult");
-    serialize::serialize_tensor<real_type, 5>(state.h_art_adult, output_dir / "h_art_adult");
-    serialize::serialize_tensor<real_type, 4>(state.h_hiv_deaths_no_art, output_dir / "h_hiv_deaths_no_art");
-    serialize::serialize_tensor<real_type, 3>(state.p_infections, output_dir / "p_infections");
-    serialize::serialize_tensor<real_type, 5>(state.h_hiv_deaths_art, output_dir / "h_hiv_deaths_art");
-    serialize::serialize_tensor<real_type, 4>(state.h_art_initiation, output_dir / "h_art_initiation");
-    serialize::serialize_tensor<real_type, 3>(state.p_hiv_deaths, output_dir / "p_hiv_deaths");
+    write_data<real_type, typename Config::OutputState::shape_p_hiv_pop>(output_file, "p_hiv_pop", state.p_hiv_pop);
+    write_data<real_type, typename Config::OutputState::shape_p_hiv_pop_background_deaths>(output_file, "p_hiv_pop_background_deaths", state.p_hiv_pop_background_deaths);
+    write_data<real_type, typename Config::OutputState::shape_h_hiv_adult>(output_file, "h_hiv_adult", state.h_hiv_adult);
+    write_data<real_type, typename Config::OutputState::shape_h_art_adult>(output_file, "h_art_adult", state.h_art_adult);
+    write_data<real_type, typename Config::OutputState::shape_h_hiv_deaths_no_art>(output_file, "h_hiv_deaths_no_art", state.h_hiv_deaths_no_art);
+    write_data<real_type, typename Config::OutputState::shape_p_infections>(output_file, "p_infections", state.p_infections);
+    write_data<real_type, typename Config::OutputState::shape_h_hiv_deaths_art>(output_file, "h_hiv_deaths_art", state.h_hiv_deaths_art);
+    write_data<real_type, typename Config::OutputState::shape_h_art_initiation>(output_file, "h_art_initiation", state.h_art_initiation);
+    write_data<real_type, typename Config::OutputState::shape_p_hiv_deaths>(output_file, "p_hiv_deaths", state.p_hiv_deaths);
     return index + output_count;
   };
 };
@@ -116,51 +96,50 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
   using Config = HcConfig<real_type, ModelVariant>;
 
   static Config::Pars get_pars(
-    const std::filesystem::path &input_dir,
-    const Options<real_type> &opts
+    OwnedParsMixed<real_type, ModelVariant>::Pars& owned_pars
   ) {
     return {
-      .hc_nosocomial = read_data<real_type>(input_dir, "hc_nosocomial", opts.proj_steps),
-      .hc1_cd4_dist = read_data<real_type>(input_dir, "hc1_cd4_dist", SS::hc1DS),
-      .hc1_cd4_mort = read_data<real_type>(input_dir, "hc1_cd4_mort", SS::hc1DS, SS::hcTT, SS::hc1AG),
-      .hc2_cd4_mort = read_data<real_type>(input_dir, "hc2_cd4_mort", SS::hc2DS, SS::hcTT, SS::hc2AG),
-      .hc1_cd4_prog = read_data<real_type>(input_dir, "hc1_cd4_prog", SS::hc1DS, SS::hc1AG_c, SS::NS),
-      .hc2_cd4_prog = read_data<real_type>(input_dir, "hc2_cd4_prog", SS::hc2DS, SS::hc2AG_c, SS::NS),
-      .ctx_val = read_data<real_type>(input_dir, "ctx_val", opts.proj_steps),
-      .hc_art_elig_age = read_data<int>(input_dir, "hc_art_elig_age", opts.proj_steps),
-      .hc_art_elig_cd4 = read_data<int>(input_dir, "hc_art_elig_cd4", SS::p_idx_hiv_first_adult, opts.proj_steps),
-      .hc_art_mort_rr = read_data<real_type>(input_dir, "hc_art_mort_rr", SS::hTS, SS::p_idx_hiv_first_adult, opts.proj_steps),
-      .hc1_art_mort = read_data<real_type>(input_dir, "hc1_art_mort", SS::hc1DS, SS::hTS, SS::hc1AG),
-      .hc2_art_mort = read_data<real_type>(input_dir, "hc2_art_mort", SS::hc2DS, SS::hTS, SS::hc2AG),
-      .hc_art_isperc = read_data<int>(input_dir, "hc_art_isperc", opts.proj_steps),
-      .hc_art_val = read_data<real_type>(input_dir, "hc_art_val", SS::hcAG_coarse, opts.proj_steps),
-      .hc_art_init_dist = read_data<real_type>(input_dir, "hc_art_init_dist", SS::p_idx_hiv_first_adult, opts.proj_steps),
-      .fert_mult_by_age = read_data<real_type>(input_dir, "fert_mult_by_age", SS::hAG_fert, opts.proj_steps),
-      .fert_mult_off_art = read_data<real_type>(input_dir, "fert_mult_off_art", SS::hDS),
-      .fert_mult_on_art = read_data<real_type>(input_dir, "fert_mult_on_art", SS::hAG_fert),
-      .total_fertility_rate = read_data<real_type>(input_dir, "total_fertility_rate", opts.proj_steps),
-      .PMTCT = read_data<real_type>(input_dir, "PMTCT", SS::hPS, opts.proj_steps),
-      .vertical_transmission_rate = read_data<real_type>(input_dir, "vertical_transmission_rate", SS::hDS + 1, SS::hVT),
-      .PMTCT_transmission_rate = read_data<real_type>(input_dir, "PMTCT_transmission_rate", SS::hDS, SS::hPS, SS::hVT),
-      .PMTCT_dropout = read_data<real_type>(input_dir, "PMTCT_dropout", SS::hPS_dropout, opts.proj_steps),
-      .PMTCT_input_is_percent = read_data<int>(input_dir, "PMTCT_input_is_percent", opts.proj_steps),
-      .breastfeeding_duration_art = read_data<real_type>(input_dir, "breastfeeding_duration_art", SS::hBF, opts.proj_steps),
-      .breastfeeding_duration_no_art = read_data<real_type>(input_dir, "breastfeeding_duration_no_art", SS::hBF, opts.proj_steps),
-      .mat_hiv_births = read_data<real_type>(input_dir, "mat_hiv_births", opts.proj_steps),
-      .mat_prev_input = read_data<int>(input_dir, "mat_prev_input", opts.proj_steps),
-      .prop_lt200 = read_data<real_type>(input_dir, "prop_lt200", opts.proj_steps),
-      .prop_gte350 = read_data<real_type>(input_dir, "prop_gte350", opts.proj_steps),
-      .ctx_val_is_percent = read_data<int>(input_dir, "ctx_val_is_percent", opts.proj_steps),
-      .hc_art_is_age_spec = read_data<int>(input_dir, "hc_art_is_age_spec", opts.proj_steps),
-      .abortion = read_data<real_type>(input_dir, "abortion", SS::hAB_ind, opts.proj_steps),
-      .patients_reallocated = read_data<real_type>(input_dir, "patients_reallocated", opts.proj_steps),
-      .hc_art_ltfu = read_data<real_type>(input_dir, "hc_art_ltfu", opts.proj_steps),
-      .adult_female_infections = read_data<real_type>(input_dir, "adult_female_infections", SS::p_fertility_age_groups, opts.proj_steps),
-      .adult_female_hivnpop = read_data<real_type>(input_dir, "adult_female_hivnpop", SS::p_fertility_age_groups, opts.proj_steps),
-      .total_births = read_data<real_type>(input_dir, "total_births", opts.proj_steps),
-      .ctx_effect = read_data<real_type>(input_dir, "ctx_effect", 3),
-      .hc_art_start = read_data<int>(input_dir, "hc_art_start"),
-      .local_adj_factor = read_data<real_type>(input_dir, "local_adj_factor")
+      .hc_nosocomial = { owned_pars.hc.hc_nosocomial.data(), owned_pars.hc.hc_nosocomial.shape() },
+      .hc1_cd4_dist = { owned_pars.hc.hc1_cd4_dist.data(), owned_pars.hc.hc1_cd4_dist.shape() },
+      .hc1_cd4_mort = { owned_pars.hc.hc1_cd4_mort.data(), owned_pars.hc.hc1_cd4_mort.shape() },
+      .hc2_cd4_mort = { owned_pars.hc.hc2_cd4_mort.data(), owned_pars.hc.hc2_cd4_mort.shape() },
+      .hc1_cd4_prog = { owned_pars.hc.hc1_cd4_prog.data(), owned_pars.hc.hc1_cd4_prog.shape() },
+      .hc2_cd4_prog = { owned_pars.hc.hc2_cd4_prog.data(), owned_pars.hc.hc2_cd4_prog.shape() },
+      .ctx_val = { owned_pars.hc.ctx_val.data(), owned_pars.hc.ctx_val.shape() },
+      .hc_art_elig_age = { owned_pars.hc.hc_art_elig_age.data(), owned_pars.hc.hc_art_elig_age.shape() },
+      .hc_art_elig_cd4 = { owned_pars.hc.hc_art_elig_cd4.data(), owned_pars.hc.hc_art_elig_cd4.shape() },
+      .hc_art_mort_rr = { owned_pars.hc.hc_art_mort_rr.data(), owned_pars.hc.hc_art_mort_rr.shape() },
+      .hc1_art_mort = { owned_pars.hc.hc1_art_mort.data(), owned_pars.hc.hc1_art_mort.shape() },
+      .hc2_art_mort = { owned_pars.hc.hc2_art_mort.data(), owned_pars.hc.hc2_art_mort.shape() },
+      .hc_art_isperc = { owned_pars.hc.hc_art_isperc.data(), owned_pars.hc.hc_art_isperc.shape() },
+      .hc_art_val = { owned_pars.hc.hc_art_val.data(), owned_pars.hc.hc_art_val.shape() },
+      .hc_art_init_dist = { owned_pars.hc.hc_art_init_dist.data(), owned_pars.hc.hc_art_init_dist.shape() },
+      .fert_mult_by_age = { owned_pars.hc.fert_mult_by_age.data(), owned_pars.hc.fert_mult_by_age.shape() },
+      .fert_mult_off_art = { owned_pars.hc.fert_mult_off_art.data(), owned_pars.hc.fert_mult_off_art.shape() },
+      .fert_mult_on_art = { owned_pars.hc.fert_mult_on_art.data(), owned_pars.hc.fert_mult_on_art.shape() },
+      .total_fertility_rate = { owned_pars.hc.total_fertility_rate.data(), owned_pars.hc.total_fertility_rate.shape() },
+      .PMTCT = { owned_pars.hc.PMTCT.data(), owned_pars.hc.PMTCT.shape() },
+      .vertical_transmission_rate = { owned_pars.hc.vertical_transmission_rate.data(), owned_pars.hc.vertical_transmission_rate.shape() },
+      .PMTCT_transmission_rate = { owned_pars.hc.PMTCT_transmission_rate.data(), owned_pars.hc.PMTCT_transmission_rate.shape() },
+      .PMTCT_dropout = { owned_pars.hc.PMTCT_dropout.data(), owned_pars.hc.PMTCT_dropout.shape() },
+      .PMTCT_input_is_percent = { owned_pars.hc.PMTCT_input_is_percent.data(), owned_pars.hc.PMTCT_input_is_percent.shape() },
+      .breastfeeding_duration_art = { owned_pars.hc.breastfeeding_duration_art.data(), owned_pars.hc.breastfeeding_duration_art.shape() },
+      .breastfeeding_duration_no_art = { owned_pars.hc.breastfeeding_duration_no_art.data(), owned_pars.hc.breastfeeding_duration_no_art.shape() },
+      .mat_hiv_births = { owned_pars.hc.mat_hiv_births.data(), owned_pars.hc.mat_hiv_births.shape() },
+      .mat_prev_input = { owned_pars.hc.mat_prev_input.data(), owned_pars.hc.mat_prev_input.shape() },
+      .prop_lt200 = { owned_pars.hc.prop_lt200.data(), owned_pars.hc.prop_lt200.shape() },
+      .prop_gte350 = { owned_pars.hc.prop_gte350.data(), owned_pars.hc.prop_gte350.shape() },
+      .ctx_val_is_percent = { owned_pars.hc.ctx_val_is_percent.data(), owned_pars.hc.ctx_val_is_percent.shape() },
+      .hc_art_is_age_spec = { owned_pars.hc.hc_art_is_age_spec.data(), owned_pars.hc.hc_art_is_age_spec.shape() },
+      .abortion = { owned_pars.hc.abortion.data(), owned_pars.hc.abortion.shape() },
+      .patients_reallocated = { owned_pars.hc.patients_reallocated.data(), owned_pars.hc.patients_reallocated.shape() },
+      .hc_art_ltfu = { owned_pars.hc.hc_art_ltfu.data(), owned_pars.hc.hc_art_ltfu.shape() },
+      .adult_female_infections = { owned_pars.hc.adult_female_infections.data(), owned_pars.hc.adult_female_infections.shape() },
+      .adult_female_hivnpop = { owned_pars.hc.adult_female_hivnpop.data(), owned_pars.hc.adult_female_hivnpop.shape() },
+      .total_births = { owned_pars.hc.total_births.data(), owned_pars.hc.total_births.shape() },
+      .ctx_effect = { owned_pars.hc.ctx_effect.data(), owned_pars.hc.ctx_effect.shape() },
+      .hc_art_start = owned_pars.hc.hc_art_start,
+      .local_adj_factor = owned_pars.hc.local_adj_factor
     };
   };
 
@@ -169,21 +148,21 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
   static int build_output(
     int index,
     const Config::OutputState& state,
-    std::filesystem::path& output_dir
+    std::filesystem::path& output_file
   ) {
-    serialize::serialize_tensor<real_type, 5>(state.hc1_hiv_pop, output_dir / "hc1_hiv_pop");
-    serialize::serialize_tensor<real_type, 5>(state.hc2_hiv_pop, output_dir / "hc2_hiv_pop");
-    serialize::serialize_tensor<real_type, 5>(state.hc1_art_pop, output_dir / "hc1_art_pop");
-    serialize::serialize_tensor<real_type, 5>(state.hc2_art_pop, output_dir / "hc2_art_pop");
-    serialize::serialize_tensor<real_type, 5>(state.hc1_noart_aids_deaths, output_dir / "hc1_noart_aids_deaths");
-    serialize::serialize_tensor<real_type, 5>(state.hc2_noart_aids_deaths, output_dir / "hc2_noart_aids_deaths");
-    serialize::serialize_tensor<real_type, 5>(state.hc1_art_aids_deaths, output_dir / "hc1_art_aids_deaths");
-    serialize::serialize_tensor<real_type, 5>(state.hc2_art_aids_deaths, output_dir / "hc2_art_aids_deaths");
-    serialize::serialize_tensor<real_type, 2>(state.hc_art_init, output_dir / "hc_art_init");
-    serialize::serialize_tensor<real_type, 5>(state.hc_art_need_init, output_dir / "hc_art_need_init");
-    serialize::serialize_tensor<real_type, 1>(state.hiv_births, output_dir / "hiv_births");
-    serialize::serialize_tensor<real_type, 1>(state.ctx_need, output_dir / "ctx_need");
-    serialize::serialize_tensor<real_type, 4>(state.infection_by_type, output_dir / "infection_by_type");
+    write_data<real_type, typename Config::OutputState::shape_hc1_hiv_pop>(output_file, "hc1_hiv_pop", state.hc1_hiv_pop);
+    write_data<real_type, typename Config::OutputState::shape_hc2_hiv_pop>(output_file, "hc2_hiv_pop", state.hc2_hiv_pop);
+    write_data<real_type, typename Config::OutputState::shape_hc1_art_pop>(output_file, "hc1_art_pop", state.hc1_art_pop);
+    write_data<real_type, typename Config::OutputState::shape_hc2_art_pop>(output_file, "hc2_art_pop", state.hc2_art_pop);
+    write_data<real_type, typename Config::OutputState::shape_hc1_noart_aids_deaths>(output_file, "hc1_noart_aids_deaths", state.hc1_noart_aids_deaths);
+    write_data<real_type, typename Config::OutputState::shape_hc2_noart_aids_deaths>(output_file, "hc2_noart_aids_deaths", state.hc2_noart_aids_deaths);
+    write_data<real_type, typename Config::OutputState::shape_hc1_art_aids_deaths>(output_file, "hc1_art_aids_deaths", state.hc1_art_aids_deaths);
+    write_data<real_type, typename Config::OutputState::shape_hc2_art_aids_deaths>(output_file, "hc2_art_aids_deaths", state.hc2_art_aids_deaths);
+    write_data<real_type, typename Config::OutputState::shape_hc_art_init>(output_file, "hc_art_init", state.hc_art_init);
+    write_data<real_type, typename Config::OutputState::shape_hc_art_need_init>(output_file, "hc_art_need_init", state.hc_art_need_init);
+    write_data<real_type, typename Config::OutputState::shape_hiv_births>(output_file, "hiv_births", state.hiv_births);
+    write_data<real_type, typename Config::OutputState::shape_ctx_need>(output_file, "ctx_need", state.ctx_need);
+    write_data<real_type, typename Config::OutputState::shape_infection_by_type>(output_file, "infection_by_type", state.infection_by_type);
     return index + output_count;
   };
 };

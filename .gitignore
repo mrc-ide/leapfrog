@@ -6,3 +6,6 @@
 r-package/int/doc
 .vscode
 README.html
+.clangd
+.clang-format
+model-outputs

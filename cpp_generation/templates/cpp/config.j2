@@ -1,10 +1,35 @@
 {% from "template_utils.j2" import comma_except_last %}
 {% include "header.j2" %}
 
+{% macro get_struct_member_def(name, cfg, is_owned) %}
+{% if cfg.type == "tensor" %}
+using shape_{{ name }} = nda::shape<
+  {% for dim_type in get_shape_dim_types(cfg) %}
+  {{ dim_type }}{{ comma_except_last(loop) }}
+  {% endfor %}
+>;
+{% if is_owned %}
+nda::array<{{ cfg.num_type }}, shape_{{ name }}> {{ name }};
+{% else %}
+nda::array_ref<{{ cfg.num_type }}, shape_{{ name }}> {{ name }};
+{% endif %}
+{% else %}
+{{ cfg.num_type }} {{ name }};
+{% endif %}
+{% endmacro %}
+
+{% macro get_reset_function(name, cfg) %}
+{% if cfg.type == "tensor" %}
+{{ name }}.for_each_value([]({{ cfg.num_type }}& x) { x = {{ get_reset_value(cfg) }}; });
+{% else %}
+{{ name }} = {{ get_reset_value(cfg) }};
+{% endif %}
+{% endmacro %}
+
 #pragma once
 
+#include "../array/array.h"
 #include "state_space_mixer.hpp"
-#include "tensor_types.hpp"
 
 namespace leapfrog {
 namespace internal {
@@ -16,54 +41,61 @@ struct {{ config.name }}Config {
 
   struct Pars {
     {% for name, cfg in config.pars.default.items() %}
-    {{ get_member_type(cfg) }} {{ name }};
-    {% endfor %}
+    {{ get_struct_member_def(name, cfg, False)|indent(4) }}
+    {%- endfor %}
   };
 
   struct Intermediate {
     {% for name, cfg in config.intermediate.items() %}
-    {{ get_member_type(cfg) }} {{ name }};
-    {% endfor %}
+    {{ get_struct_member_def(name, cfg, True)|indent(4) }}
+    {%- endfor %}
 
     Intermediate() {};
 
     void reset() {
       {% for name, cfg in config.intermediate.items() %}
-      {{ get_reset(name, cfg) }};
-      {% endfor %}
+      {{ get_reset_function(name, cfg)|indent(4) }}
+      {%- endfor %}
     };
   };
 
   struct State {
     {% for name, cfg in config.state.items() %}
-    {{ get_member_type(cfg) }} {{ name }};
-    {% endfor %}
+    {{ get_struct_member_def(name, cfg, True)|indent(4) }}
+    {%- endfor %}
 
     void reset() {
       {% for name, cfg in config.state.items() %}
-      {{ get_reset(name, cfg) }};
-      {% endfor %}
+      {{ get_reset_function(name, cfg)|indent(4) }}
+      {%- endfor %}
     };
   };
 
   struct OutputState {
-    {% for name, cfg in config.state.items() %}
-    {{ get_output_state_member_type(cfg) }} {{ name }};
-    {% endfor %}
+    {% for name, cfg in config.output_state.items() %}
+    {{ get_struct_member_def(name, cfg, True)|indent(4) }}
+    {%- endfor %}
 
     OutputState(int output_years):
-      {% for name, cfg in config.state.items() %}
-      {{ name }}({{ collapse_dims_with_trailing_sep(cfg) }}output_years){{ comma_except_last(loop) }}
+      {% for name, cfg in config.output_state.items() %}
+      {{ name }}(shape_{{ name }}({{ collapse(cfg.dims) }})){{ comma_except_last(loop) }}
       {% endfor %}
     {
-      {% for name in config.state.keys() %}
-      {{ name }}.setZero();
-      {% endfor %}
+      {% for name, cfg in config.output_state.items() %}
+      {{ get_reset_function(name, cfg)|indent(4) }}
+      {%- endfor %}
     };
 
     void save_state(const size_t i, const State &state) {
-      {% for name, cfg in config.state.items() %}
-      {{ get_output_state_chip(name, cfg) }} = state.{{ name }};
+      {% for name, cfg in config.output_state.items() %}
+      {% if cfg.dims|length > 1 %}
+      auto chip_{{ name }} = {{ name }}({{ nda_all_chip(cfg) }}, i);
+      nda::for_each_index(chip_{{ name }}.shape(), [&](auto idx) -> void {
+        chip_{{ name }}[idx] = state.{{ name }}[idx];
+      });
+      {% else %}
+      {{ name }}(i) = state.{{ name }};
+      {% endif %}
       {% endfor %}
     };
   };

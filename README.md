@@ -81,13 +81,20 @@ Then to run code generation follow
 
 ### Simulation model
 
-  - The model was implemented using *Eigen::Tensor* containers. These
-    were preferred for several reasons:
-      - Benchmarking found they were slighlty more efficient than
-        *boost::multi\_array*.
-      - Column-major indexing in the same order as R
-      - Other statistical packages (e.g. TMB, Stan) rely heavily on
-        *Eigen* so using *Eigen* containers slims the dependencies.
+  - The model was initially implemented using *Eigen::Tensor* however, we then
+    switched to [nda](https://github.com/dsharlet/array). This was preferred for
+    several reasons:
+      - Benchmarking found nda was twice as fast as eigen for our models.
+      - Eigen supports either knowing all the dimensions at compile time or
+        none of them. We have a lot of tensors where we know all the sizes except
+        the last dimension (time dimension usually). nda has support for partial
+        compile time known dimensions which is probably where most of the speed
+        up is coming from.
+      - The package is currently being maintained.
+      - They have good error handling. They have test suites that test that one
+        error is being produced for common error in heavily templated C++ code.
+      - Eigen had some compiler warnings when it was compiled.
+      - Column-major indexing in the same order as R (Eigen also has this).
 
 ## License
 

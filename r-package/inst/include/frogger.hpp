@@ -1,5 +1,6 @@
 #pragma once
 
+#include "array/array.h"
 #include "generated/model_variants.hpp"
 #include "generated/config_mixer.hpp"
 #include "models/general_demographic_projection.hpp"

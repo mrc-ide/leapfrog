@@ -13,6 +13,14 @@ def collapse_dims_with_trailing_sep(cfg, sep = ", "):
     return ""
 
 
+def collapse(l, sep = ", "):
+  return sep.join(l)
+
+
+def nda_all_chip(cfg):
+  return ", ".join(["nda::_"] * (len(cfg["dims"]) - 1))
+
+
 def dim_len(cfg):
   if not cfg.get("dims"):
     return 0
@@ -28,16 +36,65 @@ def get_member_type(cfg):
     return f'{cfg["num_type"]}'
 
 
+def get_shape_dim_types(cfg):
+  all_static_dims = True
+  shape_dim_types = []
+  for index, dim in enumerate(cfg["dims"]):
+    if not all_static_dims:
+      shape_dim_types.append("nda::dim<0, nda::dynamic, nda::dynamic>")
+    elif "opts." in dim or "output_years" in dim:
+      stride = "1" if index == 0  else " * ".join([f"({d})" for d in cfg["dims"][:index]])
+      shape_dim_types.append(f"nda::dim<0, nda::dynamic, {stride}>")
+      all_static_dims = False
+    else:
+      stride = "1" if index == 0 else " * ".join([f"({d})" for d in cfg["dims"][:index]])
+      shape_dim_types.append(f"nda::dim<0, {dim}, {stride}>")
+  return shape_dim_types
+
+
 def get_r_internal_data_pointer(cfg):
   return "INTEGER" if cfg["num_type"] == "int" else "REAL"
 
 
-def get_r_parse_data(cfg, alias = None):
-  r_alias = alias or cfg["alias"]["r"]
+def get_r_parse_data(cfg):
+  r_alias = cfg["alias"]["r"]
   if cfg["type"] == "scalar":
     return f'Rcpp::as<{cfg["num_type"]}>(data["{r_alias}"])'
   else:
-    return f'parse_data<{cfg["num_type"]}>(data, "{r_alias}", {collapse_dims(cfg)})'
+    dim_types = []
+    for index, dim in enumerate(cfg["dims"]):
+      prod_prev_dim = "1" if index == 0 else " * ".join([f"({d})" for d in cfg["dims"][:index]])
+      dim_types.append(f'nda::dim<>(0, {dim}, {prod_prev_dim})')
+    return f'parse_data<{cfg["num_type"]}, {len(cfg["dims"])}>(data, "{r_alias}", {{ {", ".join(dim_types)} }})'
+
+
+def get_r_initial_state(cfg, name):
+  if cfg["type"] == "scalar":
+    return f'state.{name} = Rcpp::as<{cfg["num_type"]}>(data["{name}"])'
+  else:
+    shape_path = f'Config::State::shape_{name}'
+    return f'fill_initial_state<{cfg["num_type"]}, typename {shape_path}>(data, "{name}", state.{name})'
+
+
+def get_parse_pars_cpp(name, cfg):
+  r_alias = cfg["alias"]["r"]
+  if cfg["type"] == "scalar":
+    return f'read_data_scalar<{cfg["num_type"]}>(params_file, "{r_alias}")'
+  else:
+    dim_types = []
+    for index, dim in enumerate(cfg["dims"]):
+      prod_prev_dim = "1" if index == 0 else " * ".join([f"({d})" for d in cfg["dims"][:index]])
+      dim_types.append(f'nda::dim<>(0, {dim}, {prod_prev_dim})')
+    shape = f'typename Pars::shape_{name}'
+    return f'read_data<{cfg["num_type"]}, {shape}>(params_file, "{r_alias}", {{ {", ".join(dim_types)} }})'
+
+
+def get_pars_cpp(name, cfg, ns):
+  el = f'owned_pars.{ns}.{name}'
+  if cfg["type"] == "scalar":
+    return el
+  else:
+    return f'{{ {el}.data(), {el}.shape() }}'
 
 
 def get_cpp_read_data(name, cfg):
@@ -52,20 +109,26 @@ def get_c_read_data(config_name, name, cfg):
   if cfg["type"] == "scalar":
     return f'params.{config_name}->{name}'
   else:
-    return f'read_data<{cfg["num_type"]}>(params.{config_name}->{name}, params.{config_name}->{name}_length, "{name}", {collapse_dims(cfg)})'
+    dim_types = []
+    for index, dim in enumerate(cfg["dims"]):
+      prod_prev_dim = "1" if index == 0 else " * ".join([f"({d})" for d in cfg["dims"][:index]])
+      dim_types.append(f'nda::dim<>(0, {dim}, {prod_prev_dim})')
+    return f'read_data<{cfg["num_type"]}, {dim_len(cfg)}>(params.{config_name}->{name}, params.{config_name}->{name}_length, "{name}", {{ {", ".join(dim_types)} }})'
 
 
 def get_c_initial_state(config_name, name, cfg):
   config_name = config_name.lower()
   if cfg["type"] == "scalar":
-    return f'*(state.{config_name}->{name})'
+    return f'initial_state.{name} = *(state.{config_name}->{name})'
   else:
-    return f'read_data<{cfg["num_type"]}>(state.{config_name}->{name}, state.{config_name}->{name}_length, "{name}", {collapse_dims(cfg)})'
+    shape_path = f'Config::State::shape_{name}'
+    return f'fill_initial_state<{cfg["num_type"]}, typename {shape_path}>(state.{config_name}->{name}, state.{config_name}->{name}_length, "{name}", initial_state.{name})'
 
 
 def get_c_write_data(config_name, name, cfg):
   config_name = config_name.lower()
-  return f'write_data<{cfg["num_type"]}, {dim_len(cfg) + 1}>(state.{name}, out.{config_name}->{name}, out.{config_name}->{name}_length, "{name}");'
+  shape_path = f'Config::OutputState::shape_{name}'
+  return f'write_data<{cfg["num_type"]}, typename {shape_path}>(state.{name}, out.{config_name}->{name}, out.{config_name}->{name}_length, "{name}");'
 
 
 def get_c_write_data_single_year(config_name, name, cfg):
@@ -73,14 +136,12 @@ def get_c_write_data_single_year(config_name, name, cfg):
   if dim_len(cfg) == 0:
     return f'*(out.{config_name}->{name}) = state.{name};'
   else:
-    return f'write_data<{cfg["num_type"]}, {dim_len(cfg)}>(state.{name}, out.{config_name}->{name}, out.{config_name}->{name}_length, "{name}");'
+    shape_path = f'Config::State::shape_{name}'
+    return f'write_data<{cfg["num_type"]}, typename {shape_path}>(state.{name}, out.{config_name}->{name}, out.{config_name}->{name}_length, "{name}");'
 
 
-def get_reset(name, cfg):
-  if cfg["type"] == "scalar":
-    return f'{name} = {cfg.get("default") or 0}'
-  else:
-    return f'{name}.setZero()'
+def get_reset_value(cfg):
+  return cfg.get("default") or 0
 
 
 def get_output_state_member_type(cfg):
