@@ -36,12 +36,6 @@ jobs:
         run: |
           R CMD INSTALL .
 
-      - name: Generate test data
-        shell: bash
-        working-directory: r-package
-        run: |
-          ./scripts/create_test_data.R
-
       - name: R Model Output
         shell: bash
         working-directory: r-package
