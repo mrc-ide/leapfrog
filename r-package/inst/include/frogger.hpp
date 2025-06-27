@@ -8,6 +8,7 @@
 #include "models/adult_hiv_model_simulation.hpp"
 #include "models/child_model_simulation.hpp"
 #include "options.hpp"
+#include "initial_year.hpp"
 
 #include <format>
 
@@ -33,11 +34,7 @@ struct Leapfrog {
     State initial_state = {};
     initial_state.reset();
     if constexpr (ModelVariant::run_demographic_projection) {
-      for (int g = 0; g < SS::NS; ++g) {
-        for (int a = 0; a < SS::pAG; ++a) {
-          initial_state.dp.p_total_pop(a, g) = pars.dp.base_pop(a, g);
-        }
-      }
+      run_initial_year_calculations<L, real_type, ModelVariant>(pars, initial_state);
     }
 
     return run_model_from_state(pars, opts, initial_state, simulation_start_year, output_years);

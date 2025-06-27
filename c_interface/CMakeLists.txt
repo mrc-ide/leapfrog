@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.15)
 
 project(LeapfrogDll)
 
@@ -13,6 +13,10 @@ set(SOURCE_FILES
 
 # Create the shared library (DLL)
 add_library(leapfrog SHARED ${SOURCE_FILES})
+
+# Include runtime in the DLL
+set_property(TARGET leapfrog PROPERTY
+             MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 message(CMAKE_CURRENT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 
