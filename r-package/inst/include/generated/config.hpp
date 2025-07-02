@@ -1032,6 +1032,11 @@ struct HcConfig {
       nda::dim<0, SS::NS, (SS::hcTT) * (SS::hc1AG)>
     >;
     nda::array<real_type, shape_infection_by_type> infection_by_type;
+    using shape_mtct_by_source_tr = nda::shape<
+      nda::dim<0, SS::mtct_source, 1>,
+      nda::dim<0, SS::hcTT, (SS::mtct_source)>
+    >;
+    nda::array<real_type, shape_mtct_by_source_tr> mtct_by_source_tr;
 
     void reset() {
       hc1_hiv_pop.for_each_value([](real_type& x) { x = 0; });
@@ -1047,6 +1052,7 @@ struct HcConfig {
       hiv_births = 0;
       ctx_need = 0;
       infection_by_type.for_each_value([](real_type& x) { x = 0; });
+      mtct_by_source_tr.for_each_value([](real_type& x) { x = 0; });
     };
   };
 
@@ -1143,6 +1149,12 @@ struct HcConfig {
       nda::dim<0, nda::dynamic, (SS::hcTT) * (SS::hc1AG) * (SS::NS)>
     >;
     nda::array<real_type, shape_infection_by_type> infection_by_type;
+    using shape_mtct_by_source_tr = nda::shape<
+      nda::dim<0, SS::mtct_source, 1>,
+      nda::dim<0, SS::hcTT, (SS::mtct_source)>,
+      nda::dim<0, nda::dynamic, (SS::mtct_source) * (SS::hcTT)>
+    >;
+    nda::array<real_type, shape_mtct_by_source_tr> mtct_by_source_tr;
 
     OutputState(int output_years):
       hc1_hiv_pop(shape_hc1_hiv_pop(SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, output_years)),
@@ -1157,7 +1169,8 @@ struct HcConfig {
       hc_art_need_init(shape_hc_art_need_init(SS::hc1DS, SS::hcTT, SS::hcAG_end, SS::NS, output_years)),
       hiv_births(shape_hiv_births(output_years)),
       ctx_need(shape_ctx_need(output_years)),
-      infection_by_type(shape_infection_by_type(SS::hcTT, SS::hc1AG, SS::NS, output_years))
+      infection_by_type(shape_infection_by_type(SS::hcTT, SS::hc1AG, SS::NS, output_years)),
+      mtct_by_source_tr(shape_mtct_by_source_tr(SS::mtct_source, SS::hcTT, output_years))
     {
       hc1_hiv_pop.for_each_value([](real_type& x) { x = 0; });
       hc2_hiv_pop.for_each_value([](real_type& x) { x = 0; });
@@ -1172,6 +1185,7 @@ struct HcConfig {
       hiv_births.for_each_value([](real_type& x) { x = 0; });
       ctx_need.for_each_value([](real_type& x) { x = 0; });
       infection_by_type.for_each_value([](real_type& x) { x = 0; });
+      mtct_by_source_tr.for_each_value([](real_type& x) { x = 0; });
     };
 
     void save_state(const size_t i, const State &state) {
@@ -1221,10 +1235,14 @@ struct HcConfig {
       nda::for_each_index(chip_infection_by_type.shape(), [&](auto idx) -> void {
         chip_infection_by_type[idx] = state.infection_by_type[idx];
       });
+      auto chip_mtct_by_source_tr = mtct_by_source_tr(nda::_, nda::_, i);
+      nda::for_each_index(chip_mtct_by_source_tr.shape(), [&](auto idx) -> void {
+        chip_mtct_by_source_tr[idx] = state.mtct_by_source_tr[idx];
+      });
     };
   };
 
-  static constexpr int output_count = 13;
+  static constexpr int output_count = 14;
   static int get_build_output_size(int prev_size) {
     return prev_size + output_count;
   };

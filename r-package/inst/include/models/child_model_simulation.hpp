@@ -52,6 +52,7 @@ struct ChildModelSimulation<Config> {
   static constexpr auto hc_age_coarse = SS::hc_age_coarse;
   static constexpr auto hc_age_coarse_cd4 = SS::hc_age_coarse_cd4;
   static constexpr auto hc_cd4_transition = SS::hc_cd4_transition;
+  static constexpr auto mtct_source = SS::mtct_source;
 
   // function args
   int t;
@@ -475,6 +476,13 @@ struct ChildModelSimulation<Config> {
     // Calculate transmission rate
     i_hc.retained_on_ART = i_hc.PMTCT_coverage(4);
     i_hc.retained_started_ART = i_hc.PMTCT_coverage(5);
+    i_hc.receiving_PMTCT = i_hc.PMTCT_coverage(0) + i_hc.PMTCT_coverage(1) +
+      i_hc.PMTCT_coverage(2) + i_hc.PMTCT_coverage(3) +
+      i_hc.retained_on_ART + i_hc.retained_started_ART +
+      i_hc.PMTCT_coverage(6);
+    i_hc.no_PMTCT = 1 - i_hc.receiving_PMTCT;
+    i_hc.no_PMTCT = std::max(i_hc.no_PMTCT, 0.0);
+
 
     // Transmission among women on treatment
     i_hc.perinatal_transmission_rate = i_hc.PMTCT_coverage(0) * i_hc.optA_transmission_rate +
@@ -485,13 +493,9 @@ struct ChildModelSimulation<Config> {
                                        i_hc.retained_started_ART * p_hc.PMTCT_transmission_rate(0, 5, 0) +
                                        i_hc.PMTCT_coverage(6) * p_hc.PMTCT_transmission_rate(0, 6, 0);
 
-    i_hc.receiving_PMTCT = i_hc.PMTCT_coverage(0) + i_hc.PMTCT_coverage(1) +
-                           i_hc.PMTCT_coverage(2) + i_hc.PMTCT_coverage(3) +
-                           i_hc.retained_on_ART + i_hc.retained_started_ART +
-                           i_hc.PMTCT_coverage(6);
 
-    i_hc.no_PMTCT = 1 - i_hc.receiving_PMTCT;
-    i_hc.no_PMTCT = std::max(i_hc.no_PMTCT, 0.0);
+
+
 
     // Transmission among women not on treatment
     if (i_hc.num_wlhiv > 0) {

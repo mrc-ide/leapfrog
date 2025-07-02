@@ -345,6 +345,8 @@ type
     ctxNeedLength: Integer;
     infectionByType: PDouble;
     infectionByTypeLength: Integer;
+    mtctBySourceTr: PDouble;
+    mtctBySourceTrLength: Integer;
 end;
 
 type
@@ -363,6 +365,7 @@ type
     hivBirths: TGBFixedArray<Double>;
     ctxNeed: TGBFixedArray<Double>;
     infectionByType: TGBFixedArray<Double>;
+    mtctBySourceTr: TGBFixedArray<Double>;
     function getView(): LeapfrogHivChildStateView;
     procedure writeToDisk(dir: string);
     Destructor Destroy; override;
@@ -594,6 +597,7 @@ begin;
   hivBirths.Free;
   ctxNeed.Free;
   infectionByType.Free;
+  mtctBySourceTr.Free;
   inherited;
 end;
 
@@ -711,6 +715,8 @@ begin;
   Result.ctxNeedLength := ctxNeed.GetLength();
   Result.infectionByType := PDouble(infectionByType.data);
   Result.infectionByTypeLength := infectionByType.GetLength();
+  Result.mtctBySourceTr := PDouble(mtctBySourceTr.data);
+  Result.mtctBySourceTrLength := mtctBySourceTr.GetLength();
 end;
 
 procedure LeapfrogDemProjParams.writeToDisk(dir: string);
@@ -826,6 +832,7 @@ begin;
   hcArtInit.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hcArtInit');
   hcArtNeedInit.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hcArtNeedInit');
   infectionByType.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'infectionByType');
+  mtctBySourceTr.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'mtctBySourceTr');
 end;
 
 procedure LeapfrogParams.SetDemProjParams(const demprojParams: LeapfrogDemProjParamsView);

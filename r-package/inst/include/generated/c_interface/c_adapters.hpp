@@ -262,10 +262,11 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
     initial_state.hiv_births = *(state.hc->hiv_births);
     initial_state.ctx_need = *(state.hc->ctx_need);
     fill_initial_state<real_type, typename Config::State::shape_infection_by_type>(state.hc->infection_by_type, state.hc->infection_by_type_length, "infection_by_type", initial_state.infection_by_type);
+    fill_initial_state<real_type, typename Config::State::shape_mtct_by_source_tr>(state.hc->mtct_by_source_tr, state.hc->mtct_by_source_tr_length, "mtct_by_source_tr", initial_state.mtct_by_source_tr);
     return initial_state;
   };
 
-  static constexpr int output_count = 13;
+  static constexpr int output_count = 14;
 
   static int build_output(
     int index,
@@ -285,6 +286,7 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
     write_data<real_type, typename Config::OutputState::shape_hiv_births>(state.hiv_births, out.hc->hiv_births, out.hc->hiv_births_length, "hiv_births");
     write_data<real_type, typename Config::OutputState::shape_ctx_need>(state.ctx_need, out.hc->ctx_need, out.hc->ctx_need_length, "ctx_need");
     write_data<real_type, typename Config::OutputState::shape_infection_by_type>(state.infection_by_type, out.hc->infection_by_type, out.hc->infection_by_type_length, "infection_by_type");
+    write_data<real_type, typename Config::OutputState::shape_mtct_by_source_tr>(state.mtct_by_source_tr, out.hc->mtct_by_source_tr, out.hc->mtct_by_source_tr_length, "mtct_by_source_tr");
     return index + output_count;
   };
 
@@ -306,6 +308,7 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
     *(out.hc->hiv_births) = state.hiv_births;
     *(out.hc->ctx_need) = state.ctx_need;
     write_data<real_type, typename Config::State::shape_infection_by_type>(state.infection_by_type, out.hc->infection_by_type, out.hc->infection_by_type_length, "infection_by_type");
+    write_data<real_type, typename Config::State::shape_mtct_by_source_tr>(state.mtct_by_source_tr, out.hc->mtct_by_source_tr, out.hc->mtct_by_source_tr_length, "mtct_by_source_tr");
     return index + output_count;
   };
 };

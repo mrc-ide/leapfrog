@@ -23,6 +23,7 @@
       "hcAG_coarse": 4,
       "hAB_ind": 2,
       "hAG_fert": 7,
+      "mtct_source": 6,
       "hc_age_coarse": [1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3],
       "hc_age_coarse_cd4": [0, 0, 0, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
       "hc_cd4_transition": [
@@ -569,6 +570,10 @@
     "infection_by_type": {
       "num_type": "real_type",
       "dims": ["SS::hcTT", "SS::hc1AG", "SS::NS"]
+    },
+    "mtct_by_source_tr": {
+      "num_type": "real_type",
+      "dims": ["SS::mtct_source", "SS::hcTT"]
     }
   }
 }

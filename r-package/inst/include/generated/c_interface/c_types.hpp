@@ -213,6 +213,8 @@ struct HcOut {
   int ctx_need_length;
   real_type* infection_by_type;
   int infection_by_type_length;
+  real_type* mtct_by_source_tr;
+  int mtct_by_source_tr_length;
 };
 
 template<typename real_type>
