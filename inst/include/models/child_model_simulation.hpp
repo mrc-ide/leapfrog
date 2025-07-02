@@ -1033,13 +1033,13 @@ private:
             for (int htn = 0; htn < hTN; ++htn) {
               for (int hp_agg = 0; hp_agg < hPS_agg; ++hp_agg) {
                 if (a < hc2_agestart) {
-                  if(a == 0){
-                    if(hp_agg == 5){ //make eligibility contingent upon having a mother who is engaged incare
-                      n_hc.hc_art_need_init_strat(hp_agg, hd, cat, a, s, htn) += n_hc.hc1_hiv_pop_strat(hp_agg, hd, cat, a, s, htn);
-                    }
-                  }else{
+                  // if(a == 0){
+                  //   if(hp_agg == 5){ //make eligibility contingent upon having a mother who is engaged incare
+                  //     n_hc.hc_art_need_init_strat(hp_agg, hd, cat, a, s, htn) += n_hc.hc1_hiv_pop_strat(hp_agg, hd, cat, a, s, htn);
+                  //   }
+                  // }else{
                     n_hc.hc_art_need_init_strat(hp_agg, hd, cat, a, s, htn) += n_hc.hc1_hiv_pop_strat(hp_agg, hd, cat, a, s, htn);
-                  }
+                  // }
                 } else if (hd < hc2DS) {
                   n_hc.hc_art_need_init_strat(hp_agg, hd, cat, a, s, htn) += n_hc.hc2_hiv_pop_strat(hp_agg, hd, cat, a - hc2_agestart, s, htn);
                 }
