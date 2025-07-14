@@ -1,10 +1,5 @@
-# SPDX-FileCopyrightText: 2024-present Rob Ashton <robertashton94@gmail.com>
-#
-# SPDX-License-Identifier: MIT
-from leapfrog_py.leapfrog_py import (
-    project_single_year,
-    run_leapfrog,
-    set_initial_state,
-)
+from leapfrog_py._core import return_20
 
-__all__ = ["project_single_year", "run_leapfrog", "set_initial_state"]
+
+def hello() -> str:
+    return return_20()
