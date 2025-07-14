@@ -10,7 +10,9 @@ if (NOT SKBUILD)
   command below
   =====================================================================
    $ uv build
+   $ pip install dist/**.tar.gz
   =====================================================================
+  where the you install the built tar file.
   ")
 endif()
 
