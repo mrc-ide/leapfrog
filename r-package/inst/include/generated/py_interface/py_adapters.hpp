@@ -48,6 +48,9 @@ void fill_initial_state(const nb::dict& data, char const* key, nda::array<T, Sha
   });
 }
 
+template<typename T, nb::ssize_t ...Args>
+using py_array = nb::ndarray<const T, nb::numpy, nb::shape<Args...>, nb::f_contig>;
+
 template<typename real_type, MV ModelVariant>
 struct DpAdapter<Language::Py, real_type, ModelVariant> {
   using SS = SSMixed<ModelVariant>;
@@ -78,12 +81,9 @@ struct DpAdapter<Language::Py, real_type, ModelVariant> {
 
   static constexpr int output_count = 3;
 
-  template<typename T, nb::ssize_t ...Args>
-  using py_array = nb::ndarray<T, nb::numpy, nb::shape<Args...>, nb::f_contig>;
-
   static int build_output(
     int index,
-    Config::OutputState& state,
+    const Config::OutputState& state,
     nb::dict& ret,
     const size_t& output_years
   ) {
@@ -101,7 +101,7 @@ struct DpAdapter<Language::Py, real_type, ModelVariant> {
 
   static int build_output_single_year(
     int index,
-    Config::State& state,
+    const Config::State& state,
     nb::dict& ret
   ) {
     const int py_rank_p_total_pop = 2;
@@ -162,12 +162,9 @@ struct HaAdapter<Language::Py, real_type, ModelVariant> {
 
   static constexpr int output_count = 9;
 
-  template<typename T, nb::ssize_t ...Args>
-  using py_array = nb::ndarray<T, nb::numpy, nb::shape<Args...>, nb::f_contig>;
-
   static int build_output(
     int index,
-    Config::OutputState& state,
+    const Config::OutputState& state,
     nb::dict& ret,
     const size_t& output_years
   ) {
@@ -203,7 +200,7 @@ struct HaAdapter<Language::Py, real_type, ModelVariant> {
 
   static int build_output_single_year(
     int index,
-    Config::State& state,
+    const Config::State& state,
     nb::dict& ret
   ) {
     const int py_rank_p_hiv_pop = 2;
@@ -313,12 +310,9 @@ struct HcAdapter<Language::Py, real_type, ModelVariant> {
 
   static constexpr int output_count = 13;
 
-  template<typename T, nb::ssize_t ...Args>
-  using py_array = nb::ndarray<T, nb::numpy, nb::shape<Args...>, nb::f_contig>;
-
   static int build_output(
     int index,
-    Config::OutputState& state,
+    const Config::OutputState& state,
     nb::dict& ret,
     const size_t& output_years
   ) {
@@ -366,7 +360,7 @@ struct HcAdapter<Language::Py, real_type, ModelVariant> {
 
   static int build_output_single_year(
     int index,
-    Config::State& state,
+    const Config::State& state,
     nb::dict& ret
   ) {
     const int py_rank_hc1_hiv_pop = 4;
