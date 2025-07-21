@@ -173,7 +173,7 @@ NB_MODULE(_core, m) {
       Run the leapfrog model.
   )pbdoc");
   m.def("run_base_model_from_state", &run_base_model_from_state, R"pbdoc(
-      Run the leapfrog model from an initial_state.
+      Run the leapfrog model from an initial state.
   )pbdoc");
   m.def("run_base_model_single_year", &run_base_model_single_year, R"pbdoc(
       Run the leapfrog model from an initial state for a single year.
