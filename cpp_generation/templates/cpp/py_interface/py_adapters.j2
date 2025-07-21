@@ -46,6 +46,9 @@ void fill_initial_state(const nb::dict& data, char const* key, nda::array<T, Sha
   });
 }
 
+template<typename T, nb::ssize_t ...Args>
+using py_array = nb::ndarray<const T, nb::numpy, nb::shape<Args...>, nb::f_contig>;
+
 {% for config in configs %}
 template<typename real_type, MV ModelVariant>
 struct {{ config.name }}Adapter<Language::Py, real_type, ModelVariant> {
@@ -75,12 +78,9 @@ struct {{ config.name }}Adapter<Language::Py, real_type, ModelVariant> {
 
   static constexpr int output_count = {{ dict_len(config.state) }};
 
-  template<typename T, nb::ssize_t ...Args>
-  using py_array = nb::ndarray<T, nb::numpy, nb::shape<Args...>, nb::f_contig>;
-
   static int build_output(
     int index,
-    Config::OutputState& state,
+    const Config::OutputState& state,
     nb::dict& ret,
     const size_t& output_years
   ) {
@@ -94,7 +94,7 @@ struct {{ config.name }}Adapter<Language::Py, real_type, ModelVariant> {
 
   static int build_output_single_year(
     int index,
-    Config::State& state,
+    const Config::State& state,
     nb::dict& ret
   ) {
     {% for name, cfg in config.state.items() %}

@@ -148,13 +148,13 @@ struct ConfigMixer<L, real_type1, ModelVariant1, Pair<true, DpConfig<real_type1,
   };
 
   template<typename... Args>
-  static int build_output(int index, OutputState& state, Args&&... args) {
+  static int build_output(int index, const OutputState& state, Args&&... args) {
     int new_index = Adapter::build_output(index, state.dp, std::forward<Args>(args)...);
     return NextConfigMixer::build_output(new_index, state, std::forward<Args>(args)...);
   }
 
   template<typename... Args>
-  static int build_output_single_year(int index, State& state, Args&&... args) {
+  static int build_output_single_year(int index, const State& state, Args&&... args) {
     int new_index = Adapter::build_output_single_year(index, state.dp, std::forward<Args>(args)...);
     return NextConfigMixer::build_output_single_year(new_index, state, std::forward<Args>(args)...);
   }
@@ -240,13 +240,13 @@ struct ConfigMixer<L, real_type1, ModelVariant1, Pair<true, HaConfig<real_type1,
   };
 
   template<typename... Args>
-  static int build_output(int index, OutputState& state, Args&&... args) {
+  static int build_output(int index, const OutputState& state, Args&&... args) {
     int new_index = Adapter::build_output(index, state.ha, std::forward<Args>(args)...);
     return NextConfigMixer::build_output(new_index, state, std::forward<Args>(args)...);
   }
 
   template<typename... Args>
-  static int build_output_single_year(int index, State& state, Args&&... args) {
+  static int build_output_single_year(int index, const State& state, Args&&... args) {
     int new_index = Adapter::build_output_single_year(index, state.ha, std::forward<Args>(args)...);
     return NextConfigMixer::build_output_single_year(new_index, state, std::forward<Args>(args)...);
   }
@@ -332,13 +332,13 @@ struct ConfigMixer<L, real_type1, ModelVariant1, Pair<true, HcConfig<real_type1,
   };
 
   template<typename... Args>
-  static int build_output(int index, OutputState& state, Args&&... args) {
+  static int build_output(int index, const OutputState& state, Args&&... args) {
     int new_index = Adapter::build_output(index, state.hc, std::forward<Args>(args)...);
     return NextConfigMixer::build_output(new_index, state, std::forward<Args>(args)...);
   }
 
   template<typename... Args>
-  static int build_output_single_year(int index, State& state, Args&&... args) {
+  static int build_output_single_year(int index, const State& state, Args&&... args) {
     int new_index = Adapter::build_output_single_year(index, state.hc, std::forward<Args>(args)...);
     return NextConfigMixer::build_output_single_year(new_index, state, std::forward<Args>(args)...);
   }
