@@ -62,7 +62,7 @@ jobs:
         shell: bash
         working-directory: leapfrog-py
         run: |
-          ./scripts/create_model_output.py ../model-outputs
+          uv run ./scripts/create_model_output.py ../model-outputs
 
       - name: Install hdf5 and compile standalone model
         shell: bash
