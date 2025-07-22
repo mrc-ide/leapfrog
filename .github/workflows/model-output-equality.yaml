@@ -42,6 +42,16 @@ jobs:
         run: |
           ./scripts/create_model_output.R ../model-outputs
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.8'
+
+      - name: Py Model Output
+        shell: bash
+        working-directory: leapfrog-py
+        run: |
+          ./scripts/create_model_output.py ../model-outputs
+
       - name: Install hdf5 and compile standalone model
         shell: bash
         working-directory: cpp_interface
@@ -62,3 +72,4 @@ jobs:
         run: |
           sudo apt install hdf5-tools
           h5diff output.h5 r-output.h5
+          h5diff output.h5 py-output.h5
