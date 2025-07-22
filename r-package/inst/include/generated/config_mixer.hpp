@@ -13,7 +13,8 @@ namespace leapfrog {
 enum Language {
   Cpp,
   R,
-  C
+  C,
+  Py
 };
 
 namespace internal {

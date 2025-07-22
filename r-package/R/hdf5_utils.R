@@ -29,7 +29,11 @@ save_datasets <- function(h5f, df, group = "") {
       h5f$create_group(new_path)
       save_datasets(h5f, dat, new_path)
     } else {
-      h5f[[new_path]] <- dat
+      if (is.logical(dat)) {
+        h5f[[new_path]] <- as.integer(dat)
+      } else {
+        h5f[[new_path]] <- dat
+      }
     }
   })
 }
