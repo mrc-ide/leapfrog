@@ -14,6 +14,5 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 nanobind_add_module(_core MODULE src/main.cpp)
-target_compile_features(_core PRIVATE cxx_std_20)
 target_include_directories(_core PRIVATE ../r-package/inst/include)
 install(TARGETS _core DESTINATION ${SKBUILD_PROJECT_NAME})
