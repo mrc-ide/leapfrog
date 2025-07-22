@@ -1,17 +1,22 @@
 [project]
 name = "leapfrog-py"
 version = "0.1.0"
-description = "Add your description here"
+description = "Python interface for Leapfrog model"
 readme = "README.md"
 authors = [
-    { name = "Mantra", email = "mantrakusumgar@outlook.com" }
+    { name = "Mantra", email = "mantrakusumgar@outlook.com" },
+    { name = "Rob Ashton", email = "robertashton94@gmail.com" }
 ]
 requires-python = ">=3.8"
 dependencies = [
-    "deepdiff>=8.4.2",
     "h5py>=3.11.0",
     "numpy>=1.24.4",
 ]
+
+[project.urls]
+Documentation = "https://github.com/mrc-ide/leapfrog#readme"
+Issues = "https://github.com/mrc-ide/leapfrog/issues"
+Source = "https://github.com/mrc-ide/leapfrog"
 
 [tool.scikit-build]
 minimum-version = "build-system.requires"
@@ -26,6 +31,7 @@ build-backend = "scikit_build_core.build"
 
 [dependency-groups]
 dev = [
+    "deepdiff>=8.4.2",
     "docopt>=0.6.2",
     "pytest>=8.3.5",
 ]
