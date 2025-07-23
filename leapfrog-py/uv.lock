@@ -159,8 +159,6 @@ name = "leapfrog-py"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
-    { name = "deepdiff", version = "8.4.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
-    { name = "deepdiff", version = "8.5.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
     { name = "h5py", version = "3.11.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
     { name = "h5py", version = "3.14.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
     { name = "numpy", version = "1.24.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
@@ -171,6 +169,8 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "deepdiff", version = "8.4.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
+    { name = "deepdiff", version = "8.5.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
     { name = "docopt" },
     { name = "pytest", version = "8.3.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
     { name = "pytest", version = "8.4.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
@@ -178,13 +178,13 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "deepdiff", specifier = ">=8.4.2" },
     { name = "h5py", specifier = ">=3.11.0" },
     { name = "numpy", specifier = ">=1.24.4" },
 ]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "deepdiff", specifier = ">=8.4.2" },
     { name = "docopt", specifier = ">=0.6.2" },
     { name = "pytest", specifier = ">=8.3.5" },
 ]
