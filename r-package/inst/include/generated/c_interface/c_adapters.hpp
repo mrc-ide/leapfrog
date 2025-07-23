@@ -6,8 +6,8 @@
 #pragma once
 
 #include <filesystem>
+#include <sstream>
 #include <string_view>
-#include <format>
 #include <stdexcept>
 
 #include "../../array/array.h"
@@ -21,12 +21,10 @@ template<typename T, size_t Rank>
 auto read_data(T* data, int length, std::string_view name, nda::shape_of_rank<Rank> shape) {
   const auto size = shape.flat_max() + 1;
   if (length != size) {
-    throw std::invalid_argument(
-      std::format(
-        "Input data '{}' is the wrong size. Received array of length '{}', expected '{}'.",
-        name, length, size
-      )
-    );
+    std::ostringstream oss;
+    oss << "Input data '" << name << "' is the wrong size. "
+        << "Received array of length '" << length << "', expected '" << size << "'.";
+    throw std::invalid_argument(oss.str());
   }
   return nda::array_ref_of_rank<T, Rank>(data, shape);
 }
@@ -46,12 +44,10 @@ void write_data(const nda::array<T, Shape>& array, T* output, int length, std::s
   std::size_t totalSize = array.size();
 
   if (length != totalSize) {
-    throw std::invalid_argument(
-      std::format(
-        "Output data '{}' is the wrong size. Received array of length '{}', expected '{}'.",
-        name, length, totalSize
-      )
-    );
+    std::ostringstream oss;
+    oss << "Output data '" << name << "' is the wrong size. "
+        << "Received array of length '" << length << "', expected '" << totalSize << "'.";
+    throw std::invalid_argument(oss.str());
   }
   std::copy(dataPtr, dataPtr + totalSize, output);
 }
