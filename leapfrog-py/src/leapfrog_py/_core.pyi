@@ -1,20 +1,25 @@
+from leapfrog_py import LeapfrogData, LeapfrogDataSingleYear, LeapfrogParameters, LeapfrogRange
+
+
 def run_base_model(
-    parameters: dict,
+    parameters: LeapfrogParameters,
     configuration: str,
-    output_years: list
-) -> dict: ...
+    output_years: LeapfrogRange
+) -> LeapfrogData: ...
+
 
 def run_base_model_from_state(
-    parameters: dict,
+    parameters: LeapfrogParameters,
     configuration: str,
-    initial_state: dict,
+    initial_state: LeapfrogDataSingleYear,
     simulation_start_year: int,
-    output_years: list
-) -> dict: ...
+    output_years: LeapfrogRange
+) -> LeapfrogData: ...
+
 
 def run_base_model_single_year(
-    parameters: dict,
+    parameters: LeapfrogParameters,
     configuration: str,
-    initial_state: dict,
+    initial_state: LeapfrogDataSingleYear,
     simulation_start_year: int
-) -> dict: ...
+) -> LeapfrogDataSingleYear: ...
