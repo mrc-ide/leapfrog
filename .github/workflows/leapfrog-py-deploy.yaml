@@ -5,9 +5,7 @@ on:
   push:
     branches:
       - main
-  release:
-    types:
-      - published
+      - leapfrog-py-4
 
 jobs:
   build_wheels:
@@ -55,13 +53,12 @@ jobs:
   upload_pypi:
     needs: [build_wheels, build_sdist]
     runs-on: ubuntu-latest
-    environment: pypi
+    environment:
+      name: pypi
+      url: https://pypi.org/p/leapfrog-py
     permissions:
-      id-token: write
-    if: github.event_name == 'release' && github.event.action == 'published'
-    # or, alternatively, upload to PyPI on every tag starting with 'v'
-    # (remove on: release above to use this)
-    # if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+      id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
 
     steps:
       - uses: actions/download-artifact@v4
