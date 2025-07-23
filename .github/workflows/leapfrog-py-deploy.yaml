@@ -20,7 +20,7 @@ jobs:
     strategy:
       matrix:
         # macos-13 is an intel runner, macos-14 is apple silicon
-        os: [ubuntu-latest, windows-latest, macos-13, macos-14]
+        os: [ubuntu-latest, windows-latest, macos-14]
 
     steps:
       - uses: actions/checkout@v4
@@ -29,10 +29,6 @@ jobs:
         uses: pypa/cibuildwheel@v2.19.1
         with:
           package-dir: leapfrog-py
-        env:
-          # Issue with compiling pybind11 eigen header as it has an invalid
-          # conversion from size_t to int
-          CIBW_SKIP: "pp38-manylinux_i686 pp39-manylinux_i686 pp310-manylinux_i686"
 
       - uses: actions/upload-artifact@v4
         with:
@@ -52,7 +48,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: cibw-sdist
-          path: dist/*.tar.gz
+          path: leapfrog-py/dist/*.tar.gz
 
   # upload_pypi:
   #   needs: [build_wheels, build_sdist]
