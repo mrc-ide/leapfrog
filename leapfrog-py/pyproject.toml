@@ -35,3 +35,7 @@ dev = [
     "docopt>=0.6.2",
     "pytest>=8.3.5",
 ]
+
+# Needed for full C++17 support on macOS
+[tool.cibuildwheel.macos.environment]
+MACOSX_DEPLOYMENT_TARGET = "10.14"
