@@ -2,7 +2,9 @@
 
 ## Installation
 
-We are not currently publishing to PyPi.
+```bash
+pip install leapfrog-py
+```
 
 ## Usage
 

@@ -7,9 +7,9 @@
 
 #include <nanobind/nanobind.h>
 #include <nanobind/ndarray.h>
+#include <sstream>
 #include <stdexcept>
 #include <iostream>
-#include <format>
 
 #include "../config_mixer.hpp"
 
@@ -27,12 +27,10 @@ nda::array_ref_of_rank<T, Rank> parse_data(const nb::dict& data, char const* key
   int expected_length = shape.flat_max() + 1;
 
   if (actual_length < expected_length) {
-    throw std::invalid_argument(
-      std::format(
-        "Invalid size of data for '{}', expected {} got {}",
-        key, expected_length, actual_length
-      )
-    );
+    std::ostringstream oss;
+    oss << "Invalid size of data for '" << key << "', expected " << expected_length
+        << " got " << actual_length;
+    throw std::invalid_argument(oss.str());
   }
   return { array_data, shape };
 }
