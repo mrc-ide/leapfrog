@@ -1,0 +1,113 @@
+{% from "template_utils.j2" import comma_except_last %}
+{% include "header.j2" %}
+
+#pragma once
+
+#include <nanobind/nanobind.h>
+#include <nanobind/ndarray.h>
+#include <sstream>
+#include <stdexcept>
+#include <iostream>
+
+#include "../config_mixer.hpp"
+
+namespace nb = nanobind;
+
+namespace leapfrog {
+namespace internal {
+
+template <typename T, size_t Rank>
+nda::array_ref_of_rank<T, Rank> parse_data(const nb::dict& data, char const* key, nda::shape_of_rank<Rank> shape) {
+  auto array = nb::cast<nb::ndarray<T, nb::numpy>>(data[key]);
+  T* array_data = array.data();
+
+  int actual_length = array.size();
+  int expected_length = shape.flat_max() + 1;
+
+  if (actual_length < expected_length) {
+    std::ostringstream oss;
+    oss << "Invalid size of data for '" << key << "', expected " << expected_length
+        << " got " << actual_length;
+    throw std::invalid_argument(oss.str());
+  }
+  return { array_data, shape };
+}
+
+template <typename T, typename Shape>
+void fill_initial_state(const nb::dict& data, char const* key, nda::array<T, Shape>& array) {
+  auto array_data = nb::cast<nb::ndarray<T, nb::numpy>>(data[key]).data();
+
+  nda::array_ref<T, Shape> array_ref(array_data);
+
+  nda::for_each_index(Shape(), [&](auto i) {
+    array[i] = array_ref[i];
+  });
+}
+
+template<typename T, nb::ssize_t ...Args>
+using py_array = nb::ndarray<const T, nb::numpy, nb::shape<Args...>, nb::f_contig>;
+
+{% for config in configs %}
+template<typename real_type, MV ModelVariant>
+struct {{ config.name }}Adapter<Language::Py, real_type, ModelVariant> {
+  using SS = SSMixed<ModelVariant>;
+  using Config = {{ config.name }}Config<real_type, ModelVariant>;
+
+  static Config::Pars get_pars(
+    const nb::dict &data,
+    const Options<real_type> &opts
+  ) {
+    return {
+      {% for name, cfg in config.pars.default.items() %}
+      .{{ name }} = {{ get_py_parse_data(name, cfg) }}{{ comma_except_last(loop) }}
+      {% endfor %}
+    };
+  };
+
+  static Config::State get_initial_state(
+    const nb::dict &data
+  ) {
+    typename Config::State state;
+    {% for name, cfg in config.state.items() %}
+    {{ get_py_initial_state(cfg, name) }};
+    {% endfor %}
+    return state;
+  };
+
+  static constexpr int output_count = {{ dict_len(config.state) }};
+
+  static int build_output(
+    int index,
+    const Config::OutputState& state,
+    nb::dict& ret,
+    const size_t& output_years
+  ) {
+    {% for name, cfg in config.state.items() %}
+    const int py_rank_{{ name }} = {{ dim_len(cfg) + 1 }};
+    size_t py_dims_{{ name }}[py_rank_{{ name }}] = { {{ collapse_dims_with_trailing_sep(cfg, ", ") }}output_years };
+    ret["{{ name }}"] = py_array<{{ cfg.num_type }}>(state.{{ name }}.data(), py_rank_{{ name }}, py_dims_{{ name }});
+    {% endfor %}
+    return index + output_count;
+  };
+
+  static int build_output_single_year(
+    int index,
+    const Config::State& state,
+    nb::dict& ret
+  ) {
+    {% for name, cfg in config.state.items() %}
+    {% if cfg.type == "scalar" %}
+    ret["{{ name }}"] = state.{{ name }};
+    {% else %}
+    const int py_rank_{{ name }} = {{ dim_len(cfg) }};
+    size_t py_dims_{{ name }}[py_rank_{{ name }}] = { {{ collapse_dims(cfg) }} };
+    ret["{{ name }}"] = py_array<{{ cfg.num_type }}>(state.{{ name }}.data(), py_rank_{{ name }}, py_dims_{{ name }});
+    {% endif %}
+    {% endfor %}
+    return index + output_count;
+  };
+};
+
+{% endfor %}
+} // namespace internal
+} // namespace leapfrog

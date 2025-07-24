@@ -1,5 +1,6 @@
 #pragma once
 
+#include <sstream>
 #include "array/array.h"
 #include "generated/model_variants.hpp"
 #include "generated/config_mixer.hpp"
@@ -9,8 +10,6 @@
 #include "models/child_model_simulation.hpp"
 #include "options.hpp"
 #include "initial_year.hpp"
-
-#include <format>
 
 namespace leapfrog {
 
@@ -51,9 +50,11 @@ struct Leapfrog {
     const auto min_output_year = std::min_element(std::begin(output_years),
                                                   std::end(output_years));
     if (*min_output_year != opts.proj_start_year && *min_output_year <= simulation_start_year) {
-      throw std::invalid_argument(
-        std::format("Cannot output year '{}'. Output years must be later than simulation start year '{}'.",
-          *min_output_year, simulation_start_year));
+      std::ostringstream oss;
+      oss << "Cannot output year '" << *min_output_year << "'. "
+          << "Output years must be later than simulation start year"
+          << " '" << simulation_start_year << "'.";
+      throw std::invalid_argument(oss.str());
     }
     auto state = initial_state;
     auto state_next = state;
