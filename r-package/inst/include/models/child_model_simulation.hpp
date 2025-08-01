@@ -1329,7 +1329,7 @@ struct ChildModelSimulation<Config> {
 
     if (p_hc.hc_art_is_age_spec(t)) {
       for (int s = 0; s < NS; ++s) {
-        for (int a = 0; a < p_idx_fertility_first; ++a) {
+        for (int a = 0; a < p_idx_hiv_first_adult; ++a) {
           for (int hd = 0; hd < hc1DS; ++hd) {
             for (int cat = 0; cat < hcTT; ++cat) {
               i_hc.hc_initByAge(hc_age_coarse[a]) += n_hc.hc_art_need_init(hd, cat, a, s) *
