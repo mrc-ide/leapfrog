@@ -158,7 +158,7 @@ struct ChildModelSimulation<Config> {
     }
 
     for (int s = 0; s < NS; ++s) {
-      for (int a = (hc2_agestart + 1); a < p_idx_fertility_first; ++a) {
+      for (int a = (hc2_agestart + 1); a < p_idx_hiv_first_adult; ++a) {
         for (int hd = 0; hd < hc2DS; ++hd) {
           for (int cat = 0; cat < hcTT; ++cat) {
             n_hc.hc2_hiv_pop(hd, cat, a - hc2_agestart, s) += c_hc.hc2_hiv_pop(hd, cat, a - hc2_agestart - 1, s) *
@@ -728,7 +728,7 @@ struct ChildModelSimulation<Config> {
     // all children under a certain CD4 eligible for ART
     for (int s = 0; s < NS; ++s) {
       for (int cat = 0; cat < hcTT; ++cat) {
-        for (int a = p_hc.hc_art_elig_age(t); a < p_idx_fertility_first; ++a) {
+        for (int a = p_hc.hc_art_elig_age(t); a < p_idx_hiv_first_adult; ++a) {
           for (int hd = 0; hd < hc1DS; ++hd) {
             if (hd >= p_hc.hc_art_elig_cd4(a, t)) {
               if (a < hc2_agestart) {
@@ -785,7 +785,7 @@ struct ChildModelSimulation<Config> {
     // Spectrum uses a lagged population and eligibility for children over five (TODO: verify)
     for (int s = 0; s < NS; ++s) {
       for (int cat = 0; cat < hcTT; ++cat) {
-        for (int a = hc2_agestart; a < p_idx_fertility_first; ++a) {
+        for (int a = hc2_agestart; a < p_idx_hiv_first_adult; ++a) {
           for (int hd = 0; hd < hc2DS; ++hd) {
             if (a < p_hc.hc_art_elig_age(t) || hd >= p_hc.hc_art_elig_cd4(a, t - 1)) {
               n_hc.ctx_need += c_hc.hc2_hiv_pop(hd, cat, a - hc2_agestart, s);
@@ -828,7 +828,7 @@ struct ChildModelSimulation<Config> {
     }
 
     for (int s = 0; s < NS; ++s) {
-      for (int a = hc2_agestart; a < p_idx_fertility_first; ++a) {
+      for (int a = hc2_agestart; a < p_idx_hiv_first_adult; ++a) {
         for (int cat = 0; cat < hcTT; ++cat) {
           for (int hd = 0; hd < hc2DS; ++hd) {
             auto hiv_deaths_strat = i_hc.ctx_mean(art_flag) * n_hc.hc2_hiv_pop(hd, cat, a - hc2_agestart, s) *
@@ -859,7 +859,7 @@ struct ChildModelSimulation<Config> {
     // progress through CD4 categories
     for (int s = 0; s < NS; ++s) {
       for (int hd = 1; hd < hc2DS; ++hd) {
-        for (int a = hc2_agestart; a < p_idx_fertility_first; ++a) {
+        for (int a = hc2_agestart; a < p_idx_hiv_first_adult; ++a) {
           for (int cat = 0; cat < hcTT; ++cat) {
             auto cd4_grad = p_hc.hc2_cd4_prog(hd - 1, 0, s) *
                             (i_hc.hc_posthivmort(hd - 1, cat, a, s) + n_hc.hc2_hiv_pop(hd - 1, cat, a - hc2_agestart, s)) /
@@ -892,7 +892,7 @@ struct ChildModelSimulation<Config> {
     }
 
     for (int s = 0; s < NS; ++s) {
-      for (int a = hc2_agestart; a < p_idx_fertility_first; ++a) {
+      for (int a = hc2_agestart; a < p_idx_hiv_first_adult; ++a) {
         for (int cat = 0; cat < hcTT; ++cat) {
           for (int hd = 0; hd < hc2DS; ++hd) {
             auto cd4_mort_grad = i_hc.ctx_mean(art_flag) *
@@ -922,7 +922,7 @@ struct ChildModelSimulation<Config> {
     } // end s
 
     for (int s = 0; s < NS; ++s) {
-      for (int a = hc2_agestart; a < p_idx_fertility_first; ++a) {
+      for (int a = hc2_agestart; a < p_idx_hiv_first_adult; ++a) {
         for (int cat = 0; cat < hcTT; ++cat) {
           for (int hd = 0; hd < hc2DS; ++hd) {
             n_hc.hc2_hiv_pop(hd, cat, a - hc2_agestart, s) += i_hc.hc_grad(hd, cat, a, s);
@@ -941,7 +941,7 @@ struct ChildModelSimulation<Config> {
 
     for (int s = 0; s < NS; ++s) {
       for (int cat = 0; cat < hcTT; ++cat) {
-        for (int a = 0; a < p_idx_fertility_first; ++a) {
+        for (int a = 0; a < p_idx_hiv_first_adult; ++a) {
           for (int hd = 0; hd < hc1DS; ++hd) {
             i_hc.eligible(hd, a, s) += n_hc.hc_art_need_init(hd, cat, a, s);
           } // end hc1DS
@@ -958,7 +958,7 @@ struct ChildModelSimulation<Config> {
     get_cotrim_effect(art_flag);
 
     for (int s = 0; s < NS; ++s) {
-      for (int a = 0; a < p_idx_fertility_first; ++a) {
+      for (int a = 0; a < p_idx_hiv_first_adult; ++a) {
         for (int hd = 0; hd < hc1DS; ++hd) {
           i_hc.hc_death_rate = 0.0;
           i_hc.hc_art_grad(t_art_idx, hd, a, s) = 0.0;
@@ -1018,7 +1018,7 @@ struct ChildModelSimulation<Config> {
     for (int dur = 0; dur < hTS; ++dur) {
       for (int s = 0; s < NS; ++s) {
         for (int hd = 0; hd < hc1DS; ++hd) {
-          for (int a = 0; a < p_idx_fertility_first; ++a) {
+          for (int a = 0; a < p_idx_hiv_first_adult; ++a) {
             i_hc.hc_death_rate = 0.0;
 
             if (dur == 0) {
@@ -1072,7 +1072,7 @@ struct ChildModelSimulation<Config> {
 
     // Progress ART to the correct time on ART
     for (int hd = 0; hd < hc1DS; ++hd) {
-      for (int a = 0; a < p_idx_fertility_first; ++a) {
+      for (int a = 0; a < p_idx_hiv_first_adult; ++a) {
         for (int s = 0; s < NS; ++s) {
           if (a < hc2_agestart) {
             if (n_hc.hc1_art_pop(curr_t_idx, hd, a, s) > 0) {
@@ -1093,7 +1093,7 @@ struct ChildModelSimulation<Config> {
     auto& i_hc = intermediate.hc;
 
     for (int s = 0; s < NS; ++s) {
-      for (int a = 0; a < p_idx_fertility_first; ++a) {
+      for (int a = 0; a < p_idx_hiv_first_adult; ++a) {
         for (int hd = 0; hd < hc1DS; ++hd) {
           for (int dur = 0; dur < hTS; ++dur) {
             if (a < hc2_agestart) {
@@ -1111,7 +1111,7 @@ struct ChildModelSimulation<Config> {
     auto& i_hc = intermediate.hc;
 
     for (int s = 0; s < NS; ++s) {
-      for (int a = 0; a < p_idx_fertility_first; ++a) {
+      for (int a = 0; a < p_idx_hiv_first_adult; ++a) {
         for (int hd = 0; hd < hc1DS; ++hd) {
           i_hc.unmet_need(hc_age_coarse[a]) += i_hc.eligible(hd, a, s);
         } // end hc1DS
@@ -1137,7 +1137,7 @@ struct ChildModelSimulation<Config> {
       } // end ag
     } else {
       for (int s = 0; s < NS; ++s) {
-        for (int a = 0; a < p_idx_fertility_first; ++a) {
+        for (int a = 0; a < p_idx_hiv_first_adult; ++a) {
           for (int hd = 0; hd < hc1DS; ++hd) {
             for (int dur = 0; dur < hTS; ++dur) {
               if (a < hc2_agestart) {
@@ -1229,7 +1229,7 @@ struct ChildModelSimulation<Config> {
     auto& i_hc = intermediate.hc;
 
     for (int s = 0; s < NS; ++s) {
-      for (int a = 0; a < p_idx_fertility_first; ++a) {
+      for (int a = 0; a < p_idx_hiv_first_adult; ++a) {
         for (int hd = 0; hd < hc1DS; ++hd) {
           for (int cat = 0; cat < hcTT; ++cat) {
             if (a < hc2_agestart) {
@@ -1243,7 +1243,7 @@ struct ChildModelSimulation<Config> {
     } // end NS
 
     for (int s = 0; s <NS; ++s) {
-      for (int a = 0; a < p_idx_fertility_first; ++a) {
+      for (int a = 0; a < p_idx_hiv_first_adult; ++a) {
         for (int hd = 0; hd < hc1DS; ++hd) {
           for (int cat = 0; cat < hcTT; ++cat) {
             if (a < hc2_agestart) {
@@ -1257,7 +1257,7 @@ struct ChildModelSimulation<Config> {
     } // end NS
 
     for (int s = 0; s < NS; ++s) {
-      for (int a = 0; a < p_idx_fertility_first; ++a) {
+      for (int a = 0; a < p_idx_hiv_first_adult; ++a) {
         for (int hd = 0; hd < hc1DS; ++hd) {
           for (int cat = 0; cat < hcTT; ++cat) {
             if (a < hc2_agestart) {
@@ -1288,7 +1288,7 @@ struct ChildModelSimulation<Config> {
     auto& i_hc = intermediate.hc;
 
     for (int s = 0; s < NS; ++s) {
-      for (int a = 0; a < p_idx_fertility_first; ++a) {
+      for (int a = 0; a < p_idx_hiv_first_adult; ++a) {
         for (int hd = 0; hd < hc1DS; ++hd) {
           for (int cat = 0; cat < hcTT; ++cat) {
             if (a < hc2_agestart) {
@@ -1307,7 +1307,7 @@ struct ChildModelSimulation<Config> {
     auto& i_hc = intermediate.hc;
 
     for (int s = 0; s < NS; ++s) {
-      for (int a = 0; a < p_idx_fertility_first; ++a) {
+      for (int a = 0; a < p_idx_hiv_first_adult; ++a) {
         for (int hd = 0; hd < hc1DS; ++hd) {
           for (int cat = 0; cat < hcTT; ++cat) {
             if (a < hc2_agestart) {
@@ -1349,7 +1349,7 @@ struct ChildModelSimulation<Config> {
 
       for (int s = 0; s < NS; ++s) {
         for (int cat = 0; cat < hcTT; ++cat) {
-          for (int a = 0; a < p_idx_fertility_first; ++a) {
+          for (int a = 0; a < p_idx_hiv_first_adult; ++a) {
             for (int hd = 0; hd < hc1DS; ++hd) {
               auto& coarse_hc_adj = i_hc.hc_adj(hc_age_coarse[a]);
               auto& coarse_hc_art_scalar = i_hc.hc_art_scalar(hc_age_coarse[a]);
@@ -1378,7 +1378,7 @@ struct ChildModelSimulation<Config> {
       } // end  NS
     } else {
       for (int s = 0; s < NS; ++s) {
-        for (int a = 0; a < p_idx_fertility_first; ++a) {
+        for (int a = 0; a < p_idx_hiv_first_adult; ++a) {
           for (int hd = 0; hd < hc1DS; ++hd) {
             for (int cat = 0; cat < hcTT; ++cat) {
               i_hc.hc_initByAge(0) += n_hc.hc_art_need_init(hd, cat, a, s) * p_hc.hc_art_init_dist(a, t);
@@ -1395,7 +1395,7 @@ struct ChildModelSimulation<Config> {
 
       for (int s = 0; s < NS; ++s) {
         for (int cat = 0; cat < hcTT; ++cat) {
-          for (int a = 0; a < p_idx_fertility_first; ++a) {
+          for (int a = 0; a < p_idx_hiv_first_adult; ++a) {
             for (int hd = 0; hd < hc1DS; ++hd) {
               auto hc_art_val_sum = p_hc.hc_art_val(0, t) + p_hc.hc_art_val(0, t - 1);
               if (hc_art_val_sum <= 0) {
@@ -1424,7 +1424,7 @@ struct ChildModelSimulation<Config> {
     auto& n_hc = state_next.hc;
 
     for (int hd = 0; hd < hDS; ++hd) {
-      for (int a = 0; a < p_idx_fertility_first; ++a) {
+      for (int a = 0; a < p_idx_hiv_first_adult; ++a) {
         for (int s = 0; s < NS; ++s) {
           for (int cat = 0; cat < hcTT; ++cat) {
             if (a < hc2_agestart) {
@@ -1445,7 +1445,7 @@ struct ChildModelSimulation<Config> {
       } // end a
     } // end hDS
 
-    for (int a = 0; a < p_idx_fertility_first; ++a) {
+    for (int a = 0; a < p_idx_hiv_first_adult; ++a) {
       for (int s = 0; s < NS; ++s) {
         n_ha.p_hiv_pop(a, s) += n_ha.p_infections(a, s);
         n_ha.p_hiv_pop(a, s) -= n_ha.p_hiv_deaths(a, s);
