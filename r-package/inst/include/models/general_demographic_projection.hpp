@@ -70,7 +70,8 @@ struct GeneralDemographicProjection<Config> {
       // Migration for ages 0, ..., 80+
       for (int a = 0; a < pAG; ++a) {
         // Calculate migration rate as number of net migrants divided by total pop.
-        i_dp.migration_rate(a, g) = p_dp.net_migration(a, g, t) / n_dp.p_total_pop(a, g);
+        i_dp.migration_rate(a, g) = p_dp.net_migration(a, g, t) == 0.0 ? 0.0 :
+	  p_dp.net_migration(a, g, t) / n_dp.p_total_pop(a, g);
         n_dp.p_total_pop(a, g) *= 1.0 + i_dp.migration_rate(a, g);
       }
     }
@@ -110,9 +111,10 @@ struct GeneralDemographicProjection<Config> {
         // Get migration rate, as number of net migrants adjusted for survivorship
         // to end of period. Divide by 2 as (on average) half of deaths will
         // happen before they migrate. Then divide by total pop to get rate.
-        i_dp.migration_rate(a, g) = p_dp.net_migration(a, g, t) *
-                                    (1.0 + p_dp.survival_probability(a, g, t)) *
-                                    0.5 / n_dp.p_total_pop(a, g);
+        i_dp.migration_rate(a, g) = p_dp.net_migration(a, g, t) == 0.0 ? 0.0 :
+	                              p_dp.net_migration(a, g, t) *
+                                      (1.0 + p_dp.survival_probability(a, g, t)) * 0.5 /
+	                              n_dp.p_total_pop(a, g);
         n_dp.p_total_pop(a, g) *= 1.0 + i_dp.migration_rate(a, g);
       }
 
@@ -120,16 +122,13 @@ struct GeneralDemographicProjection<Config> {
       // weighted survival_probability for age 79 and age 80+.
       // * Numerator: p_total_pop(a, g, t-1) * (1.0 + survival_probability(a+1, g, t))
       // + p_total_pop(a-1, g, t-1) * (1.0 + survival_probability(a, g, t))
-      // * Denominator: p_total_pop(a, g, t-1) + p_total_pop(a-1, g,
-      // t-1) Re-expressed current population and deaths to open age group
-      // (already calculated):
+      // * Denominator: p_total_pop(a, g, t-1) + p_total_pop(a-1, g, t-1)
+      // Re-expressed current population and deaths to open age group (already calculated):
       int a = pAG - 1;
-      real_type survival_probability_netmig = (n_dp.p_total_pop(a, g) +
-                                              0.5 * n_dp.p_total_pop_background_deaths(a, g)) /
-                                              (n_dp.p_total_pop(a, g) + n_dp.p_total_pop_background_deaths(a, g));
-      i_dp.migration_rate(a, g) = survival_probability_netmig *
-                                  p_dp.net_migration(a, g, t) /
-                                  n_dp.p_total_pop(a, g);
+      real_type survival_probability_netmig = (n_dp.p_total_pop(a, g) + 0.5 * n_dp.p_total_pop_background_deaths(a, g)) /
+                                                (n_dp.p_total_pop(a, g) + n_dp.p_total_pop_background_deaths(a, g));
+      i_dp.migration_rate(a, g) = p_dp.net_migration(a, g, t) == 0.0 ? 0.0 :
+	survival_probability_netmig * p_dp.net_migration(a, g, t) / n_dp.p_total_pop(a, g);
       n_dp.p_total_pop(a, g) *= 1.0 + i_dp.migration_rate(a, g);
     }
   };
