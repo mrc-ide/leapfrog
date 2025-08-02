@@ -1,0 +1,63 @@
+Year,Source,Value,Indicator
+2017,Started ART before the pregnancy,5916.6665,Number of pregnant women
+2017,Started ART before pregnancy then dropped off,1479.16663,Number of pregnant women
+2017,Started ART during the pregnancy,1841.33337,Number of pregnant women
+2017,Started ART during pregnancy then dropped off,460.33334,Number of pregnant women
+2017,Started ART late in the pregnancy,202.16667,Number of pregnant women
+2017,Did not receive ART,798.04327,Number of pregnant women
+2017,Mother infected during pregnancy,324.58881,Number of pregnant women
+2017,Started ART before the pregnancy: child infected during pregnancy,20,New child infections
+2017,Started ART during the pregnancy: child infected during pregnancy,18,New child infections
+2017,Dropped off ART during pregnancy: child infected during pregnancy,365,New child infections
+2017,Started ART late in the pregnancy: child infected during pregnancy,11,New child infections
+2017,Did not receive ART during pregnancy,150,New child infections
+2017,Mother infected during pregnancy,58,New child infections
+2017,Started ART before pregnancy: child infected during breastfeeding,11,New child infections
+2017,Started ART during pregnancy: child infected during breastfeeding,21,New child infections
+2017,Dropped off ART: child infected during breastfeeding,187,New child infections
+2017,Started ART late in pregnancy: child infected during breastfeeding,2,New child infections
+2017,Did not receive ART during breastfeeding,52,New child infections
+2017,Mother infected during breastfeeding,112,New child infections
+2017,Started ART before the pregnancy: child infected during pregnancy,0.18696,Mother-to-child transmission rate
+2017,Started ART during the pregnancy: child infected during pregnancy,0.16826,Mother-to-child transmission rate
+2017,Dropped off ART during pregnancy: child infected during pregnancy,3.41195,Mother-to-child transmission rate
+2017,Started ART late in the pregnancy: child infected during pregnancy,0.10283,Mother-to-child transmission rate
+2017,Did not receive ART during pregnancy,1.40217,Mother-to-child transmission rate
+2017,Mother infected during pregnancy,0.54217,Mother-to-child transmission rate
+2017,Started ART before pregnancy: child infected during breastfeeding,0.10283,Mother-to-child transmission rate
+2017,Started ART during pregnancy: child infected during breastfeeding,0.1963,Mother-to-child transmission rate
+2017,Dropped off ART: child infected during breastfeeding,1.74804,Mother-to-child transmission rate
+2017,Started ART late in pregnancy: child infected during breastfeeding,0.0187,Mother-to-child transmission rate
+2017,Did not receive ART during breastfeeding,0.48609,Mother-to-child transmission rate
+2017,Mother infected during breastfeeding,1.04695,Mother-to-child transmission rate
+2018,Started ART before the pregnancy,5533.3335,Number of pregnant women
+2018,Started ART before pregnancy then dropped off,1383.33337,Number of pregnant women
+2018,Started ART during the pregnancy,1505.06665,Number of pregnant women
+2018,Started ART during pregnancy then dropped off,376.26666,Number of pregnant women
+2018,Started ART late in the pregnancy,190.33333,Number of pregnant women
+2018,Did not receive ART,1265.05432,Number of pregnant women
+2018,Mother infected during pregnancy,283.98996,Number of pregnant women
+2018,Started ART before the pregnancy: child infected during pregnancy,18,New child infections
+2018,Started ART during the pregnancy: child infected during pregnancy,15,New child infections
+2018,Dropped off ART during pregnancy: child infected during pregnancy,331,New child infections
+2018,Started ART late in the pregnancy: child infected during pregnancy,10,New child infections
+2018,Did not receive ART during pregnancy,238,New child infections
+2018,Mother infected during pregnancy,51,New child infections
+2018,Started ART before pregnancy: child infected during breastfeeding,10,New child infections
+2018,Started ART during pregnancy: child infected during breastfeeding,17,New child infections
+2018,Dropped off ART: child infected during breastfeeding,168,New child infections
+2018,Started ART late in pregnancy: child infected during breastfeeding,2,New child infections
+2018,Did not receive ART during breastfeeding,82,New child infections
+2018,Mother infected during breastfeeding,97,New child infections
+2018,Started ART before the pregnancy: child infected during pregnancy,0.17555,Mother-to-child transmission rate
+2018,Started ART during the pregnancy: child infected during pregnancy,0.14629,Mother-to-child transmission rate
+2018,Dropped off ART during pregnancy: child infected during pregnancy,3.2282,Mother-to-child transmission rate
+2018,Started ART late in the pregnancy: child infected during pregnancy,0.09753,Mother-to-child transmission rate
+2018,Did not receive ART during pregnancy,2.32118,Mother-to-child transmission rate
+2018,Mother infected during pregnancy,0.4974,Mother-to-child transmission rate
+2018,Started ART before pregnancy: child infected during breastfeeding,0.09753,Mother-to-child transmission rate
+2018,Started ART during pregnancy: child infected during breastfeeding,0.1658,Mother-to-child transmission rate
+2018,Dropped off ART: child infected during breastfeeding,1.63848,Mother-to-child transmission rate
+2018,Started ART late in pregnancy: child infected during breastfeeding,0.01951,Mother-to-child transmission rate
+2018,Did not receive ART during breastfeeding,0.79974,Mother-to-child transmission rate
+2018,Mother infected during breastfeeding,0.94603,Mother-to-child transmission rate

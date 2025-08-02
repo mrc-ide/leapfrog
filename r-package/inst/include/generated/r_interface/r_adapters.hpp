@@ -360,10 +360,12 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
     state.ctx_need = Rcpp::as<real_type>(data["ctx_need"]);
     fill_initial_state<real_type, typename Config::State::shape_infection_by_type>(data, "infection_by_type", state.infection_by_type);
     fill_initial_state<real_type, typename Config::State::shape_mtct_by_source_tr>(data, "mtct_by_source_tr", state.mtct_by_source_tr);
+    fill_initial_state<real_type, typename Config::State::shape_mtct_by_source_women>(data, "mtct_by_source_women", state.mtct_by_source_women);
+    fill_initial_state<real_type, typename Config::State::shape_mtct_by_source_hc_infections>(data, "mtct_by_source_hc_infections", state.mtct_by_source_hc_infections);
     return state;
   };
 
-  static constexpr int output_count = 14;
+  static constexpr int output_count = 16;
 
   static int build_output(
     int index,
@@ -437,11 +439,21 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
     std::copy_n(state.infection_by_type.data(), state.infection_by_type.size(), REAL(r_infection_by_type));
     names[index + 12] = "infection_by_type";
     ret[index + 12] = r_infection_by_type;
-    Rcpp::NumericVector r_mtct_by_source_tr(SS::mtct_source * SS::hcTT * output_years);
-    r_mtct_by_source_tr.attr("dim") = Rcpp::IntegerVector::create(SS::mtct_source, SS::hcTT, output_years);
+    Rcpp::NumericVector r_mtct_by_source_tr(SS::mtct_source * SS::hVT * output_years);
+    r_mtct_by_source_tr.attr("dim") = Rcpp::IntegerVector::create(SS::mtct_source, SS::hVT, output_years);
     std::copy_n(state.mtct_by_source_tr.data(), state.mtct_by_source_tr.size(), REAL(r_mtct_by_source_tr));
     names[index + 13] = "mtct_by_source_tr";
     ret[index + 13] = r_mtct_by_source_tr;
+    Rcpp::NumericVector r_mtct_by_source_women(SS::mtct_source * output_years);
+    r_mtct_by_source_women.attr("dim") = Rcpp::IntegerVector::create(SS::mtct_source, output_years);
+    std::copy_n(state.mtct_by_source_women.data(), state.mtct_by_source_women.size(), REAL(r_mtct_by_source_women));
+    names[index + 14] = "mtct_by_source_women";
+    ret[index + 14] = r_mtct_by_source_women;
+    Rcpp::NumericVector r_mtct_by_source_hc_infections(SS::mtct_source * SS::hVT * output_years);
+    r_mtct_by_source_hc_infections.attr("dim") = Rcpp::IntegerVector::create(SS::mtct_source, SS::hVT, output_years);
+    std::copy_n(state.mtct_by_source_hc_infections.data(), state.mtct_by_source_hc_infections.size(), REAL(r_mtct_by_source_hc_infections));
+    names[index + 15] = "mtct_by_source_hc_infections";
+    ret[index + 15] = r_mtct_by_source_hc_infections;
     return index + output_count;
   };
 
@@ -510,11 +522,21 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
     std::copy_n(state.infection_by_type.data(), state.infection_by_type.size(), REAL(r_infection_by_type));
     names[index + 12] = "infection_by_type";
     ret[index + 12] = r_infection_by_type;
-    Rcpp::NumericVector r_mtct_by_source_tr(SS::mtct_source * SS::hcTT);
-    r_mtct_by_source_tr.attr("dim") = Rcpp::IntegerVector::create(SS::mtct_source, SS::hcTT);
+    Rcpp::NumericVector r_mtct_by_source_tr(SS::mtct_source * SS::hVT);
+    r_mtct_by_source_tr.attr("dim") = Rcpp::IntegerVector::create(SS::mtct_source, SS::hVT);
     std::copy_n(state.mtct_by_source_tr.data(), state.mtct_by_source_tr.size(), REAL(r_mtct_by_source_tr));
     names[index + 13] = "mtct_by_source_tr";
     ret[index + 13] = r_mtct_by_source_tr;
+    Rcpp::NumericVector r_mtct_by_source_women(SS::mtct_source);
+    r_mtct_by_source_women.attr("dim") = Rcpp::IntegerVector::create(SS::mtct_source);
+    std::copy_n(state.mtct_by_source_women.data(), state.mtct_by_source_women.size(), REAL(r_mtct_by_source_women));
+    names[index + 14] = "mtct_by_source_women";
+    ret[index + 14] = r_mtct_by_source_women;
+    Rcpp::NumericVector r_mtct_by_source_hc_infections(SS::mtct_source * SS::hVT);
+    r_mtct_by_source_hc_infections.attr("dim") = Rcpp::IntegerVector::create(SS::mtct_source, SS::hVT);
+    std::copy_n(state.mtct_by_source_hc_infections.data(), state.mtct_by_source_hc_infections.size(), REAL(r_mtct_by_source_hc_infections));
+    names[index + 15] = "mtct_by_source_hc_infections";
+    ret[index + 15] = r_mtct_by_source_hc_infections;
     return index + output_count;
   };
 };

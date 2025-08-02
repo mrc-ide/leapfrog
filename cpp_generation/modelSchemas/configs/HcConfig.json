@@ -23,7 +23,8 @@
       "hcAG_coarse": 4,
       "hAB_ind": 2,
       "hAG_fert": 7,
-      "mtct_source": 6,
+      "mtct_source": 7,
+      "hVT": 2,
       "hc_age_coarse": [1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3],
       "hc_age_coarse_cd4": [0, 0, 0, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
       "hc_cd4_transition": [
@@ -382,6 +383,10 @@
       "num_type": "real_type",
       "dims": ["SS::hPS"]
     },
+    "PMTCT_not_retained": {
+      "num_type": "real_type",
+      "dims": ["SS::hPS"]
+    },
     "bf_transmission_rate": {
       "num_type": "real_type",
       "dims": ["SS::hBF_coarse"]
@@ -518,6 +523,12 @@
     "ctx_mean": {
       "num_type": "real_type",
       "dims": ["3"]
+    },
+    "PMTCT_before_dropout": {
+      "num_type": "real_type"
+    },
+    "PMTCT_during_dropout": {
+      "num_type": "real_type"
     }
   },
   "state": {
@@ -573,7 +584,15 @@
     },
     "mtct_by_source_tr": {
       "num_type": "real_type",
-      "dims": ["SS::mtct_source", "SS::hcTT"]
+      "dims": ["SS::mtct_source", "SS::hVT"]
+    },
+    "mtct_by_source_women": {
+      "num_type": "real_type",
+      "dims": ["SS::mtct_source"]
+    },
+    "mtct_by_source_hc_infections": {
+      "num_type": "real_type",
+      "dims": ["SS::mtct_source", "SS::hVT"]
     }
   }
 }
