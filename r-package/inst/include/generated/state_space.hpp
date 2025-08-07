@@ -17,24 +17,47 @@ template<MV ModelVariant>
 struct DpSS {
   static constexpr int NS = 2;
   static constexpr int pAG = 81;
+  static constexpr int p_idx_fertility_first = 15;
+  static constexpr int p_fertility_age_groups = 35;
+};
+
+template<MV ModelVariant>
+requires(ModelVariant::age10_adult)
+struct DpSS<ModelVariant> {
+  static constexpr int NS = 2;
+  static constexpr int pAG = 106;
+  static constexpr int p_idx_fertility_first = 10;
+  static constexpr int p_fertility_age_groups = 40;
 };
 
 
 template<MV ModelVariant>
 struct HaSS {
-  static constexpr std::array<int, 66> hAG_span = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+  static constexpr int hAG = 66;
   static constexpr int hDS = 7;
   static constexpr int hTS = 3;
-  static constexpr int hAG = 66;
+  static constexpr int p_idx_hiv_first_adult = 15;
+  static constexpr std::array<int, 66> hAG_span = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 };
 
 template<MV ModelVariant>
 requires(ModelVariant::use_coarse_stratification)
 struct HaSS<ModelVariant> {
-  static constexpr std::array<int, 9> hAG_span = { 2, 3, 5, 5, 5, 5, 5, 5, 31 };
+  static constexpr int hAG = 9;
   static constexpr int hDS = 7;
   static constexpr int hTS = 3;
-  static constexpr int hAG = 9;
+  static constexpr int p_idx_hiv_first_adult = 15;
+  static constexpr std::array<int, 9> hAG_span = { 2, 3, 5, 5, 5, 5, 5, 5, 31 };
+};
+
+template<MV ModelVariant>
+requires(ModelVariant::age10_adult)
+struct HaSS<ModelVariant> {
+  static constexpr int hAG = 96;
+  static constexpr int hDS = 7;
+  static constexpr int hTS = 3;
+  static constexpr int p_idx_hiv_first_adult = 10;
+  static constexpr std::array<int, 96> hAG_span = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 };
 
 
@@ -71,9 +94,6 @@ struct BaseSS {
   static constexpr int ART0MOS = 0;
   static constexpr int PROJPERIOD_CALENDAR = 0;
   static constexpr int PROJPERIOD_MIDYEAR = 1;
-  static constexpr int p_idx_fertility_first = 15;
-  static constexpr int p_fertility_age_groups = 35;
-  static constexpr int p_idx_hiv_first_adult = 15;
   static constexpr int adult_incidence_first_age_group = 15;
   static constexpr int pAG_INCIDPOP = 35;
   static constexpr int hIDX_15PLUS = 0;

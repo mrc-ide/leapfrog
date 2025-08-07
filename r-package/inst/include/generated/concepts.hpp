@@ -14,6 +14,8 @@ concept MV = requires (ModelVariant mv) {
   { mv.run_hiv_simulation } -> std::convertible_to<bool>;
   { mv.use_coarse_stratification } -> std::convertible_to<bool>;
   { mv.run_child_model } -> std::convertible_to<bool>;
+  { mv.age10_adult } -> std::convertible_to<bool>;
+  { mv.age105_open } -> std::convertible_to<bool>;
 };
 
 
@@ -28,6 +30,12 @@ concept UseCoarseStratification = MV<typename Config::ModelVariant> && Config::M
 
 template<typename Config>
 concept RunChildModel = MV<typename Config::ModelVariant> && Config::ModelVariant::run_child_model;
+
+template<typename Config>
+concept Age10Adult = MV<typename Config::ModelVariant> && Config::ModelVariant::age10_adult;
+
+template<typename Config>
+concept Age105Open = MV<typename Config::ModelVariant> && Config::ModelVariant::age105_open;
 
 } // namespace internal
 } // namespace leapfrog

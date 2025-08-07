@@ -17,7 +17,8 @@ std::vector<std::string> list_model_configurations() {
     "DemographicProjection",
     "HivFullAgeStratification",
     "HivCoarseAgeStratification",
-    "ChildModel"
+    "ChildModel",
+    "GBD"
   };
 }
 
@@ -137,6 +138,8 @@ auto sim_model(const std::string configuration, Args&&... args) {
     return simulate_model<leapfrog::HivCoarseAgeStratification>(std::forward<Args>(args)...);
   } else if (configuration == "ChildModel") {
     return simulate_model<leapfrog::ChildModel>(std::forward<Args>(args)...);
+  } else if (configuration == "GBD") {
+    return simulate_model<leapfrog::GBD>(std::forward<Args>(args)...);    
   } else {
     const auto available_variants = list_model_configurations();
     std::ostringstream oss;

@@ -171,14 +171,14 @@ struct AdultHivModelSimulation<Config> {
       }
 
       for (int a = adult_incid_first_age_group; a < adult_incid_last_age_group; ++a) {
-        i_ha.Xhivn_incagerr += p_ha.relative_risk_age(a - adult_incid_first_age_group, g, t) *
+        i_ha.Xhivn_incagerr += p_ha.relative_risk_age(a - p_idx_hiv_first_adult, g, t) *
                                i_ha.hiv_negative_pop(a);
       }
 
-      for (int a = adult_incid_first_age_group; a < pAG; ++a) {
+      for (int a = p_idx_hiv_first_adult; a < pAG; ++a) {
         i_ha.p_infections_ts(a, g) = i_ha.hiv_negative_pop(a) *
                                      i_ha.rate_sex(g) *
-                                     p_ha.relative_risk_age(a - adult_incid_first_age_group, g, t) *
+                                     p_ha.relative_risk_age(a - p_idx_hiv_first_adult, g, t) *
                                      i_ha.hiv_neg_aggregate(g) /
                                      i_ha.Xhivn_incagerr;
       }

@@ -6,8 +6,20 @@
   "state_space": {
     "default": {
       "NS": 2,
-      "pAG": 81
-    }
+      "pAG": 81,
+      "p_idx_fertility_first": 15,
+      "p_fertility_age_groups": 35
+    },
+    "overrides": [
+      {
+        "applies_if": "age10_adult",
+        "vars": {
+          "pAG": 106,
+          "p_idx_fertility_first": 10,
+          "p_fertility_age_groups": 40
+        }	  
+      }
+    ]      
   },
   "pars": {
     "default": {
