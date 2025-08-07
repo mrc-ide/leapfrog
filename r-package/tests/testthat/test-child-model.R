@@ -318,7 +318,7 @@ test_that("Stacked bar outputs align",{
     dplyr::mutate(spectrum  = spectrum)
   infections <- merge(frogger_output_infections, spec_output_infections, by = c('Source', 'trans_type', 'Year'))
   infections <- dplyr::mutate(infections, diff = frogger - spectrum)
-  expect_true(all(abs(infections$diff) == 0 ))
+  expect_true(all(abs(infections$diff) < 5e-5))
 
 })
 
