@@ -56,6 +56,20 @@ struct ChildModelSimulation<Config> {
   static constexpr auto hVT = SS::hVT;
   static constexpr auto hVT_dropout = SS::hVT_dropout;
 
+  enum Index {
+    option_a = 0,
+    option_b = 1,
+    sdnvp = 2,
+    dual_arv = 3,
+    bplus_before = 4,
+    bplus_early = 5,
+    bplus_late = 6,
+    no_art = 7,
+    mat_sero = 8,
+    bplus_before_do = 9,
+    bplus_during_do = 10
+  };
+
   // function args
   int t;
   const Pars& pars;
@@ -297,14 +311,15 @@ struct ChildModelSimulation<Config> {
         } else {
           i_hc.PMTCT_coverage(hp) = p_hc.PMTCT(hp, t) / i_hc.sumARV *
             i_hc.on_PMTCT / i_hc.need_PMTCT ;
-          if(hp == 4){
+          if(hp == bplus_before){
             //Dropped off ART, started before
-            n_hc.mtct_by_source_women(9) += p_hc.PMTCT(hp, t) * (1 - p_hc.PMTCT_dropout(hp, 0, t)); //number
+            n_hc.mtct_by_source_women(bplus_before_do) += p_hc.PMTCT(hp, t) * (1 - p_hc.PMTCT_dropout(hp, 0, t)); //number
+            // n_hc.mtct_by_source_women(option_a) += p_hc.PMTCT(hp, t) * (1 - p_hc.PMTCT_dropout(hp, 0, t)); //number
             i_hc.PMTCT_before_dropout = i_hc.PMTCT_coverage(hp) * (1 - p_hc.PMTCT_dropout(hp, 0, t)); //coverage
           }
-          if(hp == 5){
+          if(hp == bplus_early){
             //Dropped off ART, started during
-            n_hc.mtct_by_source_women(10) += p_hc.PMTCT(hp, t) * (1 - p_hc.PMTCT_dropout(hp, 0, t)); //number
+            n_hc.mtct_by_source_women(bplus_during_do) += p_hc.PMTCT(hp, t) * (1 - p_hc.PMTCT_dropout(hp, 0, t)); //number
             i_hc.PMTCT_during_dropout = i_hc.PMTCT_coverage(hp) * (1 - p_hc.PMTCT_dropout(hp, 0, t)); //coverage
           }
           i_hc.PMTCT_coverage(hp) *=  p_hc.PMTCT_dropout(hp, 0, t);
@@ -315,10 +330,10 @@ struct ChildModelSimulation<Config> {
       }// end hPS
 
       //No ART
-      n_hc.mtct_by_source_women(7) = i_hc.need_PMTCT;
+      n_hc.mtct_by_source_women(no_art) = i_hc.need_PMTCT;
       for(int ms = 0; ms < mtct_source; ms++){
-        if(ms != 7){
-          n_hc.mtct_by_source_women(7) -= n_hc.mtct_by_source_women(ms);
+        if(ms != no_art){
+          n_hc.mtct_by_source_women(no_art) -= n_hc.mtct_by_source_women(ms);
         }
       }
     } //end else
@@ -334,8 +349,8 @@ struct ChildModelSimulation<Config> {
       i_hc.PMTCT_coverage(hp) *= 1.0 - p_hc.PMTCT_transmission_rate(0, hp, 0);
     } // end hPS
 
-    i_hc.PMTCT_before_dropout -= n_hc.mtct_by_source_tr(9,0);
-    i_hc.PMTCT_during_dropout -= n_hc.mtct_by_source_tr(10,0);
+    i_hc.PMTCT_before_dropout -= n_hc.mtct_by_source_tr(bplus_before_do,0);
+    i_hc.PMTCT_during_dropout -= n_hc.mtct_by_source_tr(bplus_during_do,0);
 
   };
 
@@ -425,15 +440,15 @@ struct ChildModelSimulation<Config> {
         i_hc.excessratio_bf = option_A_B_coverage - i_hc.prop_wlhiv_gte350;
         auto excess_factor_bf = i_hc.excessratio_bf / option_A_B_coverage * (1.45 / 0.46) +
                                 i_hc.prop_wlhiv_gte350;
-        i_hc.optA_bf_transmission_rate = excess_factor_bf * p_hc.PMTCT_transmission_rate(4, 0, 1);
-        i_hc.optB_bf_transmission_rate = excess_factor_bf * p_hc.PMTCT_transmission_rate(4, 1, 1);
+        i_hc.optA_bf_transmission_rate = excess_factor_bf * p_hc.PMTCT_transmission_rate(4, option_a, 1);
+        i_hc.optB_bf_transmission_rate = excess_factor_bf * p_hc.PMTCT_transmission_rate(4, option_b, 1);
       } else {
-        i_hc.optA_bf_transmission_rate = p_hc.PMTCT_transmission_rate(4, 0, 1);
-        i_hc.optB_bf_transmission_rate = p_hc.PMTCT_transmission_rate(4, 1, 1);
+        i_hc.optA_bf_transmission_rate = p_hc.PMTCT_transmission_rate(4, option_a, 1);
+        i_hc.optB_bf_transmission_rate = p_hc.PMTCT_transmission_rate(4, option_b, 1);
       }
     } else {
-      i_hc.optA_bf_transmission_rate = p_hc.PMTCT_transmission_rate(4, 0, 1);
-      i_hc.optB_bf_transmission_rate = p_hc.PMTCT_transmission_rate(4, 1, 1);
+      i_hc.optA_bf_transmission_rate = p_hc.PMTCT_transmission_rate(4, option_a, 1);
+      i_hc.optB_bf_transmission_rate = p_hc.PMTCT_transmission_rate(4, option_b, 1);
     }
   };
 
@@ -511,9 +526,9 @@ struct ChildModelSimulation<Config> {
 
 
     for (int hp = 0; hp < hPS; ++hp) {
-      if(hp == 0){
+      if(hp == option_a){
         n_hc.mtct_by_source_tr(hp,0) = i_hc.PMTCT_coverage(hp) * i_hc.optA_transmission_rate ;
-      }else if(hp == 1){
+      }else if(hp == option_b){
         n_hc.mtct_by_source_tr(hp,0) = i_hc.PMTCT_coverage(hp) * i_hc.optB_transmission_rate ;
       }else{
         n_hc.mtct_by_source_tr(hp,0) = i_hc.PMTCT_coverage(hp) * p_hc.PMTCT_transmission_rate(0, hp, 0) ;
@@ -531,12 +546,12 @@ struct ChildModelSimulation<Config> {
       //No ART
       if((i_hc.no_PMTCT - i_hc.PMTCT_before_dropout -
          i_hc.PMTCT_during_dropout) > 0 ){
-        n_hc.mtct_by_source_tr(7,0) = (i_hc.no_PMTCT - i_hc.PMTCT_before_dropout -
+        n_hc.mtct_by_source_tr(no_art,0) = (i_hc.no_PMTCT - i_hc.PMTCT_before_dropout -
           i_hc.PMTCT_during_dropout) * untreated_vertical_tr;
       }
       //Dropped off ART
-      n_hc.mtct_by_source_tr(9,0) = i_hc.PMTCT_before_dropout * untreated_vertical_tr;
-      n_hc.mtct_by_source_tr(10,0) = i_hc.PMTCT_during_dropout * untreated_vertical_tr;
+      n_hc.mtct_by_source_tr(bplus_before_do,0) = i_hc.PMTCT_before_dropout * untreated_vertical_tr;
+      n_hc.mtct_by_source_tr(bplus_during_do,0) = i_hc.PMTCT_during_dropout * untreated_vertical_tr;
     }
     i_hc.perinatal_transmission_rate_bf_calc = i_hc.perinatal_transmission_rate;
 
@@ -544,7 +559,7 @@ struct ChildModelSimulation<Config> {
 
     if (i_hc.need_PMTCT > 0.0) {
       i_hc.perinatal_transmission_rate += i_hc.perinatal_transmission_from_incidence / i_hc.need_PMTCT;
-      n_hc.mtct_by_source_tr(8,0) = i_hc.perinatal_transmission_from_incidence / i_hc.need_PMTCT;
+      n_hc.mtct_by_source_tr(mat_sero,0) = i_hc.perinatal_transmission_from_incidence / i_hc.need_PMTCT;
     }
   };
 
@@ -565,7 +580,7 @@ struct ChildModelSimulation<Config> {
     } else {
       total_births = n_dp.births;
     }
-    n_hc.mtct_by_source_tr(8,1) = i_hc.bf_incident_hiv_transmission_rate * (total_births - n_hc.hiv_births) / n_hc.hiv_births;
+    n_hc.mtct_by_source_tr(mat_sero,1) = i_hc.bf_incident_hiv_transmission_rate * (total_births - n_hc.hiv_births) / n_hc.hiv_births;
 
   };
 
@@ -582,10 +597,6 @@ struct ChildModelSimulation<Config> {
         i_hc.PMTCT_during_dropout += i_hc.PMTCT_coverage(hp) * p_hc.PMTCT_dropout(hp,hPS_dropout_idx, t) * 2;
       }
       i_hc.PMTCT_coverage(hp) *= PMTCT_retention;
-
-      }
-      if(bf == 1 & t == 30){
-        std::cout << i_hc.PMTCT_coverage(0);
       }
   };
 
@@ -619,9 +630,9 @@ struct ChildModelSimulation<Config> {
         i_hc.percent_on_treatment = 0;
         i_hc.percent_no_treatment -=  i_hc.PMTCT_coverage(hp);
 
-        if (hp <= 1) continue;
+        if (hp <= option_b) continue;
         // sdnvp stratifies transmission by CD4, but spectrum only uses one
-        const auto hDS_idx = (hp == 2) ? 0 : 4;
+        const auto hDS_idx = (hp == sdnvp) ? 0 : 4;
         auto tr = i_hc.PMTCT_coverage(hp) * p_hc.PMTCT_transmission_rate(hDS_idx, hp, 1) *
                   2 * (1 - p_hc.breastfeeding_duration_art(bf, t)) * i_hc.bf_scalar;
         i_hc.PMTCT_coverage(hp) -= tr;
@@ -643,19 +654,19 @@ struct ChildModelSimulation<Config> {
         auto tr_during = i_hc.bf_scalar * i_hc.PMTCT_during_dropout *
           untreated_vertical_bf_tr *
           2 * (1 - p_hc.breastfeeding_duration_no_art(bf, t));
-        n_hc.mtct_by_source_tr(10,1) += tr_during;
+        n_hc.mtct_by_source_tr(bplus_during_do,1) += tr_during;
 
         //Started ART before pregnancy then dropped off
         auto tr_before = i_hc.bf_scalar * i_hc.PMTCT_before_dropout *
           untreated_vertical_bf_tr *
           2 * (1 - p_hc.breastfeeding_duration_no_art(bf, t));
-        n_hc.mtct_by_source_tr(9,1) += tr_before;
+        n_hc.mtct_by_source_tr(bplus_before_do,1) += tr_before;
 
         //Never on ART
         auto art_naive = i_hc.percent_no_treatment -
           i_hc.PMTCT_during_dropout -
           i_hc.PMTCT_before_dropout;
-        n_hc.mtct_by_source_tr(7,1) += i_hc.bf_scalar * art_naive *
+        n_hc.mtct_by_source_tr(no_art,1) += i_hc.bf_scalar * art_naive *
           untreated_vertical_bf_tr *
           2 * (1 - p_hc.breastfeeding_duration_no_art(bf, t));
 

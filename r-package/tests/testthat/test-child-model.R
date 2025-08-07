@@ -189,10 +189,8 @@ test_that("Stacked bar outputs align",{
   parameters <- read_parameters(test_path("testdata/child_parms.h5"))
   out <- run_model(parameters, "ChildModel", 1970:2030)
   spec_output <- read.csv(test_path("testdata/mtct_by_source_MANUALLY_GENERATED.csv"))
-  x <- data.table::data.table(spec_output)
-  x[Indicator == "Mother-to-child transmission rate",Source] %>% unique()
 
-  ###Compare number of women, spec_output###Compare number of women, WORKING
+  ###Compare number of women
   dimnames(out$mtct_by_source_women) <- list(Source = c(rep('Started ART during the pregnancy', 4),
                                                         'Started ART before the pregnancy',
                                                         'Started ART during the pregnancy',
@@ -213,7 +211,7 @@ test_that("Stacked bar outputs align",{
   women <- dplyr::mutate(women, diff = frogger - spectrum)
   expect_true(all(abs(women$diff) < 5e-4))
 
-  ###Compare transmission rate, this will not match ultimately, but will be close.
+  ###Compare transmission rate
   dimnames(out$mtct_by_source_tr) <- list(Source = c(rep('Started ART during the pregnancy', 4),
                                                      'Started ART before the pregnancy',
                                                      'Started ART during the pregnancy',
@@ -254,11 +252,8 @@ test_that("Stacked bar outputs align",{
   tr <- merge(frogger_output_tr, spec_output_tr, by = c('Source', 'trans_type', 'Year'))
   tr <- dplyr::mutate(tr, diff = frogger - spectrum)
   expect_true(all(abs(tr$diff) < 5e-3))
-  tr <- data.table::data.table(tr)
-  tr[trans_type == 'Perinatal']
-  tr[trans_type == 'Breastfeeding']
 
-  #######Ensure that the total frogger transmission rate matches with the stacked bar
+  ###Ensure that the total frogger transmission rate matches with the stacked bar
   tr <- tr %>%
     dplyr::as_tibble() %>%
     dplyr::group_by(Year, trans_type) %>%
@@ -284,13 +279,14 @@ test_that("Stacked bar outputs align",{
     dplyr::mutate(diff = frogger - tr)
   expect_true(all(abs(tr$diff) < 5e-5))
 
-  dimnames(out$mtct_by_source_hc_infections) <- list(Source = c('Mother infected',
-                                                     'Did not receive ART',
-                                                     'Started ART late in the pregnancy',
-                                                     'Started ART during the pregnancy',
-                                                     'Started ART before the pregnancy',
-                                                     'Started ART during pregnancy then dropped off',
-                                                     'Started ART before pregnancy then dropped off'),
+  dimnames(out$mtct_by_source_hc_infections) <- list(Source = c(rep('Started ART during the pregnancy', 4),
+                                                                'Started ART before the pregnancy',
+                                                                'Started ART during the pregnancy',
+                                                                'Started ART late in the pregnancy',
+                                                                'Did not receive ART',
+                                                                'Mother infected',
+                                                                'Started ART before pregnancy then dropped off',
+                                                                'Started ART during pregnancy then dropped off'),
                                           trans_type = c('Perinatal', 'Breastfeeding'),
                                           Year = 1970:2030)
   frogger_output_infections <- out$mtct_by_source_hc_infections %>%
@@ -322,8 +318,7 @@ test_that("Stacked bar outputs align",{
     dplyr::mutate(spectrum  = spectrum)
   infections <- merge(frogger_output_infections, spec_output_infections, by = c('Source', 'trans_type', 'Year'))
   infections <- dplyr::mutate(infections, diff = frogger - spectrum)
-  ##Allow for higher margin of error because Spectrum's stacked bar does not handle breastfeeding dropout exactly correctly.
-  expect_true(all(abs(infections$diff) < 10))
+  expect_true(all(abs(infections$diff) == 0 ))
 
 })
 
@@ -358,9 +353,6 @@ test_that("Infections among children align", {
   dt <- dt %>%
     dplyr::mutate(diff = Spec - lfrog) %>%
     dplyr::filter(Age < 4 & Year < 2030)
-
-  inf = dt
-  inf <- data.table::data.table(inf)
 
   expect_true(all(abs(dt$diff) < 5e-2))
 })

@@ -78,8 +78,8 @@ input_pmtct_retained <- function(pjnz){
                                year = colnames(pmtct_retained)))
   out[,'perinatal',] <- 1
   out[c('Option B+: before pregnancy', 'Option B+: >4 weeks'),'perinatal',] <- pmtct_retained / 100
-  out[c('Option A', 'Option B','Option B+: before pregnancy', 'Option B+: >4 weeks','Option B+: <4 weeks'),'breastfeeding <12 months',] <- unlist(dropout['pmtct_postnatal_monthlydropout_art0to12months',])
-  out[c('Option A', 'Option B','Option B+: before pregnancy', 'Option B+: >4 weeks','Option B+: <4 weeks'),'breastfeeding 12+ months',] <- unlist(dropout['pmtct_postnatal_monthlydropout_art12plusmonths',])
+  out[c('Option A', 'Option B','Option B+: before pregnancy', 'Option B+: >4 weeks','Option B+: <4 weeks'),'breastfeeding <12 months',] <- matrix(unlist(dropout['pmtct_postnatal_monthlydropout_art0to12months',]), nrow = 5, ncol = 61, byrow = TRUE)
+  out[c('Option A', 'Option B','Option B+: before pregnancy', 'Option B+: >4 weeks','Option B+: <4 weeks'),'breastfeeding 12+ months',] <- matrix(unlist(dropout['pmtct_postnatal_monthlydropout_art12plusmonths',]), nrow = 5, ncol = 61, byrow = TRUE)
 
   out
 }
