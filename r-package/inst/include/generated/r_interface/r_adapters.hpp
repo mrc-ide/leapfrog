@@ -320,7 +320,7 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
       .PMTCT = parse_data<real_type, 2>(data, "pmtct", { nda::dim<>(0, SS::hPS, 1), nda::dim<>(0, opts.proj_steps, (SS::hPS)) }),
       .vertical_transmission_rate = parse_data<real_type, 2>(data, "mtct", { nda::dim<>(0, SS::hDS + 1, 1), nda::dim<>(0, SS::hVT, (SS::hDS + 1)) }),
       .PMTCT_transmission_rate = parse_data<real_type, 3>(data, "pmtct_mtct", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hPS, (SS::hDS)), nda::dim<>(0, SS::hVT, (SS::hDS) * (SS::hPS)) }),
-      .PMTCT_dropout = parse_data<real_type, 2>(data, "pmtct_dropout", { nda::dim<>(0, SS::hPS_dropout, 1), nda::dim<>(0, opts.proj_steps, (SS::hPS_dropout)) }),
+      .PMTCT_dropout = parse_data<real_type, 3>(data, "pmtct_dropout", { nda::dim<>(0, SS::hPS, 1), nda::dim<>(0, SS::hVT_dropout, (SS::hPS)), nda::dim<>(0, opts.proj_steps, (SS::hPS) * (SS::hVT_dropout)) }),
       .PMTCT_input_is_percent = parse_data<int, 1>(data, "pmtct_input_isperc", { nda::dim<>(0, opts.proj_steps, 1) }),
       .breastfeeding_duration_art = parse_data<real_type, 2>(data, "bf_duration_art", { nda::dim<>(0, SS::hBF, 1), nda::dim<>(0, opts.proj_steps, (SS::hBF)) }),
       .breastfeeding_duration_no_art = parse_data<real_type, 2>(data, "bf_duration_no_art", { nda::dim<>(0, SS::hBF, 1), nda::dim<>(0, opts.proj_steps, (SS::hBF)) }),

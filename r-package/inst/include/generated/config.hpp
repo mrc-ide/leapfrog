@@ -652,8 +652,9 @@ struct HcConfig {
     >;
     nda::array_ref<real_type, shape_PMTCT_transmission_rate> PMTCT_transmission_rate;
     using shape_PMTCT_dropout = nda::shape<
-      nda::dim<0, SS::hPS_dropout, 1>,
-      nda::dim<0, nda::dynamic, (SS::hPS_dropout)>
+      nda::dim<0, SS::hPS, 1>,
+      nda::dim<0, SS::hVT_dropout, (SS::hPS)>,
+      nda::dim<0, nda::dynamic, (SS::hPS) * (SS::hVT_dropout)>
     >;
     nda::array_ref<real_type, shape_PMTCT_dropout> PMTCT_dropout;
     using shape_PMTCT_input_is_percent = nda::shape<

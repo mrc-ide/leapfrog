@@ -189,19 +189,23 @@ test_that("Stacked bar outputs align",{
   parameters <- read_parameters(test_path("testdata/child_parms.h5"))
   out <- run_model(parameters, "ChildModel", 1970:2030)
   spec_output <- read.csv(test_path("testdata/mtct_by_source_MANUALLY_GENERATED.csv"))
+  x <- data.table::data.table(spec_output)
+  x[Indicator == "Mother-to-child transmission rate",Source] %>% unique()
 
-  ###Compare number of women, WORKING
-  dimnames(out$mtct_by_source_women) <- list(Source = c('Mother infected during pregnancy',
-                                                         'Did not receive ART',
-                                                         'Started ART late in the pregnancy',
-                                                         'Started ART during the pregnancy',
-                                                         'Started ART before the pregnancy',
-                                                         'Started ART during pregnancy then dropped off',
-                                                         'Started ART before pregnancy then dropped off'),
+  ###Compare number of women, spec_output###Compare number of women, WORKING
+  dimnames(out$mtct_by_source_women) <- list(Source = c(rep('Started ART during the pregnancy', 4),
+                                                        'Started ART before the pregnancy',
+                                                        'Started ART during the pregnancy',
+                                                        'Started ART late in the pregnancy',
+                                                        'Did not receive ART',
+                                                        'Mother infected during pregnancy',
+                                                        'Started ART before pregnancy then dropped off',
+                                                        'Started ART during pregnancy then dropped off'),
                                              Year = 1970:2030)
-  frogger_output_women <- out$mtct_by_source_women %>%
-    reshape2::melt() %>% dplyr::mutate(frogger = value) %>%
-    dplyr::select(Source, Year, frogger)
+  frogger_output_women <- reshape2::melt(out$mtct_by_source_women) %>%
+    dplyr::as_tibble() %>%
+    dplyr::group_by(Source, Year) %>%
+    dplyr::summarise(frogger = sum(value), .groups = "drop")
   spec_output_women <- spec_output %>%
     dplyr::filter(Indicator == "Number of pregnant women") %>%
     dplyr::transmute(Source, Year, spectrum = Value)
@@ -210,13 +214,14 @@ test_that("Stacked bar outputs align",{
   expect_true(all(abs(women$diff) < 5e-4))
 
   ###Compare transmission rate, this will not match ultimately, but will be close.
-  dimnames(out$mtct_by_source_tr) <- list(Source = c('Mother infected',
-                                                     'Did not receive ART',
-                                                     'Started ART late in the pregnancy',
-                                                     'Started ART during the pregnancy',
+  dimnames(out$mtct_by_source_tr) <- list(Source = c(rep('Started ART during the pregnancy', 4),
                                                      'Started ART before the pregnancy',
-                                                     'Started ART during pregnancy then dropped off',
-                                                     'Started ART before pregnancy then dropped off'),
+                                                     'Started ART during the pregnancy',
+                                                     'Started ART late in the pregnancy',
+                                                     'Did not receive ART',
+                                                     'Mother infected',
+                                                     'Started ART before pregnancy then dropped off',
+                                                     'Started ART during pregnancy then dropped off'),
                                           trans_type = c('Perinatal', 'Breastfeeding'),
                                           Year = 1970:2030)
   frogger_output_tr <- out$mtct_by_source_tr %>%
@@ -249,6 +254,9 @@ test_that("Stacked bar outputs align",{
   tr <- merge(frogger_output_tr, spec_output_tr, by = c('Source', 'trans_type', 'Year'))
   tr <- dplyr::mutate(tr, diff = frogger - spectrum)
   expect_true(all(abs(tr$diff) < 5e-3))
+  tr <- data.table::data.table(tr)
+  tr[trans_type == 'Perinatal']
+  tr[trans_type == 'Breastfeeding']
 
   #######Ensure that the total frogger transmission rate matches with the stacked bar
   tr <- tr %>%
@@ -352,6 +360,7 @@ test_that("Infections among children align", {
     dplyr::filter(Age < 4 & Year < 2030)
 
   inf = dt
+  inf <- data.table::data.table(inf)
 
   expect_true(all(abs(dt$diff) < 5e-2))
 })

@@ -16,15 +16,14 @@
       "hcAG_end": 15,
       "hcTT": 4,
       "hPS": 7,
-      "hPS_dropout": 6,
+      "hVT_dropout": 3,
       "hVT": 2,
       "hBF": 18,
       "hBF_coarse": 4,
       "hcAG_coarse": 4,
       "hAB_ind": 2,
       "hAG_fert": 7,
-      "mtct_source": 7,
-      "hVT": 2,
+      "mtct_source": 11,
       "hc_age_coarse": [1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3],
       "hc_age_coarse_cd4": [0, 0, 0, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
       "hc_cd4_transition": [
@@ -201,7 +200,7 @@
       },
       "PMTCT_dropout": {
         "num_type": "real_type",
-        "dims": ["SS::hPS_dropout", "opts.proj_steps"],
+        "dims": ["SS::hPS", "SS::hVT_dropout", "opts.proj_steps"],
         "alias": {
           "r": "pmtct_dropout"
         }
