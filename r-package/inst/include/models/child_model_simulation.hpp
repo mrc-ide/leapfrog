@@ -37,7 +37,6 @@ struct ChildModelSimulation<Config> {
   static constexpr int MALE = SS::MALE;
   static constexpr int FEMALE = SS::FEMALE;
   static constexpr int ART0MOS = SS::ART0MOS;
-  static constexpr int hcAG_end = SS::hcAG_end;
   static constexpr int hc2_agestart = SS::hc2_agestart;
   static constexpr int hc1_ageend = SS::hc1_ageend;
   static constexpr int hcAG_end = SS::hcAG_end;
