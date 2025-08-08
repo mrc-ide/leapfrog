@@ -268,6 +268,7 @@ struct HcAdapter<Language::Py, real_type, ModelVariant> {
       .PMTCT_input_is_percent = parse_data<int, 1>(data, "pmtct_input_isperc", { nda::dim<>(0, opts.proj_steps, 1) }),
       .breastfeeding_duration_art = parse_data<real_type, 2>(data, "bf_duration_art", { nda::dim<>(0, SS::hBF, 1), nda::dim<>(0, opts.proj_steps, (SS::hBF)) }),
       .breastfeeding_duration_no_art = parse_data<real_type, 2>(data, "bf_duration_no_art", { nda::dim<>(0, SS::hBF, 1), nda::dim<>(0, opts.proj_steps, (SS::hBF)) }),
+      .bigpop = parse_data<real_type, 3>(data, "bigpop", { nda::dim<>(0, SS::pAG, 1), nda::dim<>(0, SS::NS, (SS::pAG)), nda::dim<>(0, opts.proj_steps, (SS::pAG) * (SS::NS)) }),
       .mat_hiv_births = parse_data<real_type, 1>(data, "mat_hiv_births", { nda::dim<>(0, opts.proj_steps, 1) }),
       .mat_prev_input = parse_data<int, 1>(data, "mat_prev_input", { nda::dim<>(0, opts.proj_steps, 1) }),
       .prop_lt200 = parse_data<real_type, 1>(data, "prop_lt200", { nda::dim<>(0, opts.proj_steps, 1) }),

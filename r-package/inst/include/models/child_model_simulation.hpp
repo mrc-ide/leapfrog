@@ -669,16 +669,27 @@ struct ChildModelSimulation<Config> {
       // 12 plus
       run_bf_transmission_rate(6, 12, 2);
       run_bf_transmission_rate(12, hBF, 3);
+
       for (int s = 0; s < NS; ++s) {
+        //If the adult model output isn't being used, use the input total population ('bigpop')
+        if (p_hc.mat_prev_input(t)) {
+            n_dp.p_total_pop(1, 0) = p_hc.bigpop(1, 0, t) ;
+            n_dp.p_total_pop(1, 1) = p_hc.bigpop(1, 1, t) ;
+
+            n_dp.p_total_pop(2, 0) = p_hc.bigpop(2, 0, t) ;
+            n_dp.p_total_pop(2, 1) = p_hc.bigpop(2, 1, t) ;
+        }
+
         auto total_pop_12_24 = n_dp.p_total_pop(1, 0) - n_ha.p_hiv_pop(1, 0) +
-                               n_dp.p_total_pop(1, 1) - n_ha.p_hiv_pop(1, 1);
+          n_dp.p_total_pop(1, 1) - n_ha.p_hiv_pop(1, 1);
+        auto total_pop_24_plus = n_dp.p_total_pop(2, 0) - n_ha.p_hiv_pop(2, 0) +
+          n_dp.p_total_pop(2, 1) - n_ha.p_hiv_pop(2, 1);
+
         if (s == 1) {
          total_pop_12_24 -= n_ha.p_infections(1, 0);
         }
         auto uninfected_prop_12_24 = (n_dp.p_total_pop(1, s) - n_ha.p_hiv_pop(1, s)) / total_pop_12_24;
 
-        auto total_pop_24_plus = n_dp.p_total_pop(2, 0) - n_ha.p_hiv_pop(2, 0) +
-                                 n_dp.p_total_pop(2, 1) - n_ha.p_hiv_pop(2, 1);
         if (s == 1) {
          total_pop_24_plus -= n_ha.p_infections(2, 0);
         }
@@ -1444,30 +1455,6 @@ struct ChildModelSimulation<Config> {
         } // end NS
       } // end a
     } // end hDS
-
-    // for (int hd = 0; hd < hDS; ++hd) {
-    //   for (int a = 0; a < p_idx_fertility_first; ++a) {
-    //     for (int s = 0; s < NS; ++s) {
-    //       for (int cat = 0; cat < hcTT; ++cat) {
-    //         if (a < hc2_agestart) {
-    //           n_ha.p_hiv_deaths(a,s) += i_hc.hc_grad(hd, cat, a, s);
-    //         } else if (hd < hc2DS) {
-    //           n_ha.p_hiv_deaths(a,s) += i_hc.hc_grad(hd, cat, a, s);
-    //         }
-    //       } // end hcTT
-    //
-    //       for (int dur = 0; dur < hTS; ++dur) {
-    //         if (a < hc2_agestart) {
-    //           n_ha.p_hiv_deaths(a,s) += n_hc.hc1_art_aids_deaths(dur, hd, a, s);
-    //         } else if (hd < hc2DS) {
-    //           n_ha.p_hiv_deaths(a,s) += n_hc.hc2_art_aids_deaths(dur, hd, a - hc2_agestart, s);
-    //         }
-    //       } // end dur
-    //     } // end NS
-    //   } // end a
-    // } // end hDS
-
-    // n_hc.hc1_noart_aids_deaths
 
     for (int a = 0; a < p_idx_fertility_first; ++a) {
       for (int s = 0; s < NS; ++s) {

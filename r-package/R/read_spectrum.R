@@ -932,6 +932,11 @@ prepare_hc_leapfrog_projp <- function(pjnz, params) {
   total_births <- SpectrumUtils::dp.output.births(dp.raw = dp.x, direction = 'long')$Value %>% as.array()
   v$total_births <- total_births
 
+  bigpop <- SpectrumUtils::dp.output.bigpop(dp.raw = dp.x, direction = 'long')
+  bigpop <- array(bigpop$Value, dim = c(81, 2, 61), dimnames = list(age = c(0:79, '80+'),
+                                                          sex = c('Male', 'Female'),
+                                                          year = 1970:2030))
+  v$bigpop <- bigpop
 
   specres <- eppasm::read_hivproj_output(pjnz)
   newinf <- specres$newinf.f[4:10,] %>% colSums()
