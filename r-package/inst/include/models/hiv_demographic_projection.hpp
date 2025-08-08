@@ -35,6 +35,10 @@ struct HivDemographicProjection<Config> {
   static constexpr auto hAG_span = SS::hAG_span;
   static constexpr int PROJPERIOD_MIDYEAR = SS::PROJPERIOD_MIDYEAR;
   static constexpr int p_idx_hiv_first_adult = SS::p_idx_hiv_first_adult;
+  static constexpr int hc2_agestart = SS::hc2_agestart;
+  static constexpr int hcAG_end = SS::hcAG_end;
+  static constexpr int hc1DS = SS::hc1DS;
+  static constexpr int hc2DS = SS::hc2DS;
 
   // function args
   int t;
@@ -276,6 +280,39 @@ struct HivDemographicProjection<Config> {
         }
       }
     }
+
+    // remove non-HIV deaths and net migration from paediatric stratified population
+    for (int s = 0; s < NS; ++s) {
+      real_type deaths_migrate = 0.0;
+      for (int a = 0; a < hcAG_end; ++a) {
+        deaths_migrate -= n_ha.p_hiv_pop_background_deaths(a, g);
+        if (opts.proj_period_int == PROJPERIOD_MIDYEAR) {
+          deaths_migrate += i_ha.hiv_net_migration(a, g);
+        }
+        if(a < hc2_agestart){
+          for (int hd = 0; hd < hc1DS; ++hm) {
+            n_hc.hc1_hiv_pop(hd, a, g) *= 1.0 + deaths_migrate_rate;
+            if (t > opts.ts_art_start) {
+              for (int dur = 0; dur < hTS; ++dur) {
+                n_hc.hc1_art_pop(durr, hd, a, g) *= 1.0 + deaths_migrate_rate;
+              }
+            }
+          }
+        }else{
+          for (int hd = 0; hd < hc2DS; ++hm) {
+            n_hc.hc2_hiv_pop(hd, a - hc2_agestart, g) *= 1.0 + deaths_migrate_rate;
+            if (t > opts.ts_art_start) {
+              for (int dur = 0; dur < hTS; ++dur) {
+                n_hc.hc2_art_pop(dur, hd, a - hc2_agestart, g) *= 1.0 + deaths_migrate_rate;
+              }
+            }
+          }
+        }
+        }
+
+    }
+
+
   };
 };
 
