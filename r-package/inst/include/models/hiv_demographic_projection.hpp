@@ -78,9 +78,6 @@ struct HivDemographicProjection<Config> {
       for (int a = 0; a < pAG; ++a) {
         i_ha.hiv_net_migration(a, g) = n_ha.p_hiv_pop(a, g) * i_dp.migration_rate(a, g);
         n_ha.p_hiv_pop(a, g) += i_ha.hiv_net_migration(a, g);
-        if(a == 0 & g == 0 & t == 33){
-          std::cout << n_ha.p_hiv_pop(a, g);
-        }
       }
     }
 

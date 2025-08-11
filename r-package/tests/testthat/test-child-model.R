@@ -214,8 +214,6 @@ test_that("Infections among children align", {
   dt <- dt %>%
     dplyr::mutate(diff = Spec - lfrog) %>%
     dplyr::filter(Age < 4 & Year < 2030)
-  x = data.table::data.table(dt)
-  ggplot(x, aes(Year, diff, col = Sex, group = Sex)) + geom_line() + facet_wrap(~Age)
 
   expect_true(all(abs(dt$diff) < 5e-2))
 })
@@ -267,9 +265,6 @@ test_that("CLHIV align", {
     dplyr::mutate(diff = pop - fr) %>%
     dplyr::filter(year < 2030) %>%
     dplyr::filter(age < 15)
-  x = data.table::data.table(dt)
-  x <- x[,.(diff = sum(diff)), by = c('age', 'year')]
-  ggplot(x, aes(year, diff)) + geom_line() + facet_wrap(~age)
 
   expect_true(all(abs(dt$diff) < 5e-2))
 })
