@@ -788,10 +788,10 @@ struct HcConfig {
     >;
     nda::array<real_type, shape_total_art_this_year> total_art_this_year;
     using shape_hc_art_grad = nda::shape<
-      nda::dim<0, SS::hDS, 1>,
-      nda::dim<0, SS::hcTT, (SS::hDS)>,
-      nda::dim<0, SS::hcAG_end, (SS::hDS) * (SS::hcTT)>,
-      nda::dim<0, SS::NS, (SS::hDS) * (SS::hcTT) * (SS::hcAG_end)>
+      nda::dim<0, SS::hcTT, 1>,
+      nda::dim<0, SS::hDS, (SS::hcTT)>,
+      nda::dim<0, SS::hcAG_end, (SS::hcTT) * (SS::hDS)>,
+      nda::dim<0, SS::NS, (SS::hcTT) * (SS::hDS) * (SS::hcAG_end)>
     >;
     nda::array<real_type, shape_hc_art_grad> hc_art_grad;
     using shape_hc_art_scalar = nda::shape<
