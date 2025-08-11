@@ -158,7 +158,7 @@ In 5 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 | fert_mult_onart    | children.fert_mult_onart                 | Fertility ratio for WLHIV on treatment by age                                                                                                                         |
 | tfr                | children.total_fertility_rate            | Total fertility rate                                                                                                                                                  |
 | laf                | children.local_adj_factor                | Local fertility adjustment to match progromattic data                                                                                                                 |
-| pmtct              | children.PMTCT                           | Number of percent of women receiving ARVs for PMTCT                                                                                                                   |
+| pmtct              | children.PMTCT                           | Number or percent of women receiving ARVs for PMTCT  (order: option A, Option B, SDNVP, Dual ARV, Option B+: before pregnancy, Option B+: >4 weeks, Option B+:<4 weeks)                                                                                                                 |
 | mtct               | children.vertical_transmission_rate      | Vertical transmsision rate for pregnant and breastfeeding women not receiving ARV by CD4 category                                                                     |
 | pmtct_mtct         | children.PMTCT_transmission_rate         | Vertical transmission rate for pregnant and breastfeeding women by PMTCT regimen                                                                                      |
 | pmtct_dropout      | children.PMTCT_dropout                   | Dropout rates for women receiving ARV for PMTCT during pregnancy and breastfeeding                                                                                    |
@@ -197,6 +197,12 @@ In 5 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 |                  | hiv_births                 | Number of births to WLHIV by year                                                          |
 |                  | hc_art_need_init           | Children who are eligible for ART by CD4, transmsission, age, sex, and year                |
 |                  | hc_art_init                | Number of new ART initiates by five year age group.                                        |
+|                  | ctx_need                   | Number of children in need of cotrim                                                       |
+|                  | infecton_by_type           | Number of paediatric HIV infections by type of infection (peri vs bf) and age at infection.|
+|                  | ctx_need                   | Number of children in need of cotrim                                                       |
+|                  | mtct_by_source_tr          | Transmission rate by maternal treatement history (stacked bar output)                      |
+|                  | mtct_by_source_women       | Number of pregnant WLHIV by maternal treatement history (stacked bar output)               |
+|                  | mtct_by_source_hc_infections | Number of paediatric infections by maternal treatement history (stacked bar output)      |
 
 
 ## Intermediate data
