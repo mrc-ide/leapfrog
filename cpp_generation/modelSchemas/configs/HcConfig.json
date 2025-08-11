@@ -295,7 +295,7 @@
       "local_adj_factor": {
         "num_type": "real_type",
         "alias": {
-          "r": "laf"
+          "r": "frr_scalar"
         }
       }
     }
