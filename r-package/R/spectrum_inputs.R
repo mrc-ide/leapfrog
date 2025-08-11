@@ -282,8 +282,8 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   v$cd4_mort_coarse <- projp$cd4_mort[ ,idx_expand_coarse, ]
   v$art_mort_coarse <- projp$artmx_multiplier * projp$art_mort[c(1, 2, rep(3, hTS - 2)), , idx_expand_coarse, ]
 
-  v$pAG_INCIDPOP <- 35
-  v$pIDX_INCIDPOP <- 15
+  v$pAG_INCIDPOP <- 35L
+  v$pIDX_INCIDPOP <- 15L
 
   v
 }
