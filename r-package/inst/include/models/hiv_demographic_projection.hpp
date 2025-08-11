@@ -134,24 +134,19 @@ struct HivDemographicProjection<Config> {
         real_type hc_hivpop_postmig = n_ha.p_hiv_pop(a, s);
         hc_migration_num = i_ha.hiv_net_migration(a, s);
 
-
         real_type migration_rate = 0.0;
         if (hc_hivpop_postmig > 0.0) {
           migration_rate = hc_migration_num / (hc_hivpop_postmig - hc_migration_num);
         }
 
-
-        auto temp = 0.0;
         if(a < hc2_agestart){
           for (int hd = 0; hd < hc1DS; ++hd) {
             for (int cat = 0; cat < hcTT; ++cat) {
               n_hc.hc1_hiv_pop(hd, cat, a, s) *= 1.0 + migration_rate;
-              temp +=  n_hc.hc1_hiv_pop(hd, cat, a, s);
             }
             if (t >= p_hc.hc_art_start) {
               for (int dur = 0; dur < hTS; ++dur) {
                 n_hc.hc1_art_pop(dur, hd, a, s) *= 1.0 + migration_rate;
-                temp +=  n_hc.hc1_art_pop(dur, hd, a, s) ;
               }
             }
           }
@@ -159,22 +154,14 @@ struct HivDemographicProjection<Config> {
           for (int hd = 0; hd < hc2DS; ++hd) {
             for (int cat = 0; cat < hcTT; ++cat) {
               n_hc.hc2_hiv_pop(hd, cat, a - hc2_agestart, s) *= 1.0 + migration_rate;
-              // temp +=  n_hc.hc2_hiv_pop(hd, cat, a - hc2_agestart, s);
             }
             if (t >= p_hc.hc_art_start) {
               for (int dur = 0; dur < hTS; ++dur) {
                 n_hc.hc2_art_pop(dur, hd, a - hc2_agestart, s) *= 1.0 + migration_rate;
-                // temp +=   n_hc.hc2_art_pop(dur, hd, a - hc2_agestart, s);
-
               }
             }
           }
         }
-
-        if(a == 0 & s == 0 & t == 33){
-          std::cout << temp;
-        }
-
       }
     }
 
