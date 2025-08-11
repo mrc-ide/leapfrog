@@ -619,8 +619,8 @@ struct HcConfig {
     >;
     nda::array_ref<real_type, shape_hc_art_init_dist> hc_art_init_dist;
     using shape_fert_mult_by_age = nda::shape<
-      nda::dim<0, SS::hAG_fert, 1>,
-      nda::dim<0, nda::dynamic, (SS::hAG_fert)>
+      nda::dim<0, SS::p_fertility_age_groups, 1>,
+      nda::dim<0, nda::dynamic, (SS::p_fertility_age_groups)>
     >;
     nda::array_ref<real_type, shape_fert_mult_by_age> fert_mult_by_age;
     using shape_fert_mult_off_art = nda::shape<
@@ -628,7 +628,7 @@ struct HcConfig {
     >;
     nda::array_ref<real_type, shape_fert_mult_off_art> fert_mult_off_art;
     using shape_fert_mult_on_art = nda::shape<
-      nda::dim<0, SS::hAG_fert, 1>
+      nda::dim<0, SS::p_fertility_age_groups, 1>
     >;
     nda::array_ref<real_type, shape_fert_mult_on_art> fert_mult_on_art;
     using shape_total_fertility_rate = nda::shape<

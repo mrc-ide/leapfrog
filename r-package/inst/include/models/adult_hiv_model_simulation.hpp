@@ -64,6 +64,7 @@ struct AdultHivModelSimulation<Config> {
   void run_hiv_model_simulation() {
     const auto& p_ha = pars.ha;
     auto& i_ha = intermediate.ha;
+    auto& n_ha = state_next.ha;
 
     i_ha.everARTelig_idx = p_ha.idx_hm_elig(t) < hDS ? p_ha.idx_hm_elig(t) : hDS;
     i_ha.anyelig_idx = p_ha.idx_hm_elig(t);
@@ -78,14 +79,23 @@ struct AdultHivModelSimulation<Config> {
       run_new_p_infections(hiv_step);
       run_new_hiv_p_infections(hiv_step);
 
+
       if (t >= opts.ts_art_start) {
         run_art_progression_and_mortality(hiv_step);
         run_h_art_initiation(hiv_step);
         run_update_art_stratification(hiv_step);
       }
-
+      if(t == 60 & hiv_step == 0){
+        std::cout<<  i_ha.grad(0, 0, 1);
+      }
       run_update_hiv_stratification(hiv_step);
+      if(t == 60 & hiv_step == 0){
+        std::cout<<  i_ha.grad(0, 0, 1);
+      }
       run_remove_p_hiv_deaths(hiv_step);
+      if(t == 60 & hiv_step == 0){
+        std::cout<<  i_ha.grad(0, 0, 1);
+      }
     }
   };
 
@@ -403,6 +413,7 @@ struct AdultHivModelSimulation<Config> {
     auto& n_ha = state_next.ha;
     auto& i_ha = intermediate.ha;
 
+
     for (int g = 0; g < NS; ++g) {
       for (int ha = 0; ha < hAG; ++ha) {
         for (int hm = 0; hm < hDS; ++hm) {
@@ -410,6 +421,7 @@ struct AdultHivModelSimulation<Config> {
         }
       }
     }
+
   };
 
   void run_remove_p_hiv_deaths(int hiv_step) {

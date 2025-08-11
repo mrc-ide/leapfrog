@@ -259,12 +259,14 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   ## State space dimensions
   v$hAG_SPAN_full <- rep(1L, 66L)
   v$hAG_SPAN_coarse <- c(2L, 3L, 5L, 5L, 5L, 5L, 5L, 5L, 31L)
+  v$hAG_SPAN_fert_full <- rep(1L, 35L)
+  v$hAG_SPAN_fert_coarse <- rep(5L, 7L)
 
   ## Add in pediatric components
   v$cd4fert_rat <- projp$cd4fert_rat
   v$frr_art6mos_coarse <- projp$frr_art6mos
   v$frr_art6mos_full <- rep(projp$frr_art6mos, each = 5)
-  v$frr_scalar <- projp$frr_scalar
+  v$frr_scalar <- as.numeric(projp$frr_scalar)
   v$fert_rat_coarse <- projp$fert_rat
   v$fert_rat_full <- apply(projp$fert_rat, 2, rep, each = 5)
   ## HIV positive entrants, right now just doing those without ART

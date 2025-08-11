@@ -313,9 +313,9 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
       .hc_art_isperc = parse_data<int, 1>(data, "artpaeds_isperc", { nda::dim<>(0, opts.proj_steps, 1) }),
       .hc_art_val = parse_data<real_type, 2>(data, "paed_art_val", { nda::dim<>(0, SS::hcAG_coarse, 1), nda::dim<>(0, opts.proj_steps, (SS::hcAG_coarse)) }),
       .hc_art_init_dist = parse_data<real_type, 2>(data, "init_art_dist", { nda::dim<>(0, SS::p_idx_hiv_first_adult, 1), nda::dim<>(0, opts.proj_steps, (SS::p_idx_hiv_first_adult)) }),
-      .fert_mult_by_age = parse_data<real_type, 2>(data, "fert_rat", { nda::dim<>(0, SS::hAG_fert, 1), nda::dim<>(0, opts.proj_steps, (SS::hAG_fert)) }),
+      .fert_mult_by_age = parse_data<real_type, 2>(data, "fert_rat_full", { nda::dim<>(0, SS::p_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::p_fertility_age_groups)) }),
       .fert_mult_off_art = parse_data<real_type, 1>(data, "cd4fert_rat", { nda::dim<>(0, SS::hDS, 1) }),
-      .fert_mult_on_art = parse_data<real_type, 1>(data, "frr_art6mos", { nda::dim<>(0, SS::hAG_fert, 1) }),
+      .fert_mult_on_art = parse_data<real_type, 1>(data, "frr_art6mos_full", { nda::dim<>(0, SS::p_fertility_age_groups, 1) }),
       .total_fertility_rate = parse_data<real_type, 1>(data, "tfr", { nda::dim<>(0, opts.proj_steps, 1) }),
       .PMTCT = parse_data<real_type, 2>(data, "pmtct", { nda::dim<>(0, SS::hPS, 1), nda::dim<>(0, opts.proj_steps, (SS::hPS)) }),
       .vertical_transmission_rate = parse_data<real_type, 2>(data, "mtct", { nda::dim<>(0, SS::hDS + 1, 1), nda::dim<>(0, SS::hVT, (SS::hDS + 1)) }),
@@ -338,7 +338,7 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
       .total_births = parse_data<real_type, 1>(data, "total_births", { nda::dim<>(0, opts.proj_steps, 1) }),
       .ctx_effect = parse_data<real_type, 1>(data, "ctx_effect", { nda::dim<>(0, 3, 1) }),
       .hc_art_start = Rcpp::as<int>(data["hc_art_start"]),
-      .local_adj_factor = Rcpp::as<real_type>(data["laf"])
+      .local_adj_factor = Rcpp::as<real_type>(data["frr_scalar"])
     };
   };
 

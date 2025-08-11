@@ -191,8 +191,6 @@ struct ChildModelSimulation<Config> {
       i_hc.nHIVcurr = 0.0;
       i_hc.nHIVlast = 0.0;
       i_hc.df = 0.0;
-      // Convert from single years to 5-year age group index
-      auto a_fert_idx = std::floor(a/5);
 
       for (int hd = 0; hd < hDS; ++hd) {
         i_hc.nHIVcurr += n_ha.h_hiv_adult(hd, a, 1);
@@ -206,24 +204,30 @@ struct ChildModelSimulation<Config> {
       i_hc.prev = i_hc.nHIVcurr / n_dp.p_total_pop(a + 15, 1);
 
       for (int hd = 0; hd < hDS; ++hd) {
-        i_hc.df += p_hc.local_adj_factor * p_hc.fert_mult_by_age(a_fert_idx, t) * p_hc.fert_mult_off_art(hd) *
-                   (n_ha.h_hiv_adult(hd, a, 1) + c_ha.h_hiv_adult(hd, a, 1)) / 2;
+        i_hc.df += p_hc.local_adj_factor *
+          p_hc.fert_mult_by_age(a, t) *
+          p_hc.fert_mult_off_art(hd) *
+          (n_ha.h_hiv_adult(hd, a, 1) + c_ha.h_hiv_adult(hd, a, 1)) / 2;
         // women on ART less than 6 months use the off art fertility multiplier
-        i_hc.df += p_hc.local_adj_factor * p_hc.fert_mult_by_age(a_fert_idx, t) * p_hc.fert_mult_off_art(hd) *
-                   (n_ha.h_art_adult(0, hd, a, 1) + c_ha.h_art_adult(0, hd, a, 1)) / 2;
+        i_hc.df += p_hc.local_adj_factor *
+          p_hc.fert_mult_by_age(a, t) *
+          p_hc.fert_mult_off_art(hd) *
+          (n_ha.h_art_adult(0, hd, a, 1) + c_ha.h_art_adult(0, hd, a, 1)) / 2;
         for (int ht = 1; ht < hTS; ++ht) {
-          i_hc.df += p_hc.local_adj_factor * p_hc.fert_mult_on_art(a_fert_idx) *
-                     (n_ha.h_art_adult(ht, hd, a, 1) + c_ha.h_art_adult(ht, hd, a, 1)) / 2;
+          i_hc.df += p_hc.local_adj_factor *
+            p_hc.fert_mult_on_art(a) *
+            (n_ha.h_art_adult(ht, hd, a, 1) + c_ha.h_art_adult(ht, hd, a, 1)) / 2;
         } // end hTS
       } // end hDS
 
 
       auto midyear_fertileHIV = (i_hc.nHIVcurr + i_hc.nHIVlast) / 2;
-      if (i_hc.nHIVcurr > 0) {
+      if (midyear_fertileHIV > 0) {
         i_hc.df = i_hc.df / midyear_fertileHIV;
       } else {
         i_hc.df = 1;
       }
+
       i_hc.birthsCurrAge = midyear_fertileHIV * p_hc.total_fertility_rate(t) *
                            i_hc.df / (i_hc.df * i_hc.prev + 1 - i_hc.prev) *
                            p_dp.age_specific_fertility_rate(a, t) / i_hc.asfr_sum ;
@@ -337,7 +341,7 @@ struct ChildModelSimulation<Config> {
       i_hc.prop_wlhiv_gte350 = 0.0;
       i_hc.prop_wlhiv_lt350 = 0.0;
 
-      for (int a = 0; a < 35; ++a) {
+      for (int a = 0; a < p_idx_fertility_first; ++a) {
         i_hc.num_wlhiv_lt200 += n_ha.h_hiv_adult(4, a, 1) + n_ha.h_hiv_adult(5, a, 1) + n_ha.h_hiv_adult(6, a, 1);
         i_hc.num_wlhiv_200to350 += n_ha.h_hiv_adult(3, a, 1) + n_ha.h_hiv_adult(2, a, 1);
         i_hc.num_wlhiv_gte350 += n_ha.h_hiv_adult(0, a, 1) + n_ha.h_hiv_adult(1, a, 1);

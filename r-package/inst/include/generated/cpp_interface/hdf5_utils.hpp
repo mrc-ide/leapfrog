@@ -390,8 +390,8 @@ struct HcOwnedPars {
   nda::array<real_type, shape_hc_art_init_dist> hc_art_init_dist;
 
     using shape_fert_mult_by_age = nda::shape<
-    nda::dim<0, SS::hAG_fert, 1>,
-    nda::dim<0, nda::dynamic, (SS::hAG_fert)>
+    nda::dim<0, SS::p_fertility_age_groups, 1>,
+    nda::dim<0, nda::dynamic, (SS::p_fertility_age_groups)>
   >;
   nda::array<real_type, shape_fert_mult_by_age> fert_mult_by_age;
 
@@ -401,7 +401,7 @@ struct HcOwnedPars {
   nda::array<real_type, shape_fert_mult_off_art> fert_mult_off_art;
 
     using shape_fert_mult_on_art = nda::shape<
-    nda::dim<0, SS::hAG_fert, 1>
+    nda::dim<0, SS::p_fertility_age_groups, 1>
   >;
   nda::array<real_type, shape_fert_mult_on_art> fert_mult_on_art;
 
@@ -546,9 +546,9 @@ struct HcOwnedPars {
       .hc_art_isperc = read_data<int, typename Pars::shape_hc_art_isperc>(params_file, "artpaeds_isperc", { nda::dim<>(0, opts.proj_steps, 1) }),
       .hc_art_val = read_data<real_type, typename Pars::shape_hc_art_val>(params_file, "paed_art_val", { nda::dim<>(0, SS::hcAG_coarse, 1), nda::dim<>(0, opts.proj_steps, (SS::hcAG_coarse)) }),
       .hc_art_init_dist = read_data<real_type, typename Pars::shape_hc_art_init_dist>(params_file, "init_art_dist", { nda::dim<>(0, SS::p_idx_hiv_first_adult, 1), nda::dim<>(0, opts.proj_steps, (SS::p_idx_hiv_first_adult)) }),
-      .fert_mult_by_age = read_data<real_type, typename Pars::shape_fert_mult_by_age>(params_file, "fert_rat", { nda::dim<>(0, SS::hAG_fert, 1), nda::dim<>(0, opts.proj_steps, (SS::hAG_fert)) }),
+      .fert_mult_by_age = read_data<real_type, typename Pars::shape_fert_mult_by_age>(params_file, "fert_rat_full", { nda::dim<>(0, SS::p_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::p_fertility_age_groups)) }),
       .fert_mult_off_art = read_data<real_type, typename Pars::shape_fert_mult_off_art>(params_file, "cd4fert_rat", { nda::dim<>(0, SS::hDS, 1) }),
-      .fert_mult_on_art = read_data<real_type, typename Pars::shape_fert_mult_on_art>(params_file, "frr_art6mos", { nda::dim<>(0, SS::hAG_fert, 1) }),
+      .fert_mult_on_art = read_data<real_type, typename Pars::shape_fert_mult_on_art>(params_file, "frr_art6mos_full", { nda::dim<>(0, SS::p_fertility_age_groups, 1) }),
       .total_fertility_rate = read_data<real_type, typename Pars::shape_total_fertility_rate>(params_file, "tfr", { nda::dim<>(0, opts.proj_steps, 1) }),
       .PMTCT = read_data<real_type, typename Pars::shape_PMTCT>(params_file, "pmtct", { nda::dim<>(0, SS::hPS, 1), nda::dim<>(0, opts.proj_steps, (SS::hPS)) }),
       .vertical_transmission_rate = read_data<real_type, typename Pars::shape_vertical_transmission_rate>(params_file, "mtct", { nda::dim<>(0, SS::hDS + 1, 1), nda::dim<>(0, SS::hVT, (SS::hDS + 1)) }),
@@ -571,7 +571,7 @@ struct HcOwnedPars {
       .total_births = read_data<real_type, typename Pars::shape_total_births>(params_file, "total_births", { nda::dim<>(0, opts.proj_steps, 1) }),
       .ctx_effect = read_data<real_type, typename Pars::shape_ctx_effect>(params_file, "ctx_effect", { nda::dim<>(0, 3, 1) }),
       .hc_art_start = read_data_scalar<int>(params_file, "hc_art_start"),
-      .local_adj_factor = read_data_scalar<real_type>(params_file, "laf")
+      .local_adj_factor = read_data_scalar<real_type>(params_file, "frr_scalar")
     };
   };
 };
