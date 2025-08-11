@@ -704,9 +704,9 @@ struct ChildModelSimulation<Config> {
     auto& i_hc = intermediate.hc;
 
     if (n_hc.hiv_births > 0) {
+      // Perinatal transmission
       perinatal_tr();
 
-      // Perinatal transmission
       auto perinatal_transmission_births = n_hc.hiv_births * i_hc.perinatal_transmission_rate;
       for (int s = 0; s < NS; ++s) {
         for (int hd = 0; hd < hc1DS; ++hd) {
