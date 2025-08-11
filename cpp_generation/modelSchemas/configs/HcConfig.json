@@ -319,11 +319,11 @@
     },
     "hc_grad": {
       "num_type": "real_type",
-      "dims": ["SS::hDS", "SS::hcTT", "SS::hcAG_end", "SS::NS"]
+      "dims": ["SS::hDS", "SS::hcTT",  "SS::hcAG_end", "SS::NS"]
     },
     "eligible": {
       "num_type": "real_type",
-      "dims": ["SS::hDS", "SS::hcAG_end", "SS::NS"]
+      "dims": ["SS::hDS",  "SS::hcAG_end", "SS::NS"]
     },
     "unmet_need": {
       "num_type": "real_type",
@@ -347,7 +347,7 @@
     },
     "hc_art_grad": {
       "num_type": "real_type",
-      "dims": ["SS::hDS", "SS::hcTT", "SS::hcAG_end", "SS::NS"]
+      "dims": ["SS::hDS", "SS::hcTT",  "SS::hcAG_end", "SS::NS"]
     },
     "hc_art_scalar": {
       "num_type": "real_type",
