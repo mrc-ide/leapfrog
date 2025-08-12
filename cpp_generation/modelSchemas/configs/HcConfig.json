@@ -149,7 +149,7 @@
       },
       "fert_mult_by_age": {
         "num_type": "real_type",
-        "dims": ["SS::p_fertility_age_groups", "opts.proj_steps"],
+        "dims": ["SS::hc_p_fertility_age_groups", "opts.proj_steps"],
         "alias": {
           "r": "fert_rat_full"
         }
@@ -163,7 +163,7 @@
       },
       "fert_mult_on_art": {
         "num_type": "real_type",
-        "dims": ["SS::p_fertility_age_groups"],
+        "dims": ["SS::hc_p_fertility_age_groups"],
         "alias": {
           "r": "frr_art6mos_full"
         }
@@ -271,14 +271,14 @@
       },
       "adult_female_infections": {
         "num_type": "real_type",
-        "dims": ["SS::p_fertility_age_groups", "opts.proj_steps"],
+        "dims": ["SS::hc_p_fertility_age_groups", "opts.proj_steps"],
         "alias": {
           "r": "adult_female_infections_full"
         }
       },
       "adult_female_hivnpop": {
         "num_type": "real_type",
-        "dims": ["SS::p_fertility_age_groups", "opts.proj_steps"],
+        "dims": ["SS::hc_p_fertility_age_groups", "opts.proj_steps"],
         "alias": {
           "r": "hivnpop_full"
         }
@@ -302,7 +302,7 @@
       },
       "hc_age_specific_fertility_rate": {
         "num_type": "real_type",
-        "dims": ["SS::p_fertility_age_groups", "opts.proj_steps"],
+        "dims": ["SS::hc_p_fertility_age_groups", "opts.proj_steps"],
         "alias": {
           "r": "asfr_coarse"
         }
@@ -314,35 +314,35 @@
         "vars": {
           "fert_mult_by_age": {
             "num_type": "real_type",
-            "dims": ["SS::p_fertility_age_groups", "opts.proj_steps"],
+            "dims": ["SS::hc_p_fertility_age_groups", "opts.proj_steps"],
             "alias": {
               "r": "fert_rat_coarse"
            }
           },
           "fert_mult_on_art": {
             "num_type": "real_type",
-            "dims": ["SS::p_fertility_age_groups"],
+            "dims": ["SS::hc_p_fertility_age_groups"],
             "alias": {
               "r": "frr_art6mos_coarse"
           }
          },
           "adult_female_infections":  {
             "num_type": "real_type",
-            "dims": ["SS::p_fertility_age_groups", "opts.proj_steps"],
+            "dims": ["SS::hc_p_fertility_age_groups", "opts.proj_steps"],
             "alias": {
               "r": "adult_female_infections_coarse"
             }
           },
           "adult_female_hivnpop": {
             "num_type": "real_type",
-            "dims": ["SS::p_fertility_age_groups", "opts.proj_steps"],
+            "dims": ["SS::hc_p_fertility_age_groups", "opts.proj_steps"],
             "alias": {
               "r": "hivnpop_coarse"
             }
           },
           "hc_age_specific_fertility_rate": {
             "num_type": "real_type",
-            "dims": ["SS::p_fertility_age_groups", "opts.proj_steps"],
+            "dims": ["SS::hc_p_fertility_age_groups", "opts.proj_steps"],
             "alias": {
               "r": "asfr_coarse"
             }

@@ -83,10 +83,11 @@ struct ChildModelSimulation<Config> {
       run_wlhiv_births();
     }
 
-    // adjust_hiv_births();
-    // add_infections();
-    // need_for_cotrim();
-    // cd4_mortality();
+    adjust_hiv_births();
+    add_infections();
+    need_for_cotrim();
+    cd4_mortality(); //for some reason this is causing a break
+    //Something with the p_idx_fertility_first value?
     // run_child_hiv_mort();
     // add_child_grad();
     //
@@ -843,37 +844,37 @@ struct ChildModelSimulation<Config> {
         }
       }
     }
-
-    // progress through CD4 categories
-    for (int s = 0; s < NS; ++s) {
-      for (int hd = 1; hd < hc1DS; ++hd) {
-        for (int a = 0; a < hc2_agestart; ++a) {
-          for (int cat = 0; cat < hcTT; ++cat) {
-            const auto& coarse_hc1_cd4_prog = p_hc.hc1_cd4_prog(hd - 1, hc_age_coarse_cd4[a], s);
-            auto cd4_grad = coarse_hc1_cd4_prog *
-                            (i_hc.hc_posthivmort(hd - 1, cat, a, s) + n_hc.hc1_hiv_pop(hd - 1, cat, a, s)) /
-                            2.0;
-            i_hc.hc_grad(hd - 1, cat, a, s) -= cd4_grad; // moving to next cd4 category
-            i_hc.hc_grad(hd, cat, a, s) += cd4_grad; // moving into this cd4 category
-          }
-        }
-      }
-    }
-
-    // progress through CD4 categories
-    for (int s = 0; s < NS; ++s) {
-      for (int hd = 1; hd < hc2DS; ++hd) {
-        for (int a = hc2_agestart; a < p_idx_fertility_first; ++a) {
-          for (int cat = 0; cat < hcTT; ++cat) {
-            auto cd4_grad = p_hc.hc2_cd4_prog(hd - 1, 0, s) *
-                            (i_hc.hc_posthivmort(hd - 1, cat, a, s) + n_hc.hc2_hiv_pop(hd - 1, cat, a - hc2_agestart, s)) /
-                            2.0;
-            i_hc.hc_grad(hd - 1, cat, a, s) -= cd4_grad; // moving to next cd4 category
-            i_hc.hc_grad(hd, cat, a, s) += cd4_grad; // moving into this cd4 category
-          }
-        }
-      }
-    }
+//
+//     // progress through CD4 categories
+//     for (int s = 0; s < NS; ++s) {
+//       for (int hd = 1; hd < hc1DS; ++hd) {
+//         for (int a = 0; a < hc2_agestart; ++a) {
+//           for (int cat = 0; cat < hcTT; ++cat) {
+//             const auto& coarse_hc1_cd4_prog = p_hc.hc1_cd4_prog(hd - 1, hc_age_coarse_cd4[a], s);
+//             auto cd4_grad = coarse_hc1_cd4_prog *
+//                             (i_hc.hc_posthivmort(hd - 1, cat, a, s) + n_hc.hc1_hiv_pop(hd - 1, cat, a, s)) /
+//                             2.0;
+//             i_hc.hc_grad(hd - 1, cat, a, s) -= cd4_grad; // moving to next cd4 category
+//             i_hc.hc_grad(hd, cat, a, s) += cd4_grad; // moving into this cd4 category
+//           }
+//         }
+//       }
+//     }
+//
+//     // progress through CD4 categories
+//     for (int s = 0; s < NS; ++s) {
+//       for (int hd = 1; hd < hc2DS; ++hd) {
+//         for (int a = hc2_agestart; a < p_idx_fertility_first; ++a) {
+//           for (int cat = 0; cat < hcTT; ++cat) {
+//             auto cd4_grad = p_hc.hc2_cd4_prog(hd - 1, 0, s) *
+//                             (i_hc.hc_posthivmort(hd - 1, cat, a, s) + n_hc.hc2_hiv_pop(hd - 1, cat, a - hc2_agestart, s)) /
+//                             2.0;
+//             i_hc.hc_grad(hd - 1, cat, a, s) -= cd4_grad; // moving to next cd4 category
+//             i_hc.hc_grad(hd, cat, a, s) += cd4_grad; // moving into this cd4 category
+//           }
+//         }
+//       }
+//     }
   };
 
   void run_child_hiv_mort() {
