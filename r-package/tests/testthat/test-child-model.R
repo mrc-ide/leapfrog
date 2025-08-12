@@ -38,13 +38,17 @@ test_that("Child model can be run for all years", {
 
 })
 
-test_that("Coarse hild model can be run for all years", {
+test_that("Coarse child model can be run for all years", {
   parameters <- read_parameters(test_path("testdata/child_parms.h5"))
+  expect_silent(out_full <- run_model(parameters, "ChildModel", 1970:2030))
   parameters$mat_prev_input[] <- as.integer(0)
-  expect_silent(out <- run_model(parameters, "CoarseChildModel", 1970:2030))
+  expect_silent(out_coarse <- run_model(parameters, "CoarseChildModel", 1970:2030))
+
+  ##Check that hiv births matches between coarse and full models
+  out_full$hiv_births - out_coarse$hiv_births
 
   expect_setequal(
-    names(out),
+    names(out_coarse),
     c(
       "p_total_pop", "births", "p_total_pop_background_deaths", "p_hiv_pop",
       "p_hiv_pop_background_deaths", "h_hiv_adult", "h_art_adult",
@@ -57,24 +61,24 @@ test_that("Coarse hild model can be run for all years", {
   )
 
   ## Nothing should ever be negative
-  expect_true(all(out$hc1_hiv_pop[, , , , ] >= 0))
-  expect_true(all(out$hc2_hiv_pop[, , , , ] >= 0))
-  expect_true(all(out$hc1_art_pop[, , , , ] >= 0))
-  expect_true(all(out$hc2_art_pop[, , , , ] >= 0))
-  expect_true(all(out$hc1_noart_aids_deaths[, , , , ] >= 0))
-  expect_true(all(out$hc2_noart_aids_deaths[, , , , ] >= 0))
-  expect_true(all(out$hc1_art_aids_deaths[, , , , ] >= 0))
-  expect_true(all(out$hc2_art_aids_deaths[, , , , ] >= 0))
-  expect_true(all(out$hiv_births >= 0))
+  expect_true(all(out_coarse$hc1_hiv_pop[, , , , ] >= 0))
+  expect_true(all(out_coarse$hc2_hiv_pop[, , , , ] >= 0))
+  expect_true(all(out_coarse$hc1_art_pop[, , , , ] >= 0))
+  expect_true(all(out_coarse$hc2_art_pop[, , , , ] >= 0))
+  expect_true(all(out_coarse$hc1_noart_aids_deaths[, , , , ] >= 0))
+  expect_true(all(out_coarse$hc2_noart_aids_deaths[, , , , ] >= 0))
+  expect_true(all(out_coarse$hc1_art_aids_deaths[, , , , ] >= 0))
+  expect_true(all(out_coarse$hc2_art_aids_deaths[, , , , ] >= 0))
+  expect_true(all(out_coarse$hiv_births >= 0))
 
-  expect_true(all(out$hc1_hiv_pop_strat[, , , , , , ] >= 0))
-  expect_true(all(out$hc2_hiv_pop_strat[, , , , , , ] >= 0))
-  expect_true(all(out$hc1_art_pop_strat[, , , , , , , ] >= 0))
-  expect_true(all(out$hc2_art_pop_strat[, , , , , , , ] >= 0))
-  expect_true(all(out$hc1_noart_aids_deaths_strat[, , , , , , ] >= 0))
-  expect_true(all(out$hc2_noart_aids_deaths_strat[, , , , , , ] >= 0))
-  expect_true(all(out$hc1_art_aids_deaths_strat[, , , , , , , ] >= 0))
-  expect_true(all(out$hc2_art_aids_deaths_strat[, , , , , , , ] >= 0))
+  expect_true(all(out_coarse$hc1_hiv_pop_strat[, , , , , , ] >= 0))
+  expect_true(all(out_coarse$hc2_hiv_pop_strat[, , , , , , ] >= 0))
+  expect_true(all(out_coarse$hc1_art_pop_strat[, , , , , , , ] >= 0))
+  expect_true(all(out_coarse$hc2_art_pop_strat[, , , , , , , ] >= 0))
+  expect_true(all(out_coarse$hc1_noart_aids_deaths_strat[, , , , , , ] >= 0))
+  expect_true(all(out_coarse$hc2_noart_aids_deaths_strat[, , , , , , ] >= 0))
+  expect_true(all(out_coarse$hc1_art_aids_deaths_strat[, , , , , , , ] >= 0))
+  expect_true(all(out_coarse$hc2_art_aids_deaths_strat[, , , , , , , ] >= 0))
 
 })
 

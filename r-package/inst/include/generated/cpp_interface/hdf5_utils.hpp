@@ -578,7 +578,7 @@ struct HcOwnedPars {
       .ctx_effect = read_data<real_type, typename Pars::shape_ctx_effect>(params_file, "ctx_effect", { nda::dim<>(0, 3, 1) }),
       .hc_art_start = read_data_scalar<int>(params_file, "hc_art_start"),
       .local_adj_factor = read_data_scalar<real_type>(params_file, "frr_scalar"),
-      .hc_age_specific_fertility_rate = read_data<real_type, typename Pars::shape_hc_age_specific_fertility_rate>(params_file, "asfr_coarse", { nda::dim<>(0, SS::hc_p_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::hc_p_fertility_age_groups)) })
+      .hc_age_specific_fertility_rate = read_data<real_type, typename Pars::shape_hc_age_specific_fertility_rate>(params_file, "asfr", { nda::dim<>(0, SS::hc_p_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::hc_p_fertility_age_groups)) })
     };
   };
 };

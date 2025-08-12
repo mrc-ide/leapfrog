@@ -304,7 +304,7 @@
         "num_type": "real_type",
         "dims": ["SS::hc_p_fertility_age_groups", "opts.proj_steps"],
         "alias": {
-          "r": "asfr_coarse"
+          "r": "asfr"
         }
       }
     },

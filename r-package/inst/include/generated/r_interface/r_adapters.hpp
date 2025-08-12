@@ -339,7 +339,7 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
       .ctx_effect = parse_data<real_type, 1>(data, "ctx_effect", { nda::dim<>(0, 3, 1) }),
       .hc_art_start = Rcpp::as<int>(data["hc_art_start"]),
       .local_adj_factor = Rcpp::as<real_type>(data["frr_scalar"]),
-      .hc_age_specific_fertility_rate = parse_data<real_type, 2>(data, "asfr_coarse", { nda::dim<>(0, SS::hc_p_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::hc_p_fertility_age_groups)) })
+      .hc_age_specific_fertility_rate = parse_data<real_type, 2>(data, "asfr", { nda::dim<>(0, SS::hc_p_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::hc_p_fertility_age_groups)) })
     };
   };
 
