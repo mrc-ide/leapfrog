@@ -79,23 +79,14 @@ struct AdultHivModelSimulation<Config> {
       run_new_p_infections(hiv_step);
       run_new_hiv_p_infections(hiv_step);
 
-
       if (t >= opts.ts_art_start) {
         run_art_progression_and_mortality(hiv_step);
         run_h_art_initiation(hiv_step);
         run_update_art_stratification(hiv_step);
       }
-      if(t == 60 & hiv_step == 0){
-        std::cout<<  i_ha.grad(0, 0, 1);
-      }
+
       run_update_hiv_stratification(hiv_step);
-      if(t == 60 & hiv_step == 0){
-        std::cout<<  i_ha.grad(0, 0, 1);
-      }
       run_remove_p_hiv_deaths(hiv_step);
-      if(t == 60 & hiv_step == 0){
-        std::cout<<  i_ha.grad(0, 0, 1);
-      }
     }
   };
 
@@ -368,11 +359,19 @@ struct AdultHivModelSimulation<Config> {
         auto eligibility_by_stage = (1.0 - p_ha.initiation_mortality_weight) *
                                     i_ha.artelig_hm(hm) /
                                     i_ha.Xartelig_15plus;
-        auto expected_mortality_by_stage = p_ha.initiation_mortality_weight *
-                                          i_ha.expect_mort_artelig_hm(hm) /
-                                          i_ha.expect_mort_artelig15plus;
-        i_ha.artinit_hm(hm) = i_ha.artinit_hts * (eligibility_by_stage + expected_mortality_by_stage);
+        if(i_ha.expect_mort_artelig15plus > 0){
+          auto expected_mortality_by_stage = p_ha.initiation_mortality_weight *
+            i_ha.expect_mort_artelig_hm(hm) /
+              i_ha.expect_mort_artelig15plus;
+          i_ha.artinit_hm(hm) = i_ha.artinit_hts * (eligibility_by_stage + expected_mortality_by_stage);
+
+        }else{
+          auto expected_mortality_by_stage = 0.0;
+          i_ha.artinit_hm(hm) = i_ha.artinit_hts * (eligibility_by_stage + expected_mortality_by_stage);
+
+        }
       }
+
 
       // Step 2: within CD4 category, allocate ART by age proportional to
       // eligibility
