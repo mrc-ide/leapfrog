@@ -259,16 +259,22 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   ## State space dimensions
   v$hAG_SPAN_full <- rep(1L, 66L)
   v$hAG_SPAN_coarse <- c(2L, 3L, 5L, 5L, 5L, 5L, 5L, 5L, 31L)
-  v$hAG_SPAN_fert_full <- rep(1L, 35L)
-  v$hAG_SPAN_fert_coarse <- rep(5L, 7L)
 
   ## Add in pediatric components
+  frr_agecat <- as.integer(rownames(projp$fert_rat))
+  h.fert.idx <- which((15L-1 + cumsum(v$hAG_SPAN_coarse)) %in% 15:49)
+  age_band_width <- length(15:49) / length(frr_agecat)
+  fert_rat.h.ag <- findInterval(15L + cumsum(v$hAG_SPAN_coarse[h.fert.idx]) - v$hAG_SPAN_coarse[h.fert.idx], frr_agecat)
+  hDS <- length(projp$cd4fert_rat)
+
   v$cd4fert_rat <- projp$cd4fert_rat
-  v$frr_art6mos_coarse <- projp$frr_art6mos
-  v$frr_art6mos_full <- rep(projp$frr_art6mos, each = 5)
+  v$frr_art6mos_full <- rep(projp$frr_art6mos, each = age_band_width)
+  v$frr_art6mos_coarse <- array(projp$frr_art6mos[fert_rat.h.ag])
+
+  v$fert_rat_coarse <- array(1, c(hDS, length(h.fert.idx), proj_years))
+  v$fert_rat_coarse[,,] <- rep(projp$fert_rat[fert_rat.h.ag, as.character(projp$yr_end:projp$yr_start )], each=hDS)
+  v$fert_rat_full <- apply(projp$fert_rat, 2, rep, each = age_band_width)
   v$frr_scalar <- as.numeric(projp$frr_scalar)
-  v$fert_rat_coarse <- projp$fert_rat
-  v$fert_rat_full <- apply(projp$fert_rat, 2, rep, each = 5)
   ## HIV positive entrants, right now just doing those without ART
   v$age15hivpop <- projp$age15hivpop
 
