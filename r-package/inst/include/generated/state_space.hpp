@@ -17,6 +17,17 @@ template<MV ModelVariant>
 struct DpSS {
   static constexpr int NS = 2;
   static constexpr int pAG = 81;
+  static constexpr int p_fertility_age_groups = 35;
+  static constexpr int hc_p_fertility_age_groups = 35;
+};
+
+template<MV ModelVariant>
+requires(ModelVariant::use_coarse_stratification)
+struct DpSS<ModelVariant> {
+  static constexpr int NS = 2;
+  static constexpr int pAG = 81;
+  static constexpr int p_fertility_age_groups = 35;
+  static constexpr int hc_p_fertility_age_groups = 8;
 };
 
 
@@ -71,7 +82,6 @@ struct BaseSS {
   static constexpr int PROJPERIOD_CALENDAR = 0;
   static constexpr int PROJPERIOD_MIDYEAR = 1;
   static constexpr int p_idx_fertility_first = 15;
-  static constexpr int p_fertility_age_groups = 35;
   static constexpr int p_idx_hiv_first_adult = 15;
   static constexpr int adult_incidence_first_age_group = 15;
   static constexpr int pAG_INCIDPOP = 35;

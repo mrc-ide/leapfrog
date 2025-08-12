@@ -727,6 +727,11 @@ struct HcConfig {
     nda::array_ref<real_type, shape_ctx_effect> ctx_effect;
     int hc_art_start;
     real_type local_adj_factor;
+    using shape_hc_age_specific_fertility_rate = nda::shape<
+      nda::dim<0, SS::p_fertility_age_groups, 1>,
+      nda::dim<0, nda::dynamic, (SS::p_fertility_age_groups)>
+    >;
+    nda::array_ref<real_type, shape_hc_age_specific_fertility_rate> hc_age_specific_fertility_rate;
   };
 
   struct Intermediate {

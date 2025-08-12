@@ -5,7 +5,6 @@
   "PROJPERIOD_CALENDAR": 0,
   "PROJPERIOD_MIDYEAR": 1,
   "p_idx_fertility_first": 15,
-  "p_fertility_age_groups": 35,
   "p_idx_hiv_first_adult": 15,
   "adult_incidence_first_age_group": 15,
   "pAG_INCIDPOP": 35,

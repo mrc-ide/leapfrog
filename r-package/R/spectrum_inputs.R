@@ -275,6 +275,7 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   v$fert_rat_coarse[,,] <- rep(projp$fert_rat[fert_rat.h.ag, as.character(projp$yr_end:projp$yr_start )], each=hDS)
   v$fert_rat_full <- apply(projp$fert_rat, 2, rep, each = age_band_width)
   v$frr_scalar <- as.numeric(projp$frr_scalar)
+
   ## HIV positive entrants, right now just doing those without ART
   v$age15hivpop <- projp$age15hivpop
 

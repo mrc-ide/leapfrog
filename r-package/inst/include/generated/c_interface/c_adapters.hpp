@@ -237,7 +237,8 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
       .total_births = read_data<real_type, 1>(params.hc->total_births, params.hc->total_births_length, "total_births", { nda::dim<>(0, opts.proj_steps, 1) }),
       .ctx_effect = read_data<real_type, 1>(params.hc->ctx_effect, params.hc->ctx_effect_length, "ctx_effect", { nda::dim<>(0, 3, 1) }),
       .hc_art_start = params.hc->hc_art_start,
-      .local_adj_factor = params.hc->local_adj_factor
+      .local_adj_factor = params.hc->local_adj_factor,
+      .hc_age_specific_fertility_rate = read_data<real_type, 2>(params.hc->hc_age_specific_fertility_rate, params.hc->hc_age_specific_fertility_rate_length, "hc_age_specific_fertility_rate", { nda::dim<>(0, SS::p_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::p_fertility_age_groups)) })
     };
   };
 

@@ -277,12 +277,13 @@ struct HcAdapter<Language::Py, real_type, ModelVariant> {
       .abortion = parse_data<real_type, 2>(data, "abortion", { nda::dim<>(0, SS::hAB_ind, 1), nda::dim<>(0, opts.proj_steps, (SS::hAB_ind)) }),
       .patients_reallocated = parse_data<real_type, 1>(data, "patients_reallocated", { nda::dim<>(0, opts.proj_steps, 1) }),
       .hc_art_ltfu = parse_data<real_type, 1>(data, "paed_art_ltfu", { nda::dim<>(0, opts.proj_steps, 1) }),
-      .adult_female_infections = parse_data<real_type, 2>(data, "adult_female_infections", { nda::dim<>(0, SS::p_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::p_fertility_age_groups)) }),
-      .adult_female_hivnpop = parse_data<real_type, 2>(data, "hivnpop", { nda::dim<>(0, SS::p_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::p_fertility_age_groups)) }),
+      .adult_female_infections = parse_data<real_type, 2>(data, "adult_female_infections_full", { nda::dim<>(0, SS::p_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::p_fertility_age_groups)) }),
+      .adult_female_hivnpop = parse_data<real_type, 2>(data, "hivnpop_full", { nda::dim<>(0, SS::p_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::p_fertility_age_groups)) }),
       .total_births = parse_data<real_type, 1>(data, "total_births", { nda::dim<>(0, opts.proj_steps, 1) }),
       .ctx_effect = parse_data<real_type, 1>(data, "ctx_effect", { nda::dim<>(0, 3, 1) }),
       .hc_art_start = nb::cast<int>(data["hc_art_start"]),
-      .local_adj_factor = nb::cast<real_type>(data["frr_scalar"])
+      .local_adj_factor = nb::cast<real_type>(data["frr_scalar"]),
+      .hc_age_specific_fertility_rate = parse_data<real_type, 2>(data, "asfr_coarse", { nda::dim<>(0, SS::p_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::p_fertility_age_groups)) })
     };
   };
 

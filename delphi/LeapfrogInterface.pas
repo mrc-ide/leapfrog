@@ -264,6 +264,8 @@ type
     hcArtStartLength: Integer;
     localAdjFactor: Double;
     localAdjFactorLength: Integer;
+    hcAgeSpecificFertilityRate: PDouble;
+    hcAgeSpecificFertilityRateLength: Integer;
 end;
 
 type
@@ -310,6 +312,7 @@ type
     ctxEffect: TGBFixedArray<Double>;
     hcArtStart: Integer;
     localAdjFactor: Double;
+    hcAgeSpecificFertilityRate: TGBFixedArray<Double>;
     function getView(): LeapfrogHivChildParamsView;
     procedure writeToDisk(dir: string);
     Destructor Destroy; override;
@@ -576,6 +579,7 @@ begin;
   adultFemaleHivnpop.Free;
   totalBirths.Free;
   ctxEffect.Free;
+  hcAgeSpecificFertilityRate.Free;
   inherited;
 end;
 
@@ -681,6 +685,8 @@ begin;
   Result.hcArtStartLength := 1;
   Result.localAdjFactor := localAdjFactor;
   Result.localAdjFactorLength := 1;
+  Result.hcAgeSpecificFertilityRate := PDouble(hcAgeSpecificFertilityRate.data);
+  Result.hcAgeSpecificFertilityRateLength := hcAgeSpecificFertilityRate.GetLength();
 end;
 
 function LeapfrogHivChildState.getView(): LeapfrogHivChildStateView;
@@ -809,6 +815,7 @@ begin;
   adultFemaleHivnpop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'adultFemaleHivnpop');
   totalBirths.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'totalBirths');
   ctxEffect.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'ctxEffect');
+  hcAgeSpecificFertilityRate.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hcAgeSpecificFertilityRate');
 end;
 
 procedure LeapfrogHivChildState.writeToDisk(dir: string);

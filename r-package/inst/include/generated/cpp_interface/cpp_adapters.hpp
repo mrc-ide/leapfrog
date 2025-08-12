@@ -139,7 +139,8 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
       .total_births = { owned_pars.hc.total_births.data(), owned_pars.hc.total_births.shape() },
       .ctx_effect = { owned_pars.hc.ctx_effect.data(), owned_pars.hc.ctx_effect.shape() },
       .hc_art_start = owned_pars.hc.hc_art_start,
-      .local_adj_factor = owned_pars.hc.local_adj_factor
+      .local_adj_factor = owned_pars.hc.local_adj_factor,
+      .hc_age_specific_fertility_rate = { owned_pars.hc.hc_age_specific_fertility_rate.data(), owned_pars.hc.hc_age_specific_fertility_rate.shape() }
     };
   };
 

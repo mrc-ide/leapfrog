@@ -183,6 +183,8 @@ struct HcParams {
   int hc_art_start_length;
   real_type local_adj_factor;
   int local_adj_factor_length;
+  real_type* hc_age_specific_fertility_rate;
+  int hc_age_specific_fertility_rate_length;
 };
 
 template<typename real_type>
