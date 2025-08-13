@@ -23,14 +23,26 @@ proj_coarse <- prepare_leapfrog_projp(pjnz_adult, use_coarse_age_groups = TRUE)
 parameters_coarse <- c(demp, proj_coarse)
 save_parameters(parameters_coarse, testthat::test_path("testdata/adult_parms_coarse.h5"))
 
+# temporary backwards compatibility for leapfrog
+leapfrog_proj <- proj
+leapfrog_proj$cd4_initdist_full <- proj$cd4_initdist
+leapfrog_proj$cd4_prog_full <- proj$cd4_prog
+leapfrog_proj$cd4_mort_full <- proj$cd4_mort
+leapfrog_proj$art_mort_full <- proj$art_mort
+
+leapfrog_proj_coarse <- proj_coarse
+leapfrog_proj_coarse$cd4_initdist_coarse <- proj_coarse$cd4_initdist
+leapfrog_proj_coarse$cd4_prog_coarse <- proj_coarse$cd4_prog
+leapfrog_proj_coarse$cd4_mort_coarse <- proj_coarse$cd4_mort
+leapfrog_proj_coarse$art_mort_coarse <- proj_coarse$art_mort
 # Used as reference data (Run from leapfrog/master)
-lmod <- leapfrog::leapfrogR(demp, proj)
+lmod <- leapfrog::leapfrogR(demp, leapfrog_proj)
 save_hdf5_file(lmod, testthat::test_path("testdata/leapfrog_fit.h5"))
 
-lmod <- leapfrog::leapfrogR(demp, proj, hiv_strat = "coarse")
+lmod <- leapfrog::leapfrogR(demp, leapfrog_proj_coarse, hiv_strat = "coarse")
 save_hdf5_file(lmod, testthat::test_path("testdata/leapfrog_fit_coarse.h5"))
 
-lmod <- leapfrog::leapfrogR(demp, proj, hiv_steps_per_year = 0L)
+lmod <- leapfrog::leapfrogR(demp, leapfrog_proj, hiv_steps_per_year = 0L)
 save_hdf5_file(lmod, testthat::test_path("testdata/fit_demography.h5"))
 
 #Create paeds parameters
