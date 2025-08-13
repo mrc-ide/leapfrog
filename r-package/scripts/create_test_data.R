@@ -16,7 +16,19 @@ demp <- prepare_leapfrog_demp(pjnz_adult)
 proj <- prepare_leapfrog_projp(pjnz_adult)
 parameters <- c(demp, proj)
 
-save_parameters(parameters, testthat::test_path("testdata/adult_parms.h5"))
+parameters_full <- parameters
+parameters_full$cd4_initdist <- parameters$cd4_initdist_full
+parameters_full$cd4_prog <- parameters$cd4_prog_full
+parameters_full$cd4_mort <- parameters$cd4_mort_full
+parameters_full$art_mort <- parameters$art_mort_full
+save_parameters(parameters_full, testthat::test_path("testdata/adult_parms.h5"))
+
+parameters_coarse <- parameters
+parameters_coarse$cd4_initdist <- parameters$cd4_initdist_coarse
+parameters_coarse$cd4_prog <- parameters$cd4_prog_coarse
+parameters_coarse$cd4_mort <- parameters$cd4_mort_coarse
+parameters_coarse$art_mort <- parameters$art_mort_coarse
+save_parameters(parameters_coarse, testthat::test_path("testdata/adult_parms_coarse.h5"))
 
 # Used as reference data (Run from leapfrog/master)
 lmod <- leapfrog::leapfrogR(demp, proj)
@@ -122,7 +134,21 @@ out <- list(dp = dp,
             ctx_need = as.numeric(unlist(spec_ctx_need)))
 
 parameters <- c(proj, demp)
-save_parameters(parameters, testthat::test_path("testdata/child_parms.h5"))
+
+parameters_full <- parameters
+parameters_full$cd4_initdist <- parameters$cd4_initdist_full
+parameters_full$cd4_prog <- parameters$cd4_prog_full
+parameters_full$cd4_mort <- parameters$cd4_mort_full
+parameters_full$art_mort <- parameters$art_mort_full
+save_parameters(parameters_full, testthat::test_path("testdata/child_parms.h5"))
+
+parameters_coarse <- parameters
+parameters_coarse$cd4_initdist <- parameters$cd4_initdist_coarse
+parameters_coarse$cd4_prog <- parameters$cd4_prog_coarse
+parameters_coarse$cd4_mort <- parameters$cd4_mort_coarse
+parameters_coarse$art_mort <- parameters$art_mort_coarse
+save_parameters(parameters, testthat::test_path("testdata/child_parms_coarse.h5"))
+
 # need this for child model tests
 saveRDS(out, testthat::test_path("testdata/child_test_utils.rds"))
 

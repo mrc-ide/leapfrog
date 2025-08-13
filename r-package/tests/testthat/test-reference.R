@@ -34,7 +34,7 @@ test_that("model agrees with leapfrog impl", {
 })
 
 test_that("model agrees with leapfrog impl", {
-  parameters <- read_parameters(test_path("testdata/adult_parms.h5"))
+  parameters <- read_parameters(test_path("testdata/adult_parms_coarse.h5"))
   actual <- run_model(parameters, "HivCoarseAgeStratification")
 
   expected <- read_parameters(test_path("testdata/leapfrog_fit_coarse.h5"))

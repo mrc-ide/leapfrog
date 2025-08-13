@@ -50,7 +50,7 @@ test_that("initial state set up works as expected", {
 })
 
 test_that("initial state set up with coarse stratified HIV works as expected", {
-  parameters <- read_parameters(test_path("testdata/adult_parms.h5"))
+  parameters <- read_parameters(test_path("testdata/adult_parms_coarse.h5"))
 
   out <- run_model(parameters, "HivCoarseAgeStratification", 1970L)
 

@@ -3,6 +3,7 @@
 root_dir <- here::here()
 
 parameters <- frogger::read_parameters(testthat::test_path("testdata/adult_parms.h5"))
+parameters_coarse <- frogger::read_parameters(testthat::test_path("testdata/adult_parms_coarse.h5"))
 
 message("Benchmarking demographic projection")
 bench::mark(
@@ -13,7 +14,7 @@ bench::mark(
 
 message("Benchmarking coarse-stratified adult HIV model")
 bench::mark(
-  frogger = frogger::run_model(parameters, "HivCoarseAgeStratification", 1970:2030),
+  frogger = frogger::run_model(parameters_coarse, "HivCoarseAgeStratification", 1970:2030),
   iterations = 10,
   check = FALSE
 )
