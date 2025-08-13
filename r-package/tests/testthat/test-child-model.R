@@ -9,7 +9,9 @@ test_that("Child model can be run for all years", {
       "p_total_pop", "births", "p_total_pop_background_deaths", "p_hiv_pop",
       "p_hiv_pop_background_deaths", "h_hiv_adult", "h_art_adult",
       "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art",
-      "h_art_initiation", "p_hiv_deaths", "hc1_hiv_pop", "hc2_hiv_pop",
+      "h_art_initiation", "p_hiv_deaths",
+      "hiv_births_by_mat_age",
+      "hc1_hiv_pop", "hc2_hiv_pop",
       "hc1_art_pop", "hc2_art_pop",
       "hc1_noart_aids_deaths", "hc2_noart_aids_deaths",
       "hc1_art_aids_deaths", "hc2_art_aids_deaths", "hiv_births",
@@ -40,11 +42,47 @@ test_that("Child model can be run for all years", {
 
 test_that("Coarse child model can be run for all years", {
   parameters <- read_parameters(test_path("testdata/child_parms.h5"))
-  expect_silent(out_full <- run_model(parameters, "ChildModel", 1970:2030))
   parameters$mat_prev_input[] <- as.integer(0)
-  expect_silent(out_coarse <- run_model(parameters, "CoarseChildModel", 1970:2030))
+  out_coarse <- run_model(parameters, "CoarseChildModel", 1970:2030)
+  out_full <- run_model(parameters, "ChildModel", 1970:2030)
+  out_coarse$h_hiv_adult[,1,2,8] ##incorrect
+  apply(out_full$h_hiv_adult[,1:2,2,8], MARGIN = 1, FUN = sum) ##correct
+
+  parameters <- read_parameters(test_path("testdata/child_parms.h5"))
+  parameters$mat_prev_input[] <- as.integer(0)
+  out_full <- run_model(parameters, "HivFullAgeStratification", 1970:2030)
+  out_coarse <- run_model(parameters, "HivCoarseAgeStratification", 1970:2030)
+  out_coarse$h_hiv_adult[,1,2,8]
+  apply(out_full$h_hiv_adult[,1:2,2,8], MARGIN = 1, FUN = sum)
+
+  out_fullchild <- run_model(parameters, "ChildModel", 1970:2030)
+  out_full <- run_model(parameters, "HivFullAgeStratification", 1970:2030)
+  expect_equal(out_fullchild$h_hiv_adult, out_full$h_hiv_adult)
+
+  out_coarsechild <- run_model(parameters, "CoarseChildModel", 1970:2030)
+  out_coarse <- run_model(parameters, "HivCoarseAgeStratification", 1970:2030)
+  expect_equal(out_coarsechild$h_hiv_adult, out_coarse$h_hiv_adult)
+
+  # Make a grouping factor for the 66 ages
+  age_group <- rep(seq_along(parameters$hAG_SPAN_coarse), times = parameters$hAG_SPAN_coarse)
+  out_full$h_hiv_adult <- aperm(out_full$h_hiv_adult, c(2, 1, 3, 4)) # now: (66, 7, 2, 61)
+  # Collapse age dimension using rowsum
+  out_full$h_hiv_adult <- apply(out_full$h_hiv_adult, c(2, 3, 4), function(x) rowsum(x, age_group))
+  # `arr_collapsed` is now (9, 7, 2, 61) → reorder back
+  out_full$h_hiv_adult <- aperm(out_full$h_hiv_adult, c(2, 1, 3, 4))
+  expect_true(all(abs(out_coarse$h_hiv_adult - out_full$h_hiv_adult) < 1e-3))
+
+
 
   ##Check that hiv births matches between coarse and full models
+  h.fert.idx <- which((15L-1 + cumsum(parameters$hAG_SPAN_coarse)) %in% 15:49)
+  fert_ages.idx <- 1L + cumsum(parameters$hAG_SPAN_coarse[h.fert.idx]) - parameters$hAG_SPAN_coarse[h.fert.idx]
+  coarse_age_groups <- cut(15:49,
+                           breaks = 15L + cumsum(parameters$hAG_SPAN_coarse[h.fert.idx]) -
+                             parameters$hAG_SPAN_coarse[h.fert.idx],
+                           right = FALSE)
+  full_hiv_births_condensed <- as.array(rowsum(out_full$hiv_births_by_mat_age, group = coarse_age_groups))
+  out_coarse$hiv_births_by_mat_age - full_hiv_births_condensed
   out_full$hiv_births - out_coarse$hiv_births
 
   expect_setequal(

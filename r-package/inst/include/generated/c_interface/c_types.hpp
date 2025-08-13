@@ -189,6 +189,8 @@ struct HcParams {
 
 template<typename real_type>
 struct HcOut {
+  real_type* hiv_births_by_mat_age;
+  int hiv_births_by_mat_age_length;
   real_type* hc1_hiv_pop;
   int hc1_hiv_pop_length;
   real_type* hc2_hiv_pop;

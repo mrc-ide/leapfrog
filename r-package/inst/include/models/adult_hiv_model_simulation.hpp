@@ -73,7 +73,6 @@ struct AdultHivModelSimulation<Config> {
       nda::fill(i_ha.grad, 0.0);
       nda::fill(i_ha.gradART, 0.0);
       nda::fill(i_ha.p_hiv_deaths_age_sex, 0.0);
-
       run_disease_progression_and_mortality(hiv_step);
       run_new_p_infections(hiv_step);
       run_new_hiv_p_infections(hiv_step);

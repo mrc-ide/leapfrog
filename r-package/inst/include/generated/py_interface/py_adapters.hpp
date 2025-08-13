@@ -291,6 +291,7 @@ struct HcAdapter<Language::Py, real_type, ModelVariant> {
     const nb::dict &data
   ) {
     typename Config::State state;
+    fill_initial_state<real_type, typename Config::State::shape_hiv_births_by_mat_age>(data, "hiv_births_by_mat_age", state.hiv_births_by_mat_age);
     fill_initial_state<real_type, typename Config::State::shape_hc1_hiv_pop>(data, "hc1_hiv_pop", state.hc1_hiv_pop);
     fill_initial_state<real_type, typename Config::State::shape_hc2_hiv_pop>(data, "hc2_hiv_pop", state.hc2_hiv_pop);
     fill_initial_state<real_type, typename Config::State::shape_hc1_art_pop>(data, "hc1_art_pop", state.hc1_art_pop);
@@ -307,7 +308,7 @@ struct HcAdapter<Language::Py, real_type, ModelVariant> {
     return state;
   };
 
-  static constexpr int output_count = 13;
+  static constexpr int output_count = 14;
 
   static int build_output(
     int index,
@@ -315,6 +316,9 @@ struct HcAdapter<Language::Py, real_type, ModelVariant> {
     nb::dict& ret,
     const size_t& output_years
   ) {
+    const int py_rank_hiv_births_by_mat_age = 2;
+    size_t py_dims_hiv_births_by_mat_age[py_rank_hiv_births_by_mat_age] = { SS::hc_p_fertility_age_groups, output_years };
+    ret["hiv_births_by_mat_age"] = py_array<real_type>(state.hiv_births_by_mat_age.data(), py_rank_hiv_births_by_mat_age, py_dims_hiv_births_by_mat_age);
     const int py_rank_hc1_hiv_pop = 5;
     size_t py_dims_hc1_hiv_pop[py_rank_hc1_hiv_pop] = { SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, output_years };
     ret["hc1_hiv_pop"] = py_array<real_type>(state.hc1_hiv_pop.data(), py_rank_hc1_hiv_pop, py_dims_hc1_hiv_pop);
@@ -362,6 +366,9 @@ struct HcAdapter<Language::Py, real_type, ModelVariant> {
     const Config::State& state,
     nb::dict& ret
   ) {
+    const int py_rank_hiv_births_by_mat_age = 1;
+    size_t py_dims_hiv_births_by_mat_age[py_rank_hiv_births_by_mat_age] = { SS::hc_p_fertility_age_groups };
+    ret["hiv_births_by_mat_age"] = py_array<real_type>(state.hiv_births_by_mat_age.data(), py_rank_hiv_births_by_mat_age, py_dims_hiv_births_by_mat_age);
     const int py_rank_hc1_hiv_pop = 4;
     size_t py_dims_hc1_hiv_pop[py_rank_hc1_hiv_pop] = { SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS };
     ret["hc1_hiv_pop"] = py_array<real_type>(state.hc1_hiv_pop.data(), py_rank_hc1_hiv_pop, py_dims_hc1_hiv_pop);

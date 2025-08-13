@@ -48,6 +48,7 @@ struct ChildModelSimulation<Config> {
   static constexpr int hcAG_coarse = SS::hcAG_coarse;
   static constexpr int p_idx_fertility_first = SS::p_idx_fertility_first;
   static constexpr int hc_p_fertility_age_groups = SS::hc_p_fertility_age_groups;
+  static constexpr int p_fertility_age_groups = SS::p_fertility_age_groups;
   static constexpr int p_idx_hiv_first_adult = SS::p_idx_hiv_first_adult;
   static constexpr auto hc_age_coarse = SS::hc_age_coarse;
   static constexpr auto hc_age_coarse_cd4 = SS::hc_age_coarse_cd4;
@@ -83,40 +84,40 @@ struct ChildModelSimulation<Config> {
       run_wlhiv_births();
     }
 
-    adjust_hiv_births();
-    add_infections();
-    need_for_cotrim();
-    cd4_mortality();
-    run_child_hiv_mort();
-    add_child_grad();
-
-    if (t >= p_hc.hc_art_start) {
-      // First calculate who is eligible for treatment and ART initiates
-      eligible_for_treatment();
-      art_ltfu();
-      calc_art_initiates();
-
-      // Before initiating people on to ART, calculate deaths among CLHIV on ART 6-12 months,
-      // the progress them to on ART 6-12 months months and calculate deaths for those on ART >12 months
-      on_art_mortality(0, 1);
-      progress_time_on_art(0, 1);
-      on_art_mortality(2, 2);
-
-      // Initiate CLHIV onto ART
-      art_initiation_by_age();
-
-      // Calculate on ART mortality among those on ART < 6 months
-      on_art_mortality(0, 1);
-      // Progress 6 to 12 mo to 12 plus months
-      progress_time_on_art(1, 2);
-
-      // Remove lost to follow ups
-      apply_ltfu_to_hivpop();
-      apply_ltfu_to_artpop();
-    }
-
-    nosocomial_infections();
-    fill_total_pop_outputs();
+    // adjust_hiv_births();
+    // add_infections();
+    // need_for_cotrim();
+    // cd4_mortality();
+    // run_child_hiv_mort();
+    // add_child_grad();
+    //
+    // if (t >= p_hc.hc_art_start) {
+    //   // First calculate who is eligible for treatment and ART initiates
+    //   eligible_for_treatment();
+    //   art_ltfu();
+    //   calc_art_initiates();
+    //
+    //   // Before initiating people on to ART, calculate deaths among CLHIV on ART 6-12 months,
+    //   // the progress them to on ART 6-12 months months and calculate deaths for those on ART >12 months
+    //   on_art_mortality(0, 1);
+    //   progress_time_on_art(0, 1);
+    //   on_art_mortality(2, 2);
+    //
+    //   // Initiate CLHIV onto ART
+    //   art_initiation_by_age();
+    //
+    //   // Calculate on ART mortality among those on ART < 6 months
+    //   on_art_mortality(0, 1);
+    //   // Progress 6 to 12 mo to 12 plus months
+    //   progress_time_on_art(1, 2);
+    //
+    //   // Remove lost to follow ups
+    //   apply_ltfu_to_hivpop();
+    //   apply_ltfu_to_artpop();
+    // }
+    //
+    // nosocomial_infections();
+    // fill_total_pop_outputs();
   };
 
   // private methods that we don't want people to call
@@ -183,10 +184,11 @@ struct ChildModelSimulation<Config> {
     auto& i_hc = intermediate.hc;
 
     i_hc.asfr_sum = 0.0;
-    for (int a = 0; a < hc_p_fertility_age_groups; ++a) {
-      i_hc.asfr_sum += p_hc.hc_age_specific_fertility_rate(a, t);
+    for (int a = 0; a < p_fertility_age_groups; ++a) {
+      i_hc.asfr_sum += p_dp.age_specific_fertility_rate(a, t);
     } // end a
 
+    int a_idx_in = p_idx_fertility_first;
     for (int a = 0; a < hc_p_fertility_age_groups; ++a) {
       i_hc.nHIVcurr = 0.0;
       i_hc.nHIVlast = 0.0;
@@ -201,13 +203,25 @@ struct ChildModelSimulation<Config> {
         } // end hTS
       } // end hDS
 
-      i_hc.prev = i_hc.nHIVcurr / n_dp.p_total_pop(a + 15, 1);
+
+      auto total_pop = 0.0;
+      auto asfr_w = 0.0;
+      for (int a_idx = a_idx_in; a_idx < (a_idx_in + hAG_span[a]); ++a_idx) {
+        total_pop += n_dp.p_total_pop(a_idx, 1);
+        asfr_w += p_dp.age_specific_fertility_rate(a_idx - p_idx_fertility_first, t) / i_hc.asfr_sum;
+      }
+      //set up a_idx_in for the next loop
+      a_idx_in = a_idx_in + hAG_span[a];
+      asfr_w /= hAG_span[a];
+
+      i_hc.prev = i_hc.nHIVcurr / total_pop;
 
       for (int hd = 0; hd < hDS; ++hd) {
         i_hc.df += p_hc.local_adj_factor *
           p_hc.fert_mult_by_age(a, t) *
           p_hc.fert_mult_off_art(hd) *
           (n_ha.h_hiv_adult(hd, a, 1) + c_ha.h_hiv_adult(hd, a, 1)) / 2;
+
         // women on ART less than 6 months use the off art fertility multiplier
         i_hc.df += p_hc.local_adj_factor *
           p_hc.fert_mult_by_age(a, t) *
@@ -228,13 +242,17 @@ struct ChildModelSimulation<Config> {
         i_hc.df = 1;
       }
 
-      i_hc.birthsCurrAge = midyear_fertileHIV * p_hc.total_fertility_rate(t) *
-                           i_hc.df / (i_hc.df * i_hc.prev + 1 - i_hc.prev) *
-                           p_hc.hc_age_specific_fertility_rate(a, t) / i_hc.asfr_sum ;
 
-      i_hc.birthsHE += i_hc.birthsCurrAge;
+      n_hc.hiv_births_by_mat_age(a) = midyear_fertileHIV * p_hc.total_fertility_rate(t) *
+                           i_hc.df / (i_hc.df * i_hc.prev + 1 - i_hc.prev) *
+                           asfr_w;
+
+
+
+
+      i_hc.birthsHE += n_hc.hiv_births_by_mat_age(a);
       if (a < 9) {
-        i_hc.births_HE_15_24 += i_hc.birthsCurrAge;
+        i_hc.births_HE_15_24 += n_hc.hiv_births_by_mat_age(a);
       }
     } // end a
     n_hc.hiv_births = i_hc.birthsHE;

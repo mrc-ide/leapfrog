@@ -7,17 +7,8 @@
     "default": {
       "NS": 2,
       "pAG": 81,
-      "p_fertility_age_groups": 35,
-      "hc_p_fertility_age_groups": 35
-    },
-    "overrides": [
-      {
-        "applies_if": "use_coarse_stratification",
-        "vars": {
-          "hc_p_fertility_age_groups": 8
-        }
-      }
-    ]
+      "p_fertility_age_groups": 35
+    }
   },
   "pars": {
     "default": {

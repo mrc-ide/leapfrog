@@ -271,8 +271,8 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   v$frr_art6mos_full <- rep(projp$frr_art6mos, each = age_band_width)
   v$frr_art6mos_coarse <- array(projp$frr_art6mos[fert_rat.h.ag])
 
-  v$fert_rat_coarse <- array(1, c(hDS, length(h.fert.idx), proj_years))
-  v$fert_rat_coarse[,,] <- rep(projp$fert_rat[fert_rat.h.ag, as.character(projp$yr_end:projp$yr_start )], each=hDS)
+  v$fert_rat_coarse <- array(1, c(length(h.fert.idx), proj_years))
+  v$fert_rat_coarse[,] <- rep(projp$fert_rat[fert_rat.h.ag, as.character(projp$yr_end:projp$yr_start )], length(proj_years))
   v$fert_rat_full <- apply(projp$fert_rat, 2, rep, each = age_band_width)
   v$frr_scalar <- as.numeric(projp$frr_scalar)
 

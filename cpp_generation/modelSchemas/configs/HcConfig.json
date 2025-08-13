@@ -22,6 +22,7 @@
       "hBF_coarse": 4,
       "hcAG_coarse": 4,
       "hAB_ind": 2,
+      "hc_p_fertility_age_groups": 35,
       "hc_age_coarse": [1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3],
       "hc_age_coarse_cd4": [0, 0, 0, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
       "hc_cd4_transition": [
@@ -41,7 +42,16 @@
         [0,   0,   0,   0,   0,         0.21],
         [0,   0,   0,   0,   0,         0.44]
       ]
-    }
+    },
+    "overrides": [
+      {
+        "applies_if": "use_coarse_stratification",
+        "vars": {
+          "hc_p_fertility_age_groups": 8
+        }
+      }
+    ]
+
   },
   "pars": {
     "default": {
@@ -461,9 +471,6 @@
     "prev": {
       "num_type": "real_type"
     },
-    "birthsCurrAge": {
-      "num_type": "real_type"
-    },
     "birthsHE": {
       "num_type": "real_type"
     },
@@ -572,6 +579,10 @@
     }
   },
   "state": {
+    "hiv_births_by_mat_age": {
+      "num_type": "real_type",
+      "dims": ["SS::hc_p_fertility_age_groups"]
+    },
     "hc1_hiv_pop": {
       "num_type": "real_type",
       "dims": ["SS::hc1DS", "SS::hcTT", "SS::hc1AG", "SS::NS"]

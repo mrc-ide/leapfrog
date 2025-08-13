@@ -940,8 +940,8 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, asfr) {
 
   ##Make a coarse ASFR, needed to run WLHIV births at the coarse level
   fert_ages.idx <- 1L + cumsum(params$hAG_SPAN_coarse[h.fert.idx]) - params$hAG_SPAN_coarse[h.fert.idx]
-  v$asfr_coarse <- as.array(unname(asfr[fert_ages.idx,]))
-
+  #v$asfr_coarse <- as.array(unname(asfr[fert_ages.idx,]))
+  v$asfr_coarse <- as.array(rowsum(asfr, group = coarse_age_groups))
 
   total_births <- SpectrumUtils::dp.output.births(dp.raw = dp.x, direction = 'long')$Value %>% as.array()
   v$total_births <- total_births

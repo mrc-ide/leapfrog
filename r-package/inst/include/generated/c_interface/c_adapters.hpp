@@ -246,6 +246,7 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
     const CState<real_type>& state
   ){
     typename Config::State initial_state;
+    fill_initial_state<real_type, typename Config::State::shape_hiv_births_by_mat_age>(state.hc->hiv_births_by_mat_age, state.hc->hiv_births_by_mat_age_length, "hiv_births_by_mat_age", initial_state.hiv_births_by_mat_age);
     fill_initial_state<real_type, typename Config::State::shape_hc1_hiv_pop>(state.hc->hc1_hiv_pop, state.hc->hc1_hiv_pop_length, "hc1_hiv_pop", initial_state.hc1_hiv_pop);
     fill_initial_state<real_type, typename Config::State::shape_hc2_hiv_pop>(state.hc->hc2_hiv_pop, state.hc->hc2_hiv_pop_length, "hc2_hiv_pop", initial_state.hc2_hiv_pop);
     fill_initial_state<real_type, typename Config::State::shape_hc1_art_pop>(state.hc->hc1_art_pop, state.hc->hc1_art_pop_length, "hc1_art_pop", initial_state.hc1_art_pop);
@@ -262,13 +263,14 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
     return initial_state;
   };
 
-  static constexpr int output_count = 13;
+  static constexpr int output_count = 14;
 
   static int build_output(
     int index,
     const Config::OutputState& state,
     CState<real_type>& out
   ) {
+    write_data<real_type, typename Config::OutputState::shape_hiv_births_by_mat_age>(state.hiv_births_by_mat_age, out.hc->hiv_births_by_mat_age, out.hc->hiv_births_by_mat_age_length, "hiv_births_by_mat_age");
     write_data<real_type, typename Config::OutputState::shape_hc1_hiv_pop>(state.hc1_hiv_pop, out.hc->hc1_hiv_pop, out.hc->hc1_hiv_pop_length, "hc1_hiv_pop");
     write_data<real_type, typename Config::OutputState::shape_hc2_hiv_pop>(state.hc2_hiv_pop, out.hc->hc2_hiv_pop, out.hc->hc2_hiv_pop_length, "hc2_hiv_pop");
     write_data<real_type, typename Config::OutputState::shape_hc1_art_pop>(state.hc1_art_pop, out.hc->hc1_art_pop, out.hc->hc1_art_pop_length, "hc1_art_pop");
@@ -290,6 +292,7 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
     const Config::State& state,
     CState<real_type>& out
   ) {
+    write_data<real_type, typename Config::State::shape_hiv_births_by_mat_age>(state.hiv_births_by_mat_age, out.hc->hiv_births_by_mat_age, out.hc->hiv_births_by_mat_age_length, "hiv_births_by_mat_age");
     write_data<real_type, typename Config::State::shape_hc1_hiv_pop>(state.hc1_hiv_pop, out.hc->hc1_hiv_pop, out.hc->hc1_hiv_pop_length, "hc1_hiv_pop");
     write_data<real_type, typename Config::State::shape_hc2_hiv_pop>(state.hc2_hiv_pop, out.hc->hc2_hiv_pop, out.hc->hc2_hiv_pop_length, "hc2_hiv_pop");
     write_data<real_type, typename Config::State::shape_hc1_art_pop>(state.hc1_art_pop, out.hc->hc1_art_pop, out.hc->hc1_art_pop_length, "hc1_art_pop");
