@@ -5,12 +5,13 @@
 ## and HIV parameters for both the adult and the child model.
 ## We also run leapfrog and save out the result for use in reference tests
 
+devtools::load_all()
+
 # nolint start
-library(frogger)
 library(dplyr)
 
 ## Create demographic and projection parameters for adults
-pjnz_adult <- system.file("pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ", package = "frogger", mustWork = TRUE)
+pjnz_adult <- file.path("inst", "pjnz", "bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ")
 
 demp <- prepare_leapfrog_demp(pjnz_adult)
 proj <- prepare_leapfrog_projp(pjnz_adult)
@@ -32,13 +33,13 @@ save_parameters(parameters_coarse, testthat::test_path("testdata/adult_parms_coa
 
 # Used as reference data (Run from leapfrog/master)
 lmod <- leapfrog::leapfrogR(demp, proj)
-frogger:::save_hdf5_file(lmod, testthat::test_path("testdata/leapfrog_fit.h5"))
+save_hdf5_file(lmod, testthat::test_path("testdata/leapfrog_fit.h5"))
 
 lmod <- leapfrog::leapfrogR(demp, proj, hiv_strat = "coarse")
-frogger:::save_hdf5_file(lmod, testthat::test_path("testdata/leapfrog_fit_coarse.h5"))
+save_hdf5_file(lmod, testthat::test_path("testdata/leapfrog_fit_coarse.h5"))
 
 lmod <- leapfrog::leapfrogR(demp, proj, hiv_steps_per_year = 0L)
-frogger:::save_hdf5_file(lmod, testthat::test_path("testdata/fit_demography.h5"))
+save_hdf5_file(lmod, testthat::test_path("testdata/fit_demography.h5"))
 
 #Create paeds parameters
 pjnz_child <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct.PJNZ")
