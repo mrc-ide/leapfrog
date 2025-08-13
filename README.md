@@ -96,6 +96,14 @@ Then to run code generation follow
       - Eigen had some compiler warnings when it was compiled.
       - Column-major indexing in the same order as R (Eigen also has this).
 
+### Testing
+
+To run any of the tests you will need to generate test data. To do this you must have `R` installed, you'll have to change directories to `r-package` and run
+
+```bash
+./scripts/create_test_data.R
+```
+
 ## License
 
 MIT © Imperial College of Science, Technology and Medicine

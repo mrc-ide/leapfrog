@@ -33,6 +33,7 @@ jobs:
           working-directory: r-package
 
       - name: Create test data
+        shell: bash
         run: ./scripts/create_test_data.R
 
       - name: Test coverage

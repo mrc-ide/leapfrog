@@ -57,6 +57,7 @@ jobs:
 
       - name: Create test data
         working-directory: r-package
+        shell: bash
         run: ./scripts/create_test_data.R
 
       - name: Run tests
