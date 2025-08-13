@@ -14,21 +14,13 @@ library(dplyr)
 pjnz_adult <- file.path("inst", "pjnz", "bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ")
 
 demp <- prepare_leapfrog_demp(pjnz_adult)
+
 proj <- prepare_leapfrog_projp(pjnz_adult)
 parameters <- c(demp, proj)
+save_parameters(parameters, testthat::test_path("testdata/adult_parms.h5"))
 
-parameters_full <- parameters
-parameters_full$cd4_initdist <- parameters$cd4_initdist_full
-parameters_full$cd4_prog <- parameters$cd4_prog_full
-parameters_full$cd4_mort <- parameters$cd4_mort_full
-parameters_full$art_mort <- parameters$art_mort_full
-save_parameters(parameters_full, testthat::test_path("testdata/adult_parms.h5"))
-
-parameters_coarse <- parameters
-parameters_coarse$cd4_initdist <- parameters$cd4_initdist_coarse
-parameters_coarse$cd4_prog <- parameters$cd4_prog_coarse
-parameters_coarse$cd4_mort <- parameters$cd4_mort_coarse
-parameters_coarse$art_mort <- parameters$art_mort_coarse
+proj_coarse <- prepare_leapfrog_projp(pjnz_adult, use_coarse_age_groups = TRUE)
+parameters_coarse <- c(demp, proj_coarse)
 save_parameters(parameters_coarse, testthat::test_path("testdata/adult_parms_coarse.h5"))
 
 # Used as reference data (Run from leapfrog/master)
@@ -47,6 +39,10 @@ pjnz_child <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct.PJN
 demp <- prepare_leapfrog_demp(pjnz_child)
 proj <- prepare_leapfrog_projp(pjnz_child)
 proj <- prepare_hc_leapfrog_projp(pjnz_child, proj)
+
+demp <- prepare_leapfrog_demp(pjnz_child)
+proj_coarse <- prepare_leapfrog_projp(pjnz_child)
+proj_coarse <- prepare_hc_leapfrog_projp(pjnz_child, proj_coarse)
 
 demp$netmigr <- leapfrog:::read_netmigr(pjnz_child, adjust_u5mig = FALSE)
 demp$netmigr_adj <- leapfrog:::adjust_spectrum_netmigr(demp$netmigr)
@@ -135,20 +131,10 @@ out <- list(dp = dp,
             ctx_need = as.numeric(unlist(spec_ctx_need)))
 
 parameters <- c(proj, demp)
+parameters_coarse <- c(proj_coarse, demp)
 
-parameters_full <- parameters
-parameters_full$cd4_initdist <- parameters$cd4_initdist_full
-parameters_full$cd4_prog <- parameters$cd4_prog_full
-parameters_full$cd4_mort <- parameters$cd4_mort_full
-parameters_full$art_mort <- parameters$art_mort_full
-save_parameters(parameters_full, testthat::test_path("testdata/child_parms.h5"))
-
-parameters_coarse <- parameters
-parameters_coarse$cd4_initdist <- parameters$cd4_initdist_coarse
-parameters_coarse$cd4_prog <- parameters$cd4_prog_coarse
-parameters_coarse$cd4_mort <- parameters$cd4_mort_coarse
-parameters_coarse$art_mort <- parameters$art_mort_coarse
-save_parameters(parameters, testthat::test_path("testdata/child_parms_coarse.h5"))
+save_parameters(parameters, testthat::test_path("testdata/child_parms.h5"))
+save_parameters(parameters_coarse, testthat::test_path("testdata/child_parms_coarse.h5"))
 
 # need this for child model tests
 saveRDS(out, testthat::test_path("testdata/child_test_utils.rds"))
