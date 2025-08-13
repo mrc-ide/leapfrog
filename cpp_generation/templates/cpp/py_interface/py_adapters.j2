@@ -58,7 +58,7 @@ struct {{ config.name }}Adapter<Language::Py, real_type, ModelVariant> {
     const Options<real_type> &opts
   ) {
     return {
-      {% for name, cfg in config.pars.default.items() %}
+      {% for name, cfg in config.pars.items() %}
       .{{ name }} = {{ get_py_parse_data(name, cfg) }}{{ comma_except_last(loop) }}
       {% endfor %}
     };
