@@ -213,11 +213,11 @@ test_that("error thrown if model run with invalid configuration", {
 
 test_that("error thrown if size of stratified data does not match expected", {
   parameters <- read_parameters(test_path("testdata/adult_parms.h5"))
-  parameters[["cd4_mort_full"]] <- rep(1, 3)
+  parameters[["cd4_mort"]] <- rep(1, 3)
 
   expect_error(
     run_model(parameters, "HivFullAgeStratification", 2030L),
-    "Invalid size of data for 'cd4_mort_full', expected 924 got 3"
+    "Invalid size of data for 'cd4_mort', expected 924 got 3"
   )
 })
 
