@@ -11,13 +11,13 @@ devtools::load_all()
 library(dplyr)
 
 ## Create demographic and projection parameters for adults
-pjnz_adult <- testthat::test_path("tesdata/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ")
+pjnz_adult <- testthat::test_path("testdata/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ")
 
 demp <- prepare_leapfrog_demp(pjnz_adult)
 
 proj <- prepare_leapfrog_projp(pjnz_adult)
 parameters <- c(demp, proj)
-save_parameters(parameters, testthat::test_path("testdata/adult_parms.h5"))
+save_parameters(parameters, testthat::test_path("testdata/adult_parms_full.h5"))
 
 proj_coarse <- prepare_leapfrog_projp(pjnz_adult, use_coarse_age_groups = TRUE)
 parameters_coarse <- c(demp, proj_coarse)
@@ -37,7 +37,7 @@ leapfrog_proj_coarse$cd4_mort_coarse <- proj_coarse$cd4_mort
 leapfrog_proj_coarse$art_mort_coarse <- proj_coarse$art_mort
 # Used as reference data (Run from leapfrog/master)
 lmod <- leapfrog::leapfrogR(demp, leapfrog_proj)
-save_hdf5_file(lmod, testthat::test_path("testdata/leapfrog_fit.h5"))
+save_hdf5_file(lmod, testthat::test_path("testdata/leapfrog_fit_full.h5"))
 
 lmod <- leapfrog::leapfrogR(demp, leapfrog_proj_coarse, hiv_strat = "coarse")
 save_hdf5_file(lmod, testthat::test_path("testdata/leapfrog_fit_coarse.h5"))
@@ -145,7 +145,7 @@ out <- list(dp = dp,
 parameters <- c(proj, demp)
 parameters_coarse <- c(proj_coarse, demp)
 
-save_parameters(parameters, testthat::test_path("testdata/child_parms.h5"))
+save_parameters(parameters, testthat::test_path("testdata/child_parms_full.h5"))
 save_parameters(parameters_coarse, testthat::test_path("testdata/child_parms_coarse.h5"))
 
 # need this for child model tests

@@ -1,5 +1,5 @@
 test_that("demographic model is correct", {
-  parameters <- read_parameters(test_path("testdata/adult_parms.h5"))
+  parameters <- read_parameters(test_path("testdata/adult_parms_full.h5"))
 
   actual <- run_model(parameters, "DemographicProjection")
 
@@ -13,10 +13,10 @@ test_that("demographic model is correct", {
 
 
 test_that("model agrees with leapfrog impl", {
-  parameters <- read_parameters(test_path("testdata/adult_parms.h5"))
+  parameters <- read_parameters(test_path("testdata/adult_parms_full.h5"))
   actual <- run_model(parameters)
 
-  expected <- read_parameters(test_path("testdata/leapfrog_fit.h5"))
+  expected <- read_parameters(test_path("testdata/leapfrog_fit_full.h5"))
 
   expect_equal(actual$p_total_pop, expected$totpop1)
   ## expected births doesn't have dim attribute so drop it for tests
