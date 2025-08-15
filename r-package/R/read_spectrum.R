@@ -659,10 +659,12 @@ dp_read_paed_art_eligibility <- function(dp) {
 #' pjnz <- system.file(
 #'   "pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ",
 #'   package = "frogger", mustWork = TRUE)
-#' projp <- prepare_leapfrog_projp(pjnz)
-#' projp <- prepare_hc_leapfrog_projp(pjnz, projp)
+#'   demp <- prepare_leapfrog_demp(pjnz)
+#'   proj <- prepare_leapfrog_projp(pjnz)
+#'   parameters <- c(proj, demp)
+#' projp <- prepare_hc_leapfrog_projp(pjnz, parameters)
 #' @export
-prepare_hc_leapfrog_projp <- function(pjnz, params, asfr) {
+prepare_hc_leapfrog_projp <- function(pjnz, params) {
   dp.x <- get_dp_data(pjnz)
 
   ## projection parameters
@@ -940,8 +942,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, asfr) {
 
   ##Make a coarse ASFR, needed to run WLHIV births at the coarse level
   fert_ages.idx <- 1L + cumsum(params$hAG_SPAN_coarse[h.fert.idx]) - params$hAG_SPAN_coarse[h.fert.idx]
-  #v$asfr_coarse <- as.array(unname(asfr[fert_ages.idx,]))
-  v$asfr_coarse <- as.array(rowsum(asfr, group = coarse_age_groups))
+  v$asfr_coarse <- as.array(rowsum(params$asfr, group = coarse_age_groups))
 
   total_births <- SpectrumUtils::dp.output.births(dp.raw = dp.x, direction = 'long')$Value %>% as.array()
   v$total_births <- total_births

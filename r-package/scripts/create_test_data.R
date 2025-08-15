@@ -32,11 +32,11 @@ frogger:::save_hdf5_file(lmod, testthat::test_path("testdata/fit_demography.h5")
 pjnz_child <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct.PJNZ")
 
 demp <- prepare_leapfrog_demp(pjnz_child)
-proj <- prepare_leapfrog_projp(pjnz_child)
-proj <- prepare_hc_leapfrog_projp(pjnz_child, proj, demp$asfr)
-
 demp$netmigr <- leapfrog:::read_netmigr(pjnz_child, adjust_u5mig = FALSE)
 demp$netmigr_adj <- leapfrog:::adjust_spectrum_netmigr(demp$netmigr)
+proj <- prepare_leapfrog_projp(pjnz_child)
+parameters <- c(proj, demp)
+parameters <- prepare_hc_leapfrog_projp(pjnz_child, parameters)
 
 dpfile <- grep(".DP$", utils::unzip(pjnz_child, list=TRUE)$Name, value=TRUE)
 dp <- utils::read.csv(unz(pjnz_child, dpfile), as.is=TRUE)
@@ -121,7 +121,7 @@ out <- list(dp = dp,
             deaths_art = aids_deathsart,
             ctx_need = as.numeric(unlist(spec_ctx_need)))
 
-parameters <- c(proj, demp)
+
 save_parameters(parameters, testthat::test_path("testdata/child_parms.h5"))
 # need this for child model tests
 saveRDS(out, testthat::test_path("testdata/child_test_utils.rds"))
