@@ -830,8 +830,8 @@ struct HcConfig {
     >;
     nda::array<real_type, shape_art_ltfu_grad> art_ltfu_grad;
     using shape_p_hiv_neg_pop = nda::shape<
-      nda::dim<0, SS::hAG, 1>,
-      nda::dim<0, SS::NS, (SS::hAG)>
+      nda::dim<0, SS::pAG, 1>,
+      nda::dim<0, SS::NS, (SS::pAG)>
     >;
     nda::array<real_type, shape_p_hiv_neg_pop> p_hiv_neg_pop;
     using shape_PMTCT_coverage = nda::shape<
@@ -851,7 +851,6 @@ struct HcConfig {
     real_type df;
     real_type prev;
     real_type birthsHE;
-    real_type births_HE_15_24;
     real_type sumARV;
     real_type need_PMTCT;
     real_type on_PMTCT;
@@ -922,7 +921,6 @@ struct HcConfig {
       df = 0;
       prev = 0;
       birthsHE = 0;
-      births_HE_15_24 = 0;
       sumARV = 0;
       need_PMTCT = 0;
       on_PMTCT = 0;
