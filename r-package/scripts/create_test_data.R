@@ -11,7 +11,7 @@ devtools::load_all()
 library(dplyr)
 
 ## Create demographic and projection parameters for adults
-pjnz_adult <- testthat::test_path("testdata/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ")
+pjnz_adult <- file.path(here::here(), "inst", "pjnz", "bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ")
 
 demp <- prepare_leapfrog_demp(pjnz_adult)
 
@@ -46,7 +46,7 @@ lmod <- leapfrog::leapfrogR(demp, leapfrog_proj, hiv_steps_per_year = 0L)
 save_hdf5_file(lmod, testthat::test_path("testdata/fit_demography.h5"))
 
 #Create paeds parameters
-pjnz_child <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct.PJNZ")
+pjnz_child <- file.path(here::here(), "inst", "pjnz", "bwa_aim-no-special-elig-numpmtct.PJNZ")
 
 demp <- prepare_leapfrog_demp(pjnz_child)
 proj <- prepare_leapfrog_projp(pjnz_child)
@@ -69,9 +69,9 @@ yr_end <- as.integer(dpsub(dp, "<FinalYear MV2>",2,4))
 proj.years <- yr_start:yr_end
 timedat.idx <- 4+1:length(proj.years)-1
 
-pop1 = paste0(getwd(), '/', gsub(x = pjnz_child, pattern = '.PJNZ', replacement = '.xlsx'))
+pop1 <- file.path(here::here(), "inst", "pjnz", "bwa_aim-no-special-elig-numpmtct.xlsx")
 
-spectrum_output <- function(file = testthat::test_path("testdata/spectrum/v6.13/bwa_aim-no-special-elig-numpmtct.xlsx"), ages = 0:14, country = 'Botswana', years_in = 1970:2030){
+spectrum_output <- function(file, ages = 0:14, country = 'Botswana', years_in = 1970:2030){
   ##pull out stratified population from the .xlsx file, This function doesn't take out the paediatric output, so going to just compare to the Spectrum software itself
   df <- file
   # if(grepl(pattern = 'testdata', file)){
