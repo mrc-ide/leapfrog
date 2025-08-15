@@ -81,7 +81,7 @@ jobs:
         shell: bash
         working-directory: cpp_interface
         run: |
-          ./build/simulate_model 61 ../r-package/tests/testthat/testdata/adult_parms.h5 ../model-outputs
+          ./build/simulate_model 61 ../r-package/tests/testthat/testdata/adult_parms_full.h5 ../model-outputs
 
       - name: Check equality
         shell: bash
