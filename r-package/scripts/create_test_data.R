@@ -11,7 +11,7 @@ devtools::load_all()
 library(dplyr)
 
 ## Create demographic and projection parameters for adults
-pjnz_adult <- file.path("inst", "pjnz", "bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ")
+pjnz_adult <- testthat::test_path("tesdata/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ")
 
 demp <- prepare_leapfrog_demp(pjnz_adult)
 
@@ -71,7 +71,7 @@ timedat.idx <- 4+1:length(proj.years)-1
 
 pop1 = paste0(getwd(), '/', gsub(x = pjnz_child, pattern = '.PJNZ', replacement = '.xlsx'))
 
-spectrum_output <- function(file = "../testdata/spectrum/v6.13/bwa_aim-no-special-elig-numpmtct.xlsx", ages = 0:14, country = 'Botswana', years_in = 1970:2030){
+spectrum_output <- function(file = testthat::test_path("testdata/spectrum/v6.13/bwa_aim-no-special-elig-numpmtct.xlsx"), ages = 0:14, country = 'Botswana', years_in = 1970:2030){
   ##pull out stratified population from the .xlsx file, This function doesn't take out the paediatric output, so going to just compare to the Spectrum software itself
   df <- file
   # if(grepl(pattern = 'testdata', file)){
