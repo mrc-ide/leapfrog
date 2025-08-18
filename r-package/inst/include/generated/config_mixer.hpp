@@ -19,6 +19,9 @@ enum Language {
 
 namespace internal {
 
+template<bool enable, typename T>
+struct Pair;
+
 template<Language L, typename real_type, MV ModelVariant>
 struct DpAdapter;
 

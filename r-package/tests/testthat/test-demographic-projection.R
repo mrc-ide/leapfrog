@@ -1,5 +1,5 @@
 test_that("demographic projection can be run", {
-  parameters <- read_parameters(test_path("testdata/adult_parms.h5"))
+  parameters <- read_parameters(test_path("testdata/adult_parms_full.h5"))
 
   out <- run_model(parameters, "DemographicProjection", 1970:2030)
 

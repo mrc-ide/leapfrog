@@ -75,6 +75,10 @@ struct HaParams {
   int initiation_mortality_weight_length;
   real_type* h_art_stage_dur;
   int h_art_stage_dur_length;
+  int pAG_INCIDPOP;
+  int pAG_INCIDPOP_length;
+  int pIDX_INCIDPOP;
+  int pIDX_INCIDPOP_length;
 };
 
 template<typename real_type>

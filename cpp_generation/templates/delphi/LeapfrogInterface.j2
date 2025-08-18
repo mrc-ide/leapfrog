@@ -25,7 +25,7 @@ end;
 type
   Leapfrog{{ config.long_name }}ParamsView = record
   private
-    {% for name, cfg in config.pars.default.items() %}
+    {% for name, cfg in config.pars.items() %}
     {{ to_lower_camel_case(name) }}: {{ get_delphi_param_view_type(cfg) }};
     {{ to_lower_camel_case(name) }}Length: Integer;
     {% endfor %}
@@ -34,7 +34,7 @@ end;
 type
   Leapfrog{{ config.long_name }}Params = class
   public
-    {% for name, cfg in config.pars.default.items() %}
+    {% for name, cfg in config.pars.items() %}
     {{ to_lower_camel_case(name) }}: {{ get_delphi_param_type(cfg) }};
     {% endfor %}
     function getView(): Leapfrog{{ config.long_name }}ParamsView;
@@ -102,7 +102,7 @@ implementation
 {% for config in configs %}
 destructor Leapfrog{{ config.long_name }}Params.Destroy;
 begin;
-  {% for name, cfg in config.pars.default.items() %}
+  {% for name, cfg in config.pars.items() %}
   {% if dim_len(cfg) > 0 %}
   {{ to_lower_camel_case(name) }}.Free;
   {% endif %}
@@ -120,7 +120,7 @@ end;
 
 function Leapfrog{{ config.long_name }}Params.getView(): Leapfrog{{ config.long_name }}ParamsView;
 begin;
-  {% for name, cfg in config.pars.default.items() %}
+  {% for name, cfg in config.pars.items() %}
   {% if dim_len(cfg) > 0 %}
   Result.{{ to_lower_camel_case(name) }} := {{ get_delphi_param_view_type(cfg) }}({{ to_lower_camel_case(name) }}.data);
   Result.{{ to_lower_camel_case(name) }}Length := {{ to_lower_camel_case(name) }}.GetLength();
@@ -145,7 +145,7 @@ procedure Leapfrog{{ config.long_name }}Params.writeToDisk(dir: string);
 begin;
   if not DirectoryExists(dir) then
     ForceDirectories(dir);
-  {% for name, cfg in config.pars.default.items() %}
+  {% for name, cfg in config.pars.items() %}
   {% if dim_len(cfg) > 0 %}
   {{ to_lower_camel_case(name) }}.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  '{{ to_lower_camel_case(name) }}');
   {% endif %}

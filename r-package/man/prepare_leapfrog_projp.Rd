@@ -4,7 +4,12 @@
 \alias{prepare_leapfrog_projp}
 \title{Prepare adult HIV projection parameters from Spectrum PJNZ}
 \usage{
-prepare_leapfrog_projp(pjnz, hiv_steps_per_year = 10L, hTS = 3)
+prepare_leapfrog_projp(
+  pjnz,
+  use_coarse_age_groups = FALSE,
+  hiv_steps_per_year = 10L,
+  hTS = 3
+)
 }
 \arguments{
 \item{pjnz}{path to PJNZ file}

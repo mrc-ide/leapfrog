@@ -161,7 +161,7 @@
         "num_type": "real_type",
         "dims": ["SS::hc_p_fertility_age_groups", "opts.proj_steps"],
         "alias": {
-          "r": "fert_rat_full"
+          "r": "fert_rat"
         }
       },
       "fert_mult_off_art": {
@@ -175,7 +175,7 @@
         "num_type": "real_type",
         "dims": ["SS::hc_p_fertility_age_groups"],
         "alias": {
-          "r": "frr_art6mos_full"
+          "r": "frr_art6mos"
         }
       },
       "total_fertility_rate": {
@@ -283,14 +283,14 @@
         "num_type": "real_type",
         "dims": ["SS::hc_p_fertility_age_groups", "opts.proj_steps"],
         "alias": {
-          "r": "adult_female_infections_full"
+          "r": "adult_female_infections"
         }
       },
       "adult_female_hivnpop": {
         "num_type": "real_type",
         "dims": ["SS::hc_p_fertility_age_groups", "opts.proj_steps"],
         "alias": {
-          "r": "hivnpop_full"
+          "r": "hivnpop"
         }
       },
       "total_births": {
@@ -317,49 +317,7 @@
           "r": "asfr"
         }
       }
-    },
-       "overrides": [
-      {
-        "applies_if": "use_coarse_stratification",
-        "vars": {
-          "fert_mult_by_age": {
-            "num_type": "real_type",
-            "dims": ["SS::hc_p_fertility_age_groups", "opts.proj_steps"],
-            "alias": {
-              "r": "fert_rat_coarse"
-           }
-          },
-          "fert_mult_on_art": {
-            "num_type": "real_type",
-            "dims": ["SS::hc_p_fertility_age_groups"],
-            "alias": {
-              "r": "frr_art6mos_coarse"
-          }
-         },
-          "adult_female_infections":  {
-            "num_type": "real_type",
-            "dims": ["SS::hc_p_fertility_age_groups", "opts.proj_steps"],
-            "alias": {
-              "r": "adult_female_infections_coarse"
-            }
-          },
-          "adult_female_hivnpop": {
-            "num_type": "real_type",
-            "dims": ["SS::hc_p_fertility_age_groups", "opts.proj_steps"],
-            "alias": {
-              "r": "hivnpop_coarse"
-            }
-          },
-          "hc_age_specific_fertility_rate": {
-            "num_type": "real_type",
-            "dims": ["SS::hc_p_fertility_age_groups", "opts.proj_steps"],
-            "alias": {
-              "r": "asfr_coarse"
-            }
-          }
-        }
-      }
-    ]
+    }
   },
 
   "intermediate": {

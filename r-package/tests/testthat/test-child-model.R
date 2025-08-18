@@ -1,6 +1,5 @@
-test_that("Full child model can be run for all years", {
-  parameters <- read_parameters(test_path("testdata/child_parms.h5"))
-  parameters$mat_prev_input[] <- as.integer(0)
+test_that("Child model can be run for all years", {
+  parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
   expect_silent(out <- run_model(parameters, "ChildModel", 1970:2030))
 
   expect_setequal(
@@ -80,7 +79,7 @@ test_that("Coarse child model can be run for all years", {
 })
 
 test_that("Model outputs are consistent", {
-  parameters <- read_parameters(test_path("testdata/child_parms.h5"))
+  parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
   out <- run_model(parameters, "ChildModel", 1970:2030)
 
   ###############################
@@ -170,7 +169,7 @@ test_that("Model outputs are consistent", {
 
 test_that("Female 15-49y pop aligns", {
   testthat::skip("Skipping this test because the adult populations currently do not align")
-  parameters <- read_parameters(test_path("testdata/child_parms.h5"))
+  parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
   utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
   dp <- utils$dp
@@ -197,7 +196,7 @@ test_that("Female 15-49y pop aligns", {
 })
 
 test_that("Mothers that need ptmct align", {
-  parameters <- read_parameters(test_path("testdata/child_parms.h5"))
+  parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
   utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
   dp <- utils$dp
@@ -216,7 +215,7 @@ test_that("Mothers that need ptmct align", {
 })
 
 test_that("Children in need of cotrim aligns", {
-  parameters <- read_parameters(test_path("testdata/child_parms.h5"))
+  parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
   utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
   out <- run_model(parameters, "ChildModel", 1970:2030)
@@ -232,7 +231,7 @@ test_that("Children in need of cotrim aligns", {
 })
 
 test_that("Infections among children align", {
-  parameters <- read_parameters(test_path("testdata/child_parms.h5"))
+  parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
   utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
   dp <- utils$dp
@@ -267,7 +266,7 @@ test_that("Infections among children align", {
 })
 
 test_that("CLHIV align", {
-  parameters <- read_parameters(test_path("testdata/child_parms.h5"))
+  parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
   utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
   dp <- utils$dp
@@ -318,7 +317,7 @@ test_that("CLHIV align", {
 })
 
 test_that("CLHIV on ART align", {
-  parameters <- read_parameters(test_path("testdata/child_parms.h5"))
+  parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
   utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
   dp <- utils$dp
@@ -368,7 +367,7 @@ test_that("CLHIV on ART align", {
 })
 
 test_that("HIV related deaths among CLHIV not on ART align", {
-  parameters <- read_parameters(test_path("testdata/child_parms.h5"))
+  parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
   utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
   dp <- utils$dp
@@ -399,7 +398,7 @@ test_that("HIV related deaths among CLHIV not on ART align", {
 })
 
 test_that("HIV related deaths among CLHIV on ART align", {
-  parameters <- read_parameters(test_path("testdata/child_parms.h5"))
+  parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
   utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
   dp <- utils$dp
@@ -431,7 +430,7 @@ test_that("HIV related deaths among CLHIV on ART align", {
 })
 
 test_that("Child model agrees when run through all years vs two parts vs single year runs", {
-  parameters <- read_parameters(test_path("testdata/child_parms.h5"))
+  parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
 
   # All years
   out_all_years <- run_model(parameters, "ChildModel", 1970:2030)
@@ -451,7 +450,7 @@ test_that("Child model agrees when run through all years vs two parts vs single 
 })
 
 test_that("error thrown if trying to output from years before simulation start year", {
-  parameters <- read_parameters(test_path("testdata/child_parms.h5"))
+  parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
 
   out_first_half_years <- run_model(parameters, "ChildModel", 1970:2000)
   expect_error(
