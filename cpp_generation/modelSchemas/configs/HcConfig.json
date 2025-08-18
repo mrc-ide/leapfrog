@@ -14,6 +14,7 @@
       "hc1AG_c": 2,
       "hc2AG": 10,
       "hc2AG_c": 1,
+      "hc_infant": 2,
       "hcTT": 4,
       "hPS": 7,
       "hPS_dropout": 6,
@@ -225,7 +226,7 @@
           "r": "bf_duration_no_art"
         }
       },
-      "bigpop": {
+      "infant_sex_ratio": {
         "num_type": "real_type",
         "dims": ["SS::pAG", "SS::NS","opts.proj_steps"]
       },
