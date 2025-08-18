@@ -21,6 +21,8 @@ Prepare child HIV projection parameters from Spectrum PJNZ
 pjnz <- system.file(
   "pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ",
   package = "frogger", mustWork = TRUE)
-projp <- prepare_leapfrog_projp(pjnz)
-projp <- prepare_hc_leapfrog_projp(pjnz, projp)
+demp <- prepare_leapfrog_demp(pjnz)
+proj <- prepare_leapfrog_projp(pjnz)
+params <- c(proj, demp)
+projp <- prepare_hc_leapfrog_projp(pjnz, params)
 }
