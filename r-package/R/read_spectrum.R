@@ -661,8 +661,8 @@ dp_read_paed_art_eligibility <- function(dp) {
 #'   package = "frogger", mustWork = TRUE)
 #' demp <- prepare_leapfrog_demp(pjnz)
 #' proj <- prepare_leapfrog_projp(pjnz)
-#' parameters <- c(proj, demp)
-#' projp <- prepare_hc_leapfrog_projp(pjnz, params = parameters)
+#' params <- c(proj, demp)
+#' projp <- prepare_hc_leapfrog_projp(pjnz, params)
 #' @export
 prepare_hc_leapfrog_projp <- function(pjnz, params) {
   dp.x <- get_dp_data(pjnz)
@@ -934,9 +934,10 @@ prepare_hc_leapfrog_projp <- function(pjnz, params) {
                                 15L + cumsum(v$hAG_SPAN_coarse[h.fert.idx]) -
                                   v$hAG_SPAN_coarse[h.fert.idx])
   coarse_age_groups <- cut(15:49,
-                           breaks = 15L + cumsum(v$hAG_SPAN_coarse[h.fert.idx]) -
-                             v$hAG_SPAN_coarse[h.fert.idx],
+                           breaks = c(15L + cumsum(v$hAG_SPAN_coarse[h.fert.idx]) -
+                             v$hAG_SPAN_coarse[h.fert.idx], 50),
                            right = FALSE)
+
   v$hivnpop_coarse <- as.array(rowsum(hivnpop, group = coarse_age_groups))
   v$adult_female_infections_coarse <- as.array(rowsum(inc.array, group = coarse_age_groups))
 
