@@ -54,11 +54,11 @@ demp$netmigr_adj <- leapfrog:::adjust_spectrum_netmigr(demp$netmigr)
 
 proj_coarse <- prepare_leapfrog_projp(pjnz_child, use_coarse_age_groups = TRUE)
 parameters_coarse <- c(demp, proj_coarse)
-parameters_coarse <- prepare_hc_leapfrog_projp(pjnz_child, parameters_coarse, use_coarse_age_groups = TRUE)
+parameters_coarse <- prepare_hc_leapfrog_projp(pjnz_child,  params = parameters_coarse, use_coarse_age_groups = TRUE)
 
-proj <- prepare_leapfrog_projp(pjnz_child)
+proj <- prepare_leapfrog_projp(pjnz_child, use_coarse_age_groups = FALSE)
 parameters <- c(proj, demp)
-parameters <- prepare_hc_leapfrog_projp(pjnz_child, parameters)
+parameters <- prepare_hc_leapfrog_projp(pjnz_child, params = parameters, use_coarse_age_groups = FALSE)
 
 dpfile <- grep(".DP$", utils::unzip(pjnz_child, list=TRUE)$Name, value=TRUE)
 dp <- utils::read.csv(unz(pjnz_child, dpfile), as.is=TRUE)

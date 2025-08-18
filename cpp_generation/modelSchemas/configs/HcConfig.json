@@ -51,10 +51,8 @@
         }
       }
     ]
-
   },
   "pars": {
-    "default": {
       "hc_nosocomial": {
         "num_type": "real_type",
         "dims": ["opts.proj_steps"],
@@ -314,12 +312,10 @@
         "num_type": "real_type",
         "dims": ["SS::hc_p_fertility_age_groups", "opts.proj_steps"],
         "alias": {
-          "r": "asfr"
+          "r": "hc_asfr"
         }
       }
-    }
   },
-
   "intermediate": {
     "age15_hiv_pop": {
       "num_type": "real_type",

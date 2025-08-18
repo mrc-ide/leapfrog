@@ -38,7 +38,7 @@ test_that("Child model can be run for all years", {
 })
 
 test_that("Coarse child model can be run for all years", {
-  parameters <- read_parameters(test_path("testdata/child_parms.h5"))
+  parameters <- read_parameters(test_path("testdata/child_parms_coarse.h5"))
   parameters$mat_prev_input[] <- as.integer(0)
   out_coarse <- run_model(parameters, "CoarseChildModel", 1970:2030)
 
@@ -459,3 +459,4 @@ test_that("error thrown if trying to output from years before simulation start y
     fixed = TRUE
   )
 })
+

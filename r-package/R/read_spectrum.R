@@ -664,7 +664,7 @@ dp_read_paed_art_eligibility <- function(dp) {
 #' params <- c(proj, demp)
 #' projp <- prepare_hc_leapfrog_projp(pjnz, params)
 #' @export
-prepare_hc_leapfrog_projp <- function(pjnz, params) {
+prepare_hc_leapfrog_projp <- function(pjnz, params, use_coarse_age_groups = FALSE) {
   dp.x <- get_dp_data(pjnz)
 
   ## projection parameters
@@ -963,6 +963,42 @@ prepare_hc_leapfrog_projp <- function(pjnz, params) {
   v$prop_gte350 <- colSums(wlhiv_cd4[1:2,]) / colSums(wlhiv_cd4)
   v$prop_lt200 <- colSums(wlhiv_cd4[5:7,]) / colSums(wlhiv_cd4)
 
+
+  if (use_coarse_age_groups) {
+    v$fert_rat <- v$fert_rat_coarse
+    v$frr_art6mos <- v$frr_art6mos_coarse
+    v$adult_female_infections <- v$adult_female_infections_coarse
+    v$hivnpop <- v$hivnpop_coarse
+    v$hc_asfr <- v$asfr_coarse
+
+    ##Replace the parameters we don't need
+    v$fert_rat_coarse <- NULL
+    v$frr_art6mos_coarse <- NULL
+    v$adult_female_infections_coarse <- NULL
+    v$hivnpop_coarse <- NULL
+    v$asfr_coarse <- NULL
+    v$fert_rat_full <- NULL
+    v$frr_art6mos_full <- NULL
+    v$adult_female_infections_full <- NULL
+    v$hivnpop_full <- NULL
+  } else {
+    v$fert_rat <- v$fert_rat_full
+    v$frr_art6mos <- v$frr_art6mos_full
+    v$adult_female_infections <- v$adult_female_infections_full
+    v$hivnpop <- v$hivnpop_full
+    v$hc_asfr <- v$asfr
+
+    ##Replace the parameters we don't need
+    v$fert_rat_coarse <- NULL
+    v$frr_art6mos_coarse <- NULL
+    v$adult_female_infections_coarse <- NULL
+    v$hivnpop_coarse <- NULL
+    v$asfr_coarse <- NULL
+    v$fert_rat_full <- NULL
+    v$frr_art6mos_full <- NULL
+    v$adult_female_infections_full <- NULL
+    v$hivnpop_full <- NULL
+  }
 
   return(v)
 }

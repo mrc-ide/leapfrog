@@ -12,24 +12,16 @@
 namespace leapfrog {
 namespace internal {
 
-<<<<<<< HEAD
-
-template<MV ModelVariant>
-struct DpSS {
-  static constexpr int NS = 2;
-  static constexpr int pAG = 81;
-  static constexpr int p_fertility_age_groups = 35;
-=======
 struct BaseSS {
   static constexpr int MALE = 0;
   static constexpr int FEMALE = 1;
   static constexpr int ART0MOS = 0;
   static constexpr int PROJPERIOD_CALENDAR = 0;
   static constexpr int PROJPERIOD_MIDYEAR = 1;
->>>>>>> origin/issue-253
 };
 
 enum ConfigsAndOverrides {
+  HcOverride0,
   Hc,
   HaOverride0,
   Ha,
@@ -52,6 +44,11 @@ struct SSMixer<ModelVariant>: public BaseSS {
 
 template<MV ModelVariant, ConfigsAndOverrides T, typename ...Ts>
 struct SSMixer<ModelVariant, SSPair<false, T>, Ts...>: public SSMixer<ModelVariant, Ts...> {};
+
+template<MV ModelVariant, typename ...Ts>
+struct SSMixer<ModelVariant, SSPair<true, HcOverride0>, Ts...>: public SSMixer<ModelVariant, Ts...> {
+  static constexpr int hc_p_fertility_age_groups = 8;
+};
 
 template<MV ModelVariant, typename ...Ts>
 struct SSMixer<ModelVariant, SSPair<true, Hc>, Ts...>: public SSMixer<ModelVariant, Ts...> {
@@ -79,52 +76,10 @@ struct SSMixer<ModelVariant, SSPair<true, Hc>, Ts...>: public SSMixer<ModelVaria
   static constexpr std::array<std::array<double, 6>, 7> adult_cd4_dist = {{ { 1.0, 1, 1, 0, 0, 0 }, { 0, 0, 0, 1.0, 0, 0 }, { 0, 0, 0, 0, 0.6665589, 0 }, { 0, 0, 0, 0, 0.3334411, 0 }, { 0, 0, 0, 0, 0, 0.35 }, { 0, 0, 0, 0, 0, 0.21 }, { 0, 0, 0, 0, 0, 0.44 } }};
 };
 
-template<MV ModelVariant>
-requires(ModelVariant::use_coarse_stratification)
-struct HcSS<ModelVariant> {
-  static constexpr int hc1DS = 7;
-  static constexpr int hc2DS = 6;
-  static constexpr int hc1_ageend = 4;
-  static constexpr int hc2_agestart = 5;
-  static constexpr int hc1AG = 5;
-  static constexpr int hc1AG_c = 2;
-  static constexpr int hc2AG = 10;
-  static constexpr int hc2AG_c = 1;
-  static constexpr int hcAG_end = 15;
-  static constexpr int hcTT = 4;
-  static constexpr int hPS = 7;
-  static constexpr int hPS_dropout = 6;
-  static constexpr int hVT = 2;
-  static constexpr int hBF = 18;
-  static constexpr int hBF_coarse = 4;
-  static constexpr int hcAG_coarse = 4;
-  static constexpr int hAB_ind = 2;
-  static constexpr int hc_p_fertility_age_groups = 8;
-  static constexpr std::array<int, 15> hc_age_coarse = { 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3 };
-  static constexpr std::array<int, 15> hc_age_coarse_cd4 = { 0, 0, 0, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
-  static constexpr std::array<std::array<double, 7>, 6> hc_cd4_transition = {{ { 0.608439, 0.33873387, 0.2004, 0.095, 0.03880388, 0.0186157, 0.0 }, { 0.185181, 0.22262226, 0.2562, 0.1693, 0.09030903, 0.0186157, 0.0014 }, { 0.105789, 0.29352935, 0.3636, 0.3082, 0.27592759, 0.09921774, 0.00990099 }, { 0.055594, 0.09350935, 0.1074, 0.2497, 0.25992599, 0.16506585, 0.00710071 }, { 0.018498, 0.03550355, 0.0579, 0.1449, 0.25572557, 0.36350134, 0.04960496 }, { 0.026499, 0.01610161, 0.0145, 0.0329, 0.07930793, 0.33498366, 0.93199334 } }};
-  static constexpr std::array<std::array<double, 6>, 7> adult_cd4_dist = {{ { 1.0, 1, 1, 0, 0, 0 }, { 0, 0, 0, 1.0, 0, 0 }, { 0, 0, 0, 0, 0.6665589, 0 }, { 0, 0, 0, 0, 0.3334411, 0 }, { 0, 0, 0, 0, 0, 0.35 }, { 0, 0, 0, 0, 0, 0.21 }, { 0, 0, 0, 0, 0, 0.44 } }};
-};
-
-<<<<<<< HEAD
-
-struct BaseSS {
-  static constexpr int MALE = 0;
-  static constexpr int FEMALE = 1;
-  static constexpr int ART0MOS = 0;
-  static constexpr int PROJPERIOD_CALENDAR = 0;
-  static constexpr int PROJPERIOD_MIDYEAR = 1;
-  static constexpr int p_idx_fertility_first = 15;
-  static constexpr int p_idx_hiv_first_adult = 15;
-  static constexpr int adult_incidence_first_age_group = 15;
-  static constexpr int pAG_INCIDPOP = 35;
-  static constexpr int hIDX_15PLUS = 0;
-=======
 template<MV ModelVariant, typename ...Ts>
 struct SSMixer<ModelVariant, SSPair<true, HaOverride0>, Ts...>: public SSMixer<ModelVariant, Ts...> {
   static constexpr std::array<int, 9> hAG_span = { 2, 3, 5, 5, 5, 5, 5, 5, 31 };
   static constexpr int hAG = 9;
->>>>>>> origin/issue-253
 };
 
 template<MV ModelVariant, typename ...Ts>
@@ -139,12 +94,14 @@ template<MV ModelVariant, typename ...Ts>
 struct SSMixer<ModelVariant, SSPair<true, Dp>, Ts...>: public SSMixer<ModelVariant, Ts...> {
   static constexpr int NS = 2;
   static constexpr int pAG = 81;
+  static constexpr int p_fertility_age_groups = 35;
 };
 
 
 template<MV ModelVariant>
 using SSMixed = SSMixer<
   ModelVariant,
+  SSPair<ModelVariant::run_child_model && ModelVariant::use_coarse_stratification, HcOverride0>,
   SSPair<ModelVariant::run_child_model, Hc>,
   SSPair<ModelVariant::run_hiv_simulation && ModelVariant::use_coarse_stratification, HaOverride0>,
   SSPair<ModelVariant::run_hiv_simulation, Ha>,
