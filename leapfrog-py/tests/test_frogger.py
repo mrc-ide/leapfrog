@@ -7,7 +7,7 @@ def assert_equal(obj1, obj2):
 
 
 def test_adult_model_full_strat():
-    parameters = read_h5_file("../r-package/tests/testthat/testdata/adult_parms.h5")
+    parameters = read_h5_file("../r-package/tests/testthat/testdata/adult_parms_full.h5")
     ret = run_model(parameters)
     returned_vars = list(ret.keys())
     expected_vars = [
@@ -22,7 +22,7 @@ def test_adult_model_full_strat():
 
 
 def test_child_model():
-    parameters = read_h5_file("../r-package/tests/testthat/testdata/child_parms.h5")
+    parameters = read_h5_file("../r-package/tests/testthat/testdata/child_parms_full.h5")
     ret = run_model(parameters, "ChildModel")
     returned_vars = list(ret.keys())
     expected_vars = [
@@ -42,14 +42,14 @@ def test_child_model():
 
 
 def test_child_model_running_twice_gives_same_result():
-    parameters = read_h5_file("../r-package/tests/testthat/testdata/child_parms.h5")
+    parameters = read_h5_file("../r-package/tests/testthat/testdata/child_parms_full.h5")
     ret1 = run_model(parameters, "ChildModel")
     ret2 = run_model(parameters, "ChildModel")
     assert_equal(ret1, ret2)
 
 
 def test_child_model_agrees_on_all_years_two_parts_single_year_runs():
-    parameters = read_h5_file("../r-package/tests/testthat/testdata/child_parms.h5")
+    parameters = read_h5_file("../r-package/tests/testthat/testdata/child_parms_full.h5")
     ret_all_years = run_model(parameters, "ChildModel")
 
     ret_first_half = run_model(parameters, "ChildModel", range(1970, 2001))

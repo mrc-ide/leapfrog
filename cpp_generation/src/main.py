@@ -69,15 +69,6 @@ def add_output_year_dim(cfg):
     cfg["dims"].append("output_years")
 
 
-def apply_default_vars_to_overrides(dat, section):
-  overrides = dat[section].get("overrides")
-  if not overrides: return
-
-  default_vars = dat[section]["default"]
-  for override in overrides:
-    override["vars"] = default_vars | override["vars"]
-
-
 def generate_hpp(template_name, *args, **kwargs):
   template_path = f'cpp/{template_name}.j2'
   dest_path = relative_file_path("..", "..", "r-package", "inst", "include", "generated", f"{template_name}.hpp")
@@ -92,19 +83,13 @@ def generate_delphi(template_name, *args, **kwargs):
 
 dat = load_json("..", "modelSchemas", "FullModel.json")
 dat = { k: load_children_model_schemas(v) for k, v in dat.items() }
-for cfg in dat["configs"]:
-  apply_default_vars_to_overrides(cfg, "state_space")
-  apply_default_vars_to_overrides(cfg, "pars")
 
 
 for config in dat["configs"]:
   config["output_state"] = copy.deepcopy(config["state"])
-  for name, cfg in config["pars"]["default"].items():
+
+  for name, cfg in config["pars"].items():
     process_var_config(name, cfg, True)
-  if config["pars"].get("overrides"):
-      for override in config["pars"]["overrides"]:
-          for name, cfg in override["vars"].items():
-              process_var_config(name, cfg, True)
 
   for name, cfg in config["intermediate"].items():
     process_var_config(name, cfg)
@@ -127,9 +112,8 @@ env = Environment(
 )
 
 generate_hpp("model_variants", dat)
-generate_hpp("state_space", dat | vars(utils.state_space))
+generate_hpp("state_space", utils.state_space.extract_state_space_info(dat) | vars(utils.state_space))
 generate_hpp("concepts", dat | vars(utils.concepts))
-generate_hpp("state_space_mixer", dat)
 generate_hpp("config", dat | vars(utils.config) | vars(utils.general))
 generate_hpp("config_mixer", dat)
 generate_hpp("py_interface/py_adapters", dat | vars(utils.config) | vars(utils.general))

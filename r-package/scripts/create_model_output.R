@@ -18,7 +18,7 @@ if (!dir.exists(dat$output_dir)) {
   dir.create(dat$output_dir, recursive = TRUE)
 }
 
-parameters <- frogger::read_parameters(testthat::test_path("testdata/adult_parms.h5"))
+parameters <- frogger::read_parameters(testthat::test_path("testdata/adult_parms_full.h5"))
 out <- frogger::run_model(parameters)
 
 frogger:::save_hdf5_file(out, file.path(dat$output_dir, "r-output.h5"))

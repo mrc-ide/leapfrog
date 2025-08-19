@@ -138,7 +138,7 @@ struct {{ config.name }}OwnedPars {
   using SS = SSMixed<ModelVariant>;
   
   struct Pars {
-    {% for name, cfg in config.pars.default.items() %}
+    {% for name, cfg in config.pars.items() %}
     {{ get_struct_member_def(name, cfg)|indent(2) }}
     {% endfor %}
   };
@@ -148,7 +148,7 @@ struct {{ config.name }}OwnedPars {
     const Options<real_type> &opts
   ) {
     return {
-      {% for name, cfg in config.pars.default.items() %}
+      {% for name, cfg in config.pars.items() %}
       .{{ name }} = {{ get_parse_pars_cpp(name, cfg) }}{{ comma_except_last(loop) }}
       {% endfor %}
     };
