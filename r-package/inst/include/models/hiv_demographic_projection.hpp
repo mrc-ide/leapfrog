@@ -378,7 +378,7 @@ struct HivDemographicProjection<Config> {
               for (int cat = 0; cat < hcTT; ++cat) {
                 n_hc.hc2_hiv_pop(hd, cat, a - hc2_agestart, s) *= 1.0 + deaths_migrate;
               }
-              if (t >= p_hc.hc_art_start) {
+              if (t > p_hc.hc_art_start) {
                 for (int dur = 0; dur < hTS; ++dur) {
                   n_hc.hc2_art_pop(dur, hd, a - hc2_agestart, s) *= 1.0 + deaths_migrate;
                 }
