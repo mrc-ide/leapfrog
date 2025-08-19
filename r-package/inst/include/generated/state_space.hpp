@@ -42,7 +42,6 @@ template<MV ModelVariant>
 struct HcSS {
   static constexpr int hc1DS = 7;
   static constexpr int hc2DS = 6;
-  static constexpr int hc1_ageend = 4;
   static constexpr int hc2_agestart = 5;
   static constexpr int hcAG_end = 15;
   static constexpr int hc1AG = 5;

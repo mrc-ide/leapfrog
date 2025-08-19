@@ -38,7 +38,6 @@ struct ChildModelSimulation<Config> {
   static constexpr int FEMALE = SS::FEMALE;
   static constexpr int ART0MOS = SS::ART0MOS;
   static constexpr int hc2_agestart = SS::hc2_agestart;
-  static constexpr int hc1_ageend = SS::hc1_ageend;
   static constexpr int hcAG_end = SS::hcAG_end;
   static constexpr int hc_infant = SS::hc_infant;
   static constexpr int hc1DS = SS::hc1DS;
@@ -145,12 +144,12 @@ struct ChildModelSimulation<Config> {
       for (int hd = 0; hd < hc1DS; ++hd) {
         for (int hd_alt = 0; hd_alt < hc2DS; ++hd_alt) {
           for (int cat = 0; cat < hcTT; ++cat) {
-            n_hc.hc2_hiv_pop(hd_alt, cat, 0, s) += c_hc.hc1_hiv_pop(hd, cat, hc1_ageend, s) *
+            n_hc.hc2_hiv_pop(hd_alt, cat, 0, s) += c_hc.hc1_hiv_pop(hd, cat, (hc2_agestart-1), s) *
                                                    p_dp.survival_probability(hc2_agestart, s, t) *
                                                    hc_cd4_transition[hd_alt][hd];
           }
           for (int dur = 0; dur < hTS; ++dur) {
-            n_hc.hc2_art_pop(dur, hd_alt, 0, s) += c_hc.hc1_art_pop(dur, hd, hc1_ageend, s) *
+            n_hc.hc2_art_pop(dur, hd_alt, 0, s) += c_hc.hc1_art_pop(dur, hd, (hc2_agestart-1), s) *
                                                    p_dp.survival_probability(hc2_agestart, s, t) *
                                                    hc_cd4_transition[hd_alt][hd];
           }

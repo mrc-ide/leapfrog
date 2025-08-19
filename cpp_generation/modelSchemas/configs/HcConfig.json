@@ -7,7 +7,6 @@
     "default": {
       "hc1DS": 7,
       "hc2DS": 6,
-      "hc1_ageend": 4,
       "hc2_agestart": 5,
       "hcAG_end": 15,
       "hc1AG": 5,
