@@ -8,7 +8,7 @@
 #pragma once
 
 #include "../array/array.h"
-#include "state_space_mixer.hpp"
+#include "state_space.hpp"
 
 namespace leapfrog {
 namespace internal {
