@@ -186,7 +186,7 @@ test_that("Children in need of cotrim aligns", {
 
 test_that("Stacked bar outputs align",{
   warning('MTCT by source output from Spectrum must be manually extracted when the Spectrum file is changed')
-  parameters <- read_parameters(test_path("testdata/child_parms.h5"))
+  parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
   out <- run_model(parameters, "ChildModel", 1970:2030)
   spec_output <- read.csv(test_path("testdata/mtct_by_source_MANUALLY_GENERATED.csv"))
 
