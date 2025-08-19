@@ -217,7 +217,10 @@ prepare_leapfrog_projp <- function(pjnz, use_coarse_age_groups = FALSE, hiv_step
   v$incidpopage <- attr(v$incidinput, "incidpopage")
   v$incrr_sex <- projp$incrr_sex
 
-  v$pAG_INCIDPOP <- ifelse(v$incidpopage == 0L, 35L, 66L)
+  pAG_15_to_49 <- 35L
+  pAG_15_plus <- 66L
+
+  v$pAG_INCIDPOP <- ifelse(v$incidpopage == 0L, pAG_15_to_49, pAG_15_plus)
   v$pIDX_INCIDPOP <- 15L
 
   v$artmx_timerr <- projp$artmx_timerr[c(1, 2, rep(3, hTS - 2)), ]
