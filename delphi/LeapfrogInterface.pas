@@ -111,6 +111,10 @@ type
     initiationMortalityWeightLength: Integer;
     hArtStageDur: PDouble;
     hArtStageDurLength: Integer;
+    pagIncidpop: Integer;
+    pagIncidpopLength: Integer;
+    pidxIncidpop: Integer;
+    pidxIncidpopLength: Integer;
 end;
 
 type
@@ -132,6 +136,8 @@ type
     adultsOnArtIsPercent: TGBFixedArray<Integer>;
     initiationMortalityWeight: Double;
     hArtStageDur: TGBFixedArray<Double>;
+    pagIncidpop: Integer;
+    pidxIncidpop: Integer;
     function getView(): LeapfrogHivAdultParamsView;
     procedure writeToDisk(dir: string);
     Destructor Destroy; override;
@@ -514,6 +520,10 @@ begin;
   Result.initiationMortalityWeightLength := 1;
   Result.hArtStageDur := PDouble(hArtStageDur.data);
   Result.hArtStageDurLength := hArtStageDur.GetLength();
+  Result.pagIncidpop := pagIncidpop;
+  Result.pagIncidpopLength := 1;
+  Result.pidxIncidpop := pidxIncidpop;
+  Result.pidxIncidpopLength := 1;
 end;
 
 function LeapfrogHivAdultState.getView(): LeapfrogHivAdultStateView;

@@ -130,7 +130,9 @@ struct HaAdapter<Language::C, real_type, ModelVariant> {
       .adults_on_art = read_data<real_type, 2>(params.ha->adults_on_art, params.ha->adults_on_art_length, "adults_on_art", { nda::dim<>(0, SS::NS, 1), nda::dim<>(0, opts.proj_steps, (SS::NS)) }),
       .adults_on_art_is_percent = read_data<int, 2>(params.ha->adults_on_art_is_percent, params.ha->adults_on_art_is_percent_length, "adults_on_art_is_percent", { nda::dim<>(0, SS::NS, 1), nda::dim<>(0, opts.proj_steps, (SS::NS)) }),
       .initiation_mortality_weight = params.ha->initiation_mortality_weight,
-      .h_art_stage_dur = read_data<real_type, 1>(params.ha->h_art_stage_dur, params.ha->h_art_stage_dur_length, "h_art_stage_dur", { nda::dim<>(0, SS::hTS - 1, 1) })
+      .h_art_stage_dur = read_data<real_type, 1>(params.ha->h_art_stage_dur, params.ha->h_art_stage_dur_length, "h_art_stage_dur", { nda::dim<>(0, SS::hTS - 1, 1) }),
+      .pAG_INCIDPOP = params.ha->pAG_INCIDPOP,
+      .pIDX_INCIDPOP = params.ha->pIDX_INCIDPOP
     };
   };
 

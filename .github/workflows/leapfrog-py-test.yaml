@@ -43,6 +43,23 @@ jobs:
       - name: Install the project
         run: uv sync --all-extras --dev
 
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: release
+          use-public-rspm: true
+          extra-repositories: https://mrc-ide.r-universe.dev
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck, any::here
+          needs: check
+          working-directory: r-package
+
+      - name: Create test data
+        working-directory: r-package
+        shell: bash
+        run: ./scripts/create_test_data.R
+
       - name: Run tests
         run: uv run pytest
 

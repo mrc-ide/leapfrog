@@ -45,7 +45,6 @@
     }
   },
   "pars": {
-    "default": {
       "hc_nosocomial": {
         "num_type": "real_type",
         "dims": ["opts.proj_steps"],
@@ -302,7 +301,6 @@
           "r": "laf"
         }
       }
-    }
   },
   "intermediate": {
     "age15_hiv_pop": {

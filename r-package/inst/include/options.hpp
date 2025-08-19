@@ -7,7 +7,7 @@
 #include <cmath>
 #include <string>
 
-#include "generated/state_space_mixer.hpp"
+#include "generated/state_space.hpp"
 
 namespace leapfrog {
 
