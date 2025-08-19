@@ -69,7 +69,7 @@ yr_end <- as.integer(dpsub(dp, "<FinalYear MV2>",2,4))
 proj.years <- yr_start:yr_end
 timedat.idx <- 4+1:length(proj.years)-1
 
-pop1 <- file.path(here::here(), "inst", "pjnz", "bwa_aim-no-special-elig-numpmtct.xlsx")
+pop1 <- gsub('.PJNZ', '_pop1.xlsx', pjnz_child)
 
 spectrum_output <- function(file, ages = 0:14, country = 'Botswana', years_in = 1970:2030){
   ##pull out stratified population from the .xlsx file, This function doesn't take out the paediatric output, so going to just compare to the Spectrum software itself
