@@ -66,7 +66,9 @@ struct HaAdapter<Language::Cpp, real_type, ModelVariant> {
       .adults_on_art = { owned_pars.ha.adults_on_art.data(), owned_pars.ha.adults_on_art.shape() },
       .adults_on_art_is_percent = { owned_pars.ha.adults_on_art_is_percent.data(), owned_pars.ha.adults_on_art_is_percent.shape() },
       .initiation_mortality_weight = owned_pars.ha.initiation_mortality_weight,
-      .h_art_stage_dur = { owned_pars.ha.h_art_stage_dur.data(), owned_pars.ha.h_art_stage_dur.shape() }
+      .h_art_stage_dur = { owned_pars.ha.h_art_stage_dur.data(), owned_pars.ha.h_art_stage_dur.shape() },
+      .pAG_INCIDPOP = owned_pars.ha.pAG_INCIDPOP,
+      .pIDX_INCIDPOP = owned_pars.ha.pIDX_INCIDPOP
     };
   };
 

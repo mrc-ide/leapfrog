@@ -30,6 +30,11 @@ jobs:
           needs: check
           working-directory: r-package
 
+      - name: Create test data
+        working-directory: r-package
+        shell: bash
+        run: ./scripts/create_test_data.R
+
       - name: Install R Package
         shell: bash
         working-directory: r-package
@@ -76,7 +81,7 @@ jobs:
         shell: bash
         working-directory: cpp_interface
         run: |
-          ./build/simulate_model 61 ../r-package/tests/testthat/testdata/adult_parms.h5 ../model-outputs
+          ./build/simulate_model 61 ../r-package/tests/testthat/testdata/adult_parms_full.h5 ../model-outputs
 
       - name: Check equality
         shell: bash

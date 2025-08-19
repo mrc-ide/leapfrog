@@ -19,7 +19,7 @@ struct {{ config.name }}Adapter<Language::Cpp, real_type, ModelVariant> {
     OwnedParsMixed<real_type, ModelVariant>::Pars& owned_pars
   ) {
     return {
-      {% for name, cfg in config.pars.default.items() %}
+      {% for name, cfg in config.pars.items() %}
       .{{ name }} = {{ get_pars_cpp(name, cfg, config.namespace) }}{{ comma_except_last(loop) }}
       {% endfor %}
     };

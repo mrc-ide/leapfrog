@@ -265,6 +265,10 @@ struct HaOwnedPars {
   >;
   nda::array<real_type, shape_h_art_stage_dur> h_art_stage_dur;
 
+    int pAG_INCIDPOP;
+
+    int pIDX_INCIDPOP;
+
   };
 
   static Pars parse_pars(
@@ -275,19 +279,21 @@ struct HaOwnedPars {
       .total_rate = read_data<real_type, typename Pars::shape_total_rate>(params_file, "incidinput", { nda::dim<>(0, opts.proj_steps, 1) }),
       .relative_risk_age = read_data<real_type, typename Pars::shape_relative_risk_age>(params_file, "incrr_age", { nda::dim<>(0, SS::pAG - SS::p_idx_hiv_first_adult, 1), nda::dim<>(0, SS::NS, (SS::pAG - SS::p_idx_hiv_first_adult)), nda::dim<>(0, opts.proj_steps, (SS::pAG - SS::p_idx_hiv_first_adult) * (SS::NS)) }),
       .relative_risk_sex = read_data<real_type, typename Pars::shape_relative_risk_sex>(params_file, "incrr_sex", { nda::dim<>(0, opts.proj_steps, 1) }),
-      .cd4_mortality = read_data<real_type, typename Pars::shape_cd4_mortality>(params_file, "cd4_mort_full", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),
-      .cd4_progression = read_data<real_type, typename Pars::shape_cd4_progression>(params_file, "cd4_prog_full", { nda::dim<>(0, SS::hDS - 1, 1), nda::dim<>(0, SS::hAG, (SS::hDS - 1)), nda::dim<>(0, SS::NS, (SS::hDS - 1) * (SS::hAG)) }),
-      .cd4_initial_distribution = read_data<real_type, typename Pars::shape_cd4_initial_distribution>(params_file, "cd4_initdist_full", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),
+      .cd4_mortality = read_data<real_type, typename Pars::shape_cd4_mortality>(params_file, "cd4_mort", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),
+      .cd4_progression = read_data<real_type, typename Pars::shape_cd4_progression>(params_file, "cd4_prog", { nda::dim<>(0, SS::hDS - 1, 1), nda::dim<>(0, SS::hAG, (SS::hDS - 1)), nda::dim<>(0, SS::NS, (SS::hDS - 1) * (SS::hAG)) }),
+      .cd4_initial_distribution = read_data<real_type, typename Pars::shape_cd4_initial_distribution>(params_file, "cd4_initdist", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),
       .scale_cd4_mortality = read_data_scalar<int>(params_file, "scale_cd4_mort"),
       .idx_hm_elig = read_data<int, typename Pars::shape_idx_hm_elig>(params_file, "artcd4elig_idx", { nda::dim<>(0, opts.proj_steps, 1) }),
-      .mortality = read_data<real_type, typename Pars::shape_mortality>(params_file, "art_mort_full", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, SS::hDS, (SS::hTS)), nda::dim<>(0, SS::hAG, (SS::hTS) * (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hTS) * (SS::hDS) * (SS::hAG)) }),
+      .mortality = read_data<real_type, typename Pars::shape_mortality>(params_file, "art_mort", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, SS::hDS, (SS::hTS)), nda::dim<>(0, SS::hAG, (SS::hTS) * (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hTS) * (SS::hDS) * (SS::hAG)) }),
       .mortality_time_rate_ratio = read_data<real_type, typename Pars::shape_mortality_time_rate_ratio>(params_file, "artmx_timerr", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, opts.proj_steps, (SS::hTS)) }),
       .dropout_recover_cd4 = read_data_scalar<int>(params_file, "art_dropout_recover_cd4"),
       .dropout_rate = read_data<real_type, typename Pars::shape_dropout_rate>(params_file, "art_dropout_rate", { nda::dim<>(0, opts.proj_steps, 1) }),
       .adults_on_art = read_data<real_type, typename Pars::shape_adults_on_art>(params_file, "art15plus_num", { nda::dim<>(0, SS::NS, 1), nda::dim<>(0, opts.proj_steps, (SS::NS)) }),
       .adults_on_art_is_percent = read_data<int, typename Pars::shape_adults_on_art_is_percent>(params_file, "art15plus_isperc", { nda::dim<>(0, SS::NS, 1), nda::dim<>(0, opts.proj_steps, (SS::NS)) }),
       .initiation_mortality_weight = read_data_scalar<real_type>(params_file, "art_alloc_mxweight"),
-      .h_art_stage_dur = read_data<real_type, typename Pars::shape_h_art_stage_dur>(params_file, "h_art_stage_dur", { nda::dim<>(0, SS::hTS - 1, 1) })
+      .h_art_stage_dur = read_data<real_type, typename Pars::shape_h_art_stage_dur>(params_file, "h_art_stage_dur", { nda::dim<>(0, SS::hTS - 1, 1) }),
+      .pAG_INCIDPOP = read_data_scalar<int>(params_file, "pAG_INCIDPOP"),
+      .pIDX_INCIDPOP = read_data_scalar<int>(params_file, "pIDX_INCIDPOP")
     };
   };
 };
