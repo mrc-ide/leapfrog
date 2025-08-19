@@ -935,16 +935,16 @@ prepare_hc_leapfrog_projp <- function(pjnz, params) {
   ###Need sex ratio of 1 and 2 year olds for option when running model without adult input
   infant_sex_dist <- SpectrumUtils::dp.output.bigpop(dp.raw = dp.x, direction = "long")
   infant_sex_array <- infant_sex_dist %>%
-    filter(Age %in% c(1, 2)) %>%
-    select(Age, Sex, Year, Value) %>%     # keep only relevant columns
+    dplyr::filter(Age %in% c(1, 2)) %>%
+    dplyr::select(Age, Sex, Year, Value) %>%     # keep only relevant columns
     tidyr::pivot_wider(
       names_from = c(Sex, Year),
       values_from = Value
     )
   infant_sex_array <- array(
     infant_sex_dist %>%
-      filter(Age %in% c(1,2)) %>%
-      pull(Value),
+      dplyr::filter(Age %in% c(1,2)) %>%
+      dplyr::pull(Value),
     dim = c(
       Age = 2,
       Sex = length(unique(infant_sex_dist$Sex)),
