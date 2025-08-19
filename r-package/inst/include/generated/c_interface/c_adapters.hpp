@@ -223,7 +223,7 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
       .PMTCT_input_is_percent = read_data<int, 1>(params.hc->PMTCT_input_is_percent, params.hc->PMTCT_input_is_percent_length, "PMTCT_input_is_percent", { nda::dim<>(0, opts.proj_steps, 1) }),
       .breastfeeding_duration_art = read_data<real_type, 2>(params.hc->breastfeeding_duration_art, params.hc->breastfeeding_duration_art_length, "breastfeeding_duration_art", { nda::dim<>(0, SS::hBF, 1), nda::dim<>(0, opts.proj_steps, (SS::hBF)) }),
       .breastfeeding_duration_no_art = read_data<real_type, 2>(params.hc->breastfeeding_duration_no_art, params.hc->breastfeeding_duration_no_art_length, "breastfeeding_duration_no_art", { nda::dim<>(0, SS::hBF, 1), nda::dim<>(0, opts.proj_steps, (SS::hBF)) }),
-      .bigpop = read_data<real_type, 3>(params.hc->bigpop, params.hc->bigpop_length, "bigpop", { nda::dim<>(0, SS::pAG, 1), nda::dim<>(0, SS::NS, (SS::pAG)), nda::dim<>(0, opts.proj_steps, (SS::pAG) * (SS::NS)) }),
+      .infant_pop = read_data<real_type, 3>(params.hc->infant_pop, params.hc->infant_pop_length, "infant_pop", { nda::dim<>(0, SS::hc_infant, 1), nda::dim<>(0, SS::NS, (SS::hc_infant)), nda::dim<>(0, opts.proj_steps, (SS::hc_infant) * (SS::NS)) }),
       .mat_hiv_births = read_data<real_type, 1>(params.hc->mat_hiv_births, params.hc->mat_hiv_births_length, "mat_hiv_births", { nda::dim<>(0, opts.proj_steps, 1) }),
       .mat_prev_input = read_data<int, 1>(params.hc->mat_prev_input, params.hc->mat_prev_input_length, "mat_prev_input", { nda::dim<>(0, opts.proj_steps, 1) }),
       .prop_lt200 = read_data<real_type, 1>(params.hc->prop_lt200, params.hc->prop_lt200_length, "prop_lt200", { nda::dim<>(0, opts.proj_steps, 1) }),

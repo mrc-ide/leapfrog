@@ -452,12 +452,12 @@ struct HcOwnedPars {
   >;
   nda::array<real_type, shape_breastfeeding_duration_no_art> breastfeeding_duration_no_art;
 
-    using shape_bigpop = nda::shape<
-    nda::dim<0, SS::pAG, 1>,
-    nda::dim<0, SS::NS, (SS::pAG)>,
-    nda::dim<0, nda::dynamic, (SS::pAG) * (SS::NS)>
+    using shape_infant_pop = nda::shape<
+    nda::dim<0, SS::hc_infant, 1>,
+    nda::dim<0, SS::NS, (SS::hc_infant)>,
+    nda::dim<0, nda::dynamic, (SS::hc_infant) * (SS::NS)>
   >;
-  nda::array<real_type, shape_bigpop> bigpop;
+  nda::array<real_type, shape_infant_pop> infant_pop;
 
     using shape_mat_hiv_births = nda::shape<
     nda::dim<0, nda::dynamic, 1>
@@ -564,7 +564,7 @@ struct HcOwnedPars {
       .PMTCT_input_is_percent = read_data<int, typename Pars::shape_PMTCT_input_is_percent>(params_file, "pmtct_input_isperc", { nda::dim<>(0, opts.proj_steps, 1) }),
       .breastfeeding_duration_art = read_data<real_type, typename Pars::shape_breastfeeding_duration_art>(params_file, "bf_duration_art", { nda::dim<>(0, SS::hBF, 1), nda::dim<>(0, opts.proj_steps, (SS::hBF)) }),
       .breastfeeding_duration_no_art = read_data<real_type, typename Pars::shape_breastfeeding_duration_no_art>(params_file, "bf_duration_no_art", { nda::dim<>(0, SS::hBF, 1), nda::dim<>(0, opts.proj_steps, (SS::hBF)) }),
-      .bigpop = read_data<real_type, typename Pars::shape_bigpop>(params_file, "bigpop", { nda::dim<>(0, SS::pAG, 1), nda::dim<>(0, SS::NS, (SS::pAG)), nda::dim<>(0, opts.proj_steps, (SS::pAG) * (SS::NS)) }),
+      .infant_pop = read_data<real_type, typename Pars::shape_infant_pop>(params_file, "infant_pop", { nda::dim<>(0, SS::hc_infant, 1), nda::dim<>(0, SS::NS, (SS::hc_infant)), nda::dim<>(0, opts.proj_steps, (SS::hc_infant) * (SS::NS)) }),
       .mat_hiv_births = read_data<real_type, typename Pars::shape_mat_hiv_births>(params_file, "mat_hiv_births", { nda::dim<>(0, opts.proj_steps, 1) }),
       .mat_prev_input = read_data<int, typename Pars::shape_mat_prev_input>(params_file, "mat_prev_input", { nda::dim<>(0, opts.proj_steps, 1) }),
       .prop_lt200 = read_data<real_type, typename Pars::shape_prop_lt200>(params_file, "prop_lt200", { nda::dim<>(0, opts.proj_steps, 1) }),

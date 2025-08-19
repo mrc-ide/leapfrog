@@ -670,12 +670,12 @@ struct HcConfig {
       nda::dim<0, nda::dynamic, (SS::hBF)>
     >;
     nda::array_ref<real_type, shape_breastfeeding_duration_no_art> breastfeeding_duration_no_art;
-    using shape_bigpop = nda::shape<
-      nda::dim<0, SS::pAG, 1>,
-      nda::dim<0, SS::NS, (SS::pAG)>,
-      nda::dim<0, nda::dynamic, (SS::pAG) * (SS::NS)>
+    using shape_infant_pop = nda::shape<
+      nda::dim<0, SS::hc_infant, 1>,
+      nda::dim<0, SS::NS, (SS::hc_infant)>,
+      nda::dim<0, nda::dynamic, (SS::hc_infant) * (SS::NS)>
     >;
-    nda::array_ref<real_type, shape_bigpop> bigpop;
+    nda::array_ref<real_type, shape_infant_pop> infant_pop;
     using shape_mat_hiv_births = nda::shape<
       nda::dim<0, nda::dynamic, 1>
     >;

@@ -125,7 +125,7 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
       .PMTCT_input_is_percent = { owned_pars.hc.PMTCT_input_is_percent.data(), owned_pars.hc.PMTCT_input_is_percent.shape() },
       .breastfeeding_duration_art = { owned_pars.hc.breastfeeding_duration_art.data(), owned_pars.hc.breastfeeding_duration_art.shape() },
       .breastfeeding_duration_no_art = { owned_pars.hc.breastfeeding_duration_no_art.data(), owned_pars.hc.breastfeeding_duration_no_art.shape() },
-      .bigpop = { owned_pars.hc.bigpop.data(), owned_pars.hc.bigpop.shape() },
+      .infant_pop = { owned_pars.hc.infant_pop.data(), owned_pars.hc.infant_pop.shape() },
       .mat_hiv_births = { owned_pars.hc.mat_hiv_births.data(), owned_pars.hc.mat_hiv_births.shape() },
       .mat_prev_input = { owned_pars.hc.mat_prev_input.data(), owned_pars.hc.mat_prev_input.shape() },
       .prop_lt200 = { owned_pars.hc.prop_lt200.data(), owned_pars.hc.prop_lt200.shape() },

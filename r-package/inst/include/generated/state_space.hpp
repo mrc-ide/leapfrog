@@ -49,6 +49,7 @@ struct HcSS {
   static constexpr int hc1AG_c = 2;
   static constexpr int hc2AG = 10;
   static constexpr int hc2AG_c = 1;
+  static constexpr int hc_infant = 2;
   static constexpr int hcTT = 4;
   static constexpr int hPS = 7;
   static constexpr int hPS_dropout = 6;

@@ -40,6 +40,7 @@ struct ChildModelSimulation<Config> {
   static constexpr int hc2_agestart = SS::hc2_agestart;
   static constexpr int hc1_ageend = SS::hc1_ageend;
   static constexpr int hcAG_end = SS::hcAG_end;
+  static constexpr int hc_infant = SS::hc_infant;
   static constexpr int hc1DS = SS::hc1DS;
   static constexpr int hcTT = SS::hcTT;
   static constexpr int hc2DS = SS::hc2DS;
@@ -673,11 +674,11 @@ struct ChildModelSimulation<Config> {
       for (int s = 0; s < NS; ++s) {
         //If the adult model output isn't being used, use the input total population ('bigpop')
         if (p_hc.mat_prev_input(t)) {
-            n_dp.p_total_pop(1, 0) = p_hc.bigpop(1, 0, t) ;
-            n_dp.p_total_pop(1, 1) = p_hc.bigpop(1, 1, t) ;
-
-            n_dp.p_total_pop(2, 0) = p_hc.bigpop(2, 0, t) ;
-            n_dp.p_total_pop(2, 1) = p_hc.bigpop(2, 1, t) ;
+          for (int s = 0; s < NS; ++s) {
+            for (int ag = 0; ag < hc_infant; ++ag) {
+              n_dp.p_total_pop(ag + 1, s) = p_hc.infant_pop(ag, s, t) ;
+            } // end hc_infant
+          } // end NS
         }
 
         auto total_pop_12_24 = n_dp.p_total_pop(1, 0) - n_ha.p_hiv_pop(1, 0) +

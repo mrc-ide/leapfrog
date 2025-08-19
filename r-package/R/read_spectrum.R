@@ -933,25 +933,30 @@ prepare_hc_leapfrog_projp <- function(pjnz, params) {
   v$total_births <- total_births
 
   ###Need sex ratio of 1 and 2 year olds for option when running model without adult input
-  infant_sex_ratio <- SpectrumUtils::dp.output.bigpop(dp.raw = dp.x, direction = "long") %>%
-    dplyr::filter(Age %in% c(1, 2)) %>%
-    dplyr::group_by(Age, Year) %>%
-    dplyr::mutate(total = sum(Value)) %>%
-    dplyr::ungroup() %>%
-    dplyr::filter(Sex == "Male") %>%
-    dplyr::mutate(sr = Value / total) %>%
-    dplyr::select(Year, Age, sr) %>%
-    tidyr::pivot_wider(names_from = Year, values_from = sr) %>%
-    dplyr::arrange(Age)
-
-  # Convert back to array
-  infant_sex_ratio <- infant_sex_ratio %>%
-    dplyr::select(-Age) %>%
-    base::as.matrix()
-
-  base::dim(infant_sex_ratio) <- c(2, length(proj.years))
-  base::dimnames(infant_sex_ratio) <- list(Age = c(1, 2), Year = proj.years)
-  v$infant_sex_ratio <- infant_sex_ratio
+  infant_sex_dist <- SpectrumUtils::dp.output.bigpop(dp.raw = dp.x, direction = "long")
+  infant_sex_array <- infant_sex_dist %>%
+    filter(Age %in% c(1, 2)) %>%
+    select(Age, Sex, Year, Value) %>%     # keep only relevant columns
+    tidyr::pivot_wider(
+      names_from = c(Sex, Year),
+      values_from = Value
+    )
+  infant_sex_array <- array(
+    infant_sex_dist %>%
+      filter(Age %in% c(1,2)) %>%
+      pull(Value),
+    dim = c(
+      Age = 2,
+      Sex = length(unique(infant_sex_dist$Sex)),
+      Year = length(unique(infant_sex_dist$Year))
+    ),
+    dimnames = list(
+      Age = sort(unique(infant_sex_dist$Age[infant_sex_dist$Age %in% c(1,2)])),
+      Sex = sort(unique(infant_sex_dist$Sex)),
+      Year = sort(unique(infant_sex_dist$Year))
+    )
+  )
+  v$infant_pop <- infant_sex_array
 
   specres <- eppasm::read_hivproj_output(pjnz)
   newinf <- specres$newinf.f[4:10,] %>% colSums()
