@@ -202,6 +202,8 @@ struct HaConfig {
       nda::dim<0, SS::hTS - 1, 1>
     >;
     nda::array_ref<real_type, shape_h_art_stage_dur> h_art_stage_dur;
+    int pAG_INCIDPOP;
+    int pIDX_INCIDPOP;
   };
 
   struct Intermediate {

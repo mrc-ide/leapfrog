@@ -265,6 +265,10 @@ struct HaOwnedPars {
   >;
   nda::array<real_type, shape_h_art_stage_dur> h_art_stage_dur;
 
+    int pAG_INCIDPOP;
+
+    int pIDX_INCIDPOP;
+
   };
 
   static Pars parse_pars(
@@ -287,7 +291,9 @@ struct HaOwnedPars {
       .adults_on_art = read_data<real_type, typename Pars::shape_adults_on_art>(params_file, "art15plus_num", { nda::dim<>(0, SS::NS, 1), nda::dim<>(0, opts.proj_steps, (SS::NS)) }),
       .adults_on_art_is_percent = read_data<int, typename Pars::shape_adults_on_art_is_percent>(params_file, "art15plus_isperc", { nda::dim<>(0, SS::NS, 1), nda::dim<>(0, opts.proj_steps, (SS::NS)) }),
       .initiation_mortality_weight = read_data_scalar<real_type>(params_file, "art_alloc_mxweight"),
-      .h_art_stage_dur = read_data<real_type, typename Pars::shape_h_art_stage_dur>(params_file, "h_art_stage_dur", { nda::dim<>(0, SS::hTS - 1, 1) })
+      .h_art_stage_dur = read_data<real_type, typename Pars::shape_h_art_stage_dur>(params_file, "h_art_stage_dur", { nda::dim<>(0, SS::hTS - 1, 1) }),
+      .pAG_INCIDPOP = read_data_scalar<int>(params_file, "pAG_INCIDPOP"),
+      .pIDX_INCIDPOP = read_data_scalar<int>(params_file, "pIDX_INCIDPOP")
     };
   };
 };

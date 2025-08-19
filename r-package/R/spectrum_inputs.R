@@ -216,6 +216,12 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   v$incidpopage <- attr(v$incidinput, "incidpopage")
   v$incrr_sex <- projp$incrr_sex
 
+  pAG_15_to_49 <- 35L
+  pAG_15_plus <- 66L
+
+  v$pAG_INCIDPOP <- ifelse(v$incidpopage == 0L, pAG_15_to_49, pAG_15_plus)
+  v$pIDX_INCIDPOP <- 15L
+
   v$artmx_timerr <- projp$artmx_timerr[c(1, 2, rep(3, hTS - 2)), ]
 
   ## ## ART eligibility and numbers on treatment

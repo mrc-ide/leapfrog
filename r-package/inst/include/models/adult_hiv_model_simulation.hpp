@@ -38,8 +38,6 @@ struct AdultHivModelSimulation<Config> {
   static constexpr int FEMALE = SS::FEMALE;
   static constexpr int ART0MOS = SS::ART0MOS;
   static constexpr int p_idx_hiv_first_adult = SS::p_idx_hiv_first_adult;
-  static constexpr int adult_incidence_first_age_group = SS::adult_incidence_first_age_group;
-  static constexpr int pAG_INCIDPOP = SS::pAG_INCIDPOP;
   static constexpr int hIDX_15PLUS = SS::hIDX_15PLUS;
 
   // function args
@@ -103,12 +101,13 @@ struct AdultHivModelSimulation<Config> {
   };
 
   void run_calculate_incidence_rate() {
+    const auto& p_ha = pars.ha;
     const auto& c_dp = state_curr.dp;
     const auto& c_ha = state_curr.ha;
     auto& i_ha = intermediate.ha;
 
-    const auto adult_incid_first_age_group = adult_incidence_first_age_group;
-    const auto adult_incid_last_age_group = adult_incid_first_age_group + pAG_INCIDPOP;
+    const auto adult_incid_first_age_group = p_ha.pIDX_INCIDPOP;
+    const auto adult_incid_last_age_group = adult_incid_first_age_group + p_ha.pAG_INCIDPOP;
 
     for (int g = 0; g < NS; ++g) {
       for (int a = adult_incid_first_age_group; a < adult_incid_last_age_group; ++a) {
@@ -159,8 +158,8 @@ struct AdultHivModelSimulation<Config> {
     auto& n_dp = state_next.dp;
     auto& i_ha = intermediate.ha;
 
-    const auto adult_incid_first_age_group = adult_incidence_first_age_group;
-    const auto adult_incid_last_age_group = adult_incid_first_age_group + pAG_INCIDPOP;
+    const auto adult_incid_first_age_group = p_ha.pIDX_INCIDPOP;
+    const auto adult_incid_last_age_group = adult_incid_first_age_group + p_ha.pAG_INCIDPOP;
 
     for (int g = 0; g < NS; ++g) {
       nda::fill(i_ha.hiv_negative_pop, 0.0);

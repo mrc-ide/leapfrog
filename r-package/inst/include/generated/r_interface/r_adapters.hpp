@@ -156,7 +156,9 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
       .adults_on_art = parse_data<real_type, 2>(data, "art15plus_num", { nda::dim<>(0, SS::NS, 1), nda::dim<>(0, opts.proj_steps, (SS::NS)) }),
       .adults_on_art_is_percent = parse_data<int, 2>(data, "art15plus_isperc", { nda::dim<>(0, SS::NS, 1), nda::dim<>(0, opts.proj_steps, (SS::NS)) }),
       .initiation_mortality_weight = Rcpp::as<real_type>(data["art_alloc_mxweight"]),
-      .h_art_stage_dur = parse_data<real_type, 1>(data, "h_art_stage_dur", { nda::dim<>(0, SS::hTS - 1, 1) })
+      .h_art_stage_dur = parse_data<real_type, 1>(data, "h_art_stage_dur", { nda::dim<>(0, SS::hTS - 1, 1) }),
+      .pAG_INCIDPOP = Rcpp::as<int>(data["pAG_INCIDPOP"]),
+      .pIDX_INCIDPOP = Rcpp::as<int>(data["pIDX_INCIDPOP"])
     };
   };
 
@@ -535,7 +537,9 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
       .adults_on_art = parse_data<real_type, 2>(data, "art15plus_num", { nda::dim<>(0, SS::NS, 1), nda::dim<>(0, opts.proj_steps, (SS::NS)) }),
       .adults_on_art_is_percent = parse_data<int, 2>(data, "art15plus_isperc", { nda::dim<>(0, SS::NS, 1), nda::dim<>(0, opts.proj_steps, (SS::NS)) }),
       .initiation_mortality_weight = Rcpp::as<real_type>(data["art_alloc_mxweight"]),
-      .h_art_stage_dur = parse_data<real_type, 1>(data, "h_art_stage_dur", { nda::dim<>(0, SS::hTS - 1, 1) })
+      .h_art_stage_dur = parse_data<real_type, 1>(data, "h_art_stage_dur", { nda::dim<>(0, SS::hTS - 1, 1) }),
+      .pAG_INCIDPOP = Rcpp::as<int>(data["pAG_INCIDPOP"]),
+      .pIDX_INCIDPOP = Rcpp::as<int>(data["pIDX_INCIDPOP"])
     };
   };
 
