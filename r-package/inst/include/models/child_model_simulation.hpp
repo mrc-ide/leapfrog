@@ -57,17 +57,17 @@ struct ChildModelSimulation<Config> {
   static constexpr auto hVT_dropout = SS::hVT_dropout;
 
   enum Index {
-    option_a = 0,
-    option_b = 1,
-    sdnvp = 2,
-    dual_arv = 3,
-    bplus_before = 4,
-    bplus_early = 5,
-    bplus_late = 6,
-    no_art = 7,
-    mat_sero = 8,
-    bplus_before_do = 9,
-    bplus_during_do = 10
+    option_a = 0, //PMTCT: Option A
+    option_b = 1, //PMTCT: Option B
+    sdnvp = 2, //PMTCT: SDNVP
+    dual_arv = 3, //PMTCT: Dual ARV
+    bplus_before = 4, //PMTCT: Option B+, ART initiated before pregnancy
+    bplus_early = 5, //PMTCT: Option B+, ART initiated 5-39 weeks before delivery
+    bplus_late = 6, //PMTCT: Option B+, ART initaited ≤4 weeks before delivery
+    no_art = 7, //MTCT: Mother did not receive ART
+    mat_sero = 8, //MTCT: Mother seroconverted during pregnancy / breastfeeding
+    bplus_before_dropout = 9, //Mother on Option B+, ART initiated before pregnancy but dropped out
+    bplus_during_dropout = 10 //Mother on Option B+, ART initiated during pregnancy but dropped out
   };
 
   // function args
@@ -313,13 +313,13 @@ struct ChildModelSimulation<Config> {
             i_hc.on_PMTCT / i_hc.need_PMTCT ;
           if(hp == bplus_before){
             //Dropped off ART, started before
-            n_hc.mtct_by_source_women(bplus_before_do) += p_hc.PMTCT(hp, t) * (1 - p_hc.PMTCT_dropout(hp, 0, t)); //number
+            n_hc.mtct_by_source_women(bplus_before_dropout) += p_hc.PMTCT(hp, t) * (1 - p_hc.PMTCT_dropout(hp, 0, t)); //number
             // n_hc.mtct_by_source_women(option_a) += p_hc.PMTCT(hp, t) * (1 - p_hc.PMTCT_dropout(hp, 0, t)); //number
             i_hc.PMTCT_before_dropout = i_hc.PMTCT_coverage(hp) * (1 - p_hc.PMTCT_dropout(hp, 0, t)); //coverage
           }
           if(hp == bplus_early){
             //Dropped off ART, started during
-            n_hc.mtct_by_source_women(bplus_during_do) += p_hc.PMTCT(hp, t) * (1 - p_hc.PMTCT_dropout(hp, 0, t)); //number
+            n_hc.mtct_by_source_women(bplus_during_dropout) += p_hc.PMTCT(hp, t) * (1 - p_hc.PMTCT_dropout(hp, 0, t)); //number
             i_hc.PMTCT_during_dropout = i_hc.PMTCT_coverage(hp) * (1 - p_hc.PMTCT_dropout(hp, 0, t)); //coverage
           }
           i_hc.PMTCT_coverage(hp) *=  p_hc.PMTCT_dropout(hp, 0, t);
@@ -349,8 +349,8 @@ struct ChildModelSimulation<Config> {
       i_hc.PMTCT_coverage(hp) *= 1.0 - p_hc.PMTCT_transmission_rate(0, hp, 0);
     } // end hPS
 
-    i_hc.PMTCT_before_dropout -= n_hc.mtct_by_source_tr(bplus_before_do,0);
-    i_hc.PMTCT_during_dropout -= n_hc.mtct_by_source_tr(bplus_during_do,0);
+    i_hc.PMTCT_before_dropout -= n_hc.mtct_by_source_tr(bplus_before_dropout,0);
+    i_hc.PMTCT_during_dropout -= n_hc.mtct_by_source_tr(bplus_during_dropout,0);
 
   };
 
@@ -550,8 +550,8 @@ struct ChildModelSimulation<Config> {
           i_hc.PMTCT_during_dropout) * untreated_vertical_tr;
       }
       //Dropped off ART
-      n_hc.mtct_by_source_tr(bplus_before_do,0) = i_hc.PMTCT_before_dropout * untreated_vertical_tr;
-      n_hc.mtct_by_source_tr(bplus_during_do,0) = i_hc.PMTCT_during_dropout * untreated_vertical_tr;
+      n_hc.mtct_by_source_tr(bplus_before_dropout,0) = i_hc.PMTCT_before_dropout * untreated_vertical_tr;
+      n_hc.mtct_by_source_tr(bplus_during_dropout,0) = i_hc.PMTCT_during_dropout * untreated_vertical_tr;
     }
     i_hc.perinatal_transmission_rate_bf_calc = i_hc.perinatal_transmission_rate;
 
@@ -654,13 +654,13 @@ struct ChildModelSimulation<Config> {
         auto tr_during = i_hc.bf_scalar * i_hc.PMTCT_during_dropout *
           untreated_vertical_bf_tr *
           2 * (1 - p_hc.breastfeeding_duration_no_art(bf, t));
-        n_hc.mtct_by_source_tr(bplus_during_do,1) += tr_during;
+        n_hc.mtct_by_source_tr(bplus_during_dropout,1) += tr_during;
 
         //Started ART before pregnancy then dropped off
         auto tr_before = i_hc.bf_scalar * i_hc.PMTCT_before_dropout *
           untreated_vertical_bf_tr *
           2 * (1 - p_hc.breastfeeding_duration_no_art(bf, t));
-        n_hc.mtct_by_source_tr(bplus_before_do,1) += tr_before;
+        n_hc.mtct_by_source_tr(bplus_before_dropout,1) += tr_before;
 
         //Never on ART
         auto art_naive = i_hc.percent_no_treatment -
