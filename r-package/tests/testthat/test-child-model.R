@@ -55,7 +55,8 @@ test_that("Coarse child model can be run for all years", {
       "hc1_art_pop", "hc2_art_pop",
       "hc1_noart_aids_deaths", "hc2_noart_aids_deaths",
       "hc1_art_aids_deaths", "hc2_art_aids_deaths",
-      "hc_art_init", "hc_art_need_init", "ctx_need", "infection_by_type")
+      "hc_art_init", "hc_art_need_init", "ctx_need", "infection_by_type",
+      "mtct_by_source_tr", "mtct_by_source_women", "mtct_by_source_hc_infections")
   )
 
   ## Nothing should ever be negative
@@ -96,6 +97,16 @@ test_that("Model outputs are consistent", {
   strat <- apply(out$infection_by_type, c(2,3,4), sum)
   pop <- out$p_infections[1:5,,]
   expect_equal(strat, pop)
+
+  ###############################
+  ##Infections stratified by stacked bar categories should be the same
+  ###############################
+  strat <- apply(out$infection_by_type, c(1,4), sum)
+  stacked_bar <- apply(out$mtct_by_source_hc_infections, c(2,3), sum)
+  #perinatal infections
+  expect_equal(strat[1,], stacked_bar[1,])
+  #bf infections
+  expect_equal(apply(strat[2:4,], 2, 'sum'), apply(out$mtct_by_source_hc_infections[,2:5,], 3, 'sum'))
 
   ###############################
   ##Stratified deaths and population deaths should be the same

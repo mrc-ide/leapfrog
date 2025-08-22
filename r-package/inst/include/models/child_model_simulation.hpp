@@ -42,6 +42,7 @@ struct ChildModelSimulation<Config> {
   static constexpr int hc_infant = SS::hc_infant;
   static constexpr int hc1DS = SS::hc1DS;
   static constexpr int hcTT = SS::hcTT;
+  static constexpr int hcTT_expanded = SS::hcTT_expanded;
   static constexpr int hc2DS = SS::hc2DS;
   static constexpr int hPS = SS::hPS;
   static constexpr int hBF = SS::hBF;
@@ -391,7 +392,7 @@ struct ChildModelSimulation<Config> {
     auto& i_hc = intermediate.hc;
     auto& n_hc = state_next.hc;
 
-    // TODO: Maggie to confirm why Option A/B alt tr aren't used
+    // TODO: Maggie to confirm why Option A/B alt tr aren't used (noted in issue #274)
     for (int hp = 0; hp < hPS; ++hp) {
       i_hc.PMTCT_coverage(hp) *= 1.0 - p_hc.PMTCT_transmission_rate(0, hp, 0);
     } // end hPS
@@ -426,18 +427,11 @@ struct ChildModelSimulation<Config> {
       i_hc.prop_wlhiv_gte350 = 0.0;
       i_hc.prop_wlhiv_lt350 = 0.0;
 
-<<<<<<< HEAD
       //MAGGIE CHECK HERE
       for (int a = 0; a < p_idx_fertility_first; ++a) {
-        i_hc.num_wlhiv_lt200 += n_ha.h_hiv_adult(4, a, 1) + n_ha.h_hiv_adult(5, a, 1) + n_ha.h_hiv_adult(6, a, 1);
-        i_hc.num_wlhiv_200to350 += n_ha.h_hiv_adult(3, a, 1) + n_ha.h_hiv_adult(2, a, 1);
-        i_hc.num_wlhiv_gte350 += n_ha.h_hiv_adult(0, a, 1) + n_ha.h_hiv_adult(1, a, 1);
-=======
-      for (int a = 0; a < 35; ++a) {
         i_hc.num_wlhiv_lt200 += n_ha.h_hiv_adult(4, a, FEMALE) + n_ha.h_hiv_adult(5, a, FEMALE) + n_ha.h_hiv_adult(6, a, FEMALE);
         i_hc.num_wlhiv_200to350 += n_ha.h_hiv_adult(3, a, FEMALE) + n_ha.h_hiv_adult(2, a, FEMALE);
         i_hc.num_wlhiv_gte350 += n_ha.h_hiv_adult(0, a, FEMALE) + n_ha.h_hiv_adult(1, a, FEMALE);
->>>>>>> origin/main
       }
       i_hc.num_wlhiv = i_hc.num_wlhiv_200to350 + i_hc.num_wlhiv_gte350 + i_hc.num_wlhiv_lt200;
 
@@ -635,7 +629,7 @@ struct ChildModelSimulation<Config> {
     } else {
       total_births = n_dp.births;
     }
-    n_hc.mtct_by_source_tr(MAT_SERO,1) = i_hc.bf_incident_hiv_transmission_rate * (total_births - n_hc.hiv_births) / n_hc.hiv_births;
+    n_hc.mtct_by_source_tr(MAT_SERO,VT_BF_00_05) = i_hc.bf_incident_hiv_transmission_rate * (total_births - n_hc.hiv_births) / n_hc.hiv_births;
 
   };
 
@@ -692,7 +686,7 @@ struct ChildModelSimulation<Config> {
                   2 * (1 - p_hc.breastfeeding_duration_art(bf, t)) * i_hc.bf_scalar;
         i_hc.PMTCT_coverage(hp) -= tr;
         i_hc.bf_transmission_rate(index) += tr;
-        n_hc.mtct_by_source_tr(hp,1) += tr;
+        n_hc.mtct_by_source_tr(hp,index+1) += tr;
       }
 
       // No treatment
@@ -709,19 +703,19 @@ struct ChildModelSimulation<Config> {
         auto tr_during = i_hc.bf_scalar * i_hc.PMTCT_during_dropout *
           untreated_vertical_bf_tr *
           2 * (1 - p_hc.breastfeeding_duration_no_art(bf, t));
-        n_hc.mtct_by_source_tr(BPLUS_DURING_DROPOUT,1) += tr_during;
+        n_hc.mtct_by_source_tr(BPLUS_DURING_DROPOUT,index+1) += tr_during;
 
         //Started ART before pregnancy then dropped off
         auto tr_before = i_hc.bf_scalar * i_hc.PMTCT_before_dropout *
           untreated_vertical_bf_tr *
           2 * (1 - p_hc.breastfeeding_duration_no_art(bf, t));
-        n_hc.mtct_by_source_tr(BPLUS_BEFORE_DROPOUT,1) += tr_before;
+        n_hc.mtct_by_source_tr(BPLUS_BEFORE_DROPOUT,index+1) += tr_before;
 
         //Never on ART
         auto art_naive = i_hc.percent_no_treatment -
           i_hc.PMTCT_during_dropout -
           i_hc.PMTCT_before_dropout;
-        n_hc.mtct_by_source_tr(NO_ART,1) += i_hc.bf_scalar * art_naive *
+        n_hc.mtct_by_source_tr(NO_ART,index+1) += i_hc.bf_scalar * art_naive *
           untreated_vertical_bf_tr *
           2 * (1 - p_hc.breastfeeding_duration_no_art(bf, t));
 
@@ -762,11 +756,6 @@ struct ChildModelSimulation<Config> {
       // Perinatal transmission
       perinatal_tr();
 
-<<<<<<< HEAD
-
-      // Perinatal transmission
-=======
->>>>>>> origin/main
       auto perinatal_transmission_births = n_hc.hiv_births * i_hc.perinatal_transmission_rate;
       for (int s = 0; s < NS; ++s) {
         for (int hd = 0; hd < hc1DS; ++hd) {
@@ -822,7 +811,6 @@ struct ChildModelSimulation<Config> {
       // 12 plus
       run_bf_transmission_rate(VT_MOS_12_13, VT_MOS_22_23, (VT_BF_12_23 - 1));
       run_bf_transmission_rate(VT_MOS_24_25, VT_MOS_34_35, (VT_BF_24_35 - 1));
-
       //If the adult model output isn't being used, use the input total population ('bigpop')
       if (p_hc.mat_prev_input(t)) {
         for (int s = 0; s < NS; ++s) {
@@ -838,6 +826,8 @@ struct ChildModelSimulation<Config> {
         total_pop_24_plus += n_dp.p_total_pop(age_2, s) - n_ha.p_hiv_pop(age_2, s);
       } // end NS
 
+      auto scalar_prop_12_24 = 0.0;
+      auto scalar_prop_24_plus = 0.0;
       for (int s = 0; s < NS; ++s) {
         if (s == FEMALE) {
          total_pop_12_24 -= n_ha.p_infections(age_1, MALE);
@@ -845,11 +835,13 @@ struct ChildModelSimulation<Config> {
         }
 
         auto uninfected_prop_12_24 = (n_dp.p_total_pop(age_1, s) - n_ha.p_hiv_pop(age_1, s)) / total_pop_12_24;
+        scalar_prop_12_24 += uninfected_prop_12_24;
         auto uninfected_prop_24_plus = (n_dp.p_total_pop(age_2, s) - n_ha.p_hiv_pop(age_2, s)) / total_pop_24_plus;
+        scalar_prop_24_plus += uninfected_prop_24_plus;
 
         for (int hd = 0; hd < hc1DS; ++hd) {
           auto bf_hiv_transmission_12_24 = n_hc.hiv_births * i_hc.bf_transmission_rate((VT_BF_12_23 - 1)) * uninfected_prop_12_24;
-          auto bf_hiv_transmission_24_plus = n_hc.hiv_births * i_hc.bf_transmission_rate(3) * uninfected_prop_24_plus;
+          auto bf_hiv_transmission_24_plus = n_hc.hiv_births * i_hc.bf_transmission_rate((VT_BF_24_35 - 1)) * uninfected_prop_24_plus;
           // 12-24
           n_hc.hc1_hiv_pop(hd, VT_BF_12_23, age_1, s) += p_hc.hc1_cd4_dist(hd) * bf_hiv_transmission_12_24;
           n_ha.p_infections(age_1, s) += p_hc.hc1_cd4_dist(hd) * bf_hiv_transmission_12_24;
@@ -863,9 +855,15 @@ struct ChildModelSimulation<Config> {
         } // end hc1DS
       } // end NS
 
+      //Sex splitting causes some misalignment, this fixes it but is noted in issue #274
+      for(int ms = 0; ms < mtct_source; ms++){
+        n_hc.mtct_by_source_tr(ms, VT_BF_12_23) = n_hc.mtct_by_source_tr(ms, VT_BF_12_23) * scalar_prop_12_24 ;
+        n_hc.mtct_by_source_tr(ms,VT_BF_24_35) = n_hc.mtct_by_source_tr(ms, VT_BF_24_35) * scalar_prop_24_plus;
+      }
+
       //Fill in infections for the stacked bar output
       for(int ms = 0; ms < mtct_source; ms++){
-        for(int hv = 0; hv < hVT; hv++){
+        for(int hv = 0; hv < hcTT_expanded; hv++){
           n_hc.mtct_by_source_hc_infections(ms, hv) = n_hc.mtct_by_source_tr(ms, hv) * n_hc.hiv_births;
         }
       }
@@ -953,7 +951,7 @@ struct ChildModelSimulation<Config> {
     } // end NS
 
     // All ART eligible children ages 5-14 eligible
-    // Spectrum uses a lagged population and eligibility for children over five (TODO: verify)
+    // Spectrum uses a lagged population and eligibility for children over five (TODO: verify, noted in issue #274)
     for (int s = 0; s < NS; ++s) {
       for (int cat = 0; cat < hcTT; ++cat) {
         for (int a = hc2_agestart; a < hcAG_end; ++a) {

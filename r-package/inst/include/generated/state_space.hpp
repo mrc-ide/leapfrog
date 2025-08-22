@@ -62,6 +62,7 @@ struct SSMixer<ModelVariant, SSPair<true, Hc>, Ts...>: public SSMixer<ModelVaria
   static constexpr int hc2AG_c = 1;
   static constexpr int hc_infant = 2;
   static constexpr int hcTT = 4;
+  static constexpr int hcTT_expanded = 5;
   static constexpr int hPS = 7;
   static constexpr int hVT_dropout = 3;
   static constexpr int hVT = 2;

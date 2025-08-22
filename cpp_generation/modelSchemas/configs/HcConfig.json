@@ -15,6 +15,7 @@
       "hc2AG_c": 1,
       "hc_infant": 2,
       "hcTT": 4,
+      "hcTT_expanded": 5,
       "hPS": 7,
       "hVT_dropout": 3,
       "hVT": 2,
@@ -602,7 +603,7 @@
     },
     "mtct_by_source_tr": {
       "num_type": "real_type",
-      "dims": ["SS::mtct_source", "SS::hVT"]
+      "dims": ["SS::mtct_source", "SS::hcTT_expanded"]
     },
     "mtct_by_source_women": {
       "num_type": "real_type",
@@ -610,7 +611,7 @@
     },
     "mtct_by_source_hc_infections": {
       "num_type": "real_type",
-      "dims": ["SS::mtct_source", "SS::hVT"]
+      "dims": ["SS::mtct_source", "SS::hcTT_expanded"]
     }
   }
 }

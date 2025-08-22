@@ -1057,7 +1057,7 @@ struct HcConfig {
     nda::array<real_type, shape_infection_by_type> infection_by_type;
     using shape_mtct_by_source_tr = nda::shape<
       nda::dim<0, SS::mtct_source, 1>,
-      nda::dim<0, SS::hVT, (SS::mtct_source)>
+      nda::dim<0, SS::hcTT_expanded, (SS::mtct_source)>
     >;
     nda::array<real_type, shape_mtct_by_source_tr> mtct_by_source_tr;
     using shape_mtct_by_source_women = nda::shape<
@@ -1066,7 +1066,7 @@ struct HcConfig {
     nda::array<real_type, shape_mtct_by_source_women> mtct_by_source_women;
     using shape_mtct_by_source_hc_infections = nda::shape<
       nda::dim<0, SS::mtct_source, 1>,
-      nda::dim<0, SS::hVT, (SS::mtct_source)>
+      nda::dim<0, SS::hcTT_expanded, (SS::mtct_source)>
     >;
     nda::array<real_type, shape_mtct_by_source_hc_infections> mtct_by_source_hc_infections;
 
@@ -1191,8 +1191,8 @@ struct HcConfig {
     nda::array<real_type, shape_infection_by_type> infection_by_type;
     using shape_mtct_by_source_tr = nda::shape<
       nda::dim<0, SS::mtct_source, 1>,
-      nda::dim<0, SS::hVT, (SS::mtct_source)>,
-      nda::dim<0, nda::dynamic, (SS::mtct_source) * (SS::hVT)>
+      nda::dim<0, SS::hcTT_expanded, (SS::mtct_source)>,
+      nda::dim<0, nda::dynamic, (SS::mtct_source) * (SS::hcTT_expanded)>
     >;
     nda::array<real_type, shape_mtct_by_source_tr> mtct_by_source_tr;
     using shape_mtct_by_source_women = nda::shape<
@@ -1202,8 +1202,8 @@ struct HcConfig {
     nda::array<real_type, shape_mtct_by_source_women> mtct_by_source_women;
     using shape_mtct_by_source_hc_infections = nda::shape<
       nda::dim<0, SS::mtct_source, 1>,
-      nda::dim<0, SS::hVT, (SS::mtct_source)>,
-      nda::dim<0, nda::dynamic, (SS::mtct_source) * (SS::hVT)>
+      nda::dim<0, SS::hcTT_expanded, (SS::mtct_source)>,
+      nda::dim<0, nda::dynamic, (SS::mtct_source) * (SS::hcTT_expanded)>
     >;
     nda::array<real_type, shape_mtct_by_source_hc_infections> mtct_by_source_hc_infections;
 
@@ -1222,9 +1222,9 @@ struct HcConfig {
       hiv_births(shape_hiv_births(output_years)),
       ctx_need(shape_ctx_need(output_years)),
       infection_by_type(shape_infection_by_type(SS::hcTT, SS::hc1AG, SS::NS, output_years)),
-      mtct_by_source_tr(shape_mtct_by_source_tr(SS::mtct_source, SS::hVT, output_years)),
+      mtct_by_source_tr(shape_mtct_by_source_tr(SS::mtct_source, SS::hcTT_expanded, output_years)),
       mtct_by_source_women(shape_mtct_by_source_women(SS::mtct_source, output_years)),
-      mtct_by_source_hc_infections(shape_mtct_by_source_hc_infections(SS::mtct_source, SS::hVT, output_years))
+      mtct_by_source_hc_infections(shape_mtct_by_source_hc_infections(SS::mtct_source, SS::hcTT_expanded, output_years))
     {
       hiv_births_by_mat_age.for_each_value([](real_type& x) { x = 0; });
       hc1_hiv_pop.for_each_value([](real_type& x) { x = 0; });
