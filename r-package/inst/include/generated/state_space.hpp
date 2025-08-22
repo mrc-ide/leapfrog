@@ -48,13 +48,13 @@ template<MV ModelVariant, typename ...Ts>
 struct SSMixer<ModelVariant, SSPair<true, Hc>, Ts...>: public SSMixer<ModelVariant, Ts...> {
   static constexpr int hc1DS = 7;
   static constexpr int hc2DS = 6;
-  static constexpr int hc1_ageend = 4;
   static constexpr int hc2_agestart = 5;
+  static constexpr int hcAG_end = 15;
   static constexpr int hc1AG = 5;
   static constexpr int hc1AG_c = 2;
   static constexpr int hc2AG = 10;
   static constexpr int hc2AG_c = 1;
-  static constexpr int hcAG_end = 15;
+  static constexpr int hc_infant = 2;
   static constexpr int hcTT = 4;
   static constexpr int hPS = 7;
   static constexpr int hVT_dropout = 3;

@@ -932,6 +932,31 @@ prepare_hc_leapfrog_projp <- function(pjnz, params) {
   total_births <- SpectrumUtils::dp.output.births(dp.raw = dp.x, direction = 'long')$Value %>% as.array()
   v$total_births <- total_births
 
+  ###Need sex ratio of 1 and 2 year olds for option when running model without adult input
+  infant_sex_dist <- SpectrumUtils::dp.output.bigpop(dp.raw = dp.x, direction = "long")
+  infant_sex_array <- infant_sex_dist %>%
+    dplyr::filter(Age %in% c(1, 2)) %>%
+    dplyr::select(Age, Sex, Year, Value) %>%     # keep only relevant columns
+    tidyr::pivot_wider(
+      names_from = c(Sex, Year),
+      values_from = Value
+    )
+  infant_sex_array <- array(
+    infant_sex_dist %>%
+      dplyr::filter(Age %in% c(1,2)) %>%
+      dplyr::pull(Value),
+    dim = c(
+      Age = 2,
+      Sex = length(unique(infant_sex_dist$Sex)),
+      Year = length(unique(infant_sex_dist$Year))
+    ),
+    dimnames = list(
+      Age = sort(unique(infant_sex_dist$Age[infant_sex_dist$Age %in% c(1,2)])),
+      Sex = sort(unique(infant_sex_dist$Sex)),
+      Year = sort(unique(infant_sex_dist$Year))
+    )
+  )
+  v$infant_pop <- infant_sex_array
 
   specres <- eppasm::read_hivproj_output(pjnz)
   newinf <- specres$newinf.f[4:10,] %>% colSums()
