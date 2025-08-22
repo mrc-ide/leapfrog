@@ -13,7 +13,8 @@ test_that("Child model can be run for all years", {
       "hc1_art_pop", "hc2_art_pop",
       "hc1_noart_aids_deaths", "hc2_noart_aids_deaths",
       "hc1_art_aids_deaths", "hc2_art_aids_deaths", "hiv_births",
-      "hc_art_init", "hc_art_need_init", "ctx_need", "infection_by_type")
+      "hc_art_init", "hc_art_need_init", "ctx_need", "infection_by_type",
+      "mtct_by_source_tr", "mtct_by_source_women", "mtct_by_source_hc_infections")
   )
 
   ## Nothing should ever be negative
