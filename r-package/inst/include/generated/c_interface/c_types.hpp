@@ -157,6 +157,8 @@ struct HcParams {
   int breastfeeding_duration_art_length;
   real_type* breastfeeding_duration_no_art;
   int breastfeeding_duration_no_art_length;
+  real_type* infant_pop;
+  int infant_pop_length;
   real_type* mat_hiv_births;
   int mat_hiv_births_length;
   int* mat_prev_input;

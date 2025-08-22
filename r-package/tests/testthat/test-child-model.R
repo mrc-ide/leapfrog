@@ -192,6 +192,7 @@ test_that("Infections among children align", {
   pjnz <- utils$pjnz
 
   out <- run_model(parameters, "ChildModel", 1970:2030)
+  system.time(out <- run_model(parameters, "ChildModel", 1970:2030))
   inf_spec <- SpectrumUtils::dp.output.incident.hiv(dp.raw = dp)
   inf_spec <- inf_spec %>%
     dplyr::filter(Sex != "Male+Female") %>%

@@ -7,13 +7,13 @@
     "default": {
       "hc1DS": 7,
       "hc2DS": 6,
-      "hc1_ageend": 4,
       "hc2_agestart": 5,
+      "hcAG_end": 15,
       "hc1AG": 5,
       "hc1AG_c": 2,
       "hc2AG": 10,
       "hc2AG_c": 1,
-      "hcAG_end": 15,
+      "hc_infant": 2,
       "hcTT": 4,
       "hPS": 7,
       "hVT_dropout": 3,
@@ -225,6 +225,10 @@
           "r": "bf_duration_no_art"
         }
       },
+      "infant_pop": {
+        "num_type": "real_type",
+        "dims": ["SS::hc_infant", "SS::NS","opts.proj_steps"]
+      },
       "mat_hiv_births": {
         "num_type": "real_type",
         "dims": ["opts.proj_steps"]
@@ -310,15 +314,15 @@
     },
     "hc_posthivmort": {
       "num_type": "real_type",
-      "dims": ["SS::hDS", "SS::hcTT", "SS::hAG", "SS::NS"]
+      "dims": ["SS::hDS", "SS::hcTT", "SS::hcAG_end", "SS::NS"]
     },
     "hc_grad": {
       "num_type": "real_type",
-      "dims": ["SS::hDS", "SS::hcTT", "SS::hAG", "SS::NS"]
+      "dims": ["SS::hDS", "SS::hcTT",  "SS::hcAG_end", "SS::NS"]
     },
     "eligible": {
       "num_type": "real_type",
-      "dims": ["SS::hDS", "SS::hAG", "SS::NS"]
+      "dims": ["SS::hDS",  "SS::hcAG_end", "SS::NS"]
     },
     "unmet_need": {
       "num_type": "real_type",
@@ -342,7 +346,7 @@
     },
     "hc_art_grad": {
       "num_type": "real_type",
-      "dims": ["SS::hcTT", "SS::hDS", "SS::hAG", "SS::NS"]
+      "dims": ["SS::hcTT", "SS::hDS", "SS::hcAG_end", "SS::NS"]
     },
     "hc_art_scalar": {
       "num_type": "real_type",
