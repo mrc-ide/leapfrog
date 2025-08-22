@@ -266,7 +266,7 @@ struct HcAdapter<Language::Py, real_type, ModelVariant> {
       .PMTCT = parse_data<real_type, 2>(data, "pmtct", { nda::dim<>(0, SS::hPS, 1), nda::dim<>(0, opts.proj_steps, (SS::hPS)) }),
       .vertical_transmission_rate = parse_data<real_type, 2>(data, "mtct", { nda::dim<>(0, SS::hDS + 1, 1), nda::dim<>(0, SS::hVT, (SS::hDS + 1)) }),
       .PMTCT_transmission_rate = parse_data<real_type, 3>(data, "pmtct_mtct", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hPS, (SS::hDS)), nda::dim<>(0, SS::hVT, (SS::hDS) * (SS::hPS)) }),
-      .PMTCT_dropout = parse_data<real_type, 2>(data, "pmtct_dropout", { nda::dim<>(0, SS::hPS_dropout, 1), nda::dim<>(0, opts.proj_steps, (SS::hPS_dropout)) }),
+      .PMTCT_dropout = parse_data<real_type, 3>(data, "pmtct_dropout", { nda::dim<>(0, SS::hPS, 1), nda::dim<>(0, SS::hVT_dropout, (SS::hPS)), nda::dim<>(0, opts.proj_steps, (SS::hPS) * (SS::hVT_dropout)) }),
       .PMTCT_input_is_percent = parse_data<int, 1>(data, "pmtct_input_isperc", { nda::dim<>(0, opts.proj_steps, 1) }),
       .breastfeeding_duration_art = parse_data<real_type, 2>(data, "bf_duration_art", { nda::dim<>(0, SS::hBF, 1), nda::dim<>(0, opts.proj_steps, (SS::hBF)) }),
       .breastfeeding_duration_no_art = parse_data<real_type, 2>(data, "bf_duration_no_art", { nda::dim<>(0, SS::hBF, 1), nda::dim<>(0, opts.proj_steps, (SS::hBF)) }),
@@ -305,10 +305,13 @@ struct HcAdapter<Language::Py, real_type, ModelVariant> {
     state.hiv_births = nb::cast<real_type>(data["hiv_births"]);
     state.ctx_need = nb::cast<real_type>(data["ctx_need"]);
     fill_initial_state<real_type, typename Config::State::shape_infection_by_type>(data, "infection_by_type", state.infection_by_type);
+    fill_initial_state<real_type, typename Config::State::shape_mtct_by_source_tr>(data, "mtct_by_source_tr", state.mtct_by_source_tr);
+    fill_initial_state<real_type, typename Config::State::shape_mtct_by_source_women>(data, "mtct_by_source_women", state.mtct_by_source_women);
+    fill_initial_state<real_type, typename Config::State::shape_mtct_by_source_hc_infections>(data, "mtct_by_source_hc_infections", state.mtct_by_source_hc_infections);
     return state;
   };
 
-  static constexpr int output_count = 13;
+  static constexpr int output_count = 16;
 
   static int build_output(
     int index,
@@ -355,6 +358,15 @@ struct HcAdapter<Language::Py, real_type, ModelVariant> {
     const int py_rank_infection_by_type = 4;
     size_t py_dims_infection_by_type[py_rank_infection_by_type] = { SS::hcTT, SS::hc1AG, SS::NS, output_years };
     ret["infection_by_type"] = py_array<real_type>(state.infection_by_type.data(), py_rank_infection_by_type, py_dims_infection_by_type);
+    const int py_rank_mtct_by_source_tr = 3;
+    size_t py_dims_mtct_by_source_tr[py_rank_mtct_by_source_tr] = { SS::mtct_source, SS::hVT, output_years };
+    ret["mtct_by_source_tr"] = py_array<real_type>(state.mtct_by_source_tr.data(), py_rank_mtct_by_source_tr, py_dims_mtct_by_source_tr);
+    const int py_rank_mtct_by_source_women = 2;
+    size_t py_dims_mtct_by_source_women[py_rank_mtct_by_source_women] = { SS::mtct_source, output_years };
+    ret["mtct_by_source_women"] = py_array<real_type>(state.mtct_by_source_women.data(), py_rank_mtct_by_source_women, py_dims_mtct_by_source_women);
+    const int py_rank_mtct_by_source_hc_infections = 3;
+    size_t py_dims_mtct_by_source_hc_infections[py_rank_mtct_by_source_hc_infections] = { SS::mtct_source, SS::hVT, output_years };
+    ret["mtct_by_source_hc_infections"] = py_array<real_type>(state.mtct_by_source_hc_infections.data(), py_rank_mtct_by_source_hc_infections, py_dims_mtct_by_source_hc_infections);
     return index + output_count;
   };
 
@@ -398,6 +410,15 @@ struct HcAdapter<Language::Py, real_type, ModelVariant> {
     const int py_rank_infection_by_type = 3;
     size_t py_dims_infection_by_type[py_rank_infection_by_type] = { SS::hcTT, SS::hc1AG, SS::NS };
     ret["infection_by_type"] = py_array<real_type>(state.infection_by_type.data(), py_rank_infection_by_type, py_dims_infection_by_type);
+    const int py_rank_mtct_by_source_tr = 2;
+    size_t py_dims_mtct_by_source_tr[py_rank_mtct_by_source_tr] = { SS::mtct_source, SS::hVT };
+    ret["mtct_by_source_tr"] = py_array<real_type>(state.mtct_by_source_tr.data(), py_rank_mtct_by_source_tr, py_dims_mtct_by_source_tr);
+    const int py_rank_mtct_by_source_women = 1;
+    size_t py_dims_mtct_by_source_women[py_rank_mtct_by_source_women] = { SS::mtct_source };
+    ret["mtct_by_source_women"] = py_array<real_type>(state.mtct_by_source_women.data(), py_rank_mtct_by_source_women, py_dims_mtct_by_source_women);
+    const int py_rank_mtct_by_source_hc_infections = 2;
+    size_t py_dims_mtct_by_source_hc_infections[py_rank_mtct_by_source_hc_infections] = { SS::mtct_source, SS::hVT };
+    ret["mtct_by_source_hc_infections"] = py_array<real_type>(state.mtct_by_source_hc_infections.data(), py_rank_mtct_by_source_hc_infections, py_dims_mtct_by_source_hc_infections);
     return index + output_count;
   };
 };

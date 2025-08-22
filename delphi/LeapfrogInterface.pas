@@ -351,6 +351,12 @@ type
     ctxNeedLength: Integer;
     infectionByType: PDouble;
     infectionByTypeLength: Integer;
+    mtctBySourceTr: PDouble;
+    mtctBySourceTrLength: Integer;
+    mtctBySourceWomen: PDouble;
+    mtctBySourceWomenLength: Integer;
+    mtctBySourceHcInfections: PDouble;
+    mtctBySourceHcInfectionsLength: Integer;
 end;
 
 type
@@ -369,6 +375,9 @@ type
     hivBirths: TGBFixedArray<Double>;
     ctxNeed: TGBFixedArray<Double>;
     infectionByType: TGBFixedArray<Double>;
+    mtctBySourceTr: TGBFixedArray<Double>;
+    mtctBySourceWomen: TGBFixedArray<Double>;
+    mtctBySourceHcInfections: TGBFixedArray<Double>;
     function getView(): LeapfrogHivChildStateView;
     procedure writeToDisk(dir: string);
     Destructor Destroy; override;
@@ -604,6 +613,9 @@ begin;
   hivBirths.Free;
   ctxNeed.Free;
   infectionByType.Free;
+  mtctBySourceTr.Free;
+  mtctBySourceWomen.Free;
+  mtctBySourceHcInfections.Free;
   inherited;
 end;
 
@@ -721,6 +733,12 @@ begin;
   Result.ctxNeedLength := ctxNeed.GetLength();
   Result.infectionByType := PDouble(infectionByType.data);
   Result.infectionByTypeLength := infectionByType.GetLength();
+  Result.mtctBySourceTr := PDouble(mtctBySourceTr.data);
+  Result.mtctBySourceTrLength := mtctBySourceTr.GetLength();
+  Result.mtctBySourceWomen := PDouble(mtctBySourceWomen.data);
+  Result.mtctBySourceWomenLength := mtctBySourceWomen.GetLength();
+  Result.mtctBySourceHcInfections := PDouble(mtctBySourceHcInfections.data);
+  Result.mtctBySourceHcInfectionsLength := mtctBySourceHcInfections.GetLength();
 end;
 
 procedure LeapfrogDemProjParams.writeToDisk(dir: string);
@@ -836,6 +854,9 @@ begin;
   hcArtInit.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hcArtInit');
   hcArtNeedInit.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hcArtNeedInit');
   infectionByType.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'infectionByType');
+  mtctBySourceTr.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'mtctBySourceTr');
+  mtctBySourceWomen.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'mtctBySourceWomen');
+  mtctBySourceHcInfections.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'mtctBySourceHcInfections');
 end;
 
 procedure LeapfrogParams.SetDemProjParams(const demprojParams: LeapfrogDemProjParamsView);
