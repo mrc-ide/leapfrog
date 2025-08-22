@@ -49,15 +49,16 @@ save_hdf5_file(lmod, testthat::test_path("testdata/fit_demography.h5"))
 pjnz_child <- file.path(here::here(), "inst", "pjnz", "bwa_aim-no-special-elig-numpmtct.PJNZ")
 
 demp <- prepare_leapfrog_demp(pjnz_child)
-proj <- prepare_leapfrog_projp(pjnz_child)
-proj <- prepare_hc_leapfrog_projp(pjnz_child, proj)
-
-demp <- prepare_leapfrog_demp(pjnz_child)
-proj_coarse <- prepare_leapfrog_projp(pjnz_child)
-proj_coarse <- prepare_hc_leapfrog_projp(pjnz_child, proj_coarse)
-
 demp$netmigr <- leapfrog:::read_netmigr(pjnz_child, adjust_u5mig = FALSE)
 demp$netmigr_adj <- leapfrog:::adjust_spectrum_netmigr(demp$netmigr)
+
+proj_coarse <- prepare_leapfrog_projp(pjnz_child, use_coarse_age_groups = TRUE)
+parameters_coarse <- c(demp, proj_coarse)
+parameters_coarse <- prepare_hc_leapfrog_projp(pjnz_child,  params = parameters_coarse, use_coarse_age_groups = TRUE)
+
+proj <- prepare_leapfrog_projp(pjnz_child, use_coarse_age_groups = FALSE)
+parameters <- c(proj, demp)
+parameters <- prepare_hc_leapfrog_projp(pjnz_child, params = parameters, use_coarse_age_groups = FALSE)
 
 dpfile <- grep(".DP$", utils::unzip(pjnz_child, list=TRUE)$Name, value=TRUE)
 dp <- utils::read.csv(unz(pjnz_child, dpfile), as.is=TRUE)
@@ -141,9 +142,6 @@ out <- list(dp = dp,
             deaths_noart = aids_deathsnoart,
             deaths_art = aids_deathsart,
             ctx_need = as.numeric(unlist(spec_ctx_need)))
-
-parameters <- c(proj, demp)
-parameters_coarse <- c(proj_coarse, demp)
 
 save_parameters(parameters, testthat::test_path("testdata/child_parms_full.h5"))
 save_parameters(parameters_coarse, testthat::test_path("testdata/child_parms_coarse.h5"))

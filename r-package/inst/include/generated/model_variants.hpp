@@ -31,5 +31,11 @@ struct ChildModel {
   static constexpr bool use_coarse_stratification = false;
   static constexpr bool run_child_model = true;
 };
+struct CoarseChildModel {
+  static constexpr bool run_demographic_projection = true;
+  static constexpr bool run_hiv_simulation = true;
+  static constexpr bool use_coarse_stratification = true;
+  static constexpr bool run_child_model = true;
+};
 
 }

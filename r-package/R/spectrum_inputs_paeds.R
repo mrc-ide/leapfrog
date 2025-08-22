@@ -56,9 +56,9 @@ input_pmtct_ispercent <- function(pjnz){
 pmtct <- format_pmtct(pjnz)$pmtct_value
 
 ## pmtct_input_isperc
-pmtct_input_isperc <- array(data = 0, dim = c(nrow(pmtct[[1]]),ncol(pmtct[[1]])), dimnames = list(hp = unlist(lapply(rownames(pmtct[[1]]), gsub, pattern = '_number', replacement = '')),
+pmtct_input_isperc <- array(data = FALSE, dim = c(nrow(pmtct[[1]]),ncol(pmtct[[1]])), dimnames = list(hp = unlist(lapply(rownames(pmtct[[1]]), gsub, pattern = '_number', replacement = '')),
                                                                                                   year = 1970:(1969 + ncol(pmtct[[1]]))))
-pmtct_input_isperc[!is.na(pmtct[[1]])] <- 1
+pmtct_input_isperc[!is.na(pmtct[[1]])] <- TRUE
 
 pmtct_input_isperc
 }
