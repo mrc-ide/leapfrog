@@ -142,17 +142,19 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
       .total_births = { owned_pars.hc.total_births.data(), owned_pars.hc.total_births.shape() },
       .ctx_effect = { owned_pars.hc.ctx_effect.data(), owned_pars.hc.ctx_effect.shape() },
       .hc_art_start = owned_pars.hc.hc_art_start,
-      .local_adj_factor = owned_pars.hc.local_adj_factor
+      .local_adj_factor = owned_pars.hc.local_adj_factor,
+      .hc_age_specific_fertility_rate = { owned_pars.hc.hc_age_specific_fertility_rate.data(), owned_pars.hc.hc_age_specific_fertility_rate.shape() }
     };
   };
 
-  static constexpr int output_count = 16;
+  static constexpr int output_count = 17;
 
   static int build_output(
     int index,
     const Config::OutputState& state,
     std::filesystem::path& output_file
   ) {
+    write_data<real_type, typename Config::OutputState::shape_hiv_births_by_mat_age>(output_file, "hiv_births_by_mat_age", state.hiv_births_by_mat_age);
     write_data<real_type, typename Config::OutputState::shape_hc1_hiv_pop>(output_file, "hc1_hiv_pop", state.hc1_hiv_pop);
     write_data<real_type, typename Config::OutputState::shape_hc2_hiv_pop>(output_file, "hc2_hiv_pop", state.hc2_hiv_pop);
     write_data<real_type, typename Config::OutputState::shape_hc1_art_pop>(output_file, "hc1_art_pop", state.hc1_art_pop);

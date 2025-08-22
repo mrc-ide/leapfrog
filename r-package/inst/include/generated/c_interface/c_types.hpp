@@ -189,10 +189,14 @@ struct HcParams {
   int hc_art_start_length;
   real_type local_adj_factor;
   int local_adj_factor_length;
+  real_type* hc_age_specific_fertility_rate;
+  int hc_age_specific_fertility_rate_length;
 };
 
 template<typename real_type>
 struct HcOut {
+  real_type* hiv_births_by_mat_age;
+  int hiv_births_by_mat_age_length;
   real_type* hc1_hiv_pop;
   int hc1_hiv_pop_length;
   real_type* hc2_hiv_pop;

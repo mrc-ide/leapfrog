@@ -6,7 +6,8 @@
   "state_space": {
     "default": {
       "NS": 2,
-      "pAG": 81
+      "pAG": 81,
+      "p_fertility_age_groups": 35
     }
   },
   "pars": {
