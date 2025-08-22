@@ -127,6 +127,7 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
       .PMTCT_input_is_percent = { owned_pars.hc.PMTCT_input_is_percent.data(), owned_pars.hc.PMTCT_input_is_percent.shape() },
       .breastfeeding_duration_art = { owned_pars.hc.breastfeeding_duration_art.data(), owned_pars.hc.breastfeeding_duration_art.shape() },
       .breastfeeding_duration_no_art = { owned_pars.hc.breastfeeding_duration_no_art.data(), owned_pars.hc.breastfeeding_duration_no_art.shape() },
+      .infant_pop = { owned_pars.hc.infant_pop.data(), owned_pars.hc.infant_pop.shape() },
       .mat_hiv_births = { owned_pars.hc.mat_hiv_births.data(), owned_pars.hc.mat_hiv_births.shape() },
       .mat_prev_input = { owned_pars.hc.mat_prev_input.data(), owned_pars.hc.mat_prev_input.shape() },
       .prop_lt200 = { owned_pars.hc.prop_lt200.data(), owned_pars.hc.prop_lt200.shape() },
@@ -146,7 +147,7 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
     };
   };
 
-  static constexpr int output_count = 14;
+  static constexpr int output_count = 17;
 
   static int build_output(
     int index,
@@ -167,6 +168,9 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
     write_data<real_type, typename Config::OutputState::shape_hiv_births>(output_file, "hiv_births", state.hiv_births);
     write_data<real_type, typename Config::OutputState::shape_ctx_need>(output_file, "ctx_need", state.ctx_need);
     write_data<real_type, typename Config::OutputState::shape_infection_by_type>(output_file, "infection_by_type", state.infection_by_type);
+    write_data<real_type, typename Config::OutputState::shape_mtct_by_source_tr>(output_file, "mtct_by_source_tr", state.mtct_by_source_tr);
+    write_data<real_type, typename Config::OutputState::shape_mtct_by_source_women>(output_file, "mtct_by_source_women", state.mtct_by_source_women);
+    write_data<real_type, typename Config::OutputState::shape_mtct_by_source_hc_infections>(output_file, "mtct_by_source_hc_infections", state.mtct_by_source_hc_infections);
     return index + output_count;
   };
 };

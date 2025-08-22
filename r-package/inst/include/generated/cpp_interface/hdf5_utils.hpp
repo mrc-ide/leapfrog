@@ -436,8 +436,9 @@ struct HcOwnedPars {
   nda::array<real_type, shape_PMTCT_transmission_rate> PMTCT_transmission_rate;
 
     using shape_PMTCT_dropout = nda::shape<
-    nda::dim<0, SS::hPS_dropout, 1>,
-    nda::dim<0, nda::dynamic, (SS::hPS_dropout)>
+    nda::dim<0, SS::hPS, 1>,
+    nda::dim<0, SS::hVT_dropout, (SS::hPS)>,
+    nda::dim<0, nda::dynamic, (SS::hPS) * (SS::hVT_dropout)>
   >;
   nda::array<real_type, shape_PMTCT_dropout> PMTCT_dropout;
 
@@ -457,6 +458,13 @@ struct HcOwnedPars {
     nda::dim<0, nda::dynamic, (SS::hBF)>
   >;
   nda::array<real_type, shape_breastfeeding_duration_no_art> breastfeeding_duration_no_art;
+
+    using shape_infant_pop = nda::shape<
+    nda::dim<0, SS::hc_infant, 1>,
+    nda::dim<0, SS::NS, (SS::hc_infant)>,
+    nda::dim<0, nda::dynamic, (SS::hc_infant) * (SS::NS)>
+  >;
+  nda::array<real_type, shape_infant_pop> infant_pop;
 
     using shape_mat_hiv_births = nda::shape<
     nda::dim<0, nda::dynamic, 1>
@@ -565,10 +573,11 @@ struct HcOwnedPars {
       .PMTCT = read_data<real_type, typename Pars::shape_PMTCT>(params_file, "pmtct", { nda::dim<>(0, SS::hPS, 1), nda::dim<>(0, opts.proj_steps, (SS::hPS)) }),
       .vertical_transmission_rate = read_data<real_type, typename Pars::shape_vertical_transmission_rate>(params_file, "mtct", { nda::dim<>(0, SS::hDS + 1, 1), nda::dim<>(0, SS::hVT, (SS::hDS + 1)) }),
       .PMTCT_transmission_rate = read_data<real_type, typename Pars::shape_PMTCT_transmission_rate>(params_file, "pmtct_mtct", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hPS, (SS::hDS)), nda::dim<>(0, SS::hVT, (SS::hDS) * (SS::hPS)) }),
-      .PMTCT_dropout = read_data<real_type, typename Pars::shape_PMTCT_dropout>(params_file, "pmtct_dropout", { nda::dim<>(0, SS::hPS_dropout, 1), nda::dim<>(0, opts.proj_steps, (SS::hPS_dropout)) }),
+      .PMTCT_dropout = read_data<real_type, typename Pars::shape_PMTCT_dropout>(params_file, "pmtct_dropout", { nda::dim<>(0, SS::hPS, 1), nda::dim<>(0, SS::hVT_dropout, (SS::hPS)), nda::dim<>(0, opts.proj_steps, (SS::hPS) * (SS::hVT_dropout)) }),
       .PMTCT_input_is_percent = read_data<int, typename Pars::shape_PMTCT_input_is_percent>(params_file, "pmtct_input_isperc", { nda::dim<>(0, opts.proj_steps, 1) }),
       .breastfeeding_duration_art = read_data<real_type, typename Pars::shape_breastfeeding_duration_art>(params_file, "bf_duration_art", { nda::dim<>(0, SS::hBF, 1), nda::dim<>(0, opts.proj_steps, (SS::hBF)) }),
       .breastfeeding_duration_no_art = read_data<real_type, typename Pars::shape_breastfeeding_duration_no_art>(params_file, "bf_duration_no_art", { nda::dim<>(0, SS::hBF, 1), nda::dim<>(0, opts.proj_steps, (SS::hBF)) }),
+      .infant_pop = read_data<real_type, typename Pars::shape_infant_pop>(params_file, "infant_pop", { nda::dim<>(0, SS::hc_infant, 1), nda::dim<>(0, SS::NS, (SS::hc_infant)), nda::dim<>(0, opts.proj_steps, (SS::hc_infant) * (SS::NS)) }),
       .mat_hiv_births = read_data<real_type, typename Pars::shape_mat_hiv_births>(params_file, "mat_hiv_births", { nda::dim<>(0, opts.proj_steps, 1) }),
       .mat_prev_input = read_data<int, typename Pars::shape_mat_prev_input>(params_file, "mat_prev_input", { nda::dim<>(0, opts.proj_steps, 1) }),
       .prop_lt200 = read_data<real_type, typename Pars::shape_prop_lt200>(params_file, "prop_lt200", { nda::dim<>(0, opts.proj_steps, 1) }),
@@ -584,7 +593,7 @@ struct HcOwnedPars {
       .ctx_effect = read_data<real_type, typename Pars::shape_ctx_effect>(params_file, "ctx_effect", { nda::dim<>(0, 3, 1) }),
       .hc_art_start = read_data_scalar<int>(params_file, "hc_art_start"),
       .local_adj_factor = read_data_scalar<real_type>(params_file, "frr_scalar"),
-      .hc_age_specific_fertility_rate = read_data<real_type, typename Pars::shape_hc_age_specific_fertility_rate>(params_file, "asfr", { nda::dim<>(0, SS::hc_p_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::hc_p_fertility_age_groups)) })
+      .hc_age_specific_fertility_rate = read_data<real_type, typename Pars::shape_hc_age_specific_fertility_rate>(params_file, "hc_asfr", { nda::dim<>(0, SS::hc_p_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::hc_p_fertility_age_groups)) })
     };
   };
 };

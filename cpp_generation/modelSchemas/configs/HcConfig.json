@@ -7,22 +7,24 @@
     "default": {
       "hc1DS": 7,
       "hc2DS": 6,
-      "hc1_ageend": 4,
       "hc2_agestart": 5,
+      "hcAG_end": 15,
       "hc1AG": 5,
       "hc1AG_c": 2,
       "hc2AG": 10,
       "hc2AG_c": 1,
-      "hcAG_end": 15,
+      "hc_infant": 2,
       "hcTT": 4,
       "hPS": 7,
-      "hPS_dropout": 6,
+      "hVT_dropout": 3,
       "hVT": 2,
       "hBF": 18,
       "hBF_coarse": 4,
       "hcAG_coarse": 4,
       "hAB_ind": 2,
       "hc_p_fertility_age_groups": 35,
+      "hAG_fert": 7,
+      "mtct_source": 11,
       "hc_age_coarse": [1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3],
       "hc_age_coarse_cd4": [0, 0, 0, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
       "hc_cd4_transition": [
@@ -206,7 +208,7 @@
       },
       "PMTCT_dropout": {
         "num_type": "real_type",
-        "dims": ["SS::hPS_dropout", "opts.proj_steps"],
+        "dims": ["SS::hPS", "SS::hVT_dropout", "opts.proj_steps"],
         "alias": {
           "r": "pmtct_dropout"
         }
@@ -231,6 +233,10 @@
         "alias": {
           "r": "bf_duration_no_art"
         }
+      },
+      "infant_pop": {
+        "num_type": "real_type",
+        "dims": ["SS::hc_infant", "SS::NS","opts.proj_steps"]
       },
       "mat_hiv_births": {
         "num_type": "real_type",
@@ -397,6 +403,10 @@
       "num_type": "real_type",
       "dims": ["SS::hPS"]
     },
+    "PMTCT_not_retained": {
+      "num_type": "real_type",
+      "dims": ["SS::hPS"]
+    },
     "bf_transmission_rate": {
       "num_type": "real_type",
       "dims": ["SS::hBF_coarse"]
@@ -527,6 +537,12 @@
     "ctx_mean": {
       "num_type": "real_type",
       "dims": ["3"]
+    },
+    "PMTCT_before_dropout": {
+      "num_type": "real_type"
+    },
+    "PMTCT_during_dropout": {
+      "num_type": "real_type"
     }
   },
   "state": {
@@ -583,6 +599,18 @@
     "infection_by_type": {
       "num_type": "real_type",
       "dims": ["SS::hcTT", "SS::hc1AG", "SS::NS"]
+    },
+    "mtct_by_source_tr": {
+      "num_type": "real_type",
+      "dims": ["SS::mtct_source", "SS::hVT"]
+    },
+    "mtct_by_source_women": {
+      "num_type": "real_type",
+      "dims": ["SS::mtct_source"]
+    },
+    "mtct_by_source_hc_infections": {
+      "num_type": "real_type",
+      "dims": ["SS::mtct_source", "SS::hVT"]
     }
   }
 }

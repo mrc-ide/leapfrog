@@ -14,7 +14,8 @@ test_that("Child model can be run for all years", {
       "hc1_art_pop", "hc2_art_pop",
       "hc1_noart_aids_deaths", "hc2_noart_aids_deaths",
       "hc1_art_aids_deaths", "hc2_art_aids_deaths",
-      "hc_art_init", "hc_art_need_init", "ctx_need", "infection_by_type")
+      "hc_art_init", "hc_art_need_init", "ctx_need", "infection_by_type",
+      "mtct_by_source_tr", "mtct_by_source_women", "mtct_by_source_hc_infections")
   )
 
   ## Nothing should ever be negative
@@ -238,6 +239,7 @@ test_that("Infections among children align", {
   pjnz <- utils$pjnz
 
   out <- run_model(parameters, "ChildModel", 1970:2030)
+  system.time(out <- run_model(parameters, "ChildModel", 1970:2030))
   inf_spec <- SpectrumUtils::dp.output.incident.hiv(dp.raw = dp)
   inf_spec <- inf_spec %>%
     dplyr::filter(Sex != "Male+Female") %>%

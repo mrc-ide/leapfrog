@@ -322,10 +322,11 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
       .PMTCT = parse_data<real_type, 2>(data, "pmtct", { nda::dim<>(0, SS::hPS, 1), nda::dim<>(0, opts.proj_steps, (SS::hPS)) }),
       .vertical_transmission_rate = parse_data<real_type, 2>(data, "mtct", { nda::dim<>(0, SS::hDS + 1, 1), nda::dim<>(0, SS::hVT, (SS::hDS + 1)) }),
       .PMTCT_transmission_rate = parse_data<real_type, 3>(data, "pmtct_mtct", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hPS, (SS::hDS)), nda::dim<>(0, SS::hVT, (SS::hDS) * (SS::hPS)) }),
-      .PMTCT_dropout = parse_data<real_type, 2>(data, "pmtct_dropout", { nda::dim<>(0, SS::hPS_dropout, 1), nda::dim<>(0, opts.proj_steps, (SS::hPS_dropout)) }),
+      .PMTCT_dropout = parse_data<real_type, 3>(data, "pmtct_dropout", { nda::dim<>(0, SS::hPS, 1), nda::dim<>(0, SS::hVT_dropout, (SS::hPS)), nda::dim<>(0, opts.proj_steps, (SS::hPS) * (SS::hVT_dropout)) }),
       .PMTCT_input_is_percent = parse_data<int, 1>(data, "pmtct_input_isperc", { nda::dim<>(0, opts.proj_steps, 1) }),
       .breastfeeding_duration_art = parse_data<real_type, 2>(data, "bf_duration_art", { nda::dim<>(0, SS::hBF, 1), nda::dim<>(0, opts.proj_steps, (SS::hBF)) }),
       .breastfeeding_duration_no_art = parse_data<real_type, 2>(data, "bf_duration_no_art", { nda::dim<>(0, SS::hBF, 1), nda::dim<>(0, opts.proj_steps, (SS::hBF)) }),
+      .infant_pop = parse_data<real_type, 3>(data, "infant_pop", { nda::dim<>(0, SS::hc_infant, 1), nda::dim<>(0, SS::NS, (SS::hc_infant)), nda::dim<>(0, opts.proj_steps, (SS::hc_infant) * (SS::NS)) }),
       .mat_hiv_births = parse_data<real_type, 1>(data, "mat_hiv_births", { nda::dim<>(0, opts.proj_steps, 1) }),
       .mat_prev_input = parse_data<int, 1>(data, "mat_prev_input", { nda::dim<>(0, opts.proj_steps, 1) }),
       .prop_lt200 = parse_data<real_type, 1>(data, "prop_lt200", { nda::dim<>(0, opts.proj_steps, 1) }),
@@ -341,7 +342,7 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
       .ctx_effect = parse_data<real_type, 1>(data, "ctx_effect", { nda::dim<>(0, 3, 1) }),
       .hc_art_start = Rcpp::as<int>(data["hc_art_start"]),
       .local_adj_factor = Rcpp::as<real_type>(data["frr_scalar"]),
-      .hc_age_specific_fertility_rate = parse_data<real_type, 2>(data, "asfr", { nda::dim<>(0, SS::hc_p_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::hc_p_fertility_age_groups)) })
+      .hc_age_specific_fertility_rate = parse_data<real_type, 2>(data, "hc_asfr", { nda::dim<>(0, SS::hc_p_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::hc_p_fertility_age_groups)) })
     };
   };
 
@@ -363,10 +364,13 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
     state.hiv_births = Rcpp::as<real_type>(data["hiv_births"]);
     state.ctx_need = Rcpp::as<real_type>(data["ctx_need"]);
     fill_initial_state<real_type, typename Config::State::shape_infection_by_type>(data, "infection_by_type", state.infection_by_type);
+    fill_initial_state<real_type, typename Config::State::shape_mtct_by_source_tr>(data, "mtct_by_source_tr", state.mtct_by_source_tr);
+    fill_initial_state<real_type, typename Config::State::shape_mtct_by_source_women>(data, "mtct_by_source_women", state.mtct_by_source_women);
+    fill_initial_state<real_type, typename Config::State::shape_mtct_by_source_hc_infections>(data, "mtct_by_source_hc_infections", state.mtct_by_source_hc_infections);
     return state;
   };
 
-  static constexpr int output_count = 14;
+  static constexpr int output_count = 17;
 
   static int build_output(
     int index,
@@ -445,6 +449,21 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
     std::copy_n(state.infection_by_type.data(), state.infection_by_type.size(), REAL(r_infection_by_type));
     names[index + 13] = "infection_by_type";
     ret[index + 13] = r_infection_by_type;
+    Rcpp::NumericVector r_mtct_by_source_tr(SS::mtct_source * SS::hVT * output_years);
+    r_mtct_by_source_tr.attr("dim") = Rcpp::IntegerVector::create(SS::mtct_source, SS::hVT, output_years);
+    std::copy_n(state.mtct_by_source_tr.data(), state.mtct_by_source_tr.size(), REAL(r_mtct_by_source_tr));
+    names[index + 14] = "mtct_by_source_tr";
+    ret[index + 14] = r_mtct_by_source_tr;
+    Rcpp::NumericVector r_mtct_by_source_women(SS::mtct_source * output_years);
+    r_mtct_by_source_women.attr("dim") = Rcpp::IntegerVector::create(SS::mtct_source, output_years);
+    std::copy_n(state.mtct_by_source_women.data(), state.mtct_by_source_women.size(), REAL(r_mtct_by_source_women));
+    names[index + 15] = "mtct_by_source_women";
+    ret[index + 15] = r_mtct_by_source_women;
+    Rcpp::NumericVector r_mtct_by_source_hc_infections(SS::mtct_source * SS::hVT * output_years);
+    r_mtct_by_source_hc_infections.attr("dim") = Rcpp::IntegerVector::create(SS::mtct_source, SS::hVT, output_years);
+    std::copy_n(state.mtct_by_source_hc_infections.data(), state.mtct_by_source_hc_infections.size(), REAL(r_mtct_by_source_hc_infections));
+    names[index + 16] = "mtct_by_source_hc_infections";
+    ret[index + 16] = r_mtct_by_source_hc_infections;
     return index + output_count;
   };
 
@@ -518,6 +537,21 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
     std::copy_n(state.infection_by_type.data(), state.infection_by_type.size(), REAL(r_infection_by_type));
     names[index + 13] = "infection_by_type";
     ret[index + 13] = r_infection_by_type;
+    Rcpp::NumericVector r_mtct_by_source_tr(SS::mtct_source * SS::hVT);
+    r_mtct_by_source_tr.attr("dim") = Rcpp::IntegerVector::create(SS::mtct_source, SS::hVT);
+    std::copy_n(state.mtct_by_source_tr.data(), state.mtct_by_source_tr.size(), REAL(r_mtct_by_source_tr));
+    names[index + 14] = "mtct_by_source_tr";
+    ret[index + 14] = r_mtct_by_source_tr;
+    Rcpp::NumericVector r_mtct_by_source_women(SS::mtct_source);
+    r_mtct_by_source_women.attr("dim") = Rcpp::IntegerVector::create(SS::mtct_source);
+    std::copy_n(state.mtct_by_source_women.data(), state.mtct_by_source_women.size(), REAL(r_mtct_by_source_women));
+    names[index + 15] = "mtct_by_source_women";
+    ret[index + 15] = r_mtct_by_source_women;
+    Rcpp::NumericVector r_mtct_by_source_hc_infections(SS::mtct_source * SS::hVT);
+    r_mtct_by_source_hc_infections.attr("dim") = Rcpp::IntegerVector::create(SS::mtct_source, SS::hVT);
+    std::copy_n(state.mtct_by_source_hc_infections.data(), state.mtct_by_source_hc_infections.size(), REAL(r_mtct_by_source_hc_infections));
+    names[index + 16] = "mtct_by_source_hc_infections";
+    ret[index + 16] = r_mtct_by_source_hc_infections;
     return index + output_count;
   };
 };

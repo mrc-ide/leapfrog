@@ -157,6 +157,8 @@ struct HcParams {
   int breastfeeding_duration_art_length;
   real_type* breastfeeding_duration_no_art;
   int breastfeeding_duration_no_art_length;
+  real_type* infant_pop;
+  int infant_pop_length;
   real_type* mat_hiv_births;
   int mat_hiv_births_length;
   int* mat_prev_input;
@@ -221,6 +223,12 @@ struct HcOut {
   int ctx_need_length;
   real_type* infection_by_type;
   int infection_by_type_length;
+  real_type* mtct_by_source_tr;
+  int mtct_by_source_tr_length;
+  real_type* mtct_by_source_women;
+  int mtct_by_source_women_length;
+  real_type* mtct_by_source_hc_infections;
+  int mtct_by_source_hc_infections_length;
 };
 
 template<typename real_type>
