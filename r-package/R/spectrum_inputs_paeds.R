@@ -68,9 +68,18 @@ input_pmtct_retained <- function(pjnz){
   dropout <- format_pmtct(pjnz)$dropout
 
   ##ASK: not sure of the best way to do these indexes
-  out <- array(data = NA, dim = c(6, ncol(pmtct_retained)), dimnames = list(type = c(rownames(pmtct_retained), rownames(dropout)), year = colnames(pmtct_retained)))
-  out[1:2,] <- pmtct_retained / 100
-  out[3:nrow(out),] <- unlist(dropout)
+  out <- array(data = 0, dim = c(7, 3, ncol(pmtct_retained)),
+               dimnames = list(pmtct = c('Option A', 'Option B', 'SDNVP',
+                                         'Dual ARV', 'Option B+: before pregnancy',
+                                         'Option B+: >4 weeks', 'Option B+: <4 weeks'),
+                               trans_time = c('perinatal',
+                                              'breastfeeding <12 months',
+                                              'breastfeeding 12+ months'),
+                               year = colnames(pmtct_retained)))
+  out[,'perinatal',] <- 1
+  out[c('Option B+: before pregnancy', 'Option B+: >4 weeks'),'perinatal',] <- pmtct_retained / 100
+  out[c('Option A', 'Option B','Option B+: before pregnancy', 'Option B+: >4 weeks','Option B+: <4 weeks'),'breastfeeding <12 months',] <- matrix(unlist(dropout['pmtct_postnatal_monthlydropout_art0to12months',]), nrow = 5, ncol = 61, byrow = TRUE)
+  out[c('Option A', 'Option B','Option B+: before pregnancy', 'Option B+: >4 weeks','Option B+: <4 weeks'),'breastfeeding 12+ months',] <- matrix(unlist(dropout['pmtct_postnatal_monthlydropout_art12plusmonths',]), nrow = 5, ncol = 61, byrow = TRUE)
 
   out
 }

@@ -221,7 +221,7 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
       .PMTCT = read_data<real_type, 2>(params.hc->PMTCT, params.hc->PMTCT_length, "PMTCT", { nda::dim<>(0, SS::hPS, 1), nda::dim<>(0, opts.proj_steps, (SS::hPS)) }),
       .vertical_transmission_rate = read_data<real_type, 2>(params.hc->vertical_transmission_rate, params.hc->vertical_transmission_rate_length, "vertical_transmission_rate", { nda::dim<>(0, SS::hDS + 1, 1), nda::dim<>(0, SS::hVT, (SS::hDS + 1)) }),
       .PMTCT_transmission_rate = read_data<real_type, 3>(params.hc->PMTCT_transmission_rate, params.hc->PMTCT_transmission_rate_length, "PMTCT_transmission_rate", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hPS, (SS::hDS)), nda::dim<>(0, SS::hVT, (SS::hDS) * (SS::hPS)) }),
-      .PMTCT_dropout = read_data<real_type, 2>(params.hc->PMTCT_dropout, params.hc->PMTCT_dropout_length, "PMTCT_dropout", { nda::dim<>(0, SS::hPS_dropout, 1), nda::dim<>(0, opts.proj_steps, (SS::hPS_dropout)) }),
+      .PMTCT_dropout = read_data<real_type, 3>(params.hc->PMTCT_dropout, params.hc->PMTCT_dropout_length, "PMTCT_dropout", { nda::dim<>(0, SS::hPS, 1), nda::dim<>(0, SS::hVT_dropout, (SS::hPS)), nda::dim<>(0, opts.proj_steps, (SS::hPS) * (SS::hVT_dropout)) }),
       .PMTCT_input_is_percent = read_data<int, 1>(params.hc->PMTCT_input_is_percent, params.hc->PMTCT_input_is_percent_length, "PMTCT_input_is_percent", { nda::dim<>(0, opts.proj_steps, 1) }),
       .breastfeeding_duration_art = read_data<real_type, 2>(params.hc->breastfeeding_duration_art, params.hc->breastfeeding_duration_art_length, "breastfeeding_duration_art", { nda::dim<>(0, SS::hBF, 1), nda::dim<>(0, opts.proj_steps, (SS::hBF)) }),
       .breastfeeding_duration_no_art = read_data<real_type, 2>(params.hc->breastfeeding_duration_no_art, params.hc->breastfeeding_duration_no_art_length, "breastfeeding_duration_no_art", { nda::dim<>(0, SS::hBF, 1), nda::dim<>(0, opts.proj_steps, (SS::hBF)) }),
@@ -260,10 +260,13 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
     initial_state.hiv_births = *(state.hc->hiv_births);
     initial_state.ctx_need = *(state.hc->ctx_need);
     fill_initial_state<real_type, typename Config::State::shape_infection_by_type>(state.hc->infection_by_type, state.hc->infection_by_type_length, "infection_by_type", initial_state.infection_by_type);
+    fill_initial_state<real_type, typename Config::State::shape_mtct_by_source_tr>(state.hc->mtct_by_source_tr, state.hc->mtct_by_source_tr_length, "mtct_by_source_tr", initial_state.mtct_by_source_tr);
+    fill_initial_state<real_type, typename Config::State::shape_mtct_by_source_women>(state.hc->mtct_by_source_women, state.hc->mtct_by_source_women_length, "mtct_by_source_women", initial_state.mtct_by_source_women);
+    fill_initial_state<real_type, typename Config::State::shape_mtct_by_source_hc_infections>(state.hc->mtct_by_source_hc_infections, state.hc->mtct_by_source_hc_infections_length, "mtct_by_source_hc_infections", initial_state.mtct_by_source_hc_infections);
     return initial_state;
   };
 
-  static constexpr int output_count = 13;
+  static constexpr int output_count = 16;
 
   static int build_output(
     int index,
@@ -283,6 +286,9 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
     write_data<real_type, typename Config::OutputState::shape_hiv_births>(state.hiv_births, out.hc->hiv_births, out.hc->hiv_births_length, "hiv_births");
     write_data<real_type, typename Config::OutputState::shape_ctx_need>(state.ctx_need, out.hc->ctx_need, out.hc->ctx_need_length, "ctx_need");
     write_data<real_type, typename Config::OutputState::shape_infection_by_type>(state.infection_by_type, out.hc->infection_by_type, out.hc->infection_by_type_length, "infection_by_type");
+    write_data<real_type, typename Config::OutputState::shape_mtct_by_source_tr>(state.mtct_by_source_tr, out.hc->mtct_by_source_tr, out.hc->mtct_by_source_tr_length, "mtct_by_source_tr");
+    write_data<real_type, typename Config::OutputState::shape_mtct_by_source_women>(state.mtct_by_source_women, out.hc->mtct_by_source_women, out.hc->mtct_by_source_women_length, "mtct_by_source_women");
+    write_data<real_type, typename Config::OutputState::shape_mtct_by_source_hc_infections>(state.mtct_by_source_hc_infections, out.hc->mtct_by_source_hc_infections, out.hc->mtct_by_source_hc_infections_length, "mtct_by_source_hc_infections");
     return index + output_count;
   };
 
@@ -304,6 +310,9 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
     *(out.hc->hiv_births) = state.hiv_births;
     *(out.hc->ctx_need) = state.ctx_need;
     write_data<real_type, typename Config::State::shape_infection_by_type>(state.infection_by_type, out.hc->infection_by_type, out.hc->infection_by_type_length, "infection_by_type");
+    write_data<real_type, typename Config::State::shape_mtct_by_source_tr>(state.mtct_by_source_tr, out.hc->mtct_by_source_tr, out.hc->mtct_by_source_tr_length, "mtct_by_source_tr");
+    write_data<real_type, typename Config::State::shape_mtct_by_source_women>(state.mtct_by_source_women, out.hc->mtct_by_source_women, out.hc->mtct_by_source_women_length, "mtct_by_source_women");
+    write_data<real_type, typename Config::State::shape_mtct_by_source_hc_infections>(state.mtct_by_source_hc_infections, out.hc->mtct_by_source_hc_infections, out.hc->mtct_by_source_hc_infections_length, "mtct_by_source_hc_infections");
     return index + output_count;
   };
 };

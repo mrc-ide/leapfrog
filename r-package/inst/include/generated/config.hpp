@@ -654,8 +654,9 @@ struct HcConfig {
     >;
     nda::array_ref<real_type, shape_PMTCT_transmission_rate> PMTCT_transmission_rate;
     using shape_PMTCT_dropout = nda::shape<
-      nda::dim<0, SS::hPS_dropout, 1>,
-      nda::dim<0, nda::dynamic, (SS::hPS_dropout)>
+      nda::dim<0, SS::hPS, 1>,
+      nda::dim<0, SS::hVT_dropout, (SS::hPS)>,
+      nda::dim<0, nda::dynamic, (SS::hPS) * (SS::hVT_dropout)>
     >;
     nda::array_ref<real_type, shape_PMTCT_dropout> PMTCT_dropout;
     using shape_PMTCT_input_is_percent = nda::shape<
@@ -784,10 +785,10 @@ struct HcConfig {
     >;
     nda::array<real_type, shape_total_art_this_year> total_art_this_year;
     using shape_hc_art_grad = nda::shape<
-      nda::dim<0, SS::hDS, 1>,
-      nda::dim<0, SS::hcTT, (SS::hDS)>,
-      nda::dim<0, SS::hAG, (SS::hDS) * (SS::hcTT)>,
-      nda::dim<0, SS::NS, (SS::hDS) * (SS::hcTT) * (SS::hAG)>
+      nda::dim<0, SS::hcTT, 1>,
+      nda::dim<0, SS::hDS, (SS::hcTT)>,
+      nda::dim<0, SS::hAG, (SS::hcTT) * (SS::hDS)>,
+      nda::dim<0, SS::NS, (SS::hcTT) * (SS::hDS) * (SS::hAG)>
     >;
     nda::array<real_type, shape_hc_art_grad> hc_art_grad;
     using shape_hc_art_scalar = nda::shape<
@@ -835,6 +836,10 @@ struct HcConfig {
       nda::dim<0, SS::hPS, 1>
     >;
     nda::array<real_type, shape_PMTCT_coverage> PMTCT_coverage;
+    using shape_PMTCT_not_retained = nda::shape<
+      nda::dim<0, SS::hPS, 1>
+    >;
+    nda::array<real_type, shape_PMTCT_not_retained> PMTCT_not_retained;
     using shape_bf_transmission_rate = nda::shape<
       nda::dim<0, SS::hBF_coarse, 1>
     >;
@@ -886,6 +891,8 @@ struct HcConfig {
       nda::dim<0, 3, 1>
     >;
     nda::array<real_type, shape_ctx_mean> ctx_mean;
+    real_type PMTCT_before_dropout;
+    real_type PMTCT_during_dropout;
 
     Intermediate() {};
 
@@ -910,6 +917,7 @@ struct HcConfig {
       art_ltfu_grad.for_each_value([](real_type& x) { x = 0; });
       p_hiv_neg_pop.for_each_value([](real_type& x) { x = 0; });
       PMTCT_coverage.for_each_value([](real_type& x) { x = 0; });
+      PMTCT_not_retained.for_each_value([](real_type& x) { x = 0; });
       bf_transmission_rate.for_each_value([](real_type& x) { x = 0; });
       retained = 0;
       hc_death_rate = 0;
@@ -955,6 +963,8 @@ struct HcConfig {
       percent_on_treatment = 0;
       bf_scalar = 0;
       ctx_mean.for_each_value([](real_type& x) { x = 0; });
+      PMTCT_before_dropout = 0;
+      PMTCT_during_dropout = 0;
     };
   };
 
@@ -1034,6 +1044,20 @@ struct HcConfig {
       nda::dim<0, SS::NS, (SS::hcTT) * (SS::hc1AG)>
     >;
     nda::array<real_type, shape_infection_by_type> infection_by_type;
+    using shape_mtct_by_source_tr = nda::shape<
+      nda::dim<0, SS::mtct_source, 1>,
+      nda::dim<0, SS::hVT, (SS::mtct_source)>
+    >;
+    nda::array<real_type, shape_mtct_by_source_tr> mtct_by_source_tr;
+    using shape_mtct_by_source_women = nda::shape<
+      nda::dim<0, SS::mtct_source, 1>
+    >;
+    nda::array<real_type, shape_mtct_by_source_women> mtct_by_source_women;
+    using shape_mtct_by_source_hc_infections = nda::shape<
+      nda::dim<0, SS::mtct_source, 1>,
+      nda::dim<0, SS::hVT, (SS::mtct_source)>
+    >;
+    nda::array<real_type, shape_mtct_by_source_hc_infections> mtct_by_source_hc_infections;
 
     void reset() {
       hc1_hiv_pop.for_each_value([](real_type& x) { x = 0; });
@@ -1049,6 +1073,9 @@ struct HcConfig {
       hiv_births = 0;
       ctx_need = 0;
       infection_by_type.for_each_value([](real_type& x) { x = 0; });
+      mtct_by_source_tr.for_each_value([](real_type& x) { x = 0; });
+      mtct_by_source_women.for_each_value([](real_type& x) { x = 0; });
+      mtct_by_source_hc_infections.for_each_value([](real_type& x) { x = 0; });
     };
   };
 
@@ -1145,6 +1172,23 @@ struct HcConfig {
       nda::dim<0, nda::dynamic, (SS::hcTT) * (SS::hc1AG) * (SS::NS)>
     >;
     nda::array<real_type, shape_infection_by_type> infection_by_type;
+    using shape_mtct_by_source_tr = nda::shape<
+      nda::dim<0, SS::mtct_source, 1>,
+      nda::dim<0, SS::hVT, (SS::mtct_source)>,
+      nda::dim<0, nda::dynamic, (SS::mtct_source) * (SS::hVT)>
+    >;
+    nda::array<real_type, shape_mtct_by_source_tr> mtct_by_source_tr;
+    using shape_mtct_by_source_women = nda::shape<
+      nda::dim<0, SS::mtct_source, 1>,
+      nda::dim<0, nda::dynamic, (SS::mtct_source)>
+    >;
+    nda::array<real_type, shape_mtct_by_source_women> mtct_by_source_women;
+    using shape_mtct_by_source_hc_infections = nda::shape<
+      nda::dim<0, SS::mtct_source, 1>,
+      nda::dim<0, SS::hVT, (SS::mtct_source)>,
+      nda::dim<0, nda::dynamic, (SS::mtct_source) * (SS::hVT)>
+    >;
+    nda::array<real_type, shape_mtct_by_source_hc_infections> mtct_by_source_hc_infections;
 
     OutputState(int output_years):
       hc1_hiv_pop(shape_hc1_hiv_pop(SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, output_years)),
@@ -1159,7 +1203,10 @@ struct HcConfig {
       hc_art_need_init(shape_hc_art_need_init(SS::hc1DS, SS::hcTT, SS::hcAG_end, SS::NS, output_years)),
       hiv_births(shape_hiv_births(output_years)),
       ctx_need(shape_ctx_need(output_years)),
-      infection_by_type(shape_infection_by_type(SS::hcTT, SS::hc1AG, SS::NS, output_years))
+      infection_by_type(shape_infection_by_type(SS::hcTT, SS::hc1AG, SS::NS, output_years)),
+      mtct_by_source_tr(shape_mtct_by_source_tr(SS::mtct_source, SS::hVT, output_years)),
+      mtct_by_source_women(shape_mtct_by_source_women(SS::mtct_source, output_years)),
+      mtct_by_source_hc_infections(shape_mtct_by_source_hc_infections(SS::mtct_source, SS::hVT, output_years))
     {
       hc1_hiv_pop.for_each_value([](real_type& x) { x = 0; });
       hc2_hiv_pop.for_each_value([](real_type& x) { x = 0; });
@@ -1174,6 +1221,9 @@ struct HcConfig {
       hiv_births.for_each_value([](real_type& x) { x = 0; });
       ctx_need.for_each_value([](real_type& x) { x = 0; });
       infection_by_type.for_each_value([](real_type& x) { x = 0; });
+      mtct_by_source_tr.for_each_value([](real_type& x) { x = 0; });
+      mtct_by_source_women.for_each_value([](real_type& x) { x = 0; });
+      mtct_by_source_hc_infections.for_each_value([](real_type& x) { x = 0; });
     };
 
     void save_state(const size_t i, const State &state) {
@@ -1223,10 +1273,22 @@ struct HcConfig {
       nda::for_each_index(chip_infection_by_type.shape(), [&](auto idx) -> void {
         chip_infection_by_type[idx] = state.infection_by_type[idx];
       });
+      auto chip_mtct_by_source_tr = mtct_by_source_tr(nda::_, nda::_, i);
+      nda::for_each_index(chip_mtct_by_source_tr.shape(), [&](auto idx) -> void {
+        chip_mtct_by_source_tr[idx] = state.mtct_by_source_tr[idx];
+      });
+      auto chip_mtct_by_source_women = mtct_by_source_women(nda::_, i);
+      nda::for_each_index(chip_mtct_by_source_women.shape(), [&](auto idx) -> void {
+        chip_mtct_by_source_women[idx] = state.mtct_by_source_women[idx];
+      });
+      auto chip_mtct_by_source_hc_infections = mtct_by_source_hc_infections(nda::_, nda::_, i);
+      nda::for_each_index(chip_mtct_by_source_hc_infections.shape(), [&](auto idx) -> void {
+        chip_mtct_by_source_hc_infections[idx] = state.mtct_by_source_hc_infections[idx];
+      });
     };
   };
 
-  static constexpr int output_count = 13;
+  static constexpr int output_count = 16;
   static int get_build_output_size(int prev_size) {
     return prev_size + output_count;
   };
