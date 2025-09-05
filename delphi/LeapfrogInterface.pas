@@ -165,6 +165,8 @@ type
     hArtInitiationLength: Integer;
     pHivDeaths: PDouble;
     pHivDeathsLength: Integer;
+    hivNetMigration: PDouble;
+    hivNetMigrationLength: Integer;
 end;
 
 type
@@ -179,6 +181,7 @@ type
     hHivDeathsArt: TGBFixedArray<Double>;
     hArtInitiation: TGBFixedArray<Double>;
     pHivDeaths: TGBFixedArray<Double>;
+    hivNetMigration: TGBFixedArray<Double>;
     function getView(): LeapfrogHivAdultStateView;
     procedure writeToDisk(dir: string);
     Destructor Destroy; override;
@@ -498,6 +501,7 @@ begin;
   hHivDeathsArt.Free;
   hArtInitiation.Free;
   pHivDeaths.Free;
+  hivNetMigration.Free;
   inherited;
 end;
 
@@ -561,6 +565,8 @@ begin;
   Result.hArtInitiationLength := hArtInitiation.GetLength();
   Result.pHivDeaths := PDouble(pHivDeaths.data);
   Result.pHivDeathsLength := pHivDeaths.GetLength();
+  Result.hivNetMigration := PDouble(hivNetMigration.data);
+  Result.hivNetMigrationLength := hivNetMigration.GetLength();
 end;
 
 destructor LeapfrogHivChildParams.Destroy;
@@ -810,6 +816,7 @@ begin;
   hHivDeathsArt.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hHivDeathsArt');
   hArtInitiation.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hArtInitiation');
   pHivDeaths.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pHivDeaths');
+  hivNetMigration.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hivNetMigration');
 end;
 
 procedure LeapfrogHivChildParams.writeToDisk(dir: string);
