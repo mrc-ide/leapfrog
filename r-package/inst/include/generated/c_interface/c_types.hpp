@@ -101,8 +101,8 @@ struct HaOut {
   int h_art_initiation_length;
   real_type* p_hiv_deaths;
   int p_hiv_deaths_length;
-  real_type* hiv_net_migration;
-  int hiv_net_migration_length;
+  real_type* p_hiv_net_migration;
+  int p_hiv_net_migration_length;
 };
 
 template<typename real_type>

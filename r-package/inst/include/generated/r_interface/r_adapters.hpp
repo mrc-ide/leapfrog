@@ -175,7 +175,7 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
     fill_initial_state<real_type, typename Config::State::shape_h_hiv_deaths_art>(data, "h_hiv_deaths_art", state.h_hiv_deaths_art);
     fill_initial_state<real_type, typename Config::State::shape_h_art_initiation>(data, "h_art_initiation", state.h_art_initiation);
     fill_initial_state<real_type, typename Config::State::shape_p_hiv_deaths>(data, "p_hiv_deaths", state.p_hiv_deaths);
-    fill_initial_state<real_type, typename Config::State::shape_hiv_net_migration>(data, "hiv_net_migration", state.hiv_net_migration);
+    fill_initial_state<real_type, typename Config::State::shape_p_hiv_net_migration>(data, "p_hiv_net_migration", state.p_hiv_net_migration);
     return state;
   };
 
@@ -233,11 +233,11 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
     std::copy_n(state.p_hiv_deaths.data(), state.p_hiv_deaths.size(), REAL(r_p_hiv_deaths));
     names[index + 8] = "p_hiv_deaths";
     ret[index + 8] = r_p_hiv_deaths;
-    Rcpp::NumericVector r_hiv_net_migration(SS::pAG * SS::NS * output_years);
-    r_hiv_net_migration.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS, output_years);
-    std::copy_n(state.hiv_net_migration.data(), state.hiv_net_migration.size(), REAL(r_hiv_net_migration));
-    names[index + 9] = "hiv_net_migration";
-    ret[index + 9] = r_hiv_net_migration;
+    Rcpp::NumericVector r_p_hiv_net_migration(SS::pAG * SS::NS * output_years);
+    r_p_hiv_net_migration.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS, output_years);
+    std::copy_n(state.p_hiv_net_migration.data(), state.p_hiv_net_migration.size(), REAL(r_p_hiv_net_migration));
+    names[index + 9] = "p_hiv_net_migration";
+    ret[index + 9] = r_p_hiv_net_migration;
     return index + output_count;
   };
 
@@ -292,11 +292,11 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
     std::copy_n(state.p_hiv_deaths.data(), state.p_hiv_deaths.size(), REAL(r_p_hiv_deaths));
     names[index + 8] = "p_hiv_deaths";
     ret[index + 8] = r_p_hiv_deaths;
-    Rcpp::NumericVector r_hiv_net_migration(SS::pAG * SS::NS);
-    r_hiv_net_migration.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS);
-    std::copy_n(state.hiv_net_migration.data(), state.hiv_net_migration.size(), REAL(r_hiv_net_migration));
-    names[index + 9] = "hiv_net_migration";
-    ret[index + 9] = r_hiv_net_migration;
+    Rcpp::NumericVector r_p_hiv_net_migration(SS::pAG * SS::NS);
+    r_p_hiv_net_migration.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS);
+    std::copy_n(state.p_hiv_net_migration.data(), state.p_hiv_net_migration.size(), REAL(r_p_hiv_net_migration));
+    names[index + 9] = "p_hiv_net_migration";
+    ret[index + 9] = r_p_hiv_net_migration;
     return index + output_count;
   };
 };

@@ -88,7 +88,7 @@ struct HaAdapter<Language::Cpp, real_type, ModelVariant> {
     write_data<real_type, typename Config::OutputState::shape_h_hiv_deaths_art>(output_file, "h_hiv_deaths_art", state.h_hiv_deaths_art);
     write_data<real_type, typename Config::OutputState::shape_h_art_initiation>(output_file, "h_art_initiation", state.h_art_initiation);
     write_data<real_type, typename Config::OutputState::shape_p_hiv_deaths>(output_file, "p_hiv_deaths", state.p_hiv_deaths);
-    write_data<real_type, typename Config::OutputState::shape_hiv_net_migration>(output_file, "hiv_net_migration", state.hiv_net_migration);
+    write_data<real_type, typename Config::OutputState::shape_p_hiv_net_migration>(output_file, "p_hiv_net_migration", state.p_hiv_net_migration);
     return index + output_count;
   };
 };
