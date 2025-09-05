@@ -148,7 +148,7 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
     };
   };
 
-  static constexpr int output_count = 17;
+  static constexpr int output_count = 18;
 
   static int build_output(
     int index,
@@ -172,6 +172,7 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
     write_data<real_type, typename Config::OutputState::shape_mtct_by_source_tr>(output_file, "mtct_by_source_tr", state.mtct_by_source_tr);
     write_data<real_type, typename Config::OutputState::shape_mtct_by_source_women>(output_file, "mtct_by_source_women", state.mtct_by_source_women);
     write_data<real_type, typename Config::OutputState::shape_mtct_by_source_hc_infections>(output_file, "mtct_by_source_hc_infections", state.mtct_by_source_hc_infections);
+    write_data<real_type, typename Config::OutputState::shape_pmtct_coverage_at_delivery>(output_file, "pmtct_coverage_at_delivery", state.pmtct_coverage_at_delivery);
     return index + output_count;
   };
 };

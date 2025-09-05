@@ -60,6 +60,7 @@ struct ChildModelSimulation<Config> {
 
   enum Index {
     // PVT categories (including those tracked by stacked bar)
+    // First 7 are "hPS" indices, full set are "mtct_source" indices
     OPTION_A = 0, //PMTCT: Option A
     OPTION_B = 1, //PMTCT: Option B
     SDNVP = 2, //PMTCT: SDNVP
@@ -563,6 +564,9 @@ struct ChildModelSimulation<Config> {
 
     // TODO: add in patients reallocated
     convert_PMTCT_num_to_perc();
+    for (int hp = 0; hp < hPS; ++hp) {
+      n_hc.pmtct_coverage_at_delivery(hp) = i_hc.PMTCT_coverage(hp);
+    }
     adjust_option_A_B_tr();
     calc_hiv_negative_pop();
 
