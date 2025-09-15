@@ -175,10 +175,11 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
     fill_initial_state<real_type, typename Config::State::shape_h_hiv_deaths_art>(data, "h_hiv_deaths_art", state.h_hiv_deaths_art);
     fill_initial_state<real_type, typename Config::State::shape_h_art_initiation>(data, "h_art_initiation", state.h_art_initiation);
     fill_initial_state<real_type, typename Config::State::shape_p_hiv_deaths>(data, "p_hiv_deaths", state.p_hiv_deaths);
+    fill_initial_state<real_type, typename Config::State::shape_p_net_migration_hivpop>(data, "p_net_migration_hivpop", state.p_net_migration_hivpop);
     return state;
   };
 
-  static constexpr int output_count = 9;
+  static constexpr int output_count = 10;
 
   static int build_output(
     int index,
@@ -232,6 +233,11 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
     std::copy_n(state.p_hiv_deaths.data(), state.p_hiv_deaths.size(), REAL(r_p_hiv_deaths));
     names[index + 8] = "p_hiv_deaths";
     ret[index + 8] = r_p_hiv_deaths;
+    Rcpp::NumericVector r_p_net_migration_hivpop(SS::pAG * SS::NS * output_years);
+    r_p_net_migration_hivpop.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS, output_years);
+    std::copy_n(state.p_net_migration_hivpop.data(), state.p_net_migration_hivpop.size(), REAL(r_p_net_migration_hivpop));
+    names[index + 9] = "p_net_migration_hivpop";
+    ret[index + 9] = r_p_net_migration_hivpop;
     return index + output_count;
   };
 
@@ -286,6 +292,11 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
     std::copy_n(state.p_hiv_deaths.data(), state.p_hiv_deaths.size(), REAL(r_p_hiv_deaths));
     names[index + 8] = "p_hiv_deaths";
     ret[index + 8] = r_p_hiv_deaths;
+    Rcpp::NumericVector r_p_net_migration_hivpop(SS::pAG * SS::NS);
+    r_p_net_migration_hivpop.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS);
+    std::copy_n(state.p_net_migration_hivpop.data(), state.p_net_migration_hivpop.size(), REAL(r_p_net_migration_hivpop));
+    names[index + 9] = "p_net_migration_hivpop";
+    ret[index + 9] = r_p_net_migration_hivpop;
     return index + output_count;
   };
 };
