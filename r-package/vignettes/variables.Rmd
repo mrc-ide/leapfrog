@@ -183,7 +183,7 @@ In 5 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 | natdeaths        | p_total_pop_background_deaths | Projected number of background deaths                                       |
 | natdeaths_hivpop | p_hiv_pop_background_deaths   | Projected number of background deaths within HIV population                 |
 | hivdeaths        | p_hiv_deaths               | Projected HIV-related deaths by sex and age                              |
-| netmig_ag        | p_hiv_net_migration        | Number of HIV+ Migrants                                                  |
+| netmig_ag        | p_net_migration_hivpop     | Number of HIV+ Migrants                                                  |
 | aidsdeaths_noart | h_hiv_deaths_no_art        | Projected HIV-related deaths off ART by sex, age and CD4                 |
 | aidsdeaths_art   | h_hiv_deaths_art           | Projected HIV-related deaths on ART by sex, age, CD4 and treatment stage |
 | artinit          | h_art_initiation           | Projected ART initiations by sex, age and CD4                            |

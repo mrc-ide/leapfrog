@@ -14,7 +14,7 @@ def test_adult_model_full_strat():
         "p_total_pop", "births", "p_total_pop_background_deaths", "p_hiv_pop",
         "p_hiv_pop_background_deaths", "h_hiv_adult", "h_art_adult",
         "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art",
-        "h_art_initiation", "p_hiv_deaths", "p_hiv_net_migration"
+        "h_art_initiation", "p_hiv_deaths", "p_net_migration_hivpop"
     ]
     returned_vars.sort()
     expected_vars.sort()
@@ -29,7 +29,7 @@ def test_child_model():
         "p_total_pop", "births", "p_total_pop_background_deaths", "p_hiv_pop",
         "p_hiv_pop_background_deaths", "h_hiv_adult", "h_art_adult",
         "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art",
-        "h_art_initiation", "p_hiv_deaths", "p_hiv_net_migration",
+        "h_art_initiation", "p_hiv_deaths", "p_net_migration_hivpop",
         "hiv_births", "hiv_births_by_mat_age",
         "hc1_hiv_pop", "hc2_hiv_pop",
         "hc1_art_pop", "hc2_art_pop",

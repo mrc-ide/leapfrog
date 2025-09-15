@@ -9,7 +9,7 @@ test_that("initial state set up works as expected", {
       "p_total_pop", "births", "p_total_pop_background_deaths", "p_hiv_pop",
       "p_hiv_pop_background_deaths", "h_hiv_adult", "h_art_adult",
       "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art",
-      "h_art_initiation", "p_hiv_deaths", "p_hiv_net_migration"
+      "h_art_initiation", "p_hiv_deaths", "p_net_migration_hivpop"
     )
   )
   expect_equal(dim(out$p_total_pop), c(81, 2, 1))
@@ -47,7 +47,7 @@ test_that("initial state set up works as expected", {
     array(rep(0, 7 * 66 * 2), dim = c(7, 66, 2, 1))
   )
   expect_equal(out$p_hiv_deaths, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
-  expect_equal(out$p_hiv_net_migration, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
+  expect_equal(out$p_net_migration_hivpop, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
 })
 
 test_that("initial state set up with coarse stratified HIV works as expected", {
@@ -61,7 +61,7 @@ test_that("initial state set up with coarse stratified HIV works as expected", {
       "p_total_pop", "births", "p_total_pop_background_deaths", "p_hiv_pop",
       "p_hiv_pop_background_deaths", "h_hiv_adult", "h_art_adult",
       "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art",
-      "h_art_initiation", "p_hiv_deaths", "p_hiv_net_migration"
+      "h_art_initiation", "p_hiv_deaths", "p_net_migration_hivpop"
     )
   )
   expect_equal(dim(out$p_total_pop), c(81, 2, 1))
@@ -98,7 +98,7 @@ test_that("initial state set up with coarse stratified HIV works as expected", {
     array(rep(0, 7 * 9 * 2), dim = c(7, 9, 2, 1))
   )
   expect_equal(out$p_hiv_deaths, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
-  expect_equal(out$p_hiv_net_migration, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
+  expect_equal(out$p_net_migration_hivpop, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
 })
 
 test_that("model for 1 time step has looped", {
@@ -112,7 +112,7 @@ test_that("model for 1 time step has looped", {
       "p_total_pop", "births", "p_total_pop_background_deaths", "p_hiv_pop",
       "p_hiv_pop_background_deaths", "h_hiv_adult", "h_art_adult",
       "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art",
-      "h_art_initiation", "p_hiv_deaths", "p_hiv_net_migration"
+      "h_art_initiation", "p_hiv_deaths", "p_net_migration_hivpop"
     )
   )
   expect_equal(dim(out$p_total_pop), c(81, 2, 1))
@@ -130,7 +130,7 @@ test_that("model for 1 time step has looped", {
   expect_true(all(out$h_hiv_deaths_art == 0))
   expect_true(all(out$h_art_initiation == 0))
   expect_true(all(out$p_hiv_deaths == 0))
-  expect_true(all(out$hiv_net_p_hiv_net_migrationmigration == 0))
+  expect_true(all(out$p_net_migration_hivpop == 0))
 })
 
 test_that("model can be run for all years", {
