@@ -15,7 +15,8 @@ test_that("Child model can be run for all years", {
       "hc1_noart_aids_deaths", "hc2_noart_aids_deaths",
       "hc1_art_aids_deaths", "hc2_art_aids_deaths",
       "hc_art_init", "hc_art_need_init", "ctx_need", "infection_by_type",
-      "mtct_by_source_tr", "mtct_by_source_women", "mtct_by_source_hc_infections")
+      "mtct_by_source_tr", "mtct_by_source_women",
+      "mtct_by_source_hc_infections", "pmtct_coverage_at_delivery")
   )
 
   ## Nothing should ever be negative
@@ -36,6 +37,7 @@ test_that("Child model can be run for all years", {
   expect_true(all(out$hc2_noart_aids_deaths_strat[, , , , , , ] >= 0))
   expect_true(all(out$hc1_art_aids_deaths_strat[, , , , , , , ] >= 0))
   expect_true(all(out$hc2_art_aids_deaths_strat[, , , , , , , ] >= 0))
+  expect_true(all(out$pmtct_coverage_at_delivery >= 0))
 })
 
 test_that("Coarse child model can be run for all years", {
@@ -56,7 +58,8 @@ test_that("Coarse child model can be run for all years", {
       "hc1_noart_aids_deaths", "hc2_noart_aids_deaths",
       "hc1_art_aids_deaths", "hc2_art_aids_deaths",
       "hc_art_init", "hc_art_need_init", "ctx_need", "infection_by_type",
-      "mtct_by_source_tr", "mtct_by_source_women", "mtct_by_source_hc_infections")
+      "mtct_by_source_tr", "mtct_by_source_women",
+      "mtct_by_source_hc_infections", "pmtct_coverage_at_delivery")
   )
 
   ## Nothing should ever be negative
@@ -78,6 +81,7 @@ test_that("Coarse child model can be run for all years", {
   expect_true(all(out_coarse$hc2_noart_aids_deaths_strat[, , , , , , ] >= 0))
   expect_true(all(out_coarse$hc1_art_aids_deaths_strat[, , , , , , , ] >= 0))
   expect_true(all(out_coarse$hc2_art_aids_deaths_strat[, , , , , , , ] >= 0))
+  expect_true(all(out_coarse$pmtct_coverage_at_delivery >= 0))
 })
 
 test_that("Model outputs are consistent", {
