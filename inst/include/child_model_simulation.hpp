@@ -490,6 +490,7 @@ void maternal_incidence_in_pregnancy_tr(int t,
   const auto& p_hc = pars.children.children;
   auto& n_ba = state_next.base;
   auto& i_hc = intermediate.children;
+  auto& n_hc = state_next.children;
 
   // Transmission due to incident infections
   i_hc.asfr_sum = 0.0;
@@ -514,6 +515,8 @@ void maternal_incidence_in_pregnancy_tr(int t,
       i_hc.incidence_rate_wlhiv = 0.0;
       i_hc.perinatal_transmission_from_incidence = 0.0;
     }
+    n_hc.mat_infections(0) = i_hc.incidence_rate_wlhiv * 0.75 * (p_hc.total_births(t) - i_hc.need_PMTCT);
+
   } else {
     for (int a = 0; a < p_op.p_fertility_age_groups; ++a) {
       auto asfr_weight = p_dm.age_specific_fertility_rate(a, t) / i_hc.asfr_sum;
@@ -531,7 +534,9 @@ void maternal_incidence_in_pregnancy_tr(int t,
       i_hc.incidence_rate_wlhiv = 0.0;
       i_hc.perinatal_transmission_from_incidence = 0.0;
     }
+    n_hc.mat_infections(0) = i_hc.incidence_rate_wlhiv * 0.75 * (p_hc.total_births(t) - i_hc.need_PMTCT);
   }
+
 }
 
 template<typename ModelVariant, typename real_type>
@@ -779,6 +784,7 @@ void add_infections(int t,
     }
 
     // 0-6
+    n_hc.mat_infections(1) =  (total_births - n_hc.hiv_births) * i_hc.bf_at_risk;
     for (int s = 0; s < ss_b.NS; ++s) {
       auto bf_hiv_by_sex = n_hc.hiv_births * p_dm.births_sex_prop(s, t) *
                            i_hc.bf_transmission_rate(0);

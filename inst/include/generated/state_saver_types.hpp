@@ -128,6 +128,7 @@ struct ChildModelOutputState<ChildModel, real_type> {
   Tensor4<real_type> infection_by_type;
   Tensor2<real_type> hiv_births_test;
   Tensor2<real_type> hiv_births_age;
+  Tensor2<real_type> mat_infections;
 
   ChildModelOutputState(int output_years): 
     hc1_hiv_pop(
@@ -220,6 +221,10 @@ struct ChildModelOutputState<ChildModel, real_type> {
     hiv_births_age(
       35,
       output_years
+    ),
+    mat_infections(
+      2,
+      output_years
     ) {
     hc1_hiv_pop.setZero();
     hc2_hiv_pop.setZero();
@@ -237,6 +242,7 @@ struct ChildModelOutputState<ChildModel, real_type> {
     infection_by_type.setZero();
     hiv_births_test.setZero();
     hiv_births_age.setZero();
+    mat_infections.setZero();
   }
 };
 
@@ -293,6 +299,7 @@ public:
     output_state.infection_by_type.chip(i, output_state.infection_by_type.NumDimensions - 1) = state.children.infection_by_type;
     output_state.hiv_births_test.chip(i, output_state.hiv_births_test.NumDimensions - 1) = state.children.hiv_births_test;
     output_state.hiv_births_age.chip(i, output_state.hiv_births_age.NumDimensions - 1) = state.children.hiv_births_age;
+    output_state.mat_infections.chip(i, output_state.mat_infections.NumDimensions - 1) = state.children.mat_infections;
     return;
   }
 };

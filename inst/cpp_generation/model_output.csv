@@ -27,3 +27,4 @@ ctx_mean,ctx_mean,REAL,ChildModel,ModelVariant::run_child_model,2,2,output_years
 infection_by_type,infection_by_type,REAL,ChildModel,ModelVariant::run_child_model,4,children.hcTT,children.hc1AG,base.NS,output_years,
 hiv_births_test,hiv_births_test,REAL,ChildModel,ModelVariant::run_child_model,2,2,output_years,,,
 hiv_births_age,hiv_births_age,REAL,ChildModel,ModelVariant::run_child_model,2,35,output_years,,,
+mat_infections,mat_infections,REAL,ChildModel,ModelVariant::run_child_model,2,2,output_years,,,
