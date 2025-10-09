@@ -166,7 +166,7 @@ struct AdultHivModelSimulation<Config> {
       nda::fill(i_ha.hiv_negative_pop, 0.0);
       i_ha.Xhivn_incagerr = 0.0;
 
-      for (int a = adult_incid_first_age_group; a < pAG; ++a) {
+      for (int a = p_idx_hiv_first_adult; a < pAG; ++a) {
         i_ha.hiv_negative_pop(a) = n_dp.p_total_pop(a, g) - n_ha.p_hiv_pop(a, g);
       }
 
