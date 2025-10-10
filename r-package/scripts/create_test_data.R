@@ -23,6 +23,9 @@ proj_coarse <- prepare_leapfrog_projp(pjnz_adult, use_coarse_age_groups = TRUE)
 parameters_coarse <- c(demp, proj_coarse)
 save_parameters(parameters_coarse, testthat::test_path("testdata/adult_parms_coarse.h5"))
 
+spectrum_parameters <- prepare_hc_leapfrog_projp(pjnz_adult, params = parameters, use_coarse_age_groups = FALSE)
+save_parameters(spectrum_parameters, testthat::test_path("testdata/spectrum_params.h5"))
+
 # temporary backwards compatibility for leapfrog
 leapfrog_proj <- proj
 leapfrog_proj$cd4_initdist_full <- proj$cd4_initdist
@@ -148,4 +151,3 @@ save_parameters(parameters_coarse, testthat::test_path("testdata/child_parms_coa
 
 # need this for child model tests
 saveRDS(out, testthat::test_path("testdata/child_test_utils.rds"))
-

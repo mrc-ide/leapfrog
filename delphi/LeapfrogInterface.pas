@@ -400,15 +400,51 @@ end;
 
 {$ALIGN 8}
 type
+  LeapfrogSpectrumParamsView = record
+  private
+end;
+
+type
+  LeapfrogSpectrumParams = class
+  public
+    function getView(): LeapfrogSpectrumParamsView;
+    procedure writeToDisk(dir: string);
+    Destructor Destroy; override;
+end;
+
+{$ALIGN 8}
+type
+  LeapfrogSpectrumStateView = record
+  private
+    pDeathsNonaidsArtpop: PDouble;
+    pDeathsNonaidsArtpopLength: Integer;
+    pDeathsNonaidsHivpop: PDouble;
+    pDeathsNonaidsHivpopLength: Integer;
+end;
+
+type
+  LeapfrogSpectrumState = class
+  public
+    pDeathsNonaidsArtpop: TGBFixedArray<Double>;
+    pDeathsNonaidsHivpop: TGBFixedArray<Double>;
+    function getView(): LeapfrogSpectrumStateView;
+    procedure writeToDisk(dir: string);
+    Destructor Destroy; override;
+end;
+
+{$ALIGN 8}
+type
   LeapfrogParams = record
   private
     demproj: ^LeapfrogDemProjParamsView;
     hivadult: ^LeapfrogHivAdultParamsView;
     hivchild: ^LeapfrogHivChildParamsView;
+    spectrum: ^LeapfrogSpectrumParamsView;
   public
     procedure SetDemProjParams(const demprojParams: LeapfrogDemProjParamsView);
     procedure SetHivAdultParams(const hivadultParams: LeapfrogHivAdultParamsView);
     procedure SetHivChildParams(const hivchildParams: LeapfrogHivChildParamsView);
+    procedure SetSpectrumParams(const spectrumParams: LeapfrogSpectrumParamsView);
 end;
 
 {$ALIGN 8}
@@ -418,10 +454,12 @@ type
     demproj: ^LeapfrogDemProjStateView;
     hivadult: ^LeapfrogHivAdultStateView;
     hivchild: ^LeapfrogHivChildStateView;
+    spectrum: ^LeapfrogSpectrumStateView;
   public
     procedure SetDemProjState(const demprojState: LeapfrogDemProjStateView);
     procedure SetHivAdultState(const hivadultState: LeapfrogHivAdultStateView);
     procedure SetHivChildState(const hivchildState: LeapfrogHivChildStateView);
+    procedure SetSpectrumState(const spectrumState: LeapfrogSpectrumStateView);
 end;
 
 type TCallbackFunction = procedure(Msg: PAnsiChar); stdcall;
@@ -771,6 +809,30 @@ begin;
   Result.pmtctCoverageAtDeliveryLength := pmtctCoverageAtDelivery.GetLength();
 end;
 
+destructor LeapfrogSpectrumParams.Destroy;
+begin;
+  inherited;
+end;
+
+destructor LeapfrogSpectrumState.Destroy;
+begin;
+  pDeathsNonaidsArtpop.Free;
+  pDeathsNonaidsHivpop.Free;
+  inherited;
+end;
+
+function LeapfrogSpectrumParams.getView(): LeapfrogSpectrumParamsView;
+begin;
+end;
+
+function LeapfrogSpectrumState.getView(): LeapfrogSpectrumStateView;
+begin;
+  Result.pDeathsNonaidsArtpop := PDouble(pDeathsNonaidsArtpop.data);
+  Result.pDeathsNonaidsArtpopLength := pDeathsNonaidsArtpop.GetLength();
+  Result.pDeathsNonaidsHivpop := PDouble(pDeathsNonaidsHivpop.data);
+  Result.pDeathsNonaidsHivpopLength := pDeathsNonaidsHivpop.GetLength();
+end;
+
 procedure LeapfrogDemProjParams.writeToDisk(dir: string);
 begin;
   if not DirectoryExists(dir) then
@@ -894,6 +956,20 @@ begin;
   pmtctCoverageAtDelivery.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pmtctCoverageAtDelivery');
 end;
 
+procedure LeapfrogSpectrumParams.writeToDisk(dir: string);
+begin;
+  if not DirectoryExists(dir) then
+    ForceDirectories(dir);
+end;
+
+procedure LeapfrogSpectrumState.writeToDisk(dir: string);
+begin;
+  if not DirectoryExists(dir) then
+    ForceDirectories(dir);
+  pDeathsNonaidsArtpop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pDeathsNonaidsArtpop');
+  pDeathsNonaidsHivpop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pDeathsNonaidsHivpop');
+end;
+
 procedure LeapfrogParams.SetDemProjParams(const demprojParams: LeapfrogDemProjParamsView);
 begin
   demproj := @demprojParams;
@@ -922,6 +998,16 @@ end;
 procedure LeapfrogState.SetHivChildState(const hivchildState: LeapfrogHivChildStateView);
 begin
   hivchild := @hivchildState;
+end;
+
+procedure LeapfrogParams.SetSpectrumParams(const spectrumParams: LeapfrogSpectrumParamsView);
+begin
+  spectrum := @spectrumParams;
+end;
+
+procedure LeapfrogState.SetSpectrumState(const spectrumState: LeapfrogSpectrumStateView);
+begin
+  spectrum := @spectrumState;
 end;
 
 end.

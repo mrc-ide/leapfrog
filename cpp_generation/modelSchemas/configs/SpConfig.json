@@ -1,0 +1,31 @@
+{
+  "name": "Sp",
+  "long_name": "Spectrum",
+  "namespace": "sp",
+  "enable_if": "run_spectrum_model",
+  "state_space": {
+    "default": {}
+  },
+  "pars": {},
+  "intermediate": {
+    "hiv_art_adult_sa": {
+      "num_type": "real_type"
+    },
+    "hiv_untreated_adult_sa": {
+      "num_type": "real_type"
+    },
+    "artcov_adult_sa": {
+      "num_type": "real_type"
+    }
+  },
+  "state": {
+    "p_deaths_nonaids_artpop": {
+      "num_type": "real_type",
+      "dims": ["SS::pAG", "SS::NS"]
+    },
+    "p_deaths_nonaids_hivpop": {
+      "num_type": "real_type",
+      "dims": ["SS::pAG", "SS::NS"]
+    }
+  }
+}

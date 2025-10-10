@@ -236,10 +236,23 @@ struct HcOut {
 };
 
 template<typename real_type>
+struct SpParams {
+};
+
+template<typename real_type>
+struct SpOut {
+  real_type* p_deaths_nonaids_artpop;
+  int p_deaths_nonaids_artpop_length;
+  real_type* p_deaths_nonaids_hivpop;
+  int p_deaths_nonaids_hivpop_length;
+};
+
+template<typename real_type>
 struct CParams {
   DpParams<real_type>* dp;
   HaParams<real_type>* ha;
   HcParams<real_type>* hc;
+  SpParams<real_type>* sp;
 };
 
 template<typename real_type>
@@ -247,6 +260,7 @@ struct CState {
   DpOut<real_type>* dp;
   HaOut<real_type>* ha;
   HcOut<real_type>* hc;
+  SpOut<real_type>* sp;
 };
 
 #pragma pack(pop)

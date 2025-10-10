@@ -177,5 +177,30 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
   };
 };
 
+template<typename real_type, MV ModelVariant>
+struct SpAdapter<Language::Cpp, real_type, ModelVariant> {
+  using SS = SSMixed<ModelVariant>;
+  using Config = SpConfig<real_type, ModelVariant>;
+
+  static Config::Pars get_pars(
+    OwnedParsMixed<real_type, ModelVariant>::Pars& owned_pars
+  ) {
+    return {
+    };
+  };
+
+  static constexpr int output_count = 2;
+
+  static int build_output(
+    int index,
+    const Config::OutputState& state,
+    std::filesystem::path& output_file
+  ) {
+    write_data<real_type, typename Config::OutputState::shape_p_deaths_nonaids_artpop>(output_file, "p_deaths_nonaids_artpop", state.p_deaths_nonaids_artpop);
+    write_data<real_type, typename Config::OutputState::shape_p_deaths_nonaids_hivpop>(output_file, "p_deaths_nonaids_hivpop", state.p_deaths_nonaids_hivpop);
+    return index + output_count;
+  };
+};
+
 } // namespace internal
 } // namespace leapfrog

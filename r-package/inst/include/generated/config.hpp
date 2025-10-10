@@ -1345,6 +1345,85 @@ struct HcConfig {
   };
 };
 
+template<typename real_type, MV ModelVariant>
+struct SpConfig {
+  using SS = SSMixed<ModelVariant>;
+
+  struct Pars {
+  };
+
+  struct Intermediate {
+    real_type hiv_art_adult_sa;
+    real_type hiv_untreated_adult_sa;
+    real_type artcov_adult_sa;
+
+    Intermediate() {};
+
+    void reset() {
+      hiv_art_adult_sa = 0;
+      hiv_untreated_adult_sa = 0;
+      artcov_adult_sa = 0;
+    };
+  };
+
+  struct State {
+    using shape_p_deaths_nonaids_artpop = nda::shape<
+      nda::dim<0, SS::pAG, 1>,
+      nda::dim<0, SS::NS, (SS::pAG)>
+    >;
+    nda::array<real_type, shape_p_deaths_nonaids_artpop> p_deaths_nonaids_artpop;
+    using shape_p_deaths_nonaids_hivpop = nda::shape<
+      nda::dim<0, SS::pAG, 1>,
+      nda::dim<0, SS::NS, (SS::pAG)>
+    >;
+    nda::array<real_type, shape_p_deaths_nonaids_hivpop> p_deaths_nonaids_hivpop;
+
+    void reset() {
+      p_deaths_nonaids_artpop.for_each_value([](real_type& x) { x = 0; });
+      p_deaths_nonaids_hivpop.for_each_value([](real_type& x) { x = 0; });
+    };
+  };
+
+  struct OutputState {
+    using shape_p_deaths_nonaids_artpop = nda::shape<
+      nda::dim<0, SS::pAG, 1>,
+      nda::dim<0, SS::NS, (SS::pAG)>,
+      nda::dim<0, nda::dynamic, (SS::pAG) * (SS::NS)>
+    >;
+    nda::array<real_type, shape_p_deaths_nonaids_artpop> p_deaths_nonaids_artpop;
+    using shape_p_deaths_nonaids_hivpop = nda::shape<
+      nda::dim<0, SS::pAG, 1>,
+      nda::dim<0, SS::NS, (SS::pAG)>,
+      nda::dim<0, nda::dynamic, (SS::pAG) * (SS::NS)>
+    >;
+    nda::array<real_type, shape_p_deaths_nonaids_hivpop> p_deaths_nonaids_hivpop;
+
+    OutputState(int output_years):
+      p_deaths_nonaids_artpop(shape_p_deaths_nonaids_artpop(SS::pAG, SS::NS, output_years)),
+      p_deaths_nonaids_hivpop(shape_p_deaths_nonaids_hivpop(SS::pAG, SS::NS, output_years))
+    {
+      p_deaths_nonaids_artpop.for_each_value([](real_type& x) { x = 0; });
+      p_deaths_nonaids_hivpop.for_each_value([](real_type& x) { x = 0; });
+    };
+
+    void save_state(const size_t i, const State &state) {
+      auto chip_p_deaths_nonaids_artpop = p_deaths_nonaids_artpop(nda::_, nda::_, i);
+      nda::for_each_index(chip_p_deaths_nonaids_artpop.shape(), [&](auto idx) -> void {
+        chip_p_deaths_nonaids_artpop[idx] = state.p_deaths_nonaids_artpop[idx];
+      });
+      auto chip_p_deaths_nonaids_hivpop = p_deaths_nonaids_hivpop(nda::_, nda::_, i);
+      nda::for_each_index(chip_p_deaths_nonaids_hivpop.shape(), [&](auto idx) -> void {
+        chip_p_deaths_nonaids_hivpop[idx] = state.p_deaths_nonaids_hivpop[idx];
+      });
+    };
+  };
+
+  static constexpr int output_count = 2;
+  static int get_build_output_size(int prev_size) {
+    return prev_size + output_count;
+  };
+};
+
 
 } // namespace internal
 } // namespace leapfrog

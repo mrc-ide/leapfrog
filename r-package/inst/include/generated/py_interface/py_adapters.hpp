@@ -446,5 +446,59 @@ struct HcAdapter<Language::Py, real_type, ModelVariant> {
   };
 };
 
+template<typename real_type, MV ModelVariant>
+struct SpAdapter<Language::Py, real_type, ModelVariant> {
+  using SS = SSMixed<ModelVariant>;
+  using Config = SpConfig<real_type, ModelVariant>;
+
+  static Config::Pars get_pars(
+    const nb::dict &data,
+    const Options<real_type> &opts
+  ) {
+    return {
+    };
+  };
+
+  static Config::State get_initial_state(
+    const nb::dict &data
+  ) {
+    typename Config::State state;
+    fill_initial_state<real_type, typename Config::State::shape_p_deaths_nonaids_artpop>(data, "p_deaths_nonaids_artpop", state.p_deaths_nonaids_artpop);
+    fill_initial_state<real_type, typename Config::State::shape_p_deaths_nonaids_hivpop>(data, "p_deaths_nonaids_hivpop", state.p_deaths_nonaids_hivpop);
+    return state;
+  };
+
+  static constexpr int output_count = 2;
+
+  static int build_output(
+    int index,
+    const Config::OutputState& state,
+    nb::dict& ret,
+    const size_t& output_years
+  ) {
+    const int py_rank_p_deaths_nonaids_artpop = 3;
+    size_t py_dims_p_deaths_nonaids_artpop[py_rank_p_deaths_nonaids_artpop] = { SS::pAG, SS::NS, output_years };
+    ret["p_deaths_nonaids_artpop"] = py_array<real_type>(state.p_deaths_nonaids_artpop.data(), py_rank_p_deaths_nonaids_artpop, py_dims_p_deaths_nonaids_artpop);
+    const int py_rank_p_deaths_nonaids_hivpop = 3;
+    size_t py_dims_p_deaths_nonaids_hivpop[py_rank_p_deaths_nonaids_hivpop] = { SS::pAG, SS::NS, output_years };
+    ret["p_deaths_nonaids_hivpop"] = py_array<real_type>(state.p_deaths_nonaids_hivpop.data(), py_rank_p_deaths_nonaids_hivpop, py_dims_p_deaths_nonaids_hivpop);
+    return index + output_count;
+  };
+
+  static int build_output_single_year(
+    int index,
+    const Config::State& state,
+    nb::dict& ret
+  ) {
+    const int py_rank_p_deaths_nonaids_artpop = 2;
+    size_t py_dims_p_deaths_nonaids_artpop[py_rank_p_deaths_nonaids_artpop] = { SS::pAG, SS::NS };
+    ret["p_deaths_nonaids_artpop"] = py_array<real_type>(state.p_deaths_nonaids_artpop.data(), py_rank_p_deaths_nonaids_artpop, py_dims_p_deaths_nonaids_artpop);
+    const int py_rank_p_deaths_nonaids_hivpop = 2;
+    size_t py_dims_p_deaths_nonaids_hivpop[py_rank_p_deaths_nonaids_hivpop] = { SS::pAG, SS::NS };
+    ret["p_deaths_nonaids_hivpop"] = py_array<real_type>(state.p_deaths_nonaids_hivpop.data(), py_rank_p_deaths_nonaids_hivpop, py_dims_p_deaths_nonaids_hivpop);
+    return index + output_count;
+  };
+};
+
 } // namespace internal
 } // namespace leapfrog

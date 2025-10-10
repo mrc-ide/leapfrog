@@ -598,6 +598,22 @@ struct HcOwnedPars {
   };
 };
 
+template<typename real_type, MV ModelVariant>
+struct SpOwnedPars {
+  using SS = SSMixed<ModelVariant>;
+  
+  struct Pars {
+  };
+
+  static Pars parse_pars(
+    const std::filesystem::path &params_file,
+    const Options<real_type> &opts
+  ) {
+    return {
+    };
+  };
+};
+
 
 template<bool enable, typename Mixin>
 struct Pair;
@@ -680,6 +696,26 @@ struct OwnedParsMixer<real_type, ModelVariant, Pair<true, HcOwnedPars<real_type,
     return p;
   };
 };
+template<typename real_type, MV ModelVariant, typename ...Ts>
+struct OwnedParsMixer<real_type, ModelVariant, Pair<true, SpOwnedPars<real_type, ModelVariant>>, Ts...>: public OwnedParsMixer<real_type, ModelVariant, Ts...> {
+  using CurrOwnedPars = SpOwnedPars<real_type, ModelVariant>;
+  using NextOwnedParsMixer = OwnedParsMixer<real_type, ModelVariant, Ts...>;
+
+  struct Pars: public NextOwnedParsMixer::Pars {
+    typename CurrOwnedPars::Pars sp;
+  };
+
+  static Pars parse_pars(
+    const std::filesystem::path &params_file,
+    const Options<real_type> &opts
+  ) {
+    Pars p = {
+      NextOwnedParsMixer::parse_pars(params_file, opts),
+      CurrOwnedPars::parse_pars(params_file, opts)
+    };
+    return p;
+  };
+};
 
 template<typename real_type, MV ModelVariant>
 using OwnedParsMixed = OwnedParsMixer<
@@ -687,7 +723,8 @@ using OwnedParsMixed = OwnedParsMixer<
   ModelVariant,
   Pair<ModelVariant::run_demographic_projection, DpOwnedPars<real_type, ModelVariant>>,
   Pair<ModelVariant::run_hiv_simulation, HaOwnedPars<real_type, ModelVariant>>,
-  Pair<ModelVariant::run_child_model, HcOwnedPars<real_type, ModelVariant>>
+  Pair<ModelVariant::run_child_model, HcOwnedPars<real_type, ModelVariant>>,
+  Pair<ModelVariant::run_spectrum_model, SpOwnedPars<real_type, ModelVariant>>
 >;
 
 }

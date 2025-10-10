@@ -57,8 +57,6 @@ struct HivDemographicProjection<Config> {
   {};
 
   void run_hiv_pop_demographic_projection() {
-    auto& n_ha = state_next.ha;
-    auto& c_ha = state_curr.ha;
 
     run_hiv_ageing_and_mortality();
     if constexpr (ModelVariant::run_child_model) {
@@ -74,7 +72,6 @@ struct HivDemographicProjection<Config> {
 
   void run_hiv_pop_end_year_migration() {
     auto& n_ha = state_next.ha;
-    auto& i_ha = intermediate.ha;
     auto& i_dp = intermediate.dp;
 
     // remove net migration from hiv stratified population
@@ -125,8 +122,6 @@ struct HivDemographicProjection<Config> {
 
     auto& n_ha = state_next.ha;
     auto& n_hc = state_next.hc;
-    auto& i_ha = intermediate.ha;
-    auto& i_dp = intermediate.dp;
     const auto& p_hc = pars.hc;
 
     for (int s = 0; s < NS; ++s) {
@@ -358,8 +353,6 @@ struct HivDemographicProjection<Config> {
 
     auto& n_ha = state_next.ha;
     auto& n_hc = state_next.hc;
-    auto& i_ha = intermediate.ha;
-    auto& i_dp = intermediate.dp;
     const auto& p_hc = pars.hc;
 
     real_type deaths_migrate = 0.0;

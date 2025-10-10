@@ -578,5 +578,69 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
   };
 };
 
+template<typename real_type, MV ModelVariant>
+struct SpAdapter<Language::R, real_type, ModelVariant> {
+  using SS = SSMixed<ModelVariant>;
+  using Config = SpConfig<real_type, ModelVariant>;
+
+  static Config::Pars get_pars(
+    const Rcpp::List &data,
+    const Options<real_type> &opts
+  ) {
+    return {
+    };
+  };
+
+  static Config::State get_initial_state(
+    const Rcpp::List &data
+  ) {
+    typename Config::State state;
+    fill_initial_state<real_type, typename Config::State::shape_p_deaths_nonaids_artpop>(data, "p_deaths_nonaids_artpop", state.p_deaths_nonaids_artpop);
+    fill_initial_state<real_type, typename Config::State::shape_p_deaths_nonaids_hivpop>(data, "p_deaths_nonaids_hivpop", state.p_deaths_nonaids_hivpop);
+    return state;
+  };
+
+  static constexpr int output_count = 2;
+
+  static int build_output(
+    int index,
+    const Config::OutputState& state,
+    Rcpp::List& ret,
+    Rcpp::CharacterVector& names,
+    const size_t& output_years
+  ) {
+    Rcpp::NumericVector r_p_deaths_nonaids_artpop(SS::pAG * SS::NS * output_years);
+    r_p_deaths_nonaids_artpop.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS, output_years);
+    std::copy_n(state.p_deaths_nonaids_artpop.data(), state.p_deaths_nonaids_artpop.size(), REAL(r_p_deaths_nonaids_artpop));
+    names[index + 0] = "p_deaths_nonaids_artpop";
+    ret[index + 0] = r_p_deaths_nonaids_artpop;
+    Rcpp::NumericVector r_p_deaths_nonaids_hivpop(SS::pAG * SS::NS * output_years);
+    r_p_deaths_nonaids_hivpop.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS, output_years);
+    std::copy_n(state.p_deaths_nonaids_hivpop.data(), state.p_deaths_nonaids_hivpop.size(), REAL(r_p_deaths_nonaids_hivpop));
+    names[index + 1] = "p_deaths_nonaids_hivpop";
+    ret[index + 1] = r_p_deaths_nonaids_hivpop;
+    return index + output_count;
+  };
+
+  static int build_output_single_year(
+    int index,
+    const Config::State& state,
+    Rcpp::List& ret,
+    Rcpp::CharacterVector& names
+  ) {
+    Rcpp::NumericVector r_p_deaths_nonaids_artpop(SS::pAG * SS::NS);
+    r_p_deaths_nonaids_artpop.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS);
+    std::copy_n(state.p_deaths_nonaids_artpop.data(), state.p_deaths_nonaids_artpop.size(), REAL(r_p_deaths_nonaids_artpop));
+    names[index + 0] = "p_deaths_nonaids_artpop";
+    ret[index + 0] = r_p_deaths_nonaids_artpop;
+    Rcpp::NumericVector r_p_deaths_nonaids_hivpop(SS::pAG * SS::NS);
+    r_p_deaths_nonaids_hivpop.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS);
+    std::copy_n(state.p_deaths_nonaids_hivpop.data(), state.p_deaths_nonaids_hivpop.size(), REAL(r_p_deaths_nonaids_hivpop));
+    names[index + 1] = "p_deaths_nonaids_hivpop";
+    ret[index + 1] = r_p_deaths_nonaids_hivpop;
+    return index + output_count;
+  };
+};
+
 } // namespace internal
 } // namespace leapfrog

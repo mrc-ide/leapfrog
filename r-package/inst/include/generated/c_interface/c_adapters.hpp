@@ -328,5 +328,50 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
   };
 };
 
+template<typename real_type, MV ModelVariant>
+struct SpAdapter<Language::C, real_type, ModelVariant> {
+  using SS = SSMixed<ModelVariant>;
+  using Config = SpConfig<real_type, ModelVariant>;
+
+  static Config::Pars get_pars(
+    const CParams<real_type> &params,
+    const Options<real_type> &opts
+  ) {
+    return {
+    };
+  };
+
+  static Config::State get_initial_state(
+    const CState<real_type>& state
+  ){
+    typename Config::State initial_state;
+    fill_initial_state<real_type, typename Config::State::shape_p_deaths_nonaids_artpop>(state.sp->p_deaths_nonaids_artpop, state.sp->p_deaths_nonaids_artpop_length, "p_deaths_nonaids_artpop", initial_state.p_deaths_nonaids_artpop);
+    fill_initial_state<real_type, typename Config::State::shape_p_deaths_nonaids_hivpop>(state.sp->p_deaths_nonaids_hivpop, state.sp->p_deaths_nonaids_hivpop_length, "p_deaths_nonaids_hivpop", initial_state.p_deaths_nonaids_hivpop);
+    return initial_state;
+  };
+
+  static constexpr int output_count = 2;
+
+  static int build_output(
+    int index,
+    const Config::OutputState& state,
+    CState<real_type>& out
+  ) {
+    write_data<real_type, typename Config::OutputState::shape_p_deaths_nonaids_artpop>(state.p_deaths_nonaids_artpop, out.sp->p_deaths_nonaids_artpop, out.sp->p_deaths_nonaids_artpop_length, "p_deaths_nonaids_artpop");
+    write_data<real_type, typename Config::OutputState::shape_p_deaths_nonaids_hivpop>(state.p_deaths_nonaids_hivpop, out.sp->p_deaths_nonaids_hivpop, out.sp->p_deaths_nonaids_hivpop_length, "p_deaths_nonaids_hivpop");
+    return index + output_count;
+  };
+
+  static int build_output_single_year(
+    int index,
+    const Config::State& state,
+    CState<real_type>& out
+  ) {
+    write_data<real_type, typename Config::State::shape_p_deaths_nonaids_artpop>(state.p_deaths_nonaids_artpop, out.sp->p_deaths_nonaids_artpop, out.sp->p_deaths_nonaids_artpop_length, "p_deaths_nonaids_artpop");
+    write_data<real_type, typename Config::State::shape_p_deaths_nonaids_hivpop>(state.p_deaths_nonaids_hivpop, out.sp->p_deaths_nonaids_hivpop, out.sp->p_deaths_nonaids_hivpop_length, "p_deaths_nonaids_hivpop");
+    return index + output_count;
+  };
+};
+
 } // namespace internal
 } // namespace leapfrog
