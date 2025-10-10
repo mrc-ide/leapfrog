@@ -4,10 +4,12 @@
 \alias{prepare_leapfrog_parameters}
 \title{Prepare leapfrog input parameters from Spectrum PJNZ}
 \usage{
-prepare_leapfrog_parameters(pjnz)
+prepare_leapfrog_parameters(pjnz, use_coarse_age_groups = FALSE)
 }
 \arguments{
 \item{pjnz}{path to PJNZ file}
+
+\item{use_coarse_age_groups}{use coarse age groups in the model?}
 }
 \value{
 list of demographic and HIV projection input parameters

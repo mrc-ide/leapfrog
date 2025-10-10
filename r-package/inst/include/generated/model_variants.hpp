@@ -47,5 +47,11 @@ struct GBD {
   static constexpr bool age10_adult = true;
   static constexpr bool age105_open = true;
 };
+struct CoarseChildModel {
+  static constexpr bool run_demographic_projection = true;
+  static constexpr bool run_hiv_simulation = true;
+  static constexpr bool use_coarse_stratification = true;
+  static constexpr bool run_child_model = true;
+};
 
 }

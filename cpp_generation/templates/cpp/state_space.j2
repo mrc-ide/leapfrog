@@ -1,3 +1,4 @@
+{% from "template_utils.j2" import comma_except_last %}
 {% include "header.j2" %}
 
 #pragma once
@@ -9,31 +10,51 @@
 namespace leapfrog {
 namespace internal {
 
-{% for config in configs %}
-
-template<MV ModelVariant>
-struct {{ config.name }}SS {
-  {% for name, val in config.state_space.default.items() %}
-  static constexpr {{ get_member_type(val) }} {{ name }} = {{ get_member_value(val) }};
-  {% endfor %}
-};
-{% for override in config.state_space.overrides +%}
-template<MV ModelVariant>
-requires(ModelVariant::{{ override.applies_if }})
-struct {{ config.name }}SS<ModelVariant> {
-  {% for name, val in override.vars.items() %}
-  static constexpr {{ get_member_type(val) }} {{ name }} = {{ get_member_value(val) }};
-  {% endfor %}
-};
-{% endfor %}
-
-{% endfor %}
-
 struct BaseSS {
-  {% for name, val in global_state_space.items() %}
+  {% for name, val in base.not_overridable.items() %}
   static constexpr {{ get_member_type(val) }} {{ name }} = {{ get_member_value(val) }};
   {% endfor %}
 };
+
+enum ConfigsAndOverrides {
+  {% for el in configs_and_overrides %}
+  {{ el.name }}{{ comma_except_last(loop) }}
+  {% endfor %}
+};
+
+template<bool enable, ConfigsAndOverrides T>
+struct SSPair;
+
+template<MV ModelVariant, typename ...Ts>
+struct SSMixer;
+
+template<MV ModelVariant>
+struct SSMixer<ModelVariant>: public BaseSS {
+  {% for name, val in base.overridable.items() %}
+  static constexpr {{ get_member_type(val) }} {{ name }} = {{ get_member_value(val) }};
+  {% endfor %}
+};
+
+template<MV ModelVariant, ConfigsAndOverrides T, typename ...Ts>
+struct SSMixer<ModelVariant, SSPair<false, T>, Ts...>: public SSMixer<ModelVariant, Ts...> {};
+
+{% for el in configs_and_overrides %}
+template<MV ModelVariant, typename ...Ts>
+struct SSMixer<ModelVariant, SSPair<true, {{ el.name }}>, Ts...>: public SSMixer<ModelVariant, Ts...> {
+  {% for name, val in el.vars.items() %}
+  static constexpr {{ get_member_type(val) }} {{ name }} = {{ get_member_value(val) }};
+  {% endfor %}
+};
+
+{% endfor %}
+
+template<MV ModelVariant>
+using SSMixed = SSMixer<
+  ModelVariant,
+  {% for el in configs_and_overrides %}
+  SSPair<{{ el.condition }}, {{ el.name }}>{{ comma_except_last(loop) }}
+  {% endfor %}
+>;
 
 } // namespace internal
 } // namespace leapfrog

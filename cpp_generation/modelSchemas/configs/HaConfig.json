@@ -30,155 +30,120 @@
     ]
   },
   "pars": {
-    "default": {
-      "total_rate": {
-        "num_type": "real_type",
-        "dims": ["opts.proj_steps"],
-        "alias": {
-          "r": "incidinput"
-        }
-      },
-      "relative_risk_age": {
-        "num_type": "real_type",
-        "dims": ["SS::pAG - SS::p_idx_hiv_first_adult", "SS::NS", "opts.proj_steps"],
-        "alias": {
-          "r": "incrr_age"
-        }
-      },
-      "relative_risk_sex": {
-        "num_type": "real_type",
-        "dims": ["opts.proj_steps"],
-        "alias": {
-          "r": "incrr_sex"
-        }
-      },
-      "cd4_mortality": {
-        "num_type": "real_type",
-        "dims": ["SS::hDS", "SS::hAG", "SS::NS"],
-        "alias": {
-          "r": "cd4_mort_full"
-        }
-      },
-      "cd4_progression": {
-        "num_type": "real_type",
-        "dims": ["SS::hDS - 1", "SS::hAG", "SS::NS"],
-        "alias": {
-          "r": "cd4_prog_full"
-        }
-      },
-      "cd4_initial_distribution": {
-        "num_type": "real_type",
-        "dims": ["SS::hDS", "SS::hAG", "SS::NS"],
-        "alias": {
-          "r": "cd4_initdist_full"
-        }
-      },
-      "scale_cd4_mortality": {
-        "num_type": "int",
-        "alias": {
-          "r": "scale_cd4_mort"
-        }
-      },
-      "idx_hm_elig": {
-        "num_type": "int",
-        "dims": ["opts.proj_steps"],
-        "alias": {
-          "r": "artcd4elig_idx"
-        }
-      },
-      "mortality": {
-        "num_type": "real_type",
-        "dims": ["SS::hTS", "SS::hDS", "SS::hAG", "SS::NS"],
-        "alias": {
-          "r": "art_mort_full"
-        }
-      },
-      "mortality_time_rate_ratio": {
-        "num_type": "real_type",
-        "dims": ["SS::hTS", "opts.proj_steps"],
-        "alias": {
-          "r": "artmx_timerr"
-        }
-      },
-      "dropout_recover_cd4": {
-        "num_type": "int",
-        "alias": {
-          "r": "art_dropout_recover_cd4"
-        }
-      },
-      "dropout_rate": {
-        "num_type": "real_type",
-        "dims": ["opts.proj_steps"],
-        "alias": {
-          "r": "art_dropout_rate"
-        }
-      },
-      "adults_on_art": {
-        "num_type": "real_type",
-        "dims": ["SS::NS", "opts.proj_steps"],
-        "alias": {
-          "r": "art15plus_num"
-        }
-      },
-      "adults_on_art_is_percent": {
-        "num_type": "int",
-        "dims": ["SS::NS", "opts.proj_steps"],
-        "alias": {
-          "r": "art15plus_isperc"
-        }
-      },
-      "initiation_mortality_weight": {
-        "num_type": "real_type",
-        "alias": {
-          "r": "art_alloc_mxweight"
-        }
-      },
-      "h_art_stage_dur": {
-        "num_type": "real_type",
-        "dims": ["SS::hTS - 1"]
+    "total_rate": {
+      "num_type": "real_type",
+      "dims": ["opts.proj_steps"],
+      "alias": {
+        "r": "incidinput"
       }
     },
-    "overrides": [
-      {
-        "applies_if": "use_coarse_stratification",
-        "vars": {
-          "cd4_initial_distribution": {
-            "num_type": "real_type",
-            "dims": ["SS::hDS", "SS::hAG", "SS::NS"],
-            "alias": {
-              "r": "cd4_initdist_coarse"
-            }
-          },
-          "cd4_progression": {
-            "num_type": "real_type",
-            "dims": ["SS::hDS - 1", "SS::hAG", "SS::NS"],
-            "alias": {
-              "r": "cd4_prog_coarse"
-            }
-          },
-          "cd4_mortality": {
-            "num_type": "real_type",
-            "dims": ["SS::hDS", "SS::hAG", "SS::NS"],
-            "alias": {
-              "r": "cd4_mort_coarse"
-            }
-          },
-          "mortality": {
-            "num_type": "real_type",
-            "dims": ["SS::hTS", "SS::hDS", "SS::hAG", "SS::NS"],
-            "alias": {
-              "r": "art_mort_coarse"
-            }
-          }
-        }
+    "relative_risk_age": {
+      "num_type": "real_type",
+      "dims": ["SS::pAG - SS::p_idx_hiv_first_adult", "SS::NS", "opts.proj_steps"],
+      "alias": {
+        "r": "incrr_age"
       }
-    ]
+    },
+    "relative_risk_sex": {
+      "num_type": "real_type",
+      "dims": ["opts.proj_steps"],
+      "alias": {
+        "r": "incrr_sex"
+      }
+    },
+    "cd4_mortality": {
+      "num_type": "real_type",
+      "dims": ["SS::hDS", "SS::hAG", "SS::NS"],
+      "alias": {
+        "r": "cd4_mort"
+      }
+    },
+    "cd4_progression": {
+      "num_type": "real_type",
+      "dims": ["SS::hDS - 1", "SS::hAG", "SS::NS"],
+      "alias": {
+        "r": "cd4_prog"
+      }
+    },
+    "cd4_initial_distribution": {
+      "num_type": "real_type",
+      "dims": ["SS::hDS", "SS::hAG", "SS::NS"],
+      "alias": {
+        "r": "cd4_initdist"
+      }
+    },
+    "scale_cd4_mortality": {
+      "num_type": "int",
+      "alias": {
+        "r": "scale_cd4_mort"
+      }
+    },
+    "idx_hm_elig": {
+      "num_type": "int",
+      "dims": ["opts.proj_steps"],
+      "alias": {
+        "r": "artcd4elig_idx"
+      }
+    },
+    "mortality": {
+      "num_type": "real_type",
+      "dims": ["SS::hTS", "SS::hDS", "SS::hAG", "SS::NS"],
+      "alias": {
+        "r": "art_mort"
+      }
+    },
+    "mortality_time_rate_ratio": {
+      "num_type": "real_type",
+      "dims": ["SS::hTS", "opts.proj_steps"],
+      "alias": {
+        "r": "artmx_timerr"
+      }
+    },
+    "dropout_recover_cd4": {
+      "num_type": "int",
+      "alias": {
+        "r": "art_dropout_recover_cd4"
+      }
+    },
+    "dropout_rate": {
+      "num_type": "real_type",
+      "dims": ["opts.proj_steps"],
+      "alias": {
+        "r": "art_dropout_rate"
+      }
+    },
+    "adults_on_art": {
+      "num_type": "real_type",
+      "dims": ["SS::NS", "opts.proj_steps"],
+      "alias": {
+        "r": "art15plus_num"
+      }
+    },
+    "adults_on_art_is_percent": {
+      "num_type": "int",
+      "dims": ["SS::NS", "opts.proj_steps"],
+      "alias": {
+        "r": "art15plus_isperc"
+      }
+    },
+    "initiation_mortality_weight": {
+      "num_type": "real_type",
+      "alias": {
+        "r": "art_alloc_mxweight"
+      }
+    },
+    "h_art_stage_dur": {
+      "num_type": "real_type",
+      "dims": ["SS::hTS - 1"]
+    },
+    "pAG_INCIDPOP": {
+      "num_type": "int"
+    },
+    "pIDX_INCIDPOP": {
+      "num_type": "int"
+    }
   },
   "intermediate": {
-    "hiv_net_migration": {
-      "num_type": "real_type",
-      "dims": ["SS::pAG", "SS::NS"]
-    },
     "hiv_negative_pop": {
       "num_type": "real_type",
       "dims": ["SS::pAG"]
@@ -331,6 +296,10 @@
       "dims": ["SS::hDS", "SS::hAG", "SS::NS"]
     },
     "p_hiv_deaths": {
+      "num_type": "real_type",
+      "dims": ["SS::pAG", "SS::NS"]
+    },
+    "p_net_migration_hivpop": {
       "num_type": "real_type",
       "dims": ["SS::pAG", "SS::NS"]
     }

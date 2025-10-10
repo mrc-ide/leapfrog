@@ -126,19 +126,21 @@ struct HaAdapter<Language::Py, real_type, ModelVariant> {
       .total_rate = parse_data<real_type, 1>(data, "incidinput", { nda::dim<>(0, opts.proj_steps, 1) }),
       .relative_risk_age = parse_data<real_type, 3>(data, "incrr_age", { nda::dim<>(0, SS::pAG - SS::p_idx_hiv_first_adult, 1), nda::dim<>(0, SS::NS, (SS::pAG - SS::p_idx_hiv_first_adult)), nda::dim<>(0, opts.proj_steps, (SS::pAG - SS::p_idx_hiv_first_adult) * (SS::NS)) }),
       .relative_risk_sex = parse_data<real_type, 1>(data, "incrr_sex", { nda::dim<>(0, opts.proj_steps, 1) }),
-      .cd4_mortality = parse_data<real_type, 3>(data, "cd4_mort_full", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),
-      .cd4_progression = parse_data<real_type, 3>(data, "cd4_prog_full", { nda::dim<>(0, SS::hDS - 1, 1), nda::dim<>(0, SS::hAG, (SS::hDS - 1)), nda::dim<>(0, SS::NS, (SS::hDS - 1) * (SS::hAG)) }),
-      .cd4_initial_distribution = parse_data<real_type, 3>(data, "cd4_initdist_full", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),
+      .cd4_mortality = parse_data<real_type, 3>(data, "cd4_mort", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),
+      .cd4_progression = parse_data<real_type, 3>(data, "cd4_prog", { nda::dim<>(0, SS::hDS - 1, 1), nda::dim<>(0, SS::hAG, (SS::hDS - 1)), nda::dim<>(0, SS::NS, (SS::hDS - 1) * (SS::hAG)) }),
+      .cd4_initial_distribution = parse_data<real_type, 3>(data, "cd4_initdist", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),
       .scale_cd4_mortality = nb::cast<int>(data["scale_cd4_mort"]),
       .idx_hm_elig = parse_data<int, 1>(data, "artcd4elig_idx", { nda::dim<>(0, opts.proj_steps, 1) }),
-      .mortality = parse_data<real_type, 4>(data, "art_mort_full", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, SS::hDS, (SS::hTS)), nda::dim<>(0, SS::hAG, (SS::hTS) * (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hTS) * (SS::hDS) * (SS::hAG)) }),
+      .mortality = parse_data<real_type, 4>(data, "art_mort", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, SS::hDS, (SS::hTS)), nda::dim<>(0, SS::hAG, (SS::hTS) * (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hTS) * (SS::hDS) * (SS::hAG)) }),
       .mortality_time_rate_ratio = parse_data<real_type, 2>(data, "artmx_timerr", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, opts.proj_steps, (SS::hTS)) }),
       .dropout_recover_cd4 = nb::cast<int>(data["art_dropout_recover_cd4"]),
       .dropout_rate = parse_data<real_type, 1>(data, "art_dropout_rate", { nda::dim<>(0, opts.proj_steps, 1) }),
       .adults_on_art = parse_data<real_type, 2>(data, "art15plus_num", { nda::dim<>(0, SS::NS, 1), nda::dim<>(0, opts.proj_steps, (SS::NS)) }),
       .adults_on_art_is_percent = parse_data<int, 2>(data, "art15plus_isperc", { nda::dim<>(0, SS::NS, 1), nda::dim<>(0, opts.proj_steps, (SS::NS)) }),
       .initiation_mortality_weight = nb::cast<real_type>(data["art_alloc_mxweight"]),
-      .h_art_stage_dur = parse_data<real_type, 1>(data, "h_art_stage_dur", { nda::dim<>(0, SS::hTS - 1, 1) })
+      .h_art_stage_dur = parse_data<real_type, 1>(data, "h_art_stage_dur", { nda::dim<>(0, SS::hTS - 1, 1) }),
+      .pAG_INCIDPOP = nb::cast<int>(data["pAG_INCIDPOP"]),
+      .pIDX_INCIDPOP = nb::cast<int>(data["pIDX_INCIDPOP"])
     };
   };
 
@@ -155,10 +157,11 @@ struct HaAdapter<Language::Py, real_type, ModelVariant> {
     fill_initial_state<real_type, typename Config::State::shape_h_hiv_deaths_art>(data, "h_hiv_deaths_art", state.h_hiv_deaths_art);
     fill_initial_state<real_type, typename Config::State::shape_h_art_initiation>(data, "h_art_initiation", state.h_art_initiation);
     fill_initial_state<real_type, typename Config::State::shape_p_hiv_deaths>(data, "p_hiv_deaths", state.p_hiv_deaths);
+    fill_initial_state<real_type, typename Config::State::shape_p_net_migration_hivpop>(data, "p_net_migration_hivpop", state.p_net_migration_hivpop);
     return state;
   };
 
-  static constexpr int output_count = 9;
+  static constexpr int output_count = 10;
 
   static int build_output(
     int index,
@@ -193,6 +196,9 @@ struct HaAdapter<Language::Py, real_type, ModelVariant> {
     const int py_rank_p_hiv_deaths = 3;
     size_t py_dims_p_hiv_deaths[py_rank_p_hiv_deaths] = { SS::pAG, SS::NS, output_years };
     ret["p_hiv_deaths"] = py_array<real_type>(state.p_hiv_deaths.data(), py_rank_p_hiv_deaths, py_dims_p_hiv_deaths);
+    const int py_rank_p_net_migration_hivpop = 3;
+    size_t py_dims_p_net_migration_hivpop[py_rank_p_net_migration_hivpop] = { SS::pAG, SS::NS, output_years };
+    ret["p_net_migration_hivpop"] = py_array<real_type>(state.p_net_migration_hivpop.data(), py_rank_p_net_migration_hivpop, py_dims_p_net_migration_hivpop);
     return index + output_count;
   };
 
@@ -228,6 +234,9 @@ struct HaAdapter<Language::Py, real_type, ModelVariant> {
     const int py_rank_p_hiv_deaths = 2;
     size_t py_dims_p_hiv_deaths[py_rank_p_hiv_deaths] = { SS::pAG, SS::NS };
     ret["p_hiv_deaths"] = py_array<real_type>(state.p_hiv_deaths.data(), py_rank_p_hiv_deaths, py_dims_p_hiv_deaths);
+    const int py_rank_p_net_migration_hivpop = 2;
+    size_t py_dims_p_net_migration_hivpop[py_rank_p_net_migration_hivpop] = { SS::pAG, SS::NS };
+    ret["p_net_migration_hivpop"] = py_array<real_type>(state.p_net_migration_hivpop.data(), py_rank_p_net_migration_hivpop, py_dims_p_net_migration_hivpop);
     return index + output_count;
   };
 };
@@ -257,17 +266,18 @@ struct HcAdapter<Language::Py, real_type, ModelVariant> {
       .hc_art_isperc = parse_data<int, 1>(data, "artpaeds_isperc", { nda::dim<>(0, opts.proj_steps, 1) }),
       .hc_art_val = parse_data<real_type, 2>(data, "paed_art_val", { nda::dim<>(0, SS::hcAG_coarse, 1), nda::dim<>(0, opts.proj_steps, (SS::hcAG_coarse)) }),
       .hc_art_init_dist = parse_data<real_type, 2>(data, "init_art_dist", { nda::dim<>(0, SS::p_idx_hiv_first_adult, 1), nda::dim<>(0, opts.proj_steps, (SS::p_idx_hiv_first_adult)) }),
-      .fert_mult_by_age = parse_data<real_type, 2>(data, "fert_rat", { nda::dim<>(0, SS::hAG_fert, 1), nda::dim<>(0, opts.proj_steps, (SS::hAG_fert)) }),
+      .fert_mult_by_age = parse_data<real_type, 2>(data, "fert_rat", { nda::dim<>(0, SS::hc_p_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::hc_p_fertility_age_groups)) }),
       .fert_mult_off_art = parse_data<real_type, 1>(data, "cd4fert_rat", { nda::dim<>(0, SS::hDS, 1) }),
-      .fert_mult_on_art = parse_data<real_type, 1>(data, "frr_art6mos", { nda::dim<>(0, SS::hAG_fert, 1) }),
+      .fert_mult_on_art = parse_data<real_type, 1>(data, "frr_art6mos", { nda::dim<>(0, SS::hc_p_fertility_age_groups, 1) }),
       .total_fertility_rate = parse_data<real_type, 1>(data, "tfr", { nda::dim<>(0, opts.proj_steps, 1) }),
       .PMTCT = parse_data<real_type, 2>(data, "pmtct", { nda::dim<>(0, SS::hPS, 1), nda::dim<>(0, opts.proj_steps, (SS::hPS)) }),
       .vertical_transmission_rate = parse_data<real_type, 2>(data, "mtct", { nda::dim<>(0, SS::hDS + 1, 1), nda::dim<>(0, SS::hVT, (SS::hDS + 1)) }),
       .PMTCT_transmission_rate = parse_data<real_type, 3>(data, "pmtct_mtct", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hPS, (SS::hDS)), nda::dim<>(0, SS::hVT, (SS::hDS) * (SS::hPS)) }),
-      .PMTCT_dropout = parse_data<real_type, 2>(data, "pmtct_dropout", { nda::dim<>(0, SS::hPS_dropout, 1), nda::dim<>(0, opts.proj_steps, (SS::hPS_dropout)) }),
+      .PMTCT_dropout = parse_data<real_type, 3>(data, "pmtct_dropout", { nda::dim<>(0, SS::hPS, 1), nda::dim<>(0, SS::hVT_dropout, (SS::hPS)), nda::dim<>(0, opts.proj_steps, (SS::hPS) * (SS::hVT_dropout)) }),
       .PMTCT_input_is_percent = parse_data<int, 1>(data, "pmtct_input_isperc", { nda::dim<>(0, opts.proj_steps, 1) }),
       .breastfeeding_duration_art = parse_data<real_type, 2>(data, "bf_duration_art", { nda::dim<>(0, SS::hBF, 1), nda::dim<>(0, opts.proj_steps, (SS::hBF)) }),
       .breastfeeding_duration_no_art = parse_data<real_type, 2>(data, "bf_duration_no_art", { nda::dim<>(0, SS::hBF, 1), nda::dim<>(0, opts.proj_steps, (SS::hBF)) }),
+      .infant_pop = parse_data<real_type, 3>(data, "infant_pop", { nda::dim<>(0, SS::hc_infant, 1), nda::dim<>(0, SS::NS, (SS::hc_infant)), nda::dim<>(0, opts.proj_steps, (SS::hc_infant) * (SS::NS)) }),
       .mat_hiv_births = parse_data<real_type, 1>(data, "mat_hiv_births", { nda::dim<>(0, opts.proj_steps, 1) }),
       .mat_prev_input = parse_data<int, 1>(data, "mat_prev_input", { nda::dim<>(0, opts.proj_steps, 1) }),
       .prop_lt200 = parse_data<real_type, 1>(data, "prop_lt200", { nda::dim<>(0, opts.proj_steps, 1) }),
@@ -277,12 +287,13 @@ struct HcAdapter<Language::Py, real_type, ModelVariant> {
       .abortion = parse_data<real_type, 2>(data, "abortion", { nda::dim<>(0, SS::hAB_ind, 1), nda::dim<>(0, opts.proj_steps, (SS::hAB_ind)) }),
       .patients_reallocated = parse_data<real_type, 1>(data, "patients_reallocated", { nda::dim<>(0, opts.proj_steps, 1) }),
       .hc_art_ltfu = parse_data<real_type, 1>(data, "paed_art_ltfu", { nda::dim<>(0, opts.proj_steps, 1) }),
-      .adult_female_infections = parse_data<real_type, 2>(data, "adult_female_infections", { nda::dim<>(0, SS::p_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::p_fertility_age_groups)) }),
-      .adult_female_hivnpop = parse_data<real_type, 2>(data, "hivnpop", { nda::dim<>(0, SS::p_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::p_fertility_age_groups)) }),
+      .adult_female_infections = parse_data<real_type, 2>(data, "adult_female_infections", { nda::dim<>(0, SS::hc_p_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::hc_p_fertility_age_groups)) }),
+      .adult_female_hivnpop = parse_data<real_type, 2>(data, "hivnpop", { nda::dim<>(0, SS::hc_p_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::hc_p_fertility_age_groups)) }),
       .total_births = parse_data<real_type, 1>(data, "total_births", { nda::dim<>(0, opts.proj_steps, 1) }),
       .ctx_effect = parse_data<real_type, 1>(data, "ctx_effect", { nda::dim<>(0, 3, 1) }),
       .hc_art_start = nb::cast<int>(data["hc_art_start"]),
-      .local_adj_factor = nb::cast<real_type>(data["laf"])
+      .local_adj_factor = nb::cast<real_type>(data["frr_scalar"]),
+      .hc_age_specific_fertility_rate = parse_data<real_type, 2>(data, "hc_asfr", { nda::dim<>(0, SS::hc_p_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::hc_p_fertility_age_groups)) })
     };
   };
 
@@ -290,6 +301,7 @@ struct HcAdapter<Language::Py, real_type, ModelVariant> {
     const nb::dict &data
   ) {
     typename Config::State state;
+    fill_initial_state<real_type, typename Config::State::shape_hiv_births_by_mat_age>(data, "hiv_births_by_mat_age", state.hiv_births_by_mat_age);
     fill_initial_state<real_type, typename Config::State::shape_hc1_hiv_pop>(data, "hc1_hiv_pop", state.hc1_hiv_pop);
     fill_initial_state<real_type, typename Config::State::shape_hc2_hiv_pop>(data, "hc2_hiv_pop", state.hc2_hiv_pop);
     fill_initial_state<real_type, typename Config::State::shape_hc1_art_pop>(data, "hc1_art_pop", state.hc1_art_pop);
@@ -303,10 +315,13 @@ struct HcAdapter<Language::Py, real_type, ModelVariant> {
     state.hiv_births = nb::cast<real_type>(data["hiv_births"]);
     state.ctx_need = nb::cast<real_type>(data["ctx_need"]);
     fill_initial_state<real_type, typename Config::State::shape_infection_by_type>(data, "infection_by_type", state.infection_by_type);
+    fill_initial_state<real_type, typename Config::State::shape_mtct_by_source_tr>(data, "mtct_by_source_tr", state.mtct_by_source_tr);
+    fill_initial_state<real_type, typename Config::State::shape_mtct_by_source_women>(data, "mtct_by_source_women", state.mtct_by_source_women);
+    fill_initial_state<real_type, typename Config::State::shape_mtct_by_source_hc_infections>(data, "mtct_by_source_hc_infections", state.mtct_by_source_hc_infections);
     return state;
   };
 
-  static constexpr int output_count = 13;
+  static constexpr int output_count = 17;
 
   static int build_output(
     int index,
@@ -314,6 +329,9 @@ struct HcAdapter<Language::Py, real_type, ModelVariant> {
     nb::dict& ret,
     const size_t& output_years
   ) {
+    const int py_rank_hiv_births_by_mat_age = 2;
+    size_t py_dims_hiv_births_by_mat_age[py_rank_hiv_births_by_mat_age] = { SS::hc_p_fertility_age_groups, output_years };
+    ret["hiv_births_by_mat_age"] = py_array<real_type>(state.hiv_births_by_mat_age.data(), py_rank_hiv_births_by_mat_age, py_dims_hiv_births_by_mat_age);
     const int py_rank_hc1_hiv_pop = 5;
     size_t py_dims_hc1_hiv_pop[py_rank_hc1_hiv_pop] = { SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS, output_years };
     ret["hc1_hiv_pop"] = py_array<real_type>(state.hc1_hiv_pop.data(), py_rank_hc1_hiv_pop, py_dims_hc1_hiv_pop);
@@ -353,6 +371,15 @@ struct HcAdapter<Language::Py, real_type, ModelVariant> {
     const int py_rank_infection_by_type = 4;
     size_t py_dims_infection_by_type[py_rank_infection_by_type] = { SS::hcTT, SS::hc1AG, SS::NS, output_years };
     ret["infection_by_type"] = py_array<real_type>(state.infection_by_type.data(), py_rank_infection_by_type, py_dims_infection_by_type);
+    const int py_rank_mtct_by_source_tr = 3;
+    size_t py_dims_mtct_by_source_tr[py_rank_mtct_by_source_tr] = { SS::mtct_source, SS::hcTT_expanded, output_years };
+    ret["mtct_by_source_tr"] = py_array<real_type>(state.mtct_by_source_tr.data(), py_rank_mtct_by_source_tr, py_dims_mtct_by_source_tr);
+    const int py_rank_mtct_by_source_women = 2;
+    size_t py_dims_mtct_by_source_women[py_rank_mtct_by_source_women] = { SS::mtct_source, output_years };
+    ret["mtct_by_source_women"] = py_array<real_type>(state.mtct_by_source_women.data(), py_rank_mtct_by_source_women, py_dims_mtct_by_source_women);
+    const int py_rank_mtct_by_source_hc_infections = 3;
+    size_t py_dims_mtct_by_source_hc_infections[py_rank_mtct_by_source_hc_infections] = { SS::mtct_source, SS::hcTT_expanded, output_years };
+    ret["mtct_by_source_hc_infections"] = py_array<real_type>(state.mtct_by_source_hc_infections.data(), py_rank_mtct_by_source_hc_infections, py_dims_mtct_by_source_hc_infections);
     return index + output_count;
   };
 
@@ -361,6 +388,9 @@ struct HcAdapter<Language::Py, real_type, ModelVariant> {
     const Config::State& state,
     nb::dict& ret
   ) {
+    const int py_rank_hiv_births_by_mat_age = 1;
+    size_t py_dims_hiv_births_by_mat_age[py_rank_hiv_births_by_mat_age] = { SS::hc_p_fertility_age_groups };
+    ret["hiv_births_by_mat_age"] = py_array<real_type>(state.hiv_births_by_mat_age.data(), py_rank_hiv_births_by_mat_age, py_dims_hiv_births_by_mat_age);
     const int py_rank_hc1_hiv_pop = 4;
     size_t py_dims_hc1_hiv_pop[py_rank_hc1_hiv_pop] = { SS::hc1DS, SS::hcTT, SS::hc1AG, SS::NS };
     ret["hc1_hiv_pop"] = py_array<real_type>(state.hc1_hiv_pop.data(), py_rank_hc1_hiv_pop, py_dims_hc1_hiv_pop);
@@ -396,6 +426,15 @@ struct HcAdapter<Language::Py, real_type, ModelVariant> {
     const int py_rank_infection_by_type = 3;
     size_t py_dims_infection_by_type[py_rank_infection_by_type] = { SS::hcTT, SS::hc1AG, SS::NS };
     ret["infection_by_type"] = py_array<real_type>(state.infection_by_type.data(), py_rank_infection_by_type, py_dims_infection_by_type);
+    const int py_rank_mtct_by_source_tr = 2;
+    size_t py_dims_mtct_by_source_tr[py_rank_mtct_by_source_tr] = { SS::mtct_source, SS::hcTT_expanded };
+    ret["mtct_by_source_tr"] = py_array<real_type>(state.mtct_by_source_tr.data(), py_rank_mtct_by_source_tr, py_dims_mtct_by_source_tr);
+    const int py_rank_mtct_by_source_women = 1;
+    size_t py_dims_mtct_by_source_women[py_rank_mtct_by_source_women] = { SS::mtct_source };
+    ret["mtct_by_source_women"] = py_array<real_type>(state.mtct_by_source_women.data(), py_rank_mtct_by_source_women, py_dims_mtct_by_source_women);
+    const int py_rank_mtct_by_source_hc_infections = 2;
+    size_t py_dims_mtct_by_source_hc_infections[py_rank_mtct_by_source_hc_infections] = { SS::mtct_source, SS::hcTT_expanded };
+    ret["mtct_by_source_hc_infections"] = py_array<real_type>(state.mtct_by_source_hc_infections.data(), py_rank_mtct_by_source_hc_infections, py_dims_mtct_by_source_hc_infections);
     return index + output_count;
   };
 };

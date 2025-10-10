@@ -117,6 +117,7 @@ adjust_spectrum_netmigr <- function(netmigr) {
 #' Prepare leapfrog input parameters from Spectrum PJNZ
 #'
 #' @param pjnz path to PJNZ file
+#' @param use_coarse_age_groups use coarse age groups in the model?
 #'
 #' @return list of demographic and HIV projection input parameters
 #'
@@ -127,11 +128,11 @@ adjust_spectrum_netmigr <- function(netmigr) {
 #' parameters <- prepare_leapfrog_parameters(pjnz)
 #'
 #' @export
-prepare_leapfrog_parameters <- function(pjnz) {
+prepare_leapfrog_parameters <- function(pjnz, use_coarse_age_groups = FALSE) {
   ## TODO: We're reading the PJNZ file several times below, revisit this,
   ## we should only have to read this in once
   dp <- prepare_leapfrog_demp(pjnz)
-  projp <- prepare_leapfrog_projp(pjnz)
+  projp <- prepare_leapfrog_projp(pjnz, use_coarse_age_groups)
   c(dp, projp)
 }
 
@@ -201,7 +202,7 @@ prepare_leapfrog_demp <- function(pjnz) {
 #' projp <- prepare_leapfrog_projp(pjnz)
 #'
 #' @export
-prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
+prepare_leapfrog_projp <- function(pjnz, use_coarse_age_groups = FALSE, hiv_steps_per_year = 10L, hTS = 3) {
 
   projp <- eppasm::read_hivproj_param(pjnz)
 
@@ -215,6 +216,12 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   v$incidinput <- eppasm::read_incid_input(pjnz)
   v$incidpopage <- attr(v$incidinput, "incidpopage")
   v$incrr_sex <- projp$incrr_sex
+
+  pAG_15_to_49 <- 35L
+  pAG_15_plus <- 66L
+
+  v$pAG_INCIDPOP <- ifelse(v$incidpopage == 0L, pAG_15_to_49, pAG_15_plus)
+  v$pIDX_INCIDPOP <- 15L
 
   v$artmx_timerr <- projp$artmx_timerr[c(1, 2, rep(3, hTS - 2)), ]
 
@@ -261,10 +268,21 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   v$hAG_SPAN_coarse <- c(2L, 3L, 5L, 5L, 5L, 5L, 5L, 5L, 31L)
 
   ## Add in pediatric components
+  frr_agecat <- as.integer(rownames(projp$fert_rat))
+  h.fert.idx <- which((15L-1 + cumsum(v$hAG_SPAN_coarse)) %in% 15:49)
+  age_band_width <- length(15:49) / length(frr_agecat)
+  fert_rat.h.ag <- findInterval(15L + cumsum(v$hAG_SPAN_coarse[h.fert.idx]) - v$hAG_SPAN_coarse[h.fert.idx], frr_agecat)
+  hDS <- length(projp$cd4fert_rat)
+
   v$cd4fert_rat <- projp$cd4fert_rat
-  v$frr_art6mos <- projp$frr_art6mos
-  v$frr_scalar <- projp$frr_scalar
-  v$fert_rat <- projp$fert_rat
+  v$frr_art6mos_full <- rep(projp$frr_art6mos, each = age_band_width)
+  v$frr_art6mos_coarse <- array(projp$frr_art6mos[fert_rat.h.ag])
+
+  v$fert_rat_coarse <- array(1, c(length(h.fert.idx), proj_years))
+  v$fert_rat_coarse[,] <- rep(projp$fert_rat[fert_rat.h.ag, as.character(projp$yr_end:projp$yr_start )], length(proj_years))
+  v$fert_rat_full <- apply(projp$fert_rat, 2, rep, each = age_band_width)
+  v$frr_scalar <- as.numeric(projp$frr_scalar)
+
   ## HIV positive entrants, right now just doing those without ART
   v$age15hivpop <- projp$age15hivpop
 
@@ -272,15 +290,17 @@ prepare_leapfrog_projp <- function(pjnz, hiv_steps_per_year = 10L, hTS = 3) {
   v$incrr_age <- apply(projp$incrr_age, 2:3, beers_open_ended)[16:81, , ] ## !! Hard coded
   v$incrr_age[v$incrr_age < 0] <- 0
 
-  v$cd4_initdist_full <- projp$cd4_initdist[ , idx_expand_full, ]
-  v$cd4_prog_full <- (1-exp(-projp$cd4_prog[ , idx_expand_full, ] / hiv_steps_per_year)) * hiv_steps_per_year
-  v$cd4_mort_full <- projp$cd4_mort[ ,idx_expand_full, ]
-  v$art_mort_full <- projp$artmx_multiplier * projp$art_mort[c(1, 2, rep(3, hTS - 2)), , idx_expand_full, ]
-
-  v$cd4_initdist_coarse <- projp$cd4_initdist[ , idx_expand_coarse, ]
-  v$cd4_prog_coarse <- (1-exp(-projp$cd4_prog[ , idx_expand_coarse, ] / hiv_steps_per_year)) * hiv_steps_per_year
-  v$cd4_mort_coarse <- projp$cd4_mort[ ,idx_expand_coarse, ]
-  v$art_mort_coarse <- projp$artmx_multiplier * projp$art_mort[c(1, 2, rep(3, hTS - 2)), , idx_expand_coarse, ]
+  if (use_coarse_age_groups) {
+    v$cd4_initdist <- projp$cd4_initdist[ , idx_expand_coarse, ]
+    v$cd4_prog <- (1-exp(-projp$cd4_prog[ , idx_expand_coarse, ] / hiv_steps_per_year)) * hiv_steps_per_year
+    v$cd4_mort <- projp$cd4_mort[ ,idx_expand_coarse, ]
+    v$art_mort <- projp$artmx_multiplier * projp$art_mort[c(1, 2, rep(3, hTS - 2)), , idx_expand_coarse, ]
+  } else {
+    v$cd4_initdist <- projp$cd4_initdist[ , idx_expand_full, ]
+    v$cd4_prog <- (1-exp(-projp$cd4_prog[ , idx_expand_full, ] / hiv_steps_per_year)) * hiv_steps_per_year
+    v$cd4_mort <- projp$cd4_mort[ ,idx_expand_full, ]
+    v$art_mort <- projp$artmx_multiplier * projp$art_mort[c(1, 2, rep(3, hTS - 2)), , idx_expand_full, ]
+  }
 
   v
 }

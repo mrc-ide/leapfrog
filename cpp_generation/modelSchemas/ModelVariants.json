@@ -31,6 +31,14 @@
     "age10_adult": "false",
     "age105_open": "false"
   },
+  "CoarseChildModel": {
+    "run_demographic_projection": "true",
+    "run_hiv_simulation": "true",
+    "use_coarse_stratification": "true",
+    "run_child_model": "true",
+    "age10_adult": "false",
+    "age105_open": "false"      
+  },
   "GBD": {
     "run_demographic_projection": "true",
     "run_hiv_simulation": "true",

@@ -1,6 +1,5 @@
 test_that("Child model can be run for all years", {
-  parameters <- read_parameters(test_path("testdata/child_parms.h5"))
-
+  parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
   expect_silent(out <- run_model(parameters, "ChildModel", 1970:2030))
 
   expect_setequal(
@@ -9,14 +8,18 @@ test_that("Child model can be run for all years", {
       "p_total_pop", "births", "p_total_pop_background_deaths", "p_hiv_pop",
       "p_hiv_pop_background_deaths", "h_hiv_adult", "h_art_adult",
       "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art",
-      "h_art_initiation", "p_hiv_deaths", "hc1_hiv_pop", "hc2_hiv_pop",
+      "h_art_initiation", "p_hiv_deaths", "p_net_migration_hivpop",
+      "hiv_births_by_mat_age", "hiv_births",
+      "hc1_hiv_pop", "hc2_hiv_pop",
       "hc1_art_pop", "hc2_art_pop",
       "hc1_noart_aids_deaths", "hc2_noart_aids_deaths",
-      "hc1_art_aids_deaths", "hc2_art_aids_deaths", "hiv_births",
-      "hc_art_init", "hc_art_need_init", "ctx_need", "infection_by_type")
+      "hc1_art_aids_deaths", "hc2_art_aids_deaths",
+      "hc_art_init", "hc_art_need_init", "ctx_need", "infection_by_type",
+      "mtct_by_source_tr", "mtct_by_source_women", "mtct_by_source_hc_infections")
   )
 
   ## Nothing should ever be negative
+  expect_true(all(out$hiv_births >= 0))
   expect_true(all(out$hc1_hiv_pop[, , , , ] >= 0))
   expect_true(all(out$hc2_hiv_pop[, , , , ] >= 0))
   expect_true(all(out$hc1_art_pop[, , , , ] >= 0))
@@ -25,8 +28,6 @@ test_that("Child model can be run for all years", {
   expect_true(all(out$hc2_noart_aids_deaths[, , , , ] >= 0))
   expect_true(all(out$hc1_art_aids_deaths[, , , , ] >= 0))
   expect_true(all(out$hc2_art_aids_deaths[, , , , ] >= 0))
-  expect_true(all(out$hiv_births >= 0))
-
   expect_true(all(out$hc1_hiv_pop_strat[, , , , , , ] >= 0))
   expect_true(all(out$hc2_hiv_pop_strat[, , , , , , ] >= 0))
   expect_true(all(out$hc1_art_pop_strat[, , , , , , , ] >= 0))
@@ -35,12 +36,60 @@ test_that("Child model can be run for all years", {
   expect_true(all(out$hc2_noart_aids_deaths_strat[, , , , , , ] >= 0))
   expect_true(all(out$hc1_art_aids_deaths_strat[, , , , , , , ] >= 0))
   expect_true(all(out$hc2_art_aids_deaths_strat[, , , , , , , ] >= 0))
+})
 
+test_that("Coarse child model can be run for all years", {
+  parameters <- read_parameters(test_path("testdata/child_parms_coarse.h5"))
+  parameters$mat_prev_input[] <- as.integer(0)
+  out_coarse <- run_model(parameters, "CoarseChildModel", 1970:2030)
+
+  expect_setequal(
+    names(out_coarse),
+    c(
+      "p_total_pop", "births", "p_total_pop_background_deaths", "p_hiv_pop",
+      "p_hiv_pop_background_deaths", "h_hiv_adult", "h_art_adult",
+      "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art",
+      "h_art_initiation", "p_hiv_deaths", "p_net_migration_hivpop",
+      "hiv_births_by_mat_age", "hiv_births",
+      "hc1_hiv_pop", "hc2_hiv_pop",
+      "hc1_art_pop", "hc2_art_pop",
+      "hc1_noart_aids_deaths", "hc2_noart_aids_deaths",
+      "hc1_art_aids_deaths", "hc2_art_aids_deaths",
+      "hc_art_init", "hc_art_need_init", "ctx_need", "infection_by_type",
+      "mtct_by_source_tr", "mtct_by_source_women", "mtct_by_source_hc_infections")
+  )
+
+  ## Nothing should ever be negative
+  expect_true(all(out_coarse$hiv_births >= 0))
+  expect_true(all(out_coarse$hiv_births_by_mat_age >= 0))
+  expect_true(all(out_coarse$hc1_hiv_pop[, , , , ] >= 0))
+  expect_true(all(out_coarse$hc2_hiv_pop[, , , , ] >= 0))
+  expect_true(all(out_coarse$hc1_art_pop[, , , , ] >= 0))
+  expect_true(all(out_coarse$hc2_art_pop[, , , , ] >= 0))
+  expect_true(all(out_coarse$hc1_noart_aids_deaths[, , , , ] >= 0))
+  expect_true(all(out_coarse$hc2_noart_aids_deaths[, , , , ] >= 0))
+  expect_true(all(out_coarse$hc1_art_aids_deaths[, , , , ] >= 0))
+  expect_true(all(out_coarse$hc2_art_aids_deaths[, , , , ] >= 0))
+  expect_true(all(out_coarse$hc1_hiv_pop_strat[, , , , , , ] >= 0))
+  expect_true(all(out_coarse$hc2_hiv_pop_strat[, , , , , , ] >= 0))
+  expect_true(all(out_coarse$hc1_art_pop_strat[, , , , , , , ] >= 0))
+  expect_true(all(out_coarse$hc2_art_pop_strat[, , , , , , , ] >= 0))
+  expect_true(all(out_coarse$hc1_noart_aids_deaths_strat[, , , , , , ] >= 0))
+  expect_true(all(out_coarse$hc2_noart_aids_deaths_strat[, , , , , , ] >= 0))
+  expect_true(all(out_coarse$hc1_art_aids_deaths_strat[, , , , , , , ] >= 0))
+  expect_true(all(out_coarse$hc2_art_aids_deaths_strat[, , , , , , , ] >= 0))
 })
 
 test_that("Model outputs are consistent", {
-  parameters <- read_parameters(test_path("testdata/child_parms.h5"))
+  parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
   out <- run_model(parameters, "ChildModel", 1970:2030)
+
+  ###############################
+  ##HIV births by maternal age matches total hiv births
+  ###############################
+  if(!all(parameters$mat_prev_input)){
+    expect_true(all(abs(colSums(out$hiv_births_by_mat_age) - out$hiv_births) < 1e-5))
+  }
 
   ###############################
   ##Infections stratified by infection type and population infections should be the same
@@ -48,6 +97,16 @@ test_that("Model outputs are consistent", {
   strat <- apply(out$infection_by_type, c(2,3,4), sum)
   pop <- out$p_infections[1:5,,]
   expect_equal(strat, pop)
+
+  ###############################
+  ##Infections stratified by stacked bar categories should be the same
+  ###############################
+  strat <- apply(out$infection_by_type, c(1,4), sum)
+  stacked_bar <- apply(out$mtct_by_source_hc_infections, c(2,3), sum)
+  #perinatal infections
+  expect_equal(strat[1,], stacked_bar[1,])
+  #bf infections
+  expect_equal(apply(strat[2:4,], 2, 'sum'), apply(out$mtct_by_source_hc_infections[,2:5,], 3, 'sum'))
 
   ###############################
   ##Stratified deaths and population deaths should be the same
@@ -122,7 +181,7 @@ test_that("Model outputs are consistent", {
 
 test_that("Female 15-49y pop aligns", {
   testthat::skip("Skipping this test because the adult populations currently do not align")
-  parameters <- read_parameters(test_path("testdata/child_parms.h5"))
+  parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
   utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
   dp <- utils$dp
@@ -149,7 +208,7 @@ test_that("Female 15-49y pop aligns", {
 })
 
 test_that("Mothers that need ptmct align", {
-  parameters <- read_parameters(test_path("testdata/child_parms.h5"))
+  parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
   utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
   dp <- utils$dp
@@ -168,7 +227,7 @@ test_that("Mothers that need ptmct align", {
 })
 
 test_that("Children in need of cotrim aligns", {
-  parameters <- read_parameters(test_path("testdata/child_parms.h5"))
+  parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
   utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
   out <- run_model(parameters, "ChildModel", 1970:2030)
@@ -184,13 +243,14 @@ test_that("Children in need of cotrim aligns", {
 })
 
 test_that("Infections among children align", {
-  parameters <- read_parameters(test_path("testdata/child_parms.h5"))
+  parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
   utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
   dp <- utils$dp
   pjnz <- utils$pjnz
 
   out <- run_model(parameters, "ChildModel", 1970:2030)
+  system.time(out <- run_model(parameters, "ChildModel", 1970:2030))
   inf_spec <- SpectrumUtils::dp.output.incident.hiv(dp.raw = dp)
   inf_spec <- inf_spec %>%
     dplyr::filter(Sex != "Male+Female") %>%
@@ -219,7 +279,7 @@ test_that("Infections among children align", {
 })
 
 test_that("CLHIV align", {
-  parameters <- read_parameters(test_path("testdata/child_parms.h5"))
+  parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
   utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
   dp <- utils$dp
@@ -270,7 +330,7 @@ test_that("CLHIV align", {
 })
 
 test_that("CLHIV on ART align", {
-  parameters <- read_parameters(test_path("testdata/child_parms.h5"))
+  parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
   utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
   dp <- utils$dp
@@ -320,7 +380,7 @@ test_that("CLHIV on ART align", {
 })
 
 test_that("HIV related deaths among CLHIV not on ART align", {
-  parameters <- read_parameters(test_path("testdata/child_parms.h5"))
+  parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
   utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
   dp <- utils$dp
@@ -351,7 +411,7 @@ test_that("HIV related deaths among CLHIV not on ART align", {
 })
 
 test_that("HIV related deaths among CLHIV on ART align", {
-  parameters <- read_parameters(test_path("testdata/child_parms.h5"))
+  parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
   utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
   dp <- utils$dp
@@ -383,7 +443,7 @@ test_that("HIV related deaths among CLHIV on ART align", {
 })
 
 test_that("Child model agrees when run through all years vs two parts vs single year runs", {
-  parameters <- read_parameters(test_path("testdata/child_parms.h5"))
+  parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
 
   # All years
   out_all_years <- run_model(parameters, "ChildModel", 1970:2030)
@@ -403,7 +463,7 @@ test_that("Child model agrees when run through all years vs two parts vs single 
 })
 
 test_that("error thrown if trying to output from years before simulation start year", {
-  parameters <- read_parameters(test_path("testdata/child_parms.h5"))
+  parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
 
   out_first_half_years <- run_model(parameters, "ChildModel", 1970:2000)
   expect_error(
@@ -412,3 +472,4 @@ test_that("error thrown if trying to output from years before simulation start y
     fixed = TRUE
   )
 })
+

@@ -7,14 +7,14 @@ def assert_equal(obj1, obj2):
 
 
 def test_adult_model_full_strat():
-    parameters = read_h5_file("../r-package/tests/testthat/testdata/adult_parms.h5")
+    parameters = read_h5_file("../r-package/tests/testthat/testdata/adult_parms_full.h5")
     ret = run_model(parameters)
     returned_vars = list(ret.keys())
     expected_vars = [
         "p_total_pop", "births", "p_total_pop_background_deaths", "p_hiv_pop",
         "p_hiv_pop_background_deaths", "h_hiv_adult", "h_art_adult",
         "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art",
-        "h_art_initiation", "p_hiv_deaths"
+        "h_art_initiation", "p_hiv_deaths", "p_net_migration_hivpop"
     ]
     returned_vars.sort()
     expected_vars.sort()
@@ -22,18 +22,21 @@ def test_adult_model_full_strat():
 
 
 def test_child_model():
-    parameters = read_h5_file("../r-package/tests/testthat/testdata/child_parms.h5")
+    parameters = read_h5_file("../r-package/tests/testthat/testdata/child_parms_full.h5")
     ret = run_model(parameters, "ChildModel")
     returned_vars = list(ret.keys())
     expected_vars = [
         "p_total_pop", "births", "p_total_pop_background_deaths", "p_hiv_pop",
         "p_hiv_pop_background_deaths", "h_hiv_adult", "h_art_adult",
         "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art",
-        "h_art_initiation", "p_hiv_deaths", "hc1_hiv_pop", "hc2_hiv_pop",
+        "h_art_initiation", "p_hiv_deaths", "p_net_migration_hivpop",
+        "hiv_births", "hiv_births_by_mat_age",
+        "hc1_hiv_pop", "hc2_hiv_pop",
         "hc1_art_pop", "hc2_art_pop",
         "hc1_noart_aids_deaths", "hc2_noart_aids_deaths",
-        "hc1_art_aids_deaths", "hc2_art_aids_deaths", "hiv_births",
-        "hc_art_init", "hc_art_need_init", "ctx_need", "infection_by_type"
+        "hc1_art_aids_deaths", "hc2_art_aids_deaths",
+        "hc_art_init", "hc_art_need_init", "ctx_need", "infection_by_type",
+        "mtct_by_source_tr", "mtct_by_source_women", "mtct_by_source_hc_infections"
     ]
     returned_vars.sort()
     expected_vars.sort()
@@ -41,14 +44,14 @@ def test_child_model():
 
 
 def test_child_model_running_twice_gives_same_result():
-    parameters = read_h5_file("../r-package/tests/testthat/testdata/child_parms.h5")
+    parameters = read_h5_file("../r-package/tests/testthat/testdata/child_parms_full.h5")
     ret1 = run_model(parameters, "ChildModel")
     ret2 = run_model(parameters, "ChildModel")
     assert_equal(ret1, ret2)
 
 
 def test_child_model_agrees_on_all_years_two_parts_single_year_runs():
-    parameters = read_h5_file("../r-package/tests/testthat/testdata/child_parms.h5")
+    parameters = read_h5_file("../r-package/tests/testthat/testdata/child_parms_full.h5")
     ret_all_years = run_model(parameters, "ChildModel")
 
     ret_first_half = run_model(parameters, "ChildModel", range(1970, 2001))

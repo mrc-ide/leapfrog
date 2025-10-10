@@ -24,7 +24,7 @@ if __name__ == '__main__':
         os.mkdir(output_dir)
 
 
-    parameters = read_h5_file("../r-package/tests/testthat/testdata/adult_parms.h5")
+    parameters = read_h5_file("../r-package/tests/testthat/testdata/adult_parms_full.h5")
     ret = run_model(parameters)
 
     save_h5_file(ret, os.path.join(output_dir, "py-output.h5"))

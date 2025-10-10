@@ -36,6 +36,7 @@ struct HivDemographicProjection<Config> {
   static constexpr int PROJPERIOD_MIDYEAR = SS::PROJPERIOD_MIDYEAR;
   static constexpr int p_idx_hiv_first_adult = SS::p_idx_hiv_first_adult;
 
+
   // function args
   int t;
   const Pars& pars;
@@ -56,14 +57,19 @@ struct HivDemographicProjection<Config> {
   {};
 
   void run_hiv_pop_demographic_projection() {
-    run_hiv_ageing_and_mortality();
+    auto& n_ha = state_next.ha;
+    auto& c_ha = state_curr.ha;
 
+    run_hiv_ageing_and_mortality();
     if constexpr (ModelVariant::run_child_model) {
       run_age_15_entrants();
     }
-
     run_hiv_and_art_stratified_ageing();
     run_hiv_and_art_stratified_deaths_and_migration();
+    if constexpr (ModelVariant::run_child_model) {
+      run_hc_hiv_and_art_stratified_deaths_and_migration();
+    }
+
   };
 
   void run_hiv_pop_end_year_migration() {
@@ -74,8 +80,8 @@ struct HivDemographicProjection<Config> {
     // remove net migration from hiv stratified population
     for (int g = 0; g < NS; ++g) {
       for (int a = 0; a < pAG; ++a) {
-        i_ha.hiv_net_migration(a, g) = n_ha.p_hiv_pop(a, g) * i_dp.migration_rate(a, g);
-        n_ha.p_hiv_pop(a, g) += i_ha.hiv_net_migration(a, g);
+        n_ha.p_net_migration_hivpop(a, g) = n_ha.p_hiv_pop(a, g) * i_dp.migration_rate(a, g);
+        n_ha.p_hiv_pop(a, g) += n_ha.p_net_migration_hivpop(a, g);
       }
     }
 
@@ -87,7 +93,7 @@ struct HivDemographicProjection<Config> {
         real_type hivpop_ha_postmig = 0.0;
         for (int i = 0; i < hAG_span[ha]; ++i, ++a) {
           hivpop_ha_postmig += n_ha.p_hiv_pop(a, g);
-          migration_num_ha += i_ha.hiv_net_migration(a, g);
+          migration_num_ha += n_ha.p_net_migration_hivpop(a, g);
         }
 
         real_type migration_rate = 0.0;
@@ -105,6 +111,61 @@ struct HivDemographicProjection<Config> {
         }
       }
     }
+  };
+
+  void run_hc_hiv_pop_end_year_migration() {
+    static_assert(ModelVariant::run_child_model,
+                  "run_age_15_entrants can only be called for model variants where run_child_model is true");
+    static constexpr int hc2_agestart = SS::hc2_agestart;
+    static constexpr int hcAG_end = SS::hcAG_end;
+    static constexpr int hc1DS = SS::hc1DS;
+    static constexpr int hc2DS = SS::hc2DS;
+    static constexpr int hTS = SS::hTS;
+    static constexpr int hcTT = SS::hcTT;
+
+    auto& n_ha = state_next.ha;
+    auto& n_hc = state_next.hc;
+    auto& i_ha = intermediate.ha;
+    auto& i_dp = intermediate.dp;
+    const auto& p_hc = pars.hc;
+
+    for (int s = 0; s < NS; ++s) {
+      for (int a = 0; a < hcAG_end; ++a) {
+        real_type hc_migration_num = 0.0;
+        real_type hc_hivpop_postmig = n_ha.p_hiv_pop(a, s);
+        hc_migration_num = n_ha.p_net_migration_hivpop(a, s);
+
+        real_type migration_rate = 0.0;
+        if (hc_hivpop_postmig > 0.0) {
+          migration_rate = hc_migration_num / (hc_hivpop_postmig - hc_migration_num);
+        }
+
+        if (a < hc2_agestart) {
+          for (int hd = 0; hd < hc1DS; ++hd) {
+            for (int cat = 0; cat < hcTT; ++cat) {
+              n_hc.hc1_hiv_pop(hd, cat, a, s) *= 1.0 + migration_rate;
+            }
+            if (t >= p_hc.hc_art_start) {
+              for (int dur = 0; dur < hTS; ++dur) {
+                n_hc.hc1_art_pop(dur, hd, a, s) *= 1.0 + migration_rate;
+              }
+            }
+          }
+        } else {
+          for (int hd = 0; hd < hc2DS; ++hd) {
+            for (int cat = 0; cat < hcTT; ++cat) {
+              n_hc.hc2_hiv_pop(hd, cat, a - hc2_agestart, s) *= 1.0 + migration_rate;
+            }
+            if (t >= p_hc.hc_art_start) {
+              for (int dur = 0; dur < hTS; ++dur) {
+                n_hc.hc2_art_pop(dur, hd, a - hc2_agestart, s) *= 1.0 + migration_rate;
+              }
+            }
+          }
+        }
+      }
+    }
+
   };
 
   // private methods that we don't want people to call
@@ -178,6 +239,7 @@ struct HivDemographicProjection<Config> {
     }
 
 
+
     for (int g = 0; g < NS; ++g) {
       for (int ha = 1; ha < hAG; ++ha) {
         for (int hm = 0; hm < hDS; ++hm) {
@@ -201,10 +263,18 @@ struct HivDemographicProjection<Config> {
       for (int g = 0; g < NS; ++g) {
         for (int hm = 0; hm < hDS; ++hm) {
           for (int hm_adol = 0; hm_adol < hc2DS; ++hm_adol){
-            n_ha.h_hiv_adult(hm, 0, g) += i_hc.age15_hiv_pop(hm_adol, g) * adult_cd4_dist[hm][hm_adol];
+            if(i_hc.age15_hiv_pop(hm_adol, g) > 0){
+              n_ha.h_hiv_adult(hm, 0, g) += i_hc.age15_hiv_pop(hm_adol, g) * adult_cd4_dist[hm][hm_adol];
+            }else{
+              n_ha.h_hiv_adult(hm, 0, g) = (1.0 - i_ha.hiv_age_up_prob(0, g)) * c_ha.h_hiv_adult(hm, 0, g);
+            }
             if ((t > opts.ts_art_start)) {
               for (int hu = 0; hu < hTS; ++hu) {
-                n_ha.h_art_adult(hu,hm, 0, g) += i_hc.age15_art_pop(hu, hm_adol, g) * adult_cd4_dist[hm][hm_adol];
+                if(i_hc.age15_art_pop(hu, hm_adol, g) > 0){
+                  n_ha.h_art_adult(hu,hm, 0, g) += i_hc.age15_art_pop(hu, hm_adol, g) * adult_cd4_dist[hm][hm_adol];
+                }else{
+                  n_ha.h_art_adult(hu, hm, 0, g) = (1.0 - i_ha.hiv_age_up_prob(0, g)) * c_ha.h_art_adult(hu, hm, 0, g);
+                }
               }
             }
           }
@@ -243,8 +313,8 @@ struct HivDemographicProjection<Config> {
       for (int a = 1; a < pAG; ++a) {
         n_ha.p_hiv_pop(a, g) -= n_ha.p_hiv_pop_background_deaths(a, g);
         if (opts.proj_period_int == PROJPERIOD_MIDYEAR) {
-          i_ha.hiv_net_migration(a, g) = n_ha.p_hiv_pop(a, g) * i_dp.migration_rate(a, g);
-          n_ha.p_hiv_pop(a, g) += i_ha.hiv_net_migration(a, g);
+          n_ha.p_net_migration_hivpop(a, g) = n_ha.p_hiv_pop(a, g) * i_dp.migration_rate(a, g);
+          n_ha.p_hiv_pop(a, g) += n_ha.p_net_migration_hivpop(a, g);
         }
       }
     }
@@ -257,7 +327,7 @@ struct HivDemographicProjection<Config> {
         for (int i = 0; i < hAG_span[ha]; ++i, ++a) {
           deaths_migrate -= n_ha.p_hiv_pop_background_deaths(a, g);
           if (opts.proj_period_int == PROJPERIOD_MIDYEAR) {
-            deaths_migrate += i_ha.hiv_net_migration(a, g);
+            deaths_migrate += n_ha.p_net_migration_hivpop(a, g);
           }
         }
 
@@ -277,7 +347,59 @@ struct HivDemographicProjection<Config> {
       }
     }
   };
-};
 
+  void run_hc_hiv_and_art_stratified_deaths_and_migration() {
+    static constexpr int hc2_agestart = SS::hc2_agestart;
+    static constexpr int hcAG_end = SS::hcAG_end;
+    static constexpr int hc1DS = SS::hc1DS;
+    static constexpr int hc2DS = SS::hc2DS;
+    static constexpr int hTS = SS::hTS;
+    static constexpr int hcTT = SS::hcTT;
+
+    auto& n_ha = state_next.ha;
+    auto& n_hc = state_next.hc;
+    auto& i_ha = intermediate.ha;
+    auto& i_dp = intermediate.dp;
+    const auto& p_hc = pars.hc;
+
+    real_type deaths_migrate = 0.0;
+    for (int s = 0; s < NS; ++s) {
+      for (int a = 0; a < hcAG_end; ++a) {
+        deaths_migrate -= n_ha.p_hiv_pop_background_deaths(a, s);
+        if (opts.proj_period_int == PROJPERIOD_MIDYEAR) {
+          deaths_migrate += n_ha.p_net_migration_hivpop(a, s);
+        }
+        if(n_ha.p_hiv_pop(a, s) > 0){
+          deaths_migrate /= n_ha.p_hiv_pop(a, s);
+        }
+        if (a < hc2_agestart) {
+          for (int hd = 0; hd < hc1DS; ++hd) {
+            for (int cat = 0; cat < hcTT; ++cat) {
+              n_hc.hc1_hiv_pop(hd, cat, a, s) *= 1.0 + deaths_migrate;
+            }
+            if (t > p_hc.hc_art_start) {
+              for (int dur = 0; dur < hTS; ++dur) {
+                n_hc.hc1_art_pop(dur, hd, a, s) *= 1.0 + deaths_migrate;
+              }
+            }
+          }
+          } else {
+            for (int hd = 0; hd < hc2DS; ++hd) {
+              for (int cat = 0; cat < hcTT; ++cat) {
+                n_hc.hc2_hiv_pop(hd, cat, a - hc2_agestart, s) *= 1.0 + deaths_migrate;
+              }
+              if (t > p_hc.hc_art_start) {
+                for (int dur = 0; dur < hTS; ++dur) {
+                  n_hc.hc2_art_pop(dur, hd, a - hc2_agestart, s) *= 1.0 + deaths_migrate;
+                }
+              }
+            }
+          }
+
+      }
+    }
+  };
+
+};
 }
 }

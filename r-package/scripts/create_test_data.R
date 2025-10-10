@@ -5,38 +5,60 @@
 ## and HIV parameters for both the adult and the child model.
 ## We also run leapfrog and save out the result for use in reference tests
 
+devtools::load_all()
+
 # nolint start
-library(frogger)
 library(dplyr)
 
 ## Create demographic and projection parameters for adults
-pjnz_adult <- system.file("pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ", package = "frogger", mustWork = TRUE)
+pjnz_adult <- file.path(here::here(), "inst", "pjnz", "bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ")
 
 demp <- prepare_leapfrog_demp(pjnz_adult)
+
 proj <- prepare_leapfrog_projp(pjnz_adult)
 parameters <- c(demp, proj)
+save_parameters(parameters, testthat::test_path("testdata/adult_parms_full.h5"))
 
-save_parameters(parameters, testthat::test_path("testdata/adult_parms.h5"))
+proj_coarse <- prepare_leapfrog_projp(pjnz_adult, use_coarse_age_groups = TRUE)
+parameters_coarse <- c(demp, proj_coarse)
+save_parameters(parameters_coarse, testthat::test_path("testdata/adult_parms_coarse.h5"))
 
+# temporary backwards compatibility for leapfrog
+leapfrog_proj <- proj
+leapfrog_proj$cd4_initdist_full <- proj$cd4_initdist
+leapfrog_proj$cd4_prog_full <- proj$cd4_prog
+leapfrog_proj$cd4_mort_full <- proj$cd4_mort
+leapfrog_proj$art_mort_full <- proj$art_mort
+
+leapfrog_proj_coarse <- proj_coarse
+leapfrog_proj_coarse$cd4_initdist_coarse <- proj_coarse$cd4_initdist
+leapfrog_proj_coarse$cd4_prog_coarse <- proj_coarse$cd4_prog
+leapfrog_proj_coarse$cd4_mort_coarse <- proj_coarse$cd4_mort
+leapfrog_proj_coarse$art_mort_coarse <- proj_coarse$art_mort
 # Used as reference data (Run from leapfrog/master)
-lmod <- leapfrog::leapfrogR(demp, proj)
-frogger:::save_hdf5_file(lmod, testthat::test_path("testdata/leapfrog_fit.h5"))
+lmod <- leapfrog::leapfrogR(demp, leapfrog_proj)
+save_hdf5_file(lmod, testthat::test_path("testdata/leapfrog_fit_full.h5"))
 
-lmod <- leapfrog::leapfrogR(demp, proj, hiv_strat = "coarse")
-frogger:::save_hdf5_file(lmod, testthat::test_path("testdata/leapfrog_fit_coarse.h5"))
+lmod <- leapfrog::leapfrogR(demp, leapfrog_proj_coarse, hiv_strat = "coarse")
+save_hdf5_file(lmod, testthat::test_path("testdata/leapfrog_fit_coarse.h5"))
 
-lmod <- leapfrog::leapfrogR(demp, proj, hiv_steps_per_year = 0L)
-frogger:::save_hdf5_file(lmod, testthat::test_path("testdata/fit_demography.h5"))
+lmod <- leapfrog::leapfrogR(demp, leapfrog_proj, hiv_steps_per_year = 0L)
+save_hdf5_file(lmod, testthat::test_path("testdata/fit_demography.h5"))
 
 #Create paeds parameters
-pjnz_child <- testthat::test_path("testdata/bwa_aim-no-special-elig-numpmtct.PJNZ")
+pjnz_child <- file.path(here::here(), "inst", "pjnz", "bwa_aim-no-special-elig-numpmtct.PJNZ")
 
 demp <- prepare_leapfrog_demp(pjnz_child)
-proj <- prepare_leapfrog_projp(pjnz_child)
-proj <- prepare_hc_leapfrog_projp(pjnz_child, proj)
-
 demp$netmigr <- leapfrog:::read_netmigr(pjnz_child, adjust_u5mig = FALSE)
 demp$netmigr_adj <- leapfrog:::adjust_spectrum_netmigr(demp$netmigr)
+
+proj_coarse <- prepare_leapfrog_projp(pjnz_child, use_coarse_age_groups = TRUE)
+parameters_coarse <- c(demp, proj_coarse)
+parameters_coarse <- prepare_hc_leapfrog_projp(pjnz_child,  params = parameters_coarse, use_coarse_age_groups = TRUE)
+
+proj <- prepare_leapfrog_projp(pjnz_child, use_coarse_age_groups = FALSE)
+parameters <- c(proj, demp)
+parameters <- prepare_hc_leapfrog_projp(pjnz_child, params = parameters, use_coarse_age_groups = FALSE)
 
 dpfile <- grep(".DP$", utils::unzip(pjnz_child, list=TRUE)$Name, value=TRUE)
 dp <- utils::read.csv(unz(pjnz_child, dpfile), as.is=TRUE)
@@ -48,9 +70,9 @@ yr_end <- as.integer(dpsub(dp, "<FinalYear MV2>",2,4))
 proj.years <- yr_start:yr_end
 timedat.idx <- 4+1:length(proj.years)-1
 
-pop1 = paste0(getwd(), '/', gsub(x = pjnz_child, pattern = '.PJNZ', replacement = '.xlsx'))
+pop1 <- gsub(pattern = '.PJNZ', replacement = '_pop1.xlsx', x = pjnz_child)
 
-spectrum_output <- function(file = "../testdata/spectrum/v6.13/bwa_aim-no-special-elig-numpmtct.xlsx", ages = 0:14, country = 'Botswana', years_in = 1970:2030){
+spectrum_output <- function(file, ages = 0:14, country = 'Botswana', years_in = 1970:2030){
   ##pull out stratified population from the .xlsx file, This function doesn't take out the paediatric output, so going to just compare to the Spectrum software itself
   df <- file
   # if(grepl(pattern = 'testdata', file)){
@@ -121,8 +143,9 @@ out <- list(dp = dp,
             deaths_art = aids_deathsart,
             ctx_need = as.numeric(unlist(spec_ctx_need)))
 
-parameters <- c(proj, demp)
-save_parameters(parameters, testthat::test_path("testdata/child_parms.h5"))
+save_parameters(parameters, testthat::test_path("testdata/child_parms_full.h5"))
+save_parameters(parameters_coarse, testthat::test_path("testdata/child_parms_coarse.h5"))
+
 # need this for child model tests
 saveRDS(out, testthat::test_path("testdata/child_test_utils.rds"))
 
