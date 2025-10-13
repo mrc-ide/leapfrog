@@ -269,10 +269,11 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
     fill_initial_state<real_type, typename Config::State::shape_mtct_by_source_tr>(state.hc->mtct_by_source_tr, state.hc->mtct_by_source_tr_length, "mtct_by_source_tr", initial_state.mtct_by_source_tr);
     fill_initial_state<real_type, typename Config::State::shape_mtct_by_source_women>(state.hc->mtct_by_source_women, state.hc->mtct_by_source_women_length, "mtct_by_source_women", initial_state.mtct_by_source_women);
     fill_initial_state<real_type, typename Config::State::shape_mtct_by_source_hc_infections>(state.hc->mtct_by_source_hc_infections, state.hc->mtct_by_source_hc_infections_length, "mtct_by_source_hc_infections", initial_state.mtct_by_source_hc_infections);
+    fill_initial_state<real_type, typename Config::State::shape_pmtct_coverage_at_delivery>(state.hc->pmtct_coverage_at_delivery, state.hc->pmtct_coverage_at_delivery_length, "pmtct_coverage_at_delivery", initial_state.pmtct_coverage_at_delivery);
     return initial_state;
   };
 
-  static constexpr int output_count = 17;
+  static constexpr int output_count = 18;
 
   static int build_output(
     int index,
@@ -296,6 +297,7 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
     write_data<real_type, typename Config::OutputState::shape_mtct_by_source_tr>(state.mtct_by_source_tr, out.hc->mtct_by_source_tr, out.hc->mtct_by_source_tr_length, "mtct_by_source_tr");
     write_data<real_type, typename Config::OutputState::shape_mtct_by_source_women>(state.mtct_by_source_women, out.hc->mtct_by_source_women, out.hc->mtct_by_source_women_length, "mtct_by_source_women");
     write_data<real_type, typename Config::OutputState::shape_mtct_by_source_hc_infections>(state.mtct_by_source_hc_infections, out.hc->mtct_by_source_hc_infections, out.hc->mtct_by_source_hc_infections_length, "mtct_by_source_hc_infections");
+    write_data<real_type, typename Config::OutputState::shape_pmtct_coverage_at_delivery>(state.pmtct_coverage_at_delivery, out.hc->pmtct_coverage_at_delivery, out.hc->pmtct_coverage_at_delivery_length, "pmtct_coverage_at_delivery");
     return index + output_count;
   };
 
@@ -321,6 +323,7 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
     write_data<real_type, typename Config::State::shape_mtct_by_source_tr>(state.mtct_by_source_tr, out.hc->mtct_by_source_tr, out.hc->mtct_by_source_tr_length, "mtct_by_source_tr");
     write_data<real_type, typename Config::State::shape_mtct_by_source_women>(state.mtct_by_source_women, out.hc->mtct_by_source_women, out.hc->mtct_by_source_women_length, "mtct_by_source_women");
     write_data<real_type, typename Config::State::shape_mtct_by_source_hc_infections>(state.mtct_by_source_hc_infections, out.hc->mtct_by_source_hc_infections, out.hc->mtct_by_source_hc_infections_length, "mtct_by_source_hc_infections");
+    write_data<real_type, typename Config::State::shape_pmtct_coverage_at_delivery>(state.pmtct_coverage_at_delivery, out.hc->pmtct_coverage_at_delivery, out.hc->pmtct_coverage_at_delivery_length, "pmtct_coverage_at_delivery");
     return index + output_count;
   };
 };

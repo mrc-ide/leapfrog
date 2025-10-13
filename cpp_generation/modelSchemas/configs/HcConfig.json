@@ -612,6 +612,10 @@
     "mtct_by_source_hc_infections": {
       "num_type": "real_type",
       "dims": ["SS::mtct_source", "SS::hcTT_expanded"]
+    },
+    "pmtct_coverage_at_delivery": {
+      "num_type": "real_type",
+      "dims": ["SS::hPS"]
     }
   }
 }

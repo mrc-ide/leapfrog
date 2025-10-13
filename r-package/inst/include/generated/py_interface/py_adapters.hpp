@@ -318,10 +318,11 @@ struct HcAdapter<Language::Py, real_type, ModelVariant> {
     fill_initial_state<real_type, typename Config::State::shape_mtct_by_source_tr>(data, "mtct_by_source_tr", state.mtct_by_source_tr);
     fill_initial_state<real_type, typename Config::State::shape_mtct_by_source_women>(data, "mtct_by_source_women", state.mtct_by_source_women);
     fill_initial_state<real_type, typename Config::State::shape_mtct_by_source_hc_infections>(data, "mtct_by_source_hc_infections", state.mtct_by_source_hc_infections);
+    fill_initial_state<real_type, typename Config::State::shape_pmtct_coverage_at_delivery>(data, "pmtct_coverage_at_delivery", state.pmtct_coverage_at_delivery);
     return state;
   };
 
-  static constexpr int output_count = 17;
+  static constexpr int output_count = 18;
 
   static int build_output(
     int index,
@@ -380,6 +381,9 @@ struct HcAdapter<Language::Py, real_type, ModelVariant> {
     const int py_rank_mtct_by_source_hc_infections = 3;
     size_t py_dims_mtct_by_source_hc_infections[py_rank_mtct_by_source_hc_infections] = { SS::mtct_source, SS::hcTT_expanded, output_years };
     ret["mtct_by_source_hc_infections"] = py_array<real_type>(state.mtct_by_source_hc_infections.data(), py_rank_mtct_by_source_hc_infections, py_dims_mtct_by_source_hc_infections);
+    const int py_rank_pmtct_coverage_at_delivery = 2;
+    size_t py_dims_pmtct_coverage_at_delivery[py_rank_pmtct_coverage_at_delivery] = { SS::hPS, output_years };
+    ret["pmtct_coverage_at_delivery"] = py_array<real_type>(state.pmtct_coverage_at_delivery.data(), py_rank_pmtct_coverage_at_delivery, py_dims_pmtct_coverage_at_delivery);
     return index + output_count;
   };
 
@@ -435,6 +439,9 @@ struct HcAdapter<Language::Py, real_type, ModelVariant> {
     const int py_rank_mtct_by_source_hc_infections = 2;
     size_t py_dims_mtct_by_source_hc_infections[py_rank_mtct_by_source_hc_infections] = { SS::mtct_source, SS::hcTT_expanded };
     ret["mtct_by_source_hc_infections"] = py_array<real_type>(state.mtct_by_source_hc_infections.data(), py_rank_mtct_by_source_hc_infections, py_dims_mtct_by_source_hc_infections);
+    const int py_rank_pmtct_coverage_at_delivery = 1;
+    size_t py_dims_pmtct_coverage_at_delivery[py_rank_pmtct_coverage_at_delivery] = { SS::hPS };
+    ret["pmtct_coverage_at_delivery"] = py_array<real_type>(state.pmtct_coverage_at_delivery.data(), py_rank_pmtct_coverage_at_delivery, py_dims_pmtct_coverage_at_delivery);
     return index + output_count;
   };
 };

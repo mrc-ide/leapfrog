@@ -1,6 +1,6 @@
 Package: frogger
 Title: Multistate Population Projection Model for Demographic and HIV Estimation
-Version: 0.1.4
+Version: 0.1.5
 Authors@R: c(
     person(given = "Jeffrey",
            family = "Imai-Eaton",
