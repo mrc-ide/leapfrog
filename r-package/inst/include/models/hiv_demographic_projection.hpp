@@ -207,14 +207,14 @@ struct HivDemographicProjection<Config> {
 	  for (int htm = 0; htm < hcTT; ++htm) {
 	    age15_hivpop_hm_adol += c_hc.hc2_hiv_pop(hm_adol, htm, (hc2AG - 1), g);
 	  }
-	  i_hc.age15_hiv_pop(hm, g) += age15_hivpop_hm_adol * SS::adult_cd4_dist[hm][hm_adol];
+	  i_hc.age15_hiv_pop(hm, g) += age15_hivpop_hm_adol * SS::hc2_to_ha_cd4_transition[hm][hm_adol];
 	}
 
 	if (t > opts.ts_art_start) {
 	  for (int hu = 0; hu < hTS; ++hu) {
 	    i_hc.age15_art_pop(hu, hm, g) = 0.0;
 	      for (int hm_adol = 0; hm_adol < hc2DS; ++hm_adol) {
-		i_hc.age15_art_pop(hu, hm, g) += c_hc.hc2_art_pop(hu, hm_adol, (hc2AG - 1), g)  * SS::adult_cd4_dist[hm][hm_adol];
+		i_hc.age15_art_pop(hu, hm, g) += c_hc.hc2_art_pop(hu, hm_adol, (hc2AG - 1), g)  * SS::hc2_to_ha_cd4_transition[hm][hm_adol];
 	      }
 	  }
 	}

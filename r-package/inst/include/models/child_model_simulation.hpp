@@ -53,7 +53,7 @@ struct ChildModelSimulation<Config> {
   static constexpr int p_idx_hiv_first_adult = SS::p_idx_hiv_first_adult;
   static constexpr auto hc_age_coarse = SS::hc_age_coarse;
   static constexpr auto hc_age_coarse_cd4 = SS::hc_age_coarse_cd4;
-  static constexpr auto hc_cd4_transition = SS::hc_cd4_transition;
+  static constexpr auto hc1_to_hc2_cd4_transition = SS::hc1_to_hc2_cd4_transition;
   static constexpr auto mtct_source = SS::mtct_source;
   static constexpr auto hVT = SS::hVT;
   static constexpr auto hVT_dropout = SS::hVT_dropout;
@@ -199,12 +199,12 @@ struct ChildModelSimulation<Config> {
           for (int cat = 0; cat < hcTT; ++cat) {
             n_hc.hc2_hiv_pop(hd_alt, cat, 0, s) += c_hc.hc1_hiv_pop(hd, cat, (hc2_agestart-1), s) *
                                                    p_dp.survival_probability(hc2_agestart, s, t) *
-                                                   hc_cd4_transition[hd_alt][hd];
+                                                   hc1_to_hc2_cd4_transition[hd_alt][hd];
           }
           for (int dur = 0; dur < hTS; ++dur) {
             n_hc.hc2_art_pop(dur, hd_alt, 0, s) += c_hc.hc1_art_pop(dur, hd, (hc2_agestart-1), s) *
                                                    p_dp.survival_probability(hc2_agestart, s, t) *
-                                                   hc_cd4_transition[hd_alt][hd];
+                                                   hc1_to_hc2_cd4_transition[hd_alt][hd];
           }
         }
       }
