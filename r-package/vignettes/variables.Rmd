@@ -251,7 +251,7 @@ In 5 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 | hivpop_ha(ha)             | hivpop_ha                       | HIV population by coarse HIV age group stratification                     |
 | hivqx_ha                  |                                 |                                                                           |
 | hivdeaths_a               |                                 |                                                                           |
-| age15_hivpop              | age15_hiv_pop                   | 15 year olds aging out of the paediatric population                       |
+| age15_hivpop              | age15_hiv_pop                   | 15 year olds aging into the adult population                              |
 | deaths_paeds              | hc_posthivmort                  | PLHIV 0-14y stratified by age, sex, transmission type, and CD4 after HIV related mortality |
 | grad_paeds                | hc_grad                         | Difference in PLHIV 0-14 stratified by age, sex, transmission type, and CD4 between the current and next timestep      |
 |                           | eligible                        | Children eligilbe for ART by CD4, age, and sex. Summed hc_art_need_init by transmission category.|

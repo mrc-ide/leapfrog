@@ -326,7 +326,7 @@
   "intermediate": {
     "age15_hiv_pop": {
       "num_type": "real_type",
-      "dims": ["SS::hc2DS", "SS::NS"]
+      "dims": ["SS::hDS", "SS::NS"]
     },
     "age15_art_pop": {
       "num_type": "real_type",

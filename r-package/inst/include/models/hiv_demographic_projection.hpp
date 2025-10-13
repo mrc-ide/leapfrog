@@ -200,21 +200,29 @@ struct HivDemographicProjection<Config> {
     auto& i_hc = intermediate.hc;
 
     for (int g = 0; g < NS; ++g) {
-      for (int hm = 0; hm < hc2DS; ++hm) {
-        for (int htm = 0; htm < hcTT; ++htm) {
-          i_hc.age15_hiv_pop(hm, g) += c_hc.hc2_hiv_pop(hm, htm, (hc2AG - 1), g);
-        }
-      }
-    }
-    for (int g = 0; g < NS; ++g) {
-      for (int hm = 0; hm < hc2DS; ++hm) {
-        for (int hu = 0; hu < hTS; ++hu) {
-          i_hc.age15_art_pop(hu, hm, g) += c_hc.hc2_art_pop(hu, hm, (hc2AG - 1), g);
-        }
-      }
-    }
-  };
+      for (int hm = 0; hm < hDS; ++hm) {
+	i_hc.age15_hiv_pop(hm, g) = 0.0;
+	for (int hm_adol = 0; hm_adol < hc2DS; ++hm_adol) {
+	  auto age15_hivpop_hm_adol = 0.0;
+	  for (int htm = 0; htm < hcTT; ++htm) {
+	    age15_hivpop_hm_adol += c_hc.hc2_hiv_pop(hm_adol, htm, (hc2AG - 1), g);
+	  }
+	  i_hc.age15_hiv_pop(hm, g) += age15_hivpop_hm_adol * SS::adult_cd4_dist[hm][hm_adol];
+	}
 
+	if (t > opts.ts_art_start) {
+	  for (int hu = 0; hu < hTS; ++hu) {
+	    i_hc.age15_art_pop(hu, hm, g) = 0.0;
+	      for (int hm_adol = 0; hm_adol < hc2DS; ++hm_adol) {
+		i_hc.age15_art_pop(hu, hm, g) += c_hc.hc2_art_pop(hu, hm_adol, (hc2AG - 1), g)  * SS::adult_cd4_dist[hm][hm_adol];
+	      }
+	  }
+	}
+	
+      } // hm
+    } // g
+  };
+  
   void run_hiv_and_art_stratified_ageing() {
     const auto& c_ha = state_curr.ha;
     auto& n_ha = state_next.ha;
@@ -254,44 +262,23 @@ struct HivDemographicProjection<Config> {
       }
     }
 
+    // Entrants ageing into adult HIV population
     if constexpr (ModelVariant::run_child_model) {
-      constexpr int hc2DS = SS::hc2DS;
-      constexpr auto adult_cd4_dist = SS::adult_cd4_dist;
-
       auto& i_hc = intermediate.hc;
 
       for (int g = 0; g < NS; ++g) {
         for (int hm = 0; hm < hDS; ++hm) {
-          for (int hm_adol = 0; hm_adol < hc2DS; ++hm_adol){
-            if(i_hc.age15_hiv_pop(hm_adol, g) > 0){
-              n_ha.h_hiv_adult(hm, 0, g) += i_hc.age15_hiv_pop(hm_adol, g) * adult_cd4_dist[hm][hm_adol];
-            }else{
-              n_ha.h_hiv_adult(hm, 0, g) = (1.0 - i_ha.hiv_age_up_prob(0, g)) * c_ha.h_hiv_adult(hm, 0, g);
-            }
-            if ((t > opts.ts_art_start)) {
-              for (int hu = 0; hu < hTS; ++hu) {
-                if(i_hc.age15_art_pop(hu, hm_adol, g) > 0){
-                  n_ha.h_art_adult(hu,hm, 0, g) += i_hc.age15_art_pop(hu, hm_adol, g) * adult_cd4_dist[hm][hm_adol];
-                }else{
-                  n_ha.h_art_adult(hu, hm, 0, g) = (1.0 - i_ha.hiv_age_up_prob(0, g)) * c_ha.h_art_adult(hu, hm, 0, g);
-                }
-              }
-            }
-          }
-        }
-      }
-    } else {
-      for (int g = 0; g < NS; ++g) {
-        for (int hm = 0; hm < hDS; ++hm) {
-          n_ha.h_hiv_adult(hm, 0, g) = (1.0 - i_ha.hiv_age_up_prob(0, g)) * c_ha.h_hiv_adult(hm, 0, g);
-          if (t > opts.ts_art_start) {
-            for (int hu = 0; hu < hTS; ++hu) {
-              n_ha.h_art_adult(hu, hm, 0, g) = (1.0 - i_ha.hiv_age_up_prob(0, g)) * c_ha.h_art_adult(hu, hm, 0, g);
-            }
-          }
-        }
+	  n_ha.h_hiv_adult(hm, 0, g) += i_hc.age15_hiv_pop(hm, g);
+	  if (t > opts.ts_art_start) {
+	    for (int hu = 0; hu < hTS; ++hu) {
+	      n_ha.h_art_adult(hu, hm, 0, g) += i_hc.age15_art_pop(hu, hm, g);
+	    }
+	  }
+	}
       }
     }
+    // TODO: implement static entrants to adult HIV population here for case when child model not simulated
+    
   };
 
   void run_hiv_and_art_stratified_deaths_and_migration() {

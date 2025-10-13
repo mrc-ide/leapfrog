@@ -757,8 +757,8 @@ struct HcConfig {
 
   struct Intermediate {
     using shape_age15_hiv_pop = nda::shape<
-      nda::dim<0, SS::hc2DS, 1>,
-      nda::dim<0, SS::NS, (SS::hc2DS)>
+      nda::dim<0, SS::hDS, 1>,
+      nda::dim<0, SS::NS, (SS::hDS)>
     >;
     nda::array<real_type, shape_age15_hiv_pop> age15_hiv_pop;
     using shape_age15_art_pop = nda::shape<
