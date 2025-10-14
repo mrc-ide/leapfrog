@@ -19,7 +19,7 @@ You can install the development version of frogger from
 
 ``` r
 # install.packages("remotes")
-remotes::install_github("mrc-ide/frogger", subdir = "r-pacakge")
+remotes::install_github("mrc-ide/frogger", subdir = "r-package")
 ```
 
 ## Simulation model
