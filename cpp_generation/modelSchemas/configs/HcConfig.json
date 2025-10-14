@@ -56,7 +56,8 @@
       {
         "applies_if": "age10_adult",
         "vars": {	      
-          "hcAG_end": 10
+          "hcAG_end": 10,
+          "hc2AG": 5
         }
       }
     ]

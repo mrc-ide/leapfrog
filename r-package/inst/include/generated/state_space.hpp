@@ -52,6 +52,7 @@ struct SSMixer<ModelVariant, SSPair<false, T>, Ts...>: public SSMixer<ModelVaria
 template<MV ModelVariant, typename ...Ts>
 struct SSMixer<ModelVariant, SSPair<true, HcOverride1>, Ts...>: public SSMixer<ModelVariant, Ts...> {
   static constexpr int hcAG_end = 10;
+  static constexpr int hc2AG = 5;
 };
 
 template<MV ModelVariant, typename ...Ts>
