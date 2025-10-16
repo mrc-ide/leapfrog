@@ -115,7 +115,7 @@ struct HivDemographicProjection<Config> {
 
   void run_hc_hiv_pop_end_year_migration() {
     static_assert(ModelVariant::run_child_model,
-                  "run_age_15_entrants can only be called for model variants where run_child_model is true");
+                  "run_hc_hiv_pop_end_year_migration can only be called for model variants where run_child_model is true");
     static constexpr int hc2_agestart = SS::hc2_agestart;
     static constexpr int hcAG_end = SS::hcAG_end;
     static constexpr int hc1DS = SS::hc1DS;
