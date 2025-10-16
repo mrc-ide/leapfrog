@@ -78,10 +78,10 @@ struct AdultHivModelSimulation<Config> {
       if (t >= opts.ts_art_start) {
         run_art_progression_and_mortality(hiv_step);
         run_h_art_initiation(hiv_step);
-        run_update_art_stratification(hiv_step);
+        run_update_art_adult(hiv_step);
       }
 
-      run_update_hiv_stratification(hiv_step);
+      run_update_hiv_adult(hiv_step);
       run_remove_p_hiv_deaths(hiv_step);
     }
   };
@@ -389,7 +389,7 @@ struct AdultHivModelSimulation<Config> {
     }
   };
 
-  void run_update_art_stratification(int hiv_step) {
+  void run_update_art_adult(int hiv_step) {
     auto& n_ha = state_next.ha;
     auto& i_ha = intermediate.ha;
 
@@ -404,7 +404,7 @@ struct AdultHivModelSimulation<Config> {
     }
   };
 
-  void run_update_hiv_stratification(int hiv_step) {
+  void run_update_hiv_adult(int hiv_step) {
     auto& n_ha = state_next.ha;
     auto& i_ha = intermediate.ha;
 
