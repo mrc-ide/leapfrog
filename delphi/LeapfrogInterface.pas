@@ -56,10 +56,10 @@ end;
 type
   LeapfrogDemProjStateView = record
   private
-    pTotalPop: PDouble;
-    pTotalPopLength: Integer;
-    pTotalPopBackgroundDeaths: PDouble;
-    pTotalPopBackgroundDeathsLength: Integer;
+    pTotpop: PDouble;
+    pTotpopLength: Integer;
+    pBackgroundDeathsTotpop: PDouble;
+    pBackgroundDeathsTotpopLength: Integer;
     births: PDouble;
     birthsLength: Integer;
 end;
@@ -67,8 +67,8 @@ end;
 type
   LeapfrogDemProjState = class
   public
-    pTotalPop: TGBFixedArray<Double>;
-    pTotalPopBackgroundDeaths: TGBFixedArray<Double>;
+    pTotpop: TGBFixedArray<Double>;
+    pBackgroundDeathsTotpop: TGBFixedArray<Double>;
     births: TGBFixedArray<Double>;
     function getView(): LeapfrogDemProjStateView;
     procedure writeToDisk(dir: string);
@@ -147,14 +147,14 @@ end;
 type
   LeapfrogHivAdultStateView = record
   private
-    pHivPop: PDouble;
-    pHivPopLength: Integer;
-    pHivPopBackgroundDeaths: PDouble;
-    pHivPopBackgroundDeathsLength: Integer;
-    hHivAdult: PDouble;
-    hHivAdultLength: Integer;
-    hArtAdult: PDouble;
-    hArtAdultLength: Integer;
+    pHivpop: PDouble;
+    pHivpopLength: Integer;
+    pBackgroundDeathsHivpop: PDouble;
+    pBackgroundDeathsHivpopLength: Integer;
+    hHivpop: PDouble;
+    hHivpopLength: Integer;
+    hArtpop: PDouble;
+    hArtpopLength: Integer;
     hHivDeathsNoArt: PDouble;
     hHivDeathsNoArtLength: Integer;
     pInfections: PDouble;
@@ -172,10 +172,10 @@ end;
 type
   LeapfrogHivAdultState = class
   public
-    pHivPop: TGBFixedArray<Double>;
-    pHivPopBackgroundDeaths: TGBFixedArray<Double>;
-    hHivAdult: TGBFixedArray<Double>;
-    hArtAdult: TGBFixedArray<Double>;
+    pHivpop: TGBFixedArray<Double>;
+    pBackgroundDeathsHivpop: TGBFixedArray<Double>;
+    hHivpop: TGBFixedArray<Double>;
+    hArtpop: TGBFixedArray<Double>;
     hHivDeathsNoArt: TGBFixedArray<Double>;
     pInfections: TGBFixedArray<Double>;
     hHivDeathsArt: TGBFixedArray<Double>;
@@ -336,14 +336,14 @@ type
   private
     hivBirthsByMatAge: PDouble;
     hivBirthsByMatAgeLength: Integer;
-    hc1HivPop: PDouble;
-    hc1HivPopLength: Integer;
-    hc2HivPop: PDouble;
-    hc2HivPopLength: Integer;
-    hc1ArtPop: PDouble;
-    hc1ArtPopLength: Integer;
-    hc2ArtPop: PDouble;
-    hc2ArtPopLength: Integer;
+    hc1Hivpop: PDouble;
+    hc1HivpopLength: Integer;
+    hc2Hivpop: PDouble;
+    hc2HivpopLength: Integer;
+    hc1Artpop: PDouble;
+    hc1ArtpopLength: Integer;
+    hc2Artpop: PDouble;
+    hc2ArtpopLength: Integer;
     hc1NoartAidsDeaths: PDouble;
     hc1NoartAidsDeathsLength: Integer;
     hc2NoartAidsDeaths: PDouble;
@@ -376,10 +376,10 @@ type
   LeapfrogHivChildState = class
   public
     hivBirthsByMatAge: TGBFixedArray<Double>;
-    hc1HivPop: TGBFixedArray<Double>;
-    hc2HivPop: TGBFixedArray<Double>;
-    hc1ArtPop: TGBFixedArray<Double>;
-    hc2ArtPop: TGBFixedArray<Double>;
+    hc1Hivpop: TGBFixedArray<Double>;
+    hc2Hivpop: TGBFixedArray<Double>;
+    hc1Artpop: TGBFixedArray<Double>;
+    hc2Artpop: TGBFixedArray<Double>;
     hc1NoartAidsDeaths: TGBFixedArray<Double>;
     hc2NoartAidsDeaths: TGBFixedArray<Double>;
     hc1ArtAidsDeaths: TGBFixedArray<Double>;
@@ -445,8 +445,8 @@ end;
 
 destructor LeapfrogDemProjState.Destroy;
 begin;
-  pTotalPop.Free;
-  pTotalPopBackgroundDeaths.Free;
+  pTotpop.Free;
+  pBackgroundDeathsTotpop.Free;
   births.Free;
   inherited;
 end;
@@ -467,10 +467,10 @@ end;
 
 function LeapfrogDemProjState.getView(): LeapfrogDemProjStateView;
 begin;
-  Result.pTotalPop := PDouble(pTotalPop.data);
-  Result.pTotalPopLength := pTotalPop.GetLength();
-  Result.pTotalPopBackgroundDeaths := PDouble(pTotalPopBackgroundDeaths.data);
-  Result.pTotalPopBackgroundDeathsLength := pTotalPopBackgroundDeaths.GetLength();
+  Result.pTotpop := PDouble(pTotpop.data);
+  Result.pTotpopLength := pTotpop.GetLength();
+  Result.pBackgroundDeathsTotpop := PDouble(pBackgroundDeathsTotpop.data);
+  Result.pBackgroundDeathsTotpopLength := pBackgroundDeathsTotpop.GetLength();
   Result.births := PDouble(births.data);
   Result.birthsLength := births.GetLength();
 end;
@@ -495,10 +495,10 @@ end;
 
 destructor LeapfrogHivAdultState.Destroy;
 begin;
-  pHivPop.Free;
-  pHivPopBackgroundDeaths.Free;
-  hHivAdult.Free;
-  hArtAdult.Free;
+  pHivpop.Free;
+  pBackgroundDeathsHivpop.Free;
+  hHivpop.Free;
+  hArtpop.Free;
   hHivDeathsNoArt.Free;
   pInfections.Free;
   hHivDeathsArt.Free;
@@ -550,14 +550,14 @@ end;
 
 function LeapfrogHivAdultState.getView(): LeapfrogHivAdultStateView;
 begin;
-  Result.pHivPop := PDouble(pHivPop.data);
-  Result.pHivPopLength := pHivPop.GetLength();
-  Result.pHivPopBackgroundDeaths := PDouble(pHivPopBackgroundDeaths.data);
-  Result.pHivPopBackgroundDeathsLength := pHivPopBackgroundDeaths.GetLength();
-  Result.hHivAdult := PDouble(hHivAdult.data);
-  Result.hHivAdultLength := hHivAdult.GetLength();
-  Result.hArtAdult := PDouble(hArtAdult.data);
-  Result.hArtAdultLength := hArtAdult.GetLength();
+  Result.pHivpop := PDouble(pHivpop.data);
+  Result.pHivpopLength := pHivpop.GetLength();
+  Result.pBackgroundDeathsHivpop := PDouble(pBackgroundDeathsHivpop.data);
+  Result.pBackgroundDeathsHivpopLength := pBackgroundDeathsHivpop.GetLength();
+  Result.hHivpop := PDouble(hHivpop.data);
+  Result.hHivpopLength := hHivpop.GetLength();
+  Result.hArtpop := PDouble(hArtpop.data);
+  Result.hArtpopLength := hArtpop.GetLength();
   Result.hHivDeathsNoArt := PDouble(hHivDeathsNoArt.data);
   Result.hHivDeathsNoArtLength := hHivDeathsNoArt.GetLength();
   Result.pInfections := PDouble(pInfections.data);
@@ -621,10 +621,10 @@ end;
 destructor LeapfrogHivChildState.Destroy;
 begin;
   hivBirthsByMatAge.Free;
-  hc1HivPop.Free;
-  hc2HivPop.Free;
-  hc1ArtPop.Free;
-  hc2ArtPop.Free;
+  hc1Hivpop.Free;
+  hc2Hivpop.Free;
+  hc1Artpop.Free;
+  hc2Artpop.Free;
   hc1NoartAidsDeaths.Free;
   hc2NoartAidsDeaths.Free;
   hc1ArtAidsDeaths.Free;
@@ -735,14 +735,14 @@ function LeapfrogHivChildState.getView(): LeapfrogHivChildStateView;
 begin;
   Result.hivBirthsByMatAge := PDouble(hivBirthsByMatAge.data);
   Result.hivBirthsByMatAgeLength := hivBirthsByMatAge.GetLength();
-  Result.hc1HivPop := PDouble(hc1HivPop.data);
-  Result.hc1HivPopLength := hc1HivPop.GetLength();
-  Result.hc2HivPop := PDouble(hc2HivPop.data);
-  Result.hc2HivPopLength := hc2HivPop.GetLength();
-  Result.hc1ArtPop := PDouble(hc1ArtPop.data);
-  Result.hc1ArtPopLength := hc1ArtPop.GetLength();
-  Result.hc2ArtPop := PDouble(hc2ArtPop.data);
-  Result.hc2ArtPopLength := hc2ArtPop.GetLength();
+  Result.hc1Hivpop := PDouble(hc1Hivpop.data);
+  Result.hc1HivpopLength := hc1Hivpop.GetLength();
+  Result.hc2Hivpop := PDouble(hc2Hivpop.data);
+  Result.hc2HivpopLength := hc2Hivpop.GetLength();
+  Result.hc1Artpop := PDouble(hc1Artpop.data);
+  Result.hc1ArtpopLength := hc1Artpop.GetLength();
+  Result.hc2Artpop := PDouble(hc2Artpop.data);
+  Result.hc2ArtpopLength := hc2Artpop.GetLength();
   Result.hc1NoartAidsDeaths := PDouble(hc1NoartAidsDeaths.data);
   Result.hc1NoartAidsDeathsLength := hc1NoartAidsDeaths.GetLength();
   Result.hc2NoartAidsDeaths := PDouble(hc2NoartAidsDeaths.data);
@@ -786,8 +786,8 @@ procedure LeapfrogDemProjState.writeToDisk(dir: string);
 begin;
   if not DirectoryExists(dir) then
     ForceDirectories(dir);
-  pTotalPop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pTotalPop');
-  pTotalPopBackgroundDeaths.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pTotalPopBackgroundDeaths');
+  pTotpop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pTotpop');
+  pBackgroundDeathsTotpop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pBackgroundDeathsTotpop');
 end;
 
 procedure LeapfrogHivAdultParams.writeToDisk(dir: string);
@@ -813,10 +813,10 @@ procedure LeapfrogHivAdultState.writeToDisk(dir: string);
 begin;
   if not DirectoryExists(dir) then
     ForceDirectories(dir);
-  pHivPop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pHivPop');
-  pHivPopBackgroundDeaths.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pHivPopBackgroundDeaths');
-  hHivAdult.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hHivAdult');
-  hArtAdult.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hArtAdult');
+  pHivpop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pHivpop');
+  pBackgroundDeathsHivpop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pBackgroundDeathsHivpop');
+  hHivpop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hHivpop');
+  hArtpop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hArtpop');
   hHivDeathsNoArt.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hHivDeathsNoArt');
   pInfections.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pInfections');
   hHivDeathsArt.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hHivDeathsArt');
@@ -877,10 +877,10 @@ begin;
   if not DirectoryExists(dir) then
     ForceDirectories(dir);
   hivBirthsByMatAge.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hivBirthsByMatAge');
-  hc1HivPop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hc1HivPop');
-  hc2HivPop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hc2HivPop');
-  hc1ArtPop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hc1ArtPop');
-  hc2ArtPop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hc2ArtPop');
+  hc1Hivpop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hc1Hivpop');
+  hc2Hivpop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hc2Hivpop');
+  hc1Artpop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hc1Artpop');
+  hc2Artpop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hc2Artpop');
   hc1NoartAidsDeaths.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hc1NoartAidsDeaths');
   hc2NoartAidsDeaths.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hc2NoartAidsDeaths');
   hc1ArtAidsDeaths.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hc1ArtAidsDeaths');

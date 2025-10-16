@@ -42,32 +42,32 @@ py::dict build_python_output(const OutputState<ModelVariant, real_type> &state,
   int output_years = save_steps.size();
   constexpr auto ss = StateSpace<ModelVariant>();
   constexpr auto dp = ss.dp;
-  py::array_t<real_type, py::array::f_style> p_total_pop({dp.pAG, dp.NS, output_years}, state.dp.p_total_pop.data());
+  py::array_t<real_type, py::array::f_style> p_totpop({dp.pAG, dp.NS, output_years}, state.dp.p_totpop.data());
   py::array_t<real_type, py::array::f_style> births({output_years}, state.dp.births.data());
-  py::array_t<real_type, py::array::f_style> p_total_pop_natural_deaths({dp.pAG, dp.NS, output_years}, state.dp.p_total_pop_natural_deaths.data());
+  py::array_t<real_type, py::array::f_style> p_totpop_natural_deaths({dp.pAG, dp.NS, output_years}, state.dp.p_totpop_natural_deaths.data());
 
   py::dict result;
-  result["p_total_pop"] = p_total_pop;
+  result["p_totpop"] = p_totpop;
   result["births"] = births;
-  result["p_total_pop_natural_deaths"] = p_total_pop_natural_deaths;
+  result["p_totpop_natural_deaths"] = p_totpop_natural_deaths;
 
   if constexpr (ModelVariant::run_hiv_simulation) {
     constexpr auto dp = ss.dp;
     constexpr auto hiv = ss.hiv;
-    py::array_t<real_type, py::array::f_style> p_hiv_pop({dp.pAG, dp.NS, output_years}, state.hiv.p_hiv_pop.data());
-    py::array_t<real_type, py::array::f_style> p_hiv_pop_natural_deaths({dp.pAG, dp.NS, output_years}, state.hiv.p_hiv_pop_natural_deaths.data());
-    py::array_t<real_type, py::array::f_style> h_hiv_adult({hiv.hDS, hiv.hAG, dp.NS, output_years}, state.hiv.h_hiv_adult.data());
-    py::array_t<real_type, py::array::f_style> h_art_adult({hiv.hTS, hiv.hDS, hiv.hAG, dp.NS, output_years}, state.hiv.h_art_adult.data());
+    py::array_t<real_type, py::array::f_style> p_hivpop({dp.pAG, dp.NS, output_years}, state.hiv.p_hivpop.data());
+    py::array_t<real_type, py::array::f_style> p_hivpop_natural_deaths({dp.pAG, dp.NS, output_years}, state.hiv.p_hivpop_natural_deaths.data());
+    py::array_t<real_type, py::array::f_style> h_hivpop({hiv.hDS, hiv.hAG, dp.NS, output_years}, state.hiv.h_hivpop.data());
+    py::array_t<real_type, py::array::f_style> h_artpop({hiv.hTS, hiv.hDS, hiv.hAG, dp.NS, output_years}, state.hiv.h_artpop.data());
     py::array_t<real_type, py::array::f_style> h_hiv_deaths_no_art({hiv.hDS, hiv.hAG, dp.NS, output_years}, state.hiv.h_hiv_deaths_no_art.data());
     py::array_t<real_type, py::array::f_style> p_infections({dp.pAG, dp.NS, output_years}, state.hiv.p_infections.data());
     py::array_t<real_type, py::array::f_style> h_hiv_deaths_art({hiv.hTS, hiv.hDS, hiv.hAG, dp.NS, output_years}, state.hiv.h_hiv_deaths_art.data());
     py::array_t<real_type, py::array::f_style> h_art_initiation({hiv.hDS, hiv.hAG, dp.NS, output_years}, state.hiv.h_art_initiation.data());
     py::array_t<real_type, py::array::f_style> p_hiv_deaths({dp.pAG, dp.NS, output_years}, state.hiv.p_hiv_deaths.data());
 
-    result["p_hiv_pop"] = p_hiv_pop;
-    result["p_hiv_pop_natural_deaths"] = p_hiv_pop_natural_deaths;
-    result["h_hiv_adult"] = h_hiv_adult;
-    result["h_art_adult"] = h_art_adult;
+    result["p_hivpop"] = p_hivpop;
+    result["p_hivpop_natural_deaths"] = p_hivpop_natural_deaths;
+    result["h_hivpop"] = h_hivpop;
+    result["h_artpop"] = h_artpop;
     result["h_hiv_deaths_no_art"] = h_hiv_deaths_no_art;
     result["p_infections"] = p_infections;
     result["h_hiv_deaths_art"] = h_hiv_deaths_art;
@@ -80,10 +80,10 @@ py::dict build_python_output(const OutputState<ModelVariant, real_type> &state,
     constexpr auto dp = ss.dp;
     constexpr auto hiv = ss.hiv;
 
-    py::array_t<real_type, py::array::f_style> hc1_hiv_pop({children.hc1DS, children.hcTT, children.hc1AG, dp.NS, output_years}, state.children.hc1_hiv_pop.data());
-    py::array_t<real_type, py::array::f_style> hc2_hiv_pop({children.hc2DS, children.hcTT, children.hc2AG, dp.NS, output_years}, state.children.hc2_hiv_pop.data());
-    py::array_t<real_type, py::array::f_style> hc1_art_pop({hiv.hTS, children.hc1DS, children.hc1AG, dp.NS, output_years}, state.children.hc1_art_pop.data());
-    py::array_t<real_type, py::array::f_style> hc2_art_pop({hiv.hTS, children.hc2DS, children.hc2AG, dp.NS, output_years}, state.children.hc2_art_pop.data());
+    py::array_t<real_type, py::array::f_style> hc1_hivpop({children.hc1DS, children.hcTT, children.hc1AG, dp.NS, output_years}, state.children.hc1_hivpop.data());
+    py::array_t<real_type, py::array::f_style> hc2_hivpop({children.hc2DS, children.hcTT, children.hc2AG, dp.NS, output_years}, state.children.hc2_hivpop.data());
+    py::array_t<real_type, py::array::f_style> hc1_artpop({hiv.hTS, children.hc1DS, children.hc1AG, dp.NS, output_years}, state.children.hc1_artpop.data());
+    py::array_t<real_type, py::array::f_style> hc2_artpop({hiv.hTS, children.hc2DS, children.hc2AG, dp.NS, output_years}, state.children.hc2_artpop.data());
     py::array_t<real_type, py::array::f_style> hc1_noart_aids_deaths({children.hc1DS, children.hcTT, children.hc1AG, dp.NS, output_years}, state.children.hc1_noart_aids_deaths.data());
     py::array_t<real_type, py::array::f_style> hc2_noart_aids_deaths({children.hc2DS, children.hcTT, children.hc2AG, dp.NS, output_years}, state.children.hc2_noart_aids_deaths.data());
     py::array_t<real_type, py::array::f_style> hc1_art_aids_deaths({hiv.hTS, children.hc1DS, children.hc1AG, dp.NS, output_years}, state.children.hc1_art_aids_deaths.data());
@@ -94,10 +94,10 @@ py::dict build_python_output(const OutputState<ModelVariant, real_type> &state,
     py::array_t<real_type, py::array::f_style> ctx_need({output_years}, state.children.ctx_need.data());
     py::array_t<real_type, py::array::f_style> ctx_mean({output_years}, state.children.ctx_mean.data());
 
-    result["hc1_hiv_pop"] = hc1_hiv_pop;
-    result["hc2_hiv_pop"] = hc2_hiv_pop;
-    result["hc1_art_pop"] = hc1_art_pop;
-    result["hc2_art_pop"] = hc2_art_pop;
+    result["hc1_hivpop"] = hc1_hivpop;
+    result["hc2_hivpop"] = hc2_hivpop;
+    result["hc1_artpop"] = hc1_artpop;
+    result["hc2_artpop"] = hc2_artpop;
     result["hc1_noart_aids_deaths"] = hc1_noart_aids_deaths;
     result["hc2_noart_aids_deaths"] = hc2_noart_aids_deaths;
     result["hc1_art_aids_deaths"] = hc1_art_aids_deaths;

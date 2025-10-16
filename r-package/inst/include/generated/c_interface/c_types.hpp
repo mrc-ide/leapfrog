@@ -33,10 +33,10 @@ struct DpParams {
 
 template<typename real_type>
 struct DpOut {
-  real_type* p_total_pop;
-  int p_total_pop_length;
-  real_type* p_total_pop_background_deaths;
-  int p_total_pop_background_deaths_length;
+  real_type* p_totpop;
+  int p_totpop_length;
+  real_type* p_background_deaths_totpop;
+  int p_background_deaths_totpop_length;
   real_type* births;
   int births_length;
 };
@@ -83,14 +83,14 @@ struct HaParams {
 
 template<typename real_type>
 struct HaOut {
-  real_type* p_hiv_pop;
-  int p_hiv_pop_length;
-  real_type* p_hiv_pop_background_deaths;
-  int p_hiv_pop_background_deaths_length;
-  real_type* h_hiv_adult;
-  int h_hiv_adult_length;
-  real_type* h_art_adult;
-  int h_art_adult_length;
+  real_type* p_hivpop;
+  int p_hivpop_length;
+  real_type* p_background_deaths_hivpop;
+  int p_background_deaths_hivpop_length;
+  real_type* h_hivpop;
+  int h_hivpop_length;
+  real_type* h_artpop;
+  int h_artpop_length;
   real_type* h_hiv_deaths_no_art;
   int h_hiv_deaths_no_art_length;
   real_type* p_infections;
@@ -199,14 +199,14 @@ template<typename real_type>
 struct HcOut {
   real_type* hiv_births_by_mat_age;
   int hiv_births_by_mat_age_length;
-  real_type* hc1_hiv_pop;
-  int hc1_hiv_pop_length;
-  real_type* hc2_hiv_pop;
-  int hc2_hiv_pop_length;
-  real_type* hc1_art_pop;
-  int hc1_art_pop_length;
-  real_type* hc2_art_pop;
-  int hc2_art_pop_length;
+  real_type* hc1_hivpop;
+  int hc1_hivpop_length;
+  real_type* hc2_hivpop;
+  int hc2_hivpop_length;
+  real_type* hc1_artpop;
+  int hc1_artpop_length;
+  real_type* hc2_artpop;
+  int hc2_artpop_length;
   real_type* hc1_noart_aids_deaths;
   int hc1_noart_aids_deaths_length;
   real_type* hc2_noart_aids_deaths;

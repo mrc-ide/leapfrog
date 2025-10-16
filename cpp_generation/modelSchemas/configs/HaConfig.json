@@ -151,7 +151,7 @@
       "num_type": "real_type",
       "dims": ["SS::pAG", "SS::NS"]
     },
-    "p_hiv_pop_coarse_ages": {
+    "p_coarse_ages_hivpop": {
       "num_type": "real_type",
       "dims": ["SS::hAG", "SS::NS"]
     },
@@ -254,19 +254,19 @@
     }
   },
   "state": {
-    "p_hiv_pop": {
+    "p_hivpop": {
       "num_type": "real_type",
       "dims": ["SS::pAG", "SS::NS"]
     },
-    "p_hiv_pop_background_deaths": {
+    "p_background_deaths_hivpop": {
       "num_type": "real_type",
       "dims": ["SS::pAG", "SS::NS"]
     },
-    "h_hiv_adult": {
+    "h_hivpop": {
       "num_type": "real_type",
       "dims": ["SS::hDS", "SS::hAG", "SS::NS"]
     },
-    "h_art_adult": {
+    "h_artpop": {
       "num_type": "real_type",
       "dims": ["SS::hTS", "SS::hDS", "SS::hAG", "SS::NS"]
     },
