@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">frogger</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.5</span>
       </span>
     </div>
 
@@ -78,12 +78,8 @@
       </header><div class="row">
   <div class="contents col-md-9">
 <div class="section level1">
-<div class="page-header"><h1 id="frogger">frogger<a class="anchor" aria-label="anchor" href="#frogger"></a>
+<div class="page-header"><h1 id="frogger-r-package">frogger R package<a class="anchor" aria-label="anchor" href="#frogger-r-package"></a>
 </h1></div>
-<!-- badges: start -->
-
-<p>Leapfrog is a multistate population projection model for demographic and HIV epidemic estimation.</p>
-<p>The name <em>leapfrog</em> is in honor of <a href="https://iussp.org/en/basia-zaba-1949-2018" class="external-link">Professor</a> Basia <a href="https://translate.google.co.uk/?sl=pl&amp;tl=en&amp;text=Zaba&amp;op=translate" class="external-link">Zaba</a>.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -95,32 +91,27 @@
 <p>You can install the development version of frogger from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"mrc-ide/frogger"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"mrc-ide/frogger"</span>, subdir <span class="op">=</span> <span class="st">"r-package"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="simulation-model">Simulation model<a class="anchor" aria-label="anchor" href="#simulation-model"></a>
 </h2>
-<p>The simulation model is implemented in a header-only C++ library located in <a href="inst/include/frogger.hpp"><code>inst/include/frogger.hpp</code></a>. This location allows the C++ code to be imported in other R packages via specifying <code>LinkingTo: leapfrog</code> in the <code>DESCRIPTION</code> file.</p>
+<p>The simulation model is implemented in a header-only C++ library located in <a href="r-package/inst/include/frogger.hpp"><code>r-package/inst/include/frogger.hpp</code></a>. This location allows the C++ code to be imported in other R packages via specifying <code>LinkingTo: leapfrog</code> in the <code>DESCRIPTION</code> file.</p>
 <blockquote>
 <p>[!IMPORTANT] We use C++20 for this package. Please make sure you have a compiler that is compatible.</p>
 </blockquote>
 <p>The simulation model is callable in R via a wrapper function <code><a href="reference/run_model.html">run_model()</a></code> created with <a href="https://www.rcpp.org" class="external-link">Rcpp</a>.</p>
-<p>You can control how the simulation model is run with the following arguments:</p>
-<ul>
-<li>
-<code>run_hiv_simulation</code> which is <code>TRUE</code> by default. Set to <code>FALSE</code> to turn off the HIV simulation and run only the demographic projection.</li>
-<li>
-<code>hiv_age_stratification</code> which must be “coarse” or “full”. Coarse is run with 5-year age groups and full with single year ages.</li>
-<li>
-<code>run_child_model</code> which is <code>FALSE</code> by default. Set to <code>TRUE</code> to run the child portion of the model.</li>
-</ul>
+<p>You can control how the simulation model is run by setting the <code>configuration</code> argument, see</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">frogger</span><span class="fu">::</span><span class="fu"><a href="reference/list_model_configurations.html">list_model_configurations</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>for the list of available models. At the time of writing these are - <code>DemographicProjection</code> - runs on the demographic projections - <code>HivFullAgeStratification</code> - runs the demographic projection and HIV adult projection with single-year age groups - <code>HivCoarseAgeStratification</code> - runs the demographic projection and HIV adult projection with 5-year age groups - <code>ChildModel</code> - runs the demographic projection, single-year age stratified HIV adult projection and HIV child projection</p>
 </div>
 <div class="section level2">
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h2>
 <p>The file <code>pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ</code> contains an example Spectrum file constructed from default country data for Botswana with Spectrum (April 2022).</p>
 <p>Prepare model inputs.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mrc-ide/frogger" class="external-link">frogger</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">pjnz</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ"</span>,</span>
@@ -128,11 +119,11 @@
 <span></span>
 <span><span class="va">parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/prepare_leapfrog_parameters.html">prepare_leapfrog_parameters</a></span><span class="op">(</span><span class="va">pjnz</span><span class="op">)</span></span></code></pre></div>
 <p>Simulate adult ‘full’ age group (single-year age) and ‘coarse’ age group (collapsed age groups) models from 1970 to 2030 with 10 HIV time steps per year.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lsimF</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/run_model.html">run_model</a></span><span class="op">(</span><span class="va">parameters</span>, <span class="st">"HivFullAgeStratification"</span>, <span class="fl">1970</span><span class="op">:</span><span class="fl">2030</span><span class="op">)</span></span>
 <span><span class="va">lsimC</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/run_model.html">run_model</a></span><span class="op">(</span><span class="va">parameters</span>, <span class="st">"HivCoarseAgeStratification"</span>, <span class="fl">1970</span><span class="op">:</span><span class="fl">2030</span><span class="op">)</span></span></code></pre></div>
 <p>Compare the HIV prevalence age 15-49 years and AIDS deaths 50+ years. Deaths 50+ years are to show some noticeable divergence between the <code>"full"</code> and <code>"coarse"</code> age group simulations.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">prevF</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colSums</a></span><span class="op">(</span><span class="va">lsimF</span><span class="op">$</span><span class="va">p_hiv_pop</span><span class="op">[</span><span class="fl">16</span><span class="op">:</span><span class="fl">50</span>,,<span class="op">]</span>,,<span class="fl">2</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colSums</a></span><span class="op">(</span><span class="va">lsimF</span><span class="op">$</span><span class="va">p_total_pop</span><span class="op">[</span><span class="fl">16</span><span class="op">:</span><span class="fl">50</span>,,<span class="op">]</span>,,<span class="fl">2</span><span class="op">)</span></span>
 <span><span class="va">prevC</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colSums</a></span><span class="op">(</span><span class="va">lsimC</span><span class="op">$</span><span class="va">p_hiv_pop</span><span class="op">[</span><span class="fl">16</span><span class="op">:</span><span class="fl">50</span>,,<span class="op">]</span>,,<span class="fl">2</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colSums</a></span><span class="op">(</span><span class="va">lsimC</span><span class="op">$</span><span class="va">p_total_pop</span><span class="op">[</span><span class="fl">16</span><span class="op">:</span><span class="fl">50</span>,,<span class="op">]</span>,,<span class="fl">2</span><span class="op">)</span></span>
 <span></span>
@@ -142,7 +133,7 @@
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fl">1970</span><span class="op">:</span><span class="fl">2030</span>, <span class="va">prevF</span>, type <span class="op">=</span> <span class="st">"l"</span>, main <span class="op">=</span> <span class="st">"Prevalence 15-49"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="fl">1970</span><span class="op">:</span><span class="fl">2030</span>, <span class="va">prevC</span>, col <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-sim_prev-1.png" width="100%"></p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fl">1970</span><span class="op">:</span><span class="fl">2030</span>, <span class="va">deathsF</span>, type <span class="op">=</span> <span class="st">"l"</span>, main <span class="op">=</span> <span class="st">"AIDS Deaths 50+ years"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="fl">1970</span><span class="op">:</span><span class="fl">2030</span>, <span class="va">deathsC</span>, col <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
@@ -157,25 +148,14 @@
 <h2 id="lint">lint<a class="anchor" aria-label="anchor" href="#lint"></a>
 </h2>
 <p>Lint R code with <code>lintr</code></p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">lintr</span><span class="fu">::</span><span class="fu">lint_package</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Lint C++ code with <a href="https://github.com/cpplint/cpplint" class="external-link">cpplint</a></p>
-<pre class="console"><code>cpplint inst/include/*</code></pre>
+<pre class="console"><code>cpplint r-package/inst/include/*</code></pre>
 </div>
 <div class="section level2">
 <h2 id="code-design">Code design<a class="anchor" aria-label="anchor" href="#code-design"></a>
 </h2>
-<div class="section level3">
-<h3 id="simulation-model-1">Simulation model<a class="anchor" aria-label="anchor" href="#simulation-model-1"></a>
-</h3>
-<p>The simulation model is implemented as templated C++ code in <code>inst/include/frogger.hpp</code>. This is so the simulation model may be developed as a standalone C++ library that can be called by other software without requiring R-specific code features. The code uses header-only open source libraries to maximize portability.</p>
-</div>
-<div class="section level3">
-<h3 id="code-generation">Code generation<a class="anchor" aria-label="anchor" href="#code-generation"></a>
-</h3>
-<p>To change what parameters can be passed in from <code>R</code> or the structure of <code>Intermediate</code>, <code>State</code> or <code>OutputState</code>, please modify json files <a href="./cpp_generation/modelSchemas/">here</a>.</p>
-<p>Then to run code generation follow <a href="./cpp_generation/README.html">cpp_generation/README.md</a></p>
-</div>
 <div class="section level3">
 <h3 id="r-functions">R functions<a class="anchor" aria-label="anchor" href="#r-functions"></a>
 </h3>
@@ -191,46 +171,8 @@
 <p>There is some pre-prepared test data available to make tests run faster. This is generated and saved <code>./scripts/create_test_data.R</code>.</p>
 <p>We also have some separate data written out in a generic format which can be read to test the model directly from C++. This is in <code>inst/standalone_model/data</code> in zipped files.</p>
 <p>If this is your first time running you will need to unzip the standalone test data</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>.<span class="sc">/</span>inst<span class="sc">/</span>standalone_model<span class="sc">/</span>extract_data</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>.<span class="sc">/</span>inst<span class="sc">/</span>standalone_model<span class="sc">/</span>extract_data</span></code></pre></div>
 <p>If you want to update the test data, it should be updated in the <code>./scripts/create_test_data.R</code> script so that we know how it was created and we can do it again fairly easily. Steps are 1. Update the script and generate the test data 1. Update the standalone data which is built from this <code>./scripts/update_standalone_data</code>. You might need to add a new mapping from R to serialized name if you are adding new input data 1. Unzip this for automated tests <code>./inst/standalone_model/extract_data</code></p>
-</div>
-<div class="section level3">
-<h3 id="simulation-model-2">Simulation model<a class="anchor" aria-label="anchor" href="#simulation-model-2"></a>
-</h3>
-<ul>
-<li>The model was implemented using <em>Eigen::Tensor</em> containers. These were preferred for several reasons:
-<ul>
-<li>Benchmarking found they were slighlty more efficient than <em>boost::multi_array</em>.</li>
-<li>Column-major indexing in the same order as R</li>
-<li>Other statistical packages (e.g. TMB, Stan) rely heavily on <em>Eigen</em> so using <em>Eigen</em> containers slims the dependencies.</li>
-</ul>
-</li>
-</ul>
-</div>
-<div class="section level3">
-<h3 id="todo">TODO<a class="anchor" aria-label="anchor" href="#todo"></a>
-</h3>
-<ul>
-<li>Restructuring the model code to identify more common code
-<ul>
-<li>There are examples like general demographic projection and hiv population demographic projection which are running similar processes like ageing, non HIV mortality, migration. We should be able to write a function for e.g. ageing which we can run on each of our population matrices. Even for the HIV and ART stratified we can add overloaded function to work with higher dimension data</li>
-</ul>
-</li>
-<li>Add a test that checks that no <code>double</code>s are used in <code>inst/include</code> dir. We should be using templated <code>real_type</code> for TMB</li>
-<li>Add a broad level overview of the algorithm - is there a diagram available?</li>
-<li>Convert string flags to the model to enums if we need to switch on them in several places. This should make it easier to reason about in C++ world and isolate the string checking to a single place</li>
-<li>Previously <code>hiv_negative_pop</code> was fixed size by having dimensions specified by template, how much does this speed up the code? Is there a better way to do this?</li>
-<li>Tidy up confusing looping see <a href="https://github.com/mrc-ide/frogger/pull/7#discussion_r1217847753" class="external-link uri">https://github.com/mrc-ide/frogger/pull/7#discussion_r1217847753</a>
-</li>
-<li>Add R casting helpers which return better errors than Rcpp see <a href="https://github.com/mrc-ide/frogger/pull/7#discussion_r1217884684" class="external-link uri">https://github.com/mrc-ide/frogger/pull/7#discussion_r1217884684</a>
-</li>
-<li>Add a helper to do 0 to base 1 conversion and check upper bounds see <a href="https://github.com/mrc-ide/frogger/pull/7#discussion_r1217888684" class="external-link uri">https://github.com/mrc-ide/frogger/pull/7#discussion_r1217888684</a>
-</li>
-<li>Review what we pass as parameters - can some of these be computed in the struct ctor? e.g. <a href="https://github.com/mrc-ide/frogger/pull/7#discussion_r1217890466" class="external-link uri">https://github.com/mrc-ide/frogger/pull/7#discussion_r1217890466</a>
-</li>
-<li>Refactor <code>OutputState</code> to take a struct of state-space dimensions instead of unpacking the subset of parameters we need. See <a href="https://github.com/mrc-ide/frogger/pull/12#discussion_r1245170775" class="external-link uri">https://github.com/mrc-ide/frogger/pull/12#discussion_r1245170775</a>
-</li>
-</ul>
 </div>
 </div>
 <div class="section level2">
@@ -277,13 +219,7 @@
 </ul>
 </div>
 
-<div class="dev-status">
-<h2 data-toc-skip>Dev status</h2>
-<ul class="list-unstyled">
-<li><a href="https://www.repostatus.org/#wip" class="external-link"><img src="https://www.repostatus.org/badges/latest/wip.svg" alt="Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public."></a></li>
-<li><a href="https://github.com/mrc-ide/frogger/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/mrc-ide/frogger/actions/workflows/R-CMD-check.yaml/badge.svg?branch=main" alt="R-CMD-check"></a></li>
-</ul>
-</div>
+
 
   </div>
 </div>

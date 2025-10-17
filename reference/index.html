@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">frogger</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.5</span>
       </span>
     </div>
 
@@ -89,6 +89,18 @@
         </td>
         <td><p>Prepare adult HIV projection parameters from Spectrum PJNZ</p></td>
       </tr><tr><td>
+          <p><code><a href="process_parameters_to_cpp.html">process_parameters_to_cpp()</a></code> </p>
+        </td>
+        <td><p>Process parameters and convert from 1 based indexing in R to 0 based indexing in C++. Also add in any defaults/extra parameters, e.g. <code>h_art_stage_dur</code>.</p></td>
+      </tr><tr><td>
+          <p><code><a href="process_parameters_to_r.html">process_parameters_to_r()</a></code> </p>
+        </td>
+        <td><p>Process parameters and convert from 0 based indexing for C++ to 1 based indexing in R.</p></td>
+      </tr><tr><td>
+          <p><code><a href="read_parameters.html">read_parameters()</a></code> </p>
+        </td>
+        <td><p>Read parameters from HDF5 file format. This implicitly processes the parameters from C++ 0 based indexing to R 1 based indexing.</p></td>
+      </tr><tr><td>
           <p><code><a href="run_model.html">run_model()</a></code> </p>
         </td>
         <td><p>Run leapfrog model fit</p></td>
@@ -100,6 +112,10 @@
           <p><code><a href="run_model_single_year.html">run_model_single_year()</a></code> </p>
         </td>
         <td><p>Run leapfrog model fit for a single year</p></td>
+      </tr><tr><td>
+          <p><code><a href="save_parameters.html">save_parameters()</a></code> </p>
+        </td>
+        <td><p>Save parameters to HDF5 file format. This implicitly processes the parameters to C++ 0 based indexing.</p></td>
       </tr></tbody></table></div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

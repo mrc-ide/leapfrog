@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">frogger</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.5</span>
       </span>
     </div>
 
@@ -603,7 +603,9 @@ olds</td>
 <tr class="even">
 <td>pmtct</td>
 <td>children.PMTCT</td>
-<td>Number of percent of women receiving ARVs for PMTCT</td>
+<td>Number or percent of women receiving ARVs for PMTCT (order: option
+A, Option B, SDNVP, Dual ARV, Option B+: before pregnancy, Option B+:
+&gt;4 weeks, Option B+:&lt;4 weeks)</td>
 </tr>
 <tr class="odd">
 <td>mtct</td>
@@ -726,84 +728,123 @@ vertical transmission rather than results from adult model</td>
 <td>Projected HIV-related deaths by sex and age</td>
 </tr>
 <tr class="even">
+<td>netmig_ag</td>
+<td>p_net_migration_hivpop</td>
+<td>Number of HIV+ Migrants</td>
+</tr>
+<tr class="odd">
 <td>aidsdeaths_noart</td>
 <td>h_hiv_deaths_no_art</td>
 <td>Projected HIV-related deaths off ART by sex, age and CD4</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>aidsdeaths_art</td>
 <td>h_hiv_deaths_art</td>
 <td>Projected HIV-related deaths on ART by sex, age, CD4 and treatment
 stage</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>artinit</td>
 <td>h_art_initiation</td>
 <td>Projected ART initiations by sex, age and CD4</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>hivstrat_paeds</td>
 <td>hc1_hiv_pop</td>
 <td>Projected PLHIV 0-4y not on ART by age, sex, transmission type, and
 CD4</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>hivstrat_paeds</td>
 <td>hc2_hiv_pop</td>
 <td>Projected PLHIV 5-14y not on ART by age, sex, transmission type, and
 CD4</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>artstrat_paeds</td>
 <td>hc1_art_pop</td>
 <td>Projected PLHIV 0-4y on ART by age, sex, treatment stage and
 CD4</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>artstrat_paeds</td>
 <td>hc2_art_pop</td>
 <td>Projected PLHIV 5-14y on ART by age, sex, treatment stage and
 CD4</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td></td>
 <td>hc1_noart_aids_deaths</td>
 <td>Projected deaths among PLHIV 0-4y not on ART by CD4, transmission
 type, age, sex, and year</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td></td>
 <td>hc2_noart_aids_deaths</td>
 <td>Projected deaths among PLHIV 5-14y not on ART by CD4, transmission
 type, age, sex, and year</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td></td>
 <td>hc1_art_aids_deaths</td>
 <td>Projected deaths among PLHIV 0-4y on ART by time on treatment, CD4,
 age, sex, and year</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td></td>
 <td>hc2_art_aids_deaths</td>
 <td>Projected deaths among PLHIV 5-14y on ART by time on treatment, CD4,
 age, sex, and year</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td></td>
 <td>hiv_births</td>
 <td>Number of births to WLHIV by year</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td></td>
 <td>hc_art_need_init</td>
 <td>Children who are eligible for ART by CD4, transmsission, age, sex,
 and year</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td></td>
 <td>hc_art_init</td>
 <td>Number of new ART initiates by five year age group.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>ctx_need</td>
+<td>Number of children in need of cotrim</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>infecton_by_type</td>
+<td>Number of paediatric HIV infections by type of infection (peri vs
+bf) and age at infection.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>ctx_need</td>
+<td>Number of children in need of cotrim</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>mtct_by_source_tr</td>
+<td>Transmission rate by maternal treatement history (stacked bar
+output)</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>mtct_by_source_women</td>
+<td>Number of pregnant WLHIV by maternal treatement history (stacked bar
+output)</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>mtct_by_source_hc_infections</td>
+<td>Number of paediatric infections by maternal treatement history
+(stacked bar output)</td>
 </tr>
 </tbody>
 </table>
@@ -891,244 +932,239 @@ stratification</td>
 <td></td>
 </tr>
 <tr class="even">
-<td>netmig_ag</td>
-<td>hiv_net_migration</td>
-<td></td>
-</tr>
-<tr class="odd">
 <td>deathsmig_ha</td>
 <td>deaths_migrate</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>deathmigrate_ha</td>
 <td>deaths_migrate_rate</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>cd4elig_idx</td>
 <td>?</td>
 <td>Index of the maximum CD4 count category eligible for ART</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>anyelig_idx</td>
 <td>anyelig_idx</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>everARTelig_idx</td>
 <td>?</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>infections_ts</td>
 <td>infections_ts</td>
 <td>Infections occurring at a specific time step</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>hivn_ag</td>
 <td>hiv_negative_pop</td>
 <td>HIV negative population for a given age and sex</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Xhivn</td>
 <td>hiv_neg_aggregate</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Xhivn_incagerr</td>
 <td>?</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>hivdeaths_ha</td>
 <td>hiv_deaths_age_sex</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>grad</td>
 <td>grad</td>
 <td>Movement between cd4 categories at a given time step</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>artpop_hahm</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>cd4mx_scale</td>
 <td></td>
 <td></td>
 </tr>
+<tr class="odd">
+<td>infections_a</td>
+<td>infections_a</td>
+<td></td>
+</tr>
 <tr class="even">
-<td>infections_a</td>
-<td>infections_a</td>
+<td>infections_ha</td>
+<td>infections_ha</td>
 <td></td>
 </tr>
 <tr class="odd">
-<td>infections_ha</td>
-<td>infections_ha</td>
-<td></td>
-</tr>
-<tr class="even">
 <td>gradART</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>artelig_hahm</td>
 <td></td>
 <td>Number of PLHIV eligible for ART by age and disease stage</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Xart_15plus</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Xartelig_15plus</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>expect_mort_artelig15plus</td>
 <td></td>
 <td>Total mortality amongst ART eligible population</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>artnum_hts</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>artcov_hts</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>curr_coverage</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>artinit_hts</td>
 <td>art_initiation</td>
 <td>Total number by sex to initiate on ART by sex</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>artinit_hahm</td>
 <td></td>
 <td>Number who initiate treatment by age and disease stage</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>hivpop_ha(ha)</td>
 <td>hivpop_ha</td>
 <td>HIV population by coarse HIV age group stratification</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>hivqx_ha</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>hivdeaths_a</td>
 <td></td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>age15_hivpop</td>
 <td>age15_hiv_pop</td>
 <td>15 year olds aging out of the paediatric population</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>deaths_paeds</td>
 <td>hc_posthivmort</td>
 <td>PLHIV 0-14y stratified by age, sex, transmission type, and CD4 after
 HIV related mortality</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>grad_paeds</td>
 <td>hc_grad</td>
 <td>Difference in PLHIV 0-14 stratified by age, sex, transmission type,
 and CD4 between the current and next timestep</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td></td>
 <td>eligible</td>
 <td>Children eligilbe for ART by CD4, age, and sex. Summed
 hc_art_need_init by transmission category.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td></td>
 <td>hc_death_rate</td>
 <td>Death rate for children receiving treatment from the risk ratios and
 combined death rates. By age.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td></td>
 <td>hc_art_grad</td>
 <td>Difference in CLHIV on ART in a given timestep by time on art, CD4,
 age, and sex. Just used for on ART mortality.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td></td>
 <td>hc_art_deaths</td>
 <td>Number of deaths occuring among CLHIV on ART before initation.
 Needed to calculate the number of children in need of tx. By five year
 age group.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td></td>
 <td>unmet_need</td>
 <td>Total number of children in need of ART initiation summed across all
 categories by five year age group.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td></td>
 <td>on_art</td>
 <td>Children on ART by five year age group. Needed to calculate total
 need for ART.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td></td>
 <td>total_need</td>
 <td>Children in need of ART in the current timestep by five year age
 group. Sum of children on ART, those that need to initiate, and deaths
 in year t.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td></td>
 <td>total_art_last_year</td>
 <td>Number of CLHIV receiving ART in t-1.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td></td>
 <td>total_art_this_year</td>
 <td>Number of CLHIV receiving ART in t.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td></td>
 <td>total_art_last_year</td>
 <td>Number of CLHIV receiving ART in t-1.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td></td>
 <td>retained</td>
 <td>Proportion of CLHIV on ART after dropout.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td></td>
 <td>hc_initByAge</td>
 <td>Total number of children by five year age group that will initiate
 when correcting for the probability of initiation from IeDEA data.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td></td>
 <td>hc_adj</td>
 <td>Proportion of all initiates that will intiatiate once corrected for
 prob of initiation.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td></td>
 <td>hc_art_scalar</td>
 <td></td>

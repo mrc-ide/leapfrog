@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">frogger</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.5</span>
       </span>
     </div>
 
@@ -103,7 +103,7 @@ it. Or at least document it better.</p>
 <h3 id="model-variants">Model variants<a class="anchor" aria-label="anchor" href="#model-variants"></a>
 </h3>
 <p>Leapfrog has a set of <code>ModelVariant</code>s which can be run.
-See <a href="https://github.com/mrc-ide/frogger/blob/main/inst/include/model_variants.hpp" class="external-link"><code>inst/include/model_variants.hpp</code></a>
+See <a href="https://github.com/mrc-ide/frogger/blob/main/r-package/inst/include/model_variants.hpp" class="external-link"><code>r-package/inst/include/model_variants.hpp</code></a>
 for details of these. Each model variant is a collection of boolean
 switches or enums. These are used to turn on or off different parts of
 the code when it is run, so that leapfrog can have different extensions
@@ -176,7 +176,7 @@ you can specify which years you want to output data for. By default it
 will output for all time steps, but if say you are only interested in
 the last time step. You can return this by running e.g.</p>
 <pre><code><span><span class="fu"><a href="../reference/run_model.html">run_model</a></span><span class="op">(</span><span class="va">data</span>, <span class="va">parameters</span>, <span class="fl">1970</span><span class="op">:</span><span class="fl">2030</span>, <span class="fl">10</span>, <span class="fl">2030</span><span class="op">)</span></span></code></pre>
-<p>This time output is managed by the state saver see <a href="https://github.com/mrc-ide/frogger/blob/main/inst/include/state_saver.hpp" class="external-link"><code>inst/include/state_saver.hpp</code></a></p>
+<p>This time output is managed by the state saver see <a href="https://github.com/mrc-ide/frogger/blob/main/r-package/inst/include/state_saver.hpp" class="external-link"><code>r-package/inst/include/state_saver.hpp</code></a></p>
 </div>
 </div>
 <div class="section level2">
@@ -197,7 +197,7 @@ and run <a href="https://github.com/mrc-ide/frogger/blob/main/scripts/generate" 
 <div class="section level3">
 <h3 id="input-data">Input data<a class="anchor" aria-label="anchor" href="#input-data"></a>
 </h3>
-<p>Input data is generated from csv file in <a href="https://github.com/mrc-ide/frogger/blob/main/inst/include/model_input.hpp" class="external-link"><code>inst/include/model_input.hpp</code></a>,
+<p>Input data is generated from csv file in <a href="https://github.com/mrc-ide/frogger/blob/main/r-package/inst/include/model_input.hpp" class="external-link"><code>r-package/inst/include/model_input.hpp</code></a>,
 the columns in this file are</p>
 <ol style="list-style-type: decimal">
 <li>
@@ -248,7 +248,7 @@ the <a href="https://mrc-ide.github.io/frogger/#state-space" class="external-lin
 for valid state space sizes.</p>
 <p>After making changes to the <a href="https://github.com/mrc-ide/frogger/blob/main/inst/cpp_generation/model_input.csv" class="external-link"><code>model_input.csv</code></a>,
 run the generate script <a href="https://github.com/mrc-ide/frogger/blob/main/scripts/generate" class="external-link"><code>scripts/generate</code></a>.
-This update file <a href="https://github.com/mrc-ide/frogger/blob/main/inst/include/model_input.hpp" class="external-link"><code>inst/include/model_input.hpp</code></a>.
+This update file <a href="https://github.com/mrc-ide/frogger/blob/main/r-package/inst/include/model_input.hpp" class="external-link"><code>r-package/inst/include/model_input.hpp</code></a>.
 Note that this file should never be changed manually as the generate
 script will completely rewrite it.</p>
 <p>After regenerating the code, rebuild the project and you are ready to
@@ -303,7 +303,7 @@ for valid state space sizes.</p>
 <p>Intermediate data is used as a place to store The intermediate data
 is not handled by code generation as it only requires changes in one
 place. You can make modifications by adding new data into the struct in
-<a href="https://github.com/mrc-ide/frogger/blob/main/inst/include/types.hpp" class="external-link"><code>inst/include/types.hpp</code></a>,
+<a href="https://github.com/mrc-ide/frogger/blob/main/r-package/inst/include/types.hpp" class="external-link"><code>r-package/inst/include/types.hpp</code></a>,
 making sure to set its default value in the <code>reset</code> function
 on the struct.</p>
 </div>
@@ -321,8 +321,8 @@ variant is one of the first types, which brings additional input/output
 or the second type which does not bring additional data.</p>
 <p>To add a new variant. Firstly, in the code generation:</p>
 <ol style="list-style-type: decimal">
-<li>Add any new input or output data in <a href="https://github.com/mrc-ide/frogger/blob/main/inst/cpp_generation/model_input.csv" class="external-link"><code>inst/include/model_input.csv</code></a>
-or <a href="https://github.com/mrc-ide/frogger/blob/main/inst/cpp_generation/model_output.csv" class="external-link"><code>inst/include/model_output.csv</code></a>
+<li>Add any new input or output data in <a href="https://github.com/mrc-ide/frogger/blob/main/inst/cpp_generation/model_input.csv" class="external-link"><code>r-package/inst/include/model_input.csv</code></a>
+or <a href="https://github.com/mrc-ide/frogger/blob/main/inst/cpp_generation/model_output.csv" class="external-link"><code>r-package/inst/include/model_output.csv</code></a>
 </li>
 <li>If you have new input data, add a specialism for the new variant
 into the state_types template in <a href="https://github.com/mrc-ide/frogger/blob/main/inst/cpp_generation/state_types.hpp.in" class="external-link"><code>inst/cpp_generation/state_types.hpp.in</code></a>
@@ -331,15 +331,15 @@ into the state_types template in <a href="https://github.com/mrc-ide/frogger/blo
 </ol>
 <p>In the C++ code:</p>
 <ol style="list-style-type: decimal">
-<li>Add your new variant in <a href="https://github.com/mrc-ide/frogger/blob/main/inst/include/model_variants.hpp" class="external-link"><code>inst/include/model_variants.hpp</code></a>
+<li>Add your new variant in <a href="https://github.com/mrc-ide/frogger/blob/main/r-package/inst/include/model_variants.hpp" class="external-link"><code>r-package/inst/include/model_variants.hpp</code></a>
 </li>
-<li>Add a struct for the new state space in <a href="https://github.com/mrc-ide/frogger/blob/main/inst/include/state_space.hpp" class="external-link"><code>inst/include/state_space.hpp</code></a>
+<li>Add a struct for the new state space in <a href="https://github.com/mrc-ide/frogger/blob/main/r-package/inst/include/state_space.hpp" class="external-link"><code>r-package/inst/include/state_space.hpp</code></a>
 </li>
 <li>If your model has new input data, add parameters for this variant in
-<a href="https://github.com/mrc-ide/frogger/blob/main/inst/include/parameters.hpp" class="external-link"><code>inst/include/parameters.hpp</code></a>.
+<a href="https://github.com/mrc-ide/frogger/blob/main/r-package/inst/include/parameters.hpp" class="external-link"><code>r-package/inst/include/parameters.hpp</code></a>.
 Parameter types will be generated, you need to add those types to the
 appropriate template specialisation</li>
-<li>If your model has new output data, add a new specialisation in <a href="https://github.com/mrc-ide/frogger/blob/main/inst/include/state_saver.hpp" class="external-link"><code>inst/include/state_saver.hpp</code></a>
+<li>If your model has new output data, add a new specialisation in <a href="https://github.com/mrc-ide/frogger/blob/main/r-package/inst/include/state_saver.hpp" class="external-link"><code>r-package/inst/include/state_saver.hpp</code></a>
 </li>
 </ol>
 <p>You now need to update the R wrapper to be able to call this new

@@ -18,9 +18,13 @@
 <url><loc>/reference/prepare_leapfrog_demp.html</loc></url>
 <url><loc>/reference/prepare_leapfrog_parameters.html</loc></url>
 <url><loc>/reference/prepare_leapfrog_projp.html</loc></url>
+<url><loc>/reference/process_parameters_to_cpp.html</loc></url>
+<url><loc>/reference/process_parameters_to_r.html</loc></url>
+<url><loc>/reference/read_parameters.html</loc></url>
 <url><loc>/reference/run_model.html</loc></url>
 <url><loc>/reference/run_model_from_state.html</loc></url>
 <url><loc>/reference/run_model_single_year.html</loc></url>
+<url><loc>/reference/save_parameters.html</loc></url>
 <url><loc>/reference/serialize_r_to_tensor.html</loc></url>
 </urlset>
 
