@@ -149,10 +149,11 @@ struct HaAdapter<Language::C, real_type, ModelVariant> {
     fill_initial_state<real_type, typename Config::State::shape_h_hiv_deaths_art>(state.ha->h_hiv_deaths_art, state.ha->h_hiv_deaths_art_length, "h_hiv_deaths_art", initial_state.h_hiv_deaths_art);
     fill_initial_state<real_type, typename Config::State::shape_h_art_initiation>(state.ha->h_art_initiation, state.ha->h_art_initiation_length, "h_art_initiation", initial_state.h_art_initiation);
     fill_initial_state<real_type, typename Config::State::shape_p_hiv_deaths>(state.ha->p_hiv_deaths, state.ha->p_hiv_deaths_length, "p_hiv_deaths", initial_state.p_hiv_deaths);
+    fill_initial_state<real_type, typename Config::State::shape_p_net_migration_hivpop>(state.ha->p_net_migration_hivpop, state.ha->p_net_migration_hivpop_length, "p_net_migration_hivpop", initial_state.p_net_migration_hivpop);
     return initial_state;
   };
 
-  static constexpr int output_count = 9;
+  static constexpr int output_count = 10;
 
   static int build_output(
     int index,
@@ -168,6 +169,7 @@ struct HaAdapter<Language::C, real_type, ModelVariant> {
     write_data<real_type, typename Config::OutputState::shape_h_hiv_deaths_art>(state.h_hiv_deaths_art, out.ha->h_hiv_deaths_art, out.ha->h_hiv_deaths_art_length, "h_hiv_deaths_art");
     write_data<real_type, typename Config::OutputState::shape_h_art_initiation>(state.h_art_initiation, out.ha->h_art_initiation, out.ha->h_art_initiation_length, "h_art_initiation");
     write_data<real_type, typename Config::OutputState::shape_p_hiv_deaths>(state.p_hiv_deaths, out.ha->p_hiv_deaths, out.ha->p_hiv_deaths_length, "p_hiv_deaths");
+    write_data<real_type, typename Config::OutputState::shape_p_net_migration_hivpop>(state.p_net_migration_hivpop, out.ha->p_net_migration_hivpop, out.ha->p_net_migration_hivpop_length, "p_net_migration_hivpop");
     return index + output_count;
   };
 
@@ -185,6 +187,7 @@ struct HaAdapter<Language::C, real_type, ModelVariant> {
     write_data<real_type, typename Config::State::shape_h_hiv_deaths_art>(state.h_hiv_deaths_art, out.ha->h_hiv_deaths_art, out.ha->h_hiv_deaths_art_length, "h_hiv_deaths_art");
     write_data<real_type, typename Config::State::shape_h_art_initiation>(state.h_art_initiation, out.ha->h_art_initiation, out.ha->h_art_initiation_length, "h_art_initiation");
     write_data<real_type, typename Config::State::shape_p_hiv_deaths>(state.p_hiv_deaths, out.ha->p_hiv_deaths, out.ha->p_hiv_deaths_length, "p_hiv_deaths");
+    write_data<real_type, typename Config::State::shape_p_net_migration_hivpop>(state.p_net_migration_hivpop, out.ha->p_net_migration_hivpop, out.ha->p_net_migration_hivpop_length, "p_net_migration_hivpop");
     return index + output_count;
   };
 };
@@ -266,10 +269,11 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
     fill_initial_state<real_type, typename Config::State::shape_mtct_by_source_tr>(state.hc->mtct_by_source_tr, state.hc->mtct_by_source_tr_length, "mtct_by_source_tr", initial_state.mtct_by_source_tr);
     fill_initial_state<real_type, typename Config::State::shape_mtct_by_source_women>(state.hc->mtct_by_source_women, state.hc->mtct_by_source_women_length, "mtct_by_source_women", initial_state.mtct_by_source_women);
     fill_initial_state<real_type, typename Config::State::shape_mtct_by_source_hc_infections>(state.hc->mtct_by_source_hc_infections, state.hc->mtct_by_source_hc_infections_length, "mtct_by_source_hc_infections", initial_state.mtct_by_source_hc_infections);
+    fill_initial_state<real_type, typename Config::State::shape_pmtct_coverage_at_delivery>(state.hc->pmtct_coverage_at_delivery, state.hc->pmtct_coverage_at_delivery_length, "pmtct_coverage_at_delivery", initial_state.pmtct_coverage_at_delivery);
     return initial_state;
   };
 
-  static constexpr int output_count = 17;
+  static constexpr int output_count = 18;
 
   static int build_output(
     int index,
@@ -293,6 +297,7 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
     write_data<real_type, typename Config::OutputState::shape_mtct_by_source_tr>(state.mtct_by_source_tr, out.hc->mtct_by_source_tr, out.hc->mtct_by_source_tr_length, "mtct_by_source_tr");
     write_data<real_type, typename Config::OutputState::shape_mtct_by_source_women>(state.mtct_by_source_women, out.hc->mtct_by_source_women, out.hc->mtct_by_source_women_length, "mtct_by_source_women");
     write_data<real_type, typename Config::OutputState::shape_mtct_by_source_hc_infections>(state.mtct_by_source_hc_infections, out.hc->mtct_by_source_hc_infections, out.hc->mtct_by_source_hc_infections_length, "mtct_by_source_hc_infections");
+    write_data<real_type, typename Config::OutputState::shape_pmtct_coverage_at_delivery>(state.pmtct_coverage_at_delivery, out.hc->pmtct_coverage_at_delivery, out.hc->pmtct_coverage_at_delivery_length, "pmtct_coverage_at_delivery");
     return index + output_count;
   };
 
@@ -318,6 +323,7 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
     write_data<real_type, typename Config::State::shape_mtct_by_source_tr>(state.mtct_by_source_tr, out.hc->mtct_by_source_tr, out.hc->mtct_by_source_tr_length, "mtct_by_source_tr");
     write_data<real_type, typename Config::State::shape_mtct_by_source_women>(state.mtct_by_source_women, out.hc->mtct_by_source_women, out.hc->mtct_by_source_women_length, "mtct_by_source_women");
     write_data<real_type, typename Config::State::shape_mtct_by_source_hc_infections>(state.mtct_by_source_hc_infections, out.hc->mtct_by_source_hc_infections, out.hc->mtct_by_source_hc_infections_length, "mtct_by_source_hc_infections");
+    write_data<real_type, typename Config::State::shape_pmtct_coverage_at_delivery>(state.pmtct_coverage_at_delivery, out.hc->pmtct_coverage_at_delivery, out.hc->pmtct_coverage_at_delivery_length, "pmtct_coverage_at_delivery");
     return index + output_count;
   };
 };

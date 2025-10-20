@@ -72,7 +72,7 @@ struct HaAdapter<Language::Cpp, real_type, ModelVariant> {
     };
   };
 
-  static constexpr int output_count = 9;
+  static constexpr int output_count = 10;
 
   static int build_output(
     int index,
@@ -88,6 +88,7 @@ struct HaAdapter<Language::Cpp, real_type, ModelVariant> {
     write_data<real_type, typename Config::OutputState::shape_h_hiv_deaths_art>(output_file, "h_hiv_deaths_art", state.h_hiv_deaths_art);
     write_data<real_type, typename Config::OutputState::shape_h_art_initiation>(output_file, "h_art_initiation", state.h_art_initiation);
     write_data<real_type, typename Config::OutputState::shape_p_hiv_deaths>(output_file, "p_hiv_deaths", state.p_hiv_deaths);
+    write_data<real_type, typename Config::OutputState::shape_p_net_migration_hivpop>(output_file, "p_net_migration_hivpop", state.p_net_migration_hivpop);
     return index + output_count;
   };
 };
@@ -147,7 +148,7 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
     };
   };
 
-  static constexpr int output_count = 17;
+  static constexpr int output_count = 18;
 
   static int build_output(
     int index,
@@ -171,6 +172,7 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
     write_data<real_type, typename Config::OutputState::shape_mtct_by_source_tr>(output_file, "mtct_by_source_tr", state.mtct_by_source_tr);
     write_data<real_type, typename Config::OutputState::shape_mtct_by_source_women>(output_file, "mtct_by_source_women", state.mtct_by_source_women);
     write_data<real_type, typename Config::OutputState::shape_mtct_by_source_hc_infections>(output_file, "mtct_by_source_hc_infections", state.mtct_by_source_hc_infections);
+    write_data<real_type, typename Config::OutputState::shape_pmtct_coverage_at_delivery>(output_file, "pmtct_coverage_at_delivery", state.pmtct_coverage_at_delivery);
     return index + output_count;
   };
 };

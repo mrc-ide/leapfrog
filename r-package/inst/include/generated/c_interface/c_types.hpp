@@ -101,6 +101,8 @@ struct HaOut {
   int h_art_initiation_length;
   real_type* p_hiv_deaths;
   int p_hiv_deaths_length;
+  real_type* p_net_migration_hivpop;
+  int p_net_migration_hivpop_length;
 };
 
 template<typename real_type>
@@ -229,6 +231,8 @@ struct HcOut {
   int mtct_by_source_women_length;
   real_type* mtct_by_source_hc_infections;
   int mtct_by_source_hc_infections_length;
+  real_type* pmtct_coverage_at_delivery;
+  int pmtct_coverage_at_delivery_length;
 };
 
 template<typename real_type>

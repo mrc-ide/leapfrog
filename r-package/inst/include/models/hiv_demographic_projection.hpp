@@ -80,8 +80,8 @@ struct HivDemographicProjection<Config> {
     // remove net migration from hiv stratified population
     for (int g = 0; g < NS; ++g) {
       for (int a = 0; a < pAG; ++a) {
-        i_ha.hiv_net_migration(a, g) = n_ha.p_hiv_pop(a, g) * i_dp.migration_rate(a, g);
-        n_ha.p_hiv_pop(a, g) += i_ha.hiv_net_migration(a, g);
+        n_ha.p_net_migration_hivpop(a, g) = n_ha.p_hiv_pop(a, g) * i_dp.migration_rate(a, g);
+        n_ha.p_hiv_pop(a, g) += n_ha.p_net_migration_hivpop(a, g);
       }
     }
 
@@ -93,7 +93,7 @@ struct HivDemographicProjection<Config> {
         real_type hivpop_ha_postmig = 0.0;
         for (int i = 0; i < hAG_span[ha]; ++i, ++a) {
           hivpop_ha_postmig += n_ha.p_hiv_pop(a, g);
-          migration_num_ha += i_ha.hiv_net_migration(a, g);
+          migration_num_ha += n_ha.p_net_migration_hivpop(a, g);
         }
 
         real_type migration_rate = 0.0;
@@ -115,7 +115,7 @@ struct HivDemographicProjection<Config> {
 
   void run_hc_hiv_pop_end_year_migration() {
     static_assert(ModelVariant::run_child_model,
-                  "run_age_15_entrants can only be called for model variants where run_child_model is true");
+                  "run_hc_hiv_pop_end_year_migration can only be called for model variants where run_child_model is true");
     static constexpr int hc2_agestart = SS::hc2_agestart;
     static constexpr int hcAG_end = SS::hcAG_end;
     static constexpr int hc1DS = SS::hc1DS;
@@ -133,7 +133,7 @@ struct HivDemographicProjection<Config> {
       for (int a = 0; a < hcAG_end; ++a) {
         real_type hc_migration_num = 0.0;
         real_type hc_hivpop_postmig = n_ha.p_hiv_pop(a, s);
-        hc_migration_num = i_ha.hiv_net_migration(a, s);
+        hc_migration_num = n_ha.p_net_migration_hivpop(a, s);
 
         real_type migration_rate = 0.0;
         if (hc_hivpop_postmig > 0.0) {
@@ -313,8 +313,8 @@ struct HivDemographicProjection<Config> {
       for (int a = 1; a < pAG; ++a) {
         n_ha.p_hiv_pop(a, g) -= n_ha.p_hiv_pop_background_deaths(a, g);
         if (opts.proj_period_int == PROJPERIOD_MIDYEAR) {
-          i_ha.hiv_net_migration(a, g) = n_ha.p_hiv_pop(a, g) * i_dp.migration_rate(a, g);
-          n_ha.p_hiv_pop(a, g) += i_ha.hiv_net_migration(a, g);
+          n_ha.p_net_migration_hivpop(a, g) = n_ha.p_hiv_pop(a, g) * i_dp.migration_rate(a, g);
+          n_ha.p_hiv_pop(a, g) += n_ha.p_net_migration_hivpop(a, g);
         }
       }
     }
@@ -327,7 +327,7 @@ struct HivDemographicProjection<Config> {
         for (int i = 0; i < hAG_span[ha]; ++i, ++a) {
           deaths_migrate -= n_ha.p_hiv_pop_background_deaths(a, g);
           if (opts.proj_period_int == PROJPERIOD_MIDYEAR) {
-            deaths_migrate += i_ha.hiv_net_migration(a, g);
+            deaths_migrate += n_ha.p_net_migration_hivpop(a, g);
           }
         }
 
@@ -367,7 +367,7 @@ struct HivDemographicProjection<Config> {
       for (int a = 0; a < hcAG_end; ++a) {
         deaths_migrate -= n_ha.p_hiv_pop_background_deaths(a, s);
         if (opts.proj_period_int == PROJPERIOD_MIDYEAR) {
-          deaths_migrate += i_ha.hiv_net_migration(a, s);
+          deaths_migrate += n_ha.p_net_migration_hivpop(a, s);
         }
         if(n_ha.p_hiv_pop(a, s) > 0){
           deaths_migrate /= n_ha.p_hiv_pop(a, s);

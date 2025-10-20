@@ -207,11 +207,6 @@ struct HaConfig {
   };
 
   struct Intermediate {
-    using shape_hiv_net_migration = nda::shape<
-      nda::dim<0, SS::pAG, 1>,
-      nda::dim<0, SS::NS, (SS::pAG)>
-    >;
-    nda::array<real_type, shape_hiv_net_migration> hiv_net_migration;
     using shape_hiv_negative_pop = nda::shape<
       nda::dim<0, SS::pAG, 1>
     >;
@@ -302,7 +297,6 @@ struct HaConfig {
     Intermediate() {};
 
     void reset() {
-      hiv_net_migration.for_each_value([](real_type& x) { x = 0; });
       hiv_negative_pop.for_each_value([](real_type& x) { x = 0; });
       rate_sex.for_each_value([](real_type& x) { x = 0; });
       hiv_neg_aggregate.for_each_value([](real_type& x) { x = 0; });
@@ -393,6 +387,11 @@ struct HaConfig {
       nda::dim<0, SS::NS, (SS::pAG)>
     >;
     nda::array<real_type, shape_p_hiv_deaths> p_hiv_deaths;
+    using shape_p_net_migration_hivpop = nda::shape<
+      nda::dim<0, SS::pAG, 1>,
+      nda::dim<0, SS::NS, (SS::pAG)>
+    >;
+    nda::array<real_type, shape_p_net_migration_hivpop> p_net_migration_hivpop;
 
     void reset() {
       p_hiv_pop.for_each_value([](real_type& x) { x = 0; });
@@ -404,6 +403,7 @@ struct HaConfig {
       h_hiv_deaths_art.for_each_value([](real_type& x) { x = 0; });
       h_art_initiation.for_each_value([](real_type& x) { x = 0; });
       p_hiv_deaths.for_each_value([](real_type& x) { x = 0; });
+      p_net_migration_hivpop.for_each_value([](real_type& x) { x = 0; });
     };
   };
 
@@ -469,6 +469,12 @@ struct HaConfig {
       nda::dim<0, nda::dynamic, (SS::pAG) * (SS::NS)>
     >;
     nda::array<real_type, shape_p_hiv_deaths> p_hiv_deaths;
+    using shape_p_net_migration_hivpop = nda::shape<
+      nda::dim<0, SS::pAG, 1>,
+      nda::dim<0, SS::NS, (SS::pAG)>,
+      nda::dim<0, nda::dynamic, (SS::pAG) * (SS::NS)>
+    >;
+    nda::array<real_type, shape_p_net_migration_hivpop> p_net_migration_hivpop;
 
     OutputState(int output_years):
       p_hiv_pop(shape_p_hiv_pop(SS::pAG, SS::NS, output_years)),
@@ -479,7 +485,8 @@ struct HaConfig {
       p_infections(shape_p_infections(SS::pAG, SS::NS, output_years)),
       h_hiv_deaths_art(shape_h_hiv_deaths_art(SS::hTS, SS::hDS, SS::hAG, SS::NS, output_years)),
       h_art_initiation(shape_h_art_initiation(SS::hDS, SS::hAG, SS::NS, output_years)),
-      p_hiv_deaths(shape_p_hiv_deaths(SS::pAG, SS::NS, output_years))
+      p_hiv_deaths(shape_p_hiv_deaths(SS::pAG, SS::NS, output_years)),
+      p_net_migration_hivpop(shape_p_net_migration_hivpop(SS::pAG, SS::NS, output_years))
     {
       p_hiv_pop.for_each_value([](real_type& x) { x = 0; });
       p_hiv_pop_background_deaths.for_each_value([](real_type& x) { x = 0; });
@@ -490,6 +497,7 @@ struct HaConfig {
       h_hiv_deaths_art.for_each_value([](real_type& x) { x = 0; });
       h_art_initiation.for_each_value([](real_type& x) { x = 0; });
       p_hiv_deaths.for_each_value([](real_type& x) { x = 0; });
+      p_net_migration_hivpop.for_each_value([](real_type& x) { x = 0; });
     };
 
     void save_state(const size_t i, const State &state) {
@@ -529,10 +537,14 @@ struct HaConfig {
       nda::for_each_index(chip_p_hiv_deaths.shape(), [&](auto idx) -> void {
         chip_p_hiv_deaths[idx] = state.p_hiv_deaths[idx];
       });
+      auto chip_p_net_migration_hivpop = p_net_migration_hivpop(nda::_, nda::_, i);
+      nda::for_each_index(chip_p_net_migration_hivpop.shape(), [&](auto idx) -> void {
+        chip_p_net_migration_hivpop[idx] = state.p_net_migration_hivpop[idx];
+      });
     };
   };
 
-  static constexpr int output_count = 9;
+  static constexpr int output_count = 10;
   static int get_build_output_size(int prev_size) {
     return prev_size + output_count;
   };
@@ -1069,6 +1081,10 @@ struct HcConfig {
       nda::dim<0, SS::hcTT_expanded, (SS::mtct_source)>
     >;
     nda::array<real_type, shape_mtct_by_source_hc_infections> mtct_by_source_hc_infections;
+    using shape_pmtct_coverage_at_delivery = nda::shape<
+      nda::dim<0, SS::hPS, 1>
+    >;
+    nda::array<real_type, shape_pmtct_coverage_at_delivery> pmtct_coverage_at_delivery;
 
     void reset() {
       hiv_births_by_mat_age.for_each_value([](real_type& x) { x = 0; });
@@ -1088,6 +1104,7 @@ struct HcConfig {
       mtct_by_source_tr.for_each_value([](real_type& x) { x = 0; });
       mtct_by_source_women.for_each_value([](real_type& x) { x = 0; });
       mtct_by_source_hc_infections.for_each_value([](real_type& x) { x = 0; });
+      pmtct_coverage_at_delivery.for_each_value([](real_type& x) { x = 0; });
     };
   };
 
@@ -1206,6 +1223,11 @@ struct HcConfig {
       nda::dim<0, nda::dynamic, (SS::mtct_source) * (SS::hcTT_expanded)>
     >;
     nda::array<real_type, shape_mtct_by_source_hc_infections> mtct_by_source_hc_infections;
+    using shape_pmtct_coverage_at_delivery = nda::shape<
+      nda::dim<0, SS::hPS, 1>,
+      nda::dim<0, nda::dynamic, (SS::hPS)>
+    >;
+    nda::array<real_type, shape_pmtct_coverage_at_delivery> pmtct_coverage_at_delivery;
 
     OutputState(int output_years):
       hiv_births_by_mat_age(shape_hiv_births_by_mat_age(SS::hc_p_fertility_age_groups, output_years)),
@@ -1224,7 +1246,8 @@ struct HcConfig {
       infection_by_type(shape_infection_by_type(SS::hcTT, SS::hc1AG, SS::NS, output_years)),
       mtct_by_source_tr(shape_mtct_by_source_tr(SS::mtct_source, SS::hcTT_expanded, output_years)),
       mtct_by_source_women(shape_mtct_by_source_women(SS::mtct_source, output_years)),
-      mtct_by_source_hc_infections(shape_mtct_by_source_hc_infections(SS::mtct_source, SS::hcTT_expanded, output_years))
+      mtct_by_source_hc_infections(shape_mtct_by_source_hc_infections(SS::mtct_source, SS::hcTT_expanded, output_years)),
+      pmtct_coverage_at_delivery(shape_pmtct_coverage_at_delivery(SS::hPS, output_years))
     {
       hiv_births_by_mat_age.for_each_value([](real_type& x) { x = 0; });
       hc1_hiv_pop.for_each_value([](real_type& x) { x = 0; });
@@ -1243,6 +1266,7 @@ struct HcConfig {
       mtct_by_source_tr.for_each_value([](real_type& x) { x = 0; });
       mtct_by_source_women.for_each_value([](real_type& x) { x = 0; });
       mtct_by_source_hc_infections.for_each_value([](real_type& x) { x = 0; });
+      pmtct_coverage_at_delivery.for_each_value([](real_type& x) { x = 0; });
     };
 
     void save_state(const size_t i, const State &state) {
@@ -1308,10 +1332,14 @@ struct HcConfig {
       nda::for_each_index(chip_mtct_by_source_hc_infections.shape(), [&](auto idx) -> void {
         chip_mtct_by_source_hc_infections[idx] = state.mtct_by_source_hc_infections[idx];
       });
+      auto chip_pmtct_coverage_at_delivery = pmtct_coverage_at_delivery(nda::_, i);
+      nda::for_each_index(chip_pmtct_coverage_at_delivery.shape(), [&](auto idx) -> void {
+        chip_pmtct_coverage_at_delivery[idx] = state.pmtct_coverage_at_delivery[idx];
+      });
     };
   };
 
-  static constexpr int output_count = 17;
+  static constexpr int output_count = 18;
   static int get_build_output_size(int prev_size) {
     return prev_size + output_count;
   };

@@ -165,6 +165,8 @@ type
     hArtInitiationLength: Integer;
     pHivDeaths: PDouble;
     pHivDeathsLength: Integer;
+    pNetMigrationHivpop: PDouble;
+    pNetMigrationHivpopLength: Integer;
 end;
 
 type
@@ -179,6 +181,7 @@ type
     hHivDeathsArt: TGBFixedArray<Double>;
     hArtInitiation: TGBFixedArray<Double>;
     pHivDeaths: TGBFixedArray<Double>;
+    pNetMigrationHivpop: TGBFixedArray<Double>;
     function getView(): LeapfrogHivAdultStateView;
     procedure writeToDisk(dir: string);
     Destructor Destroy; override;
@@ -365,6 +368,8 @@ type
     mtctBySourceWomenLength: Integer;
     mtctBySourceHcInfections: PDouble;
     mtctBySourceHcInfectionsLength: Integer;
+    pmtctCoverageAtDelivery: PDouble;
+    pmtctCoverageAtDeliveryLength: Integer;
 end;
 
 type
@@ -387,6 +392,7 @@ type
     mtctBySourceTr: TGBFixedArray<Double>;
     mtctBySourceWomen: TGBFixedArray<Double>;
     mtctBySourceHcInfections: TGBFixedArray<Double>;
+    pmtctCoverageAtDelivery: TGBFixedArray<Double>;
     function getView(): LeapfrogHivChildStateView;
     procedure writeToDisk(dir: string);
     Destructor Destroy; override;
@@ -498,6 +504,7 @@ begin;
   hHivDeathsArt.Free;
   hArtInitiation.Free;
   pHivDeaths.Free;
+  pNetMigrationHivpop.Free;
   inherited;
 end;
 
@@ -561,6 +568,8 @@ begin;
   Result.hArtInitiationLength := hArtInitiation.GetLength();
   Result.pHivDeaths := PDouble(pHivDeaths.data);
   Result.pHivDeathsLength := pHivDeaths.GetLength();
+  Result.pNetMigrationHivpop := PDouble(pNetMigrationHivpop.data);
+  Result.pNetMigrationHivpopLength := pNetMigrationHivpop.GetLength();
 end;
 
 destructor LeapfrogHivChildParams.Destroy;
@@ -628,6 +637,7 @@ begin;
   mtctBySourceTr.Free;
   mtctBySourceWomen.Free;
   mtctBySourceHcInfections.Free;
+  pmtctCoverageAtDelivery.Free;
   inherited;
 end;
 
@@ -757,6 +767,8 @@ begin;
   Result.mtctBySourceWomenLength := mtctBySourceWomen.GetLength();
   Result.mtctBySourceHcInfections := PDouble(mtctBySourceHcInfections.data);
   Result.mtctBySourceHcInfectionsLength := mtctBySourceHcInfections.GetLength();
+  Result.pmtctCoverageAtDelivery := PDouble(pmtctCoverageAtDelivery.data);
+  Result.pmtctCoverageAtDeliveryLength := pmtctCoverageAtDelivery.GetLength();
 end;
 
 procedure LeapfrogDemProjParams.writeToDisk(dir: string);
@@ -810,6 +822,7 @@ begin;
   hHivDeathsArt.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hHivDeathsArt');
   hArtInitiation.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hArtInitiation');
   pHivDeaths.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pHivDeaths');
+  pNetMigrationHivpop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pNetMigrationHivpop');
 end;
 
 procedure LeapfrogHivChildParams.writeToDisk(dir: string);
@@ -878,6 +891,7 @@ begin;
   mtctBySourceTr.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'mtctBySourceTr');
   mtctBySourceWomen.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'mtctBySourceWomen');
   mtctBySourceHcInfections.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'mtctBySourceHcInfections');
+  pmtctCoverageAtDelivery.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pmtctCoverageAtDelivery');
 end;
 
 procedure LeapfrogParams.SetDemProjParams(const demprojParams: LeapfrogDemProjParamsView);
