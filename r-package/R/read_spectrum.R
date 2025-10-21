@@ -810,7 +810,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, use_coarse_age_groups = FALS
     v$pmtct_input_isperc = rep(T, length(proj.years))
   }
 
-  pmtct_new <- array(0, dim = c(7, 61), dimnames = list(pmtct = c("Option A", "Option B", "SDNVP", "Dual ARV", "Option B+: before pregnancy", "Option B+: >4 weeks", "Option B+: <4 weeks")))
+  pmtct_new <- array(0, dim = c(7, length(proj.years)), dimnames = list(pmtct = c("Option A", "Option B", "SDNVP", "Dual ARV", "Option B+: before pregnancy", "Option B+: >4 weeks", "Option B+: <4 weeks")))
   ## pick out which ones were inserted as numbers
   pmtct_new[, which(colSums(pmtct_list)[, 1] > 0)] <- pmtct_list[, (which(colSums(pmtct_list)[, 1] > 0)), 1]
   ## pick out which ones were inserted as percent
