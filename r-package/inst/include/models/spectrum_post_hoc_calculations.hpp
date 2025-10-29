@@ -31,6 +31,7 @@ struct SpectrumPostHocCalculations<Config> {
   static constexpr int hDS = SS::hDS;
   static constexpr int hTS = SS::hTS;
   static constexpr int hAG = SS::hAG;
+  static constexpr auto hAG_span = SS::hAG_span;
   static constexpr int pAG = SS::pAG;
   static constexpr int p_idx_hiv_first_adult = SS::p_idx_hiv_first_adult;
 
@@ -66,21 +67,22 @@ struct SpectrumPostHocCalculations<Config> {
 
     for (int g = 0; g < NS; ++g) {
 
-      for (int ha = 0; ha < p_idx_hiv_first_adult; ++ha) {
+      for (int a = 0; a < p_idx_hiv_first_adult; ++a) {
         // Spectrum stores nonaids deaths by age but for children is always 0.
         // Write this out as 0 for children so we match Spectrum.
-        n_sp.p_deaths_nonaids_artpop(ha, g) = 0.0;
-        n_sp.p_deaths_nonaids_hivpop(ha, g) = 0.0;
+        n_sp.p_deaths_nonaids_artpop(a, g) = 0.0;
+        n_sp.p_deaths_nonaids_hivpop(a, g) = 0.0;
       }
 
-      for (int ha = p_idx_hiv_first_adult; ha < pAG; ++ha) {
+      int a = p_idx_hiv_first_adult;
+      for (int ha = 0; ha < hAG; ++ha) {
         i_sp.hiv_art_adult_sa = 0.0;
         i_sp.hiv_untreated_adult_sa = 0.0;
 
         for (int hm = 0; hm < hDS; ++hm) {
-          i_sp.hiv_untreated_adult_sa = i_sp.hiv_untreated_adult_sa + n_ha.h_hiv_adult(hm, ha - p_idx_hiv_first_adult, g);
+          i_sp.hiv_untreated_adult_sa += n_ha.h_hiv_adult(hm, ha, g);
           for (int hu = 0; hu < hTS; ++hu) {
-            i_sp.hiv_art_adult_sa = i_sp.hiv_art_adult_sa + n_ha.h_art_adult(hu, hm, ha - p_idx_hiv_first_adult, g);
+            i_sp.hiv_art_adult_sa += n_ha.h_art_adult(hu, hm, ha, g);
           }
         }
 
@@ -90,8 +92,10 @@ struct SpectrumPostHocCalculations<Config> {
           i_sp.artcov_adult_sa = 0.0;
         }
 
-        n_sp.p_deaths_nonaids_artpop(ha, g) = n_ha.p_hiv_pop_background_deaths(ha, g) * i_sp.artcov_adult_sa;
-        n_sp.p_deaths_nonaids_hivpop(ha, g) = n_ha.p_hiv_pop_background_deaths(ha, g) * (1.0 - i_sp.artcov_adult_sa);
+        for (int i = 0; i < hAG_span[ha]; ++i, ++a) {
+          n_sp.p_deaths_nonaids_artpop(a, g) = n_ha.p_hiv_pop_background_deaths(a, g) * i_sp.artcov_adult_sa;
+          n_sp.p_deaths_nonaids_hivpop(a, g) = n_ha.p_hiv_pop_background_deaths(a, g) * (1.0 - i_sp.artcov_adult_sa);
+        }
       }
     }
   };
