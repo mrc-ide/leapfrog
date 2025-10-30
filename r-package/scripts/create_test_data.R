@@ -24,6 +24,7 @@ parameters_coarse <- c(demp, proj_coarse)
 save_parameters(parameters_coarse, testthat::test_path("testdata/adult_parms_coarse.h5"))
 
 spectrum_parameters <- prepare_hc_leapfrog_projp(pjnz_adult, params = parameters, use_coarse_age_groups = FALSE)
+spectrum_parameters <- prepare_spectrum_leapfrog_projp(pjnz_adult, params = spectrum_parameters)
 save_parameters(spectrum_parameters, testthat::test_path("testdata/spectrum_params.h5"))
 
 # temporary backwards compatibility for leapfrog

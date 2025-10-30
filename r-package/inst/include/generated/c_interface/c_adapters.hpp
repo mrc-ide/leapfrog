@@ -338,6 +338,8 @@ struct SpAdapter<Language::C, real_type, ModelVariant> {
     const Options<real_type> &opts
   ) {
     return {
+      .cd4_nonaids_excess_mort = read_data<real_type, 3>(params.sp->cd4_nonaids_excess_mort, params.sp->cd4_nonaids_excess_mort_length, "cd4_nonaids_excess_mort", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),
+      .art_nonaids_excess_mort = read_data<real_type, 4>(params.sp->art_nonaids_excess_mort, params.sp->art_nonaids_excess_mort_length, "art_nonaids_excess_mort", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, SS::hDS, (SS::hTS)), nda::dim<>(0, SS::hAG, (SS::hTS) * (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hTS) * (SS::hDS) * (SS::hAG)) })
     };
   };
 
@@ -347,10 +349,12 @@ struct SpAdapter<Language::C, real_type, ModelVariant> {
     typename Config::State initial_state;
     fill_initial_state<real_type, typename Config::State::shape_p_deaths_nonaids_artpop>(state.sp->p_deaths_nonaids_artpop, state.sp->p_deaths_nonaids_artpop_length, "p_deaths_nonaids_artpop", initial_state.p_deaths_nonaids_artpop);
     fill_initial_state<real_type, typename Config::State::shape_p_deaths_nonaids_hivpop>(state.sp->p_deaths_nonaids_hivpop, state.sp->p_deaths_nonaids_hivpop_length, "p_deaths_nonaids_hivpop", initial_state.p_deaths_nonaids_hivpop);
+    fill_initial_state<real_type, typename Config::State::shape_p_excess_deaths_nonaids_on_art>(state.sp->p_excess_deaths_nonaids_on_art, state.sp->p_excess_deaths_nonaids_on_art_length, "p_excess_deaths_nonaids_on_art", initial_state.p_excess_deaths_nonaids_on_art);
+    fill_initial_state<real_type, typename Config::State::shape_p_excess_deaths_nonaids_no_art>(state.sp->p_excess_deaths_nonaids_no_art, state.sp->p_excess_deaths_nonaids_no_art_length, "p_excess_deaths_nonaids_no_art", initial_state.p_excess_deaths_nonaids_no_art);
     return initial_state;
   };
 
-  static constexpr int output_count = 2;
+  static constexpr int output_count = 4;
 
   static int build_output(
     int index,
@@ -359,6 +363,8 @@ struct SpAdapter<Language::C, real_type, ModelVariant> {
   ) {
     write_data<real_type, typename Config::OutputState::shape_p_deaths_nonaids_artpop>(state.p_deaths_nonaids_artpop, out.sp->p_deaths_nonaids_artpop, out.sp->p_deaths_nonaids_artpop_length, "p_deaths_nonaids_artpop");
     write_data<real_type, typename Config::OutputState::shape_p_deaths_nonaids_hivpop>(state.p_deaths_nonaids_hivpop, out.sp->p_deaths_nonaids_hivpop, out.sp->p_deaths_nonaids_hivpop_length, "p_deaths_nonaids_hivpop");
+    write_data<real_type, typename Config::OutputState::shape_p_excess_deaths_nonaids_on_art>(state.p_excess_deaths_nonaids_on_art, out.sp->p_excess_deaths_nonaids_on_art, out.sp->p_excess_deaths_nonaids_on_art_length, "p_excess_deaths_nonaids_on_art");
+    write_data<real_type, typename Config::OutputState::shape_p_excess_deaths_nonaids_no_art>(state.p_excess_deaths_nonaids_no_art, out.sp->p_excess_deaths_nonaids_no_art, out.sp->p_excess_deaths_nonaids_no_art_length, "p_excess_deaths_nonaids_no_art");
     return index + output_count;
   };
 
@@ -369,6 +375,8 @@ struct SpAdapter<Language::C, real_type, ModelVariant> {
   ) {
     write_data<real_type, typename Config::State::shape_p_deaths_nonaids_artpop>(state.p_deaths_nonaids_artpop, out.sp->p_deaths_nonaids_artpop, out.sp->p_deaths_nonaids_artpop_length, "p_deaths_nonaids_artpop");
     write_data<real_type, typename Config::State::shape_p_deaths_nonaids_hivpop>(state.p_deaths_nonaids_hivpop, out.sp->p_deaths_nonaids_hivpop, out.sp->p_deaths_nonaids_hivpop_length, "p_deaths_nonaids_hivpop");
+    write_data<real_type, typename Config::State::shape_p_excess_deaths_nonaids_on_art>(state.p_excess_deaths_nonaids_on_art, out.sp->p_excess_deaths_nonaids_on_art, out.sp->p_excess_deaths_nonaids_on_art_length, "p_excess_deaths_nonaids_on_art");
+    write_data<real_type, typename Config::State::shape_p_excess_deaths_nonaids_no_art>(state.p_excess_deaths_nonaids_no_art, out.sp->p_excess_deaths_nonaids_no_art, out.sp->p_excess_deaths_nonaids_no_art_length, "p_excess_deaths_nonaids_no_art");
     return index + output_count;
   };
 };

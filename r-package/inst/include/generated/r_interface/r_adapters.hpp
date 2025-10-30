@@ -588,6 +588,8 @@ struct SpAdapter<Language::R, real_type, ModelVariant> {
     const Options<real_type> &opts
   ) {
     return {
+      .cd4_nonaids_excess_mort = parse_data<real_type, 3>(data, "cd4_nonaids_excess_mort", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),
+      .art_nonaids_excess_mort = parse_data<real_type, 4>(data, "art_nonaids_excess_mort", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, SS::hDS, (SS::hTS)), nda::dim<>(0, SS::hAG, (SS::hTS) * (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hTS) * (SS::hDS) * (SS::hAG)) })
     };
   };
 
@@ -597,10 +599,12 @@ struct SpAdapter<Language::R, real_type, ModelVariant> {
     typename Config::State state;
     fill_initial_state<real_type, typename Config::State::shape_p_deaths_nonaids_artpop>(data, "p_deaths_nonaids_artpop", state.p_deaths_nonaids_artpop);
     fill_initial_state<real_type, typename Config::State::shape_p_deaths_nonaids_hivpop>(data, "p_deaths_nonaids_hivpop", state.p_deaths_nonaids_hivpop);
+    fill_initial_state<real_type, typename Config::State::shape_p_excess_deaths_nonaids_on_art>(data, "p_excess_deaths_nonaids_on_art", state.p_excess_deaths_nonaids_on_art);
+    fill_initial_state<real_type, typename Config::State::shape_p_excess_deaths_nonaids_no_art>(data, "p_excess_deaths_nonaids_no_art", state.p_excess_deaths_nonaids_no_art);
     return state;
   };
 
-  static constexpr int output_count = 2;
+  static constexpr int output_count = 4;
 
   static int build_output(
     int index,
@@ -619,6 +623,16 @@ struct SpAdapter<Language::R, real_type, ModelVariant> {
     std::copy_n(state.p_deaths_nonaids_hivpop.data(), state.p_deaths_nonaids_hivpop.size(), REAL(r_p_deaths_nonaids_hivpop));
     names[index + 1] = "p_deaths_nonaids_hivpop";
     ret[index + 1] = r_p_deaths_nonaids_hivpop;
+    Rcpp::NumericVector r_p_excess_deaths_nonaids_on_art(SS::pAG * SS::NS * output_years);
+    r_p_excess_deaths_nonaids_on_art.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS, output_years);
+    std::copy_n(state.p_excess_deaths_nonaids_on_art.data(), state.p_excess_deaths_nonaids_on_art.size(), REAL(r_p_excess_deaths_nonaids_on_art));
+    names[index + 2] = "p_excess_deaths_nonaids_on_art";
+    ret[index + 2] = r_p_excess_deaths_nonaids_on_art;
+    Rcpp::NumericVector r_p_excess_deaths_nonaids_no_art(SS::pAG * SS::NS * output_years);
+    r_p_excess_deaths_nonaids_no_art.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS, output_years);
+    std::copy_n(state.p_excess_deaths_nonaids_no_art.data(), state.p_excess_deaths_nonaids_no_art.size(), REAL(r_p_excess_deaths_nonaids_no_art));
+    names[index + 3] = "p_excess_deaths_nonaids_no_art";
+    ret[index + 3] = r_p_excess_deaths_nonaids_no_art;
     return index + output_count;
   };
 
@@ -638,6 +652,16 @@ struct SpAdapter<Language::R, real_type, ModelVariant> {
     std::copy_n(state.p_deaths_nonaids_hivpop.data(), state.p_deaths_nonaids_hivpop.size(), REAL(r_p_deaths_nonaids_hivpop));
     names[index + 1] = "p_deaths_nonaids_hivpop";
     ret[index + 1] = r_p_deaths_nonaids_hivpop;
+    Rcpp::NumericVector r_p_excess_deaths_nonaids_on_art(SS::pAG * SS::NS);
+    r_p_excess_deaths_nonaids_on_art.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS);
+    std::copy_n(state.p_excess_deaths_nonaids_on_art.data(), state.p_excess_deaths_nonaids_on_art.size(), REAL(r_p_excess_deaths_nonaids_on_art));
+    names[index + 2] = "p_excess_deaths_nonaids_on_art";
+    ret[index + 2] = r_p_excess_deaths_nonaids_on_art;
+    Rcpp::NumericVector r_p_excess_deaths_nonaids_no_art(SS::pAG * SS::NS);
+    r_p_excess_deaths_nonaids_no_art.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS);
+    std::copy_n(state.p_excess_deaths_nonaids_no_art.data(), state.p_excess_deaths_nonaids_no_art.size(), REAL(r_p_excess_deaths_nonaids_no_art));
+    names[index + 3] = "p_excess_deaths_nonaids_no_art";
+    ret[index + 3] = r_p_excess_deaths_nonaids_no_art;
     return index + output_count;
   };
 };

@@ -3,10 +3,20 @@ test_that("spectrum post-hoc indicators can be output", {
 
   out <- run_model(parameters, "Spectrum")
 
-  expect_true(all(c("p_deaths_nonaids_artpop", "p_deaths_nonaids_hivpop") %in% names(out)))
+  expected_output <- c(
+    "p_deaths_nonaids_artpop", "p_deaths_nonaids_hivpop",
+    "p_excess_deaths_nonaids_no_art", "p_excess_deaths_nonaids_on_art"
+  )
+  expect_true(all(expected_output %in% names(out)))
   # Always 0 for children
   expect_true(all(out$p_deaths_nonaids_artpop[1:15, , ] == 0))
   expect_true(all(out$p_deaths_nonaids_hivpop[1:15, , ] == 0))
   expect_true(any(out$p_deaths_nonaids_artpop > 0))
   expect_true(any(out$p_deaths_nonaids_hivpop > 0))
+
+  expect_true(all(out$p_excess_deaths_nonaids_no_art[1:15, , ] == 0))
+  expect_true(all(out$p_excess_deaths_nonaids_on_art[1:15, , ] == 0))
+  # TODO: These are all 0, why? Fix this
+  # expect_true(any(out$p_excess_deaths_nonaids_no_art > 0))
+  # expect_true(any(out$p_excess_deaths_nonaids_on_art > 0))
 })

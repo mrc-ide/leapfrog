@@ -603,6 +603,21 @@ struct SpOwnedPars {
   using SS = SSMixed<ModelVariant>;
   
   struct Pars {
+    using shape_cd4_nonaids_excess_mort = nda::shape<
+    nda::dim<0, SS::hDS, 1>,
+    nda::dim<0, SS::hAG, (SS::hDS)>,
+    nda::dim<0, SS::NS, (SS::hDS) * (SS::hAG)>
+  >;
+  nda::array<real_type, shape_cd4_nonaids_excess_mort> cd4_nonaids_excess_mort;
+
+    using shape_art_nonaids_excess_mort = nda::shape<
+    nda::dim<0, SS::hTS, 1>,
+    nda::dim<0, SS::hDS, (SS::hTS)>,
+    nda::dim<0, SS::hAG, (SS::hTS) * (SS::hDS)>,
+    nda::dim<0, SS::NS, (SS::hTS) * (SS::hDS) * (SS::hAG)>
+  >;
+  nda::array<real_type, shape_art_nonaids_excess_mort> art_nonaids_excess_mort;
+
   };
 
   static Pars parse_pars(
@@ -610,6 +625,8 @@ struct SpOwnedPars {
     const Options<real_type> &opts
   ) {
     return {
+      .cd4_nonaids_excess_mort = read_data<real_type, typename Pars::shape_cd4_nonaids_excess_mort>(params_file, "cd4_nonaids_excess_mort", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),
+      .art_nonaids_excess_mort = read_data<real_type, typename Pars::shape_art_nonaids_excess_mort>(params_file, "art_nonaids_excess_mort", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, SS::hDS, (SS::hTS)), nda::dim<>(0, SS::hAG, (SS::hTS) * (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hTS) * (SS::hDS) * (SS::hAG)) })
     };
   };
 };

@@ -186,10 +186,12 @@ struct SpAdapter<Language::Cpp, real_type, ModelVariant> {
     OwnedParsMixed<real_type, ModelVariant>::Pars& owned_pars
   ) {
     return {
+      .cd4_nonaids_excess_mort = { owned_pars.sp.cd4_nonaids_excess_mort.data(), owned_pars.sp.cd4_nonaids_excess_mort.shape() },
+      .art_nonaids_excess_mort = { owned_pars.sp.art_nonaids_excess_mort.data(), owned_pars.sp.art_nonaids_excess_mort.shape() }
     };
   };
 
-  static constexpr int output_count = 2;
+  static constexpr int output_count = 4;
 
   static int build_output(
     int index,
@@ -198,6 +200,8 @@ struct SpAdapter<Language::Cpp, real_type, ModelVariant> {
   ) {
     write_data<real_type, typename Config::OutputState::shape_p_deaths_nonaids_artpop>(output_file, "p_deaths_nonaids_artpop", state.p_deaths_nonaids_artpop);
     write_data<real_type, typename Config::OutputState::shape_p_deaths_nonaids_hivpop>(output_file, "p_deaths_nonaids_hivpop", state.p_deaths_nonaids_hivpop);
+    write_data<real_type, typename Config::OutputState::shape_p_excess_deaths_nonaids_on_art>(output_file, "p_excess_deaths_nonaids_on_art", state.p_excess_deaths_nonaids_on_art);
+    write_data<real_type, typename Config::OutputState::shape_p_excess_deaths_nonaids_no_art>(output_file, "p_excess_deaths_nonaids_no_art", state.p_excess_deaths_nonaids_no_art);
     return index + output_count;
   };
 };

@@ -402,11 +402,17 @@ end;
 type
   LeapfrogSpectrumParamsView = record
   private
+    cd4NonaidsExcessMort: PDouble;
+    cd4NonaidsExcessMortLength: Integer;
+    artNonaidsExcessMort: PDouble;
+    artNonaidsExcessMortLength: Integer;
 end;
 
 type
   LeapfrogSpectrumParams = class
   public
+    cd4NonaidsExcessMort: TGBFixedArray<Double>;
+    artNonaidsExcessMort: TGBFixedArray<Double>;
     function getView(): LeapfrogSpectrumParamsView;
     procedure writeToDisk(dir: string);
     Destructor Destroy; override;
@@ -420,6 +426,10 @@ type
     pDeathsNonaidsArtpopLength: Integer;
     pDeathsNonaidsHivpop: PDouble;
     pDeathsNonaidsHivpopLength: Integer;
+    pExcessDeathsNonaidsOnArt: PDouble;
+    pExcessDeathsNonaidsOnArtLength: Integer;
+    pExcessDeathsNonaidsNoArt: PDouble;
+    pExcessDeathsNonaidsNoArtLength: Integer;
 end;
 
 type
@@ -427,6 +437,8 @@ type
   public
     pDeathsNonaidsArtpop: TGBFixedArray<Double>;
     pDeathsNonaidsHivpop: TGBFixedArray<Double>;
+    pExcessDeathsNonaidsOnArt: TGBFixedArray<Double>;
+    pExcessDeathsNonaidsNoArt: TGBFixedArray<Double>;
     function getView(): LeapfrogSpectrumStateView;
     procedure writeToDisk(dir: string);
     Destructor Destroy; override;
@@ -811,6 +823,8 @@ end;
 
 destructor LeapfrogSpectrumParams.Destroy;
 begin;
+  cd4NonaidsExcessMort.Free;
+  artNonaidsExcessMort.Free;
   inherited;
 end;
 
@@ -818,11 +832,17 @@ destructor LeapfrogSpectrumState.Destroy;
 begin;
   pDeathsNonaidsArtpop.Free;
   pDeathsNonaidsHivpop.Free;
+  pExcessDeathsNonaidsOnArt.Free;
+  pExcessDeathsNonaidsNoArt.Free;
   inherited;
 end;
 
 function LeapfrogSpectrumParams.getView(): LeapfrogSpectrumParamsView;
 begin;
+  Result.cd4NonaidsExcessMort := PDouble(cd4NonaidsExcessMort.data);
+  Result.cd4NonaidsExcessMortLength := cd4NonaidsExcessMort.GetLength();
+  Result.artNonaidsExcessMort := PDouble(artNonaidsExcessMort.data);
+  Result.artNonaidsExcessMortLength := artNonaidsExcessMort.GetLength();
 end;
 
 function LeapfrogSpectrumState.getView(): LeapfrogSpectrumStateView;
@@ -831,6 +851,10 @@ begin;
   Result.pDeathsNonaidsArtpopLength := pDeathsNonaidsArtpop.GetLength();
   Result.pDeathsNonaidsHivpop := PDouble(pDeathsNonaidsHivpop.data);
   Result.pDeathsNonaidsHivpopLength := pDeathsNonaidsHivpop.GetLength();
+  Result.pExcessDeathsNonaidsOnArt := PDouble(pExcessDeathsNonaidsOnArt.data);
+  Result.pExcessDeathsNonaidsOnArtLength := pExcessDeathsNonaidsOnArt.GetLength();
+  Result.pExcessDeathsNonaidsNoArt := PDouble(pExcessDeathsNonaidsNoArt.data);
+  Result.pExcessDeathsNonaidsNoArtLength := pExcessDeathsNonaidsNoArt.GetLength();
 end;
 
 procedure LeapfrogDemProjParams.writeToDisk(dir: string);
@@ -960,6 +984,8 @@ procedure LeapfrogSpectrumParams.writeToDisk(dir: string);
 begin;
   if not DirectoryExists(dir) then
     ForceDirectories(dir);
+  cd4NonaidsExcessMort.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'cd4NonaidsExcessMort');
+  artNonaidsExcessMort.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'artNonaidsExcessMort');
 end;
 
 procedure LeapfrogSpectrumState.writeToDisk(dir: string);
@@ -968,6 +994,8 @@ begin;
     ForceDirectories(dir);
   pDeathsNonaidsArtpop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pDeathsNonaidsArtpop');
   pDeathsNonaidsHivpop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pDeathsNonaidsHivpop');
+  pExcessDeathsNonaidsOnArt.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pExcessDeathsNonaidsOnArt');
+  pExcessDeathsNonaidsNoArt.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pExcessDeathsNonaidsNoArt');
 end;
 
 procedure LeapfrogParams.SetDemProjParams(const demprojParams: LeapfrogDemProjParamsView);

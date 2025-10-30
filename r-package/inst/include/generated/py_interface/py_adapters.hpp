@@ -456,6 +456,8 @@ struct SpAdapter<Language::Py, real_type, ModelVariant> {
     const Options<real_type> &opts
   ) {
     return {
+      .cd4_nonaids_excess_mort = parse_data<real_type, 3>(data, "cd4_nonaids_excess_mort", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),
+      .art_nonaids_excess_mort = parse_data<real_type, 4>(data, "art_nonaids_excess_mort", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, SS::hDS, (SS::hTS)), nda::dim<>(0, SS::hAG, (SS::hTS) * (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hTS) * (SS::hDS) * (SS::hAG)) })
     };
   };
 
@@ -465,10 +467,12 @@ struct SpAdapter<Language::Py, real_type, ModelVariant> {
     typename Config::State state;
     fill_initial_state<real_type, typename Config::State::shape_p_deaths_nonaids_artpop>(data, "p_deaths_nonaids_artpop", state.p_deaths_nonaids_artpop);
     fill_initial_state<real_type, typename Config::State::shape_p_deaths_nonaids_hivpop>(data, "p_deaths_nonaids_hivpop", state.p_deaths_nonaids_hivpop);
+    fill_initial_state<real_type, typename Config::State::shape_p_excess_deaths_nonaids_on_art>(data, "p_excess_deaths_nonaids_on_art", state.p_excess_deaths_nonaids_on_art);
+    fill_initial_state<real_type, typename Config::State::shape_p_excess_deaths_nonaids_no_art>(data, "p_excess_deaths_nonaids_no_art", state.p_excess_deaths_nonaids_no_art);
     return state;
   };
 
-  static constexpr int output_count = 2;
+  static constexpr int output_count = 4;
 
   static int build_output(
     int index,
@@ -482,6 +486,12 @@ struct SpAdapter<Language::Py, real_type, ModelVariant> {
     const int py_rank_p_deaths_nonaids_hivpop = 3;
     size_t py_dims_p_deaths_nonaids_hivpop[py_rank_p_deaths_nonaids_hivpop] = { SS::pAG, SS::NS, output_years };
     ret["p_deaths_nonaids_hivpop"] = py_array<real_type>(state.p_deaths_nonaids_hivpop.data(), py_rank_p_deaths_nonaids_hivpop, py_dims_p_deaths_nonaids_hivpop);
+    const int py_rank_p_excess_deaths_nonaids_on_art = 3;
+    size_t py_dims_p_excess_deaths_nonaids_on_art[py_rank_p_excess_deaths_nonaids_on_art] = { SS::pAG, SS::NS, output_years };
+    ret["p_excess_deaths_nonaids_on_art"] = py_array<real_type>(state.p_excess_deaths_nonaids_on_art.data(), py_rank_p_excess_deaths_nonaids_on_art, py_dims_p_excess_deaths_nonaids_on_art);
+    const int py_rank_p_excess_deaths_nonaids_no_art = 3;
+    size_t py_dims_p_excess_deaths_nonaids_no_art[py_rank_p_excess_deaths_nonaids_no_art] = { SS::pAG, SS::NS, output_years };
+    ret["p_excess_deaths_nonaids_no_art"] = py_array<real_type>(state.p_excess_deaths_nonaids_no_art.data(), py_rank_p_excess_deaths_nonaids_no_art, py_dims_p_excess_deaths_nonaids_no_art);
     return index + output_count;
   };
 
@@ -496,6 +506,12 @@ struct SpAdapter<Language::Py, real_type, ModelVariant> {
     const int py_rank_p_deaths_nonaids_hivpop = 2;
     size_t py_dims_p_deaths_nonaids_hivpop[py_rank_p_deaths_nonaids_hivpop] = { SS::pAG, SS::NS };
     ret["p_deaths_nonaids_hivpop"] = py_array<real_type>(state.p_deaths_nonaids_hivpop.data(), py_rank_p_deaths_nonaids_hivpop, py_dims_p_deaths_nonaids_hivpop);
+    const int py_rank_p_excess_deaths_nonaids_on_art = 2;
+    size_t py_dims_p_excess_deaths_nonaids_on_art[py_rank_p_excess_deaths_nonaids_on_art] = { SS::pAG, SS::NS };
+    ret["p_excess_deaths_nonaids_on_art"] = py_array<real_type>(state.p_excess_deaths_nonaids_on_art.data(), py_rank_p_excess_deaths_nonaids_on_art, py_dims_p_excess_deaths_nonaids_on_art);
+    const int py_rank_p_excess_deaths_nonaids_no_art = 2;
+    size_t py_dims_p_excess_deaths_nonaids_no_art[py_rank_p_excess_deaths_nonaids_no_art] = { SS::pAG, SS::NS };
+    ret["p_excess_deaths_nonaids_no_art"] = py_array<real_type>(state.p_excess_deaths_nonaids_no_art.data(), py_rank_p_excess_deaths_nonaids_no_art, py_dims_p_excess_deaths_nonaids_no_art);
     return index + output_count;
   };
 };

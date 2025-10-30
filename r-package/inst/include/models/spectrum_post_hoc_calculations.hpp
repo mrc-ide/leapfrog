@@ -56,6 +56,7 @@ struct SpectrumPostHocCalculations<Config> {
 
   void run_spectrum_post_hoc_calulations() {
     calculate_nonaids_deaths();
+    calculate_nonaids_excess_deaths();
   };
 
   // private methods that we don't want people to call
@@ -67,12 +68,9 @@ struct SpectrumPostHocCalculations<Config> {
 
     for (int g = 0; g < NS; ++g) {
 
-      for (int a = 0; a < p_idx_hiv_first_adult; ++a) {
-        // Spectrum stores nonaids deaths by age but for children is always 0.
-        // Write this out as 0 for children so we match Spectrum.
-        n_sp.p_deaths_nonaids_artpop(a, g) = 0.0;
-        n_sp.p_deaths_nonaids_hivpop(a, g) = 0.0;
-      }
+      // Spectrum stores nonaids deaths by age but for children is always 0.
+      // Only write values for a >= p_idx_hiv_first_adult
+      // so that it is always 0 for children to match Spectrum.
 
       int a = p_idx_hiv_first_adult;
       for (int ha = 0; ha < hAG; ++ha) {
@@ -99,6 +97,34 @@ struct SpectrumPostHocCalculations<Config> {
       }
     }
   };
+
+  void calculate_nonaids_excess_deaths() {
+    const auto& p_sp = pars.sp;
+    auto& n_ha = state_next.ha;
+    auto& n_sp = state_next.sp;
+
+    for (int g = 0; g < NS; ++g) {
+
+      // Spectrum stores nonaids-exxcess deaths by age but for children
+      // is always 0. Only write values for a >= p_idx_hiv_first_adult
+      // so that it is always 0 for children to match Spectrum.
+
+      int a = p_idx_hiv_first_adult;
+      for (int ha = 0; ha < hAG; ++ha) {
+        for (int hm = 0; hm < hDS; ++hm) {
+          for (int i = 0; i < hAG_span[ha]; ++i, ++a) {
+            n_sp.p_excess_deaths_nonaids_no_art(a, g) += p_sp.cd4_nonaids_excess_mort(hm, ha, g) * n_ha.h_hiv_adult(hm, ha, g);
+
+            if (t > opts.ts_art_start) {
+              for (int hu = 0; hu < hTS; ++hu) {
+                n_sp.p_excess_deaths_nonaids_on_art(a, g) += p_sp.art_nonaids_excess_mort(hu, hm, ha, g) * n_ha.h_art_adult(hu, hm, ha, g);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 };
 
 }

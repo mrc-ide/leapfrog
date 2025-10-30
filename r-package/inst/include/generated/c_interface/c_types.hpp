@@ -237,6 +237,10 @@ struct HcOut {
 
 template<typename real_type>
 struct SpParams {
+  real_type* cd4_nonaids_excess_mort;
+  int cd4_nonaids_excess_mort_length;
+  real_type* art_nonaids_excess_mort;
+  int art_nonaids_excess_mort_length;
 };
 
 template<typename real_type>
@@ -245,6 +249,10 @@ struct SpOut {
   int p_deaths_nonaids_artpop_length;
   real_type* p_deaths_nonaids_hivpop;
   int p_deaths_nonaids_hivpop_length;
+  real_type* p_excess_deaths_nonaids_on_art;
+  int p_excess_deaths_nonaids_on_art_length;
+  real_type* p_excess_deaths_nonaids_no_art;
+  int p_excess_deaths_nonaids_no_art_length;
 };
 
 template<typename real_type>

@@ -1350,6 +1350,19 @@ struct SpConfig {
   using SS = SSMixed<ModelVariant>;
 
   struct Pars {
+    using shape_cd4_nonaids_excess_mort = nda::shape<
+      nda::dim<0, SS::hDS, 1>,
+      nda::dim<0, SS::hAG, (SS::hDS)>,
+      nda::dim<0, SS::NS, (SS::hDS) * (SS::hAG)>
+    >;
+    nda::array_ref<real_type, shape_cd4_nonaids_excess_mort> cd4_nonaids_excess_mort;
+    using shape_art_nonaids_excess_mort = nda::shape<
+      nda::dim<0, SS::hTS, 1>,
+      nda::dim<0, SS::hDS, (SS::hTS)>,
+      nda::dim<0, SS::hAG, (SS::hTS) * (SS::hDS)>,
+      nda::dim<0, SS::NS, (SS::hTS) * (SS::hDS) * (SS::hAG)>
+    >;
+    nda::array_ref<real_type, shape_art_nonaids_excess_mort> art_nonaids_excess_mort;
   };
 
   struct Intermediate {
@@ -1377,10 +1390,22 @@ struct SpConfig {
       nda::dim<0, SS::NS, (SS::pAG)>
     >;
     nda::array<real_type, shape_p_deaths_nonaids_hivpop> p_deaths_nonaids_hivpop;
+    using shape_p_excess_deaths_nonaids_on_art = nda::shape<
+      nda::dim<0, SS::pAG, 1>,
+      nda::dim<0, SS::NS, (SS::pAG)>
+    >;
+    nda::array<real_type, shape_p_excess_deaths_nonaids_on_art> p_excess_deaths_nonaids_on_art;
+    using shape_p_excess_deaths_nonaids_no_art = nda::shape<
+      nda::dim<0, SS::pAG, 1>,
+      nda::dim<0, SS::NS, (SS::pAG)>
+    >;
+    nda::array<real_type, shape_p_excess_deaths_nonaids_no_art> p_excess_deaths_nonaids_no_art;
 
     void reset() {
       p_deaths_nonaids_artpop.for_each_value([](real_type& x) { x = 0; });
       p_deaths_nonaids_hivpop.for_each_value([](real_type& x) { x = 0; });
+      p_excess_deaths_nonaids_on_art.for_each_value([](real_type& x) { x = 0; });
+      p_excess_deaths_nonaids_no_art.for_each_value([](real_type& x) { x = 0; });
     };
   };
 
@@ -1397,13 +1422,29 @@ struct SpConfig {
       nda::dim<0, nda::dynamic, (SS::pAG) * (SS::NS)>
     >;
     nda::array<real_type, shape_p_deaths_nonaids_hivpop> p_deaths_nonaids_hivpop;
+    using shape_p_excess_deaths_nonaids_on_art = nda::shape<
+      nda::dim<0, SS::pAG, 1>,
+      nda::dim<0, SS::NS, (SS::pAG)>,
+      nda::dim<0, nda::dynamic, (SS::pAG) * (SS::NS)>
+    >;
+    nda::array<real_type, shape_p_excess_deaths_nonaids_on_art> p_excess_deaths_nonaids_on_art;
+    using shape_p_excess_deaths_nonaids_no_art = nda::shape<
+      nda::dim<0, SS::pAG, 1>,
+      nda::dim<0, SS::NS, (SS::pAG)>,
+      nda::dim<0, nda::dynamic, (SS::pAG) * (SS::NS)>
+    >;
+    nda::array<real_type, shape_p_excess_deaths_nonaids_no_art> p_excess_deaths_nonaids_no_art;
 
     OutputState(int output_years):
       p_deaths_nonaids_artpop(shape_p_deaths_nonaids_artpop(SS::pAG, SS::NS, output_years)),
-      p_deaths_nonaids_hivpop(shape_p_deaths_nonaids_hivpop(SS::pAG, SS::NS, output_years))
+      p_deaths_nonaids_hivpop(shape_p_deaths_nonaids_hivpop(SS::pAG, SS::NS, output_years)),
+      p_excess_deaths_nonaids_on_art(shape_p_excess_deaths_nonaids_on_art(SS::pAG, SS::NS, output_years)),
+      p_excess_deaths_nonaids_no_art(shape_p_excess_deaths_nonaids_no_art(SS::pAG, SS::NS, output_years))
     {
       p_deaths_nonaids_artpop.for_each_value([](real_type& x) { x = 0; });
       p_deaths_nonaids_hivpop.for_each_value([](real_type& x) { x = 0; });
+      p_excess_deaths_nonaids_on_art.for_each_value([](real_type& x) { x = 0; });
+      p_excess_deaths_nonaids_no_art.for_each_value([](real_type& x) { x = 0; });
     };
 
     void save_state(const size_t i, const State &state) {
@@ -1415,10 +1456,18 @@ struct SpConfig {
       nda::for_each_index(chip_p_deaths_nonaids_hivpop.shape(), [&](auto idx) -> void {
         chip_p_deaths_nonaids_hivpop[idx] = state.p_deaths_nonaids_hivpop[idx];
       });
+      auto chip_p_excess_deaths_nonaids_on_art = p_excess_deaths_nonaids_on_art(nda::_, nda::_, i);
+      nda::for_each_index(chip_p_excess_deaths_nonaids_on_art.shape(), [&](auto idx) -> void {
+        chip_p_excess_deaths_nonaids_on_art[idx] = state.p_excess_deaths_nonaids_on_art[idx];
+      });
+      auto chip_p_excess_deaths_nonaids_no_art = p_excess_deaths_nonaids_no_art(nda::_, nda::_, i);
+      nda::for_each_index(chip_p_excess_deaths_nonaids_no_art.shape(), [&](auto idx) -> void {
+        chip_p_excess_deaths_nonaids_no_art[idx] = state.p_excess_deaths_nonaids_no_art[idx];
+      });
     };
   };
 
-  static constexpr int output_count = 2;
+  static constexpr int output_count = 4;
   static int get_build_output_size(int prev_size) {
     return prev_size + output_count;
   };
