@@ -1,6 +1,6 @@
 test_that("spectrum post-hoc indicators can be output", {
-  parameters <- read_parameters(test_path("testdata/spectrum_params.h5"))
 
+  parameters <- read_parameters(test_path("testdata/spectrum_params.h5"))
   out <- run_model(parameters, "Spectrum")
 
   expected_output <- c(
@@ -16,7 +16,6 @@ test_that("spectrum post-hoc indicators can be output", {
 
   expect_true(all(out$p_excess_deaths_nonaids_no_art[1:15, , ] == 0))
   expect_true(all(out$p_excess_deaths_nonaids_on_art[1:15, , ] == 0))
-  # TODO: These are all 0, why? Fix this
-  # expect_true(any(out$p_excess_deaths_nonaids_no_art > 0))
-  # expect_true(any(out$p_excess_deaths_nonaids_on_art > 0))
+  expect_true(any(out$p_excess_deaths_nonaids_no_art > 0))
+  expect_true(any(out$p_excess_deaths_nonaids_on_art > 0))
 })

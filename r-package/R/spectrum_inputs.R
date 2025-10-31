@@ -334,8 +334,10 @@ prepare_spectrum_leapfrog_projp <- function(pjnz, params, use_coarse_age_groups 
   NS <- 2
 
   # 4 for the number of age categories in spectrum
-  cd4_nonaids_excess_mort <- array(0.0, c(hDS, 4, NS))
-  art_nonaids_excess_mort <- array(0.0, c(hDS, 4, NS))
+  names <- dimnames(params$cd4_mort)
+  names$agecat <- unique(names$agecat)
+  cd4_nonaids_excess_mort <- array(0.0, c(hDS, 4, NS), names)
+  art_nonaids_excess_mort <- array(0.0, c(hDS, 4, NS), names)
 
   if(exists_dptag(dp, "<AdultNonAIDSExcessMort MV>")) {
     cd4_nonaids_excess_mort[,,"Male"] <- array(as.numeric(dpsub(dp, "<AdultNonAIDSExcessMort MV>", 2, 4:31)), c(hDS, 4))

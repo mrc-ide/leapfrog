@@ -1369,6 +1369,8 @@ struct SpConfig {
     real_type hiv_art_adult_sa;
     real_type hiv_untreated_adult_sa;
     real_type artcov_adult_sa;
+    real_type excess_deaths_nonaids_no_art;
+    real_type excess_deaths_nonaids_on_art;
 
     Intermediate() {};
 
@@ -1376,6 +1378,8 @@ struct SpConfig {
       hiv_art_adult_sa = 0;
       hiv_untreated_adult_sa = 0;
       artcov_adult_sa = 0;
+      excess_deaths_nonaids_no_art = 0;
+      excess_deaths_nonaids_on_art = 0;
     };
   };
 

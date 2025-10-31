@@ -102,23 +102,35 @@ struct SpectrumPostHocCalculations<Config> {
     const auto& p_sp = pars.sp;
     auto& n_ha = state_next.ha;
     auto& n_sp = state_next.sp;
+    auto& i_sp = intermediate.sp;
 
     for (int g = 0; g < NS; ++g) {
 
-      // Spectrum stores nonaids-exxcess deaths by age but for children
+      // Spectrum stores nonaids-excess deaths by age but for children
       // is always 0. Only write values for a >= p_idx_hiv_first_adult
       // so that it is always 0 for children to match Spectrum.
 
       int a = p_idx_hiv_first_adult;
       for (int ha = 0; ha < hAG; ++ha) {
-        for (int hm = 0; hm < hDS; ++hm) {
-          for (int i = 0; i < hAG_span[ha]; ++i, ++a) {
-            n_sp.p_excess_deaths_nonaids_no_art(a, g) += p_sp.cd4_nonaids_excess_mort(hm, ha, g) * n_ha.h_hiv_adult(hm, ha, g);
+        i_sp.excess_deaths_nonaids_no_art = 0.0;
+        i_sp.excess_deaths_nonaids_on_art = 0.0;
 
-            if (t > opts.ts_art_start) {
-              for (int hu = 0; hu < hTS; ++hu) {
-                n_sp.p_excess_deaths_nonaids_on_art(a, g) += p_sp.art_nonaids_excess_mort(hu, hm, ha, g) * n_ha.h_art_adult(hu, hm, ha, g);
-              }
+        for (int hm = 0; hm < hDS; ++hm) {
+          i_sp.excess_deaths_nonaids_no_art += p_sp.cd4_nonaids_excess_mort(hm, ha, g) * n_ha.h_hiv_adult(hm, ha, g);
+
+          if (t > opts.ts_art_start) {
+            for (int hu = 0; hu < hTS; ++hu) {
+              i_sp.excess_deaths_nonaids_on_art += p_sp.art_nonaids_excess_mort(hu, hm, ha, g) * n_ha.h_art_adult(hu, hm, ha, g);
+            }
+          }
+        }
+
+        for (int i = 0; i < hAG_span[ha]; ++i, ++a) {
+          n_sp.p_excess_deaths_nonaids_no_art(a, g) += i_sp.excess_deaths_nonaids_no_art;
+
+          if (t > opts.ts_art_start) {
+            for (int hu = 0; hu < hTS; ++hu) {
+              n_sp.p_excess_deaths_nonaids_on_art(a, g) += i_sp.excess_deaths_nonaids_on_art;
             }
           }
         }

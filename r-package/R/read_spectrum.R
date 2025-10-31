@@ -810,7 +810,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, use_coarse_age_groups = FALS
     v$pmtct_input_isperc = rep(T, length(proj.years))
   }
 
-  pmtct_new <- array(0, dim = c(7, 61), dimnames = list(pmtct = c("Option A", "Option B", "SDNVP", "Dual ARV", "Option B+: before pregnancy", "Option B+: >4 weeks", "Option B+: <4 weeks")))
+  pmtct_new <- array(0, dim = c(7, length(proj.years)), dimnames = list(pmtct = c("Option A", "Option B", "SDNVP", "Dual ARV", "Option B+: before pregnancy", "Option B+: >4 weeks", "Option B+: <4 weeks")))
   ## pick out which ones were inserted as numbers
   pmtct_new[, which(colSums(pmtct_list)[, 1] > 0)] <- pmtct_list[, (which(colSums(pmtct_list)[, 1] > 0)), 1]
   ## pick out which ones were inserted as percent
@@ -820,7 +820,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, use_coarse_age_groups = FALS
   v$pmtct_input_isperc <- !(apply(input_pmtct_ispercent(dp.x), 2, any))
 
   ##PMTCT dropout
-  v$pmtct_dropout <- input_pmtct_retained(dp.x)
+  v$pmtct_dropout <- input_pmtct_retained(dp.x, proj.years)
 
   ##rates of MTCT
   mtct_rates_input <- dp_read_mtct_rates(dp.x)
@@ -979,7 +979,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, use_coarse_age_groups = FALS
   newinf_rate <- newinf / colSums(specres$totpop.f[1:10,])
 
   fp1 <- eppasm::prepare_directincid(pjnz)
-  fp1$tARTstart <- 61L
+  fp1$tARTstart <- length(proj.years)
   #Need to run the adult model to pull out the propotion by CD4 category
   mod1 <- eppasm::simmod(fp1)
 
