@@ -85,6 +85,8 @@ struct GeneralDemographicProjection<Config> {
     const auto& c_dp = state_curr.dp;
     auto& n_dp = state_next.dp;
 
+    static constexpr int p_idx_hiv_first_adult = SS::p_idx_hiv_first_adult;
+
     for (int g = 0; g < NS; ++g) {
       // Start at index 1 as we will add infant (age 0) births and deaths later
       for (int a = 1; a < pAG; ++a) {

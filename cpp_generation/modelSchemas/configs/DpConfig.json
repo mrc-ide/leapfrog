@@ -42,6 +42,13 @@
     "births_sex_prop": {
       "num_type": "real_type",
       "dims": ["SS::NS", "opts.proj_steps"]
+    },
+    "total_fertility_rate": {
+      "num_type": "real_type",
+      "dims": ["opts.proj_steps"],
+      "alias": {
+        "r": "tfr"
+      }
     }
   },
   "intermediate": {

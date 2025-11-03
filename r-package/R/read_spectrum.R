@@ -899,7 +899,7 @@ prepare_hc_leapfrog_projp <- function(pjnz, params, use_coarse_age_groups = FALS
   names(wlhiv_births) <- proj.years
   rownames(wlhiv_births) <- NULL
   v$mat_hiv_births <- as.array(as.numeric(unlist(wlhiv_births)))
-  v$mat_prev_input = rep(TRUE, length(year.idx))
+  v$mat_prev_input = rep(FALSE, length(year.idx))
 
   hivpop <- SpectrumUtils::dp.output.hivpop(dp.raw = dp.x, direction = 'long') %>% dplyr::rename(hivpop = Value)
   totpop <- SpectrumUtils::dp.output.bigpop(dp.raw = dp.x, direction = 'long') %>% dplyr::rename(totpop = Value)

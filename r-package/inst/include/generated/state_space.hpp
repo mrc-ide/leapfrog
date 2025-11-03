@@ -21,7 +21,6 @@ struct BaseSS {
 };
 
 enum ConfigsAndOverrides {
-  HcOverride0,
   Hc,
   HaOverride0,
   Ha,
@@ -46,11 +45,6 @@ template<MV ModelVariant, ConfigsAndOverrides T, typename ...Ts>
 struct SSMixer<ModelVariant, SSPair<false, T>, Ts...>: public SSMixer<ModelVariant, Ts...> {};
 
 template<MV ModelVariant, typename ...Ts>
-struct SSMixer<ModelVariant, SSPair<true, HcOverride0>, Ts...>: public SSMixer<ModelVariant, Ts...> {
-  static constexpr int hc_p_fertility_age_groups = 8;
-};
-
-template<MV ModelVariant, typename ...Ts>
 struct SSMixer<ModelVariant, SSPair<true, Hc>, Ts...>: public SSMixer<ModelVariant, Ts...> {
   static constexpr int hc1DS = 7;
   static constexpr int hc2DS = 6;
@@ -70,7 +64,6 @@ struct SSMixer<ModelVariant, SSPair<true, Hc>, Ts...>: public SSMixer<ModelVaria
   static constexpr int hBF_coarse = 4;
   static constexpr int hcAG_coarse = 4;
   static constexpr int hAB_ind = 2;
-  static constexpr int hc_p_fertility_age_groups = 35;
   static constexpr int hAG_fert = 7;
   static constexpr int mtct_source = 11;
   static constexpr std::array<int, 15> hc_age_coarse = { 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3 };
@@ -83,6 +76,7 @@ template<MV ModelVariant, typename ...Ts>
 struct SSMixer<ModelVariant, SSPair<true, HaOverride0>, Ts...>: public SSMixer<ModelVariant, Ts...> {
   static constexpr std::array<int, 9> hAG_span = { 2, 3, 5, 5, 5, 5, 5, 5, 31 };
   static constexpr int hAG = 9;
+  static constexpr int p_fertility_age_groups = 8;
 };
 
 template<MV ModelVariant, typename ...Ts>
@@ -91,6 +85,7 @@ struct SSMixer<ModelVariant, SSPair<true, Ha>, Ts...>: public SSMixer<ModelVaria
   static constexpr int hDS = 7;
   static constexpr int hTS = 3;
   static constexpr int hAG = 66;
+  static constexpr int p_fertility_age_groups = 35;
 };
 
 template<MV ModelVariant, typename ...Ts>
@@ -104,7 +99,6 @@ struct SSMixer<ModelVariant, SSPair<true, Dp>, Ts...>: public SSMixer<ModelVaria
 template<MV ModelVariant>
 using SSMixed = SSMixer<
   ModelVariant,
-  SSPair<ModelVariant::run_child_model && ModelVariant::use_coarse_stratification, HcOverride0>,
   SSPair<ModelVariant::run_child_model, Hc>,
   SSPair<ModelVariant::run_hiv_simulation && ModelVariant::use_coarse_stratification, HaOverride0>,
   SSPair<ModelVariant::run_hiv_simulation, Ha>,
