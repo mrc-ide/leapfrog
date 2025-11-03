@@ -76,7 +76,7 @@ template<MV ModelVariant, typename ...Ts>
 struct SSMixer<ModelVariant, SSPair<true, HaOverride0>, Ts...>: public SSMixer<ModelVariant, Ts...> {
   static constexpr std::array<int, 9> hAG_span = { 2, 3, 5, 5, 5, 5, 5, 5, 31 };
   static constexpr int hAG = 9;
-  static constexpr int p_fertility_age_groups = 8;
+  static constexpr int h_fertility_age_groups = 8;
 };
 
 template<MV ModelVariant, typename ...Ts>
@@ -86,6 +86,7 @@ struct SSMixer<ModelVariant, SSPair<true, Ha>, Ts...>: public SSMixer<ModelVaria
   static constexpr int hTS = 3;
   static constexpr int hAG = 66;
   static constexpr int p_fertility_age_groups = 35;
+  static constexpr int h_fertility_age_groups = 35;
 };
 
 template<MV ModelVariant, typename ...Ts>

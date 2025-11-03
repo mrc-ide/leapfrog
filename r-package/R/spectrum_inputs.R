@@ -295,12 +295,21 @@ prepare_leapfrog_projp <- function(pjnz, use_coarse_age_groups = FALSE, hiv_step
     v$cd4_prog <- (1-exp(-projp$cd4_prog[ , idx_expand_coarse, ] / hiv_steps_per_year)) * hiv_steps_per_year
     v$cd4_mort <- projp$cd4_mort[ ,idx_expand_coarse, ]
     v$art_mort <- projp$artmx_multiplier * projp$art_mort[c(1, 2, rep(3, hTS - 2)), , idx_expand_coarse, ]
+    v$fert_rat <- v$fert_rat_coarse
+    v$frr_art6mos <- v$frr_art6mos_coarse
   } else {
     v$cd4_initdist <- projp$cd4_initdist[ , idx_expand_full, ]
     v$cd4_prog <- (1-exp(-projp$cd4_prog[ , idx_expand_full, ] / hiv_steps_per_year)) * hiv_steps_per_year
     v$cd4_mort <- projp$cd4_mort[ ,idx_expand_full, ]
     v$art_mort <- projp$artmx_multiplier * projp$art_mort[c(1, 2, rep(3, hTS - 2)), , idx_expand_full, ]
+    v$fert_rat <- v$fert_rat_full
+    v$frr_art6mos <- v$frr_art6mos_full
   }
+  ##Remove unnecessary parameters
+  v$fert_rat_coarse <- NULL
+  v$frr_art6mos_coarse <- NULL
+  v$fert_rat_full <- NULL
+  v$frr_art6mos_full <- NULL
 
   v
 }

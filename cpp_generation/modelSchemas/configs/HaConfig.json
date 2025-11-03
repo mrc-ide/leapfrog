@@ -9,7 +9,8 @@
       "hDS": 7,
       "hTS": 3,
       "hAG": 66,
-      "p_fertility_age_groups": 35
+      "p_fertility_age_groups": 35,
+      "h_fertility_age_groups": 35
     },
     "overrides": [
       {
@@ -17,7 +18,7 @@
         "vars": {
           "hAG_span": [2, 3, 5, 5, 5, 5, 5, 5, 31],
           "hAG": 9,
-          "p_fertility_age_groups": 8
+          "h_fertility_age_groups": 8
         }
       }
     ]
@@ -137,7 +138,7 @@
     },
     "fert_mult_by_age": {
       "num_type": "real_type",
-      "dims": ["SS::p_fertility_age_groups", "opts.proj_steps"],
+      "dims": ["SS::h_fertility_age_groups", "opts.proj_steps"],
       "alias": {
         "r": "fert_rat"
       }
@@ -151,7 +152,7 @@
     },
     "fert_mult_on_art": {
       "num_type": "real_type",
-      "dims": ["SS::p_fertility_age_groups"],
+      "dims": ["SS::h_fertility_age_groups"],
       "alias": {
          "r": "frr_art6mos"
       }
@@ -340,7 +341,7 @@
     },
     "hiv_births_by_mat_age": {
       "num_type": "real_type",
-      "dims": ["SS::p_fertility_age_groups"]
+      "dims": ["SS::h_fertility_age_groups"]
     },
     "hiv_births": {
       "num_type": "real_type"

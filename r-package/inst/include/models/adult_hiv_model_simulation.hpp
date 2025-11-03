@@ -39,7 +39,7 @@ struct AdultHivModelSimulation<Config> {
   static constexpr int ART0MOS = SS::ART0MOS;
   static constexpr int p_idx_hiv_first_adult = SS::p_idx_hiv_first_adult;
   static constexpr int hIDX_15PLUS = SS::hIDX_15PLUS;
-  static constexpr int p_fertility_age_groups = SS::p_fertility_age_groups;
+  static constexpr int h_fertility_age_groups = SS::h_fertility_age_groups;
   static constexpr int p_idx_fertility_first = SS::p_idx_fertility_first;
 
   // function args
@@ -464,13 +464,13 @@ struct AdultHivModelSimulation<Config> {
     auto& i_ha = intermediate.ha;
 
     i_ha.asfr_sum = 0.0;
-    for (int a = 0; a < p_fertility_age_groups; ++a) {
+    for (int a = 0; a < h_fertility_age_groups; ++a) {
       i_ha.asfr_sum += p_dp.age_specific_fertility_rate(a, t);
     } // end a
 
     int a_idx_in = p_idx_fertility_first;
     n_ha.hiv_births = 0.0;
-    for (int a = 0; a < p_fertility_age_groups; ++a) {
+    for (int a = 0; a < h_fertility_age_groups; ++a) {
       i_ha.nHIVcurr = 0.0;
       i_ha.nHIVlast = 0.0;
       i_ha.df = 0.0;

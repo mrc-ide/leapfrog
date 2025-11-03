@@ -160,9 +160,9 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
       .h_art_stage_dur = parse_data<real_type, 1>(data, "h_art_stage_dur", { nda::dim<>(0, SS::hTS - 1, 1) }),
       .pAG_INCIDPOP = Rcpp::as<int>(data["pAG_INCIDPOP"]),
       .pIDX_INCIDPOP = Rcpp::as<int>(data["pIDX_INCIDPOP"]),
-      .fert_mult_by_age = parse_data<real_type, 2>(data, "fert_rat", { nda::dim<>(0, SS::p_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::p_fertility_age_groups)) }),
+      .fert_mult_by_age = parse_data<real_type, 2>(data, "fert_rat", { nda::dim<>(0, SS::h_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::h_fertility_age_groups)) }),
       .fert_mult_off_art = parse_data<real_type, 1>(data, "cd4fert_rat", { nda::dim<>(0, SS::hDS, 1) }),
-      .fert_mult_on_art = parse_data<real_type, 1>(data, "frr_art6mos", { nda::dim<>(0, SS::p_fertility_age_groups, 1) }),
+      .fert_mult_on_art = parse_data<real_type, 1>(data, "frr_art6mos", { nda::dim<>(0, SS::h_fertility_age_groups, 1) }),
       .local_adj_factor = Rcpp::as<real_type>(data["frr_scalar"])
     };
   };
@@ -245,8 +245,8 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
     std::copy_n(state.p_net_migration_hivpop.data(), state.p_net_migration_hivpop.size(), REAL(r_p_net_migration_hivpop));
     names[index + 9] = "p_net_migration_hivpop";
     ret[index + 9] = r_p_net_migration_hivpop;
-    Rcpp::NumericVector r_hiv_births_by_mat_age(SS::p_fertility_age_groups * output_years);
-    r_hiv_births_by_mat_age.attr("dim") = Rcpp::IntegerVector::create(SS::p_fertility_age_groups, output_years);
+    Rcpp::NumericVector r_hiv_births_by_mat_age(SS::h_fertility_age_groups * output_years);
+    r_hiv_births_by_mat_age.attr("dim") = Rcpp::IntegerVector::create(SS::h_fertility_age_groups, output_years);
     std::copy_n(state.hiv_births_by_mat_age.data(), state.hiv_births_by_mat_age.size(), REAL(r_hiv_births_by_mat_age));
     names[index + 10] = "hiv_births_by_mat_age";
     ret[index + 10] = r_hiv_births_by_mat_age;
@@ -314,8 +314,8 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
     std::copy_n(state.p_net_migration_hivpop.data(), state.p_net_migration_hivpop.size(), REAL(r_p_net_migration_hivpop));
     names[index + 9] = "p_net_migration_hivpop";
     ret[index + 9] = r_p_net_migration_hivpop;
-    Rcpp::NumericVector r_hiv_births_by_mat_age(SS::p_fertility_age_groups);
-    r_hiv_births_by_mat_age.attr("dim") = Rcpp::IntegerVector::create(SS::p_fertility_age_groups);
+    Rcpp::NumericVector r_hiv_births_by_mat_age(SS::h_fertility_age_groups);
+    r_hiv_births_by_mat_age.attr("dim") = Rcpp::IntegerVector::create(SS::h_fertility_age_groups);
     std::copy_n(state.hiv_births_by_mat_age.data(), state.hiv_births_by_mat_age.size(), REAL(r_hiv_births_by_mat_age));
     names[index + 10] = "hiv_births_by_mat_age";
     ret[index + 10] = r_hiv_births_by_mat_age;
@@ -367,13 +367,13 @@ struct HcAdapter<Language::R, real_type, ModelVariant> {
       .abortion = parse_data<real_type, 2>(data, "abortion", { nda::dim<>(0, SS::hAB_ind, 1), nda::dim<>(0, opts.proj_steps, (SS::hAB_ind)) }),
       .patients_reallocated = parse_data<real_type, 1>(data, "patients_reallocated", { nda::dim<>(0, opts.proj_steps, 1) }),
       .hc_art_ltfu = parse_data<real_type, 1>(data, "paed_art_ltfu", { nda::dim<>(0, opts.proj_steps, 1) }),
-      .adult_female_infections = parse_data<real_type, 2>(data, "adult_female_infections", { nda::dim<>(0, SS::p_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::p_fertility_age_groups)) }),
-      .adult_female_hivnpop = parse_data<real_type, 2>(data, "hivnpop", { nda::dim<>(0, SS::p_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::p_fertility_age_groups)) }),
+      .adult_female_infections = parse_data<real_type, 2>(data, "adult_female_infections", { nda::dim<>(0, SS::h_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::h_fertility_age_groups)) }),
+      .adult_female_hivnpop = parse_data<real_type, 2>(data, "hivnpop", { nda::dim<>(0, SS::h_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::h_fertility_age_groups)) }),
       .total_births = parse_data<real_type, 1>(data, "total_births", { nda::dim<>(0, opts.proj_steps, 1) }),
       .ctx_effect = parse_data<real_type, 1>(data, "ctx_effect", { nda::dim<>(0, 3, 1) }),
       .hc_art_start = Rcpp::as<int>(data["hc_art_start"]),
       .local_adj_factor = Rcpp::as<real_type>(data["frr_scalar"]),
-      .hc_age_specific_fertility_rate = parse_data<real_type, 2>(data, "hc_asfr", { nda::dim<>(0, SS::p_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::p_fertility_age_groups)) })
+      .hc_age_specific_fertility_rate = parse_data<real_type, 2>(data, "hc_asfr", { nda::dim<>(0, SS::h_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::h_fertility_age_groups)) })
     };
   };
 

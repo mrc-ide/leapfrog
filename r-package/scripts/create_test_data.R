@@ -15,7 +15,7 @@ pjnz_adult <- file.path(here::here(), "inst", "pjnz", "bwa_aim-adult-art-no-spec
 
 demp <- prepare_leapfrog_demp(pjnz_adult)
 
-proj <- prepare_leapfrog_projp(pjnz_adult)
+proj <- prepare_leapfrog_projp(pjnz_adult, use_coarse_age_groups = FALSE)
 parameters <- c(demp, proj)
 save_parameters(parameters, testthat::test_path("testdata/adult_parms_full.h5"))
 

@@ -93,7 +93,6 @@ struct GeneralDemographicProjection<Config> {
         n_dp.p_total_pop_background_deaths(a, g) = c_dp.p_total_pop(a - 1, g) * (1.0 - p_dp.survival_probability(a, g, t));
         n_dp.p_total_pop(a, g) = c_dp.p_total_pop(a - 1, g) - n_dp.p_total_pop_background_deaths(a, g);
       }
-
       // open age group
       real_type p_total_pop_background_deaths_open_age = c_dp.p_total_pop(pAG - 1, g) *
                                                       (1.0 - p_dp.survival_probability(pAG, g, t));

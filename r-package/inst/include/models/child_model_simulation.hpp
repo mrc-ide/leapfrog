@@ -48,7 +48,7 @@ struct ChildModelSimulation<Config> {
   static constexpr int hBF = SS::hBF;
   static constexpr int hcAG_coarse = SS::hcAG_coarse;
   static constexpr int p_idx_fertility_first = SS::p_idx_fertility_first;
-  static constexpr int p_fertility_age_groups = SS::p_fertility_age_groups;
+  static constexpr int h_fertility_age_groups = SS::h_fertility_age_groups;
   static constexpr int p_idx_hiv_first_adult = SS::p_idx_hiv_first_adult;
   static constexpr auto hc_age_coarse = SS::hc_age_coarse;
   static constexpr auto hc_age_coarse_cd4 = SS::hc_age_coarse_cd4;
@@ -127,13 +127,12 @@ struct ChildModelSimulation<Config> {
   void run_child_model_simulation() {
     const auto& p_hc = pars.hc;
     auto& n_hc = state_next.hc;
+    auto& c_hc = state_curr.hc;
 
     run_child_ageing();
-
     if (p_hc.mat_prev_input(t)) {
       run_wlhiv_births_input_mat_prev();
     }
-
     adjust_hiv_births();
     add_infections();
     need_for_cotrim();
@@ -352,7 +351,7 @@ struct ChildModelSimulation<Config> {
       i_hc.prop_wlhiv_lt350 = 0.0;
 
       //MAGGIE CHECK HERE
-      for (int a = 0; a < p_fertility_age_groups; ++a) {
+      for (int a = 0; a < h_fertility_age_groups; ++a) {
         i_hc.num_wlhiv_lt200 += n_ha.h_hiv_adult(4, a, FEMALE) + n_ha.h_hiv_adult(5, a, FEMALE) + n_ha.h_hiv_adult(6, a, FEMALE);
         i_hc.num_wlhiv_200to350 += n_ha.h_hiv_adult(3, a, FEMALE) + n_ha.h_hiv_adult(2, a, FEMALE);
         i_hc.num_wlhiv_gte350 += n_ha.h_hiv_adult(0, a, FEMALE) + n_ha.h_hiv_adult(1, a, FEMALE);
@@ -435,12 +434,12 @@ struct ChildModelSimulation<Config> {
 
     // Transmission due to incident infections
     i_hc.asfr_sum = 0.0;
-    for (int a = 0; a < p_fertility_age_groups; ++a) {
-      i_hc.asfr_sum += p_dp.age_specific_fertility_rate(a, t);
+    for (int a = 0; a < h_fertility_age_groups; ++a) {
+      i_hc.asfr_sum += p_hc.hc_age_specific_fertility_rate(a, t);
     } // end a
 
     if (p_hc.mat_prev_input(t)) {
-      for (int a = 0; a < p_fertility_age_groups; ++a) {
+      for (int a = 0; a < h_fertility_age_groups; ++a) {
         auto asfr_weight = p_hc.hc_age_specific_fertility_rate(a, t) / i_hc.asfr_sum;
         i_hc.age_weighted_hivneg += asfr_weight * p_hc.adult_female_hivnpop(a, t); // HIV negative 15-49 women weighted for ASFR
         i_hc.age_weighted_infections += asfr_weight * p_hc.adult_female_infections(a, t); // newly infected 15-49 women, weighted for ASFR
@@ -458,7 +457,7 @@ struct ChildModelSimulation<Config> {
         i_hc.perinatal_transmission_from_incidence = 0.0;
       }
     } else {
-      for (int a = 0; a < p_fertility_age_groups; ++a) {
+      for (int a = 0; a < h_fertility_age_groups; ++a) {
         auto asfr_weight = p_dp.age_specific_fertility_rate(a, t) / i_hc.asfr_sum;
         i_hc.age_weighted_hivneg += asfr_weight * i_hc.p_hiv_neg_pop(a + 15, FEMALE); // HIV negative 15-49 women weighted for ASFR
         i_hc.age_weighted_infections += asfr_weight * n_ha.p_infections(a + 15, FEMALE); // newly infected 15-49 women, weighted for ASFR
@@ -743,7 +742,7 @@ struct ChildModelSimulation<Config> {
       if (p_hc.mat_prev_input(t)) {
         for (int s = 0; s < NS; ++s) {
           for (int ag = 0; ag < hc_infant; ++ag) {
-            // n_dp.p_total_pop(ag + 1, s) = p_hc.infant_pop(ag, s, t) ;
+             n_dp.p_total_pop(ag + 1, s) = p_hc.infant_pop(ag, s, t) ;
           } // end hc_infant
         } // end NS
       }
@@ -770,6 +769,7 @@ struct ChildModelSimulation<Config> {
         for (int hd = 0; hd < hc1DS; ++hd) {
           auto bf_hiv_transmission_12_24 = n_ha.hiv_births * i_hc.bf_transmission_rate((VT_BF_12_23 - 1)) * uninfected_prop_12_24;
           auto bf_hiv_transmission_24_plus = n_ha.hiv_births * i_hc.bf_transmission_rate((VT_BF_24_35 - 1)) * uninfected_prop_24_plus;
+
           // 12-24
           n_hc.hc1_hiv_pop(hd, VT_BF_12_23, age_1, s) += p_hc.hc1_cd4_dist(hd) * bf_hiv_transmission_12_24;
           n_ha.p_infections(age_1, s) += p_hc.hc1_cd4_dist(hd) * bf_hiv_transmission_12_24;
