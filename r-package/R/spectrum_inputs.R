@@ -72,6 +72,9 @@ read_netmigr <- function(pjnz, use_ep5=FALSE, adjust_u5mig = TRUE, sx = NULL) {
 
   netmigagedist <- sapply(dpsub("<MigrAgeDist MV2>", 2 + 1:34, timedat.idx), as.numeric)/100
   netmigagedist <- array(c(netmigagedist), c(17, 2, length(proj.years)))
+  migr_age_dist_sum <- colSums(netmigagedist)
+  migr_age_dist_sum[migr_age_dist_sum == 0] <- 1
+  netmigagedist <- sweep(netmigagedist, 2:3, migr_age_dist_sum, "/")
   netmigr5 <- sweep(netmigagedist, 2:3, totnetmig, "*")
 
   netmigr <- array(dim = c(81, 2, length(proj.years)),
@@ -85,6 +88,7 @@ read_netmigr <- function(pjnz, use_ep5=FALSE, adjust_u5mig = TRUE, sx = NULL) {
       sx <- read_sx(pjnz)
     }
 
+    browser()
     u5prop <- array(dim = c(5, 2))
     u5prop[1, ] <- sx[1, , 1] * 2
     u5prop[2, ] <- sx[2, , 1] * u5prop[1, ]
