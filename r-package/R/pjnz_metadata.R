@@ -584,6 +584,15 @@ get_pars_metadata <- function(dim_vars) {
           start_offset = list(row = 1)
         )
       )
+    ),
+    vt = list(
+      type = "real",
+      read = list(
+        list(
+          tag = "TransEffAssump MV",
+          dims = list("vt_trt", "vt_trt_cat")
+        )
+      )
     )
   )
 }
@@ -625,7 +634,9 @@ get_static_dim_vars <- function() {
     art_dur_2 = list(length = 2, labels = c("0-12mos", "12mos+")),
     art_off_on = list(length = 2, labels = c("off art", "on art")),
     pops_for_treat = list(length = 7, labels = c("Pregnant women", "TB/HIV co-infected", "Discordant couples", "Sex workers", "Men who have sex with men", "Injecting drug users", "Other population")),
-    elig_perc_year = list(length = 3, labels = c("eligibility", "percent", "year"))
+    elig_perc_year = list(length = 3, labels = c("eligibility", "percent", "year")),
+    vt_trt = list(length = 11, labels = c("CD4 <200", "CD4 200-350", "CD4 >350", "Incident infections", "Single dose nevirapine", "WHO 2006 dual ARV regimen", "Option A", "Option B", "ART: Started before pregnancy", "ART: Started during pregnancy >4 weeks", "ART: Started during pregnancy <4 weeks")),
+    vt_trt_cat = list(length = 3, labels = c('Perinatal', 'Breastfeeding (per month) <350', 'Breastfeeding (per month) >=350'))
   )
 }
 
