@@ -776,7 +776,7 @@ struct ChildModelSimulation<Config> {
       maternal_incidence_in_bf_tr();
       adjust_option_A_B_bf_tr();
       convert_PMTCT_pre_bf();
-      //indexing for transmission rates need to have minus one to line up with indexing for hc1/2_hiv_pop
+      //indexing for transmission rates need to have minus one to line up with indexing for hc1/2_hivpop
       //TODO: combine perinatal and breastfeeding transmission rate so the indexing is the same
       run_bf_transmission_rate(VT_MOS_00_01, VT_MOS_04_05, (VT_BF_00_05 - 1));
 
@@ -852,7 +852,7 @@ struct ChildModelSimulation<Config> {
           n_hc.infection_by_type(VT_BF_12_23, age_1, s) += p_hc.hc1_cd4_dist(hd) * bf_hiv_transmission_12_24;
 
           // 24 plus
-          //TODO: stratify hc1/2_hiv_pop by BF 12-24 and 24 plus. For now these get put in the same category as 12-24.
+          //TODO: stratify hc1/2_hivpop by BF 12-24 and 24 plus. For now these get put in the same category as 12-24.
           n_hc.hc1_hivpop(hd, VT_BF_12_23, age_2, s) += p_hc.hc1_cd4_dist(hd) * bf_hiv_transmission_24_plus;
           n_ha.p_infections(age_2, s) += p_hc.hc1_cd4_dist(hd) * bf_hiv_transmission_24_plus;
           n_hc.infection_by_type(VT_BF_12_23, age_2, s) += p_hc.hc1_cd4_dist(hd) * bf_hiv_transmission_24_plus;

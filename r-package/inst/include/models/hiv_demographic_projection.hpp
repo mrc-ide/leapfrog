@@ -56,7 +56,7 @@ struct HivDemographicProjection<Config> {
     opts(args.opts)
   {};
 
-  void run_hiv_pop_demographic_projection() {
+  void run_hivpop_demographic_projection() {
     auto& n_ha = state_next.ha;
     auto& c_ha = state_curr.ha;
 
@@ -72,7 +72,7 @@ struct HivDemographicProjection<Config> {
 
   };
 
-  void run_hiv_pop_end_year_migration() {
+  void run_hivpop_end_year_migration() {
     auto& n_ha = state_next.ha;
     auto& i_ha = intermediate.ha;
     auto& i_dp = intermediate.dp;
@@ -113,9 +113,9 @@ struct HivDemographicProjection<Config> {
     }
   };
 
-  void run_hc_hiv_pop_end_year_migration() {
+  void run_hc_hivpop_end_year_migration() {
     static_assert(ModelVariant::run_child_model,
-                  "run_hc_hiv_pop_end_year_migration can only be called for model variants where run_child_model is true");
+                  "run_hc_hivpop_end_year_migration can only be called for model variants where run_child_model is true");
     static constexpr int hc2_agestart = SS::hc2_agestart;
     static constexpr int hcAG_end = SS::hcAG_end;
     static constexpr int hc1DS = SS::hc1DS;
