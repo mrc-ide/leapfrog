@@ -215,7 +215,7 @@ In 5 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 | births_sex                | births_sex                      |                                                                           |
 | migrate_a0                | migration_rate_a0               |                                                                           |
 | hiv_ag_prob               | hiv_age_up_prob                 | Probability of aging from one group to the next in HIV age stratification |
-| hivpop_ha(ha, g)          | hiv_population_coarse_ages      |                                                                           |
+| hivpop_ha(ha, s)          | hiv_population_coarse_ages      |                                                                           |
 | deathsmig_ha              | deaths_migrate                  |                                                                           |
 | deathmigrate_ha           | deaths_migrate_rate             |                                                                           |
 | cd4elig_idx               | ?                               | Index of the maximum CD4 count category eligible for ART                  |
