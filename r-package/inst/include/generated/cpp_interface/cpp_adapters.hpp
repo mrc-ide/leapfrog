@@ -72,7 +72,7 @@ struct HaAdapter<Language::Cpp, real_type, ModelVariant> {
     };
   };
 
-  static constexpr int output_count = 9;
+  static constexpr int output_count = 10;
 
   static int build_output(
     int index,
@@ -88,6 +88,7 @@ struct HaAdapter<Language::Cpp, real_type, ModelVariant> {
     write_data<real_type, typename Config::OutputState::shape_h_hiv_deaths_art>(output_file, "h_hiv_deaths_art", state.h_hiv_deaths_art);
     write_data<real_type, typename Config::OutputState::shape_h_art_initiation>(output_file, "h_art_initiation", state.h_art_initiation);
     write_data<real_type, typename Config::OutputState::shape_p_hiv_deaths>(output_file, "p_hiv_deaths", state.p_hiv_deaths);
+    write_data<real_type, typename Config::OutputState::shape_p_net_migration_hivpop>(output_file, "p_net_migration_hivpop", state.p_net_migration_hivpop);
     return index + output_count;
   };
 };
@@ -127,6 +128,7 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
       .PMTCT_input_is_percent = { owned_pars.hc.PMTCT_input_is_percent.data(), owned_pars.hc.PMTCT_input_is_percent.shape() },
       .breastfeeding_duration_art = { owned_pars.hc.breastfeeding_duration_art.data(), owned_pars.hc.breastfeeding_duration_art.shape() },
       .breastfeeding_duration_no_art = { owned_pars.hc.breastfeeding_duration_no_art.data(), owned_pars.hc.breastfeeding_duration_no_art.shape() },
+      .infant_pop = { owned_pars.hc.infant_pop.data(), owned_pars.hc.infant_pop.shape() },
       .mat_hiv_births = { owned_pars.hc.mat_hiv_births.data(), owned_pars.hc.mat_hiv_births.shape() },
       .mat_prev_input = { owned_pars.hc.mat_prev_input.data(), owned_pars.hc.mat_prev_input.shape() },
       .prop_lt200 = { owned_pars.hc.prop_lt200.data(), owned_pars.hc.prop_lt200.shape() },
@@ -141,17 +143,19 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
       .total_births = { owned_pars.hc.total_births.data(), owned_pars.hc.total_births.shape() },
       .ctx_effect = { owned_pars.hc.ctx_effect.data(), owned_pars.hc.ctx_effect.shape() },
       .hc_art_start = owned_pars.hc.hc_art_start,
-      .local_adj_factor = owned_pars.hc.local_adj_factor
+      .local_adj_factor = owned_pars.hc.local_adj_factor,
+      .hc_age_specific_fertility_rate = { owned_pars.hc.hc_age_specific_fertility_rate.data(), owned_pars.hc.hc_age_specific_fertility_rate.shape() }
     };
   };
 
-  static constexpr int output_count = 13;
+  static constexpr int output_count = 18;
 
   static int build_output(
     int index,
     const Config::OutputState& state,
     std::filesystem::path& output_file
   ) {
+    write_data<real_type, typename Config::OutputState::shape_hiv_births_by_mat_age>(output_file, "hiv_births_by_mat_age", state.hiv_births_by_mat_age);
     write_data<real_type, typename Config::OutputState::shape_hc1_hiv_pop>(output_file, "hc1_hiv_pop", state.hc1_hiv_pop);
     write_data<real_type, typename Config::OutputState::shape_hc2_hiv_pop>(output_file, "hc2_hiv_pop", state.hc2_hiv_pop);
     write_data<real_type, typename Config::OutputState::shape_hc1_art_pop>(output_file, "hc1_art_pop", state.hc1_art_pop);
@@ -165,6 +169,10 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
     write_data<real_type, typename Config::OutputState::shape_hiv_births>(output_file, "hiv_births", state.hiv_births);
     write_data<real_type, typename Config::OutputState::shape_ctx_need>(output_file, "ctx_need", state.ctx_need);
     write_data<real_type, typename Config::OutputState::shape_infection_by_type>(output_file, "infection_by_type", state.infection_by_type);
+    write_data<real_type, typename Config::OutputState::shape_mtct_by_source_tr>(output_file, "mtct_by_source_tr", state.mtct_by_source_tr);
+    write_data<real_type, typename Config::OutputState::shape_mtct_by_source_women>(output_file, "mtct_by_source_women", state.mtct_by_source_women);
+    write_data<real_type, typename Config::OutputState::shape_mtct_by_source_hc_infections>(output_file, "mtct_by_source_hc_infections", state.mtct_by_source_hc_infections);
+    write_data<real_type, typename Config::OutputState::shape_pmtct_coverage_at_delivery>(output_file, "pmtct_coverage_at_delivery", state.pmtct_coverage_at_delivery);
     return index + output_count;
   };
 };

@@ -165,6 +165,8 @@ type
     hArtInitiationLength: Integer;
     pHivDeaths: PDouble;
     pHivDeathsLength: Integer;
+    pNetMigrationHivpop: PDouble;
+    pNetMigrationHivpopLength: Integer;
 end;
 
 type
@@ -179,6 +181,7 @@ type
     hHivDeathsArt: TGBFixedArray<Double>;
     hArtInitiation: TGBFixedArray<Double>;
     pHivDeaths: TGBFixedArray<Double>;
+    pNetMigrationHivpop: TGBFixedArray<Double>;
     function getView(): LeapfrogHivAdultStateView;
     procedure writeToDisk(dir: string);
     Destructor Destroy; override;
@@ -240,6 +243,8 @@ type
     breastfeedingDurationArtLength: Integer;
     breastfeedingDurationNoArt: PDouble;
     breastfeedingDurationNoArtLength: Integer;
+    infantPop: PDouble;
+    infantPopLength: Integer;
     matHivBirths: PDouble;
     matHivBirthsLength: Integer;
     matPrevInput: PInteger;
@@ -270,6 +275,8 @@ type
     hcArtStartLength: Integer;
     localAdjFactor: Double;
     localAdjFactorLength: Integer;
+    hcAgeSpecificFertilityRate: PDouble;
+    hcAgeSpecificFertilityRateLength: Integer;
 end;
 
 type
@@ -301,6 +308,7 @@ type
     pmtctInputIsPercent: TGBFixedArray<Integer>;
     breastfeedingDurationArt: TGBFixedArray<Double>;
     breastfeedingDurationNoArt: TGBFixedArray<Double>;
+    infantPop: TGBFixedArray<Double>;
     matHivBirths: TGBFixedArray<Double>;
     matPrevInput: TGBFixedArray<Integer>;
     propLt200: TGBFixedArray<Double>;
@@ -316,6 +324,7 @@ type
     ctxEffect: TGBFixedArray<Double>;
     hcArtStart: Integer;
     localAdjFactor: Double;
+    hcAgeSpecificFertilityRate: TGBFixedArray<Double>;
     function getView(): LeapfrogHivChildParamsView;
     procedure writeToDisk(dir: string);
     Destructor Destroy; override;
@@ -325,6 +334,8 @@ end;
 type
   LeapfrogHivChildStateView = record
   private
+    hivBirthsByMatAge: PDouble;
+    hivBirthsByMatAgeLength: Integer;
     hc1HivPop: PDouble;
     hc1HivPopLength: Integer;
     hc2HivPop: PDouble;
@@ -351,11 +362,20 @@ type
     ctxNeedLength: Integer;
     infectionByType: PDouble;
     infectionByTypeLength: Integer;
+    mtctBySourceTr: PDouble;
+    mtctBySourceTrLength: Integer;
+    mtctBySourceWomen: PDouble;
+    mtctBySourceWomenLength: Integer;
+    mtctBySourceHcInfections: PDouble;
+    mtctBySourceHcInfectionsLength: Integer;
+    pmtctCoverageAtDelivery: PDouble;
+    pmtctCoverageAtDeliveryLength: Integer;
 end;
 
 type
   LeapfrogHivChildState = class
   public
+    hivBirthsByMatAge: TGBFixedArray<Double>;
     hc1HivPop: TGBFixedArray<Double>;
     hc2HivPop: TGBFixedArray<Double>;
     hc1ArtPop: TGBFixedArray<Double>;
@@ -369,6 +389,10 @@ type
     hivBirths: TGBFixedArray<Double>;
     ctxNeed: TGBFixedArray<Double>;
     infectionByType: TGBFixedArray<Double>;
+    mtctBySourceTr: TGBFixedArray<Double>;
+    mtctBySourceWomen: TGBFixedArray<Double>;
+    mtctBySourceHcInfections: TGBFixedArray<Double>;
+    pmtctCoverageAtDelivery: TGBFixedArray<Double>;
     function getView(): LeapfrogHivChildStateView;
     procedure writeToDisk(dir: string);
     Destructor Destroy; override;
@@ -480,6 +504,7 @@ begin;
   hHivDeathsArt.Free;
   hArtInitiation.Free;
   pHivDeaths.Free;
+  pNetMigrationHivpop.Free;
   inherited;
 end;
 
@@ -543,6 +568,8 @@ begin;
   Result.hArtInitiationLength := hArtInitiation.GetLength();
   Result.pHivDeaths := PDouble(pHivDeaths.data);
   Result.pHivDeathsLength := pHivDeaths.GetLength();
+  Result.pNetMigrationHivpop := PDouble(pNetMigrationHivpop.data);
+  Result.pNetMigrationHivpopLength := pNetMigrationHivpop.GetLength();
 end;
 
 destructor LeapfrogHivChildParams.Destroy;
@@ -573,6 +600,7 @@ begin;
   pmtctInputIsPercent.Free;
   breastfeedingDurationArt.Free;
   breastfeedingDurationNoArt.Free;
+  infantPop.Free;
   matHivBirths.Free;
   matPrevInput.Free;
   propLt200.Free;
@@ -586,11 +614,13 @@ begin;
   adultFemaleHivnpop.Free;
   totalBirths.Free;
   ctxEffect.Free;
+  hcAgeSpecificFertilityRate.Free;
   inherited;
 end;
 
 destructor LeapfrogHivChildState.Destroy;
 begin;
+  hivBirthsByMatAge.Free;
   hc1HivPop.Free;
   hc2HivPop.Free;
   hc1ArtPop.Free;
@@ -604,6 +634,10 @@ begin;
   hivBirths.Free;
   ctxNeed.Free;
   infectionByType.Free;
+  mtctBySourceTr.Free;
+  mtctBySourceWomen.Free;
+  mtctBySourceHcInfections.Free;
+  pmtctCoverageAtDelivery.Free;
   inherited;
 end;
 
@@ -661,6 +695,8 @@ begin;
   Result.breastfeedingDurationArtLength := breastfeedingDurationArt.GetLength();
   Result.breastfeedingDurationNoArt := PDouble(breastfeedingDurationNoArt.data);
   Result.breastfeedingDurationNoArtLength := breastfeedingDurationNoArt.GetLength();
+  Result.infantPop := PDouble(infantPop.data);
+  Result.infantPopLength := infantPop.GetLength();
   Result.matHivBirths := PDouble(matHivBirths.data);
   Result.matHivBirthsLength := matHivBirths.GetLength();
   Result.matPrevInput := PInteger(matPrevInput.data);
@@ -691,10 +727,14 @@ begin;
   Result.hcArtStartLength := 1;
   Result.localAdjFactor := localAdjFactor;
   Result.localAdjFactorLength := 1;
+  Result.hcAgeSpecificFertilityRate := PDouble(hcAgeSpecificFertilityRate.data);
+  Result.hcAgeSpecificFertilityRateLength := hcAgeSpecificFertilityRate.GetLength();
 end;
 
 function LeapfrogHivChildState.getView(): LeapfrogHivChildStateView;
 begin;
+  Result.hivBirthsByMatAge := PDouble(hivBirthsByMatAge.data);
+  Result.hivBirthsByMatAgeLength := hivBirthsByMatAge.GetLength();
   Result.hc1HivPop := PDouble(hc1HivPop.data);
   Result.hc1HivPopLength := hc1HivPop.GetLength();
   Result.hc2HivPop := PDouble(hc2HivPop.data);
@@ -721,6 +761,14 @@ begin;
   Result.ctxNeedLength := ctxNeed.GetLength();
   Result.infectionByType := PDouble(infectionByType.data);
   Result.infectionByTypeLength := infectionByType.GetLength();
+  Result.mtctBySourceTr := PDouble(mtctBySourceTr.data);
+  Result.mtctBySourceTrLength := mtctBySourceTr.GetLength();
+  Result.mtctBySourceWomen := PDouble(mtctBySourceWomen.data);
+  Result.mtctBySourceWomenLength := mtctBySourceWomen.GetLength();
+  Result.mtctBySourceHcInfections := PDouble(mtctBySourceHcInfections.data);
+  Result.mtctBySourceHcInfectionsLength := mtctBySourceHcInfections.GetLength();
+  Result.pmtctCoverageAtDelivery := PDouble(pmtctCoverageAtDelivery.data);
+  Result.pmtctCoverageAtDeliveryLength := pmtctCoverageAtDelivery.GetLength();
 end;
 
 procedure LeapfrogDemProjParams.writeToDisk(dir: string);
@@ -774,6 +822,7 @@ begin;
   hHivDeathsArt.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hHivDeathsArt');
   hArtInitiation.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hArtInitiation');
   pHivDeaths.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pHivDeaths');
+  pNetMigrationHivpop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pNetMigrationHivpop');
 end;
 
 procedure LeapfrogHivChildParams.writeToDisk(dir: string);
@@ -806,6 +855,7 @@ begin;
   pmtctInputIsPercent.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pmtctInputIsPercent');
   breastfeedingDurationArt.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'breastfeedingDurationArt');
   breastfeedingDurationNoArt.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'breastfeedingDurationNoArt');
+  infantPop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'infantPop');
   matHivBirths.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'matHivBirths');
   matPrevInput.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'matPrevInput');
   propLt200.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'propLt200');
@@ -819,12 +869,14 @@ begin;
   adultFemaleHivnpop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'adultFemaleHivnpop');
   totalBirths.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'totalBirths');
   ctxEffect.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'ctxEffect');
+  hcAgeSpecificFertilityRate.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hcAgeSpecificFertilityRate');
 end;
 
 procedure LeapfrogHivChildState.writeToDisk(dir: string);
 begin;
   if not DirectoryExists(dir) then
     ForceDirectories(dir);
+  hivBirthsByMatAge.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hivBirthsByMatAge');
   hc1HivPop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hc1HivPop');
   hc2HivPop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hc2HivPop');
   hc1ArtPop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hc1ArtPop');
@@ -836,6 +888,10 @@ begin;
   hcArtInit.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hcArtInit');
   hcArtNeedInit.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hcArtNeedInit');
   infectionByType.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'infectionByType');
+  mtctBySourceTr.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'mtctBySourceTr');
+  mtctBySourceWomen.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'mtctBySourceWomen');
+  mtctBySourceHcInfections.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'mtctBySourceHcInfections');
+  pmtctCoverageAtDelivery.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pmtctCoverageAtDelivery');
 end;
 
 procedure LeapfrogParams.SetDemProjParams(const demprojParams: LeapfrogDemProjParamsView);

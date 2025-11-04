@@ -221,7 +221,10 @@ prepare_leapfrog_projp <- function(pjnz, use_coarse_age_groups = FALSE, hiv_step
   v$incidpopage <- attr(v$incidinput, "incidpopage")
   v$incrr_sex <- projp$incrr_sex
 
-  v$pAG_INCIDPOP <- ifelse(v$incidpopage == 0L, 35L, 66L)
+  pAG_15_to_49 <- 35L
+  pAG_15_plus <- 66L
+
+  v$pAG_INCIDPOP <- ifelse(v$incidpopage == 0L, pAG_15_to_49, pAG_15_plus)
   v$pIDX_INCIDPOP <- 15L
 
   v$artmx_timerr <- projp$artmx_timerr[c(1, 2, rep(3, hTS - 2)), ]
@@ -269,10 +272,21 @@ prepare_leapfrog_projp <- function(pjnz, use_coarse_age_groups = FALSE, hiv_step
   v$hAG_SPAN_coarse <- c(2L, 3L, 5L, 5L, 5L, 5L, 5L, 5L, 31L)
 
   ## Add in pediatric components
+  frr_agecat <- as.integer(rownames(projp$fert_rat))
+  h.fert.idx <- which((15L-1 + cumsum(v$hAG_SPAN_coarse)) %in% 15:49)
+  age_band_width <- length(15:49) / length(frr_agecat)
+  fert_rat.h.ag <- findInterval(15L + cumsum(v$hAG_SPAN_coarse[h.fert.idx]) - v$hAG_SPAN_coarse[h.fert.idx], frr_agecat)
+  hDS <- length(projp$cd4fert_rat)
+
   v$cd4fert_rat <- projp$cd4fert_rat
-  v$frr_art6mos <- projp$frr_art6mos
-  v$frr_scalar <- projp$frr_scalar
-  v$fert_rat <- projp$fert_rat
+  v$frr_art6mos_full <- rep(projp$frr_art6mos, each = age_band_width)
+  v$frr_art6mos_coarse <- array(projp$frr_art6mos[fert_rat.h.ag])
+
+  v$fert_rat_coarse <- array(1, c(length(h.fert.idx), proj_years))
+  v$fert_rat_coarse[,] <- rep(projp$fert_rat[fert_rat.h.ag, as.character(projp$yr_end:projp$yr_start )], length(proj_years))
+  v$fert_rat_full <- apply(projp$fert_rat, 2, rep, each = age_band_width)
+  v$frr_scalar <- as.numeric(projp$frr_scalar)
+
   ## HIV positive entrants, right now just doing those without ART
   v$age15hivpop <- projp$age15hivpop
 

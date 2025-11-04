@@ -101,6 +101,8 @@ struct HaOut {
   int h_art_initiation_length;
   real_type* p_hiv_deaths;
   int p_hiv_deaths_length;
+  real_type* p_net_migration_hivpop;
+  int p_net_migration_hivpop_length;
 };
 
 template<typename real_type>
@@ -157,6 +159,8 @@ struct HcParams {
   int breastfeeding_duration_art_length;
   real_type* breastfeeding_duration_no_art;
   int breastfeeding_duration_no_art_length;
+  real_type* infant_pop;
+  int infant_pop_length;
   real_type* mat_hiv_births;
   int mat_hiv_births_length;
   int* mat_prev_input;
@@ -187,10 +191,14 @@ struct HcParams {
   int hc_art_start_length;
   real_type local_adj_factor;
   int local_adj_factor_length;
+  real_type* hc_age_specific_fertility_rate;
+  int hc_age_specific_fertility_rate_length;
 };
 
 template<typename real_type>
 struct HcOut {
+  real_type* hiv_births_by_mat_age;
+  int hiv_births_by_mat_age_length;
   real_type* hc1_hiv_pop;
   int hc1_hiv_pop_length;
   real_type* hc2_hiv_pop;
@@ -217,6 +225,14 @@ struct HcOut {
   int ctx_need_length;
   real_type* infection_by_type;
   int infection_by_type_length;
+  real_type* mtct_by_source_tr;
+  int mtct_by_source_tr_length;
+  real_type* mtct_by_source_women;
+  int mtct_by_source_women_length;
+  real_type* mtct_by_source_hc_infections;
+  int mtct_by_source_hc_infections_length;
+  real_type* pmtct_coverage_at_delivery;
+  int pmtct_coverage_at_delivery_length;
 };
 
 template<typename real_type>

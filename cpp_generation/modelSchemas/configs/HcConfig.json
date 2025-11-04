@@ -7,22 +7,25 @@
     "default": {
       "hc1DS": 7,
       "hc2DS": 6,
-      "hc1_ageend": 4,
       "hc2_agestart": 5,
+      "hcAG_end": 15,
       "hc1AG": 5,
       "hc1AG_c": 2,
       "hc2AG": 10,
       "hc2AG_c": 1,
-      "hcAG_end": 15,
+      "hc_infant": 2,
       "hcTT": 4,
+      "hcTT_expanded": 5,
       "hPS": 7,
-      "hPS_dropout": 6,
+      "hVT_dropout": 3,
       "hVT": 2,
       "hBF": 18,
       "hBF_coarse": 4,
       "hcAG_coarse": 4,
       "hAB_ind": 2,
+      "hc_p_fertility_age_groups": 35,
       "hAG_fert": 7,
+      "mtct_source": 11,
       "hc_age_coarse": [1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3],
       "hc_age_coarse_cd4": [0, 0, 0, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
       "hc_cd4_transition": [
@@ -42,261 +45,283 @@
         [0,   0,   0,   0,   0,         0.21],
         [0,   0,   0,   0,   0,         0.44]
       ]
-    }
+    },
+    "overrides": [
+      {
+        "applies_if": "use_coarse_stratification",
+        "vars": {
+          "hc_p_fertility_age_groups": 8
+        }
+      }
+    ]
   },
   "pars": {
-    "hc_nosocomial": {
-      "num_type": "real_type",
-      "dims": ["opts.proj_steps"],
-      "alias": {
-        "r": "paed_incid_input"
+      "hc_nosocomial": {
+        "num_type": "real_type",
+        "dims": ["opts.proj_steps"],
+        "alias": {
+          "r": "paed_incid_input"
+        }
+      },
+      "hc1_cd4_dist": {
+        "num_type": "real_type",
+        "dims": ["SS::hc1DS"],
+        "alias": {
+          "r": "paed_cd4_dist"
+        }
+      },
+      "hc1_cd4_mort": {
+        "num_type": "real_type",
+        "dims": ["SS::hc1DS", "SS::hcTT", "SS::hc1AG"],
+        "alias": {
+          "r": "paed_cd4_mort"
+        }
+      },
+      "hc2_cd4_mort": {
+        "num_type": "real_type",
+        "dims": ["SS::hc2DS", "SS::hcTT", "SS::hc2AG"],
+        "alias": {
+          "r": "adol_cd4_mort"
+        }
+      },
+      "hc1_cd4_prog": {
+        "num_type": "real_type",
+        "dims": ["SS::hc1DS", "SS::hc1AG_c", "SS::NS"],
+        "alias": {
+          "r": "paed_cd4_prog"
+        }
+      },
+      "hc2_cd4_prog": {
+        "num_type": "real_type",
+        "dims": ["SS::hc2DS", "SS::hc2AG_c", "SS::NS"],
+        "alias": {
+          "r": "adol_cd4_prog"
+        }
+      },
+      "ctx_val": {
+        "num_type": "real_type",
+        "dims": ["opts.proj_steps"]
+      },
+      "hc_art_elig_age": {
+        "num_type": "int",
+        "dims": ["opts.proj_steps"],
+        "alias": {
+          "r": "paed_art_elig_age"
+        }
+      },
+      "hc_art_elig_cd4": {
+        "num_type": "int",
+        "dims": ["SS::p_idx_hiv_first_adult", "opts.proj_steps"],
+        "alias": {
+          "r": "paed_art_elig_cd4"
+        }
+      },
+      "hc_art_mort_rr": {
+        "num_type": "real_type",
+        "dims": ["SS::hTS", "SS::p_idx_hiv_first_adult", "opts.proj_steps"],
+        "alias": {
+          "r": "mort_art_rr"
+        }
+      },
+      "hc1_art_mort": {
+        "num_type": "real_type",
+        "dims": ["SS::hc1DS", "SS::hTS", "SS::hc1AG"],
+        "alias": {
+          "r": "paed_art_mort"
+        }
+      },
+      "hc2_art_mort": {
+        "num_type": "real_type",
+        "dims": ["SS::hc2DS", "SS::hTS", "SS::hc2AG"],
+        "alias": {
+          "r": "adol_art_mort"
+        }
+      },
+      "hc_art_isperc": {
+        "num_type": "int",
+        "dims": ["opts.proj_steps"],
+        "alias": {
+          "r": "artpaeds_isperc"
+        }
+      },
+      "hc_art_val": {
+        "num_type": "real_type",
+        "dims": ["SS::hcAG_coarse", "opts.proj_steps"],
+        "alias": {
+          "r": "paed_art_val"
+        }
+      },
+      "hc_art_init_dist": {
+        "num_type": "real_type",
+        "dims": ["SS::p_idx_hiv_first_adult", "opts.proj_steps"],
+        "alias": {
+          "r": "init_art_dist"
+        }
+      },
+      "fert_mult_by_age": {
+        "num_type": "real_type",
+        "dims": ["SS::hc_p_fertility_age_groups", "opts.proj_steps"],
+        "alias": {
+          "r": "fert_rat"
+        }
+      },
+      "fert_mult_off_art": {
+        "num_type": "real_type",
+        "dims": ["SS::hDS"],
+        "alias": {
+          "r": "cd4fert_rat"
+        }
+      },
+      "fert_mult_on_art": {
+        "num_type": "real_type",
+        "dims": ["SS::hc_p_fertility_age_groups"],
+        "alias": {
+          "r": "frr_art6mos"
+        }
+      },
+      "total_fertility_rate": {
+        "num_type": "real_type",
+        "dims": ["opts.proj_steps"],
+        "alias": {
+          "r": "tfr"
+        }
+      },
+      "PMTCT": {
+        "num_type": "real_type",
+        "dims": ["SS::hPS", "opts.proj_steps"],
+        "alias": {
+          "r": "pmtct"
+        }
+      },
+      "vertical_transmission_rate": {
+        "num_type": "real_type",
+        "dims": ["SS::hDS + 1", "SS::hVT"],
+        "alias": {
+          "r": "mtct"
+        }
+      },
+      "PMTCT_transmission_rate": {
+        "num_type": "real_type",
+        "dims": ["SS::hDS", "SS::hPS", "SS::hVT"],
+        "alias": {
+          "r": "pmtct_mtct"
+        }
+      },
+      "PMTCT_dropout": {
+        "num_type": "real_type",
+        "dims": ["SS::hPS", "SS::hVT_dropout", "opts.proj_steps"],
+        "alias": {
+          "r": "pmtct_dropout"
+        }
+      },
+      "PMTCT_input_is_percent": {
+        "num_type": "int",
+        "dims": ["opts.proj_steps"],
+        "alias": {
+          "r": "pmtct_input_isperc"
+        }
+      },
+      "breastfeeding_duration_art": {
+        "num_type": "real_type",
+        "dims": ["SS::hBF", "opts.proj_steps"],
+        "alias": {
+          "r": "bf_duration_art"
+        }
+      },
+      "breastfeeding_duration_no_art": {
+        "num_type": "real_type",
+        "dims": ["SS::hBF", "opts.proj_steps"],
+        "alias": {
+          "r": "bf_duration_no_art"
+        }
+      },
+      "infant_pop": {
+        "num_type": "real_type",
+        "dims": ["SS::hc_infant", "SS::NS","opts.proj_steps"]
+      },
+      "mat_hiv_births": {
+        "num_type": "real_type",
+        "dims": ["opts.proj_steps"]
+      },
+      "mat_prev_input": {
+        "num_type": "int",
+        "dims": ["opts.proj_steps"]
+      },
+      "prop_lt200": {
+        "num_type": "real_type",
+        "dims": ["opts.proj_steps"]
+      },
+      "prop_gte350": {
+        "num_type": "real_type",
+        "dims": ["opts.proj_steps"]
+      },
+      "ctx_val_is_percent": {
+        "num_type": "int",
+        "dims": ["opts.proj_steps"],
+        "alias": {
+          "r": "ctx_val_ispercent"
+        }
+      },
+      "hc_art_is_age_spec": {
+        "num_type": "int",
+        "dims": ["opts.proj_steps"],
+        "alias": {
+          "r": "paed_art_age_spec"
+        }
+      },
+      "abortion": {
+        "num_type": "real_type",
+        "dims": ["SS::hAB_ind", "opts.proj_steps"]
+      },
+      "patients_reallocated": {
+        "num_type": "real_type",
+        "dims": ["opts.proj_steps"]
+      },
+      "hc_art_ltfu": {
+        "num_type": "real_type",
+        "dims": ["opts.proj_steps"],
+        "alias": {
+          "r": "paed_art_ltfu"
+        }
+      },
+      "adult_female_infections": {
+        "num_type": "real_type",
+        "dims": ["SS::hc_p_fertility_age_groups", "opts.proj_steps"],
+        "alias": {
+          "r": "adult_female_infections"
+        }
+      },
+      "adult_female_hivnpop": {
+        "num_type": "real_type",
+        "dims": ["SS::hc_p_fertility_age_groups", "opts.proj_steps"],
+        "alias": {
+          "r": "hivnpop"
+        }
+      },
+      "total_births": {
+        "num_type": "real_type",
+        "dims": ["opts.proj_steps"]
+      },
+      "ctx_effect": {
+        "num_type": "real_type",
+        "dims": ["3"]
+      },
+      "hc_art_start": {
+        "num_type": "int"
+      },
+      "local_adj_factor": {
+        "num_type": "real_type",
+        "alias": {
+          "r": "frr_scalar"
+        }
+      },
+      "hc_age_specific_fertility_rate": {
+        "num_type": "real_type",
+        "dims": ["SS::hc_p_fertility_age_groups", "opts.proj_steps"],
+        "alias": {
+          "r": "hc_asfr"
+        }
       }
-    },
-    "hc1_cd4_dist": {
-      "num_type": "real_type",
-      "dims": ["SS::hc1DS"],
-      "alias": {
-        "r": "paed_cd4_dist"
-      }
-    },
-    "hc1_cd4_mort": {
-      "num_type": "real_type",
-      "dims": ["SS::hc1DS", "SS::hcTT", "SS::hc1AG"],
-      "alias": {
-        "r": "paed_cd4_mort"
-      }
-    },
-    "hc2_cd4_mort": {
-      "num_type": "real_type",
-      "dims": ["SS::hc2DS", "SS::hcTT", "SS::hc2AG"],
-      "alias": {
-        "r": "adol_cd4_mort"
-      }
-    },
-    "hc1_cd4_prog": {
-      "num_type": "real_type",
-      "dims": ["SS::hc1DS", "SS::hc1AG_c", "SS::NS"],
-      "alias": {
-        "r": "paed_cd4_prog"
-      }
-    },
-    "hc2_cd4_prog": {
-      "num_type": "real_type",
-      "dims": ["SS::hc2DS", "SS::hc2AG_c", "SS::NS"],
-      "alias": {
-        "r": "adol_cd4_prog"
-      }
-    },
-    "ctx_val": {
-      "num_type": "real_type",
-      "dims": ["opts.proj_steps"]
-    },
-    "hc_art_elig_age": {
-      "num_type": "int",
-      "dims": ["opts.proj_steps"],
-      "alias": {
-        "r": "paed_art_elig_age"
-      }
-    },
-    "hc_art_elig_cd4": {
-      "num_type": "int",
-      "dims": ["SS::p_idx_hiv_first_adult", "opts.proj_steps"],
-      "alias": {
-        "r": "paed_art_elig_cd4"
-      }
-    },
-    "hc_art_mort_rr": {
-      "num_type": "real_type",
-      "dims": ["SS::hTS", "SS::p_idx_hiv_first_adult", "opts.proj_steps"],
-      "alias": {
-        "r": "mort_art_rr"
-      }
-    },
-    "hc1_art_mort": {
-      "num_type": "real_type",
-      "dims": ["SS::hc1DS", "SS::hTS", "SS::hc1AG"],
-      "alias": {
-        "r": "paed_art_mort"
-      }
-    },
-    "hc2_art_mort": {
-      "num_type": "real_type",
-      "dims": ["SS::hc2DS", "SS::hTS", "SS::hc2AG"],
-      "alias": {
-        "r": "adol_art_mort"
-      }
-    },
-    "hc_art_isperc": {
-      "num_type": "int",
-      "dims": ["opts.proj_steps"],
-      "alias": {
-        "r": "artpaeds_isperc"
-      }
-    },
-    "hc_art_val": {
-      "num_type": "real_type",
-      "dims": ["SS::hcAG_coarse", "opts.proj_steps"],
-      "alias": {
-        "r": "paed_art_val"
-      }
-    },
-    "hc_art_init_dist": {
-      "num_type": "real_type",
-      "dims": ["SS::p_idx_hiv_first_adult", "opts.proj_steps"],
-      "alias": {
-        "r": "init_art_dist"
-      }
-    },
-    "fert_mult_by_age": {
-      "num_type": "real_type",
-      "dims": ["SS::hAG_fert", "opts.proj_steps"],
-      "alias": {
-        "r": "fert_rat"
-      }
-    },
-    "fert_mult_off_art": {
-      "num_type": "real_type",
-      "dims": ["SS::hDS"],
-      "alias": {
-        "r": "cd4fert_rat"
-      }
-    },
-    "fert_mult_on_art": {
-      "num_type": "real_type",
-      "dims": ["SS::hAG_fert"],
-      "alias": {
-        "r": "frr_art6mos"
-      }
-    },
-    "total_fertility_rate": {
-      "num_type": "real_type",
-      "dims": ["opts.proj_steps"],
-      "alias": {
-        "r": "tfr"
-      }
-    },
-    "PMTCT": {
-      "num_type": "real_type",
-      "dims": ["SS::hPS", "opts.proj_steps"],
-      "alias": {
-        "r": "pmtct"
-      }
-    },
-    "vertical_transmission_rate": {
-      "num_type": "real_type",
-      "dims": ["SS::hDS + 1", "SS::hVT"],
-      "alias": {
-        "r": "mtct"
-      }
-    },
-    "PMTCT_transmission_rate": {
-      "num_type": "real_type",
-      "dims": ["SS::hDS", "SS::hPS", "SS::hVT"],
-      "alias": {
-        "r": "pmtct_mtct"
-      }
-    },
-    "PMTCT_dropout": {
-      "num_type": "real_type",
-      "dims": ["SS::hPS_dropout", "opts.proj_steps"],
-      "alias": {
-        "r": "pmtct_dropout"
-      }
-    },
-    "PMTCT_input_is_percent": {
-      "num_type": "int",
-      "dims": ["opts.proj_steps"],
-      "alias": {
-        "r": "pmtct_input_isperc"
-      }
-    },
-    "breastfeeding_duration_art": {
-      "num_type": "real_type",
-      "dims": ["SS::hBF", "opts.proj_steps"],
-      "alias": {
-        "r": "bf_duration_art"
-      }
-    },
-    "breastfeeding_duration_no_art": {
-      "num_type": "real_type",
-      "dims": ["SS::hBF", "opts.proj_steps"],
-      "alias": {
-        "r": "bf_duration_no_art"
-      }
-    },
-    "mat_hiv_births": {
-      "num_type": "real_type",
-      "dims": ["opts.proj_steps"]
-    },
-    "mat_prev_input": {
-      "num_type": "int",
-      "dims": ["opts.proj_steps"]
-    },
-    "prop_lt200": {
-      "num_type": "real_type",
-      "dims": ["opts.proj_steps"]
-    },
-    "prop_gte350": {
-      "num_type": "real_type",
-      "dims": ["opts.proj_steps"]
-    },
-    "ctx_val_is_percent": {
-      "num_type": "int",
-      "dims": ["opts.proj_steps"],
-      "alias": {
-        "r": "ctx_val_ispercent"
-      }
-    },
-    "hc_art_is_age_spec": {
-      "num_type": "int",
-      "dims": ["opts.proj_steps"],
-      "alias": {
-        "r": "paed_art_age_spec"
-      }
-    },
-    "abortion": {
-      "num_type": "real_type",
-      "dims": ["SS::hAB_ind", "opts.proj_steps"]
-    },
-    "patients_reallocated": {
-      "num_type": "real_type",
-      "dims": ["opts.proj_steps"]
-    },
-    "hc_art_ltfu": {
-      "num_type": "real_type",
-      "dims": ["opts.proj_steps"],
-      "alias": {
-        "r": "paed_art_ltfu"
-      }
-    },
-    "adult_female_infections": {
-      "num_type": "real_type",
-      "dims": ["SS::p_fertility_age_groups", "opts.proj_steps"]
-    },
-    "adult_female_hivnpop": {
-      "num_type": "real_type",
-      "dims": ["SS::p_fertility_age_groups", "opts.proj_steps"],
-      "alias": {
-        "r": "hivnpop"
-      }
-    },
-    "total_births": {
-      "num_type": "real_type",
-      "dims": ["opts.proj_steps"]
-    },
-    "ctx_effect": {
-      "num_type": "real_type",
-      "dims": ["3"]
-    },
-    "hc_art_start": {
-      "num_type": "int"
-    },
-    "local_adj_factor": {
-      "num_type": "real_type",
-      "alias": {
-        "r": "laf"
-      }
-    }
   },
   "intermediate": {
     "age15_hiv_pop": {
@@ -309,15 +334,15 @@
     },
     "hc_posthivmort": {
       "num_type": "real_type",
-      "dims": ["SS::hDS", "SS::hcTT", "SS::hAG", "SS::NS"]
+      "dims": ["SS::hDS", "SS::hcTT", "SS::hcAG_end", "SS::NS"]
     },
     "hc_grad": {
       "num_type": "real_type",
-      "dims": ["SS::hDS", "SS::hcTT", "SS::hAG", "SS::NS"]
+      "dims": ["SS::hDS", "SS::hcTT", "SS::hcAG_end", "SS::NS"]
     },
     "eligible": {
       "num_type": "real_type",
-      "dims": ["SS::hDS", "SS::hAG", "SS::NS"]
+      "dims": ["SS::hDS", "SS::hcAG_end", "SS::NS"]
     },
     "unmet_need": {
       "num_type": "real_type",
@@ -341,7 +366,7 @@
     },
     "hc_art_grad": {
       "num_type": "real_type",
-      "dims": ["SS::hDS", "SS::hcTT", "SS::hAG", "SS::NS"]
+      "dims": ["SS::hTS", "SS::hDS", "SS::hcAG_end", "SS::NS"]
     },
     "hc_art_scalar": {
       "num_type": "real_type",
@@ -373,9 +398,13 @@
     },
     "p_hiv_neg_pop": {
       "num_type": "real_type",
-      "dims": ["SS::hAG", "SS::NS"]
+      "dims": ["SS::pAG", "SS::NS"]
     },
     "PMTCT_coverage": {
+      "num_type": "real_type",
+      "dims": ["SS::hPS"]
+    },
+    "PMTCT_not_retained": {
       "num_type": "real_type",
       "dims": ["SS::hPS"]
     },
@@ -407,13 +436,7 @@
     "prev": {
       "num_type": "real_type"
     },
-    "birthsCurrAge": {
-      "num_type": "real_type"
-    },
     "birthsHE": {
-      "num_type": "real_type"
-    },
-    "births_HE_15_24": {
       "num_type": "real_type"
     },
     "sumARV": {
@@ -515,9 +538,19 @@
     "ctx_mean": {
       "num_type": "real_type",
       "dims": ["3"]
+    },
+    "PMTCT_before_dropout": {
+      "num_type": "real_type"
+    },
+    "PMTCT_during_dropout": {
+      "num_type": "real_type"
     }
   },
   "state": {
+    "hiv_births_by_mat_age": {
+      "num_type": "real_type",
+      "dims": ["SS::hc_p_fertility_age_groups"]
+    },
     "hc1_hiv_pop": {
       "num_type": "real_type",
       "dims": ["SS::hc1DS", "SS::hcTT", "SS::hc1AG", "SS::NS"]
@@ -567,6 +600,22 @@
     "infection_by_type": {
       "num_type": "real_type",
       "dims": ["SS::hcTT", "SS::hc1AG", "SS::NS"]
+    },
+    "mtct_by_source_tr": {
+      "num_type": "real_type",
+      "dims": ["SS::mtct_source", "SS::hcTT_expanded"]
+    },
+    "mtct_by_source_women": {
+      "num_type": "real_type",
+      "dims": ["SS::mtct_source"]
+    },
+    "mtct_by_source_hc_infections": {
+      "num_type": "real_type",
+      "dims": ["SS::mtct_source", "SS::hcTT_expanded"]
+    },
+    "pmtct_coverage_at_delivery": {
+      "num_type": "real_type",
+      "dims": ["SS::hPS"]
     }
   }
 }

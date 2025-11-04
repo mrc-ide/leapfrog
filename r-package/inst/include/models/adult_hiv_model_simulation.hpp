@@ -71,7 +71,6 @@ struct AdultHivModelSimulation<Config> {
       nda::fill(i_ha.grad, 0.0);
       nda::fill(i_ha.gradART, 0.0);
       nda::fill(i_ha.p_hiv_deaths_age_sex, 0.0);
-
       run_disease_progression_and_mortality(hiv_step);
       run_new_p_infections(hiv_step);
       run_new_hiv_p_infections(hiv_step);
@@ -79,10 +78,10 @@ struct AdultHivModelSimulation<Config> {
       if (t >= opts.ts_art_start) {
         run_art_progression_and_mortality(hiv_step);
         run_h_art_initiation(hiv_step);
-        run_update_art_stratification(hiv_step);
+        run_update_art_adult(hiv_step);
       }
 
-      run_update_hiv_stratification(hiv_step);
+      run_update_hiv_adult(hiv_step);
       run_remove_p_hiv_deaths(hiv_step);
     }
   };
@@ -357,10 +356,17 @@ struct AdultHivModelSimulation<Config> {
         auto eligibility_by_stage = (1.0 - p_ha.initiation_mortality_weight) *
                                     i_ha.artelig_hm(hm) /
                                     i_ha.Xartelig_15plus;
-        auto expected_mortality_by_stage = p_ha.initiation_mortality_weight *
-                                          i_ha.expect_mort_artelig_hm(hm) /
-                                          i_ha.expect_mort_artelig15plus;
-        i_ha.artinit_hm(hm) = i_ha.artinit_hts * (eligibility_by_stage + expected_mortality_by_stage);
+        if(i_ha.expect_mort_artelig15plus > 0){
+          auto expected_mortality_by_stage = p_ha.initiation_mortality_weight *
+            i_ha.expect_mort_artelig_hm(hm) /
+              i_ha.expect_mort_artelig15plus;
+          i_ha.artinit_hm(hm) = i_ha.artinit_hts * (eligibility_by_stage + expected_mortality_by_stage);
+
+        }else{
+          auto expected_mortality_by_stage = 0.0;
+          i_ha.artinit_hm(hm) = i_ha.artinit_hts * (eligibility_by_stage + expected_mortality_by_stage);
+
+        }
       }
 
       // Step 2: within CD4 category, allocate ART by age proportional to
@@ -383,7 +389,7 @@ struct AdultHivModelSimulation<Config> {
     }
   };
 
-  void run_update_art_stratification(int hiv_step) {
+  void run_update_art_adult(int hiv_step) {
     auto& n_ha = state_next.ha;
     auto& i_ha = intermediate.ha;
 
@@ -398,7 +404,7 @@ struct AdultHivModelSimulation<Config> {
     }
   };
 
-  void run_update_hiv_stratification(int hiv_step) {
+  void run_update_hiv_adult(int hiv_step) {
     auto& n_ha = state_next.ha;
     auto& i_ha = intermediate.ha;
 
