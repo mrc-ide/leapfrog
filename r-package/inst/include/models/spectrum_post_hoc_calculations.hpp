@@ -133,10 +133,9 @@ struct SpectrumPostHocCalculations<Config> {
 
 	// Distribute deaths from coarse age group ha to single age group a proportional
 	// to distribution of HIV population in age group a
-	
         for (int i = 0; i < hAG_span[ha]; ++i, ++a) {
+
 	  const auto hivpop_proportion_a = n_ha.p_hiv_pop(a, g) / hivpop_ha;
-	  printf("%f\n", hivpop_proportion_a);
           n_sp.p_excess_deaths_nonaids_no_art(a, g) = excess_deaths_nonaids_no_art_ha * hivpop_proportion_a;
 
           if (t > opts.ts_art_start) {
