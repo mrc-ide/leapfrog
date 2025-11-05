@@ -6,8 +6,8 @@ test_that("initial state set up works as expected", {
   expect_setequal(
     names(out),
     c(
-      "p_totpop", "births", "p_background_deaths_totpop", "p_hivpop",
-      "p_background_deaths_hivpop", "h_hivpop", "h_artpop",
+      "p_totpop", "births", "p_deaths_background_totpop", "p_hivpop",
+      "p_deaths_background_hivpop", "h_hivpop", "h_artpop",
       "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art",
       "h_art_initiation", "p_hiv_deaths", "p_net_migration_hivpop"
     )
@@ -18,11 +18,11 @@ test_that("initial state set up works as expected", {
   )
 
   ## Base year calculations will set values for
-  ## p_totpop, births and p_background_deaths_totpop
+  ## p_totpop, births and p_deaths_background_totpop
   expect_true(out$births[1] != 0)
-  expect_true(all(out$p_background_deaths_totpop != 0))
+  expect_true(all(out$p_deaths_background_totpop != 0))
   expect_equal(out$p_hivpop, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
-  expect_equal(out$p_background_deaths_hivpop, array(rep(0, 81 * 2),
+  expect_equal(out$p_deaths_background_hivpop, array(rep(0, 81 * 2),
     dim = c(81, 2, 1)
   ))
   expect_equal(
@@ -58,8 +58,8 @@ test_that("initial state set up with coarse stratified HIV works as expected", {
   expect_setequal(
     names(out),
     c(
-      "p_totpop", "births", "p_background_deaths_totpop", "p_hivpop",
-      "p_background_deaths_hivpop", "h_hivpop", "h_artpop",
+      "p_totpop", "births", "p_deaths_background_totpop", "p_hivpop",
+      "p_deaths_background_hivpop", "h_hivpop", "h_artpop",
       "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art",
       "h_art_initiation", "p_hiv_deaths", "p_net_migration_hivpop"
     )
@@ -69,11 +69,11 @@ test_that("initial state set up with coarse stratified HIV works as expected", {
                ignore_attr = TRUE)
 
   ## Base year calculations will set values for
-  ## p_totpop, births and p_background_deaths_totpop
+  ## p_totpop, births and p_deaths_background_totpop
   expect_true(out$births[1] != 0)
-  expect_true(all(out$p_background_deaths_totpop != 0))
+  expect_true(all(out$p_deaths_background_totpop != 0))
   expect_equal(out$p_hivpop, array(rep(0, 81 * 2), dim = c(81, 2, 1)))
-  expect_equal(out$p_background_deaths_hivpop, array(rep(0, 81 * 2),
+  expect_equal(out$p_deaths_background_hivpop, array(rep(0, 81 * 2),
     dim = c(81, 2, 1)
   ))
   expect_equal(
@@ -109,8 +109,8 @@ test_that("model for 1 time step has looped", {
   expect_setequal(
     names(out),
     c(
-      "p_totpop", "births", "p_background_deaths_totpop", "p_hivpop",
-      "p_background_deaths_hivpop", "h_hivpop", "h_artpop",
+      "p_totpop", "births", "p_deaths_background_totpop", "p_hivpop",
+      "p_deaths_background_hivpop", "h_hivpop", "h_artpop",
       "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art",
       "h_art_initiation", "p_hiv_deaths", "p_net_migration_hivpop"
     )
@@ -118,11 +118,11 @@ test_that("model for 1 time step has looped", {
   expect_equal(dim(out$p_totpop), c(81, 2, 1))
   expect_true(all(out$p_totpop > 100))
   expect_true(out$births > 0) ## a simulation has been run this is not still 0
-  expect_equal(dim(out$p_background_deaths_totpop), c(81, 2, 1))
-  expect_true(all(out$p_background_deaths_totpop > 0))
+  expect_equal(dim(out$p_deaths_background_totpop), c(81, 2, 1))
+  expect_true(all(out$p_deaths_background_totpop > 0))
   ## These are going to stay 0 as no p_infections after just 1 year has been run
   expect_true(all(out$p_hivpop == 0))
-  expect_true(all(out$p_background_deaths_hivpop == 0))
+  expect_true(all(out$p_deaths_background_hivpop == 0))
   expect_true(all(out$h_hivpop == 0))
   expect_true(all(out$h_artpop == 0))
   expect_true(all(out$h_hiv_deaths_no_art == 0))
@@ -141,7 +141,7 @@ test_that("model can be run for all years", {
   ## No HIV population < age 15
   expect_true(all(out$p_hivpop[1:15, , ] < 1e-20))
   expect_true(all(out$p_hivpop[1:15, , ] > -1e-20))
-  expect_true(all(out$p_background_deaths_hivpop[1:16, , ] == 0))
+  expect_true(all(out$p_deaths_background_hivpop[1:16, , ] == 0))
   expect_true(all(out$p_infections[1:15, , ] == 0))
 
   ## There is HIV population after age 15
@@ -150,7 +150,7 @@ test_that("model can be run for all years", {
   ## projection as they are calculated from
   ## the no of HIV +ve in previous year - is this right?
   expect_true(
-    all(out$p_background_deaths_hivpop[17:nrow(out$p_hivpop), , 61] != 0)
+    all(out$p_deaths_background_hivpop[17:nrow(out$p_hivpop), , 61] != 0)
   )
   ## Some of older ages can be 0 p_infections, so check the middle chunk
   expect_true(all(out$p_infections[16:70, , 61] > 0))
@@ -162,9 +162,9 @@ test_that("model can be run for all years", {
   ## Outputs cannot be negative
   expect_true(all(out$p_totpop >= 0))
   expect_true(all(out$births >= 0))
-  expect_true(all(out$p_background_deaths_totpop >= 0))
+  expect_true(all(out$p_deaths_background_totpop >= 0))
   expect_true(all(out$p_hivpop >= 0))
-  expect_true(all(out$p_background_deaths_hivpop >= 0))
+  expect_true(all(out$p_deaths_background_hivpop >= 0))
   expect_true(all(out$h_hivpop >= 0))
   expect_true(all(out$h_artpop >= 0))
   expect_true(all(out$h_hiv_deaths_no_art >= 0))

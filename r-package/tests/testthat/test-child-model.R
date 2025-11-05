@@ -5,8 +5,8 @@ test_that("Child model can be run for all years", {
   expect_setequal(
     names(out),
     c(
-      "p_totpop", "births", "p_background_deaths_totpop", "p_hivpop",
-      "p_background_deaths_hivpop", "h_hivpop", "h_artpop",
+      "p_totpop", "births", "p_deaths_background_totpop", "p_hivpop",
+      "p_deaths_background_hivpop", "h_hivpop", "h_artpop",
       "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art",
       "h_art_initiation", "p_hiv_deaths", "p_net_migration_hivpop",
       "hiv_births_by_mat_age", "hiv_births",
@@ -48,8 +48,8 @@ test_that("Coarse child model can be run for all years", {
   expect_setequal(
     names(out_coarse),
     c(
-      "p_totpop", "births", "p_background_deaths_totpop", "p_hivpop",
-      "p_background_deaths_hivpop", "h_hivpop", "h_artpop",
+      "p_totpop", "births", "p_deaths_background_totpop", "p_hivpop",
+      "p_deaths_background_hivpop", "h_hivpop", "h_artpop",
       "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art",
       "h_art_initiation", "p_hiv_deaths", "p_net_migration_hivpop",
       "hiv_births_by_mat_age", "hiv_births",

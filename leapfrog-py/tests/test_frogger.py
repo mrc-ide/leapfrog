@@ -11,8 +11,8 @@ def test_adult_model_full_strat():
     ret = run_model(parameters)
     returned_vars = list(ret.keys())
     expected_vars = [
-        "p_totpop", "births", "p_background_deaths_totpop", "p_hivpop",
-        "p_background_deaths_hivpop", "h_hivpop", "h_artpop",
+        "p_totpop", "births", "p_deaths_background_totpop", "p_hivpop",
+        "p_deaths_background_hivpop", "h_hivpop", "h_artpop",
         "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art",
         "h_art_initiation", "p_hiv_deaths", "p_net_migration_hivpop"
     ]
@@ -26,8 +26,8 @@ def test_child_model():
     ret = run_model(parameters, "ChildModel")
     returned_vars = list(ret.keys())
     expected_vars = [
-        "p_totpop", "births", "p_background_deaths_totpop", "p_hivpop",
-        "p_background_deaths_hivpop", "h_hivpop", "h_artpop",
+        "p_totpop", "births", "p_deaths_background_totpop", "p_hivpop",
+        "p_deaths_background_hivpop", "h_hivpop", "h_artpop",
         "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art",
         "h_art_initiation", "p_hiv_deaths", "p_net_migration_hivpop",
         "hiv_births", "hiv_births_by_mat_age",

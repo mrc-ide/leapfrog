@@ -88,15 +88,15 @@ struct GeneralDemographicProjection<Config> {
     for (int g = 0; g < NS; ++g) {
       // Start at index 1 as we will add infant (age 0) births and deaths later
       for (int a = 1; a < pAG; ++a) {
-        n_dp.p_background_deaths_totpop(a, g) = c_dp.p_totpop(a - 1, g) * (1.0 - p_dp.survival_probability(a, g, t));
-        n_dp.p_totpop(a, g) = c_dp.p_totpop(a - 1, g) - n_dp.p_background_deaths_totpop(a, g);
+        n_dp.p_deaths_background_totpop(a, g) = c_dp.p_totpop(a - 1, g) * (1.0 - p_dp.survival_probability(a, g, t));
+        n_dp.p_totpop(a, g) = c_dp.p_totpop(a - 1, g) - n_dp.p_deaths_background_totpop(a, g);
       }
 
       // open age group
-      real_type p_background_deaths_totpop_open_age = c_dp.p_totpop(pAG - 1, g) *
+      real_type p_deaths_background_totpop_open_age = c_dp.p_totpop(pAG - 1, g) *
                                                       (1.0 - p_dp.survival_probability(pAG, g, t));
-      n_dp.p_background_deaths_totpop(pAG - 1, g) += p_background_deaths_totpop_open_age;
-      n_dp.p_totpop(pAG - 1, g) += c_dp.p_totpop(pAG - 1, g) - p_background_deaths_totpop_open_age;
+      n_dp.p_deaths_background_totpop(pAG - 1, g) += p_deaths_background_totpop_open_age;
+      n_dp.p_totpop(pAG - 1, g) += c_dp.p_totpop(pAG - 1, g) - p_deaths_background_totpop_open_age;
     }
   };
 
@@ -125,8 +125,8 @@ struct GeneralDemographicProjection<Config> {
       // * Denominator: p_totpop(a, g, t-1) + p_totpop(a-1, g, t-1)
       // Re-expressed current population and deaths to open age group (already calculated):
       int a = pAG - 1;
-      real_type survival_probability_netmig = (n_dp.p_totpop(a, g) + 0.5 * n_dp.p_background_deaths_totpop(a, g)) /
-                                                (n_dp.p_totpop(a, g) + n_dp.p_background_deaths_totpop(a, g));
+      real_type survival_probability_netmig = (n_dp.p_totpop(a, g) + 0.5 * n_dp.p_deaths_background_totpop(a, g)) /
+                                                (n_dp.p_totpop(a, g) + n_dp.p_deaths_background_totpop(a, g));
       i_dp.migration_rate(a, g) = p_dp.net_migration(a, g, t) == 0.0 ? 0.0 :
 	survival_probability_netmig * p_dp.net_migration(a, g, t) / n_dp.p_totpop(a, g);
       n_dp.p_totpop(a, g) *= 1.0 + i_dp.migration_rate(a, g);
@@ -148,7 +148,7 @@ struct GeneralDemographicProjection<Config> {
     // add births & infant migration
     for (int g = 0; g < NS; ++g) {
       real_type births_sex = n_dp.births * p_dp.births_sex_prop(g, t);
-      n_dp.p_background_deaths_totpop(0, g) = births_sex * (1.0 - p_dp.survival_probability(0, g, t));
+      n_dp.p_deaths_background_totpop(0, g) = births_sex * (1.0 - p_dp.survival_probability(0, g, t));
       n_dp.p_totpop(0, g) = births_sex * p_dp.survival_probability(0, g, t);
 
       if (opts.proj_period_int == PROJPERIOD_MIDYEAR) {

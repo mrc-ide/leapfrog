@@ -36,7 +36,7 @@ struct DpAdapter<Language::Cpp, real_type, ModelVariant> {
     std::filesystem::path& output_file
   ) {
     write_data<real_type, typename Config::OutputState::shape_p_totpop>(output_file, "p_totpop", state.p_totpop);
-    write_data<real_type, typename Config::OutputState::shape_p_background_deaths_totpop>(output_file, "p_background_deaths_totpop", state.p_background_deaths_totpop);
+    write_data<real_type, typename Config::OutputState::shape_p_deaths_background_totpop>(output_file, "p_deaths_background_totpop", state.p_deaths_background_totpop);
     write_data<real_type, typename Config::OutputState::shape_births>(output_file, "births", state.births);
     return index + output_count;
   };
@@ -80,7 +80,7 @@ struct HaAdapter<Language::Cpp, real_type, ModelVariant> {
     std::filesystem::path& output_file
   ) {
     write_data<real_type, typename Config::OutputState::shape_p_hivpop>(output_file, "p_hivpop", state.p_hivpop);
-    write_data<real_type, typename Config::OutputState::shape_p_background_deaths_hivpop>(output_file, "p_background_deaths_hivpop", state.p_background_deaths_hivpop);
+    write_data<real_type, typename Config::OutputState::shape_p_deaths_background_hivpop>(output_file, "p_deaths_background_hivpop", state.p_deaths_background_hivpop);
     write_data<real_type, typename Config::OutputState::shape_h_hivpop>(output_file, "h_hivpop", state.h_hivpop);
     write_data<real_type, typename Config::OutputState::shape_h_artpop>(output_file, "h_artpop", state.h_artpop);
     write_data<real_type, typename Config::OutputState::shape_h_hiv_deaths_no_art>(output_file, "h_hiv_deaths_no_art", state.h_hiv_deaths_no_art);

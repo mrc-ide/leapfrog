@@ -72,7 +72,7 @@ struct DpAdapter<Language::Py, real_type, ModelVariant> {
   ) {
     typename Config::State state;
     fill_initial_state<real_type, typename Config::State::shape_p_totpop>(data, "p_totpop", state.p_totpop);
-    fill_initial_state<real_type, typename Config::State::shape_p_background_deaths_totpop>(data, "p_background_deaths_totpop", state.p_background_deaths_totpop);
+    fill_initial_state<real_type, typename Config::State::shape_p_deaths_background_totpop>(data, "p_deaths_background_totpop", state.p_deaths_background_totpop);
     state.births = nb::cast<real_type>(data["births"]);
     return state;
   };
@@ -88,9 +88,9 @@ struct DpAdapter<Language::Py, real_type, ModelVariant> {
     const int py_rank_p_totpop = 3;
     size_t py_dims_p_totpop[py_rank_p_totpop] = { SS::pAG, SS::NS, output_years };
     ret["p_totpop"] = py_array<real_type>(state.p_totpop.data(), py_rank_p_totpop, py_dims_p_totpop);
-    const int py_rank_p_background_deaths_totpop = 3;
-    size_t py_dims_p_background_deaths_totpop[py_rank_p_background_deaths_totpop] = { SS::pAG, SS::NS, output_years };
-    ret["p_background_deaths_totpop"] = py_array<real_type>(state.p_background_deaths_totpop.data(), py_rank_p_background_deaths_totpop, py_dims_p_background_deaths_totpop);
+    const int py_rank_p_deaths_background_totpop = 3;
+    size_t py_dims_p_deaths_background_totpop[py_rank_p_deaths_background_totpop] = { SS::pAG, SS::NS, output_years };
+    ret["p_deaths_background_totpop"] = py_array<real_type>(state.p_deaths_background_totpop.data(), py_rank_p_deaths_background_totpop, py_dims_p_deaths_background_totpop);
     const int py_rank_births = 1;
     size_t py_dims_births[py_rank_births] = { output_years };
     ret["births"] = py_array<real_type>(state.births.data(), py_rank_births, py_dims_births);
@@ -105,9 +105,9 @@ struct DpAdapter<Language::Py, real_type, ModelVariant> {
     const int py_rank_p_totpop = 2;
     size_t py_dims_p_totpop[py_rank_p_totpop] = { SS::pAG, SS::NS };
     ret["p_totpop"] = py_array<real_type>(state.p_totpop.data(), py_rank_p_totpop, py_dims_p_totpop);
-    const int py_rank_p_background_deaths_totpop = 2;
-    size_t py_dims_p_background_deaths_totpop[py_rank_p_background_deaths_totpop] = { SS::pAG, SS::NS };
-    ret["p_background_deaths_totpop"] = py_array<real_type>(state.p_background_deaths_totpop.data(), py_rank_p_background_deaths_totpop, py_dims_p_background_deaths_totpop);
+    const int py_rank_p_deaths_background_totpop = 2;
+    size_t py_dims_p_deaths_background_totpop[py_rank_p_deaths_background_totpop] = { SS::pAG, SS::NS };
+    ret["p_deaths_background_totpop"] = py_array<real_type>(state.p_deaths_background_totpop.data(), py_rank_p_deaths_background_totpop, py_dims_p_deaths_background_totpop);
     ret["births"] = state.births;
     return index + output_count;
   };
@@ -149,7 +149,7 @@ struct HaAdapter<Language::Py, real_type, ModelVariant> {
   ) {
     typename Config::State state;
     fill_initial_state<real_type, typename Config::State::shape_p_hivpop>(data, "p_hivpop", state.p_hivpop);
-    fill_initial_state<real_type, typename Config::State::shape_p_background_deaths_hivpop>(data, "p_background_deaths_hivpop", state.p_background_deaths_hivpop);
+    fill_initial_state<real_type, typename Config::State::shape_p_deaths_background_hivpop>(data, "p_deaths_background_hivpop", state.p_deaths_background_hivpop);
     fill_initial_state<real_type, typename Config::State::shape_h_hivpop>(data, "h_hivpop", state.h_hivpop);
     fill_initial_state<real_type, typename Config::State::shape_h_artpop>(data, "h_artpop", state.h_artpop);
     fill_initial_state<real_type, typename Config::State::shape_h_hiv_deaths_no_art>(data, "h_hiv_deaths_no_art", state.h_hiv_deaths_no_art);
@@ -172,9 +172,9 @@ struct HaAdapter<Language::Py, real_type, ModelVariant> {
     const int py_rank_p_hivpop = 3;
     size_t py_dims_p_hivpop[py_rank_p_hivpop] = { SS::pAG, SS::NS, output_years };
     ret["p_hivpop"] = py_array<real_type>(state.p_hivpop.data(), py_rank_p_hivpop, py_dims_p_hivpop);
-    const int py_rank_p_background_deaths_hivpop = 3;
-    size_t py_dims_p_background_deaths_hivpop[py_rank_p_background_deaths_hivpop] = { SS::pAG, SS::NS, output_years };
-    ret["p_background_deaths_hivpop"] = py_array<real_type>(state.p_background_deaths_hivpop.data(), py_rank_p_background_deaths_hivpop, py_dims_p_background_deaths_hivpop);
+    const int py_rank_p_deaths_background_hivpop = 3;
+    size_t py_dims_p_deaths_background_hivpop[py_rank_p_deaths_background_hivpop] = { SS::pAG, SS::NS, output_years };
+    ret["p_deaths_background_hivpop"] = py_array<real_type>(state.p_deaths_background_hivpop.data(), py_rank_p_deaths_background_hivpop, py_dims_p_deaths_background_hivpop);
     const int py_rank_h_hivpop = 4;
     size_t py_dims_h_hivpop[py_rank_h_hivpop] = { SS::hDS, SS::hAG, SS::NS, output_years };
     ret["h_hivpop"] = py_array<real_type>(state.h_hivpop.data(), py_rank_h_hivpop, py_dims_h_hivpop);
@@ -210,9 +210,9 @@ struct HaAdapter<Language::Py, real_type, ModelVariant> {
     const int py_rank_p_hivpop = 2;
     size_t py_dims_p_hivpop[py_rank_p_hivpop] = { SS::pAG, SS::NS };
     ret["p_hivpop"] = py_array<real_type>(state.p_hivpop.data(), py_rank_p_hivpop, py_dims_p_hivpop);
-    const int py_rank_p_background_deaths_hivpop = 2;
-    size_t py_dims_p_background_deaths_hivpop[py_rank_p_background_deaths_hivpop] = { SS::pAG, SS::NS };
-    ret["p_background_deaths_hivpop"] = py_array<real_type>(state.p_background_deaths_hivpop.data(), py_rank_p_background_deaths_hivpop, py_dims_p_background_deaths_hivpop);
+    const int py_rank_p_deaths_background_hivpop = 2;
+    size_t py_dims_p_deaths_background_hivpop[py_rank_p_deaths_background_hivpop] = { SS::pAG, SS::NS };
+    ret["p_deaths_background_hivpop"] = py_array<real_type>(state.p_deaths_background_hivpop.data(), py_rank_p_deaths_background_hivpop, py_dims_p_deaths_background_hivpop);
     const int py_rank_h_hivpop = 3;
     size_t py_dims_h_hivpop[py_rank_h_hivpop] = { SS::hDS, SS::hAG, SS::NS };
     ret["h_hivpop"] = py_array<real_type>(state.h_hivpop.data(), py_rank_h_hivpop, py_dims_h_hivpop);

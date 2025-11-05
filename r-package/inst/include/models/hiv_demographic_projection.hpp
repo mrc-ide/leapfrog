@@ -178,12 +178,12 @@ struct HivDemographicProjection<Config> {
     // Non-hiv deaths
     for (int g = 0; g < NS; ++g) {
       for (int a = 1; a < pAG; ++a) {
-        n_ha.p_background_deaths_hivpop(a, g) = c_ha.p_hivpop(a - 1, g) * (1.0 - p_dp.survival_probability(a, g, t));
+        n_ha.p_deaths_background_hivpop(a, g) = c_ha.p_hivpop(a - 1, g) * (1.0 - p_dp.survival_probability(a, g, t));
         n_ha.p_hivpop(a, g) = c_ha.p_hivpop(a - 1, g);
       }
 
       // open age group
-      n_ha.p_background_deaths_hivpop(pAG - 1, g) += c_ha.p_hivpop(pAG - 1, g) *
+      n_ha.p_deaths_background_hivpop(pAG - 1, g) += c_ha.p_hivpop(pAG - 1, g) *
                                                    (1.0 - p_dp.survival_probability(pAG, g, t));
       n_ha.p_hivpop(pAG - 1, g) += c_ha.p_hivpop(pAG - 1, g);
     }
@@ -311,7 +311,7 @@ struct HivDemographicProjection<Config> {
     // remove non-HIV deaths and net migration from hiv stratified population
     for (int g = 0; g < NS; ++g) {
       for (int a = 1; a < pAG; ++a) {
-        n_ha.p_hivpop(a, g) -= n_ha.p_background_deaths_hivpop(a, g);
+        n_ha.p_hivpop(a, g) -= n_ha.p_deaths_background_hivpop(a, g);
         if (opts.proj_period_int == PROJPERIOD_MIDYEAR) {
           n_ha.p_net_migration_hivpop(a, g) = n_ha.p_hivpop(a, g) * i_dp.migration_rate(a, g);
           n_ha.p_hivpop(a, g) += n_ha.p_net_migration_hivpop(a, g);
@@ -325,7 +325,7 @@ struct HivDemographicProjection<Config> {
       for (int ha = 0; ha < hAG; ++ha) {
         real_type deaths_migrate = 0.0;
         for (int i = 0; i < hAG_span[ha]; ++i, ++a) {
-          deaths_migrate -= n_ha.p_background_deaths_hivpop(a, g);
+          deaths_migrate -= n_ha.p_deaths_background_hivpop(a, g);
           if (opts.proj_period_int == PROJPERIOD_MIDYEAR) {
             deaths_migrate += n_ha.p_net_migration_hivpop(a, g);
           }
@@ -365,7 +365,7 @@ struct HivDemographicProjection<Config> {
     real_type deaths_migrate = 0.0;
     for (int s = 0; s < NS; ++s) {
       for (int a = 0; a < hcAG_end; ++a) {
-        deaths_migrate -= n_ha.p_background_deaths_hivpop(a, s);
+        deaths_migrate -= n_ha.p_deaths_background_hivpop(a, s);
         if (opts.proj_period_int == PROJPERIOD_MIDYEAR) {
           deaths_migrate += n_ha.p_net_migration_hivpop(a, s);
         }

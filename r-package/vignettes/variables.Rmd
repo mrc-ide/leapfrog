@@ -180,8 +180,8 @@ In 5 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 | hivstrat_adult   | h_hivpop                | Projected PLHIV not on ART by age, sex and CD4                           |
 | artstrat_adult   | h_artpop                | Projected PLHIV on ART by age, sex, CD4 and treatment stage              |
 | births           | births                     | Projected number of births                                               |
-| natdeaths        | p_background_deaths_totpop | Projected number of background deaths                                       |
-| natdeaths_hivpop | p_background_deaths_hivpop   | Projected number of background deaths within HIV population                 |
+| natdeaths        | p_deaths_background_totpop | Projected number of background deaths                                       |
+| natdeaths_hivpop | p_deaths_background_hivpop   | Projected number of background deaths within HIV population                 |
 | hivdeaths        | p_hiv_deaths               | Projected HIV-related deaths by sex and age                              |
 | netmig_ag        | p_net_migration_hivpop     | Number of HIV+ Migrants                                                  |
 | aidsdeaths_noart | h_hiv_deaths_no_art        | Projected HIV-related deaths off ART by sex, age and CD4                 |

@@ -77,7 +77,7 @@ struct DpAdapter<Language::R, real_type, ModelVariant> {
   ) {
     typename Config::State state;
     fill_initial_state<real_type, typename Config::State::shape_p_totpop>(data, "p_totpop", state.p_totpop);
-    fill_initial_state<real_type, typename Config::State::shape_p_background_deaths_totpop>(data, "p_background_deaths_totpop", state.p_background_deaths_totpop);
+    fill_initial_state<real_type, typename Config::State::shape_p_deaths_background_totpop>(data, "p_deaths_background_totpop", state.p_deaths_background_totpop);
     state.births = Rcpp::as<real_type>(data["births"]);
     return state;
   };
@@ -96,11 +96,11 @@ struct DpAdapter<Language::R, real_type, ModelVariant> {
     std::copy_n(state.p_totpop.data(), state.p_totpop.size(), REAL(r_p_totpop));
     names[index + 0] = "p_totpop";
     ret[index + 0] = r_p_totpop;
-    Rcpp::NumericVector r_p_background_deaths_totpop(SS::pAG * SS::NS * output_years);
-    r_p_background_deaths_totpop.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS, output_years);
-    std::copy_n(state.p_background_deaths_totpop.data(), state.p_background_deaths_totpop.size(), REAL(r_p_background_deaths_totpop));
-    names[index + 1] = "p_background_deaths_totpop";
-    ret[index + 1] = r_p_background_deaths_totpop;
+    Rcpp::NumericVector r_p_deaths_background_totpop(SS::pAG * SS::NS * output_years);
+    r_p_deaths_background_totpop.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS, output_years);
+    std::copy_n(state.p_deaths_background_totpop.data(), state.p_deaths_background_totpop.size(), REAL(r_p_deaths_background_totpop));
+    names[index + 1] = "p_deaths_background_totpop";
+    ret[index + 1] = r_p_deaths_background_totpop;
     Rcpp::NumericVector r_births(output_years);
     r_births.attr("dim") = Rcpp::IntegerVector::create(output_years);
     std::copy_n(state.births.data(), state.births.size(), REAL(r_births));
@@ -120,11 +120,11 @@ struct DpAdapter<Language::R, real_type, ModelVariant> {
     std::copy_n(state.p_totpop.data(), state.p_totpop.size(), REAL(r_p_totpop));
     names[index + 0] = "p_totpop";
     ret[index + 0] = r_p_totpop;
-    Rcpp::NumericVector r_p_background_deaths_totpop(SS::pAG * SS::NS);
-    r_p_background_deaths_totpop.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS);
-    std::copy_n(state.p_background_deaths_totpop.data(), state.p_background_deaths_totpop.size(), REAL(r_p_background_deaths_totpop));
-    names[index + 1] = "p_background_deaths_totpop";
-    ret[index + 1] = r_p_background_deaths_totpop;
+    Rcpp::NumericVector r_p_deaths_background_totpop(SS::pAG * SS::NS);
+    r_p_deaths_background_totpop.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS);
+    std::copy_n(state.p_deaths_background_totpop.data(), state.p_deaths_background_totpop.size(), REAL(r_p_deaths_background_totpop));
+    names[index + 1] = "p_deaths_background_totpop";
+    ret[index + 1] = r_p_deaths_background_totpop;
     names[index + 2] = "births";
     ret[index + 2] = state.births;
     return index + output_count;
@@ -167,7 +167,7 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
   ) {
     typename Config::State state;
     fill_initial_state<real_type, typename Config::State::shape_p_hivpop>(data, "p_hivpop", state.p_hivpop);
-    fill_initial_state<real_type, typename Config::State::shape_p_background_deaths_hivpop>(data, "p_background_deaths_hivpop", state.p_background_deaths_hivpop);
+    fill_initial_state<real_type, typename Config::State::shape_p_deaths_background_hivpop>(data, "p_deaths_background_hivpop", state.p_deaths_background_hivpop);
     fill_initial_state<real_type, typename Config::State::shape_h_hivpop>(data, "h_hivpop", state.h_hivpop);
     fill_initial_state<real_type, typename Config::State::shape_h_artpop>(data, "h_artpop", state.h_artpop);
     fill_initial_state<real_type, typename Config::State::shape_h_hiv_deaths_no_art>(data, "h_hiv_deaths_no_art", state.h_hiv_deaths_no_art);
@@ -193,11 +193,11 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
     std::copy_n(state.p_hivpop.data(), state.p_hivpop.size(), REAL(r_p_hivpop));
     names[index + 0] = "p_hivpop";
     ret[index + 0] = r_p_hivpop;
-    Rcpp::NumericVector r_p_background_deaths_hivpop(SS::pAG * SS::NS * output_years);
-    r_p_background_deaths_hivpop.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS, output_years);
-    std::copy_n(state.p_background_deaths_hivpop.data(), state.p_background_deaths_hivpop.size(), REAL(r_p_background_deaths_hivpop));
-    names[index + 1] = "p_background_deaths_hivpop";
-    ret[index + 1] = r_p_background_deaths_hivpop;
+    Rcpp::NumericVector r_p_deaths_background_hivpop(SS::pAG * SS::NS * output_years);
+    r_p_deaths_background_hivpop.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS, output_years);
+    std::copy_n(state.p_deaths_background_hivpop.data(), state.p_deaths_background_hivpop.size(), REAL(r_p_deaths_background_hivpop));
+    names[index + 1] = "p_deaths_background_hivpop";
+    ret[index + 1] = r_p_deaths_background_hivpop;
     Rcpp::NumericVector r_h_hivpop(SS::hDS * SS::hAG * SS::NS * output_years);
     r_h_hivpop.attr("dim") = Rcpp::IntegerVector::create(SS::hDS, SS::hAG, SS::NS, output_years);
     std::copy_n(state.h_hivpop.data(), state.h_hivpop.size(), REAL(r_h_hivpop));
@@ -252,11 +252,11 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
     std::copy_n(state.p_hivpop.data(), state.p_hivpop.size(), REAL(r_p_hivpop));
     names[index + 0] = "p_hivpop";
     ret[index + 0] = r_p_hivpop;
-    Rcpp::NumericVector r_p_background_deaths_hivpop(SS::pAG * SS::NS);
-    r_p_background_deaths_hivpop.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS);
-    std::copy_n(state.p_background_deaths_hivpop.data(), state.p_background_deaths_hivpop.size(), REAL(r_p_background_deaths_hivpop));
-    names[index + 1] = "p_background_deaths_hivpop";
-    ret[index + 1] = r_p_background_deaths_hivpop;
+    Rcpp::NumericVector r_p_deaths_background_hivpop(SS::pAG * SS::NS);
+    r_p_deaths_background_hivpop.attr("dim") = Rcpp::IntegerVector::create(SS::pAG, SS::NS);
+    std::copy_n(state.p_deaths_background_hivpop.data(), state.p_deaths_background_hivpop.size(), REAL(r_p_deaths_background_hivpop));
+    names[index + 1] = "p_deaths_background_hivpop";
+    ret[index + 1] = r_p_deaths_background_hivpop;
     Rcpp::NumericVector r_h_hivpop(SS::hDS * SS::hAG * SS::NS);
     r_h_hivpop.attr("dim") = Rcpp::IntegerVector::create(SS::hDS, SS::hAG, SS::NS);
     std::copy_n(state.h_hivpop.data(), state.h_hivpop.size(), REAL(r_h_hivpop));

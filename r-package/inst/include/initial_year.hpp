@@ -49,16 +49,16 @@ void run_initial_year_calculations(
   for (int g = 0; g < SS::NS; ++g) {
 
 	  // (a) age 0 deaths
-	  is_dp.p_background_deaths_totpop(0, g) = is_dp.births * p_dp.births_sex_prop(g, t0) *
+	  is_dp.p_deaths_background_totpop(0, g) = is_dp.births * p_dp.births_sex_prop(g, t0) *
 	    (1.0 - p_dp.survival_probability(0, g, t0));
 
 	  // (b) age 1 to pAG-1 deaths
 	  for (int a = 1; a < SS::pAG; ++a) {
-	    is_dp.p_background_deaths_totpop(a, g) = is_dp.p_totpop(a-1, g) * (1.0 - p_dp.survival_probability(a, g, t0));
+	    is_dp.p_deaths_background_totpop(a, g) = is_dp.p_totpop(a-1, g) * (1.0 - p_dp.survival_probability(a, g, t0));
 	  }
 
 	  // (c) additional deaths from open-ended age group
-	  is_dp.p_background_deaths_totpop(SS::pAG-1, g) += is_dp.p_totpop(SS::pAG-1, g) * (1.0 - p_dp.survival_probability(SS::pAG-1, g, t0));
+	  is_dp.p_deaths_background_totpop(SS::pAG-1, g) += is_dp.p_totpop(SS::pAG-1, g) * (1.0 - p_dp.survival_probability(SS::pAG-1, g, t0));
   }
 }
 

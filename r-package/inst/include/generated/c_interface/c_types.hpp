@@ -35,8 +35,8 @@ template<typename real_type>
 struct DpOut {
   real_type* p_totpop;
   int p_totpop_length;
-  real_type* p_background_deaths_totpop;
-  int p_background_deaths_totpop_length;
+  real_type* p_deaths_background_totpop;
+  int p_deaths_background_totpop_length;
   real_type* births;
   int births_length;
 };
@@ -85,8 +85,8 @@ template<typename real_type>
 struct HaOut {
   real_type* p_hivpop;
   int p_hivpop_length;
-  real_type* p_background_deaths_hivpop;
-  int p_background_deaths_hivpop_length;
+  real_type* p_deaths_background_hivpop;
+  int p_deaths_background_hivpop_length;
   real_type* h_hivpop;
   int h_hivpop_length;
   real_type* h_artpop;

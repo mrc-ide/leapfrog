@@ -8,7 +8,7 @@ test_that("demographic model is correct", {
   expect_equal(actual$p_totpop, expected$totpop1)
   ## expected births doesn't have dim attribute so drop it for tests
   expect_equal(actual$births, expected$births)
-  expect_equal(actual$p_background_deaths_totpop, expected$natdeaths)
+  expect_equal(actual$p_deaths_background_totpop, expected$natdeaths)
 })
 
 
@@ -21,9 +21,9 @@ test_that("model agrees with leapfrog impl", {
   expect_equal(actual$p_totpop, expected$totpop1)
   ## expected births doesn't have dim attribute so drop it for tests
   expect_equal(actual$births, expected$births)
-  expect_equal(actual$p_background_deaths_totpop, expected$natdeaths)
+  expect_equal(actual$p_deaths_background_totpop, expected$natdeaths)
   expect_equal(actual$p_hivpop, expected$hivpop1)
-  expect_equal(actual$p_background_deaths_hivpop, expected$natdeaths_hivpop)
+  expect_equal(actual$p_deaths_background_hivpop, expected$natdeaths_hivpop)
   expect_equal(actual$h_hivpop, expected$hivstrat_adult)
   expect_equal(actual$h_artpop, expected$artstrat_adult)
   expect_equal(actual$h_hiv_deaths_no_art, expected$aidsdeaths_noart)
@@ -42,9 +42,9 @@ test_that("model agrees with leapfrog impl", {
   expect_equal(actual$p_totpop, expected$totpop1)
   ## expected births doesn't have dim attribute so drop it for tests
   expect_equal(actual$births, expected$births)
-  expect_equal(actual$p_background_deaths_totpop, expected$natdeaths)
+  expect_equal(actual$p_deaths_background_totpop, expected$natdeaths)
   expect_equal(actual$p_hivpop, expected$hivpop1)
-  expect_equal(actual$p_background_deaths_hivpop, expected$natdeaths_hivpop)
+  expect_equal(actual$p_deaths_background_hivpop, expected$natdeaths_hivpop)
   expect_equal(actual$h_hivpop, expected$hivstrat_adult)
   expect_equal(actual$h_artpop, expected$artstrat_adult)
   expect_equal(actual$h_hiv_deaths_no_art, expected$aidsdeaths_noart)

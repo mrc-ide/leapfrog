@@ -58,8 +58,8 @@ type
   private
     pTotpop: PDouble;
     pTotpopLength: Integer;
-    pBackgroundDeathsTotpop: PDouble;
-    pBackgroundDeathsTotpopLength: Integer;
+    pDeathsBackgroundTotpop: PDouble;
+    pDeathsBackgroundTotpopLength: Integer;
     births: PDouble;
     birthsLength: Integer;
 end;
@@ -68,7 +68,7 @@ type
   LeapfrogDemProjState = class
   public
     pTotpop: TGBFixedArray<Double>;
-    pBackgroundDeathsTotpop: TGBFixedArray<Double>;
+    pDeathsBackgroundTotpop: TGBFixedArray<Double>;
     births: TGBFixedArray<Double>;
     function getView(): LeapfrogDemProjStateView;
     procedure writeToDisk(dir: string);
@@ -149,8 +149,8 @@ type
   private
     pHivpop: PDouble;
     pHivpopLength: Integer;
-    pBackgroundDeathsHivpop: PDouble;
-    pBackgroundDeathsHivpopLength: Integer;
+    pDeathsBackgroundHivpop: PDouble;
+    pDeathsBackgroundHivpopLength: Integer;
     hHivpop: PDouble;
     hHivpopLength: Integer;
     hArtpop: PDouble;
@@ -173,7 +173,7 @@ type
   LeapfrogHivAdultState = class
   public
     pHivpop: TGBFixedArray<Double>;
-    pBackgroundDeathsHivpop: TGBFixedArray<Double>;
+    pDeathsBackgroundHivpop: TGBFixedArray<Double>;
     hHivpop: TGBFixedArray<Double>;
     hArtpop: TGBFixedArray<Double>;
     hHivDeathsNoArt: TGBFixedArray<Double>;
@@ -446,7 +446,7 @@ end;
 destructor LeapfrogDemProjState.Destroy;
 begin;
   pTotpop.Free;
-  pBackgroundDeathsTotpop.Free;
+  pDeathsBackgroundTotpop.Free;
   births.Free;
   inherited;
 end;
@@ -469,8 +469,8 @@ function LeapfrogDemProjState.getView(): LeapfrogDemProjStateView;
 begin;
   Result.pTotpop := PDouble(pTotpop.data);
   Result.pTotpopLength := pTotpop.GetLength();
-  Result.pBackgroundDeathsTotpop := PDouble(pBackgroundDeathsTotpop.data);
-  Result.pBackgroundDeathsTotpopLength := pBackgroundDeathsTotpop.GetLength();
+  Result.pDeathsBackgroundTotpop := PDouble(pDeathsBackgroundTotpop.data);
+  Result.pDeathsBackgroundTotpopLength := pDeathsBackgroundTotpop.GetLength();
   Result.births := PDouble(births.data);
   Result.birthsLength := births.GetLength();
 end;
@@ -496,7 +496,7 @@ end;
 destructor LeapfrogHivAdultState.Destroy;
 begin;
   pHivpop.Free;
-  pBackgroundDeathsHivpop.Free;
+  pDeathsBackgroundHivpop.Free;
   hHivpop.Free;
   hArtpop.Free;
   hHivDeathsNoArt.Free;
@@ -552,8 +552,8 @@ function LeapfrogHivAdultState.getView(): LeapfrogHivAdultStateView;
 begin;
   Result.pHivpop := PDouble(pHivpop.data);
   Result.pHivpopLength := pHivpop.GetLength();
-  Result.pBackgroundDeathsHivpop := PDouble(pBackgroundDeathsHivpop.data);
-  Result.pBackgroundDeathsHivpopLength := pBackgroundDeathsHivpop.GetLength();
+  Result.pDeathsBackgroundHivpop := PDouble(pDeathsBackgroundHivpop.data);
+  Result.pDeathsBackgroundHivpopLength := pDeathsBackgroundHivpop.GetLength();
   Result.hHivpop := PDouble(hHivpop.data);
   Result.hHivpopLength := hHivpop.GetLength();
   Result.hArtpop := PDouble(hArtpop.data);
@@ -787,7 +787,7 @@ begin;
   if not DirectoryExists(dir) then
     ForceDirectories(dir);
   pTotpop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pTotpop');
-  pBackgroundDeathsTotpop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pBackgroundDeathsTotpop');
+  pDeathsBackgroundTotpop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pDeathsBackgroundTotpop');
 end;
 
 procedure LeapfrogHivAdultParams.writeToDisk(dir: string);
@@ -814,7 +814,7 @@ begin;
   if not DirectoryExists(dir) then
     ForceDirectories(dir);
   pHivpop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pHivpop');
-  pBackgroundDeathsHivpop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pBackgroundDeathsHivpop');
+  pDeathsBackgroundHivpop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pDeathsBackgroundHivpop');
   hHivpop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hHivpop');
   hArtpop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hArtpop');
   hHivDeathsNoArt.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'hHivDeathsNoArt');

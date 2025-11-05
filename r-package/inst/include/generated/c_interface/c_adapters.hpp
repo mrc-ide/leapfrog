@@ -75,7 +75,7 @@ struct DpAdapter<Language::C, real_type, ModelVariant> {
   ){
     typename Config::State initial_state;
     fill_initial_state<real_type, typename Config::State::shape_p_totpop>(state.dp->p_totpop, state.dp->p_totpop_length, "p_totpop", initial_state.p_totpop);
-    fill_initial_state<real_type, typename Config::State::shape_p_background_deaths_totpop>(state.dp->p_background_deaths_totpop, state.dp->p_background_deaths_totpop_length, "p_background_deaths_totpop", initial_state.p_background_deaths_totpop);
+    fill_initial_state<real_type, typename Config::State::shape_p_deaths_background_totpop>(state.dp->p_deaths_background_totpop, state.dp->p_deaths_background_totpop_length, "p_deaths_background_totpop", initial_state.p_deaths_background_totpop);
     initial_state.births = *(state.dp->births);
     return initial_state;
   };
@@ -88,7 +88,7 @@ struct DpAdapter<Language::C, real_type, ModelVariant> {
     CState<real_type>& out
   ) {
     write_data<real_type, typename Config::OutputState::shape_p_totpop>(state.p_totpop, out.dp->p_totpop, out.dp->p_totpop_length, "p_totpop");
-    write_data<real_type, typename Config::OutputState::shape_p_background_deaths_totpop>(state.p_background_deaths_totpop, out.dp->p_background_deaths_totpop, out.dp->p_background_deaths_totpop_length, "p_background_deaths_totpop");
+    write_data<real_type, typename Config::OutputState::shape_p_deaths_background_totpop>(state.p_deaths_background_totpop, out.dp->p_deaths_background_totpop, out.dp->p_deaths_background_totpop_length, "p_deaths_background_totpop");
     write_data<real_type, typename Config::OutputState::shape_births>(state.births, out.dp->births, out.dp->births_length, "births");
     return index + output_count;
   };
@@ -99,7 +99,7 @@ struct DpAdapter<Language::C, real_type, ModelVariant> {
     CState<real_type>& out
   ) {
     write_data<real_type, typename Config::State::shape_p_totpop>(state.p_totpop, out.dp->p_totpop, out.dp->p_totpop_length, "p_totpop");
-    write_data<real_type, typename Config::State::shape_p_background_deaths_totpop>(state.p_background_deaths_totpop, out.dp->p_background_deaths_totpop, out.dp->p_background_deaths_totpop_length, "p_background_deaths_totpop");
+    write_data<real_type, typename Config::State::shape_p_deaths_background_totpop>(state.p_deaths_background_totpop, out.dp->p_deaths_background_totpop, out.dp->p_deaths_background_totpop_length, "p_deaths_background_totpop");
     *(out.dp->births) = state.births;
     return index + output_count;
   };
@@ -141,7 +141,7 @@ struct HaAdapter<Language::C, real_type, ModelVariant> {
   ){
     typename Config::State initial_state;
     fill_initial_state<real_type, typename Config::State::shape_p_hivpop>(state.ha->p_hivpop, state.ha->p_hivpop_length, "p_hivpop", initial_state.p_hivpop);
-    fill_initial_state<real_type, typename Config::State::shape_p_background_deaths_hivpop>(state.ha->p_background_deaths_hivpop, state.ha->p_background_deaths_hivpop_length, "p_background_deaths_hivpop", initial_state.p_background_deaths_hivpop);
+    fill_initial_state<real_type, typename Config::State::shape_p_deaths_background_hivpop>(state.ha->p_deaths_background_hivpop, state.ha->p_deaths_background_hivpop_length, "p_deaths_background_hivpop", initial_state.p_deaths_background_hivpop);
     fill_initial_state<real_type, typename Config::State::shape_h_hivpop>(state.ha->h_hivpop, state.ha->h_hivpop_length, "h_hivpop", initial_state.h_hivpop);
     fill_initial_state<real_type, typename Config::State::shape_h_artpop>(state.ha->h_artpop, state.ha->h_artpop_length, "h_artpop", initial_state.h_artpop);
     fill_initial_state<real_type, typename Config::State::shape_h_hiv_deaths_no_art>(state.ha->h_hiv_deaths_no_art, state.ha->h_hiv_deaths_no_art_length, "h_hiv_deaths_no_art", initial_state.h_hiv_deaths_no_art);
@@ -161,7 +161,7 @@ struct HaAdapter<Language::C, real_type, ModelVariant> {
     CState<real_type>& out
   ) {
     write_data<real_type, typename Config::OutputState::shape_p_hivpop>(state.p_hivpop, out.ha->p_hivpop, out.ha->p_hivpop_length, "p_hivpop");
-    write_data<real_type, typename Config::OutputState::shape_p_background_deaths_hivpop>(state.p_background_deaths_hivpop, out.ha->p_background_deaths_hivpop, out.ha->p_background_deaths_hivpop_length, "p_background_deaths_hivpop");
+    write_data<real_type, typename Config::OutputState::shape_p_deaths_background_hivpop>(state.p_deaths_background_hivpop, out.ha->p_deaths_background_hivpop, out.ha->p_deaths_background_hivpop_length, "p_deaths_background_hivpop");
     write_data<real_type, typename Config::OutputState::shape_h_hivpop>(state.h_hivpop, out.ha->h_hivpop, out.ha->h_hivpop_length, "h_hivpop");
     write_data<real_type, typename Config::OutputState::shape_h_artpop>(state.h_artpop, out.ha->h_artpop, out.ha->h_artpop_length, "h_artpop");
     write_data<real_type, typename Config::OutputState::shape_h_hiv_deaths_no_art>(state.h_hiv_deaths_no_art, out.ha->h_hiv_deaths_no_art, out.ha->h_hiv_deaths_no_art_length, "h_hiv_deaths_no_art");
@@ -179,7 +179,7 @@ struct HaAdapter<Language::C, real_type, ModelVariant> {
     CState<real_type>& out
   ) {
     write_data<real_type, typename Config::State::shape_p_hivpop>(state.p_hivpop, out.ha->p_hivpop, out.ha->p_hivpop_length, "p_hivpop");
-    write_data<real_type, typename Config::State::shape_p_background_deaths_hivpop>(state.p_background_deaths_hivpop, out.ha->p_background_deaths_hivpop, out.ha->p_background_deaths_hivpop_length, "p_background_deaths_hivpop");
+    write_data<real_type, typename Config::State::shape_p_deaths_background_hivpop>(state.p_deaths_background_hivpop, out.ha->p_deaths_background_hivpop, out.ha->p_deaths_background_hivpop_length, "p_deaths_background_hivpop");
     write_data<real_type, typename Config::State::shape_h_hivpop>(state.h_hivpop, out.ha->h_hivpop, out.ha->h_hivpop_length, "h_hivpop");
     write_data<real_type, typename Config::State::shape_h_artpop>(state.h_artpop, out.ha->h_artpop, out.ha->h_artpop_length, "h_artpop");
     write_data<real_type, typename Config::State::shape_h_hiv_deaths_no_art>(state.h_hiv_deaths_no_art, out.ha->h_hiv_deaths_no_art, out.ha->h_hiv_deaths_no_art_length, "h_hiv_deaths_no_art");

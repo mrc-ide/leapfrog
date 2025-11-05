@@ -67,16 +67,16 @@ struct DpConfig {
       nda::dim<0, SS::NS, (SS::pAG)>
     >;
     nda::array<real_type, shape_p_totpop> p_totpop;
-    using shape_p_background_deaths_totpop = nda::shape<
+    using shape_p_deaths_background_totpop = nda::shape<
       nda::dim<0, SS::pAG, 1>,
       nda::dim<0, SS::NS, (SS::pAG)>
     >;
-    nda::array<real_type, shape_p_background_deaths_totpop> p_background_deaths_totpop;
+    nda::array<real_type, shape_p_deaths_background_totpop> p_deaths_background_totpop;
     real_type births;
 
     void reset() {
       p_totpop.for_each_value([](real_type& x) { x = 0; });
-      p_background_deaths_totpop.for_each_value([](real_type& x) { x = 0; });
+      p_deaths_background_totpop.for_each_value([](real_type& x) { x = 0; });
       births = 0;
     };
   };
@@ -88,12 +88,12 @@ struct DpConfig {
       nda::dim<0, nda::dynamic, (SS::pAG) * (SS::NS)>
     >;
     nda::array<real_type, shape_p_totpop> p_totpop;
-    using shape_p_background_deaths_totpop = nda::shape<
+    using shape_p_deaths_background_totpop = nda::shape<
       nda::dim<0, SS::pAG, 1>,
       nda::dim<0, SS::NS, (SS::pAG)>,
       nda::dim<0, nda::dynamic, (SS::pAG) * (SS::NS)>
     >;
-    nda::array<real_type, shape_p_background_deaths_totpop> p_background_deaths_totpop;
+    nda::array<real_type, shape_p_deaths_background_totpop> p_deaths_background_totpop;
     using shape_births = nda::shape<
       nda::dim<0, nda::dynamic, 1>
     >;
@@ -101,11 +101,11 @@ struct DpConfig {
 
     OutputState(int output_years):
       p_totpop(shape_p_totpop(SS::pAG, SS::NS, output_years)),
-      p_background_deaths_totpop(shape_p_background_deaths_totpop(SS::pAG, SS::NS, output_years)),
+      p_deaths_background_totpop(shape_p_deaths_background_totpop(SS::pAG, SS::NS, output_years)),
       births(shape_births(output_years))
     {
       p_totpop.for_each_value([](real_type& x) { x = 0; });
-      p_background_deaths_totpop.for_each_value([](real_type& x) { x = 0; });
+      p_deaths_background_totpop.for_each_value([](real_type& x) { x = 0; });
       births.for_each_value([](real_type& x) { x = 0; });
     };
 
@@ -114,9 +114,9 @@ struct DpConfig {
       nda::for_each_index(chip_p_totpop.shape(), [&](auto idx) -> void {
         chip_p_totpop[idx] = state.p_totpop[idx];
       });
-      auto chip_p_background_deaths_totpop = p_background_deaths_totpop(nda::_, nda::_, i);
-      nda::for_each_index(chip_p_background_deaths_totpop.shape(), [&](auto idx) -> void {
-        chip_p_background_deaths_totpop[idx] = state.p_background_deaths_totpop[idx];
+      auto chip_p_deaths_background_totpop = p_deaths_background_totpop(nda::_, nda::_, i);
+      nda::for_each_index(chip_p_deaths_background_totpop.shape(), [&](auto idx) -> void {
+        chip_p_deaths_background_totpop[idx] = state.p_deaths_background_totpop[idx];
       });
       births(i) = state.births;
     };
@@ -340,11 +340,11 @@ struct HaConfig {
       nda::dim<0, SS::NS, (SS::pAG)>
     >;
     nda::array<real_type, shape_p_hivpop> p_hivpop;
-    using shape_p_background_deaths_hivpop = nda::shape<
+    using shape_p_deaths_background_hivpop = nda::shape<
       nda::dim<0, SS::pAG, 1>,
       nda::dim<0, SS::NS, (SS::pAG)>
     >;
-    nda::array<real_type, shape_p_background_deaths_hivpop> p_background_deaths_hivpop;
+    nda::array<real_type, shape_p_deaths_background_hivpop> p_deaths_background_hivpop;
     using shape_h_hivpop = nda::shape<
       nda::dim<0, SS::hDS, 1>,
       nda::dim<0, SS::hAG, (SS::hDS)>,
@@ -395,7 +395,7 @@ struct HaConfig {
 
     void reset() {
       p_hivpop.for_each_value([](real_type& x) { x = 0; });
-      p_background_deaths_hivpop.for_each_value([](real_type& x) { x = 0; });
+      p_deaths_background_hivpop.for_each_value([](real_type& x) { x = 0; });
       h_hivpop.for_each_value([](real_type& x) { x = 0; });
       h_artpop.for_each_value([](real_type& x) { x = 0; });
       h_hiv_deaths_no_art.for_each_value([](real_type& x) { x = 0; });
@@ -414,12 +414,12 @@ struct HaConfig {
       nda::dim<0, nda::dynamic, (SS::pAG) * (SS::NS)>
     >;
     nda::array<real_type, shape_p_hivpop> p_hivpop;
-    using shape_p_background_deaths_hivpop = nda::shape<
+    using shape_p_deaths_background_hivpop = nda::shape<
       nda::dim<0, SS::pAG, 1>,
       nda::dim<0, SS::NS, (SS::pAG)>,
       nda::dim<0, nda::dynamic, (SS::pAG) * (SS::NS)>
     >;
-    nda::array<real_type, shape_p_background_deaths_hivpop> p_background_deaths_hivpop;
+    nda::array<real_type, shape_p_deaths_background_hivpop> p_deaths_background_hivpop;
     using shape_h_hivpop = nda::shape<
       nda::dim<0, SS::hDS, 1>,
       nda::dim<0, SS::hAG, (SS::hDS)>,
@@ -478,7 +478,7 @@ struct HaConfig {
 
     OutputState(int output_years):
       p_hivpop(shape_p_hivpop(SS::pAG, SS::NS, output_years)),
-      p_background_deaths_hivpop(shape_p_background_deaths_hivpop(SS::pAG, SS::NS, output_years)),
+      p_deaths_background_hivpop(shape_p_deaths_background_hivpop(SS::pAG, SS::NS, output_years)),
       h_hivpop(shape_h_hivpop(SS::hDS, SS::hAG, SS::NS, output_years)),
       h_artpop(shape_h_artpop(SS::hTS, SS::hDS, SS::hAG, SS::NS, output_years)),
       h_hiv_deaths_no_art(shape_h_hiv_deaths_no_art(SS::hDS, SS::hAG, SS::NS, output_years)),
@@ -489,7 +489,7 @@ struct HaConfig {
       p_net_migration_hivpop(shape_p_net_migration_hivpop(SS::pAG, SS::NS, output_years))
     {
       p_hivpop.for_each_value([](real_type& x) { x = 0; });
-      p_background_deaths_hivpop.for_each_value([](real_type& x) { x = 0; });
+      p_deaths_background_hivpop.for_each_value([](real_type& x) { x = 0; });
       h_hivpop.for_each_value([](real_type& x) { x = 0; });
       h_artpop.for_each_value([](real_type& x) { x = 0; });
       h_hiv_deaths_no_art.for_each_value([](real_type& x) { x = 0; });
@@ -505,9 +505,9 @@ struct HaConfig {
       nda::for_each_index(chip_p_hivpop.shape(), [&](auto idx) -> void {
         chip_p_hivpop[idx] = state.p_hivpop[idx];
       });
-      auto chip_p_background_deaths_hivpop = p_background_deaths_hivpop(nda::_, nda::_, i);
-      nda::for_each_index(chip_p_background_deaths_hivpop.shape(), [&](auto idx) -> void {
-        chip_p_background_deaths_hivpop[idx] = state.p_background_deaths_hivpop[idx];
+      auto chip_p_deaths_background_hivpop = p_deaths_background_hivpop(nda::_, nda::_, i);
+      nda::for_each_index(chip_p_deaths_background_hivpop.shape(), [&](auto idx) -> void {
+        chip_p_deaths_background_hivpop[idx] = state.p_deaths_background_hivpop[idx];
       });
       auto chip_h_hivpop = h_hivpop(nda::_, nda::_, nda::_, i);
       nda::for_each_index(chip_h_hivpop.shape(), [&](auto idx) -> void {
