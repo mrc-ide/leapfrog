@@ -225,12 +225,6 @@
     "artpop_hahm": {
       "num_type": "real_type"
     },
-    "deaths_hiv": {
-      "num_type": "real_type"
-    },
-    "deaths_excess_nonaids": {
-      "num_type": "real_type"
-    },      
     "p_infections_a": {
       "num_type": "real_type"
     },
