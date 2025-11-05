@@ -122,7 +122,7 @@ struct Leapfrog {
       general_dp.run_general_pop_demographic_projection();
 
       if constexpr (ModelVariant::run_hiv_simulation) {
-        hiv_dp.run_hiv_pop_demographic_projection();
+        hiv_dp.run_hivpop_demographic_projection();
         hiv_sim.run_hiv_model_simulation();
       }
 
@@ -134,10 +134,10 @@ struct Leapfrog {
         general_dp.run_end_year_migration();
 
         if constexpr (ModelVariant::run_hiv_simulation) {
-          hiv_dp.run_hiv_pop_end_year_migration();
+          hiv_dp.run_hivpop_end_year_migration();
         }
         if constexpr (ModelVariant::run_child_model) {
-          hiv_dp.run_hc_hiv_pop_end_year_migration();
+          hiv_dp.run_hc_hivpop_end_year_migration();
         }
       }
     }

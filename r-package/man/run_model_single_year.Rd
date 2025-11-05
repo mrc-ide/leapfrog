@@ -27,7 +27,7 @@ This is different from \code{\link[=run_model_from_state]{run_model_from_state()
 that do include the last time dimension. Since only the next time
 step is returned, dropping the time dimensions makes it easier to
 feed the returned list into the next single year model run. In
-contrast to \code{\link[=run_model_from_state]{run_model_from_state()}} the \code{p_total_pop} output will
+contrast to \code{\link[=run_model_from_state]{run_model_from_state()}} the \code{p_totpop} output will
 have dimensions 81 x 2 not 81 x 2 x 61.
 }
 \description{

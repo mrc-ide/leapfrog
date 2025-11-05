@@ -35,8 +35,8 @@ struct DpAdapter<Language::Cpp, real_type, ModelVariant> {
     const Config::OutputState& state,
     std::filesystem::path& output_file
   ) {
-    write_data<real_type, typename Config::OutputState::shape_p_total_pop>(output_file, "p_total_pop", state.p_total_pop);
-    write_data<real_type, typename Config::OutputState::shape_p_total_pop_background_deaths>(output_file, "p_total_pop_background_deaths", state.p_total_pop_background_deaths);
+    write_data<real_type, typename Config::OutputState::shape_p_totpop>(output_file, "p_totpop", state.p_totpop);
+    write_data<real_type, typename Config::OutputState::shape_p_deaths_background_totpop>(output_file, "p_deaths_background_totpop", state.p_deaths_background_totpop);
     write_data<real_type, typename Config::OutputState::shape_births>(output_file, "births", state.births);
     return index + output_count;
   };
@@ -79,10 +79,10 @@ struct HaAdapter<Language::Cpp, real_type, ModelVariant> {
     const Config::OutputState& state,
     std::filesystem::path& output_file
   ) {
-    write_data<real_type, typename Config::OutputState::shape_p_hiv_pop>(output_file, "p_hiv_pop", state.p_hiv_pop);
-    write_data<real_type, typename Config::OutputState::shape_p_hiv_pop_background_deaths>(output_file, "p_hiv_pop_background_deaths", state.p_hiv_pop_background_deaths);
-    write_data<real_type, typename Config::OutputState::shape_h_hiv_adult>(output_file, "h_hiv_adult", state.h_hiv_adult);
-    write_data<real_type, typename Config::OutputState::shape_h_art_adult>(output_file, "h_art_adult", state.h_art_adult);
+    write_data<real_type, typename Config::OutputState::shape_p_hivpop>(output_file, "p_hivpop", state.p_hivpop);
+    write_data<real_type, typename Config::OutputState::shape_p_deaths_background_hivpop>(output_file, "p_deaths_background_hivpop", state.p_deaths_background_hivpop);
+    write_data<real_type, typename Config::OutputState::shape_h_hivpop>(output_file, "h_hivpop", state.h_hivpop);
+    write_data<real_type, typename Config::OutputState::shape_h_artpop>(output_file, "h_artpop", state.h_artpop);
     write_data<real_type, typename Config::OutputState::shape_h_hiv_deaths_no_art>(output_file, "h_hiv_deaths_no_art", state.h_hiv_deaths_no_art);
     write_data<real_type, typename Config::OutputState::shape_p_infections>(output_file, "p_infections", state.p_infections);
     write_data<real_type, typename Config::OutputState::shape_h_hiv_deaths_art>(output_file, "h_hiv_deaths_art", state.h_hiv_deaths_art);
@@ -156,10 +156,10 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
     std::filesystem::path& output_file
   ) {
     write_data<real_type, typename Config::OutputState::shape_hiv_births_by_mat_age>(output_file, "hiv_births_by_mat_age", state.hiv_births_by_mat_age);
-    write_data<real_type, typename Config::OutputState::shape_hc1_hiv_pop>(output_file, "hc1_hiv_pop", state.hc1_hiv_pop);
-    write_data<real_type, typename Config::OutputState::shape_hc2_hiv_pop>(output_file, "hc2_hiv_pop", state.hc2_hiv_pop);
-    write_data<real_type, typename Config::OutputState::shape_hc1_art_pop>(output_file, "hc1_art_pop", state.hc1_art_pop);
-    write_data<real_type, typename Config::OutputState::shape_hc2_art_pop>(output_file, "hc2_art_pop", state.hc2_art_pop);
+    write_data<real_type, typename Config::OutputState::shape_hc1_hivpop>(output_file, "hc1_hivpop", state.hc1_hivpop);
+    write_data<real_type, typename Config::OutputState::shape_hc2_hivpop>(output_file, "hc2_hivpop", state.hc2_hivpop);
+    write_data<real_type, typename Config::OutputState::shape_hc1_artpop>(output_file, "hc1_artpop", state.hc1_artpop);
+    write_data<real_type, typename Config::OutputState::shape_hc2_artpop>(output_file, "hc2_artpop", state.hc2_artpop);
     write_data<real_type, typename Config::OutputState::shape_hc1_noart_aids_deaths>(output_file, "hc1_noart_aids_deaths", state.hc1_noart_aids_deaths);
     write_data<real_type, typename Config::OutputState::shape_hc2_noart_aids_deaths>(output_file, "hc2_noart_aids_deaths", state.hc2_noart_aids_deaths);
     write_data<real_type, typename Config::OutputState::shape_hc1_art_aids_deaths>(output_file, "hc1_art_aids_deaths", state.hc1_art_aids_deaths);
