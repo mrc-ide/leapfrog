@@ -123,8 +123,10 @@ struct HaAdapter<Language::C, real_type, ModelVariant> {
       .cd4_initial_distribution = read_data<real_type, 3>(params.ha->cd4_initial_distribution, params.ha->cd4_initial_distribution_length, "cd4_initial_distribution", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),
       .scale_cd4_mortality = params.ha->scale_cd4_mortality,
       .idx_hm_elig = read_data<int, 1>(params.ha->idx_hm_elig, params.ha->idx_hm_elig_length, "idx_hm_elig", { nda::dim<>(0, opts.proj_steps, 1) }),
-      .mortality = read_data<real_type, 4>(params.ha->mortality, params.ha->mortality_length, "mortality", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, SS::hDS, (SS::hTS)), nda::dim<>(0, SS::hAG, (SS::hTS) * (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hTS) * (SS::hDS) * (SS::hAG)) }),
-      .mortality_time_rate_ratio = read_data<real_type, 2>(params.ha->mortality_time_rate_ratio, params.ha->mortality_time_rate_ratio_length, "mortality_time_rate_ratio", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, opts.proj_steps, (SS::hTS)) }),
+      .art_mortality = read_data<real_type, 4>(params.ha->art_mortality, params.ha->art_mortality_length, "art_mortality", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, SS::hDS, (SS::hTS)), nda::dim<>(0, SS::hAG, (SS::hTS) * (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hTS) * (SS::hDS) * (SS::hAG)) }),
+      .art_mortality_time_rate_ratio = read_data<real_type, 2>(params.ha->art_mortality_time_rate_ratio, params.ha->art_mortality_time_rate_ratio_length, "art_mortality_time_rate_ratio", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, opts.proj_steps, (SS::hTS)) }),
+      .cd4_nonaids_excess_mort = read_data<real_type, 3>(params.ha->cd4_nonaids_excess_mort, params.ha->cd4_nonaids_excess_mort_length, "cd4_nonaids_excess_mort", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),
+      .art_nonaids_excess_mort = read_data<real_type, 4>(params.ha->art_nonaids_excess_mort, params.ha->art_nonaids_excess_mort_length, "art_nonaids_excess_mort", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, SS::hDS, (SS::hTS)), nda::dim<>(0, SS::hAG, (SS::hTS) * (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hTS) * (SS::hDS) * (SS::hAG)) }),
       .dropout_recover_cd4 = params.ha->dropout_recover_cd4,
       .dropout_rate = read_data<real_type, 1>(params.ha->dropout_rate, params.ha->dropout_rate_length, "dropout_rate", { nda::dim<>(0, opts.proj_steps, 1) }),
       .adults_on_art = read_data<real_type, 2>(params.ha->adults_on_art, params.ha->adults_on_art_length, "adults_on_art", { nda::dim<>(0, SS::NS, 1), nda::dim<>(0, opts.proj_steps, (SS::NS)) }),
@@ -145,15 +147,18 @@ struct HaAdapter<Language::C, real_type, ModelVariant> {
     fill_initial_state<real_type, typename Config::State::shape_h_hiv_adult>(state.ha->h_hiv_adult, state.ha->h_hiv_adult_length, "h_hiv_adult", initial_state.h_hiv_adult);
     fill_initial_state<real_type, typename Config::State::shape_h_art_adult>(state.ha->h_art_adult, state.ha->h_art_adult_length, "h_art_adult", initial_state.h_art_adult);
     fill_initial_state<real_type, typename Config::State::shape_h_hiv_deaths_no_art>(state.ha->h_hiv_deaths_no_art, state.ha->h_hiv_deaths_no_art_length, "h_hiv_deaths_no_art", initial_state.h_hiv_deaths_no_art);
+    fill_initial_state<real_type, typename Config::State::shape_h_deaths_excess_nonaids_no_art>(state.ha->h_deaths_excess_nonaids_no_art, state.ha->h_deaths_excess_nonaids_no_art_length, "h_deaths_excess_nonaids_no_art", initial_state.h_deaths_excess_nonaids_no_art);
     fill_initial_state<real_type, typename Config::State::shape_p_infections>(state.ha->p_infections, state.ha->p_infections_length, "p_infections", initial_state.p_infections);
     fill_initial_state<real_type, typename Config::State::shape_h_hiv_deaths_art>(state.ha->h_hiv_deaths_art, state.ha->h_hiv_deaths_art_length, "h_hiv_deaths_art", initial_state.h_hiv_deaths_art);
+    fill_initial_state<real_type, typename Config::State::shape_h_deaths_excess_nonaids_on_art>(state.ha->h_deaths_excess_nonaids_on_art, state.ha->h_deaths_excess_nonaids_on_art_length, "h_deaths_excess_nonaids_on_art", initial_state.h_deaths_excess_nonaids_on_art);
     fill_initial_state<real_type, typename Config::State::shape_h_art_initiation>(state.ha->h_art_initiation, state.ha->h_art_initiation_length, "h_art_initiation", initial_state.h_art_initiation);
     fill_initial_state<real_type, typename Config::State::shape_p_hiv_deaths>(state.ha->p_hiv_deaths, state.ha->p_hiv_deaths_length, "p_hiv_deaths", initial_state.p_hiv_deaths);
+    fill_initial_state<real_type, typename Config::State::shape_p_deaths_excess_nonaids>(state.ha->p_deaths_excess_nonaids, state.ha->p_deaths_excess_nonaids_length, "p_deaths_excess_nonaids", initial_state.p_deaths_excess_nonaids);
     fill_initial_state<real_type, typename Config::State::shape_p_net_migration_hivpop>(state.ha->p_net_migration_hivpop, state.ha->p_net_migration_hivpop_length, "p_net_migration_hivpop", initial_state.p_net_migration_hivpop);
     return initial_state;
   };
 
-  static constexpr int output_count = 10;
+  static constexpr int output_count = 13;
 
   static int build_output(
     int index,
@@ -165,10 +170,13 @@ struct HaAdapter<Language::C, real_type, ModelVariant> {
     write_data<real_type, typename Config::OutputState::shape_h_hiv_adult>(state.h_hiv_adult, out.ha->h_hiv_adult, out.ha->h_hiv_adult_length, "h_hiv_adult");
     write_data<real_type, typename Config::OutputState::shape_h_art_adult>(state.h_art_adult, out.ha->h_art_adult, out.ha->h_art_adult_length, "h_art_adult");
     write_data<real_type, typename Config::OutputState::shape_h_hiv_deaths_no_art>(state.h_hiv_deaths_no_art, out.ha->h_hiv_deaths_no_art, out.ha->h_hiv_deaths_no_art_length, "h_hiv_deaths_no_art");
+    write_data<real_type, typename Config::OutputState::shape_h_deaths_excess_nonaids_no_art>(state.h_deaths_excess_nonaids_no_art, out.ha->h_deaths_excess_nonaids_no_art, out.ha->h_deaths_excess_nonaids_no_art_length, "h_deaths_excess_nonaids_no_art");
     write_data<real_type, typename Config::OutputState::shape_p_infections>(state.p_infections, out.ha->p_infections, out.ha->p_infections_length, "p_infections");
     write_data<real_type, typename Config::OutputState::shape_h_hiv_deaths_art>(state.h_hiv_deaths_art, out.ha->h_hiv_deaths_art, out.ha->h_hiv_deaths_art_length, "h_hiv_deaths_art");
+    write_data<real_type, typename Config::OutputState::shape_h_deaths_excess_nonaids_on_art>(state.h_deaths_excess_nonaids_on_art, out.ha->h_deaths_excess_nonaids_on_art, out.ha->h_deaths_excess_nonaids_on_art_length, "h_deaths_excess_nonaids_on_art");
     write_data<real_type, typename Config::OutputState::shape_h_art_initiation>(state.h_art_initiation, out.ha->h_art_initiation, out.ha->h_art_initiation_length, "h_art_initiation");
     write_data<real_type, typename Config::OutputState::shape_p_hiv_deaths>(state.p_hiv_deaths, out.ha->p_hiv_deaths, out.ha->p_hiv_deaths_length, "p_hiv_deaths");
+    write_data<real_type, typename Config::OutputState::shape_p_deaths_excess_nonaids>(state.p_deaths_excess_nonaids, out.ha->p_deaths_excess_nonaids, out.ha->p_deaths_excess_nonaids_length, "p_deaths_excess_nonaids");
     write_data<real_type, typename Config::OutputState::shape_p_net_migration_hivpop>(state.p_net_migration_hivpop, out.ha->p_net_migration_hivpop, out.ha->p_net_migration_hivpop_length, "p_net_migration_hivpop");
     return index + output_count;
   };
@@ -183,10 +191,13 @@ struct HaAdapter<Language::C, real_type, ModelVariant> {
     write_data<real_type, typename Config::State::shape_h_hiv_adult>(state.h_hiv_adult, out.ha->h_hiv_adult, out.ha->h_hiv_adult_length, "h_hiv_adult");
     write_data<real_type, typename Config::State::shape_h_art_adult>(state.h_art_adult, out.ha->h_art_adult, out.ha->h_art_adult_length, "h_art_adult");
     write_data<real_type, typename Config::State::shape_h_hiv_deaths_no_art>(state.h_hiv_deaths_no_art, out.ha->h_hiv_deaths_no_art, out.ha->h_hiv_deaths_no_art_length, "h_hiv_deaths_no_art");
+    write_data<real_type, typename Config::State::shape_h_deaths_excess_nonaids_no_art>(state.h_deaths_excess_nonaids_no_art, out.ha->h_deaths_excess_nonaids_no_art, out.ha->h_deaths_excess_nonaids_no_art_length, "h_deaths_excess_nonaids_no_art");
     write_data<real_type, typename Config::State::shape_p_infections>(state.p_infections, out.ha->p_infections, out.ha->p_infections_length, "p_infections");
     write_data<real_type, typename Config::State::shape_h_hiv_deaths_art>(state.h_hiv_deaths_art, out.ha->h_hiv_deaths_art, out.ha->h_hiv_deaths_art_length, "h_hiv_deaths_art");
+    write_data<real_type, typename Config::State::shape_h_deaths_excess_nonaids_on_art>(state.h_deaths_excess_nonaids_on_art, out.ha->h_deaths_excess_nonaids_on_art, out.ha->h_deaths_excess_nonaids_on_art_length, "h_deaths_excess_nonaids_on_art");
     write_data<real_type, typename Config::State::shape_h_art_initiation>(state.h_art_initiation, out.ha->h_art_initiation, out.ha->h_art_initiation_length, "h_art_initiation");
     write_data<real_type, typename Config::State::shape_p_hiv_deaths>(state.p_hiv_deaths, out.ha->p_hiv_deaths, out.ha->p_hiv_deaths_length, "p_hiv_deaths");
+    write_data<real_type, typename Config::State::shape_p_deaths_excess_nonaids>(state.p_deaths_excess_nonaids, out.ha->p_deaths_excess_nonaids, out.ha->p_deaths_excess_nonaids_length, "p_deaths_excess_nonaids");
     write_data<real_type, typename Config::State::shape_p_net_migration_hivpop>(state.p_net_migration_hivpop, out.ha->p_net_migration_hivpop, out.ha->p_net_migration_hivpop_length, "p_net_migration_hivpop");
     return index + output_count;
   };
@@ -338,8 +349,6 @@ struct SpAdapter<Language::C, real_type, ModelVariant> {
     const Options<real_type> &opts
   ) {
     return {
-      .cd4_nonaids_excess_mort = read_data<real_type, 3>(params.sp->cd4_nonaids_excess_mort, params.sp->cd4_nonaids_excess_mort_length, "cd4_nonaids_excess_mort", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),
-      .art_nonaids_excess_mort = read_data<real_type, 4>(params.sp->art_nonaids_excess_mort, params.sp->art_nonaids_excess_mort_length, "art_nonaids_excess_mort", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, SS::hDS, (SS::hTS)), nda::dim<>(0, SS::hAG, (SS::hTS) * (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hTS) * (SS::hDS) * (SS::hAG)) })
     };
   };
 

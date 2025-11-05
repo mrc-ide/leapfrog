@@ -225,19 +225,34 @@ struct HaOwnedPars {
   >;
   nda::array<int, shape_idx_hm_elig> idx_hm_elig;
 
-    using shape_mortality = nda::shape<
+    using shape_art_mortality = nda::shape<
     nda::dim<0, SS::hTS, 1>,
     nda::dim<0, SS::hDS, (SS::hTS)>,
     nda::dim<0, SS::hAG, (SS::hTS) * (SS::hDS)>,
     nda::dim<0, SS::NS, (SS::hTS) * (SS::hDS) * (SS::hAG)>
   >;
-  nda::array<real_type, shape_mortality> mortality;
+  nda::array<real_type, shape_art_mortality> art_mortality;
 
-    using shape_mortality_time_rate_ratio = nda::shape<
+    using shape_art_mortality_time_rate_ratio = nda::shape<
     nda::dim<0, SS::hTS, 1>,
     nda::dim<0, nda::dynamic, (SS::hTS)>
   >;
-  nda::array<real_type, shape_mortality_time_rate_ratio> mortality_time_rate_ratio;
+  nda::array<real_type, shape_art_mortality_time_rate_ratio> art_mortality_time_rate_ratio;
+
+    using shape_cd4_nonaids_excess_mort = nda::shape<
+    nda::dim<0, SS::hDS, 1>,
+    nda::dim<0, SS::hAG, (SS::hDS)>,
+    nda::dim<0, SS::NS, (SS::hDS) * (SS::hAG)>
+  >;
+  nda::array<real_type, shape_cd4_nonaids_excess_mort> cd4_nonaids_excess_mort;
+
+    using shape_art_nonaids_excess_mort = nda::shape<
+    nda::dim<0, SS::hTS, 1>,
+    nda::dim<0, SS::hDS, (SS::hTS)>,
+    nda::dim<0, SS::hAG, (SS::hTS) * (SS::hDS)>,
+    nda::dim<0, SS::NS, (SS::hTS) * (SS::hDS) * (SS::hAG)>
+  >;
+  nda::array<real_type, shape_art_nonaids_excess_mort> art_nonaids_excess_mort;
 
     int dropout_recover_cd4;
 
@@ -284,8 +299,10 @@ struct HaOwnedPars {
       .cd4_initial_distribution = read_data<real_type, typename Pars::shape_cd4_initial_distribution>(params_file, "cd4_initdist", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),
       .scale_cd4_mortality = read_data_scalar<int>(params_file, "scale_cd4_mort"),
       .idx_hm_elig = read_data<int, typename Pars::shape_idx_hm_elig>(params_file, "artcd4elig_idx", { nda::dim<>(0, opts.proj_steps, 1) }),
-      .mortality = read_data<real_type, typename Pars::shape_mortality>(params_file, "art_mort", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, SS::hDS, (SS::hTS)), nda::dim<>(0, SS::hAG, (SS::hTS) * (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hTS) * (SS::hDS) * (SS::hAG)) }),
-      .mortality_time_rate_ratio = read_data<real_type, typename Pars::shape_mortality_time_rate_ratio>(params_file, "artmx_timerr", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, opts.proj_steps, (SS::hTS)) }),
+      .art_mortality = read_data<real_type, typename Pars::shape_art_mortality>(params_file, "art_mort", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, SS::hDS, (SS::hTS)), nda::dim<>(0, SS::hAG, (SS::hTS) * (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hTS) * (SS::hDS) * (SS::hAG)) }),
+      .art_mortality_time_rate_ratio = read_data<real_type, typename Pars::shape_art_mortality_time_rate_ratio>(params_file, "artmx_timerr", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, opts.proj_steps, (SS::hTS)) }),
+      .cd4_nonaids_excess_mort = read_data<real_type, typename Pars::shape_cd4_nonaids_excess_mort>(params_file, "cd4_nonaids_excess_mort", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),
+      .art_nonaids_excess_mort = read_data<real_type, typename Pars::shape_art_nonaids_excess_mort>(params_file, "art_nonaids_excess_mort", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, SS::hDS, (SS::hTS)), nda::dim<>(0, SS::hAG, (SS::hTS) * (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hTS) * (SS::hDS) * (SS::hAG)) }),
       .dropout_recover_cd4 = read_data_scalar<int>(params_file, "art_dropout_recover_cd4"),
       .dropout_rate = read_data<real_type, typename Pars::shape_dropout_rate>(params_file, "art_dropout_rate", { nda::dim<>(0, opts.proj_steps, 1) }),
       .adults_on_art = read_data<real_type, typename Pars::shape_adults_on_art>(params_file, "art15plus_num", { nda::dim<>(0, SS::NS, 1), nda::dim<>(0, opts.proj_steps, (SS::NS)) }),
@@ -603,21 +620,6 @@ struct SpOwnedPars {
   using SS = SSMixed<ModelVariant>;
   
   struct Pars {
-    using shape_cd4_nonaids_excess_mort = nda::shape<
-    nda::dim<0, SS::hDS, 1>,
-    nda::dim<0, SS::hAG, (SS::hDS)>,
-    nda::dim<0, SS::NS, (SS::hDS) * (SS::hAG)>
-  >;
-  nda::array<real_type, shape_cd4_nonaids_excess_mort> cd4_nonaids_excess_mort;
-
-    using shape_art_nonaids_excess_mort = nda::shape<
-    nda::dim<0, SS::hTS, 1>,
-    nda::dim<0, SS::hDS, (SS::hTS)>,
-    nda::dim<0, SS::hAG, (SS::hTS) * (SS::hDS)>,
-    nda::dim<0, SS::NS, (SS::hTS) * (SS::hDS) * (SS::hAG)>
-  >;
-  nda::array<real_type, shape_art_nonaids_excess_mort> art_nonaids_excess_mort;
-
   };
 
   static Pars parse_pars(
@@ -625,8 +627,6 @@ struct SpOwnedPars {
     const Options<real_type> &opts
   ) {
     return {
-      .cd4_nonaids_excess_mort = read_data<real_type, typename Pars::shape_cd4_nonaids_excess_mort>(params_file, "cd4_nonaids_excess_mort", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),
-      .art_nonaids_excess_mort = read_data<real_type, typename Pars::shape_art_nonaids_excess_mort>(params_file, "art_nonaids_excess_mort", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, SS::hDS, (SS::hTS)), nda::dim<>(0, SS::hAG, (SS::hTS) * (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hTS) * (SS::hDS) * (SS::hAG)) })
     };
   };
 };
