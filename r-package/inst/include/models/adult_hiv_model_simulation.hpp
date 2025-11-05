@@ -141,9 +141,9 @@ struct AdultHivModelSimulation<Config> {
           i_ha.h_hiv_deaths_age_sex(ha, g) += opts.dt * deaths_hiv;
           n_ha.h_hiv_deaths_no_art(hm, ha, g) += opts.dt * deaths_hiv;
 
-	  auto deaths_excess_nonaids = p_ha.cd4_nonaids_excess_mort(hm, ha, g) * n_ha.h_hiv_adult(hm, ha, g);
-	  i_ha.h_deaths_excess_nonaids_agesex(ha, g) += opts.dt * deaths_excess_nonaids;
-	  n_ha.h_deaths_excess_nonaids_no_art(hm, ha, g) += opts.dt * deaths_excess_nonaids;
+          auto deaths_excess_nonaids = p_ha.cd4_nonaids_excess_mort(hm, ha, g) * n_ha.h_hiv_adult(hm, ha, g);
+          i_ha.h_deaths_excess_nonaids_agesex(ha, g) += opts.dt * deaths_excess_nonaids;
+          n_ha.h_deaths_excess_nonaids_no_art(hm, ha, g) += opts.dt * deaths_excess_nonaids;
 
           i_ha.grad(hm, ha, g) = -(deaths_hiv_ha + deaths_excess_nonaids);
         }
@@ -231,11 +231,11 @@ struct AdultHivModelSimulation<Config> {
             i_ha.h_hiv_deaths_age_sex(ha, g) += new_hiv_deaths_art;
             n_ha.h_hiv_deaths_art(hu, hm, ha, g) += new_hiv_deaths_art;
 
-	    const auto deaths_excess_nonaids = p_ha.art_nonaids_excess_mort(hu, hm, ha, g) * n_ha.h_art_adult(hu, hm, ha, g);
-	    i_ha.h_deaths_excess_nonaids_agesex(ha, g) += opts.dt * deaths_excess_nonaids;
-	    n_ha.h_deaths_excess_nonaids_on_art(hu, hm, ha, g) += opts.dt * deaths_excess_nonaids;
-	    
-	    i_ha.gradART(hu, hm, ha, g) = -(i_ha.deaths_art + deaths_excess_nonaids);
+            const auto deaths_excess_nonaids = p_ha.art_nonaids_excess_mort(hu, hm, ha, g) * n_ha.h_art_adult(hu, hm, ha, g);
+            i_ha.h_deaths_excess_nonaids_agesex(ha, g) += opts.dt * deaths_excess_nonaids;
+            n_ha.h_deaths_excess_nonaids_on_art(hu, hm, ha, g) += opts.dt * deaths_excess_nonaids;
+            
+            i_ha.gradART(hu, hm, ha, g) = -(i_ha.deaths_art + deaths_excess_nonaids);
           }
 
           for (int hu = 0; hu < (hTS - 1); ++hu) {
@@ -450,19 +450,19 @@ struct AdultHivModelSimulation<Config> {
 
         if (i_ha.hivpop_ha(ha) > 0) {
           i_ha.hivqx_ha = i_ha.h_hiv_deaths_age_sex(ha, g) / i_ha.hivpop_ha(ha);
-	  auto nonaids_excess_qx_ha = i_ha.h_deaths_excess_nonaids_agesex(ha, g) / i_ha.hivpop_ha(ha);
-	  
+          auto nonaids_excess_qx_ha = i_ha.h_deaths_excess_nonaids_agesex(ha, g) / i_ha.hivpop_ha(ha);
+          
           for (int i = 0; i < hAG_span[ha]; ++i, ++a) {
             i_ha.hivdeaths_a = n_ha.p_hiv_pop(a, g) * i_ha.hivqx_ha;
-	    auto deaths_nonaids_excess_a = n_ha.p_hiv_pop(a, g) * nonaids_excess_qx_ha;
+            auto deaths_nonaids_excess_a = n_ha.p_hiv_pop(a, g) * nonaids_excess_qx_ha;
 
             n_ha.p_hiv_deaths(a, g) += i_ha.hivdeaths_a;
-	    n_ha.p_deaths_excess_nonaids(a, g) += deaths_nonaids_excess_a;
-	    
+            n_ha.p_deaths_excess_nonaids(a, g) += deaths_nonaids_excess_a;
+            
             n_dp.p_total_pop(a, g) -= i_ha.hivdeaths_a + deaths_nonaids_excess_a;
             n_ha.p_hiv_pop(a, g) -= i_ha.hivdeaths_a + deaths_nonaids_excess_a;
           }
-	  
+          
         } else {
           a += hAG_span[ha];
         }
