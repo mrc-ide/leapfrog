@@ -113,10 +113,10 @@ struct SpectrumPostHocCalculations<Config> {
       int a = p_idx_hiv_first_adult;
       for (int ha = 0; ha < hAG; ++ha) {
 
-	// Aggregate excess deaths and population in coarse age group
+        // Aggregate excess deaths and population in coarse age group
         auto excess_deaths_nonaids_no_art_ha = 0.0;
         auto excess_deaths_nonaids_on_art_ha = 0.0;
-	auto hivpop_ha = 0.0;
+        auto hivpop_ha = 0.0;
 
         for (int hm = 0; hm < hDS; ++hm) {
 	  excess_deaths_nonaids_no_art_ha += n_ha.h_deaths_excess_nonaids_no_art(hm, ha, g);
