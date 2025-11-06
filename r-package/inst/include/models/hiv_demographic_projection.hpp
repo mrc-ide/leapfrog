@@ -196,6 +196,7 @@ struct HivDemographicProjection<Config> {
     constexpr int hc2AG = SS::hc2AG;
     constexpr int hc2DS = SS::hc2DS;
 
+    const auto& p_hc = pars.hc;
     const auto& c_hc = state_curr.hc;
     auto& i_hc = intermediate.hc;
 
@@ -210,7 +211,7 @@ struct HivDemographicProjection<Config> {
 	  i_hc.age15_hiv_pop(hm, g) += age15_hivpop_hm_adol * SS::hc2_to_ha_cd4_transition[hm][hm_adol];
 	}
 
-	if (t > opts.ts_art_start) {
+	if (t > p_hc.hc_art_start) {
 	  for (int hu = 0; hu < hTS; ++hu) {
 	    i_hc.age15_art_pop(hu, hm, g) = 0.0;
 	      for (int hm_adol = 0; hm_adol < hc2DS; ++hm_adol) {
@@ -246,32 +247,48 @@ struct HivDemographicProjection<Config> {
       }
     }
 
-
-
     for (int g = 0; g < NS; ++g) {
       for (int ha = 1; ha < hAG; ++ha) {
         for (int hm = 0; hm < hDS; ++hm) {
-          n_ha.h_hiv_adult(hm, ha, g) = ((1.0 - i_ha.hiv_age_up_prob(ha, g)) * c_ha.h_hiv_adult(hm, ha, g)) +
-                                        (i_ha.hiv_age_up_prob(ha - 1, g) * c_ha.h_hiv_adult(hm, ha - 1, g));
-          if (t > opts.ts_art_start)
+          n_ha.h_hiv_adult(hm, ha, g) = (1.0 - i_ha.hiv_age_up_prob(ha, g)) * c_ha.h_hiv_adult(hm, ha, g);  // age-out
+	  n_ha.h_hiv_adult(hm, ha, g) += i_ha.hiv_age_up_prob(ha - 1, g) * c_ha.h_hiv_adult(hm, ha - 1, g); // age-in
+          if (t > opts.ts_art_start) {
             for (int hu = 0; hu < hTS; ++hu) {
-              n_ha.h_art_adult(hu, hm, ha, g) = ((1.0 - i_ha.hiv_age_up_prob(ha, g)) * c_ha.h_art_adult(hu, hm, ha, g)) +
-                                                (i_ha.hiv_age_up_prob(ha - 1, g) * c_ha.h_art_adult(hu, hm, ha - 1, g));
+              n_ha.h_art_adult(hu, hm, ha, g) = (1.0 - i_ha.hiv_age_up_prob(ha, g)) * c_ha.h_art_adult(hu, hm, ha, g);  // age-out
+	      n_ha.h_art_adult(hu, hm, ha, g) += i_ha.hiv_age_up_prob(ha - 1, g) * c_ha.h_art_adult(hu, hm, ha - 1, g); // age-in
             }
+	  }
         }
       }
-    }
 
+      // age out of ha = 0 group
+      int ha = 0;
+      for (int hm = 0; hm < hDS; ++hm) {
+	n_ha.h_hiv_adult(hm, ha, g) = (1.0 - i_ha.hiv_age_up_prob(ha, g)) * c_ha.h_hiv_adult(hm, ha, g);  // age-out
+	if (t > opts.ts_art_start) {
+	  for (int hu = 0; hu < hTS; ++hu) {
+	    n_ha.h_art_adult(hu, hm, ha, g) = (1.0 - i_ha.hiv_age_up_prob(ha, g)) * c_ha.h_art_adult(hu, hm, ha, g);  // age-out
+	  }
+	}
+      }
+      
     // Entrants ageing into adult HIV population
     if constexpr (ModelVariant::run_child_model) {
       auto& i_hc = intermediate.hc;
+      const auto& p_hc = pars.hc;
 
-      for (int g = 0; g < NS; ++g) {
         for (int hm = 0; hm < hDS; ++hm) {
 	  n_ha.h_hiv_adult(hm, 0, g) += i_hc.age15_hiv_pop(hm, g);
-	  if (t > opts.ts_art_start) {
+
+	  if (t > p_hc.hc_art_start) {
 	    for (int hu = 0; hu < hTS; ++hu) {
-	      n_ha.h_art_adult(hu, hm, 0, g) += i_hc.age15_art_pop(hu, hm, g);
+	      if (t > opts.ts_art_start) {
+		n_ha.h_art_adult(hu, hm, 0, g) += i_hc.age15_art_pop(hu, hm, g);
+	      } else {
+		// If child ART has started, but not yet adult ART has started, put
+		// children on ART into the untreated adult HIV population
+		n_ha.h_hiv_adult(hm, 0, g) += i_hc.age15_art_pop(hu, hm, g);
+	      }
 	    }
 	  }
 	}
