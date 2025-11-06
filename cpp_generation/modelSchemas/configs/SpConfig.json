@@ -6,7 +6,8 @@
   "state_space": {
     "default": {}
   },
-  "pars": {},
+  "pars": {
+  },
   "intermediate": {
     "hiv_art_adult_sa": {
       "num_type": "real_type"
@@ -24,6 +25,14 @@
       "dims": ["SS::pAG", "SS::NS"]
     },
     "p_deaths_nonaids_hivpop": {
+      "num_type": "real_type",
+      "dims": ["SS::pAG", "SS::NS"]
+    },
+    "p_excess_deaths_nonaids_on_art": {
+      "num_type": "real_type",
+      "dims": ["SS::pAG", "SS::NS"]
+    },
+    "p_excess_deaths_nonaids_no_art": {
       "num_type": "real_type",
       "dims": ["SS::pAG", "SS::NS"]
     }

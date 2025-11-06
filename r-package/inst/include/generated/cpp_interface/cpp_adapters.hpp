@@ -59,8 +59,10 @@ struct HaAdapter<Language::Cpp, real_type, ModelVariant> {
       .cd4_initial_distribution = { owned_pars.ha.cd4_initial_distribution.data(), owned_pars.ha.cd4_initial_distribution.shape() },
       .scale_cd4_mortality = owned_pars.ha.scale_cd4_mortality,
       .idx_hm_elig = { owned_pars.ha.idx_hm_elig.data(), owned_pars.ha.idx_hm_elig.shape() },
-      .mortality = { owned_pars.ha.mortality.data(), owned_pars.ha.mortality.shape() },
-      .mortality_time_rate_ratio = { owned_pars.ha.mortality_time_rate_ratio.data(), owned_pars.ha.mortality_time_rate_ratio.shape() },
+      .art_mortality = { owned_pars.ha.art_mortality.data(), owned_pars.ha.art_mortality.shape() },
+      .art_mortality_time_rate_ratio = { owned_pars.ha.art_mortality_time_rate_ratio.data(), owned_pars.ha.art_mortality_time_rate_ratio.shape() },
+      .cd4_nonaids_excess_mort = { owned_pars.ha.cd4_nonaids_excess_mort.data(), owned_pars.ha.cd4_nonaids_excess_mort.shape() },
+      .art_nonaids_excess_mort = { owned_pars.ha.art_nonaids_excess_mort.data(), owned_pars.ha.art_nonaids_excess_mort.shape() },
       .dropout_recover_cd4 = owned_pars.ha.dropout_recover_cd4,
       .dropout_rate = { owned_pars.ha.dropout_rate.data(), owned_pars.ha.dropout_rate.shape() },
       .adults_on_art = { owned_pars.ha.adults_on_art.data(), owned_pars.ha.adults_on_art.shape() },
@@ -72,7 +74,7 @@ struct HaAdapter<Language::Cpp, real_type, ModelVariant> {
     };
   };
 
-  static constexpr int output_count = 10;
+  static constexpr int output_count = 13;
 
   static int build_output(
     int index,
@@ -84,10 +86,13 @@ struct HaAdapter<Language::Cpp, real_type, ModelVariant> {
     write_data<real_type, typename Config::OutputState::shape_h_hiv_adult>(output_file, "h_hiv_adult", state.h_hiv_adult);
     write_data<real_type, typename Config::OutputState::shape_h_art_adult>(output_file, "h_art_adult", state.h_art_adult);
     write_data<real_type, typename Config::OutputState::shape_h_hiv_deaths_no_art>(output_file, "h_hiv_deaths_no_art", state.h_hiv_deaths_no_art);
+    write_data<real_type, typename Config::OutputState::shape_h_deaths_excess_nonaids_no_art>(output_file, "h_deaths_excess_nonaids_no_art", state.h_deaths_excess_nonaids_no_art);
     write_data<real_type, typename Config::OutputState::shape_p_infections>(output_file, "p_infections", state.p_infections);
     write_data<real_type, typename Config::OutputState::shape_h_hiv_deaths_art>(output_file, "h_hiv_deaths_art", state.h_hiv_deaths_art);
+    write_data<real_type, typename Config::OutputState::shape_h_deaths_excess_nonaids_on_art>(output_file, "h_deaths_excess_nonaids_on_art", state.h_deaths_excess_nonaids_on_art);
     write_data<real_type, typename Config::OutputState::shape_h_art_initiation>(output_file, "h_art_initiation", state.h_art_initiation);
     write_data<real_type, typename Config::OutputState::shape_p_hiv_deaths>(output_file, "p_hiv_deaths", state.p_hiv_deaths);
+    write_data<real_type, typename Config::OutputState::shape_p_deaths_excess_nonaids>(output_file, "p_deaths_excess_nonaids", state.p_deaths_excess_nonaids);
     write_data<real_type, typename Config::OutputState::shape_p_net_migration_hivpop>(output_file, "p_net_migration_hivpop", state.p_net_migration_hivpop);
     return index + output_count;
   };
@@ -189,7 +194,7 @@ struct SpAdapter<Language::Cpp, real_type, ModelVariant> {
     };
   };
 
-  static constexpr int output_count = 2;
+  static constexpr int output_count = 4;
 
   static int build_output(
     int index,
@@ -198,6 +203,8 @@ struct SpAdapter<Language::Cpp, real_type, ModelVariant> {
   ) {
     write_data<real_type, typename Config::OutputState::shape_p_deaths_nonaids_artpop>(output_file, "p_deaths_nonaids_artpop", state.p_deaths_nonaids_artpop);
     write_data<real_type, typename Config::OutputState::shape_p_deaths_nonaids_hivpop>(output_file, "p_deaths_nonaids_hivpop", state.p_deaths_nonaids_hivpop);
+    write_data<real_type, typename Config::OutputState::shape_p_excess_deaths_nonaids_on_art>(output_file, "p_excess_deaths_nonaids_on_art", state.p_excess_deaths_nonaids_on_art);
+    write_data<real_type, typename Config::OutputState::shape_p_excess_deaths_nonaids_no_art>(output_file, "p_excess_deaths_nonaids_no_art", state.p_excess_deaths_nonaids_no_art);
     return index + output_count;
   };
 };

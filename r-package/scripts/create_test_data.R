@@ -23,8 +23,13 @@ proj_coarse <- prepare_leapfrog_projp(pjnz_adult, use_coarse_age_groups = TRUE)
 parameters_coarse <- c(demp, proj_coarse)
 save_parameters(parameters_coarse, testthat::test_path("testdata/adult_parms_coarse.h5"))
 
-spectrum_parameters <- prepare_hc_leapfrog_projp(pjnz_adult, params = parameters, use_coarse_age_groups = FALSE)
-save_parameters(spectrum_parameters, testthat::test_path("testdata/spectrum_params.h5"))
+# We use France for testing Spectrum model variant as it has non-zero Non-AIDS excess mortality
+# inputs. Which we need for testing modelled non-AIDS excess mortality.
+# This was created by creating a new default projection in Spectrum
+pjnz_france <- file.path(here::here(), "inst", "pjnz", "france_default.PJNZ")
+france_params <- prepare_leapfrog_parameters(pjnz_france)
+france_params <- prepare_hc_leapfrog_projp(pjnz_france, params = france_params, use_coarse_age_groups = FALSE)
+save_parameters(france_params, testthat::test_path("testdata/spectrum_params.h5"))
 
 # temporary backwards compatibility for leapfrog
 leapfrog_proj <- proj

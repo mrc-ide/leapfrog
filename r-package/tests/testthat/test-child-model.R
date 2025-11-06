@@ -7,7 +7,9 @@ test_that("Child model can be run for all years", {
     c(
       "p_total_pop", "births", "p_total_pop_background_deaths", "p_hiv_pop",
       "p_hiv_pop_background_deaths", "h_hiv_adult", "h_art_adult",
-      "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art",
+      "h_hiv_deaths_no_art", "h_deaths_excess_nonaids_no_art",
+      "h_deaths_excess_nonaids_on_art", "p_deaths_excess_nonaids",
+      "p_infections", "h_hiv_deaths_art",
       "h_art_initiation", "p_hiv_deaths", "p_net_migration_hivpop",
       "hiv_births_by_mat_age", "hiv_births",
       "hc1_hiv_pop", "hc2_hiv_pop",
@@ -50,7 +52,9 @@ test_that("Coarse child model can be run for all years", {
     c(
       "p_total_pop", "births", "p_total_pop_background_deaths", "p_hiv_pop",
       "p_hiv_pop_background_deaths", "h_hiv_adult", "h_art_adult",
-      "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art",
+      "h_hiv_deaths_no_art", "h_deaths_excess_nonaids_no_art",
+      "h_deaths_excess_nonaids_on_art", "p_deaths_excess_nonaids",
+      "p_infections", "h_hiv_deaths_art",
       "h_art_initiation", "p_hiv_deaths", "p_net_migration_hivpop",
       "hiv_births_by_mat_age", "hiv_births",
       "hc1_hiv_pop", "hc2_hiv_pop",
