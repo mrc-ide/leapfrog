@@ -76,18 +76,32 @@
         "r": "artcd4elig_idx"
       }
     },
-    "mortality": {
+    "art_mortality": {
       "num_type": "real_type",
       "dims": ["SS::hTS", "SS::hDS", "SS::hAG", "SS::NS"],
       "alias": {
         "r": "art_mort"
       }
     },
-    "mortality_time_rate_ratio": {
+    "art_mortality_time_rate_ratio": {
       "num_type": "real_type",
       "dims": ["SS::hTS", "opts.proj_steps"],
       "alias": {
         "r": "artmx_timerr"
+      }
+    },
+    "cd4_nonaids_excess_mort": {
+      "num_type": "real_type",
+      "dims": ["SS::hDS", "SS::hAG", "SS::NS"],
+      "alias": {
+        "r": "cd4_nonaids_excess_mort"
+      }
+    },
+    "art_nonaids_excess_mort": {
+      "num_type": "real_type",
+      "dims": ["SS::hTS", "SS::hDS", "SS::hAG", "SS::NS"],
+      "alias": {
+        "r": "art_nonaids_excess_mort"
       }
     },
     "dropout_recover_cd4": {
@@ -159,10 +173,14 @@
       "num_type": "real_type",
       "dims": ["SS::hAG", "SS::NS"]
     },
-    "p_hiv_deaths_age_sex": {
+    "h_hiv_deaths_age_sex": {
       "num_type": "real_type",
       "dims": ["SS::hAG", "SS::NS"]
     },
+    "h_deaths_excess_nonaids_agesex": {
+      "num_type": "real_type",
+      "dims": ["SS::hAG", "SS::NS"]
+    },      
     "grad": {
       "num_type": "real_type",
       "dims": ["SS::hDS", "SS::hAG", "SS::NS"]
@@ -205,9 +223,6 @@
       "default": 1
     },
     "artpop_hahm": {
-      "num_type": "real_type"
-    },
-    "deaths": {
       "num_type": "real_type"
     },
     "p_infections_a": {
@@ -274,6 +289,10 @@
       "num_type": "real_type",
       "dims": ["SS::hDS", "SS::hAG", "SS::NS"]
     },
+    "h_deaths_excess_nonaids_no_art": {
+      "num_type": "real_type",
+      "dims": ["SS::hDS", "SS::hAG", "SS::NS"]
+    },      
     "p_infections": {
       "num_type": "real_type",
       "dims": ["SS::pAG", "SS::NS"]
@@ -282,6 +301,10 @@
       "num_type": "real_type",
       "dims": ["SS::hTS", "SS::hDS", "SS::hAG", "SS::NS"]
     },
+    "h_deaths_excess_nonaids_on_art": {
+      "num_type": "real_type",
+      "dims": ["SS::hTS", "SS::hDS", "SS::hAG", "SS::NS"]
+    },      
     "h_art_initiation": {
       "num_type": "real_type",
       "dims": ["SS::hDS", "SS::hAG", "SS::NS"]
@@ -290,6 +313,10 @@
       "num_type": "real_type",
       "dims": ["SS::pAG", "SS::NS"]
     },
+    "p_deaths_excess_nonaids": {
+      "num_type": "real_type",
+      "dims": ["SS::pAG", "SS::NS"]
+    },      
     "p_net_migration_hivpop": {
       "num_type": "real_type",
       "dims": ["SS::pAG", "SS::NS"]

@@ -25,8 +25,9 @@ remotes::install_github("mrc-ide/frogger", subdir = "r-package")
 ## Simulation model
 
 The simulation model is implemented in a header-only C++ library located
-in [`r-package/inst/include/frogger.hpp`](r-package/inst/include/frogger.hpp). This
-location allows the C++ code to be imported in other R packages via
+in
+[`r-package/inst/include/frogger.hpp`](r-package/inst/include/frogger.hpp).
+This location allows the C++ code to be imported in other R packages via
 specifying `LinkingTo: leapfrog` in the `DESCRIPTION` file.
 
 > [!IMPORTANT]
@@ -68,13 +69,19 @@ pjnz <- system.file("pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJN
 parameters <- prepare_leapfrog_parameters(pjnz)
 ```
 
-Simulate adult ‘full’ age group (single-year age) and ‘coarse’ age group
-(collapsed age groups) models from 1970 to 2030 with 10 HIV time steps
-per year.
+Simulate adult ‘full’ age group (single-year age) model from 1970 to
+2030 with 10 HIV time steps per year.
 
 ``` r
 lsimF <- run_model(parameters, "HivFullAgeStratification", 1970:2030)
-lsimC <- run_model(parameters, "HivCoarseAgeStratification", 1970:2030)
+```
+
+You can also simulate a model with ‘coarse’ age group (5-year age
+groups). You need to first prepare the coarse age group parameters
+
+``` r
+params_coarse <- prepare_leapfrog_parameters(pjnz, use_coarse_age_groups = TRUE)
+lsimC <- run_model(params_coarse, "HivCoarseAgeStratification", 1970:2030)
 ```
 
 Compare the HIV prevalence age 15-49 years and AIDS deaths 50+ years.

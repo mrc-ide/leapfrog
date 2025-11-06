@@ -59,10 +59,14 @@ struct HaParams {
   int scale_cd4_mortality_length;
   int* idx_hm_elig;
   int idx_hm_elig_length;
-  real_type* mortality;
-  int mortality_length;
-  real_type* mortality_time_rate_ratio;
-  int mortality_time_rate_ratio_length;
+  real_type* art_mortality;
+  int art_mortality_length;
+  real_type* art_mortality_time_rate_ratio;
+  int art_mortality_time_rate_ratio_length;
+  real_type* cd4_nonaids_excess_mort;
+  int cd4_nonaids_excess_mort_length;
+  real_type* art_nonaids_excess_mort;
+  int art_nonaids_excess_mort_length;
   int dropout_recover_cd4;
   int dropout_recover_cd4_length;
   real_type* dropout_rate;
@@ -93,14 +97,20 @@ struct HaOut {
   int h_artpop_length;
   real_type* h_hiv_deaths_no_art;
   int h_hiv_deaths_no_art_length;
+  real_type* h_deaths_excess_nonaids_no_art;
+  int h_deaths_excess_nonaids_no_art_length;
   real_type* p_infections;
   int p_infections_length;
   real_type* h_hiv_deaths_art;
   int h_hiv_deaths_art_length;
+  real_type* h_deaths_excess_nonaids_on_art;
+  int h_deaths_excess_nonaids_on_art_length;
   real_type* h_art_initiation;
   int h_art_initiation_length;
   real_type* p_hiv_deaths;
   int p_hiv_deaths_length;
+  real_type* p_deaths_excess_nonaids;
+  int p_deaths_excess_nonaids_length;
   real_type* p_net_migration_hivpop;
   int p_net_migration_hivpop_length;
 };
@@ -236,10 +246,27 @@ struct HcOut {
 };
 
 template<typename real_type>
+struct SpParams {
+};
+
+template<typename real_type>
+struct SpOut {
+  real_type* p_deaths_nonaids_artpop;
+  int p_deaths_nonaids_artpop_length;
+  real_type* p_deaths_nonaids_hivpop;
+  int p_deaths_nonaids_hivpop_length;
+  real_type* p_excess_deaths_nonaids_on_art;
+  int p_excess_deaths_nonaids_on_art_length;
+  real_type* p_excess_deaths_nonaids_no_art;
+  int p_excess_deaths_nonaids_no_art_length;
+};
+
+template<typename real_type>
 struct CParams {
   DpParams<real_type>* dp;
   HaParams<real_type>* ha;
   HcParams<real_type>* hc;
+  SpParams<real_type>* sp;
 };
 
 template<typename real_type>
@@ -247,6 +274,7 @@ struct CState {
   DpOut<real_type>* dp;
   HaOut<real_type>* ha;
   HcOut<real_type>* hc;
+  SpOut<real_type>* sp;
 };
 
 #pragma pack(pop)

@@ -127,7 +127,6 @@ struct ChildModelSimulation<Config> {
 
   void run_child_model_simulation() {
     const auto& p_hc = pars.hc;
-    auto& n_hc = state_next.hc;
 
     run_child_ageing();
 
@@ -1599,7 +1598,6 @@ struct ChildModelSimulation<Config> {
   void fill_total_pop_outputs() {
     auto& n_ha = state_next.ha;
     auto& n_hc = state_next.hc;
-    auto& i_hc = intermediate.hc;
 
     for (int hd = 0; hd < hDS; ++hd) {
       for (int a = 0; a < hcAG_end; ++a) {

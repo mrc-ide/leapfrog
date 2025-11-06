@@ -39,33 +39,26 @@ These prefixes can be merged e.g.
 
 # Rules for unpacking structs
 
-The `p_`, `c_`, `n_`, `i_` prefixes correspond to `pars`, `state_curr`, `state_next`, `intermediate` structs respectively. These will be followed by 2 letters indicating what part we are unpacking:
+Each model variant can have state space, input parameters, output state and intermediate data associated with it. Within the model code for each variant it can be useful to unpack the structs into a shorthand to save typing. We do this in a consistent way based on the following rules:
 
-* `dm` - `base.demography`
-* `tx` - `base.art`
-* `nh` - `base.natural_history`
-* `in` - `base.incidence`
-* `op` - `base.options`
-* `hc` - children, in the case of `pars` it is `children.children` and in the case of `state_next`, `state_curr`, `intermediate` it is `children`
-* `ba` - `base` (for `intermediate`, `state_next`, `state_curr` structs)
+1. Prefix based on what is being unpacked, `parameters`, `state_curr`, `state_next` or `intermediate`
+   1. `p_` for `pars`
+   1. `c_` for `state_curr`
+   1. `n_` for `state_next`
+   1. `i_` for `intermediate`
+1. 2nd prefix based on what model variant the data belongs to. This comes from the `namespace` value for the model variant from the config.
+   1. `dp` for the demographic projection
+   1. `ha` for the HIV adult model
+   1. `hc`for the HIV child model
+   1. `sp` for the Spectrum model
 
 So for example:
 
-* `p_dm` = `pars.base.demography`
-* `p_hc` = `pars.children.children`
-* `c_hc` = `state_curr.children`
-* `i_ba` = `intermediate.base`
+* `auto& n_dp = state_next.dp;`
+* `auto& i_ha = intermediate.ha;`
+* `const auto& p_dp = pars.dp;`
 
-For the `StateSpace` struct (defined as `ss` in the code) we use the `ss_` prefix with:
-
-* `b` - `base`
-* `c` - `children`
-
-so for example:
-
-* `ss_d` = `ss.dp`
-* `ss_h` = `ss.hiv`
-* `ss_c` = `ss.children`
+For the `StateSpace` struct on the config we can unpack this into the struct for each model variant so the state space can be used directly.
 
 # Leapfrog to Frogger glossary
 
