@@ -145,74 +145,54 @@ group within singe-year ages to be considered an adult</li>
 <div class="section level2">
 <h2 id="rules-for-unpacking-structs">Rules for unpacking structs<a class="anchor" aria-label="anchor" href="#rules-for-unpacking-structs"></a>
 </h2>
-<p>The <code>p_</code>, <code>c_</code>, <code>n_</code>,
-<code>i_</code> prefixes correspond to <code>pars</code>,
-<code>state_curr</code>, <code>state_next</code>,
-<code>intermediate</code> structs respectively. These will be followed
-by 2 letters indicating what part we are unpacking:</p>
-<ul>
+<p>Each model variant can have state space, input parameters, output
+state and intermediate data associated with it. Within the model code
+for each variant it can be useful to unpack the structs into a shorthand
+to save typing. We do this in a consistent way based on the following
+rules:</p>
+<ol style="list-style-type: decimal">
+<li>Prefix based on what is being unpacked, <code>parameters</code>,
+<code>state_curr</code>, <code>state_next</code> or
+<code>intermediate</code>
+<ol style="list-style-type: decimal">
 <li>
-<code>dm</code> - <code>base.demography</code>
+<code>p_</code> for <code>pars</code>
 </li>
 <li>
-<code>tx</code> - <code>base.art</code>
+<code>c_</code> for <code>state_curr</code>
 </li>
 <li>
-<code>nh</code> - <code>base.natural_history</code>
+<code>n_</code> for <code>state_next</code>
 </li>
 <li>
-<code>in</code> - <code>base.incidence</code>
+<code>i_</code> for <code>intermediate</code>
 </li>
-<li>
-<code>op</code> - <code>base.options</code>
+</ol>
 </li>
+<li>2nd prefix based on what model variant the data belongs to. This
+comes from the <code>namespace</code> value for the model variant from
+the config.
+<ol style="list-style-type: decimal">
 <li>
-<code>hc</code> - children, in the case of <code>pars</code> it is
-<code>children.children</code> and in the case of
-<code>state_next</code>, <code>state_curr</code>,
-<code>intermediate</code> it is <code>children</code>
+<code>dp</code> for the demographic projection</li>
+<li>
+<code>ha</code> for the HIV adult model</li>
+<li>
+<code>hc</code>for the HIV child model</li>
+<li>
+<code>sp</code> for the Spectrum model</li>
+</ol>
 </li>
-<li>
-<code>ba</code> - <code>base</code> (for <code>intermediate</code>,
-<code>state_next</code>, <code>state_curr</code> structs)</li>
-</ul>
+</ol>
 <p>So for example:</p>
 <ul>
-<li>
-<code>p_dm</code> = <code>pars.base.demography</code>
-</li>
-<li>
-<code>p_hc</code> = <code>pars.children.children</code>
-</li>
-<li>
-<code>c_hc</code> = <code>state_curr.children</code>
-</li>
-<li>
-<code>i_ba</code> = <code>intermediate.base</code>
-</li>
+<li><code>auto&amp; n_dp = state_next.dp;</code></li>
+<li><code>auto&amp; i_ha = intermediate.ha;</code></li>
+<li><code>const auto&amp; p_dp = pars.dp;</code></li>
 </ul>
-<p>For the <code>StateSpace</code> struct (defined as <code>ss</code> in
-the code) we use the <code>ss_</code> prefix with:</p>
-<ul>
-<li>
-<code>b</code> - <code>base</code>
-</li>
-<li>
-<code>c</code> - <code>children</code>
-</li>
-</ul>
-<p>so for example:</p>
-<ul>
-<li>
-<code>ss_d</code> = <code>ss.dp</code>
-</li>
-<li>
-<code>ss_h</code> = <code>ss.hiv</code>
-</li>
-<li>
-<code>ss_c</code> = <code>ss.children</code>
-</li>
-</ul>
+<p>For the <code>StateSpace</code> struct on the config we can unpack
+this into the struct for each model variant so the state space can be
+used directly.</p>
 </div>
 <div class="section level2">
 <h2 id="leapfrog-to-frogger-glossary">Leapfrog to Frogger glossary<a class="anchor" aria-label="anchor" href="#leapfrog-to-frogger-glossary"></a>
