@@ -185,6 +185,12 @@ prepare_leapfrog_demp <- function(pjnz) {
   demp
 }
 
+## Hard coded to expand age groups 15-24, 25-34, 35-44, 45+ to
+## single-year ages 15:80.
+## Requires extension for coarse HIV age group stratification
+idx_expand_full <- rep(1:4, times = c(10, 10, 10, 36))
+idx_expand_coarse <- rep(1:4, times = c(3, 2, 2, 2))
+
 
 #' Prepare adult HIV projection parameters from Spectrum PJNZ
 #'
@@ -205,12 +211,6 @@ prepare_leapfrog_demp <- function(pjnz) {
 prepare_leapfrog_projp <- function(pjnz, use_coarse_age_groups = FALSE, hiv_steps_per_year = 10L, hTS = 3) {
 
   projp <- eppasm::read_hivproj_param(pjnz)
-
-  ## Hard coded to expand age groups 15-24, 25-34, 35-44, 45+ to
-  ## single-year ages 15:80.
-  ## Requires extension for coarse HIV age group stratification
-  idx_expand_full <- rep(1:4, times = c(10, 10, 10, 36))
-  idx_expand_coarse <- rep(1:4, times = c(3, 2, 2, 2))
 
   v <- list()
   v$incidinput <- eppasm::read_incid_input(pjnz)
@@ -291,16 +291,18 @@ prepare_leapfrog_projp <- function(pjnz, use_coarse_age_groups = FALSE, hiv_step
   v$incrr_age[v$incrr_age < 0] <- 0
 
   if (use_coarse_age_groups) {
-    v$cd4_initdist <- projp$cd4_initdist[ , idx_expand_coarse, ]
-    v$cd4_prog <- (1-exp(-projp$cd4_prog[ , idx_expand_coarse, ] / hiv_steps_per_year)) * hiv_steps_per_year
-    v$cd4_mort <- projp$cd4_mort[ ,idx_expand_coarse, ]
-    v$art_mort <- projp$artmx_multiplier * projp$art_mort[c(1, 2, rep(3, hTS - 2)), , idx_expand_coarse, ]
+    idx_expand <- idx_expand_coarse
   } else {
-    v$cd4_initdist <- projp$cd4_initdist[ , idx_expand_full, ]
-    v$cd4_prog <- (1-exp(-projp$cd4_prog[ , idx_expand_full, ] / hiv_steps_per_year)) * hiv_steps_per_year
-    v$cd4_mort <- projp$cd4_mort[ ,idx_expand_full, ]
-    v$art_mort <- projp$artmx_multiplier * projp$art_mort[c(1, 2, rep(3, hTS - 2)), , idx_expand_full, ]
+    idx_expand <- idx_expand_full
   }
+  v$cd4_initdist <- projp$cd4_initdist[ , idx_expand, ]
+  v$cd4_prog <- (1-exp(-projp$cd4_prog[ , idx_expand, ] / hiv_steps_per_year)) * hiv_steps_per_year
+  v$cd4_mort <- projp$cd4_mort[ ,idx_expand, ]
+  v$art_mort <- projp$artmx_multiplier * projp$art_mort[c(1, 2, rep(3, hTS - 2)), , idx_expand, ]
+  v$cd4_nonaids_excess_mort <- projp$cd4_nonaids_excess_mort[ , idx_expand, ]
+  art_nonaids_excess_mort_hts <- array(0.0, dim(v$art_mort), dimnames(v$art_mort))
+  art_nonaids_excess_mort_hts[] <- rep(projp$art_nonaids_excess_mort[, idx_expand, ], each = hTS)
+  v$art_nonaids_excess_mort <- art_nonaids_excess_mort_hts
 
   v
 }
