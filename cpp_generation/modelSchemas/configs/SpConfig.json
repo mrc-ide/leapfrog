@@ -7,20 +7,6 @@
     "default": {}
   },
   "pars": {
-    "cd4_nonaids_excess_mort": {
-      "num_type": "real_type",
-      "dims": ["SS::hDS", "SS::hAG", "SS::NS"],
-      "alias": {
-        "r": "cd4_nonaids_excess_mort"
-      }
-    },
-    "art_nonaids_excess_mort": {
-      "num_type": "real_type",
-      "dims": ["SS::hTS", "SS::hDS", "SS::hAG", "SS::NS"],
-      "alias": {
-        "r": "art_nonaids_excess_mort"
-      }
-    }
   },
   "intermediate": {
     "hiv_art_adult_sa": {
@@ -30,12 +16,6 @@
       "num_type": "real_type"
     },
     "artcov_adult_sa": {
-      "num_type": "real_type"
-    },
-    "excess_deaths_nonaids_no_art": {
-      "num_type": "real_type"
-    },
-    "excess_deaths_nonaids_on_art": {
       "num_type": "real_type"
     }
   },

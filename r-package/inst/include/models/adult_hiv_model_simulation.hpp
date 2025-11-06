@@ -70,7 +70,8 @@ struct AdultHivModelSimulation<Config> {
     for (int hiv_step = 0; hiv_step < opts.hts_per_year; ++hiv_step) {
       nda::fill(i_ha.grad, 0.0);
       nda::fill(i_ha.gradART, 0.0);
-      nda::fill(i_ha.p_hiv_deaths_age_sex, 0.0);
+      nda::fill(i_ha.h_hiv_deaths_age_sex, 0.0);
+      nda::fill(i_ha.h_deaths_excess_nonaids_agesex, 0.0);
       run_disease_progression_and_mortality(hiv_step);
       run_new_p_infections(hiv_step);
       run_new_hiv_p_infections(hiv_step);
@@ -136,10 +137,15 @@ struct AdultHivModelSimulation<Config> {
                               (n_ha.h_hiv_adult(hm, ha, g) + i_ha.artpop_hahm);
           }
 
-          i_ha.deaths = i_ha.cd4mx_scale * p_ha.cd4_mortality(hm, ha, g) * n_ha.h_hiv_adult(hm, ha, g);
-          i_ha.p_hiv_deaths_age_sex(ha, g) += opts.dt * i_ha.deaths;
-          n_ha.h_hiv_deaths_no_art(hm, ha, g) += opts.dt * i_ha.deaths;
-          i_ha.grad(hm, ha, g) = -i_ha.deaths;
+          auto deaths_hiv  = i_ha.cd4mx_scale * p_ha.cd4_mortality(hm, ha, g) * n_ha.h_hiv_adult(hm, ha, g);
+          i_ha.h_hiv_deaths_age_sex(ha, g) += opts.dt * deaths_hiv;
+          n_ha.h_hiv_deaths_no_art(hm, ha, g) += opts.dt * deaths_hiv;
+
+          auto deaths_excess_nonaids = p_ha.cd4_nonaids_excess_mort(hm, ha, g) * n_ha.h_hiv_adult(hm, ha, g);
+          i_ha.h_deaths_excess_nonaids_agesex(ha, g) += opts.dt * deaths_excess_nonaids;
+          n_ha.h_deaths_excess_nonaids_no_art(hm, ha, g) += opts.dt * deaths_excess_nonaids;
+
+          i_ha.grad(hm, ha, g) = -(deaths_hiv + deaths_excess_nonaids);
         }
 
         for (int hm = 1; hm < hDS; ++hm) {
@@ -217,13 +223,19 @@ struct AdultHivModelSimulation<Config> {
       for (int ha = 0; ha < hAG; ++ha) {
         for (int hm = i_ha.everARTelig_idx; hm < hDS; ++hm) {
           for (int hu = 0; hu < hTS; ++hu) {
-            i_ha.deaths_art = p_ha.mortality(hu, hm, ha, g) *
-                              p_ha.mortality_time_rate_ratio(hu, t) *
+            i_ha.deaths_art = p_ha.art_mortality(hu, hm, ha, g) *
+                              p_ha.art_mortality_time_rate_ratio(hu, t) *
                               n_ha.h_art_adult(hu, hm, ha, g);
+
             const auto new_hiv_deaths_art = opts.dt * i_ha.deaths_art;
-            i_ha.p_hiv_deaths_age_sex(ha, g) += new_hiv_deaths_art;
+            i_ha.h_hiv_deaths_age_sex(ha, g) += new_hiv_deaths_art;
             n_ha.h_hiv_deaths_art(hu, hm, ha, g) += new_hiv_deaths_art;
-            i_ha.gradART(hu, hm, ha, g) = -i_ha.deaths_art;
+
+            const auto deaths_excess_nonaids = p_ha.art_nonaids_excess_mort(hu, hm, ha, g) * n_ha.h_art_adult(hu, hm, ha, g);
+            i_ha.h_deaths_excess_nonaids_agesex(ha, g) += opts.dt * deaths_excess_nonaids;
+            n_ha.h_deaths_excess_nonaids_on_art(hu, hm, ha, g) += opts.dt * deaths_excess_nonaids;
+
+            i_ha.gradART(hu, hm, ha, g) = -(i_ha.deaths_art + deaths_excess_nonaids);
           }
 
           for (int hu = 0; hu < (hTS - 1); ++hu) {
@@ -435,14 +447,22 @@ struct AdultHivModelSimulation<Config> {
       // remove hivdeaths proportionally to age-distribution within each age group
       a = p_idx_hiv_first_adult;
       for (int ha = 0; ha < hAG; ++ha) {
+
         if (i_ha.hivpop_ha(ha) > 0) {
-          i_ha.hivqx_ha = i_ha.p_hiv_deaths_age_sex(ha, g) / i_ha.hivpop_ha(ha);
+          i_ha.hivqx_ha = i_ha.h_hiv_deaths_age_sex(ha, g) / i_ha.hivpop_ha(ha);
+          auto nonaids_excess_qx_ha = i_ha.h_deaths_excess_nonaids_agesex(ha, g) / i_ha.hivpop_ha(ha);
+
           for (int i = 0; i < hAG_span[ha]; ++i, ++a) {
             i_ha.hivdeaths_a = n_ha.p_hiv_pop(a, g) * i_ha.hivqx_ha;
+            auto deaths_nonaids_excess_a = n_ha.p_hiv_pop(a, g) * nonaids_excess_qx_ha;
+
             n_ha.p_hiv_deaths(a, g) += i_ha.hivdeaths_a;
-            n_dp.p_total_pop(a, g) -= i_ha.hivdeaths_a;
-            n_ha.p_hiv_pop(a, g) -= i_ha.hivdeaths_a;
+            n_ha.p_deaths_excess_nonaids(a, g) += deaths_nonaids_excess_a;
+
+            n_dp.p_total_pop(a, g) -= i_ha.hivdeaths_a + deaths_nonaids_excess_a;
+            n_ha.p_hiv_pop(a, g) -= i_ha.hivdeaths_a + deaths_nonaids_excess_a;
           }
+
         } else {
           a += hAG_span[ha];
         }

@@ -29,7 +29,6 @@ save_parameters(parameters_coarse, testthat::test_path("testdata/adult_parms_coa
 pjnz_france <- file.path(here::here(), "inst", "pjnz", "france_default.PJNZ")
 france_params <- prepare_leapfrog_parameters(pjnz_france)
 france_params <- prepare_hc_leapfrog_projp(pjnz_france, params = france_params, use_coarse_age_groups = FALSE)
-france_params <- prepare_spectrum_leapfrog_projp(pjnz_france, params = france_params)
 save_parameters(france_params, testthat::test_path("testdata/spectrum_params.h5"))
 
 # temporary backwards compatibility for leapfrog

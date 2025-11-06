@@ -291,74 +291,18 @@ prepare_leapfrog_projp <- function(pjnz, use_coarse_age_groups = FALSE, hiv_step
   v$incrr_age[v$incrr_age < 0] <- 0
 
   if (use_coarse_age_groups) {
-    v$cd4_initdist <- projp$cd4_initdist[ , idx_expand_coarse, ]
-    v$cd4_prog <- (1-exp(-projp$cd4_prog[ , idx_expand_coarse, ] / hiv_steps_per_year)) * hiv_steps_per_year
-    v$cd4_mort <- projp$cd4_mort[ ,idx_expand_coarse, ]
-    v$art_mort <- projp$artmx_multiplier * projp$art_mort[c(1, 2, rep(3, hTS - 2)), , idx_expand_coarse, ]
-  } else {
-    v$cd4_initdist <- projp$cd4_initdist[ , idx_expand_full, ]
-    v$cd4_prog <- (1-exp(-projp$cd4_prog[ , idx_expand_full, ] / hiv_steps_per_year)) * hiv_steps_per_year
-    v$cd4_mort <- projp$cd4_mort[ ,idx_expand_full, ]
-    v$art_mort <- projp$artmx_multiplier * projp$art_mort[c(1, 2, rep(3, hTS - 2)), , idx_expand_full, ]
-  }
-
-  v
-}
-
-#' Prepare Spectrum model projection parameters from Spectrum PJNZ
-#'
-#' TODO: Rework this so we can just pass in a PJNZ. Probably best wait for
-#' Mantra's PJNZ reading work.
-#'
-#' @param pjnz path to PJNZ file
-#' @param params The child HIV projection parameters from [prepare_hc_leapfrog_projp()]
-#' @param use_coarse_age_groups If TRUE, output arrays grouped by 5-year ages
-#'
-#' @return List of Spectrum model HIV projection parameters
-#'
-#' @examples
-#' pjnz <- system.file(
-#'   "pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ",
-#'   package = "frogger", mustWork = TRUE)
-#' demp <- prepare_leapfrog_demp(pjnz)
-#' proj <- prepare_leapfrog_projp(pjnz)
-#' params <- c(proj, demp)
-#' projp <- prepare_hc_leapfrog_projp(pjnz, params)
-#' proj_spectrum <- prepare_spectrum_leapfrog_projp(pjnz, params)
-#' @export
-prepare_spectrum_leapfrog_projp <- function(pjnz, params, use_coarse_age_groups = FALSE) {
-  dp <- get_dp_data(pjnz)
-
-  hDS <- 7
-  hTS <- 3
-  NS <- 2
-
-  # 4 for the number of age categories in spectrum
-  names <- dimnames(params$cd4_mort)
-  names$agecat <- unique(names$agecat)
-  cd4_nonaids_excess_mort <- array(0.0, c(hDS, 4, NS), names)
-  art_nonaids_excess_mort <- array(0.0, c(hDS, 4, NS), names)
-
-  if(exists_dptag(dp, "<AdultNonAIDSExcessMort MV>")) {
-    cd4_nonaids_excess_mort[,,"Male"] <- array(as.numeric(dpsub(dp, "<AdultNonAIDSExcessMort MV>", 2, 4:31)), c(hDS, 4))
-    art_nonaids_excess_mort[,,"Male"] <- array(as.numeric(dpsub(dp, "<AdultNonAIDSExcessMort MV>", 3, 4:31)), c(hDS, 4))
-    cd4_nonaids_excess_mort[,,"Female"] <- array(as.numeric(dpsub(dp, "<AdultNonAIDSExcessMort MV>", 4, 4:31)), c(hDS, 4))
-    art_nonaids_excess_mort[,,"Female"] <- array(as.numeric(dpsub(dp, "<AdultNonAIDSExcessMort MV>", 5, 4:31)), c(hDS, 4))
-  }
-
-  if (use_coarse_age_groups) {
     idx_expand <- idx_expand_coarse
   } else {
     idx_expand <- idx_expand_full
   }
+  v$cd4_initdist <- projp$cd4_initdist[ , idx_expand, ]
+  v$cd4_prog <- (1-exp(-projp$cd4_prog[ , idx_expand, ] / hiv_steps_per_year)) * hiv_steps_per_year
+  v$cd4_mort <- projp$cd4_mort[ ,idx_expand, ]
+  v$art_mort <- projp$artmx_multiplier * projp$art_mort[c(1, 2, rep(3, hTS - 2)), , idx_expand, ]
+  v$cd4_nonaids_excess_mort <- projp$cd4_nonaids_excess_mort[ , idx_expand, ]
+  art_nonaids_excess_mort_hts <- array(0.0, dim(v$art_mort), dimnames(v$art_mort))
+  art_nonaids_excess_mort_hts[] <- rep(projp$art_nonaids_excess_mort[, idx_expand, ], each = hTS)
+  v$art_nonaids_excess_mort <- art_nonaids_excess_mort_hts
 
-  art_nonaids_excess_mort_hts <- array(0.0, dim(params$art_mort), dimnames(params$art_mort))
-  art_nonaids_excess_mort_hts[] <- rep(art_nonaids_excess_mort[, idx_expand, ], each = hTS)
-
-  cd4_nonaids_excess_mort <- cd4_nonaids_excess_mort[ , idx_expand, ]
-  dimnames(cd4_nonaids_excess_mort) <- dimnames(params$cd4_mort)
-
-  params$cd4_nonaids_excess_mort <- cd4_nonaids_excess_mort
-  params$art_nonaids_excess_mort <- art_nonaids_excess_mort_hts
-  params
+  v
 }
