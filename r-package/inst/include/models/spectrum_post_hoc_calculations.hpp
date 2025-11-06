@@ -99,10 +99,8 @@ struct SpectrumPostHocCalculations<Config> {
   };
 
   void calculate_nonaids_excess_deaths() {
-    const auto& p_ha = pars.ha;
     auto& n_ha = state_next.ha;
     auto& n_sp = state_next.sp;
-    auto& i_sp = intermediate.sp;
 
     for (int g = 0; g < NS; ++g) {
 
@@ -119,27 +117,27 @@ struct SpectrumPostHocCalculations<Config> {
         auto hivpop_ha = 0.0;
 
         for (int hm = 0; hm < hDS; ++hm) {
-	  excess_deaths_nonaids_no_art_ha += n_ha.h_deaths_excess_nonaids_no_art(hm, ha, g);
-	  hivpop_ha += n_ha.h_hiv_adult(hm, ha, g);
+          excess_deaths_nonaids_no_art_ha += n_ha.h_deaths_excess_nonaids_no_art(hm, ha, g);
+          hivpop_ha += n_ha.h_hiv_adult(hm, ha, g);
 
           if (t > opts.ts_art_start) {
             for (int hu = 0; hu < hTS; ++hu) {
-	      excess_deaths_nonaids_on_art_ha += n_ha.h_deaths_excess_nonaids_on_art(hu, hm, ha, g);
-	      hivpop_ha += n_ha.h_art_adult(hu, hm, ha, g);
+              excess_deaths_nonaids_on_art_ha += n_ha.h_deaths_excess_nonaids_on_art(hu, hm, ha, g);
+              hivpop_ha += n_ha.h_art_adult(hu, hm, ha, g);
             }
           }
         }
 
 
-	// Distribute deaths from coarse age group ha to single age group a proportional
-	// to distribution of HIV population in age group a
+	      // Distribute deaths from coarse age group ha to single age group a proportional
+	      // to distribution of HIV population in age group a
         for (int i = 0; i < hAG_span[ha]; ++i, ++a) {
 
-	  const auto hivpop_proportion_a = n_ha.p_hiv_pop(a, g) / hivpop_ha;
+          const auto hivpop_proportion_a = n_ha.p_hiv_pop(a, g) / hivpop_ha;
           n_sp.p_excess_deaths_nonaids_no_art(a, g) = excess_deaths_nonaids_no_art_ha * hivpop_proportion_a;
 
           if (t > opts.ts_art_start) {
-	    n_sp.p_excess_deaths_nonaids_on_art(a, g) += excess_deaths_nonaids_on_art_ha *  hivpop_proportion_a;
+            n_sp.p_excess_deaths_nonaids_on_art(a, g) += excess_deaths_nonaids_on_art_ha *  hivpop_proportion_a;
           }
         }
       }

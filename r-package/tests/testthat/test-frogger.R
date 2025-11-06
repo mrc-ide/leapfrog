@@ -8,7 +8,9 @@ test_that("initial state set up works as expected", {
     c(
       "p_total_pop", "births", "p_total_pop_background_deaths", "p_hiv_pop",
       "p_hiv_pop_background_deaths", "h_hiv_adult", "h_art_adult",
-      "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art",
+      "h_hiv_deaths_no_art", "h_deaths_excess_nonaids_no_art",
+      "h_deaths_excess_nonaids_on_art", "p_deaths_excess_nonaids",
+      "p_infections", "h_hiv_deaths_art",
       "h_art_initiation", "p_hiv_deaths", "p_net_migration_hivpop"
     )
   )
@@ -60,7 +62,9 @@ test_that("initial state set up with coarse stratified HIV works as expected", {
     c(
       "p_total_pop", "births", "p_total_pop_background_deaths", "p_hiv_pop",
       "p_hiv_pop_background_deaths", "h_hiv_adult", "h_art_adult",
-      "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art",
+      "h_hiv_deaths_no_art", "h_deaths_excess_nonaids_no_art",
+      "h_deaths_excess_nonaids_on_art", "p_deaths_excess_nonaids",
+      "p_infections", "h_hiv_deaths_art",
       "h_art_initiation", "p_hiv_deaths", "p_net_migration_hivpop"
     )
   )
@@ -111,7 +115,9 @@ test_that("model for 1 time step has looped", {
     c(
       "p_total_pop", "births", "p_total_pop_background_deaths", "p_hiv_pop",
       "p_hiv_pop_background_deaths", "h_hiv_adult", "h_art_adult",
-      "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art",
+      "h_hiv_deaths_no_art", "h_deaths_excess_nonaids_no_art",
+      "h_deaths_excess_nonaids_on_art", "p_deaths_excess_nonaids",
+      "p_infections", "h_hiv_deaths_art",
       "h_art_initiation", "p_hiv_deaths", "p_net_migration_hivpop"
     )
   )
