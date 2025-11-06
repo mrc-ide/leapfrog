@@ -5,15 +5,15 @@ test_that("Child model can be run for all years", {
   expect_setequal(
     names(out),
     c(
-      "p_total_pop", "births", "p_total_pop_background_deaths", "p_hiv_pop",
-      "p_hiv_pop_background_deaths", "h_hiv_adult", "h_art_adult",
+      "p_totpop", "births", "p_deaths_background_totpop", "p_hivpop",
+      "p_deaths_background_hivpop", "h_hivpop", "h_artpop",
       "h_hiv_deaths_no_art", "h_deaths_excess_nonaids_no_art",
       "h_deaths_excess_nonaids_on_art", "p_deaths_excess_nonaids",
       "p_infections", "h_hiv_deaths_art",
       "h_art_initiation", "p_hiv_deaths", "p_net_migration_hivpop",
       "hiv_births_by_mat_age", "hiv_births",
-      "hc1_hiv_pop", "hc2_hiv_pop",
-      "hc1_art_pop", "hc2_art_pop",
+      "hc1_hivpop", "hc2_hivpop",
+      "hc1_artpop", "hc2_artpop",
       "hc1_noart_aids_deaths", "hc2_noart_aids_deaths",
       "hc1_art_aids_deaths", "hc2_art_aids_deaths",
       "hc_art_init", "hc_art_need_init", "ctx_need", "infection_by_type",
@@ -23,18 +23,18 @@ test_that("Child model can be run for all years", {
 
   ## Nothing should ever be negative
   expect_true(all(out$hiv_births >= 0))
-  expect_true(all(out$hc1_hiv_pop[, , , , ] >= 0))
-  expect_true(all(out$hc2_hiv_pop[, , , , ] >= 0))
-  expect_true(all(out$hc1_art_pop[, , , , ] >= 0))
-  expect_true(all(out$hc2_art_pop[, , , , ] >= 0))
+  expect_true(all(out$hc1_hivpop[, , , , ] >= 0))
+  expect_true(all(out$hc2_hivpop[, , , , ] >= 0))
+  expect_true(all(out$hc1_artpop[, , , , ] >= 0))
+  expect_true(all(out$hc2_artpop[, , , , ] >= 0))
   expect_true(all(out$hc1_noart_aids_deaths[, , , , ] >= 0))
   expect_true(all(out$hc2_noart_aids_deaths[, , , , ] >= 0))
   expect_true(all(out$hc1_art_aids_deaths[, , , , ] >= 0))
   expect_true(all(out$hc2_art_aids_deaths[, , , , ] >= 0))
-  expect_true(all(out$hc1_hiv_pop_strat[, , , , , , ] >= 0))
-  expect_true(all(out$hc2_hiv_pop_strat[, , , , , , ] >= 0))
-  expect_true(all(out$hc1_art_pop_strat[, , , , , , , ] >= 0))
-  expect_true(all(out$hc2_art_pop_strat[, , , , , , , ] >= 0))
+  expect_true(all(out$hc1_hivpop_strat[, , , , , , ] >= 0))
+  expect_true(all(out$hc2_hivpop_strat[, , , , , , ] >= 0))
+  expect_true(all(out$hc1_artpop_strat[, , , , , , , ] >= 0))
+  expect_true(all(out$hc2_artpop_strat[, , , , , , , ] >= 0))
   expect_true(all(out$hc1_noart_aids_deaths_strat[, , , , , , ] >= 0))
   expect_true(all(out$hc2_noart_aids_deaths_strat[, , , , , , ] >= 0))
   expect_true(all(out$hc1_art_aids_deaths_strat[, , , , , , , ] >= 0))
@@ -50,15 +50,15 @@ test_that("Coarse child model can be run for all years", {
   expect_setequal(
     names(out_coarse),
     c(
-      "p_total_pop", "births", "p_total_pop_background_deaths", "p_hiv_pop",
-      "p_hiv_pop_background_deaths", "h_hiv_adult", "h_art_adult",
+      "p_totpop", "births", "p_deaths_background_totpop", "p_hivpop",
+      "p_deaths_background_hivpop", "h_hivpop", "h_artpop",
       "h_hiv_deaths_no_art", "h_deaths_excess_nonaids_no_art",
       "h_deaths_excess_nonaids_on_art", "p_deaths_excess_nonaids",
       "p_infections", "h_hiv_deaths_art",
       "h_art_initiation", "p_hiv_deaths", "p_net_migration_hivpop",
       "hiv_births_by_mat_age", "hiv_births",
-      "hc1_hiv_pop", "hc2_hiv_pop",
-      "hc1_art_pop", "hc2_art_pop",
+      "hc1_hivpop", "hc2_hivpop",
+      "hc1_artpop", "hc2_artpop",
       "hc1_noart_aids_deaths", "hc2_noart_aids_deaths",
       "hc1_art_aids_deaths", "hc2_art_aids_deaths",
       "hc_art_init", "hc_art_need_init", "ctx_need", "infection_by_type",
@@ -69,18 +69,18 @@ test_that("Coarse child model can be run for all years", {
   ## Nothing should ever be negative
   expect_true(all(out_coarse$hiv_births >= 0))
   expect_true(all(out_coarse$hiv_births_by_mat_age >= 0))
-  expect_true(all(out_coarse$hc1_hiv_pop[, , , , ] >= 0))
-  expect_true(all(out_coarse$hc2_hiv_pop[, , , , ] >= 0))
-  expect_true(all(out_coarse$hc1_art_pop[, , , , ] >= 0))
-  expect_true(all(out_coarse$hc2_art_pop[, , , , ] >= 0))
+  expect_true(all(out_coarse$hc1_hivpop[, , , , ] >= 0))
+  expect_true(all(out_coarse$hc2_hivpop[, , , , ] >= 0))
+  expect_true(all(out_coarse$hc1_artpop[, , , , ] >= 0))
+  expect_true(all(out_coarse$hc2_artpop[, , , , ] >= 0))
   expect_true(all(out_coarse$hc1_noart_aids_deaths[, , , , ] >= 0))
   expect_true(all(out_coarse$hc2_noart_aids_deaths[, , , , ] >= 0))
   expect_true(all(out_coarse$hc1_art_aids_deaths[, , , , ] >= 0))
   expect_true(all(out_coarse$hc2_art_aids_deaths[, , , , ] >= 0))
-  expect_true(all(out_coarse$hc1_hiv_pop_strat[, , , , , , ] >= 0))
-  expect_true(all(out_coarse$hc2_hiv_pop_strat[, , , , , , ] >= 0))
-  expect_true(all(out_coarse$hc1_art_pop_strat[, , , , , , , ] >= 0))
-  expect_true(all(out_coarse$hc2_art_pop_strat[, , , , , , , ] >= 0))
+  expect_true(all(out_coarse$hc1_hivpop_strat[, , , , , , ] >= 0))
+  expect_true(all(out_coarse$hc2_hivpop_strat[, , , , , , ] >= 0))
+  expect_true(all(out_coarse$hc1_artpop_strat[, , , , , , , ] >= 0))
+  expect_true(all(out_coarse$hc2_artpop_strat[, , , , , , , ] >= 0))
   expect_true(all(out_coarse$hc1_noart_aids_deaths_strat[, , , , , , ] >= 0))
   expect_true(all(out_coarse$hc2_noart_aids_deaths_strat[, , , , , , ] >= 0))
   expect_true(all(out_coarse$hc1_art_aids_deaths_strat[, , , , , , , ] >= 0))
@@ -155,12 +155,12 @@ test_that("Model outputs are consistent", {
   ###############################
   ##Stratified hiv pop and population hiv pop should be the same
   ###############################
-  ##p_hiv_pop & hc1_hiv_pop, hc1_art_pop, hc2_hiv_pop, hc2_hiv_pop
-  hc1_hiv <- apply(out$hc1_hiv_pop, c(3,4,5), sum)
-  hc1_art <- apply(out$hc1_art_pop, c(3,4,5), sum)
+  ##p_hivpop & hc1_hivpop, hc1_artpop, hc2_hivpop, hc2_hivpop
+  hc1_hiv <- apply(out$hc1_hivpop, c(3,4,5), sum)
+  hc1_art <- apply(out$hc1_artpop, c(3,4,5), sum)
   hc1 <- hc1_hiv + hc1_art
   dimnames(hc1) <- list(age = 0:4, sex = c('male','female'), year = 1970:2030)
-  p_hiv <- out$p_hiv_pop[1:5, , ]
+  p_hiv <- out$p_hivpop[1:5, , ]
   dimnames(p_hiv) <- list(age = 0:4, sex = c('male','female'), year = 1970:2030)
   hc1_df <- as.data.frame(as.table(hc1))
   out_df <- as.data.frame(as.table(p_hiv))
@@ -171,11 +171,11 @@ test_that("Model outputs are consistent", {
     dplyr::mutate(diff = strat - pop)
   expect_true(all(abs(c1$diff) < 1e-5))
 
-  hc2_hiv <- apply(out$hc2_hiv_pop, c(3,4,5), sum)
-  hc2_art <- apply(out$hc2_art_pop, c(3,4,5), sum)
+  hc2_hiv <- apply(out$hc2_hivpop, c(3,4,5), sum)
+  hc2_art <- apply(out$hc2_artpop, c(3,4,5), sum)
   hc2 <- hc2_hiv + hc2_art
   dimnames(hc2) <- list(age = 5:14, sex = c('male','female'), year = 1970:2030)
-  p_hiv <- out$p_hiv_pop[6:15, , ]
+  p_hiv <- out$p_hivpop[6:15, , ]
   dimnames(p_hiv) <- list(age = 5:14, sex = c('male','female'), year = 1970:2030)
   hc2_df <- as.data.frame(as.table(hc2))
   out_df <- as.data.frame(as.table(p_hiv))
@@ -201,7 +201,7 @@ test_that("Female 15-49y pop aligns", {
     dplyr::filter(Age %in% 15:49 & Sex == 'Female') %>%
     dplyr::group_by(Year)
 
-  lfrog <- out$p_hiv_pop[16:50,2,]
+  lfrog <- out$p_hivpop[16:50,2,]
   dimnames(lfrog) <- list(Age = 15:49, Year = 1970:2030)
   lfrog <- as.data.frame(as.table(lfrog)) %>%
      dplyr::mutate(lfrog = Freq)
@@ -297,8 +297,8 @@ test_that("CLHIV align", {
 
   spec_prev <- utils$offtrt
 
-  hc1 <- dplyr::right_join((reshape2::melt(out$hc1_hiv_pop)), data.frame(Var1 = 1:7, cd4_cat = c("gte30", "26-30", "21-25", "16-20", "11-15", "5-10", "lte5")), by = "Var1")
-  hc2 <- dplyr::right_join(data.frame(reshape2::melt(out$hc2_hiv_pop)), data.frame(Var1 = 1:6, cd4_cat = c("gte1000", "750-999", "500-749", "350-499", "200-349", "lte200")), by = "Var1")
+  hc1 <- dplyr::right_join((reshape2::melt(out$hc1_hivpop)), data.frame(Var1 = 1:7, cd4_cat = c("gte30", "26-30", "21-25", "16-20", "11-15", "5-10", "lte5")), by = "Var1")
+  hc2 <- dplyr::right_join(data.frame(reshape2::melt(out$hc2_hivpop)), data.frame(Var1 = 1:6, cd4_cat = c("gte1000", "750-999", "500-749", "350-499", "200-349", "lte200")), by = "Var1")
   hc1 <- dplyr::right_join(hc1, data.frame(Var2 = 1:5, transmission = c("perinatal", "bf0-6", "bf7-12", "bf12+", "bf12+")), by = "Var2")
   hc2 <- dplyr::right_join(hc2, data.frame(Var2 = 1:5, transmission = c("perinatal", "bf0-6", "bf7-12", "bf12+", "bf12+")), by = "Var2")
   hc1 <- hc1 %>%
@@ -349,9 +349,9 @@ test_that("CLHIV on ART align", {
   spec_prev <- utils$ontrt
   spec_prev <- spec_prev %>%
     dplyr::rename(time_art = transmission)
-  hc1 <- dplyr::right_join(data.frame(reshape2::melt(out$hc1_art_pop)), data.frame(Var2 = 1:7, cd4_cat = c("gte30", "26-30", "21-25", "16-20", "11-15", "5-10", "lte5")), by = ("Var2"))
+  hc1 <- dplyr::right_join(data.frame(reshape2::melt(out$hc1_artpop)), data.frame(Var2 = 1:7, cd4_cat = c("gte30", "26-30", "21-25", "16-20", "11-15", "5-10", "lte5")), by = ("Var2"))
   hc1 <- dplyr::right_join(hc1, data.frame(Var1 = 1:3, time_art = c("ARTlte5mo", "ART6to12mo", "ARTgte12mo")), by = ("Var1"))
-  hc2 <- dplyr::right_join(data.frame(reshape2::melt(out$hc2_art_pop)), data.frame(Var2 = 1:6, cd4_cat = c("gte1000", "750-999", "500-749", "350-499", "200-349", "lte200")), by = "Var2")
+  hc2 <- dplyr::right_join(data.frame(reshape2::melt(out$hc2_artpop)), data.frame(Var2 = 1:6, cd4_cat = c("gte1000", "750-999", "500-749", "350-499", "200-349", "lte200")), by = "Var2")
   hc2 <- dplyr::right_join(hc2, data.frame(Var1 = 1:3, time_art = c("ARTlte5mo", "ART6to12mo", "ARTgte12mo")), by = ("Var1"))
   hc1 <- hc1 %>%
     dplyr::mutate(

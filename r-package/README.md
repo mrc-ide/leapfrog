@@ -89,8 +89,8 @@ Deaths 50+ years are to show some noticeable divergence between the
 `"full"` and `"coarse"` age group simulations.
 
 ``` r
-prevF <- colSums(lsimF$p_hiv_pop[16:50,,],,2) / colSums(lsimF$p_total_pop[16:50,,],,2)
-prevC <- colSums(lsimC$p_hiv_pop[16:50,,],,2) / colSums(lsimC$p_total_pop[16:50,,],,2)
+prevF <- colSums(lsimF$p_hivpop[16:50,,],,2) / colSums(lsimF$p_totpop[16:50,,],,2)
+prevC <- colSums(lsimC$p_hivpop[16:50,,],,2) / colSums(lsimC$p_totpop[16:50,,],,2)
 
 deathsF <- colSums(lsimF$p_hiv_deaths[51:81,,],,2)
 deathsC <- colSums(lsimC$p_hiv_deaths[51:81,,],,2)

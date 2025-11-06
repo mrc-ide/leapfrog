@@ -78,9 +78,9 @@ struct SpectrumPostHocCalculations<Config> {
         i_sp.hiv_untreated_adult_sa = 0.0;
 
         for (int hm = 0; hm < hDS; ++hm) {
-          i_sp.hiv_untreated_adult_sa += n_ha.h_hiv_adult(hm, ha, g);
+          i_sp.hiv_untreated_adult_sa += n_ha.h_hivpop(hm, ha, g);
           for (int hu = 0; hu < hTS; ++hu) {
-            i_sp.hiv_art_adult_sa += n_ha.h_art_adult(hu, hm, ha, g);
+            i_sp.hiv_art_adult_sa += n_ha.h_artpop(hu, hm, ha, g);
           }
         }
 
@@ -91,8 +91,8 @@ struct SpectrumPostHocCalculations<Config> {
         }
 
         for (int i = 0; i < hAG_span[ha]; ++i, ++a) {
-          n_sp.p_deaths_nonaids_artpop(a, g) = n_ha.p_hiv_pop_background_deaths(a, g) * i_sp.artcov_adult_sa;
-          n_sp.p_deaths_nonaids_hivpop(a, g) = n_ha.p_hiv_pop_background_deaths(a, g) * (1.0 - i_sp.artcov_adult_sa);
+          n_sp.p_deaths_nonaids_artpop(a, g) = n_ha.p_deaths_background_hivpop(a, g) * i_sp.artcov_adult_sa;
+          n_sp.p_deaths_nonaids_hivpop(a, g) = n_ha.p_deaths_background_hivpop(a, g) * (1.0 - i_sp.artcov_adult_sa);
         }
       }
     }
@@ -118,12 +118,12 @@ struct SpectrumPostHocCalculations<Config> {
 
         for (int hm = 0; hm < hDS; ++hm) {
           excess_deaths_nonaids_no_art_ha += n_ha.h_deaths_excess_nonaids_no_art(hm, ha, g);
-          hivpop_ha += n_ha.h_hiv_adult(hm, ha, g);
+          hivpop_ha += n_ha.h_hivpop(hm, ha, g);
 
           if (t > opts.ts_art_start) {
             for (int hu = 0; hu < hTS; ++hu) {
               excess_deaths_nonaids_on_art_ha += n_ha.h_deaths_excess_nonaids_on_art(hu, hm, ha, g);
-              hivpop_ha += n_ha.h_art_adult(hu, hm, ha, g);
+              hivpop_ha += n_ha.h_artpop(hu, hm, ha, g);
             }
           }
         }
@@ -133,7 +133,7 @@ struct SpectrumPostHocCalculations<Config> {
 	      // to distribution of HIV population in age group a
         for (int i = 0; i < hAG_span[ha]; ++i, ++a) {
 
-          const auto hivpop_proportion_a = n_ha.p_hiv_pop(a, g) / hivpop_ha;
+          const auto hivpop_proportion_a = n_ha.p_hivpop(a, g) / hivpop_ha;
           n_sp.p_excess_deaths_nonaids_no_art(a, g) = excess_deaths_nonaids_no_art_ha * hivpop_proportion_a;
 
           if (t > opts.ts_art_start) {
