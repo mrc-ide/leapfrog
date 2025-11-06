@@ -66,7 +66,7 @@ struct SpectrumPostHocCalculations<Config> {
     auto& n_sp = state_next.sp;
     auto& i_sp = intermediate.sp;
 
-    for (int g = 0; g < NS; ++g) {
+    for (int s = 0; s < NS; ++s) {
 
       // Spectrum stores nonaids deaths by age but for children is always 0.
       // Only write values for a >= p_idx_hiv_first_adult
@@ -78,9 +78,9 @@ struct SpectrumPostHocCalculations<Config> {
         i_sp.hiv_untreated_adult_sa = 0.0;
 
         for (int hm = 0; hm < hDS; ++hm) {
-          i_sp.hiv_untreated_adult_sa += n_ha.h_hivpop(hm, ha, g);
+          i_sp.hiv_untreated_adult_sa += n_ha.h_hivpop(hm, ha, s);
           for (int hu = 0; hu < hTS; ++hu) {
-            i_sp.hiv_art_adult_sa += n_ha.h_artpop(hu, hm, ha, g);
+            i_sp.hiv_art_adult_sa += n_ha.h_artpop(hu, hm, ha, s);
           }
         }
 
@@ -91,8 +91,8 @@ struct SpectrumPostHocCalculations<Config> {
         }
 
         for (int i = 0; i < hAG_span[ha]; ++i, ++a) {
-          n_sp.p_deaths_nonaids_artpop(a, g) = n_ha.p_deaths_background_hivpop(a, g) * i_sp.artcov_adult_sa;
-          n_sp.p_deaths_nonaids_hivpop(a, g) = n_ha.p_deaths_background_hivpop(a, g) * (1.0 - i_sp.artcov_adult_sa);
+          n_sp.p_deaths_nonaids_artpop(a, s) = n_ha.p_deaths_background_hivpop(a, s) * i_sp.artcov_adult_sa;
+          n_sp.p_deaths_nonaids_hivpop(a, s) = n_ha.p_deaths_background_hivpop(a, s) * (1.0 - i_sp.artcov_adult_sa);
         }
       }
     }
@@ -102,7 +102,7 @@ struct SpectrumPostHocCalculations<Config> {
     auto& n_ha = state_next.ha;
     auto& n_sp = state_next.sp;
 
-    for (int g = 0; g < NS; ++g) {
+    for (int s = 0; s < NS; ++s) {
 
       // Spectrum stores nonaids-excess deaths by age but for children
       // is always 0. Only write values for a >= p_idx_hiv_first_adult
@@ -117,13 +117,13 @@ struct SpectrumPostHocCalculations<Config> {
         auto hivpop_ha = 0.0;
 
         for (int hm = 0; hm < hDS; ++hm) {
-          excess_deaths_nonaids_no_art_ha += n_ha.h_deaths_excess_nonaids_no_art(hm, ha, g);
-          hivpop_ha += n_ha.h_hivpop(hm, ha, g);
+          excess_deaths_nonaids_no_art_ha += n_ha.h_deaths_excess_nonaids_no_art(hm, ha, s);
+          hivpop_ha += n_ha.h_hivpop(hm, ha, s);
 
           if (t > opts.ts_art_start) {
             for (int hu = 0; hu < hTS; ++hu) {
-              excess_deaths_nonaids_on_art_ha += n_ha.h_deaths_excess_nonaids_on_art(hu, hm, ha, g);
-              hivpop_ha += n_ha.h_artpop(hu, hm, ha, g);
+              excess_deaths_nonaids_on_art_ha += n_ha.h_deaths_excess_nonaids_on_art(hu, hm, ha, s);
+              hivpop_ha += n_ha.h_artpop(hu, hm, ha, s);
             }
           }
         }
@@ -133,11 +133,11 @@ struct SpectrumPostHocCalculations<Config> {
 	      // to distribution of HIV population in age group a
         for (int i = 0; i < hAG_span[ha]; ++i, ++a) {
 
-          const auto hivpop_proportion_a = n_ha.p_hivpop(a, g) / hivpop_ha;
-          n_sp.p_excess_deaths_nonaids_no_art(a, g) = excess_deaths_nonaids_no_art_ha * hivpop_proportion_a;
+          const auto hivpop_proportion_a = n_ha.p_hivpop(a, s) / hivpop_ha;
+          n_sp.p_excess_deaths_nonaids_no_art(a, s) = excess_deaths_nonaids_no_art_ha * hivpop_proportion_a;
 
           if (t > opts.ts_art_start) {
-            n_sp.p_excess_deaths_nonaids_on_art(a, g) += excess_deaths_nonaids_on_art_ha *  hivpop_proportion_a;
+            n_sp.p_excess_deaths_nonaids_on_art(a, s) += excess_deaths_nonaids_on_art_ha *  hivpop_proportion_a;
           }
         }
       }

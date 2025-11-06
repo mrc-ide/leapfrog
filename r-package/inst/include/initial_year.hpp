@@ -19,9 +19,9 @@ void run_initial_year_calculations(
   auto& is_dp = initial_state.dp;
   const int t0 = 0;
 
-  for (int g = 0; g < SS::NS; ++g) {
+  for (int s = 0; s < SS::NS; ++s) {
     for (int a = 0; a < SS::pAG; ++a) {
-      is_dp.p_totpop(a, g) = p_dp.base_pop(a, g);
+      is_dp.p_totpop(a, s) = p_dp.base_pop(a, s);
     }
   }
 
@@ -46,19 +46,19 @@ void run_initial_year_calculations(
   // Note: this calculation would **probably** be more accurate if it survived the
   // population 1 year backwards before calculating deaths (discussed with Rob
   // Glaubius 7 June 2025)
-  for (int g = 0; g < SS::NS; ++g) {
+  for (int s = 0; s < SS::NS; ++s) {
 
 	  // (a) age 0 deaths
-	  is_dp.p_deaths_background_totpop(0, g) = is_dp.births * p_dp.births_sex_prop(g, t0) *
-	    (1.0 - p_dp.survival_probability(0, g, t0));
+	  is_dp.p_deaths_background_totpop(0, s) = is_dp.births * p_dp.births_sex_prop(s, t0) *
+	    (1.0 - p_dp.survival_probability(0, s, t0));
 
 	  // (b) age 1 to pAG-1 deaths
 	  for (int a = 1; a < SS::pAG; ++a) {
-	    is_dp.p_deaths_background_totpop(a, g) = is_dp.p_totpop(a-1, g) * (1.0 - p_dp.survival_probability(a, g, t0));
+	    is_dp.p_deaths_background_totpop(a, s) = is_dp.p_totpop(a-1, s) * (1.0 - p_dp.survival_probability(a, s, t0));
 	  }
 
 	  // (c) additional deaths from open-ended age group
-	  is_dp.p_deaths_background_totpop(SS::pAG-1, g) += is_dp.p_totpop(SS::pAG-1, g) * (1.0 - p_dp.survival_probability(SS::pAG-1, g, t0));
+	  is_dp.p_deaths_background_totpop(SS::pAG-1, s) += is_dp.p_totpop(SS::pAG-1, s) * (1.0 - p_dp.survival_probability(SS::pAG-1, s, t0));
   }
 }
 
