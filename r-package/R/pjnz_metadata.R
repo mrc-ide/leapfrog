@@ -37,7 +37,7 @@ get_data_from_cfg <- function(name, cfg, dim_vars, dp) {
       dimnames = unname(dim_names)
     )
   }
-
+  print(name)
   list(data = shaped_data, tag = matching_tag_cfg$tag)
 }
 
@@ -116,8 +116,6 @@ get_data_from_tag_cfg <- function(tag_cfg, dim_vars, dp) {
   data_rectangle
 }
 
-
-
 get_dim_vars <- function(dp) {
   dim_vars <- get_static_dim_vars()
   add_years_to_dim_vars(dim_vars, dp)
@@ -134,7 +132,7 @@ add_years_to_dim_vars <- function(dim_vars, dp) {
 
 parse_dp <- function(dp) {
   dim_vars <- get_dim_vars(dp)
-  metadata <- c(get_years_cfg(), get_pars_metadata(dim_vars))
+  metadata <- c(get_years_cfg(), get_pars_metadata(dim_vars, dp))
 
   ret <- lapply(names(metadata), function(name) {
     get_data_from_cfg(name, metadata[[name]], dim_vars, dp)
@@ -143,7 +141,7 @@ parse_dp <- function(dp) {
   list(data = ret, dim_vars = dim_vars)
 }
 
-get_pars_metadata <- function(dim_vars) {
+get_pars_metadata <- function(dim_vars, dp) {
   list(
     version_num = list(
       read = list(
@@ -585,6 +583,8 @@ get_pars_metadata <- function(dim_vars) {
         )
       )
     ),
+    #########CHILD TAGS HEREAFTER
+    ##TODO: change names to reflect the tag
     vt = list(
       type = "real",
       read = list(
@@ -592,6 +592,228 @@ get_pars_metadata <- function(dim_vars) {
           tag = "TransEffAssump MV",
           dims = list("vt_trt", "vt_trt_cat")
         )
+      )
+    ),
+    pmtct = list(
+      type = "real",
+      read = list(
+        list(
+          tag = "ARVRegimen MV3",
+          dims = list("pmtct_editor_order", "years")
+        ),
+        list(
+          tag = "ARVRegimen MV2",
+          dims = list("pmtct_editor_order_old", "years"),
+          start_offset = list(column = 1)
+        ),
+        list(
+          tag = "ARVRegimen MV",
+          dims = list("pmtct_editor_order_old", "years"),
+          start_offset = list(column = 1),
+          skip = list(
+            rows = as.list(
+              c(1,
+                3 + 0:6 * 3,
+                24, 26:27,
+                29 + 0:1 * 3,
+                35, 37)
+            )
+          )
+        )
+      )
+    ),
+    ##Ask: when do I convert this to a percent?
+    pmtct_retained_delivery = list(
+      ##Note: not listed in spectrum files before 2018
+      allow_null = TRUE,
+      type = "real",
+      read = list(
+        list(
+          tag = "PercentARTDelivery MV",
+          dims = list("pmtct_retained_delivery", "years")
+        )
+      )
+    ),
+    abortion = list(
+      type = "real",
+      read = list(
+        list(
+          tag = "PregTermAbortion MV3",
+          dims = list("years")
+        ),
+        list(
+          tag = "PregTermAbortion MV2",
+          dims = list("years")
+        ),
+        list(
+          tag = "PregTermAbortion MV",
+          dims = list("years")
+        )
+      )
+    ),
+    abortion_numperc = list(
+      type = "real",
+      read = list(
+        list(
+          tag = "PregTermAbortionPerNum MV2",
+          dims = list("years")
+        ),
+        list(
+          tag = "PregTermAbortionPerNum MV",
+          dims = list("years")
+        )
+      )
+    ),
+    patients_reallocated = list(
+      ##Note: not listed in spectrum files before 2018
+      allow_null = TRUE,
+      type = "real",
+      read = list(
+        list(
+          tag = "DP_TGX_PatientsReallocated_MV",
+          dims = list("years")
+        )
+      )
+    ),
+    bf_duration = list(
+      type = "real",
+      read = list(
+        list(
+          tag = "InfantFeedingOptions MV",
+          dims = list("bf_months", "years")
+        )
+      )
+    ),
+    paed_treatment = list(
+      type = "real",
+      read = list(
+        list(
+          tag = "ChildTreatInputs MV3",
+          dims = list("paed_treatment", "years")
+        ),
+        list(
+          tag = "ChildTreatInputs MV",
+          dims = list("paed_treatment_old", "years")
+        ),
+        list(
+          tag = "ChildTreatInputs2 MV",
+          dims = list("paed_treatment", "years")
+        )
+      )
+    ),
+    paed_art_is_percent = list(
+      allow_null = TRUE,
+      type = "real",
+      read = list(
+        list(
+          tag = "ChildARTByAgeGroupPerNum MV2",
+          dims = list("paed_treatment", "years")
+        ),
+        list(
+          tag = "ChildARTByAgeGroupPerNum MV",
+          dims = list("paed_treatment_old", "years")
+        )
+      )
+    ),
+    paed_art_ltfu = list(
+      ##Note: not listed in spectrum files before 2017
+      allow_null = TRUE,
+      type = "real",
+      read = list(
+        list(
+          tag = "PercLostFollowupChild MV",
+          dims = list("years")
+        )
+      )
+    ),
+    paed_art_dist = list(
+      type = "real",
+      read = list(
+        list(
+          tag = "ChildARTDist MV",
+          dims = list("a_0to14", "years")
+        )
+      )
+    ),
+    ##Age specific paed art mort multiplier, open to naming suggestions
+    paed_art_mort_mult_a = list(
+      ##Note: not listed in spectrum files before 2020
+      allow_null = TRUE,
+      type = "real",
+      read = list(
+        list(
+          tag = "ChildMortalityRates MV2",
+          dims = list("paed_art_mort", "years")
+        ),
+        list(
+          tag = "ChildMortalityRates MV",
+          dims = list("paed_art_mort", "years")
+        )
+      )
+    ),
+    ##TODO: Maggie is this implemented in leapfrog?
+    paed_art_mort_mult = list(
+      ##Note: not listed in spectrum files before 2022
+      allow_null = TRUE,
+      type = "real",
+      read = list(
+        list(tag = "ChildMortalityRatesMultiplier MV")
+      )
+    ),
+    nosocomial_infections_a = list(
+      ##Note: not listed in spectrum files before 2020
+      allow_null = TRUE,
+      type = "real",
+      read = list(
+        list(
+          tag = "NosocomialInfectionsByAge MV",
+          dims = list("a_0to14_coarse", "years")
+        )
+      )
+    ),
+    nosocomial_infections = list(
+      ##Note: not listed in spectrum files before 2018 or after 2020
+      allow_null = TRUE,
+      type = "real",
+      read = list(
+        list(
+          tag = "NosocomialInfections MV",
+          dims = list("years")
+        )
+      )
+    ),
+    ##Note: should align with adult naming convention
+    paed_cd4_init_dist = list(
+      type = "real",
+      read = list(
+        list(
+          tag = "ChildDistNewInfectionsCD4 MV",
+          dims = list("cd4_perc_0to4")
+        )
+      )
+    ),
+    paed_cd4_prog = list(
+      type = "real",
+      read = list(
+        list(
+          tag = "ChildAnnRateProgressLowerCD4 MV2",
+          dims = list("g", "cd4_prog_0to14"),
+          skip = list(
+            column = (dim_vars$cd4_perc_0to4$length - 1) * 2 + 1
+          ),
+          start_offset = list(row = 1)
+        )
+        ##TODO: Confirm with Jeff/ Rob G. how this is structured, looks like there is a value for the last CD4 cat?
+        ##dp[816:821,1:25]
+        # ,
+        # list(
+        #   tag = "ChildAnnRateProgressLowerCD4 MV",
+        #   dims = list("g", "cd4_prog_0to14"),
+        #   skip = list(
+        #     column = (dim_vars$cd4_perc_0to4$length) * 2 + 1
+        #   ),
+        #   start_offset = list(row = 1)
+        # )
       )
     )
   )
@@ -626,17 +848,62 @@ get_static_dim_vars <- function() {
     a_0to80plus_5year = list(length = 17, labels = c("0-4", "5-9", "10-14", "15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49", "50-54", "55-59", "60-64", "65-69", "70-74", "75-79", "80+")),
     a_15to35_custom = list(length = 6, labels = c("15-17", "18-19", "20-24", "25-29", "30-34", "35-49")),
     a_15to45plus_10year = list(length = 4, labels = c("15-24", "25-34", "35-44", "45+")),
+    a_0to14 = list(length = 15, labels = 0:14),
+    a_0to14_coarse = list(length = 3, c('00-04', '05-09', '10-14')),
     g = list(length = 2, labels = c("male", "female")),
     g_both_middle = list(length = 3, labels = c("male", "both", "female")),
     g_both_first = list(length = 3, labels = c("both", "male", "female")),
     cd4_count = list(length = 7, labels = c("500+", "350-500", "250-349", "200-249", "100-199", "50-99", "50-")),
     cd4_prog = list(length = 6, labels = c("500+ -> 350-500", "350-500 -> 250-349", "250-349 -> 200-249", "200-249 -> 100-199", "100-199 -> 50-99", "50-99 -> 50-")),
+    cd4_perc_0to4 = list(length = 7, labels = c(">30", "26-30", "21-25", "16-20", "11-15", "5-10", "<5")),
+    cd4_prog_0to14 = list(length = 17, labels = paste(c(rep('Age: 0-2, CD4 prog', 6), rep('Age: 3-4, CD4 prog', 6),
+                                                       rep('Age: 5-14, CD4 prog', 5)),
+                                                      c(rep(c(">30 -> 26-30", "26-30 -> 21-25", "21-25 -> 16-20", "16-20 -> 11-15", "11-15 -> 5-10", "5-10 -> <5"), 2),
+                                                           c("1000+ -> 750-999", "750-999 -> 500-749", "500-749 -> 350-499", "350-499 -> 200-349", "200-349 -> <200")))),
+   # cd4_prog_5to14 = list(length = 5, labels = c("1000+ -> 750-999", "750-999 -> 500-749", "500-749 -> 350-499", "350-499 -> 200-349", "200-349 -> <200")),
     art_dur_2 = list(length = 2, labels = c("0-12mos", "12mos+")),
     art_off_on = list(length = 2, labels = c("off art", "on art")),
     pops_for_treat = list(length = 7, labels = c("Pregnant women", "TB/HIV co-infected", "Discordant couples", "Sex workers", "Men who have sex with men", "Injecting drug users", "Other population")),
     elig_perc_year = list(length = 3, labels = c("eligibility", "percent", "year")),
     vt_trt = list(length = 11, labels = c("CD4 <200", "CD4 200-350", "CD4 >350", "Incident infections", "Single dose nevirapine", "WHO 2006 dual ARV regimen", "Option A", "Option B", "ART: Started before pregnancy", "ART: Started during pregnancy >4 weeks", "ART: Started during pregnancy <4 weeks")),
-    vt_trt_cat = list(length = 3, labels = c('Perinatal', 'Breastfeeding (per month) <350', 'Breastfeeding (per month) >=350'))
+    vt_trt_cat = list(length = 3, labels = c("Perinatal", "Breastfeeding (per month) <350", "Breastfeeding (per month) >=350")),
+    pmtct_editor_order = list(length = 26, labels = c("No prophylaxis- Percent",
+                                             paste0(c("Single dose nevirapine", "WHO 2006 dual ARV regimen",
+                                                      "Option A", "Option B",
+                                                      "ART: Started before pregnancy",
+                                                      "ART: Started during pregnancy >4 weeks",
+                                                      "ART: Started during pregnancy <4 weeks"), rep(c('- Number', '- Percent'), 7)), "Total prophlyaxis- Number",
+                                                      "Postnatal: No prophylaxis- Percent", paste0(c("Option A", "Option B"), rep(c('- Number', '- Percent'), 2)), "Total postnatal prophlyaxis- Number",
+                                             paste0("Monthly dropout breastfeeding: ",
+                                                    c("Option A", "Option B",
+                                                      "ART 0-12 months breastfeeding",
+                                                      "ART 12+ months breastfeeding")))),
+    ##TODO: Flag with Jeff, assume the same for duration of breastfeeding? modify in the input script?
+    pmtct_editor_order_old = list(length = 25, labels = c("No prophylaxis- Percent",
+                                                      paste0(c("Single dose nevirapine", "WHO 2006 dual ARV regimen",
+                                                               "Option A", "Option B",
+                                                               "ART: Started before pregnancy",
+                                                               "ART: Started during pregnancy >4 weeks",
+                                                               "ART: Started during pregnancy <4 weeks"), rep(c('- Number', '- Percent'), 7)), "Total prophlyaxis- Number",
+                                                      "Postnatal: No prophylaxis- Percent", paste0(c("Option A", "Option B"), rep(c('- Number', '- Percent'), 2)), "Total postnatal prophlyaxis- Number",
+                                                      paste0("Monthly dropout breastfeeding: ",
+                                                             c("Option A", "Option B",
+                                                               "ART")))),
+    pmtct_retained_delivery = list(length = 2, labels = c("Percent already on ART retained at delivery",
+                                                          "Percent starting ART retained at delivery")),
+    bf_months = list(length = 36, labels = paste0(rep(paste0("VT_MOS_", c("00_01", "02_03", "04_05",
+                                                               "06_07", "08_09", "10_11",
+                                                               "12_13", "14_15", "16_17",
+                                                               "18_19", "20_21", "22_23",
+                                                               "24_25", "26_27", "28_29",
+                                                               "30_31", "32_33", "34_35")), 2), c(rep('- No ART', 18), rep('- ART', 18)))),
+    paed_treatment = list(length = 5, labels = c('Cotrim', 'ART: 0-14y', 'ART: 0-4y', 'ART: 5-9y', 'ART: 10-14y')),
+    paed_treatment_old = list(length = 2, labels = c('Cotrim', 'ART: 0-14y')),
+    paed_art_mort = list(length = 4, labels = c('Age <5, <12 months on ART',
+                                                'Age <5, 12+ months on ART',
+                                                'Age >=5, <12 months on ART',
+                                                'Age >=5, 12+ months on ART'))
+
   )
 }
 
@@ -653,10 +920,10 @@ process_pjnz <- function(pjnz) {
   pars$base_pop <- pars$big_pop[, c("male", "female"), ]
   pars$Sx <- pars$surv_rate
 
-  proporiion_of_male_births <- pars$sex_birth_ratio / (pars$sex_birth_ratio + 100)
+  proportion_of_male_births <- pars$sex_birth_ratio / (pars$sex_birth_ratio + 100)
   pars$births_sex_prop <- rbind(
     male = proporiion_of_male_births,
-    female = 1 - proporiion_of_male_births
+    female = 1 - proportion_of_male_births
   )
 
   asfr <- pars$asfr / 100
