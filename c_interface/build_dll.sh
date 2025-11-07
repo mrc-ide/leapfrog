@@ -61,4 +61,4 @@ if [ "$CONFIGURE" -eq 1 ]; then
   cd "$here" && cmake -A Win32 -B build
 fi
 
-cd "$here" && cmake --build build
+cd "$here" && cmake --build build --config Release
