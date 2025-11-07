@@ -8,6 +8,7 @@
 #include "models/hiv_demographic_projection.hpp"
 #include "models/adult_hiv_model_simulation.hpp"
 #include "models/child_model_simulation.hpp"
+#include "models/spectrum_post_hoc_calculations.hpp"
 #include "options.hpp"
 #include "initial_year.hpp"
 
@@ -117,12 +118,13 @@ struct Leapfrog {
     internal::HivDemographicProjection<Cfg> hiv_dp(args);
     internal::AdultHivModelSimulation<Cfg> hiv_sim(args);
     internal::ChildModelSimulation<Cfg> child_sim(args);
+    internal::SpectrumPostHocCalculations<Cfg> spectrum(args);
 
     if constexpr (ModelVariant::run_demographic_projection) {
       general_dp.run_general_pop_demographic_projection();
 
       if constexpr (ModelVariant::run_hiv_simulation) {
-        hiv_dp.run_hiv_pop_demographic_projection();
+        hiv_dp.run_hivpop_demographic_projection();
         hiv_sim.run_hiv_model_simulation();
       }
 
@@ -134,14 +136,16 @@ struct Leapfrog {
         general_dp.run_end_year_migration();
 
         if constexpr (ModelVariant::run_hiv_simulation) {
-          hiv_dp.run_hiv_pop_end_year_migration();
+          hiv_dp.run_hivpop_end_year_migration();
         }
         if constexpr (ModelVariant::run_child_model) {
-          hiv_dp.run_hc_hiv_pop_end_year_migration();
+          hiv_dp.run_hc_hivpop_end_year_migration();
         }
       }
 
-
+      if constexpr (ModelVariant::run_spectrum_model) {
+        spectrum.run_spectrum_post_hoc_calulations();
+      }
     }
   };
 };
