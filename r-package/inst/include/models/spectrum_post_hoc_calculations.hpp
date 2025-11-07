@@ -133,11 +133,16 @@ struct SpectrumPostHocCalculations<Config> {
 	      // to distribution of HIV population in age group a
         for (int i = 0; i < hAG_span[ha]; ++i, ++a) {
 
-          const auto hivpop_proportion_a = n_ha.p_hivpop(a, s) / hivpop_ha;
-          n_sp.p_excess_deaths_nonaids_no_art(a, s) = excess_deaths_nonaids_no_art_ha * hivpop_proportion_a;
+          if (hivpop_ha > 0) {
+            const auto hivpop_proportion_a = n_ha.p_hivpop(a, s) / hivpop_ha;
+            n_sp.p_excess_deaths_nonaids_no_art(a, s) = excess_deaths_nonaids_no_art_ha * hivpop_proportion_a;
 
-          if (t > opts.ts_art_start) {
-            n_sp.p_excess_deaths_nonaids_on_art(a, s) += excess_deaths_nonaids_on_art_ha *  hivpop_proportion_a;
+            if (t > opts.ts_art_start) {
+              n_sp.p_excess_deaths_nonaids_on_art(a, s) += excess_deaths_nonaids_on_art_ha *  hivpop_proportion_a;
+            }
+          } else {
+            n_sp.p_excess_deaths_nonaids_no_art(a, s) = 0.0;
+            n_sp.p_excess_deaths_nonaids_on_art(a, s) = 0.0;
           }
         }
       }
