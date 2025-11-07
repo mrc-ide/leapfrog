@@ -16,7 +16,8 @@ def test_adult_model_full_strat():
         "h_hiv_deaths_no_art", "p_infections", "h_hiv_deaths_art",
         "h_art_initiation", "h_deaths_excess_nonaids_no_art",
         "h_deaths_excess_nonaids_on_art", "p_deaths_excess_nonaids",
-        "p_hiv_deaths", "p_net_migration_hivpop"
+        "p_hiv_deaths", "p_net_migration_hivpop", "hiv_births",
+        "hiv_births_by_mat_age",
     ]
     returned_vars.sort()
     expected_vars.sort()
