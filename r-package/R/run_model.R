@@ -9,8 +9,8 @@
 #'   from `projection_start_year` passed in the `parameters` list.
 #'
 #' @return List of model outputs, where the last dimension of each element is
-#'   time, e.g. `p_total_pop` state variable has dimensions 81 x 2. If
-#'   `output_years` specified has length 61 then the `p_total_pop` output
+#'   time, e.g. `p_totpop` state variable has dimensions 81 x 2. If
+#'   `output_years` specified has length 61 then the `p_totpop` output
 #'   will have dimensions 81 x 2 x 61.
 #' @examples
 #' pjnz <- system.file(
@@ -39,8 +39,8 @@ run_model <- function(parameters,
 #'   from `projection_start_year` passed in the `parameters` list.
 #'
 #' @return List of model outputs, where the last dimension of each element is
-#'   time, e.g. `p_total_pop` state variable has dimensions 81 x 2. If
-#'   `output_years` specified has length 61 then the `p_total_pop` output
+#'   time, e.g. `p_totpop` state variable has dimensions 81 x 2. If
+#'   `output_years` specified has length 61 then the `p_totpop` output
 #'   will have dimensions 81 x 2 x 61.
 #' @examples
 #' pjnz <- system.file(
@@ -77,7 +77,7 @@ run_model_from_state <- function(parameters,
 #'   that do include the last time dimension. Since only the next time
 #'   step is returned, dropping the time dimensions makes it easier to
 #'   feed the returned list into the next single year model run. In
-#'   contrast to [run_model_from_state()] the `p_total_pop` output will
+#'   contrast to [run_model_from_state()] the `p_totpop` output will
 #'   have dimensions 81 x 2 not 81 x 2 x 61.
 #' @examples
 #' pjnz <- system.file(

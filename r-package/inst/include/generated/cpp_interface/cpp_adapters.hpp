@@ -36,8 +36,8 @@ struct DpAdapter<Language::Cpp, real_type, ModelVariant> {
     const Config::OutputState& state,
     std::filesystem::path& output_file
   ) {
-    write_data<real_type, typename Config::OutputState::shape_p_total_pop>(output_file, "p_total_pop", state.p_total_pop);
-    write_data<real_type, typename Config::OutputState::shape_p_total_pop_background_deaths>(output_file, "p_total_pop_background_deaths", state.p_total_pop_background_deaths);
+    write_data<real_type, typename Config::OutputState::shape_p_totpop>(output_file, "p_totpop", state.p_totpop);
+    write_data<real_type, typename Config::OutputState::shape_p_deaths_background_totpop>(output_file, "p_deaths_background_totpop", state.p_deaths_background_totpop);
     write_data<real_type, typename Config::OutputState::shape_births>(output_file, "births", state.births);
     return index + output_count;
   };
@@ -60,8 +60,10 @@ struct HaAdapter<Language::Cpp, real_type, ModelVariant> {
       .cd4_initial_distribution = { owned_pars.ha.cd4_initial_distribution.data(), owned_pars.ha.cd4_initial_distribution.shape() },
       .scale_cd4_mortality = owned_pars.ha.scale_cd4_mortality,
       .idx_hm_elig = { owned_pars.ha.idx_hm_elig.data(), owned_pars.ha.idx_hm_elig.shape() },
-      .mortality = { owned_pars.ha.mortality.data(), owned_pars.ha.mortality.shape() },
-      .mortality_time_rate_ratio = { owned_pars.ha.mortality_time_rate_ratio.data(), owned_pars.ha.mortality_time_rate_ratio.shape() },
+      .art_mortality = { owned_pars.ha.art_mortality.data(), owned_pars.ha.art_mortality.shape() },
+      .art_mortality_time_rate_ratio = { owned_pars.ha.art_mortality_time_rate_ratio.data(), owned_pars.ha.art_mortality_time_rate_ratio.shape() },
+      .cd4_nonaids_excess_mort = { owned_pars.ha.cd4_nonaids_excess_mort.data(), owned_pars.ha.cd4_nonaids_excess_mort.shape() },
+      .art_nonaids_excess_mort = { owned_pars.ha.art_nonaids_excess_mort.data(), owned_pars.ha.art_nonaids_excess_mort.shape() },
       .dropout_recover_cd4 = owned_pars.ha.dropout_recover_cd4,
       .dropout_rate = { owned_pars.ha.dropout_rate.data(), owned_pars.ha.dropout_rate.shape() },
       .adults_on_art = { owned_pars.ha.adults_on_art.data(), owned_pars.ha.adults_on_art.shape() },
@@ -77,22 +79,25 @@ struct HaAdapter<Language::Cpp, real_type, ModelVariant> {
     };
   };
 
-  static constexpr int output_count = 12;
+  static constexpr int output_count = 15;
 
   static int build_output(
     int index,
     const Config::OutputState& state,
     std::filesystem::path& output_file
   ) {
-    write_data<real_type, typename Config::OutputState::shape_p_hiv_pop>(output_file, "p_hiv_pop", state.p_hiv_pop);
-    write_data<real_type, typename Config::OutputState::shape_p_hiv_pop_background_deaths>(output_file, "p_hiv_pop_background_deaths", state.p_hiv_pop_background_deaths);
-    write_data<real_type, typename Config::OutputState::shape_h_hiv_adult>(output_file, "h_hiv_adult", state.h_hiv_adult);
-    write_data<real_type, typename Config::OutputState::shape_h_art_adult>(output_file, "h_art_adult", state.h_art_adult);
+    write_data<real_type, typename Config::OutputState::shape_p_hivpop>(output_file, "p_hivpop", state.p_hivpop);
+    write_data<real_type, typename Config::OutputState::shape_p_deaths_background_hivpop>(output_file, "p_deaths_background_hivpop", state.p_deaths_background_hivpop);
+    write_data<real_type, typename Config::OutputState::shape_h_hivpop>(output_file, "h_hivpop", state.h_hivpop);
+    write_data<real_type, typename Config::OutputState::shape_h_artpop>(output_file, "h_artpop", state.h_artpop);
     write_data<real_type, typename Config::OutputState::shape_h_hiv_deaths_no_art>(output_file, "h_hiv_deaths_no_art", state.h_hiv_deaths_no_art);
+    write_data<real_type, typename Config::OutputState::shape_h_deaths_excess_nonaids_no_art>(output_file, "h_deaths_excess_nonaids_no_art", state.h_deaths_excess_nonaids_no_art);
     write_data<real_type, typename Config::OutputState::shape_p_infections>(output_file, "p_infections", state.p_infections);
     write_data<real_type, typename Config::OutputState::shape_h_hiv_deaths_art>(output_file, "h_hiv_deaths_art", state.h_hiv_deaths_art);
+    write_data<real_type, typename Config::OutputState::shape_h_deaths_excess_nonaids_on_art>(output_file, "h_deaths_excess_nonaids_on_art", state.h_deaths_excess_nonaids_on_art);
     write_data<real_type, typename Config::OutputState::shape_h_art_initiation>(output_file, "h_art_initiation", state.h_art_initiation);
     write_data<real_type, typename Config::OutputState::shape_p_hiv_deaths>(output_file, "p_hiv_deaths", state.p_hiv_deaths);
+    write_data<real_type, typename Config::OutputState::shape_p_deaths_excess_nonaids>(output_file, "p_deaths_excess_nonaids", state.p_deaths_excess_nonaids);
     write_data<real_type, typename Config::OutputState::shape_p_net_migration_hivpop>(output_file, "p_net_migration_hivpop", state.p_net_migration_hivpop);
     write_data<real_type, typename Config::OutputState::shape_hiv_births_by_mat_age>(output_file, "hiv_births_by_mat_age", state.hiv_births_by_mat_age);
     write_data<real_type, typename Config::OutputState::shape_hiv_births>(output_file, "hiv_births", state.hiv_births);
@@ -151,17 +156,18 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
     };
   };
 
-  static constexpr int output_count = 16;
+  static constexpr int output_count = 17;
 
   static int build_output(
     int index,
     const Config::OutputState& state,
     std::filesystem::path& output_file
   ) {
-    write_data<real_type, typename Config::OutputState::shape_hc1_hiv_pop>(output_file, "hc1_hiv_pop", state.hc1_hiv_pop);
-    write_data<real_type, typename Config::OutputState::shape_hc2_hiv_pop>(output_file, "hc2_hiv_pop", state.hc2_hiv_pop);
-    write_data<real_type, typename Config::OutputState::shape_hc1_art_pop>(output_file, "hc1_art_pop", state.hc1_art_pop);
-    write_data<real_type, typename Config::OutputState::shape_hc2_art_pop>(output_file, "hc2_art_pop", state.hc2_art_pop);
+    write_data<real_type, typename Config::OutputState::shape_hiv_births_by_mat_age>(output_file, "hiv_births_by_mat_age", state.hiv_births_by_mat_age);
+    write_data<real_type, typename Config::OutputState::shape_hc1_hivpop>(output_file, "hc1_hivpop", state.hc1_hivpop);
+    write_data<real_type, typename Config::OutputState::shape_hc2_hivpop>(output_file, "hc2_hivpop", state.hc2_hivpop);
+    write_data<real_type, typename Config::OutputState::shape_hc1_artpop>(output_file, "hc1_artpop", state.hc1_artpop);
+    write_data<real_type, typename Config::OutputState::shape_hc2_artpop>(output_file, "hc2_artpop", state.hc2_artpop);
     write_data<real_type, typename Config::OutputState::shape_hc1_noart_aids_deaths>(output_file, "hc1_noart_aids_deaths", state.hc1_noart_aids_deaths);
     write_data<real_type, typename Config::OutputState::shape_hc2_noart_aids_deaths>(output_file, "hc2_noart_aids_deaths", state.hc2_noart_aids_deaths);
     write_data<real_type, typename Config::OutputState::shape_hc1_art_aids_deaths>(output_file, "hc1_art_aids_deaths", state.hc1_art_aids_deaths);
@@ -174,6 +180,33 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
     write_data<real_type, typename Config::OutputState::shape_mtct_by_source_women>(output_file, "mtct_by_source_women", state.mtct_by_source_women);
     write_data<real_type, typename Config::OutputState::shape_mtct_by_source_hc_infections>(output_file, "mtct_by_source_hc_infections", state.mtct_by_source_hc_infections);
     write_data<real_type, typename Config::OutputState::shape_pmtct_coverage_at_delivery>(output_file, "pmtct_coverage_at_delivery", state.pmtct_coverage_at_delivery);
+    return index + output_count;
+  };
+};
+
+template<typename real_type, MV ModelVariant>
+struct SpAdapter<Language::Cpp, real_type, ModelVariant> {
+  using SS = SSMixed<ModelVariant>;
+  using Config = SpConfig<real_type, ModelVariant>;
+
+  static Config::Pars get_pars(
+    OwnedParsMixed<real_type, ModelVariant>::Pars& owned_pars
+  ) {
+    return {
+    };
+  };
+
+  static constexpr int output_count = 4;
+
+  static int build_output(
+    int index,
+    const Config::OutputState& state,
+    std::filesystem::path& output_file
+  ) {
+    write_data<real_type, typename Config::OutputState::shape_p_deaths_nonaids_artpop>(output_file, "p_deaths_nonaids_artpop", state.p_deaths_nonaids_artpop);
+    write_data<real_type, typename Config::OutputState::shape_p_deaths_nonaids_hivpop>(output_file, "p_deaths_nonaids_hivpop", state.p_deaths_nonaids_hivpop);
+    write_data<real_type, typename Config::OutputState::shape_p_excess_deaths_nonaids_on_art>(output_file, "p_excess_deaths_nonaids_on_art", state.p_excess_deaths_nonaids_on_art);
+    write_data<real_type, typename Config::OutputState::shape_p_excess_deaths_nonaids_no_art>(output_file, "p_excess_deaths_nonaids_no_art", state.p_excess_deaths_nonaids_no_art);
     return index + output_count;
   };
 };

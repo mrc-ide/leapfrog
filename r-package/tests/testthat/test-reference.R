@@ -5,10 +5,10 @@ test_that("demographic model is correct", {
 
   expected <- read_parameters(test_path("testdata/fit_demography.h5"))
 
-  expect_equal(actual$p_total_pop, expected$totpop1)
+  expect_equal(actual$p_totpop, expected$totpop1)
   ## expected births doesn't have dim attribute so drop it for tests
   expect_equal(actual$births, expected$births)
-  expect_equal(actual$p_total_pop_background_deaths, expected$natdeaths)
+  expect_equal(actual$p_deaths_background_totpop, expected$natdeaths)
 })
 
 
@@ -18,14 +18,14 @@ test_that("model agrees with leapfrog impl", {
 
   expected <- read_parameters(test_path("testdata/leapfrog_fit_full.h5"))
 
-  expect_equal(actual$p_total_pop, expected$totpop1)
+  expect_equal(actual$p_totpop, expected$totpop1)
   ## expected births doesn't have dim attribute so drop it for tests
   expect_equal(actual$births, expected$births)
-  expect_equal(actual$p_total_pop_background_deaths, expected$natdeaths)
-  expect_equal(actual$p_hiv_pop, expected$hivpop1)
-  expect_equal(actual$p_hiv_pop_background_deaths, expected$natdeaths_hivpop)
-  expect_equal(actual$h_hiv_adult, expected$hivstrat_adult)
-  expect_equal(actual$h_art_adult, expected$artstrat_adult)
+  expect_equal(actual$p_deaths_background_totpop, expected$natdeaths)
+  expect_equal(actual$p_hivpop, expected$hivpop1)
+  expect_equal(actual$p_deaths_background_hivpop, expected$natdeaths_hivpop)
+  expect_equal(actual$h_hivpop, expected$hivstrat_adult)
+  expect_equal(actual$h_artpop, expected$artstrat_adult)
   expect_equal(actual$h_hiv_deaths_no_art, expected$aidsdeaths_noart)
   expect_equal(actual$p_infections, expected$infections)
   expect_equal(actual$h_hiv_deaths_art, expected$aidsdeaths_art)
@@ -39,14 +39,14 @@ test_that("model agrees with leapfrog impl", {
 
   expected <- read_parameters(test_path("testdata/leapfrog_fit_coarse.h5"))
 
-  expect_equal(actual$p_total_pop, expected$totpop1)
+  expect_equal(actual$p_totpop, expected$totpop1)
   ## expected births doesn't have dim attribute so drop it for tests
   expect_equal(actual$births, expected$births)
-  expect_equal(actual$p_total_pop_background_deaths, expected$natdeaths)
-  expect_equal(actual$p_hiv_pop, expected$hivpop1)
-  expect_equal(actual$p_hiv_pop_background_deaths, expected$natdeaths_hivpop)
-  expect_equal(actual$h_hiv_adult, expected$hivstrat_adult)
-  expect_equal(actual$h_art_adult, expected$artstrat_adult)
+  expect_equal(actual$p_deaths_background_totpop, expected$natdeaths)
+  expect_equal(actual$p_hivpop, expected$hivpop1)
+  expect_equal(actual$p_deaths_background_hivpop, expected$natdeaths_hivpop)
+  expect_equal(actual$h_hivpop, expected$hivstrat_adult)
+  expect_equal(actual$h_artpop, expected$artstrat_adult)
   expect_equal(actual$h_hiv_deaths_no_art, expected$aidsdeaths_noart)
   expect_equal(actual$p_infections, expected$infections)
   expect_equal(actual$h_hiv_deaths_art, expected$aidsdeaths_art)

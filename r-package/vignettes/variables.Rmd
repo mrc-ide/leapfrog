@@ -39,33 +39,26 @@ These prefixes can be merged e.g.
 
 # Rules for unpacking structs
 
-The `p_`, `c_`, `n_`, `i_` prefixes correspond to `pars`, `state_curr`, `state_next`, `intermediate` structs respectively. These will be followed by 2 letters indicating what part we are unpacking:
+Each model variant can have state space, input parameters, output state and intermediate data associated with it. Within the model code for each variant it can be useful to unpack the structs into a shorthand to save typing. We do this in a consistent way based on the following rules:
 
-* `dm` - `base.demography`
-* `tx` - `base.art`
-* `nh` - `base.natural_history`
-* `in` - `base.incidence`
-* `op` - `base.options`
-* `hc` - children, in the case of `pars` it is `children.children` and in the case of `state_next`, `state_curr`, `intermediate` it is `children`
-* `ba` - `base` (for `intermediate`, `state_next`, `state_curr` structs)
+1. Prefix based on what is being unpacked, `parameters`, `state_curr`, `state_next` or `intermediate`
+   1. `p_` for `pars`
+   1. `c_` for `state_curr`
+   1. `n_` for `state_next`
+   1. `i_` for `intermediate`
+1. 2nd prefix based on what model variant the data belongs to. This comes from the `namespace` value for the model variant from the config.
+   1. `dp` for the demographic projection
+   1. `ha` for the HIV adult model
+   1. `hc`for the HIV child model
+   1. `sp` for the Spectrum model
 
 So for example:
 
-* `p_dm` = `pars.base.demography`
-* `p_hc` = `pars.children.children`
-* `c_hc` = `state_curr.children`
-* `i_ba` = `intermediate.base`
+* `auto& n_dp = state_next.dp;`
+* `auto& i_ha = intermediate.ha;`
+* `const auto& p_dp = pars.dp;`
 
-For the `StateSpace` struct (defined as `ss` in the code) we use the `ss_` prefix with:
-
-* `b` - `base`
-* `c` - `children`
-
-so for example:
-
-* `ss_d` = `ss.dp`
-* `ss_h` = `ss.hiv`
-* `ss_c` = `ss.children`
+For the `StateSpace` struct on the config we can unpack this into the struct for each model variant so the state space can be used directly.
 
 # Leapfrog to Frogger glossary
 
@@ -174,23 +167,23 @@ In 5 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 
 | Leapfrog         | Frogger                    | Details                                                                  |
 |------------------|----------------------------|--------------------------------------------------------------------------|
-| totpop1          | p_total_pop                | Projected total population                                               |
-| hivpop1          | p_hiv_pop                  | Projected HIV population                                                 |
+| totpop1          | p_totpop                | Projected total population                                               |
+| hivpop1          | p_hivpop                  | Projected HIV population                                                 |
 | infections       | p_infections               | Projected number of new HIV infections by sex and age                    |
-| hivstrat_adult   | h_hiv_adult                | Projected PLHIV not on ART by age, sex and CD4                           |
-| artstrat_adult   | h_art_adult                | Projected PLHIV on ART by age, sex, CD4 and treatment stage              |
+| hivstrat_adult   | h_hivpop                | Projected PLHIV not on ART by age, sex and CD4                           |
+| artstrat_adult   | h_artpop                | Projected PLHIV on ART by age, sex, CD4 and treatment stage              |
 | births           | births                     | Projected number of births                                               |
-| natdeaths        | p_total_pop_background_deaths | Projected number of background deaths                                       |
-| natdeaths_hivpop | p_hiv_pop_background_deaths   | Projected number of background deaths within HIV population                 |
+| natdeaths        | p_deaths_background_totpop | Projected number of background deaths                                       |
+| natdeaths_hivpop | p_deaths_background_hivpop   | Projected number of background deaths within HIV population                 |
 | hivdeaths        | p_hiv_deaths               | Projected HIV-related deaths by sex and age                              |
 | netmig_ag        | p_net_migration_hivpop     | Number of HIV+ Migrants                                                  |
 | aidsdeaths_noart | h_hiv_deaths_no_art        | Projected HIV-related deaths off ART by sex, age and CD4                 |
 | aidsdeaths_art   | h_hiv_deaths_art           | Projected HIV-related deaths on ART by sex, age, CD4 and treatment stage |
 | artinit          | h_art_initiation           | Projected ART initiations by sex, age and CD4                            |
-| hivstrat_paeds   | hc1_hiv_pop                | Projected PLHIV 0-4y not on ART by age, sex, transmission type, and CD4  |
-| hivstrat_paeds   | hc2_hiv_pop                | Projected PLHIV 5-14y not on ART by age, sex, transmission type, and CD4 |
-| artstrat_paeds   | hc1_art_pop                | Projected PLHIV 0-4y on ART by age, sex, treatment stage and CD4         |
-| artstrat_paeds   | hc2_art_pop                | Projected PLHIV 5-14y on ART by age, sex, treatment stage and CD4        |
+| hivstrat_paeds   | hc1_hivpop                | Projected PLHIV 0-4y not on ART by age, sex, transmission type, and CD4  |
+| hivstrat_paeds   | hc2_hivpop                | Projected PLHIV 5-14y not on ART by age, sex, transmission type, and CD4 |
+| artstrat_paeds   | hc1_artpop                | Projected PLHIV 0-4y on ART by age, sex, treatment stage and CD4         |
+| artstrat_paeds   | hc2_artpop                | Projected PLHIV 5-14y on ART by age, sex, treatment stage and CD4        |
 |                  | hc1_noart_aids_deaths      | Projected deaths among PLHIV 0-4y not on ART by CD4, transmission type, age, sex, and year |
 |                  | hc2_noart_aids_deaths      | Projected deaths among PLHIV 5-14y not on ART by CD4, transmission type, age, sex, and year|
 |                  | hc1_art_aids_deaths        | Projected deaths among PLHIV 0-4y on ART by time on treatment, CD4, age, sex, and year     |
@@ -222,7 +215,7 @@ In 5 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 | births_sex                | births_sex                      |                                                                           |
 | migrate_a0                | migration_rate_a0               |                                                                           |
 | hiv_ag_prob               | hiv_age_up_prob                 | Probability of aging from one group to the next in HIV age stratification |
-| hivpop_ha(ha, g)          | hiv_population_coarse_ages      |                                                                           |
+| hivpop_ha(ha, s)          | hiv_population_coarse_ages      |                                                                           |
 | deathsmig_ha              | deaths_migrate                  |                                                                           |
 | deathmigrate_ha           | deaths_migrate_rate             |                                                                           |
 | cd4elig_idx               | ?                               | Index of the maximum CD4 count category eligible for ART                  |
@@ -251,7 +244,7 @@ In 5 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 | hivpop_ha(ha)             | hivpop_ha                       | HIV population by coarse HIV age group stratification                     |
 | hivqx_ha                  |                                 |                                                                           |
 | hivdeaths_a               |                                 |                                                                           |
-| age15_hivpop              | age15_hiv_pop                   | 15 year olds aging out of the paediatric population                       |
+| age15_hivpop              | age15_hivpop                   | 15 year olds aging out of the paediatric population                       |
 | deaths_paeds              | hc_posthivmort                  | PLHIV 0-14y stratified by age, sex, transmission type, and CD4 after HIV related mortality |
 | grad_paeds                | hc_grad                         | Difference in PLHIV 0-14 stratified by age, sex, transmission type, and CD4 between the current and next timestep      |
 |                           | eligible                        | Children eligilbe for ART by CD4, age, and sex. Summed hc_art_need_init by transmission category.|

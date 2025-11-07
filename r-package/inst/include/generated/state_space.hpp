@@ -21,6 +21,7 @@ struct BaseSS {
 };
 
 enum ConfigsAndOverrides {
+  Sp,
   Hc,
   HaOverride0,
   Ha,
@@ -43,6 +44,10 @@ struct SSMixer<ModelVariant>: public BaseSS {
 
 template<MV ModelVariant, ConfigsAndOverrides T, typename ...Ts>
 struct SSMixer<ModelVariant, SSPair<false, T>, Ts...>: public SSMixer<ModelVariant, Ts...> {};
+
+template<MV ModelVariant, typename ...Ts>
+struct SSMixer<ModelVariant, SSPair<true, Sp>, Ts...>: public SSMixer<ModelVariant, Ts...> {
+};
 
 template<MV ModelVariant, typename ...Ts>
 struct SSMixer<ModelVariant, SSPair<true, Hc>, Ts...>: public SSMixer<ModelVariant, Ts...> {
@@ -100,6 +105,7 @@ struct SSMixer<ModelVariant, SSPair<true, Dp>, Ts...>: public SSMixer<ModelVaria
 template<MV ModelVariant>
 using SSMixed = SSMixer<
   ModelVariant,
+  SSPair<ModelVariant::run_spectrum_model, Sp>,
   SSPair<ModelVariant::run_child_model, Hc>,
   SSPair<ModelVariant::run_hiv_simulation && ModelVariant::use_coarse_stratification, HaOverride0>,
   SSPair<ModelVariant::run_hiv_simulation, Ha>,

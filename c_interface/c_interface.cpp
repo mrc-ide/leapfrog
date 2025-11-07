@@ -58,7 +58,7 @@ DllExport HRESULT WINAPI run_aim(leapfrog::internal::CParams<double> &data,
    leapfrog::internal::CState<double> &out,
    CallbackFunction error_handler) {
 #pragma EXPORT
-return fit_model<leapfrog::ChildModel>(data, options, out, error_handler);
+return fit_model<leapfrog::Spectrum>(data, options, out, error_handler);
 }
 
 template <typename ModelVariant>
@@ -112,6 +112,6 @@ DllExport HRESULT WINAPI run_aim_single_year(leapfrog::internal::CParams<double>
                                              leapfrog::internal::CState<double> &out,
                                              CallbackFunction error_handler) {
   #pragma EXPORT
-  return fit_model_single_year<leapfrog::ChildModel>(data, options, initial_state, simulation_start_year, out, error_handler);
+  return fit_model_single_year<leapfrog::Spectrum>(data, options, initial_state, simulation_start_year, out, error_handler);
 }
 
