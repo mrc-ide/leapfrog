@@ -73,6 +73,9 @@ struct AdultHivModelSimulation<Config> {
       nda::fill(i_ha.h_hiv_deaths_age_sex, 0.0);
       nda::fill(i_ha.h_deaths_excess_nonaids_agesex, 0.0);
       run_disease_progression_and_mortality(hiv_step);
+      if constexpr (ModelVariant::input_transmission_rate) {
+        calc_infections_from_transmission(hiv_step);
+      }
       run_new_p_infections(hiv_step);
       run_new_hiv_p_infections(hiv_step);
 
@@ -156,6 +159,11 @@ struct AdultHivModelSimulation<Config> {
       }
     }
   };
+
+  void calc_infections_from_transmission(int hiv_step) {
+    int ts = (t-1) * opts.hts_per_year + hiv_step;
+    // use rvec(ts) here
+  }
 
   void run_new_p_infections(int hiv_step) {
     const auto& p_ha = pars.ha;

@@ -19,7 +19,8 @@ std::vector<std::string> list_model_configurations() {
     "HivCoarseAgeStratification",
     "ChildModel",
     "CoarseChildModel",
-    "Spectrum"
+    "Spectrum",
+    "HivCoarseAgeFit"
   };
 }
 
@@ -143,6 +144,8 @@ auto sim_model(const std::string configuration, Args&&... args) {
     return simulate_model<leapfrog::CoarseChildModel>(std::forward<Args>(args)...);
   } else if (configuration == "Spectrum") {
     return simulate_model<leapfrog::Spectrum>(std::forward<Args>(args)...);
+  } else if (configuration == "HivCoarseAgeFit") {
+    return simulate_model<leapfrog::HivCoarseAgeFit>(std::forward<Args>(args)...);
   } else {
     const auto available_variants = list_model_configurations();
     std::ostringstream oss;

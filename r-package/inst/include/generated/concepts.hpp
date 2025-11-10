@@ -15,6 +15,7 @@ concept MV = requires (ModelVariant mv) {
   { mv.use_coarse_stratification } -> std::convertible_to<bool>;
   { mv.run_child_model } -> std::convertible_to<bool>;
   { mv.run_spectrum_model } -> std::convertible_to<bool>;
+  { mv.input_transmission_rate } -> std::convertible_to<bool>;
 };
 
 
@@ -32,6 +33,9 @@ concept RunChildModel = MV<typename Config::ModelVariant> && Config::ModelVarian
 
 template<typename Config>
 concept RunSpectrumModel = MV<typename Config::ModelVariant> && Config::ModelVariant::run_spectrum_model;
+
+template<typename Config>
+concept InputTransmissionRate = MV<typename Config::ModelVariant> && Config::ModelVariant::input_transmission_rate;
 
 } // namespace internal
 } // namespace leapfrog

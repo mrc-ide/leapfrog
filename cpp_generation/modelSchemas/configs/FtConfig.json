@@ -1,0 +1,17 @@
+{
+  "name": "Ft",
+  "long_name": "Fit",
+  "namespace": "ft",
+  "enable_if": "input_transmission_rate",
+  "state_space": {
+    "default": {}
+  },
+  "pars": {
+    "rvec": {
+      "num_type": "real_type",
+      "dims": ["opts.proj_steps * opts.hts_per_year"]
+    }
+  },
+  "intermediate": {},
+  "state": {}
+}
