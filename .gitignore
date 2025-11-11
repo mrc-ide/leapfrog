@@ -3,11 +3,11 @@
 .RData
 .Ruserdata
 .idea
-r-package/int/doc
+leapfrog/int/doc
 .vscode
 README.html
 .clangd
 .clang-format
 model-outputs
-r-package/tests/testthat/testdata/*.h5
-r-package/tests/testthat/testdata/*.rds
+leapfrog/tests/testthat/testdata/*.h5
+leapfrog/tests/testthat/testdata/*.rds

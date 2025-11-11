@@ -16,7 +16,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: r-package
+        working-directory: leapfrog
 
     steps:
       - uses: actions/checkout@v4
@@ -30,7 +30,7 @@ jobs:
         with:
           extra-packages: covr, any::here
           needs: coverage
-          working-directory: r-package
+          working-directory: leapfrog
 
       - name: Create test data
         shell: bash

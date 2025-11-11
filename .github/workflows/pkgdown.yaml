@@ -21,7 +21,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     defaults:
       run:
-        working-directory: r-package
+        working-directory: leapfrog
     steps:
       - uses: actions/checkout@v4
 
@@ -31,21 +31,21 @@ jobs:
         with:
           use-public-rspm: true
           extra-repositories: https://mrc-ide.r-universe.dev
-          working-directory: r-package
+          working-directory: leapfrog
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::pkgdown, any::here
           needs: website
-          working-directory: r-package
+          working-directory: leapfrog
 
       # This as a separate step as we need dependencies to be resolved
       # otherwise this is erroring when running the configure script
-      - name: Install frogger
+      - name: Install leapfrog
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
           packages: local::.
-          working-directory: r-package
+          working-directory: leapfrog
 
       - name: Build site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
@@ -57,4 +57,4 @@ jobs:
         with:
           clean: false
           branch: gh-pages
-          folder: ./r-package/docs
+          folder: ./leapfrog/docs

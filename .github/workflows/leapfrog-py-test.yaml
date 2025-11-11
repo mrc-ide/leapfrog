@@ -53,10 +53,10 @@ jobs:
         with:
           extra-packages: any::rcmdcheck, any::here
           needs: check
-          working-directory: r-package
+          working-directory: leapfrog
 
       - name: Create test data
-        working-directory: r-package
+        working-directory: leapfrog
         shell: bash
         run: ./scripts/create_test_data.R
 

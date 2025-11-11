@@ -22,6 +22,6 @@ message(CMAKE_CURRENT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 
 target_include_directories(leapfrog
     PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/../r-package/inst/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/../leapfrog/inst/include
 )
 

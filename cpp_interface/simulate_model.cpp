@@ -6,7 +6,7 @@
 #include <string_view>
 #include <numeric>
 
-#include "frogger.hpp"
+#include "leapfrog.hpp"
 #include "generated/cpp_interface/cpp_adapters.hpp"
 
 int main(int argc, char* argv[]) {
