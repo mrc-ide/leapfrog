@@ -4,7 +4,7 @@
 ## We read some input data and prepare a set of demographic projection
 ## and HIV parameters for both the adult and the child model.
 ## We also run leapfrog and save out the result for use in reference tests
-
+rm(list = ls())
 devtools::load_all()
 
 # nolint start
@@ -54,21 +54,15 @@ demp$netmigr_adj <- leapfrog:::adjust_spectrum_netmigr(demp$netmigr)
 
 proj_coarse <- prepare_leapfrog_projp(pjnz_child, use_coarse_age_groups = TRUE)
 parameters_coarse <- c(demp, proj_coarse)
-parameters_coarse <- prepare_hc_leapfrog_projp(pjnz_child,  params = parameters_coarse, use_coarse_age_groups = TRUE)
+parameters_coarse <- prepare_hc_leapfrog_projp(pjnz_child, params = parameters_coarse,
+                                               bypass_adult = TRUE,
+                                               use_coarse_age_groups = TRUE)
 
 proj <- prepare_leapfrog_projp(pjnz_child, use_coarse_age_groups = FALSE)
 parameters <- c(proj, demp)
-parameters <- prepare_hc_leapfrog_projp(pjnz_child, params = parameters, use_coarse_age_groups = FALSE)
-
-dpfile <- grep(".DP$", utils::unzip(pjnz_child, list=TRUE)$Name, value=TRUE)
-dp <- utils::read.csv(unz(pjnz_child, dpfile), as.is=TRUE)
-dpsub <- function(dp, tag, rows, cols, tagcol=1){
-  dp[which(dp[,tagcol]==tag)+rows, cols]
-}
-yr_start <- as.integer(dpsub(dp,"<FirstYear MV2>",2,4))
-yr_end <- as.integer(dpsub(dp, "<FinalYear MV2>",2,4))
-proj.years <- yr_start:yr_end
-timedat.idx <- 4+1:length(proj.years)-1
+parameters <- prepare_hc_leapfrog_projp(pjnz_child, params = parameters,
+                                        bypass_adult = TRUE,
+                                        use_coarse_age_groups = FALSE)
 
 pop1 <- gsub(pattern = '.PJNZ', replacement = '_pop1.xlsx', x = pjnz_child)
 
@@ -109,32 +103,21 @@ spectrum_output <- function(file, ages = 0:14, country = 'Botswana', years_in = 
 }
 df <- spectrum_output(pop1, ages = 0:80, 'country', years_in = 1970:2030)
 x <- df$total
-x[x$age <10 & x$year == 2001, ]
 
-tag.x ="<AIDSDeathsNoARTSingleAge MV>"
-start.id = 20898
-end.id = 21148
-aids_deathsnoart <- array(as.numeric(unlist(dpsub(dp, tag.x, 3:(end.id - start.id - 2), timedat.idx))), dim = c(length(3:(end.id - start.id - 2)),length(timedat.idx)))
-m = aids_deathsnoart[84:98,]
-f = aids_deathsnoart[166:180,]
-aids_deathsnoart <- array(0, dim = c(15,2,61))
-aids_deathsnoart[,1,] <- m
-aids_deathsnoart[,2,] <- f
+dp <- read_dp(pjnz_child)
+dat <- parse_dp(dp)
 
-tag.x ="<AIDSDeathsARTSingleAge MV>"
-start.id = 20608
-end.id = 20858
-aids_deathsart <- array(as.numeric(unlist(dpsub(dp, tag.x, 3:(end.id - start.id - 2), timedat.idx))), dim = c(length(3:(end.id - start.id - 2)),length(timedat.idx)))
-m = aids_deathsart[84:98,]
-f = aids_deathsart[166:180,]
-aids_deathsart <- array(0, dim = c(15,2,61))
-aids_deathsart[,1,] <- m
-aids_deathsart[,2,] <- f
+aids_deathsnoart <- array(0, dim = c(15,2,61), dimnames = list(age = 0:14, sex = c('male', 'female'), years = 1970:2030))
+aids_deathsnoart[,'male',] <- dat$data$aids_deaths_no_art_single_age$data[rownames(dat$data$aids_deaths_no_art_single_age$data) %in% c(paste0(0:14, ' male')),]
+aids_deathsnoart[,'female',] <- dat$data$aids_deaths_no_art_single_age$data[rownames(dat$data$aids_deaths_no_art_single_age$data) %in% c(paste0(0:14, ' female')),]
 
-spec_ctx_need <- dpsub(dp, tag = '<ChildARTCalc MV2>', rows = 3, cols = timedat.idx)
+aids_deathsart <- array(0, dim = c(15,2,61), dimnames = list(age = 0:14, sex = c('male', 'female'), years = 1970:2030))
+aids_deathsart[,'male',] <- dat$data$aids_deaths_art_single_age$data[rownames(dat$data$aids_deaths_art_single_age$data) %in% c(paste0(0:14, ' male')),]
+aids_deathsart[,'female',] <- dat$data$aids_deaths_art_single_age$data[rownames(dat$data$aids_deaths_art_single_age$data) %in% c(paste0(0:14, ' female')),]
+
+spec_ctx_need <- dat$data$child_art_calc$data["Children needing cotrim (0-14): both",]
 
 out <- list(dp = dp,
-            timedat.idx = timedat.idx,
             pjnz = pjnz_child,
             pop1 = x,
             ontrt = df$on_treatment,

@@ -88,7 +88,6 @@ read_netmigr <- function(pjnz, use_ep5=FALSE, adjust_u5mig = TRUE, sx = NULL) {
       sx <- read_sx(pjnz)
     }
 
-    browser()
     u5prop <- array(dim = c(5, 2))
     u5prop[1, ] <- sx[1, , 1] * 2
     u5prop[2, ] <- sx[2, , 1] * u5prop[1, ]
