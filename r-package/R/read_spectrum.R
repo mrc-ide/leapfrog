@@ -184,14 +184,14 @@ prepare_pmtct_dropout <- function(data){
                   "Option B",
                   "Option B+: before pregnancy",
                   "Option B+: >4 weeks",
-                  "Option B+: <4 weeks"),"<12MOS breastfeeding",] <- data$arv_regimen$data[rownames(data$arv_regimen$data) %in%
-                                                                                             c("Monthly dropout breastfeeding: ART 0-12 months breastfeeding" ),]
+                  "Option B+: <4 weeks"),"<12MOS breastfeeding",] <- rep(data$arv_regimen$data[rownames(data$arv_regimen$data) %in%
+                                                                                             c("Monthly dropout breastfeeding: ART 0-12 months breastfeeding" ),], each = 5)
   pmtct_dropout[c("Option A",
                   "Option B",
                   "Option B+: before pregnancy",
                   "Option B+: >4 weeks",
-                  "Option B+: <4 weeks"),">12MOS breastfeeding",] <- data$arv_regimen$data[rownames(data$arv_regimen$data) %in%
-                                                                                             c("Monthly dropout breastfeeding: ART 12+ months breastfeeding" ),]
+                  "Option B+: <4 weeks"),">12MOS breastfeeding",] <- rep(data$arv_regimen$data[rownames(data$arv_regimen$data) %in%
+                                                                                             c("Monthly dropout breastfeeding: ART 12+ months breastfeeding" ),], each = 5)
   pmtct_dropout[is.na(pmtct_dropout)] <- 0
   pmtct_dropout <- pmtct_dropout / 100
   return(pmtct_dropout)
@@ -422,7 +422,6 @@ prepare_hc_leapfrog_projp <- function(pjnz, params,
   v$fert_mult_by_age <- subparms$fert_rat
   v$fert_mult_on_art <- subparms$frr_art6mos
 
-# <<<<<<< HEAD
   v$abortion <- prepare_abortion_input(data)
   v$patients_reallocated <- data$dp_tgx_patients_reallocated$data
 
@@ -434,19 +433,6 @@ prepare_hc_leapfrog_projp <- function(pjnz, params,
   v$PMTCT <- pmtct$pmtct_new
   v$PMTCT_input_is_percent <- as.integer(pmtct$pmtct_input_isperc)
   v$PMTCT_dropout <- prepare_pmtct_dropout(data)
-# =======
-#   pmtct_new <- array(0, dim = c(7, length(proj.years)), dimnames = list(pmtct = c("Option A", "Option B", "SDNVP", "Dual ARV", "Option B+: before pregnancy", "Option B+: >4 weeks", "Option B+: <4 weeks")))
-#   ## pick out which ones were inserted as numbers
-#   pmtct_new[, which(colSums(pmtct_list)[, 1] > 0)] <- pmtct_list[, (which(colSums(pmtct_list)[, 1] > 0)), 1]
-#   ## pick out which ones were inserted as percent
-#   pmtct_new[, which(colSums(pmtct_list)[, 1] == 0)] <- pmtct_list[, which(colSums(pmtct_list)[, 1] == 0), 2]
-#   v$pmtct <- pmtct_new
-#
-#   v$pmtct_input_isperc <- !(apply(input_pmtct_ispercent(dp.x), 2, any))
-#
-#   ##PMTCT dropout
-#   v$pmtct_dropout <- input_pmtct_retained(dp.x, proj.years)
-# >>>>>>> main
 
   ##rates of MTCT
   mtct <- prepare_vertical_transmission(data)

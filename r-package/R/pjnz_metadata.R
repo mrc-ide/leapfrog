@@ -971,7 +971,7 @@ cd4_distribution_15_49 = list(
    read = list(
      list(
        tag = "AIDSDeathsNoARTSingleAge MV",
-       dims = list("age_by_sex_both", "years"),
+       dims = list("age_by_sex_both1", "years"),
        skip = list(
          rows = c(82,163)
        ),
@@ -984,7 +984,7 @@ aids_deaths_art_single_age = list(
   read = list(
     list(
       tag = "AIDSDeathsARTSingleAge MV",
-      dims = list("age_by_sex_both", "years"),
+      dims = list("age_by_sex_both1", "years"),
       skip = list(
         rows = c(82,163)
       ),
@@ -1113,6 +1113,7 @@ get_static_dim_vars <- function() {
    cotrim_years_effective = list(length = 5, labels = paste0('Year ', 1:5)),
    art_status = list(length = 2, labels = c('no art', 'art')),
    age_by_sex_both = list(length = 243,labels =  paste0(rep(c(0:79, "80+"), each = 3), rep(c(' both', ' male', ' female'), 81))),
+   age_by_sex_both1 = list(length = 243,labels =  paste0(rep(c(0:79, "80+"), 3), rep(c(' both', ' male', ' female'), each = 81))),
    age_by_sex = list(length = 162,labels =  paste0(rep(c(0:79, "80+"), each = 2), rep(c(' male', ' female'), 81))),
    child_art_cats = list(length = 12, labels = paste0(rep(c('Children needing cotrim (0-14): ', 'Children receiving cotrim (0-14): ', "Children needing ART (0-14): ", "Children receiving ART (0-14): "), each = 3),
                                               rep(c('both', 'male', 'female'), 4)))
