@@ -147,7 +147,8 @@ prepare_pmtct <- function(data){
                        !grepl('postnatal', rownames(pmtct)) & !grepl('Postnatal', rownames(pmtct)) &
                        !grepl('Total', rownames(pmtct)),]
   pmtct_pct <- pmtct_pct[-(which(rownames(pmtct_pct) == "No prophylaxis- Percent")),]
-  pmtct_input_isperc <- colSums(pmtct_pct) > 0
+  pmtct_input_isperc <- rep(1, ncol(pmtct_number))
+  pmtct_input_isperc[colSums(pmtct_number) > 0] <- 0
   order =  c("Option A", "Option B", "Single dose nevirapine",
              "WHO 2006 dual ARV regimen", "ART: Started before pregnancy",
              "ART: Started during pregnancy >4 weeks", "ART: Started during pregnancy <4 weeks")
@@ -176,13 +177,18 @@ prepare_pmtct_dropout <- function(data){
                          dimnames = list(pmtct = c("Option A", "Option B", "SDNVP", "Dual ARV", "Option B+: before pregnancy", "Option B+: >4 weeks", "Option B+: <4 weeks"),
                                          drop_out_by = c('Delivery', '<12MOS breastfeeding', '>12MOS breastfeeding'),
                                          year = proj.years))
+  pmtct_dropout[,"Delivery",] <- 100
   pmtct_dropout["Option B+: before pregnancy","Delivery",] <- data$percent_art_delivery$data["Percent already on ART retained at delivery",]
   pmtct_dropout["Option B+: >4 weeks","Delivery",] <- data$percent_art_delivery$data["Percent starting ART retained at delivery",]
-  pmtct_dropout[c("Option B+: before pregnancy",
+  pmtct_dropout[c("Option A",
+                  "Option B",
+                  "Option B+: before pregnancy",
                   "Option B+: >4 weeks",
                   "Option B+: <4 weeks"),"<12MOS breastfeeding",] <- data$arv_regimen$data[rownames(data$arv_regimen$data) %in%
                                                                                              c("Monthly dropout breastfeeding: ART 0-12 months breastfeeding" ),]
-  pmtct_dropout[c("Option B+: before pregnancy",
+  pmtct_dropout[c("Option A",
+                  "Option B",
+                  "Option B+: before pregnancy",
                   "Option B+: >4 weeks",
                   "Option B+: <4 weeks"),">12MOS breastfeeding",] <- data$arv_regimen$data[rownames(data$arv_regimen$data) %in%
                                                                                              c("Monthly dropout breastfeeding: ART 12+ months breastfeeding" ),]
@@ -211,14 +217,15 @@ prepare_vertical_transmission <- function(data){
   mtct_trt[,"Option B+: >4 weeks","perinatal"] <- mtct["ART: Started during pregnancy >4 weeks", "Perinatal"]
   mtct_trt[,"Option B+: <4 weeks","perinatal"] <- mtct["ART: Started during pregnancy <4 weeks", "Perinatal"]
 
-  mtct_trt[,"Option A","breastfeeding"] <- mtct["Option A", "Breastfeeding (per month) >=350"]
-  mtct_trt[,"Option B","breastfeeding"] <- mtct["Option B", "Breastfeeding (per month) >=350"]
+  mtct_trt[c('250-349', '200-249', '100-199', '50-99', '<50'),"Option A","breastfeeding"] <- mtct["Option A", "Breastfeeding (per month) >=350"]
+  mtct_trt[c('250-349', '200-249', '100-199', '50-99', '<50'),"Option B","breastfeeding"] <- mtct["Option B", "Breastfeeding (per month) >=350"]
   ##This should be CD4 stratified, but only the <350 val is actually used
-  mtct_trt[,"SDNVP","breastfeeding"] <- mtct["Single dose nevirapine", "Breastfeeding (per month) <350"]
+  mtct_trt[c('>500', '350-500'),"SDNVP","breastfeeding"] <- mtct["Single dose nevirapine", "Breastfeeding (per month) <350"]
+  mtct_trt[c('250-349', '200-249', '100-199', '50-99', '<50'),"SDNVP","breastfeeding"] <- mtct["Single dose nevirapine", "Breastfeeding (per month) >=350"]
   mtct_trt[,"Dual ARV","breastfeeding"] <- mtct["WHO 2006 dual ARV regimen", "Breastfeeding (per month) >=350"]
-  mtct_trt[,"Option B+: before pregnancy","breastfeeding"] <- mtct["ART: Started before pregnancy", "Breastfeeding (per month) <350"]
-  mtct_trt[,"Option B+: >4 weeks","breastfeeding"] <- mtct["ART: Started during pregnancy >4 weeks", "Breastfeeding (per month) <350"]
-  mtct_trt[,"Option B+: <4 weeks","breastfeeding"] <- mtct["ART: Started during pregnancy <4 weeks", "Breastfeeding (per month) <350"]
+  mtct_trt[c('250-349', '200-249', '100-199', '50-99', '<50'),"Option B+: before pregnancy","breastfeeding"] <- mtct["ART: Started before pregnancy", "Breastfeeding (per month) <350"]
+  mtct_trt[c('250-349', '200-249', '100-199', '50-99', '<50'),"Option B+: >4 weeks","breastfeeding"] <- mtct["ART: Started during pregnancy >4 weeks", "Breastfeeding (per month) <350"]
+  mtct_trt[c('250-349', '200-249', '100-199', '50-99', '<50'),"Option B+: <4 weeks","breastfeeding"] <- mtct["ART: Started during pregnancy <4 weeks", "Breastfeeding (per month) <350"]
   pmtct_mtct <- mtct_trt
 
   mtct <- array(data = 0, dim = c(8,2), dimnames = list(cd4 = c('>500', '350-500',
@@ -307,11 +314,11 @@ prepare_bypass_adult_model <- function(data, bypass_adult = F){
   wlhiv_cd4 <- data$cd4_distribution_15_49$data[paste0("HIV, female: ", c("500+", "350-500", "250-349", "200-249", "100-199", "50-99", "50-")),]
 
   hivnpop <- totpop - hivpop
-  adult_female_infections_full <- inc / hivnpop
+  adult_female_infections_full <- inc #/ hivnpop
 
   #cd4
   prop_gte350 <- colSums(wlhiv_cd4[paste0("HIV, female: ", c("500+", "350-500")),]) / colSums(wlhiv_cd4)
-  prop_lt200 <- colSums(wlhiv_cd4[paste0("HIV, female: ", c("250-349", "200-249", "100-199", "50-99", "50-")),]) / colSums(wlhiv_cd4)
+  prop_lt200 <- colSums(wlhiv_cd4[paste0("HIV, female: ", c("100-199", "50-99", "50-")),]) / colSums(wlhiv_cd4)
 
   return(list(mat_hiv_births = mat_hiv_births,
               mat_prev_input = mat_prev_input,
@@ -465,8 +472,8 @@ prepare_hc_leapfrog_projp <- function(pjnz, params,
   v$ctx_val_is_percent <- ifelse(data$child_art_by_age_group_pernum$data["Cotrim",] == 1, T, F)
   v$ctx_val_is_percent <- as.integer(v$ctx_val_is_percent)
   v$ctx_val <- data$child_treat_inputs$data["Cotrim",]
-  if(any(v$ctx_val_ispercent)){
-    v$ctx_val[v$ctx_val_ispercent] <- v$ctx_val[v$ctx_val_ispercent] / 100
+  if(any(v$ctx_val_is_percent == 1)){
+    v$ctx_val[v$ctx_val_is_percent == 1] <- v$ctx_val[v$ctx_val_is_percent == 1] / 100
   }
   v$ctx_effect <- prepare_cotrim_effect(data)
 

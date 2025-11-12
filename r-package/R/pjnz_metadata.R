@@ -599,7 +599,8 @@ get_pars_metadata <- function(dim_vars, dp) {
       read = list(
         list(
           tag = "ARVRegimen MV3",
-          dims = list("pmtct_editor_order", "years")
+          dims = list("pmtct_editor_order", "years"),
+          start_offset = list(column = 1)
         ),
         list(
           tag = "ARVRegimen MV2",
@@ -799,7 +800,7 @@ get_pars_metadata <- function(dim_vars, dp) {
           tag = "ChildAnnRateProgressLowerCD4 MV2",
           dims = list("g", "cd4_prog_0to14"),
           skip = list(
-            column = (dim_vars$cd4_perc_0to4$length - 1) * 2 + 1
+            columns = (dim_vars$cd4_perc_0to4$length - 1) * 2 + 1
           ),
           start_offset = list(row = 1)
         )
@@ -948,18 +949,19 @@ cd4_distribution_15_49 = list(
   type = "real",
   read = list(
     list(
-      tag = "CD4Distribution MV2",
-      dims = list("cd4_count_dist", "years"),
+      tag = "CD4Distribution15_49 MV2",
+      dims = list("cd4_count_dist_new", "years"),
       skip = list(
-        rows =  c(25,50)
-      )
+        rows =  c(8,16,24,25,33,41,49)
+      ),
+      start_offset = list(row = 1)
     ),
     list(
-      tag = "CD4Distribution MV",
+      tag = "CD4Distribution15_49 MV",
       dims = list("cd4_count_dist_old", "years"),
       skip = list(
         rows =  c(9:11, 19:28, 37:39,
-                  47:56, 65:67, 75: 84)
+                  47:56, 65:67, 75:84)
       )
     )
   )
@@ -1042,6 +1044,9 @@ get_static_dim_vars <- function() {
     cd4_count_dist = list(length = 48, labels = paste0(rep(c("HIV, ", "ART, "), each = 24),
                                                        rep(rep(c('both: ', 'male: ', 'female: '), each = 8), 2),
                                                        rep(c("HIV neg", "500+", "350-500", "250-349", "200-249", "100-199", "50-99", "50-"), 6))),
+    cd4_count_dist_new = list(length = 42, labels = paste0(rep(c("HIV, ", "ART, "), each = 21),
+                                                       rep(rep(c('both: ', 'male: ', 'female: '), each = 7), 2),
+                                                       rep(c("500+", "350-500", "250-349", "200-249", "100-199", "50-99", "50-"), 6))),
     cd4_count_dist_old = list(length = 45, labels = paste0(rep(c(rep("HIV, ", 8), rep("ART, ", 7)), 3),
                                                            rep(c('both: ', 'male: ', 'female: '), each = 15),
                                                        rep(c("HIV neg", rep(c("500+", "350-500", "250-349", "200-249", "100-199", "50-99", "50-"), 2)), 3))),
