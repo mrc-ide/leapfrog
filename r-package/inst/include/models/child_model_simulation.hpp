@@ -127,6 +127,7 @@ struct ChildModelSimulation<Config> {
 
   void run_child_model_simulation() {
     const auto& p_hc = pars.hc;
+    auto& n_hc = state_next.hc;
 
     run_child_ageing();
 
@@ -138,6 +139,23 @@ struct ChildModelSimulation<Config> {
 
     adjust_hiv_births();
     add_infections();
+    if(t == 26){
+      auto temp = 0.0;
+      for (int s = 0; s < NS; ++s) {
+        for (int a = 1; a < hc2_agestart; ++a) {
+          for (int cat = 0; cat < hcTT; ++cat) {
+            for (int hd = 0; hd < hc1DS; ++hd) {
+              if (a == age_1) {
+                temp += n_hc.hc1_hivpop(hd, cat, a, s) * 0.5;
+              } else {
+                temp += n_hc.hc1_hivpop(hd, cat, a, s);
+              }
+            }
+          }
+        }
+      }
+      std::cout << temp;
+    }
     need_for_cotrim();
     cd4_mortality();
     run_child_hiv_mort();
@@ -923,9 +941,6 @@ struct ChildModelSimulation<Config> {
     // Births from the last 18 months are eligible
     n_hc.ctx_need = n_hc.hiv_births * 1.5;
 
-    if(t == 26){
-      std::cout << n_hc.ctx_need;
-    }
 
     // All children 1.5-4 eligible
     for (int s = 0; s < NS; ++s) {
@@ -941,9 +956,7 @@ struct ChildModelSimulation<Config> {
         }
       }
     }
-    if(t == 26){
-      std::cout << n_hc.ctx_need;
-    }
+
     // Children under five on ART also eligible
     for (int s = 0; s < NS; ++s) {
       for (int a = 0; a < hc2_agestart; ++a) {
@@ -958,9 +971,7 @@ struct ChildModelSimulation<Config> {
         } // end a
       } // end hcTT
     } // end NS
-    if(t == 26){
-      std::cout << n_hc.ctx_need;
-    }
+
     // All ART eligible children ages 5-14 eligible
     // Spectrum uses a lagged population and eligibility for children over five (TODO: verify, noted in issue #274)
     for (int s = 0; s < NS; ++s) {
@@ -974,9 +985,7 @@ struct ChildModelSimulation<Config> {
         } // end a
       } // end hcTT
     } // end NS
-    if(t == 26){
-      std::cout << n_hc.ctx_need;
-    }
+
   };
 
   void get_cotrim_effect(int art_flag) {
