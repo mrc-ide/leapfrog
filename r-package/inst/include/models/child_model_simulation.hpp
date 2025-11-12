@@ -143,13 +143,11 @@ struct ChildModelSimulation<Config> {
       auto temp = 0.0;
       for (int s = 0; s < NS; ++s) {
         for (int a = 1; a < hc2_agestart; ++a) {
-          for (int cat = 0; cat < hcTT; ++cat) {
-            for (int hd = 0; hd < hc1DS; ++hd) {
-              if (a == age_1) {
-                temp += n_hc.hc1_hivpop(hd, cat, a, s) * 0.5;
-              } else {
-                temp += n_hc.hc1_hivpop(hd, cat, a, s);
-              }
+          for (int hd = 0; hd < hc1DS; ++hd) {
+            if (a == age_1) {
+              temp += n_hc.hc1_hivpop(hd, 0, a, s) * 0.5;
+            } else {
+              temp += n_hc.hc1_hivpop(hd, 0, a, s);
             }
           }
         }
