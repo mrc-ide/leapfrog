@@ -21,21 +21,21 @@
     ]
   },
   "pars": {
-    "total_rate": {
+    "input_adult_incidence_rate": {
       "num_type": "real_type",
       "dims": ["opts.proj_steps"],
       "alias": {
         "r": "incidinput"
       }
     },
-    "relative_risk_age": {
+    "incidence_rate_ratio_age": {
       "num_type": "real_type",
       "dims": ["SS::pAG - SS::p_idx_hiv_first_adult", "SS::NS", "opts.proj_steps"],
       "alias": {
         "r": "incrr_age"
       }
     },
-    "relative_risk_sex": {
+    "incidence_rate_ratio_sex": {
       "num_type": "real_type",
       "dims": ["opts.proj_steps"],
       "alias": {
@@ -153,7 +153,7 @@
       "num_type": "real_type",
       "dims": ["SS::pAG"]
     },
-    "rate_sex": {
+    "incidence_rate_sex": {
       "num_type": "real_type",
       "dims": ["SS::NS"]
     },

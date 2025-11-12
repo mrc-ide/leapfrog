@@ -94,10 +94,10 @@ struct AdultHivModelSimulation<Config> {
     auto& i_ha = intermediate.ha;
 
     real_type denominator = i_ha.hiv_neg_aggregate(MALE) +
-                            p_ha.relative_risk_sex(t) * i_ha.hiv_neg_aggregate(FEMALE);
+                            p_ha.incidence_rate_ratio_sex(t) * i_ha.hiv_neg_aggregate(FEMALE);
     real_type total_neg = i_ha.hiv_neg_aggregate(MALE) + i_ha.hiv_neg_aggregate(FEMALE);
-    i_ha.rate_sex(MALE) = p_ha.total_rate(t) * total_neg / denominator;
-    i_ha.rate_sex(FEMALE) = i_ha.rate_sex(MALE) * p_ha.relative_risk_sex(t);
+    i_ha.incidence_rate_sex(MALE) = p_ha.input_adult_incidence_rate(t) * total_neg / denominator;
+    i_ha.incidence_rate_sex(FEMALE) = i_ha.incidence_rate_sex(MALE) * p_ha.incidence_rate_ratio_sex(t);
   };
 
   void run_calculate_incidence_rate() {
@@ -175,14 +175,14 @@ struct AdultHivModelSimulation<Config> {
       }
 
       for (int a = adult_incid_first_age_group; a < adult_incid_last_age_group; ++a) {
-        i_ha.Xhivn_incagerr += p_ha.relative_risk_age(a - adult_incid_first_age_group, s, t) *
+        i_ha.Xhivn_incagerr += p_ha.incidence_rate_ratio_age(a - adult_incid_first_age_group, s, t) *
                                i_ha.hiv_negative_pop(a);
       }
 
       for (int a = adult_incid_first_age_group; a < pAG; ++a) {
         i_ha.p_infections_ts(a, s) = i_ha.hiv_negative_pop(a) *
-                                     i_ha.rate_sex(s) *
-                                     p_ha.relative_risk_age(a - adult_incid_first_age_group, s, t) *
+                                     i_ha.incidence_rate_sex(s) *
+                                     p_ha.incidence_rate_ratio_age(a - adult_incid_first_age_group, s, t) *
                                      i_ha.hiv_neg_aggregate(s) /
                                      i_ha.Xhivn_incagerr;
       }

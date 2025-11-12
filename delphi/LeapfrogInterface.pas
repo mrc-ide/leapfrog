@@ -79,12 +79,12 @@ end;
 type
   LeapfrogHivAdultParamsView = record
   private
-    totalRate: PDouble;
-    totalRateLength: Integer;
-    relativeRiskAge: PDouble;
-    relativeRiskAgeLength: Integer;
-    relativeRiskSex: PDouble;
-    relativeRiskSexLength: Integer;
+    inputAdultIncidenceRate: PDouble;
+    inputAdultIncidenceRateLength: Integer;
+    incidenceRateRatioAge: PDouble;
+    incidenceRateRatioAgeLength: Integer;
+    incidenceRateRatioSex: PDouble;
+    incidenceRateRatioSexLength: Integer;
     cd4Mortality: PDouble;
     cd4MortalityLength: Integer;
     cd4Progression: PDouble;
@@ -124,9 +124,9 @@ end;
 type
   LeapfrogHivAdultParams = class
   public
-    totalRate: TGBFixedArray<Double>;
-    relativeRiskAge: TGBFixedArray<Double>;
-    relativeRiskSex: TGBFixedArray<Double>;
+    inputAdultIncidenceRate: TGBFixedArray<Double>;
+    incidenceRateRatioAge: TGBFixedArray<Double>;
+    incidenceRateRatioSex: TGBFixedArray<Double>;
     cd4Mortality: TGBFixedArray<Double>;
     cd4Progression: TGBFixedArray<Double>;
     cd4InitialDistribution: TGBFixedArray<Double>;
@@ -536,9 +536,9 @@ end;
 
 destructor LeapfrogHivAdultParams.Destroy;
 begin;
-  totalRate.Free;
-  relativeRiskAge.Free;
-  relativeRiskSex.Free;
+  inputAdultIncidenceRate.Free;
+  incidenceRateRatioAge.Free;
+  incidenceRateRatioSex.Free;
   cd4Mortality.Free;
   cd4Progression.Free;
   cd4InitialDistribution.Free;
@@ -574,12 +574,12 @@ end;
 
 function LeapfrogHivAdultParams.getView(): LeapfrogHivAdultParamsView;
 begin;
-  Result.totalRate := PDouble(totalRate.data);
-  Result.totalRateLength := totalRate.GetLength();
-  Result.relativeRiskAge := PDouble(relativeRiskAge.data);
-  Result.relativeRiskAgeLength := relativeRiskAge.GetLength();
-  Result.relativeRiskSex := PDouble(relativeRiskSex.data);
-  Result.relativeRiskSexLength := relativeRiskSex.GetLength();
+  Result.inputAdultIncidenceRate := PDouble(inputAdultIncidenceRate.data);
+  Result.inputAdultIncidenceRateLength := inputAdultIncidenceRate.GetLength();
+  Result.incidenceRateRatioAge := PDouble(incidenceRateRatioAge.data);
+  Result.incidenceRateRatioAgeLength := incidenceRateRatioAge.GetLength();
+  Result.incidenceRateRatioSex := PDouble(incidenceRateRatioSex.data);
+  Result.incidenceRateRatioSexLength := incidenceRateRatioSex.GetLength();
   Result.cd4Mortality := PDouble(cd4Mortality.data);
   Result.cd4MortalityLength := cd4Mortality.GetLength();
   Result.cd4Progression := PDouble(cd4Progression.data);
@@ -898,9 +898,9 @@ procedure LeapfrogHivAdultParams.writeToDisk(dir: string);
 begin;
   if not DirectoryExists(dir) then
     ForceDirectories(dir);
-  totalRate.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'totalRate');
-  relativeRiskAge.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'relativeRiskAge');
-  relativeRiskSex.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'relativeRiskSex');
+  inputAdultIncidenceRate.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'inputAdultIncidenceRate');
+  incidenceRateRatioAge.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'incidenceRateRatioAge');
+  incidenceRateRatioSex.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'incidenceRateRatioSex');
   cd4Mortality.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'cd4Mortality');
   cd4Progression.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'cd4Progression');
   cd4InitialDistribution.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'cd4InitialDistribution');
