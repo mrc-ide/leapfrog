@@ -65,7 +65,13 @@ struct AdultHivModelSimulation<Config> {
 
     i_ha.everARTelig_idx = p_ha.idx_hm_elig(t) < hDS ? p_ha.idx_hm_elig(t) : hDS;
     i_ha.anyelig_idx = p_ha.idx_hm_elig(t);
-    run_calculate_incidence_rate();
+
+    // Note: In Spectrum, incidence rate by sex is calculated once per year, using
+    // the previous year HIV negative population.
+    // Incidence rate by age is calculated per time-step using the **current year** 
+    // HIV negative population, rathern than the previous year HIV population.
+    // Rob Glaubius, 5 August 2022: https://github.com/mrc-ide/leaptfrog/issues/18
+    run_calculate_annual_incidence_rate_by_sex();
 
     for (int hiv_step = 0; hiv_step < opts.hts_per_year; ++hiv_step) {
       nda::fill(i_ha.grad, 0.0);
@@ -89,33 +95,25 @@ struct AdultHivModelSimulation<Config> {
 
   // private methods that we don't want people to call
   private:
-  void distribute_rate_over_sexes() {
-    const auto& p_ha = pars.ha;
-    auto& i_ha = intermediate.ha;
+  void run_calculate_annual_incidence_rate_by_sex() {
 
-    real_type denominator = i_ha.hiv_neg_aggregate(MALE) +
-                            p_ha.incidence_rate_ratio_sex(t) * i_ha.hiv_neg_aggregate(FEMALE);
-    real_type total_neg = i_ha.hiv_neg_aggregate(MALE) + i_ha.hiv_neg_aggregate(FEMALE);
-    i_ha.incidence_rate_sex(MALE) = p_ha.input_adult_incidence_rate(t) * total_neg / denominator;
-    i_ha.incidence_rate_sex(FEMALE) = i_ha.incidence_rate_sex(MALE) * p_ha.incidence_rate_ratio_sex(t);
-  };
-
-  void run_calculate_incidence_rate() {
     const auto& p_ha = pars.ha;
     const auto& c_dp = state_curr.dp;
     const auto& c_ha = state_curr.ha;
     auto& i_ha = intermediate.ha;
 
-    const auto adult_incid_first_age_group = p_ha.pIDX_INCIDPOP;
-    const auto adult_incid_last_age_group = adult_incid_first_age_group + p_ha.pAG_INCIDPOP;
-
     for (int s = 0; s < NS; ++s) {
-      for (int a = adult_incid_first_age_group; a < adult_incid_last_age_group; ++a) {
+      for (int a = p_ha.pIDX_INCIDPOP; a < p_ha.pIDX_INCIDPOP + p_ha.pAG_INCIDPOP; ++a) {
         i_ha.hiv_neg_aggregate(s) += c_dp.p_totpop(a, s) - c_ha.p_hivpop(a, s);
       }
     }
 
-    distribute_rate_over_sexes();
+    real_type incrr_wgt_denominator = i_ha.hiv_neg_aggregate(MALE) +
+                            p_ha.incidence_rate_ratio_sex(t) * i_ha.hiv_neg_aggregate(FEMALE);
+    real_type total_neg = i_ha.hiv_neg_aggregate(MALE) + i_ha.hiv_neg_aggregate(FEMALE);
+    i_ha.incidence_rate_sex(MALE) = p_ha.input_adult_incidence_rate(t) * total_neg / incrr_wgt_denominator;
+    i_ha.incidence_rate_sex(FEMALE) = i_ha.incidence_rate_sex(MALE) * p_ha.incidence_rate_ratio_sex(t);
+
   };
 
   void run_disease_progression_and_mortality(int hiv_step) {
