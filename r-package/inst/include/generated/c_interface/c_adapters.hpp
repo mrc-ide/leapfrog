@@ -74,8 +74,8 @@ struct DpAdapter<Language::C, real_type, ModelVariant> {
     const CState<real_type>& state
   ){
     typename Config::State initial_state;
-    fill_initial_state<real_type, typename Config::State::shape_p_total_pop>(state.dp->p_total_pop, state.dp->p_total_pop_length, "p_total_pop", initial_state.p_total_pop);
-    fill_initial_state<real_type, typename Config::State::shape_p_total_pop_background_deaths>(state.dp->p_total_pop_background_deaths, state.dp->p_total_pop_background_deaths_length, "p_total_pop_background_deaths", initial_state.p_total_pop_background_deaths);
+    fill_initial_state<real_type, typename Config::State::shape_p_totpop>(state.dp->p_totpop, state.dp->p_totpop_length, "p_totpop", initial_state.p_totpop);
+    fill_initial_state<real_type, typename Config::State::shape_p_deaths_background_totpop>(state.dp->p_deaths_background_totpop, state.dp->p_deaths_background_totpop_length, "p_deaths_background_totpop", initial_state.p_deaths_background_totpop);
     initial_state.births = *(state.dp->births);
     return initial_state;
   };
@@ -87,8 +87,8 @@ struct DpAdapter<Language::C, real_type, ModelVariant> {
     const Config::OutputState& state,
     CState<real_type>& out
   ) {
-    write_data<real_type, typename Config::OutputState::shape_p_total_pop>(state.p_total_pop, out.dp->p_total_pop, out.dp->p_total_pop_length, "p_total_pop");
-    write_data<real_type, typename Config::OutputState::shape_p_total_pop_background_deaths>(state.p_total_pop_background_deaths, out.dp->p_total_pop_background_deaths, out.dp->p_total_pop_background_deaths_length, "p_total_pop_background_deaths");
+    write_data<real_type, typename Config::OutputState::shape_p_totpop>(state.p_totpop, out.dp->p_totpop, out.dp->p_totpop_length, "p_totpop");
+    write_data<real_type, typename Config::OutputState::shape_p_deaths_background_totpop>(state.p_deaths_background_totpop, out.dp->p_deaths_background_totpop, out.dp->p_deaths_background_totpop_length, "p_deaths_background_totpop");
     write_data<real_type, typename Config::OutputState::shape_births>(state.births, out.dp->births, out.dp->births_length, "births");
     return index + output_count;
   };
@@ -98,8 +98,8 @@ struct DpAdapter<Language::C, real_type, ModelVariant> {
     const Config::State& state,
     CState<real_type>& out
   ) {
-    write_data<real_type, typename Config::State::shape_p_total_pop>(state.p_total_pop, out.dp->p_total_pop, out.dp->p_total_pop_length, "p_total_pop");
-    write_data<real_type, typename Config::State::shape_p_total_pop_background_deaths>(state.p_total_pop_background_deaths, out.dp->p_total_pop_background_deaths, out.dp->p_total_pop_background_deaths_length, "p_total_pop_background_deaths");
+    write_data<real_type, typename Config::State::shape_p_totpop>(state.p_totpop, out.dp->p_totpop, out.dp->p_totpop_length, "p_totpop");
+    write_data<real_type, typename Config::State::shape_p_deaths_background_totpop>(state.p_deaths_background_totpop, out.dp->p_deaths_background_totpop, out.dp->p_deaths_background_totpop_length, "p_deaths_background_totpop");
     *(out.dp->births) = state.births;
     return index + output_count;
   };
@@ -123,8 +123,10 @@ struct HaAdapter<Language::C, real_type, ModelVariant> {
       .cd4_initial_distribution = read_data<real_type, 3>(params.ha->cd4_initial_distribution, params.ha->cd4_initial_distribution_length, "cd4_initial_distribution", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),
       .scale_cd4_mortality = params.ha->scale_cd4_mortality,
       .idx_hm_elig = read_data<int, 1>(params.ha->idx_hm_elig, params.ha->idx_hm_elig_length, "idx_hm_elig", { nda::dim<>(0, opts.proj_steps, 1) }),
-      .mortality = read_data<real_type, 4>(params.ha->mortality, params.ha->mortality_length, "mortality", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, SS::hDS, (SS::hTS)), nda::dim<>(0, SS::hAG, (SS::hTS) * (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hTS) * (SS::hDS) * (SS::hAG)) }),
-      .mortality_time_rate_ratio = read_data<real_type, 2>(params.ha->mortality_time_rate_ratio, params.ha->mortality_time_rate_ratio_length, "mortality_time_rate_ratio", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, opts.proj_steps, (SS::hTS)) }),
+      .art_mortality = read_data<real_type, 4>(params.ha->art_mortality, params.ha->art_mortality_length, "art_mortality", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, SS::hDS, (SS::hTS)), nda::dim<>(0, SS::hAG, (SS::hTS) * (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hTS) * (SS::hDS) * (SS::hAG)) }),
+      .art_mortality_time_rate_ratio = read_data<real_type, 2>(params.ha->art_mortality_time_rate_ratio, params.ha->art_mortality_time_rate_ratio_length, "art_mortality_time_rate_ratio", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, opts.proj_steps, (SS::hTS)) }),
+      .cd4_nonaids_excess_mort = read_data<real_type, 3>(params.ha->cd4_nonaids_excess_mort, params.ha->cd4_nonaids_excess_mort_length, "cd4_nonaids_excess_mort", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),
+      .art_nonaids_excess_mort = read_data<real_type, 4>(params.ha->art_nonaids_excess_mort, params.ha->art_nonaids_excess_mort_length, "art_nonaids_excess_mort", { nda::dim<>(0, SS::hTS, 1), nda::dim<>(0, SS::hDS, (SS::hTS)), nda::dim<>(0, SS::hAG, (SS::hTS) * (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hTS) * (SS::hDS) * (SS::hAG)) }),
       .dropout_recover_cd4 = params.ha->dropout_recover_cd4,
       .dropout_rate = read_data<real_type, 1>(params.ha->dropout_rate, params.ha->dropout_rate_length, "dropout_rate", { nda::dim<>(0, opts.proj_steps, 1) }),
       .adults_on_art = read_data<real_type, 2>(params.ha->adults_on_art, params.ha->adults_on_art_length, "adults_on_art", { nda::dim<>(0, SS::NS, 1), nda::dim<>(0, opts.proj_steps, (SS::NS)) }),
@@ -140,35 +142,41 @@ struct HaAdapter<Language::C, real_type, ModelVariant> {
     const CState<real_type>& state
   ){
     typename Config::State initial_state;
-    fill_initial_state<real_type, typename Config::State::shape_p_hiv_pop>(state.ha->p_hiv_pop, state.ha->p_hiv_pop_length, "p_hiv_pop", initial_state.p_hiv_pop);
-    fill_initial_state<real_type, typename Config::State::shape_p_hiv_pop_background_deaths>(state.ha->p_hiv_pop_background_deaths, state.ha->p_hiv_pop_background_deaths_length, "p_hiv_pop_background_deaths", initial_state.p_hiv_pop_background_deaths);
-    fill_initial_state<real_type, typename Config::State::shape_h_hiv_adult>(state.ha->h_hiv_adult, state.ha->h_hiv_adult_length, "h_hiv_adult", initial_state.h_hiv_adult);
-    fill_initial_state<real_type, typename Config::State::shape_h_art_adult>(state.ha->h_art_adult, state.ha->h_art_adult_length, "h_art_adult", initial_state.h_art_adult);
+    fill_initial_state<real_type, typename Config::State::shape_p_hivpop>(state.ha->p_hivpop, state.ha->p_hivpop_length, "p_hivpop", initial_state.p_hivpop);
+    fill_initial_state<real_type, typename Config::State::shape_p_deaths_background_hivpop>(state.ha->p_deaths_background_hivpop, state.ha->p_deaths_background_hivpop_length, "p_deaths_background_hivpop", initial_state.p_deaths_background_hivpop);
+    fill_initial_state<real_type, typename Config::State::shape_h_hivpop>(state.ha->h_hivpop, state.ha->h_hivpop_length, "h_hivpop", initial_state.h_hivpop);
+    fill_initial_state<real_type, typename Config::State::shape_h_artpop>(state.ha->h_artpop, state.ha->h_artpop_length, "h_artpop", initial_state.h_artpop);
     fill_initial_state<real_type, typename Config::State::shape_h_hiv_deaths_no_art>(state.ha->h_hiv_deaths_no_art, state.ha->h_hiv_deaths_no_art_length, "h_hiv_deaths_no_art", initial_state.h_hiv_deaths_no_art);
+    fill_initial_state<real_type, typename Config::State::shape_h_deaths_excess_nonaids_no_art>(state.ha->h_deaths_excess_nonaids_no_art, state.ha->h_deaths_excess_nonaids_no_art_length, "h_deaths_excess_nonaids_no_art", initial_state.h_deaths_excess_nonaids_no_art);
     fill_initial_state<real_type, typename Config::State::shape_p_infections>(state.ha->p_infections, state.ha->p_infections_length, "p_infections", initial_state.p_infections);
     fill_initial_state<real_type, typename Config::State::shape_h_hiv_deaths_art>(state.ha->h_hiv_deaths_art, state.ha->h_hiv_deaths_art_length, "h_hiv_deaths_art", initial_state.h_hiv_deaths_art);
+    fill_initial_state<real_type, typename Config::State::shape_h_deaths_excess_nonaids_on_art>(state.ha->h_deaths_excess_nonaids_on_art, state.ha->h_deaths_excess_nonaids_on_art_length, "h_deaths_excess_nonaids_on_art", initial_state.h_deaths_excess_nonaids_on_art);
     fill_initial_state<real_type, typename Config::State::shape_h_art_initiation>(state.ha->h_art_initiation, state.ha->h_art_initiation_length, "h_art_initiation", initial_state.h_art_initiation);
     fill_initial_state<real_type, typename Config::State::shape_p_hiv_deaths>(state.ha->p_hiv_deaths, state.ha->p_hiv_deaths_length, "p_hiv_deaths", initial_state.p_hiv_deaths);
+    fill_initial_state<real_type, typename Config::State::shape_p_deaths_excess_nonaids>(state.ha->p_deaths_excess_nonaids, state.ha->p_deaths_excess_nonaids_length, "p_deaths_excess_nonaids", initial_state.p_deaths_excess_nonaids);
     fill_initial_state<real_type, typename Config::State::shape_p_net_migration_hivpop>(state.ha->p_net_migration_hivpop, state.ha->p_net_migration_hivpop_length, "p_net_migration_hivpop", initial_state.p_net_migration_hivpop);
     return initial_state;
   };
 
-  static constexpr int output_count = 10;
+  static constexpr int output_count = 13;
 
   static int build_output(
     int index,
     const Config::OutputState& state,
     CState<real_type>& out
   ) {
-    write_data<real_type, typename Config::OutputState::shape_p_hiv_pop>(state.p_hiv_pop, out.ha->p_hiv_pop, out.ha->p_hiv_pop_length, "p_hiv_pop");
-    write_data<real_type, typename Config::OutputState::shape_p_hiv_pop_background_deaths>(state.p_hiv_pop_background_deaths, out.ha->p_hiv_pop_background_deaths, out.ha->p_hiv_pop_background_deaths_length, "p_hiv_pop_background_deaths");
-    write_data<real_type, typename Config::OutputState::shape_h_hiv_adult>(state.h_hiv_adult, out.ha->h_hiv_adult, out.ha->h_hiv_adult_length, "h_hiv_adult");
-    write_data<real_type, typename Config::OutputState::shape_h_art_adult>(state.h_art_adult, out.ha->h_art_adult, out.ha->h_art_adult_length, "h_art_adult");
+    write_data<real_type, typename Config::OutputState::shape_p_hivpop>(state.p_hivpop, out.ha->p_hivpop, out.ha->p_hivpop_length, "p_hivpop");
+    write_data<real_type, typename Config::OutputState::shape_p_deaths_background_hivpop>(state.p_deaths_background_hivpop, out.ha->p_deaths_background_hivpop, out.ha->p_deaths_background_hivpop_length, "p_deaths_background_hivpop");
+    write_data<real_type, typename Config::OutputState::shape_h_hivpop>(state.h_hivpop, out.ha->h_hivpop, out.ha->h_hivpop_length, "h_hivpop");
+    write_data<real_type, typename Config::OutputState::shape_h_artpop>(state.h_artpop, out.ha->h_artpop, out.ha->h_artpop_length, "h_artpop");
     write_data<real_type, typename Config::OutputState::shape_h_hiv_deaths_no_art>(state.h_hiv_deaths_no_art, out.ha->h_hiv_deaths_no_art, out.ha->h_hiv_deaths_no_art_length, "h_hiv_deaths_no_art");
+    write_data<real_type, typename Config::OutputState::shape_h_deaths_excess_nonaids_no_art>(state.h_deaths_excess_nonaids_no_art, out.ha->h_deaths_excess_nonaids_no_art, out.ha->h_deaths_excess_nonaids_no_art_length, "h_deaths_excess_nonaids_no_art");
     write_data<real_type, typename Config::OutputState::shape_p_infections>(state.p_infections, out.ha->p_infections, out.ha->p_infections_length, "p_infections");
     write_data<real_type, typename Config::OutputState::shape_h_hiv_deaths_art>(state.h_hiv_deaths_art, out.ha->h_hiv_deaths_art, out.ha->h_hiv_deaths_art_length, "h_hiv_deaths_art");
+    write_data<real_type, typename Config::OutputState::shape_h_deaths_excess_nonaids_on_art>(state.h_deaths_excess_nonaids_on_art, out.ha->h_deaths_excess_nonaids_on_art, out.ha->h_deaths_excess_nonaids_on_art_length, "h_deaths_excess_nonaids_on_art");
     write_data<real_type, typename Config::OutputState::shape_h_art_initiation>(state.h_art_initiation, out.ha->h_art_initiation, out.ha->h_art_initiation_length, "h_art_initiation");
     write_data<real_type, typename Config::OutputState::shape_p_hiv_deaths>(state.p_hiv_deaths, out.ha->p_hiv_deaths, out.ha->p_hiv_deaths_length, "p_hiv_deaths");
+    write_data<real_type, typename Config::OutputState::shape_p_deaths_excess_nonaids>(state.p_deaths_excess_nonaids, out.ha->p_deaths_excess_nonaids, out.ha->p_deaths_excess_nonaids_length, "p_deaths_excess_nonaids");
     write_data<real_type, typename Config::OutputState::shape_p_net_migration_hivpop>(state.p_net_migration_hivpop, out.ha->p_net_migration_hivpop, out.ha->p_net_migration_hivpop_length, "p_net_migration_hivpop");
     return index + output_count;
   };
@@ -178,15 +186,18 @@ struct HaAdapter<Language::C, real_type, ModelVariant> {
     const Config::State& state,
     CState<real_type>& out
   ) {
-    write_data<real_type, typename Config::State::shape_p_hiv_pop>(state.p_hiv_pop, out.ha->p_hiv_pop, out.ha->p_hiv_pop_length, "p_hiv_pop");
-    write_data<real_type, typename Config::State::shape_p_hiv_pop_background_deaths>(state.p_hiv_pop_background_deaths, out.ha->p_hiv_pop_background_deaths, out.ha->p_hiv_pop_background_deaths_length, "p_hiv_pop_background_deaths");
-    write_data<real_type, typename Config::State::shape_h_hiv_adult>(state.h_hiv_adult, out.ha->h_hiv_adult, out.ha->h_hiv_adult_length, "h_hiv_adult");
-    write_data<real_type, typename Config::State::shape_h_art_adult>(state.h_art_adult, out.ha->h_art_adult, out.ha->h_art_adult_length, "h_art_adult");
+    write_data<real_type, typename Config::State::shape_p_hivpop>(state.p_hivpop, out.ha->p_hivpop, out.ha->p_hivpop_length, "p_hivpop");
+    write_data<real_type, typename Config::State::shape_p_deaths_background_hivpop>(state.p_deaths_background_hivpop, out.ha->p_deaths_background_hivpop, out.ha->p_deaths_background_hivpop_length, "p_deaths_background_hivpop");
+    write_data<real_type, typename Config::State::shape_h_hivpop>(state.h_hivpop, out.ha->h_hivpop, out.ha->h_hivpop_length, "h_hivpop");
+    write_data<real_type, typename Config::State::shape_h_artpop>(state.h_artpop, out.ha->h_artpop, out.ha->h_artpop_length, "h_artpop");
     write_data<real_type, typename Config::State::shape_h_hiv_deaths_no_art>(state.h_hiv_deaths_no_art, out.ha->h_hiv_deaths_no_art, out.ha->h_hiv_deaths_no_art_length, "h_hiv_deaths_no_art");
+    write_data<real_type, typename Config::State::shape_h_deaths_excess_nonaids_no_art>(state.h_deaths_excess_nonaids_no_art, out.ha->h_deaths_excess_nonaids_no_art, out.ha->h_deaths_excess_nonaids_no_art_length, "h_deaths_excess_nonaids_no_art");
     write_data<real_type, typename Config::State::shape_p_infections>(state.p_infections, out.ha->p_infections, out.ha->p_infections_length, "p_infections");
     write_data<real_type, typename Config::State::shape_h_hiv_deaths_art>(state.h_hiv_deaths_art, out.ha->h_hiv_deaths_art, out.ha->h_hiv_deaths_art_length, "h_hiv_deaths_art");
+    write_data<real_type, typename Config::State::shape_h_deaths_excess_nonaids_on_art>(state.h_deaths_excess_nonaids_on_art, out.ha->h_deaths_excess_nonaids_on_art, out.ha->h_deaths_excess_nonaids_on_art_length, "h_deaths_excess_nonaids_on_art");
     write_data<real_type, typename Config::State::shape_h_art_initiation>(state.h_art_initiation, out.ha->h_art_initiation, out.ha->h_art_initiation_length, "h_art_initiation");
     write_data<real_type, typename Config::State::shape_p_hiv_deaths>(state.p_hiv_deaths, out.ha->p_hiv_deaths, out.ha->p_hiv_deaths_length, "p_hiv_deaths");
+    write_data<real_type, typename Config::State::shape_p_deaths_excess_nonaids>(state.p_deaths_excess_nonaids, out.ha->p_deaths_excess_nonaids, out.ha->p_deaths_excess_nonaids_length, "p_deaths_excess_nonaids");
     write_data<real_type, typename Config::State::shape_p_net_migration_hivpop>(state.p_net_migration_hivpop, out.ha->p_net_migration_hivpop, out.ha->p_net_migration_hivpop_length, "p_net_migration_hivpop");
     return index + output_count;
   };
@@ -253,10 +264,10 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
   ){
     typename Config::State initial_state;
     fill_initial_state<real_type, typename Config::State::shape_hiv_births_by_mat_age>(state.hc->hiv_births_by_mat_age, state.hc->hiv_births_by_mat_age_length, "hiv_births_by_mat_age", initial_state.hiv_births_by_mat_age);
-    fill_initial_state<real_type, typename Config::State::shape_hc1_hiv_pop>(state.hc->hc1_hiv_pop, state.hc->hc1_hiv_pop_length, "hc1_hiv_pop", initial_state.hc1_hiv_pop);
-    fill_initial_state<real_type, typename Config::State::shape_hc2_hiv_pop>(state.hc->hc2_hiv_pop, state.hc->hc2_hiv_pop_length, "hc2_hiv_pop", initial_state.hc2_hiv_pop);
-    fill_initial_state<real_type, typename Config::State::shape_hc1_art_pop>(state.hc->hc1_art_pop, state.hc->hc1_art_pop_length, "hc1_art_pop", initial_state.hc1_art_pop);
-    fill_initial_state<real_type, typename Config::State::shape_hc2_art_pop>(state.hc->hc2_art_pop, state.hc->hc2_art_pop_length, "hc2_art_pop", initial_state.hc2_art_pop);
+    fill_initial_state<real_type, typename Config::State::shape_hc1_hivpop>(state.hc->hc1_hivpop, state.hc->hc1_hivpop_length, "hc1_hivpop", initial_state.hc1_hivpop);
+    fill_initial_state<real_type, typename Config::State::shape_hc2_hivpop>(state.hc->hc2_hivpop, state.hc->hc2_hivpop_length, "hc2_hivpop", initial_state.hc2_hivpop);
+    fill_initial_state<real_type, typename Config::State::shape_hc1_artpop>(state.hc->hc1_artpop, state.hc->hc1_artpop_length, "hc1_artpop", initial_state.hc1_artpop);
+    fill_initial_state<real_type, typename Config::State::shape_hc2_artpop>(state.hc->hc2_artpop, state.hc->hc2_artpop_length, "hc2_artpop", initial_state.hc2_artpop);
     fill_initial_state<real_type, typename Config::State::shape_hc1_noart_aids_deaths>(state.hc->hc1_noart_aids_deaths, state.hc->hc1_noart_aids_deaths_length, "hc1_noart_aids_deaths", initial_state.hc1_noart_aids_deaths);
     fill_initial_state<real_type, typename Config::State::shape_hc2_noart_aids_deaths>(state.hc->hc2_noart_aids_deaths, state.hc->hc2_noart_aids_deaths_length, "hc2_noart_aids_deaths", initial_state.hc2_noart_aids_deaths);
     fill_initial_state<real_type, typename Config::State::shape_hc1_art_aids_deaths>(state.hc->hc1_art_aids_deaths, state.hc->hc1_art_aids_deaths_length, "hc1_art_aids_deaths", initial_state.hc1_art_aids_deaths);
@@ -281,10 +292,10 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
     CState<real_type>& out
   ) {
     write_data<real_type, typename Config::OutputState::shape_hiv_births_by_mat_age>(state.hiv_births_by_mat_age, out.hc->hiv_births_by_mat_age, out.hc->hiv_births_by_mat_age_length, "hiv_births_by_mat_age");
-    write_data<real_type, typename Config::OutputState::shape_hc1_hiv_pop>(state.hc1_hiv_pop, out.hc->hc1_hiv_pop, out.hc->hc1_hiv_pop_length, "hc1_hiv_pop");
-    write_data<real_type, typename Config::OutputState::shape_hc2_hiv_pop>(state.hc2_hiv_pop, out.hc->hc2_hiv_pop, out.hc->hc2_hiv_pop_length, "hc2_hiv_pop");
-    write_data<real_type, typename Config::OutputState::shape_hc1_art_pop>(state.hc1_art_pop, out.hc->hc1_art_pop, out.hc->hc1_art_pop_length, "hc1_art_pop");
-    write_data<real_type, typename Config::OutputState::shape_hc2_art_pop>(state.hc2_art_pop, out.hc->hc2_art_pop, out.hc->hc2_art_pop_length, "hc2_art_pop");
+    write_data<real_type, typename Config::OutputState::shape_hc1_hivpop>(state.hc1_hivpop, out.hc->hc1_hivpop, out.hc->hc1_hivpop_length, "hc1_hivpop");
+    write_data<real_type, typename Config::OutputState::shape_hc2_hivpop>(state.hc2_hivpop, out.hc->hc2_hivpop, out.hc->hc2_hivpop_length, "hc2_hivpop");
+    write_data<real_type, typename Config::OutputState::shape_hc1_artpop>(state.hc1_artpop, out.hc->hc1_artpop, out.hc->hc1_artpop_length, "hc1_artpop");
+    write_data<real_type, typename Config::OutputState::shape_hc2_artpop>(state.hc2_artpop, out.hc->hc2_artpop, out.hc->hc2_artpop_length, "hc2_artpop");
     write_data<real_type, typename Config::OutputState::shape_hc1_noart_aids_deaths>(state.hc1_noart_aids_deaths, out.hc->hc1_noart_aids_deaths, out.hc->hc1_noart_aids_deaths_length, "hc1_noart_aids_deaths");
     write_data<real_type, typename Config::OutputState::shape_hc2_noart_aids_deaths>(state.hc2_noart_aids_deaths, out.hc->hc2_noart_aids_deaths, out.hc->hc2_noart_aids_deaths_length, "hc2_noart_aids_deaths");
     write_data<real_type, typename Config::OutputState::shape_hc1_art_aids_deaths>(state.hc1_art_aids_deaths, out.hc->hc1_art_aids_deaths, out.hc->hc1_art_aids_deaths_length, "hc1_art_aids_deaths");
@@ -307,10 +318,10 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
     CState<real_type>& out
   ) {
     write_data<real_type, typename Config::State::shape_hiv_births_by_mat_age>(state.hiv_births_by_mat_age, out.hc->hiv_births_by_mat_age, out.hc->hiv_births_by_mat_age_length, "hiv_births_by_mat_age");
-    write_data<real_type, typename Config::State::shape_hc1_hiv_pop>(state.hc1_hiv_pop, out.hc->hc1_hiv_pop, out.hc->hc1_hiv_pop_length, "hc1_hiv_pop");
-    write_data<real_type, typename Config::State::shape_hc2_hiv_pop>(state.hc2_hiv_pop, out.hc->hc2_hiv_pop, out.hc->hc2_hiv_pop_length, "hc2_hiv_pop");
-    write_data<real_type, typename Config::State::shape_hc1_art_pop>(state.hc1_art_pop, out.hc->hc1_art_pop, out.hc->hc1_art_pop_length, "hc1_art_pop");
-    write_data<real_type, typename Config::State::shape_hc2_art_pop>(state.hc2_art_pop, out.hc->hc2_art_pop, out.hc->hc2_art_pop_length, "hc2_art_pop");
+    write_data<real_type, typename Config::State::shape_hc1_hivpop>(state.hc1_hivpop, out.hc->hc1_hivpop, out.hc->hc1_hivpop_length, "hc1_hivpop");
+    write_data<real_type, typename Config::State::shape_hc2_hivpop>(state.hc2_hivpop, out.hc->hc2_hivpop, out.hc->hc2_hivpop_length, "hc2_hivpop");
+    write_data<real_type, typename Config::State::shape_hc1_artpop>(state.hc1_artpop, out.hc->hc1_artpop, out.hc->hc1_artpop_length, "hc1_artpop");
+    write_data<real_type, typename Config::State::shape_hc2_artpop>(state.hc2_artpop, out.hc->hc2_artpop, out.hc->hc2_artpop_length, "hc2_artpop");
     write_data<real_type, typename Config::State::shape_hc1_noart_aids_deaths>(state.hc1_noart_aids_deaths, out.hc->hc1_noart_aids_deaths, out.hc->hc1_noart_aids_deaths_length, "hc1_noart_aids_deaths");
     write_data<real_type, typename Config::State::shape_hc2_noart_aids_deaths>(state.hc2_noart_aids_deaths, out.hc->hc2_noart_aids_deaths, out.hc->hc2_noart_aids_deaths_length, "hc2_noart_aids_deaths");
     write_data<real_type, typename Config::State::shape_hc1_art_aids_deaths>(state.hc1_art_aids_deaths, out.hc->hc1_art_aids_deaths, out.hc->hc1_art_aids_deaths_length, "hc1_art_aids_deaths");
@@ -324,6 +335,57 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
     write_data<real_type, typename Config::State::shape_mtct_by_source_women>(state.mtct_by_source_women, out.hc->mtct_by_source_women, out.hc->mtct_by_source_women_length, "mtct_by_source_women");
     write_data<real_type, typename Config::State::shape_mtct_by_source_hc_infections>(state.mtct_by_source_hc_infections, out.hc->mtct_by_source_hc_infections, out.hc->mtct_by_source_hc_infections_length, "mtct_by_source_hc_infections");
     write_data<real_type, typename Config::State::shape_pmtct_coverage_at_delivery>(state.pmtct_coverage_at_delivery, out.hc->pmtct_coverage_at_delivery, out.hc->pmtct_coverage_at_delivery_length, "pmtct_coverage_at_delivery");
+    return index + output_count;
+  };
+};
+
+template<typename real_type, MV ModelVariant>
+struct SpAdapter<Language::C, real_type, ModelVariant> {
+  using SS = SSMixed<ModelVariant>;
+  using Config = SpConfig<real_type, ModelVariant>;
+
+  static Config::Pars get_pars(
+    const CParams<real_type> &params,
+    const Options<real_type> &opts
+  ) {
+    return {
+    };
+  };
+
+  static Config::State get_initial_state(
+    const CState<real_type>& state
+  ){
+    typename Config::State initial_state;
+    fill_initial_state<real_type, typename Config::State::shape_p_deaths_nonaids_artpop>(state.sp->p_deaths_nonaids_artpop, state.sp->p_deaths_nonaids_artpop_length, "p_deaths_nonaids_artpop", initial_state.p_deaths_nonaids_artpop);
+    fill_initial_state<real_type, typename Config::State::shape_p_deaths_nonaids_hivpop>(state.sp->p_deaths_nonaids_hivpop, state.sp->p_deaths_nonaids_hivpop_length, "p_deaths_nonaids_hivpop", initial_state.p_deaths_nonaids_hivpop);
+    fill_initial_state<real_type, typename Config::State::shape_p_excess_deaths_nonaids_on_art>(state.sp->p_excess_deaths_nonaids_on_art, state.sp->p_excess_deaths_nonaids_on_art_length, "p_excess_deaths_nonaids_on_art", initial_state.p_excess_deaths_nonaids_on_art);
+    fill_initial_state<real_type, typename Config::State::shape_p_excess_deaths_nonaids_no_art>(state.sp->p_excess_deaths_nonaids_no_art, state.sp->p_excess_deaths_nonaids_no_art_length, "p_excess_deaths_nonaids_no_art", initial_state.p_excess_deaths_nonaids_no_art);
+    return initial_state;
+  };
+
+  static constexpr int output_count = 4;
+
+  static int build_output(
+    int index,
+    const Config::OutputState& state,
+    CState<real_type>& out
+  ) {
+    write_data<real_type, typename Config::OutputState::shape_p_deaths_nonaids_artpop>(state.p_deaths_nonaids_artpop, out.sp->p_deaths_nonaids_artpop, out.sp->p_deaths_nonaids_artpop_length, "p_deaths_nonaids_artpop");
+    write_data<real_type, typename Config::OutputState::shape_p_deaths_nonaids_hivpop>(state.p_deaths_nonaids_hivpop, out.sp->p_deaths_nonaids_hivpop, out.sp->p_deaths_nonaids_hivpop_length, "p_deaths_nonaids_hivpop");
+    write_data<real_type, typename Config::OutputState::shape_p_excess_deaths_nonaids_on_art>(state.p_excess_deaths_nonaids_on_art, out.sp->p_excess_deaths_nonaids_on_art, out.sp->p_excess_deaths_nonaids_on_art_length, "p_excess_deaths_nonaids_on_art");
+    write_data<real_type, typename Config::OutputState::shape_p_excess_deaths_nonaids_no_art>(state.p_excess_deaths_nonaids_no_art, out.sp->p_excess_deaths_nonaids_no_art, out.sp->p_excess_deaths_nonaids_no_art_length, "p_excess_deaths_nonaids_no_art");
+    return index + output_count;
+  };
+
+  static int build_output_single_year(
+    int index,
+    const Config::State& state,
+    CState<real_type>& out
+  ) {
+    write_data<real_type, typename Config::State::shape_p_deaths_nonaids_artpop>(state.p_deaths_nonaids_artpop, out.sp->p_deaths_nonaids_artpop, out.sp->p_deaths_nonaids_artpop_length, "p_deaths_nonaids_artpop");
+    write_data<real_type, typename Config::State::shape_p_deaths_nonaids_hivpop>(state.p_deaths_nonaids_hivpop, out.sp->p_deaths_nonaids_hivpop, out.sp->p_deaths_nonaids_hivpop_length, "p_deaths_nonaids_hivpop");
+    write_data<real_type, typename Config::State::shape_p_excess_deaths_nonaids_on_art>(state.p_excess_deaths_nonaids_on_art, out.sp->p_excess_deaths_nonaids_on_art, out.sp->p_excess_deaths_nonaids_on_art_length, "p_excess_deaths_nonaids_on_art");
+    write_data<real_type, typename Config::State::shape_p_excess_deaths_nonaids_no_art>(state.p_excess_deaths_nonaids_no_art, out.sp->p_excess_deaths_nonaids_no_art, out.sp->p_excess_deaths_nonaids_no_art_length, "p_excess_deaths_nonaids_no_art");
     return index + output_count;
   };
 };

@@ -29,8 +29,8 @@ from \code{projection_start_year} passed in the \code{parameters} list.}
 }
 \value{
 List of model outputs, where the last dimension of each element is
-time, e.g. \code{p_total_pop} state variable has dimensions 81 x 2. If
-\code{output_years} specified has length 61 then the \code{p_total_pop} output
+time, e.g. \code{p_totpop} state variable has dimensions 81 x 2. If
+\code{output_years} specified has length 61 then the \code{p_totpop} output
 will have dimensions 81 x 2 x 61.
 }
 \description{

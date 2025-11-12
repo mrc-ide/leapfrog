@@ -146,7 +146,6 @@
         "num_type": "real_type",
         "dims": ["SS::hDS + 1", "SS::hVT"]
       },
-      //maybe return here
       "PMTCT_transmission_rate": {
         "num_type": "real_type",
         "dims": ["SS::hDS", "SS::hPS", "SS::hVT"]
@@ -238,11 +237,11 @@
       }
   },
   "intermediate": {
-    "age15_hiv_pop": {
+    "age15_hivpop": {
       "num_type": "real_type",
       "dims": ["SS::hc2DS", "SS::NS"]
     },
-    "age15_art_pop": {
+    "age15_artpop": {
       "num_type": "real_type",
       "dims": ["SS::hTS", "SS::hDS", "SS::NS"]
     },
@@ -465,19 +464,19 @@
       "num_type": "real_type",
       "dims": ["SS::hc_p_fertility_age_groups"]
     },
-    "hc1_hiv_pop": {
+    "hc1_hivpop": {
       "num_type": "real_type",
       "dims": ["SS::hc1DS", "SS::hcTT", "SS::hc1AG", "SS::NS"]
     },
-    "hc2_hiv_pop": {
+    "hc2_hivpop": {
       "num_type": "real_type",
       "dims": ["SS::hc2DS", "SS::hcTT", "SS::hc2AG", "SS::NS"]
     },
-    "hc1_art_pop": {
+    "hc1_artpop": {
       "num_type": "real_type",
       "dims": ["SS::hTS", "SS::hc1DS", "SS::hc1AG", "SS::NS"]
     },
-    "hc2_art_pop": {
+    "hc2_artpop": {
       "num_type": "real_type",
       "dims": ["SS::hTS", "SS::hc2DS", "SS::hc2AG", "SS::NS"]
     },

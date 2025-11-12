@@ -31,6 +31,9 @@ struct HaAdapter;
 template<Language L, typename real_type, MV ModelVariant>
 struct HcAdapter;
 
+template<Language L, typename real_type, MV ModelVariant>
+struct SpAdapter;
+
 template<Language L, typename ...Ts>
 struct ConfigMixer;
 
@@ -356,12 +359,105 @@ struct ConfigMixer<L, real_type1, ModelVariant1, Pair<true, HcConfig<real_type1,
   };
 };
 
+template<Language L, typename real_type1, MV ModelVariant1, typename ...Ts>
+struct ConfigMixer<L, real_type1, ModelVariant1, Pair<true, SpConfig<real_type1, ModelVariant1>>, Ts...> {
+  using real_type = real_type1;
+  using ModelVariant = ModelVariant1;
+  using CurrConfig = SpConfig<real_type, ModelVariant>;
+  using Adapter = SpAdapter<L, real_type, ModelVariant>;
+  using NextConfigMixer = ConfigMixer<L, real_type, ModelVariant, Ts...>;
+  using SS = SSMixed<ModelVariant>;
+
+  struct Pars: public NextConfigMixer::Pars {
+    typename CurrConfig::Pars sp;
+  };
+
+  template<typename... Args>
+  static Pars get_pars(Args&&... args) {
+    Pars p = {
+      NextConfigMixer::get_pars(std::forward<Args>(args)...),
+      Adapter::get_pars(std::forward<Args>(args)...)
+    };
+    return p;
+  }
+
+  struct Intermediate: public NextConfigMixer::Intermediate {
+    typename CurrConfig::Intermediate sp;
+
+    Intermediate():
+      NextConfigMixer::Intermediate(),
+      sp() {};
+
+    void reset() {
+      NextConfigMixer::Intermediate::reset();
+      sp.reset();
+    };
+  };
+
+  struct State: public NextConfigMixer::State {
+    typename CurrConfig::State sp;
+
+    void reset() {
+      NextConfigMixer::State::reset();
+      sp.reset();
+    };
+  };
+
+  template<typename... Args>
+  static State get_initial_state(Args&&... args) {
+    return {
+      NextConfigMixer::get_initial_state(std::forward<Args>(args)...),
+      Adapter::get_initial_state(std::forward<Args>(args)...)
+    };
+  }
+
+  struct OutputState: public NextConfigMixer::OutputState {
+    typename CurrConfig::OutputState sp;
+
+    OutputState(int output_years):
+      NextConfigMixer::OutputState(output_years),
+      sp(output_years) {};
+
+    void save_state(const size_t i, const State &state) {
+      NextConfigMixer::OutputState::save_state(i, state);
+      sp.save_state(i, state.sp);
+    };
+  };
+
+  static int get_build_output_size(int prev_size) {
+    int curr_size = NextConfigMixer::get_build_output_size(prev_size);
+    return CurrConfig::get_build_output_size(curr_size);
+  };
+
+  template<typename... Args>
+  static int build_output(int index, const OutputState& state, Args&&... args) {
+    int new_index = Adapter::build_output(index, state.sp, std::forward<Args>(args)...);
+    return NextConfigMixer::build_output(new_index, state, std::forward<Args>(args)...);
+  }
+
+  template<typename... Args>
+  static int build_output_single_year(int index, const State& state, Args&&... args) {
+    int new_index = Adapter::build_output_single_year(index, state.sp, std::forward<Args>(args)...);
+    return NextConfigMixer::build_output_single_year(new_index, state, std::forward<Args>(args)...);
+  }
+
+  struct Args {
+    int t;
+    const Pars& pars;
+    const State& state_curr;
+    State& state_next;
+    Intermediate& intermediate;
+    const Options<real_type>& opts;
+  };
+};
+
 template<Language L, typename real_type, MV ModelVariant>
 using Config = ConfigMixer<
   L, real_type, ModelVariant,
   Pair<ModelVariant::run_demographic_projection, DpConfig<real_type, ModelVariant>>,
   Pair<ModelVariant::run_hiv_simulation, HaConfig<real_type, ModelVariant>>,
-  Pair<ModelVariant::run_child_model, HcConfig<real_type, ModelVariant>>
+  Pair<ModelVariant::run_child_model, HcConfig<real_type, ModelVariant>>,
+  Pair<ModelVariant::run_spectrum_model, SpConfig<real_type, ModelVariant>>
 >;
 
 } // namespace internal
