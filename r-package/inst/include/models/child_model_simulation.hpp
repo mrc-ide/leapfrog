@@ -138,8 +138,7 @@ struct ChildModelSimulation<Config> {
     }
 
     adjust_hiv_births();
-    add_infections();
-    if(t == 26){
+    if(t == 14){
       auto temp = 0.0;
       for (int s = 0; s < NS; ++s) {
         for (int a = 1; a < hc2_agestart; ++a) {
@@ -154,6 +153,7 @@ struct ChildModelSimulation<Config> {
       }
       std::cout << temp;
     }
+    add_infections();
     need_for_cotrim();
     cd4_mortality();
     run_child_hiv_mort();
