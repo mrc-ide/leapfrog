@@ -14,11 +14,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        # macos-13 is an intel runner, macos-14 is apple silicon
-        os: [ubuntu-latest, windows-latest, macos-13, macos-14]
+        # macos-15-intel is an intel runner, macos-14 is apple silicon
+        # We could add other ARM builds here if we need them
+        os: [ubuntu-latest, windows-latest, macos-15-intel, macos-14]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # Used to host cibuildwheel
       - uses: actions/setup-python@v5
@@ -26,7 +27,7 @@ jobs:
           python-version: "3.13"
 
       - name: Install cibuildwheel
-        run: python -m pip install cibuildwheel==3.0.1
+        run: python -m pip install cibuildwheel==3.2.1
 
       - name: Build wheels
         run: python -m cibuildwheel --output-dir wheelhouse leapfrog-py
@@ -41,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Build sdist
         run: pipx run build --sdist leapfrog-py
@@ -62,7 +63,7 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v')
 
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           # unpacks all CIBW artifacts into dist/
           pattern: cibw-*
