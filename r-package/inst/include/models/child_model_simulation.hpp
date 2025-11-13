@@ -939,7 +939,6 @@ struct ChildModelSimulation<Config> {
     // Births from the last 18 months are eligible
     n_hc.ctx_need = n_hc.hiv_births * 1.5;
 
-
     // All children 1.5-4 eligible
     for (int s = 0; s < NS; ++s) {
       for (int a = 1; a < hc2_agestart; ++a) {
@@ -983,7 +982,6 @@ struct ChildModelSimulation<Config> {
         } // end a
       } // end hcTT
     } // end NS
-
   };
 
   void get_cotrim_effect(int art_flag) {
