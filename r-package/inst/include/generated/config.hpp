@@ -133,20 +133,20 @@ struct HaConfig {
   using SS = SSMixed<ModelVariant>;
 
   struct Pars {
-    using shape_total_rate = nda::shape<
+    using shape_input_adult_incidence_rate = nda::shape<
       nda::dim<0, nda::dynamic, 1>
     >;
-    nda::array_ref<real_type, shape_total_rate> total_rate;
-    using shape_relative_risk_age = nda::shape<
+    nda::array_ref<real_type, shape_input_adult_incidence_rate> input_adult_incidence_rate;
+    using shape_incidence_rate_ratio_age = nda::shape<
       nda::dim<0, SS::pAG - SS::p_idx_hiv_first_adult, 1>,
       nda::dim<0, SS::NS, (SS::pAG - SS::p_idx_hiv_first_adult)>,
       nda::dim<0, nda::dynamic, (SS::pAG - SS::p_idx_hiv_first_adult) * (SS::NS)>
     >;
-    nda::array_ref<real_type, shape_relative_risk_age> relative_risk_age;
-    using shape_relative_risk_sex = nda::shape<
+    nda::array_ref<real_type, shape_incidence_rate_ratio_age> incidence_rate_ratio_age;
+    using shape_incidence_rate_ratio_sex = nda::shape<
       nda::dim<0, nda::dynamic, 1>
     >;
-    nda::array_ref<real_type, shape_relative_risk_sex> relative_risk_sex;
+    nda::array_ref<real_type, shape_incidence_rate_ratio_sex> incidence_rate_ratio_sex;
     using shape_cd4_mortality = nda::shape<
       nda::dim<0, SS::hDS, 1>,
       nda::dim<0, SS::hAG, (SS::hDS)>,
@@ -224,10 +224,10 @@ struct HaConfig {
       nda::dim<0, SS::pAG, 1>
     >;
     nda::array<real_type, shape_hiv_negative_pop> hiv_negative_pop;
-    using shape_rate_sex = nda::shape<
+    using shape_incidence_rate_sex = nda::shape<
       nda::dim<0, SS::NS, 1>
     >;
-    nda::array<real_type, shape_rate_sex> rate_sex;
+    nda::array<real_type, shape_incidence_rate_sex> incidence_rate_sex;
     using shape_hiv_neg_aggregate = nda::shape<
       nda::dim<0, SS::NS, 1>
     >;
@@ -315,7 +315,7 @@ struct HaConfig {
 
     void reset() {
       hiv_negative_pop.for_each_value([](real_type& x) { x = 0; });
-      rate_sex.for_each_value([](real_type& x) { x = 0; });
+      incidence_rate_sex.for_each_value([](real_type& x) { x = 0; });
       hiv_neg_aggregate.for_each_value([](real_type& x) { x = 0; });
       p_infections_ts.for_each_value([](real_type& x) { x = 0; });
       p_coarse_ages_hivpop.for_each_value([](real_type& x) { x = 0; });
