@@ -474,7 +474,7 @@ get_pars_metadata <- function(dim_vars, dp) {
       read = list(
         list(
           tag = "AdultNonAIDSExcessMort MV",
-          dims = list("art_off_on", "g", "cd4_count", "a_15to45plus_10year"),
+          dims = list("art_status", "g", "cd4_count", "a_15to45plus_10year"),
           column_dims = list("cd4_count", "a_15to45plus_10year")
         )
       )
@@ -623,7 +623,6 @@ get_pars_metadata <- function(dim_vars, dp) {
         )
       )
     ),
-    ##Ask: when do I convert this to a percent?
     percent_art_delivery = list(
       ##Note: not listed in spectrum files before 2018
       allow_null = TRUE,
@@ -681,7 +680,7 @@ get_pars_metadata <- function(dim_vars, dp) {
       read = list(
         list(
           tag = "InfantFeedingOptions MV",
-          dims = list("bf_months", "years")
+          dims = list("bf_months", "art_status", "years")
         )
       )
     ),
@@ -819,12 +818,11 @@ get_pars_metadata <- function(dim_vars, dp) {
     ),
     child_mort_by_cd4_no_art = list(
       allow_null = TRUE,
-      ##TODO: 5-14 starts one column later, ask Mantra what to do about this... my thought is to put this in the science code
       type = "real",
       read = list(
         list(
           tag = "ChildMortByCD4NoART MV2",
-          dims = list("vt_trans_type_mort", "paed_ordinal_cd4_cat")
+          dims = list("vt_time", "a_0to14_coarse_2", "paed_ordinal_cd4_cat")
         )
         ##TODO: Show mantra, this one is AWFUL
         # ,
@@ -925,7 +923,7 @@ get_pars_metadata <- function(dim_vars, dp) {
    read = list(
      list(
        tag = "CD4Distribution MV2",
-       dims = list("cd4_count_dist", "years"),
+       dims = list("neg_adult_cd4_categories", "g_both_first", "art_status", "years"),
        skip = list(
          rows = c(25,50)
        )
@@ -941,7 +939,7 @@ new_infections_by_single_age = list(
   read = list(
     list(
       tag = "NewInfectionsBySingleAge MV",
-      dims = list("age_by_sex_both","years")
+      dims = list("g_both_first", "a_80plus_no_80", "years")
     )
   )
 ),
@@ -950,15 +948,14 @@ cd4_distribution_15_49 = list(
   read = list(
     list(
       tag = "CD4Distribution15_49 MV2",
-      dims = list("cd4_count_dist_new", "years"),
+      dims = list("neg_adult_cd4_categories", "g_both_first", "art_status", "years"),
       skip = list(
-        rows =  c(8,16,24,25,33,41,49)
-      ),
-      start_offset = list(row = 1)
+        rows =  c(25,50)
+      )
     ),
     list(
       tag = "CD4Distribution15_49 MV",
-      dims = list("cd4_count_dist_old", "years"),
+      dims = list("cd4_count_dist_old",  "years"),
       skip = list(
         rows =  c(9:11, 19:28, 37:39,
                   47:56, 65:67, 75:84)
@@ -971,7 +968,7 @@ cd4_distribution_15_49 = list(
    read = list(
      list(
        tag = "AIDSDeathsNoARTSingleAge MV",
-       dims = list("age_by_sex_both1", "years"),
+       dims = list("a_80plus_no_80", "g_both_first", "years"),
        skip = list(
          rows = c(82,163)
        ),
@@ -984,7 +981,7 @@ aids_deaths_art_single_age = list(
   read = list(
     list(
       tag = "AIDSDeathsARTSingleAge MV",
-      dims = list("age_by_sex_both1", "years"),
+      dims = list("a_80plus_no_80", "g_both_first", "years"),
       skip = list(
         rows = c(82,163)
       ),
@@ -997,7 +994,7 @@ child_art_calc = list(
   read = list(
     list(
       tag = "ChildARTCalc MV2",
-      dims = list("child_art_cats", "years"),
+      dims = list("g_both_first", "child_art_cats", "years"),
       start_offset = list(row = 1)
     )
   )
@@ -1043,18 +1040,13 @@ get_static_dim_vars <- function() {
     a_15to35_custom = list(length = 6, labels = c("15-17", "18-19", "20-24", "25-29", "30-34", "35-49")),
     a_15to45plus_10year = list(length = 4, labels = c("15-24", "25-34", "35-44", "45+")),
     a_0to14 = list(length = 15, labels = 0:14),
-    a_0to14_coarse = list(length = 3, c("00-04", "05-09", "10-14")),
+    a_0to14_coarse = list(length = 3, labels = c("00-04", "05-09", "10-14")),
+    a_0to14_coarse_2 = list(length = 3, labels = c("00-02", "03-04", "05-14")),
     g = list(length = 2, labels = c("male", "female")),
     g_both_middle = list(length = 3, labels = c("male", "both", "female")),
     g_both_first = list(length = 3, labels = both_sex_vec),
     cd4_count = list(length = 7, labels = adult_cd4_categories),
-    ##ASK: example of where additional templating may be useful?
-    cd4_count_dist = list(length = 48, labels = paste0(rep(c("HIV, ", "ART, "), each = 24),
-                                                       rep(rep(paste0(both_sex_vec, ": "), each = 8), 2),
-                                                       rep(adult_cd4_categories, 6))),
-    cd4_count_dist_new = list(length = 42, labels = paste0(rep(c("HIV, ", "ART, "), each = 21),
-                                                       rep(rep(paste0(both_sex_vec, ": "), each = 7), 2),
-                                                       rep(adult_cd4_categories, 6))),
+    neg_adult_cd4_categories = list(length = 8, labels = c("HIV neg", adult_cd4_categories)),
     cd4_count_dist_old = list(length = 45, labels = paste0(rep(c(rep("HIV, ", 8), rep("ART, ", 7)), 3),
                                                            rep(paste0(both_sex_vec, ": "), each = 15),
                                                        rep(c("HIV neg", rep(adult_cd4_categories, 2)), 3))),
@@ -1064,16 +1056,13 @@ get_static_dim_vars <- function() {
                                                        rep("Age: 5-14, CD4 prog", 5)),
                                                       c(rep(c(">30 -> 26-30", "26-30 -> 21-25", "21-25 -> 16-20", "16-20 -> 11-15", "11-15 -> 5-10", "5-10 -> <5"), 2),
                                                            c("1000+ -> 750-999", "750-999 -> 500-749", "500-749 -> 350-499", "350-499 -> 200-349", "200-349 -> <200")))),
-   # cd4_prog_5to14 = list(length = 5, labels = c("1000+ -> 750-999", "750-999 -> 500-749", "500-749 -> 350-499", "350-499 -> 200-349", "200-349 -> <200")),
+
     art_dur_2 = list(length = 2, labels = c("0-12mos", "12mos+")),
-    art_off_on = list(length = 2, labels = c("off art", "on art")),
     pops_for_treat = list(length = 7, labels = c("Pregnant women", "TB/HIV co-infected", "Discordant couples", "Sex workers", "Men who have sex with men", "Injecting drug users", "Other population")),
     elig_perc_year = list(length = 3, labels = c("eligibility", "percent", "year")),
     vt_trt = list(length = 11, labels = c("CD4 <200", "CD4 200-350", "CD4 >350", "Incident infections", "Single dose nevirapine", "WHO 2006 dual ARV regimen", "Option A", "Option B", "ART: Started before pregnancy", "ART: Started during pregnancy >4 weeks", "ART: Started during pregnancy <4 weeks")),
     vt_trt_cat = list(length = 3, labels = c("Perinatal", "Breastfeeding (per month) <350", "Breastfeeding (per month) >=350")),
-    vt_trans_type_mort = list(length = 12, labels = paste0(rep(c("Age 0-2: ",
-                                                                "Age 3-4: ",
-                                                                "Age 5-14: "), each = 4), rep(c("Perinatal", "Breastfeeding, <6MOS", "Breastfeeding, 7-12MOS", "Breastfeeding, >12MOS"),3))),
+    vt_time = list(length = 4, labels = c("Perinatal", "Breastfeeding, <6MOS", "Breastfeeding, 7-12MOS", "Breastfeeding, >12MOS")),
     pmtct_editor_order = list(length = 26, labels = c("No prophylaxis- Percent",
                                              paste0(rep(pmtct_options, each = 2), rep(c("- Number", "- Percent"), 7)), "Total prophlyaxis- Number",
                                                       "Postnatal: No prophylaxis- Percent", paste0(rep("Postnatal ", 2), rep(c("Option A", "Option B"), each = 2), rep(c("- Number", "- Percent"), 2)), "Total postnatal prophlyaxis- Number",
@@ -1090,12 +1079,12 @@ get_static_dim_vars <- function() {
                                                                "ART")))),
     pmtct_retained_delivery = list(length = 2, labels = c("Percent already on ART retained at delivery",
                                                           "Percent starting ART retained at delivery")),
-    bf_months = list(length = 36, labels = paste0(rep(paste0("VT_MOS_", c("00_01", "02_03", "04_05",
+    bf_months = list(length = 18, labels = paste0("VT_MOS_", c("00_01", "02_03", "04_05",
                                                                "06_07", "08_09", "10_11",
                                                                "12_13", "14_15", "16_17",
                                                                "18_19", "20_21", "22_23",
                                                                "24_25", "26_27", "28_29",
-                                                               "30_31", "32_33", "34_35")), 2), c(rep("- No ART", 18), rep("- ART", 18)))),
+                                                               "30_31", "32_33", "34_35"))),
     paed_treatment = list(length = 5, labels = c("Cotrim", "ART: 0-14y", "ART: 0-4y", "ART: 5-9y", "ART: 10-14y")),
     paed_treatment_old = list(length = 2, labels = c("Cotrim", "ART: 0-14y")),
     paed_art_mort = list(length = 4, labels = c("Age <5, <12 months on ART",
@@ -1107,6 +1096,7 @@ get_static_dim_vars <- function() {
                                         c(rep(c("0: ", "1-2: ", "3-4: "), each = 7), rep(c("5-9: ", "10-14: "), each = 6)),
                                         c(rep(c(">30", "26-30", "21-25", "16-20", "11-15", "5-10", "<5"),3),
                                           rep(c(">1000", "750-999", "500-749", "350-499", "200-349", "<200"),2)))),
+   ##leaving like this as its easier to access in the leapfrog code
    paed_cd4_art_elig = list(length = 8, labels = c(paste0(
       rep(c("CD4 count: ", "CD4 percent: "), each = 4),
       rep(c("<11 MOS", "12-35 MOS", "35-39 MOS", ">=5 YRS"), 2)))),
@@ -1115,11 +1105,10 @@ get_static_dim_vars <- function() {
    age_by_sex_both = list(length = 243,labels =  paste0(rep(c(0:79, "80+"), each = 3), rep(paste0(" ", both_sex_vec), 81))),
    age_by_sex_both1 = list(length = 243,labels =  paste0(rep(c(0:79, "80+"), 3), rep(paste0(" ", both_sex_vec), each = 81))),
    age_by_sex = list(length = 162,labels =  paste0(rep(c(0:79, "80+"), each = 2), rep(c(" male", " female"), 81))),
-   child_art_cats = list(length = 12, labels = paste0(rep(c("Children needing cotrim (0-14): ",
+   child_art_cats = list(length = 4, labels = c("Children needing cotrim (0-14): ",
                                                             "Children receiving cotrim (0-14): ",
                                                             "Children needing ART (0-14): ",
-                                                            "Children receiving ART (0-14): "), each = 3),
-                                              rep(both_sex_vec, 4)))
+                                                            "Children receiving ART (0-14): "))
   )
 }
 

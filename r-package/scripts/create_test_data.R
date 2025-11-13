@@ -116,14 +116,14 @@ dp <- read_dp(pjnz_child)
 dat <- parse_dp(dp)
 
 aids_deathsnoart <- array(0, dim = c(15,2,61), dimnames = list(age = 0:14, sex = c('male', 'female'), years = 1970:2030))
-aids_deathsnoart[,'male',] <- dat$data$aids_deaths_no_art_single_age$data[rownames(dat$data$aids_deaths_no_art_single_age$data) %in% c(paste0(0:14, ' male')),]
-aids_deathsnoart[,'female',] <- dat$data$aids_deaths_no_art_single_age$data[rownames(dat$data$aids_deaths_no_art_single_age$data) %in% c(paste0(0:14, ' female')),]
+aids_deathsnoart[,'male',] <- dat$data$aids_deaths_no_art_single_age$data[as.character(0:14),"male",]
+aids_deathsnoart[,'female',] <- dat$data$aids_deaths_no_art_single_age$data[as.character(0:14),"female",]
 
 aids_deathsart <- array(0, dim = c(15,2,61), dimnames = list(age = 0:14, sex = c('male', 'female'), years = 1970:2030))
-aids_deathsart[,'male',] <- dat$data$aids_deaths_art_single_age$data[rownames(dat$data$aids_deaths_art_single_age$data) %in% c(paste0(0:14, ' male')),]
-aids_deathsart[,'female',] <- dat$data$aids_deaths_art_single_age$data[rownames(dat$data$aids_deaths_art_single_age$data) %in% c(paste0(0:14, ' female')),]
+aids_deathsart[,'male',] <- dat$data$aids_deaths_art_single_age$data[as.character(0:14),"male",]
+aids_deathsart[,'female',] <- dat$data$aids_deaths_art_single_age$data[as.character(0:14),"female",]
 
-spec_ctx_need <- dat$data$child_art_calc$data["Children needing cotrim (0-14): both",]
+spec_ctx_need <- dat$data$child_art_calc$data["both", "Children needing cotrim (0-14): ",]
 
 out <- list(dp = dp,
             pjnz = pjnz_child,

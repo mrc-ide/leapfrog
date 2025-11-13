@@ -68,22 +68,22 @@ prepare_no_art_mort <- function(data){
                                                                       transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+'),
                                                                       age =5:14))
   ## 0-2
-  hc1_cd4_mort[,"perinatal",c("0", "1", "2")] <- mort[grepl("Age 0-2: Perinatal", rownames(mort)),]
-  hc1_cd4_mort[,"bf0-6",c("0", "1", "2")] <- mort[grepl("Age 0-2: Breastfeeding, <6MOS", rownames(mort)),]
-  hc1_cd4_mort[,"bf7-12",c("0", "1", "2")] <- mort[grepl("Age 0-2: Breastfeeding, 7-12MOS", rownames(mort)),]
-  hc1_cd4_mort[,"bf12+",c("0", "1", "2")] <- mort[grepl("Age 0-2: Breastfeeding, >12MOS", rownames(mort)),]
+  hc1_cd4_mort[,"perinatal",c("0", "1", "2")] <- mort["Perinatal", "00-02",]
+  hc1_cd4_mort[,"bf0-6",c("0", "1", "2")] <- mort["Breastfeeding, <6MOS", "00-02",]
+  hc1_cd4_mort[,"bf7-12",c("0", "1", "2")] <- mort["Breastfeeding, 7-12MOS", "00-02",]
+  hc1_cd4_mort[,"bf12+",c("0", "1", "2")] <- mort["Breastfeeding, >12MOS", "00-02",]
 
   ## 3-4
-  hc1_cd4_mort[,"perinatal",c("3", "4")] <- mort[grepl("Age 3-4: Perinatal", rownames(mort)),]
-  hc1_cd4_mort[,"bf0-6",c("3", "4")] <- mort[grepl("Age 3-4: Breastfeeding, <6MOS", rownames(mort)),]
-  hc1_cd4_mort[,"bf7-12",c("3", "4")] <- mort[grepl("Age 3-4: Breastfeeding, 7-12MOS", rownames(mort)),]
-  hc1_cd4_mort[,"bf12+",c("3", "4")] <- mort[grepl("Age 3-4: Breastfeeding, >12MOS", rownames(mort)),]
+  hc1_cd4_mort[,"perinatal",c("3", "4")] <- mort["Perinatal", "03-04",]
+  hc1_cd4_mort[,"bf0-6",c("3", "4")] <- mort["Breastfeeding, <6MOS", "03-04",]
+  hc1_cd4_mort[,"bf7-12",c("3", "4")] <- mort["Breastfeeding, 7-12MOS", "03-04",]
+  hc1_cd4_mort[,"bf12+",c("3", "4")] <- mort["Breastfeeding, >12MOS", "03-04",]
 
   ## 5-14, skip first index to account for the difference in CD4 categories
-  hc2_cd4_mort[,"perinatal",as.character(5:14)] <- mort[grepl("Age 5-14: Perinatal", rownames(mort)),][-1]
-  hc2_cd4_mort[,"bf0-6",as.character(5:14)] <- mort[grepl("Age 5-14: Breastfeeding, <6MOS", rownames(mort)),][-1]
-  hc2_cd4_mort[,"bf7-12",as.character(5:14)] <- mort[grepl("Age 5-14: Breastfeeding, 7-12MOS", rownames(mort)),][-1]
-  hc2_cd4_mort[,"bf12+",as.character(5:14)] <- mort[grepl("Age 5-14: Breastfeeding, >12MOS", rownames(mort)),][-1]
+  hc2_cd4_mort[,"perinatal",as.character(5:14)] <- mort["Perinatal", "05-14",][-1]
+  hc2_cd4_mort[,"bf0-6",as.character(5:14)] <- mort["Breastfeeding, <6MOS", "05-14",][-1]
+  hc2_cd4_mort[,"bf7-12",as.character(5:14)] <- mort["Breastfeeding, 7-12MOS", "05-14",][-1]
+  hc2_cd4_mort[,"bf12+",as.character(5:14)] <- mort["Breastfeeding, >12MOS", "05-14",] [-1]
 
   return(list(hc1_cd4_mort = hc1_cd4_mort,
               hc2_cd4_mort = hc2_cd4_mort))
@@ -310,15 +310,23 @@ prepare_bypass_adult_model <- function(data, bypass_adult = F){
 
   hivpop <- data$hiv_by_single_age$data[as.character(15:49),"female",]
   totpop <- data$big_pop$data[as.character(15:49),"female",]
-  inc <- data$new_infections_by_single_age$data[paste0(15:49, ' female'),]
-  wlhiv_cd4 <- data$cd4_distribution_15_49$data[paste0("HIV, female: ", c("500+", "350-500", "250-349", "200-249", "100-199", "50-99", "50-")),]
+  inc <- data$new_infections_by_single_age$data["female",as.character(15:49),]
+  if(data$cd4_distribution_15_49$tag == "CD4Distribution15_49 MV2"){
+    wlhiv_cd4 <- data$cd4_distribution_15_49$data[c("500+", "350-500", "250-349", "200-249", "100-199", "50-99", "50-"),"female","no art",]
+    prop_gte350 <- colSums(wlhiv_cd4[c("500+", "350-500"),]) / colSums(wlhiv_cd4)
+    prop_lt200 <-  colSums(wlhiv_cd4[c("100-199", "50-99", "50-"),]) / colSums(wlhiv_cd4)
+  }else{
+    wlhiv_cd4 <- data$cd4_distribution_15_49$data[paste0("HIV, female: ", c("500+", "350-500", "250-349", "200-249", "100-199", "50-99", "50-")),]
+    prop_gte350 <- colSums(wlhiv_cd4[paste0("HIV, female: ", c("500+", "350-500")),]) / colSums(wlhiv_cd4)
+    prop_lt200 <-   colSums(wlhiv_cd4[paste0("HIV, female: ", c("100-199", "50-99", "50-")),]) / colSums(wlhiv_cd4)
+  }
+
 
   hivnpop <- totpop - hivpop
   adult_female_infections_full <- inc #/ hivnpop
 
   #cd4
-  prop_gte350 <- colSums(wlhiv_cd4[paste0("HIV, female: ", c("500+", "350-500")),]) / colSums(wlhiv_cd4)
-  prop_lt200 <- colSums(wlhiv_cd4[paste0("HIV, female: ", c("100-199", "50-99", "50-")),]) / colSums(wlhiv_cd4)
+
 
   return(list(mat_hiv_births = mat_hiv_births,
               mat_prev_input = mat_prev_input,
@@ -364,6 +372,8 @@ prepare_full_stratification <- function(data, params){
               fert_rat = params$fert_rat_full,
               frr_art6mos = params$frr_art6mos_full))
 }
+
+
 
 #' Prepare child HIV projection parameters from Spectrum PJNZ
 #'
@@ -440,8 +450,8 @@ prepare_hc_leapfrog_projp <- function(pjnz, params,
   v$vertical_transmission_rate <- mtct$mtct
 
   ##BF duration
-  v$breastfeeding_duration_art <- data$infant_feeding_options$data[!grepl('No ART', rownames(data$infant_feeding_options$data)),] / 100
-  v$breastfeeding_duration_no_art <- data$infant_feeding_options$data[grepl('No ART', rownames(data$infant_feeding_options$data)),] / 100
+  v$breastfeeding_duration_art <- data$infant_feeding_options$data[,"art",] / 100
+  v$breastfeeding_duration_no_art <- data$infant_feeding_options$data[,"no art",] / 100
 
   ##TODO: change this in leapfrog to be by multiple ages
   v$hc_nosocomial <- data$nosocomial_infections_by_age$data[1,]
