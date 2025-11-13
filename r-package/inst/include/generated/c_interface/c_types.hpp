@@ -29,6 +29,8 @@ struct DpParams {
   int age_specific_fertility_rate_length;
   real_type* births_sex_prop;
   int births_sex_prop_length;
+  real_type* total_fertility_rate;
+  int total_fertility_rate_length;
 };
 
 template<typename real_type>
@@ -83,6 +85,14 @@ struct HaParams {
   int pAG_INCIDPOP_length;
   int pIDX_INCIDPOP;
   int pIDX_INCIDPOP_length;
+  real_type* fert_mult_by_age;
+  int fert_mult_by_age_length;
+  real_type* fert_mult_off_art;
+  int fert_mult_off_art_length;
+  real_type* fert_mult_on_art;
+  int fert_mult_on_art_length;
+  real_type local_adj_factor;
+  int local_adj_factor_length;
 };
 
 template<typename real_type>
@@ -113,6 +123,10 @@ struct HaOut {
   int p_deaths_excess_nonaids_length;
   real_type* p_net_migration_hivpop;
   int p_net_migration_hivpop_length;
+  real_type* hiv_births_by_mat_age;
+  int hiv_births_by_mat_age_length;
+  real_type* hiv_births;
+  int hiv_births_length;
 };
 
 template<typename real_type>
@@ -147,14 +161,6 @@ struct HcParams {
   int hc_art_val_length;
   real_type* hc_art_init_dist;
   int hc_art_init_dist_length;
-  real_type* fert_mult_by_age;
-  int fert_mult_by_age_length;
-  real_type* fert_mult_off_art;
-  int fert_mult_off_art_length;
-  real_type* fert_mult_on_art;
-  int fert_mult_on_art_length;
-  real_type* total_fertility_rate;
-  int total_fertility_rate_length;
   real_type* PMTCT;
   int PMTCT_length;
   real_type* vertical_transmission_rate;
@@ -207,8 +213,6 @@ struct HcParams {
 
 template<typename real_type>
 struct HcOut {
-  real_type* hiv_births_by_mat_age;
-  int hiv_births_by_mat_age_length;
   real_type* hc1_hivpop;
   int hc1_hivpop_length;
   real_type* hc2_hivpop;
@@ -229,8 +233,6 @@ struct HcOut {
   int hc_art_init_length;
   real_type* hc_art_need_init;
   int hc_art_need_init_length;
-  real_type* hiv_births;
-  int hiv_births_length;
   real_type* ctx_need;
   int ctx_need_length;
   real_type* infection_by_type;

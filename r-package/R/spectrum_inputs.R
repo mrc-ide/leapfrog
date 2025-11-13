@@ -72,6 +72,9 @@ read_netmigr <- function(pjnz, use_ep5=FALSE, adjust_u5mig = TRUE, sx = NULL) {
 
   netmigagedist <- sapply(dpsub("<MigrAgeDist MV2>", 2 + 1:34, timedat.idx), as.numeric)/100
   netmigagedist <- array(c(netmigagedist), c(17, 2, length(proj.years)))
+  migr_age_dist_sum <- colSums(netmigagedist)
+  migr_age_dist_sum[migr_age_dist_sum == 0] <- 1
+  netmigagedist <- sweep(netmigagedist, 2:3, migr_age_dist_sum, "/")
   netmigr5 <- sweep(netmigagedist, 2:3, totnetmig, "*")
 
   netmigr <- array(dim = c(81, 2, length(proj.years)),
@@ -292,9 +295,14 @@ prepare_leapfrog_projp <- function(pjnz, use_coarse_age_groups = FALSE, hiv_step
 
   if (use_coarse_age_groups) {
     idx_expand <- idx_expand_coarse
+    v$fert_rat <- v$fert_rat_coarse
+    v$frr_art6mos <- v$frr_art6mos_coarse
   } else {
     idx_expand <- idx_expand_full
+    v$fert_rat <- v$fert_rat_full
+    v$frr_art6mos <- v$frr_art6mos_full
   }
+
   v$cd4_initdist <- projp$cd4_initdist[ , idx_expand, ]
   v$cd4_prog <- (1-exp(-projp$cd4_prog[ , idx_expand, ] / hiv_steps_per_year)) * hiv_steps_per_year
   v$cd4_mort <- projp$cd4_mort[ ,idx_expand, ]
@@ -303,6 +311,11 @@ prepare_leapfrog_projp <- function(pjnz, use_coarse_age_groups = FALSE, hiv_step
   art_nonaids_excess_mort_hts <- array(0.0, dim(v$art_mort), dimnames(v$art_mort))
   art_nonaids_excess_mort_hts[] <- rep(projp$art_nonaids_excess_mort[, idx_expand, ], each = hTS)
   v$art_nonaids_excess_mort <- art_nonaids_excess_mort_hts
+  ##Remove unnecessary parameters
+  v$fert_rat_coarse <- NULL
+  v$frr_art6mos_coarse <- NULL
+  v$fert_rat_full <- NULL
+  v$frr_art6mos_full <- NULL
 
   v
 }

@@ -24,7 +24,8 @@ struct DpAdapter<Language::Cpp, real_type, ModelVariant> {
       .survival_probability = { owned_pars.dp.survival_probability.data(), owned_pars.dp.survival_probability.shape() },
       .net_migration = { owned_pars.dp.net_migration.data(), owned_pars.dp.net_migration.shape() },
       .age_specific_fertility_rate = { owned_pars.dp.age_specific_fertility_rate.data(), owned_pars.dp.age_specific_fertility_rate.shape() },
-      .births_sex_prop = { owned_pars.dp.births_sex_prop.data(), owned_pars.dp.births_sex_prop.shape() }
+      .births_sex_prop = { owned_pars.dp.births_sex_prop.data(), owned_pars.dp.births_sex_prop.shape() },
+      .total_fertility_rate = { owned_pars.dp.total_fertility_rate.data(), owned_pars.dp.total_fertility_rate.shape() }
     };
   };
 
@@ -70,11 +71,15 @@ struct HaAdapter<Language::Cpp, real_type, ModelVariant> {
       .initiation_mortality_weight = owned_pars.ha.initiation_mortality_weight,
       .h_art_stage_dur = { owned_pars.ha.h_art_stage_dur.data(), owned_pars.ha.h_art_stage_dur.shape() },
       .pAG_INCIDPOP = owned_pars.ha.pAG_INCIDPOP,
-      .pIDX_INCIDPOP = owned_pars.ha.pIDX_INCIDPOP
+      .pIDX_INCIDPOP = owned_pars.ha.pIDX_INCIDPOP,
+      .fert_mult_by_age = { owned_pars.ha.fert_mult_by_age.data(), owned_pars.ha.fert_mult_by_age.shape() },
+      .fert_mult_off_art = { owned_pars.ha.fert_mult_off_art.data(), owned_pars.ha.fert_mult_off_art.shape() },
+      .fert_mult_on_art = { owned_pars.ha.fert_mult_on_art.data(), owned_pars.ha.fert_mult_on_art.shape() },
+      .local_adj_factor = owned_pars.ha.local_adj_factor
     };
   };
 
-  static constexpr int output_count = 13;
+  static constexpr int output_count = 15;
 
   static int build_output(
     int index,
@@ -94,6 +99,8 @@ struct HaAdapter<Language::Cpp, real_type, ModelVariant> {
     write_data<real_type, typename Config::OutputState::shape_p_hiv_deaths>(output_file, "p_hiv_deaths", state.p_hiv_deaths);
     write_data<real_type, typename Config::OutputState::shape_p_deaths_excess_nonaids>(output_file, "p_deaths_excess_nonaids", state.p_deaths_excess_nonaids);
     write_data<real_type, typename Config::OutputState::shape_p_net_migration_hivpop>(output_file, "p_net_migration_hivpop", state.p_net_migration_hivpop);
+    write_data<real_type, typename Config::OutputState::shape_hiv_births_by_mat_age>(output_file, "hiv_births_by_mat_age", state.hiv_births_by_mat_age);
+    write_data<real_type, typename Config::OutputState::shape_hiv_births>(output_file, "hiv_births", state.hiv_births);
     return index + output_count;
   };
 };
@@ -122,10 +129,6 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
       .hc_art_isperc = { owned_pars.hc.hc_art_isperc.data(), owned_pars.hc.hc_art_isperc.shape() },
       .hc_art_val = { owned_pars.hc.hc_art_val.data(), owned_pars.hc.hc_art_val.shape() },
       .hc_art_init_dist = { owned_pars.hc.hc_art_init_dist.data(), owned_pars.hc.hc_art_init_dist.shape() },
-      .fert_mult_by_age = { owned_pars.hc.fert_mult_by_age.data(), owned_pars.hc.fert_mult_by_age.shape() },
-      .fert_mult_off_art = { owned_pars.hc.fert_mult_off_art.data(), owned_pars.hc.fert_mult_off_art.shape() },
-      .fert_mult_on_art = { owned_pars.hc.fert_mult_on_art.data(), owned_pars.hc.fert_mult_on_art.shape() },
-      .total_fertility_rate = { owned_pars.hc.total_fertility_rate.data(), owned_pars.hc.total_fertility_rate.shape() },
       .PMTCT = { owned_pars.hc.PMTCT.data(), owned_pars.hc.PMTCT.shape() },
       .vertical_transmission_rate = { owned_pars.hc.vertical_transmission_rate.data(), owned_pars.hc.vertical_transmission_rate.shape() },
       .PMTCT_transmission_rate = { owned_pars.hc.PMTCT_transmission_rate.data(), owned_pars.hc.PMTCT_transmission_rate.shape() },
@@ -153,14 +156,13 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
     };
   };
 
-  static constexpr int output_count = 18;
+  static constexpr int output_count = 16;
 
   static int build_output(
     int index,
     const Config::OutputState& state,
     std::filesystem::path& output_file
   ) {
-    write_data<real_type, typename Config::OutputState::shape_hiv_births_by_mat_age>(output_file, "hiv_births_by_mat_age", state.hiv_births_by_mat_age);
     write_data<real_type, typename Config::OutputState::shape_hc1_hivpop>(output_file, "hc1_hivpop", state.hc1_hivpop);
     write_data<real_type, typename Config::OutputState::shape_hc2_hivpop>(output_file, "hc2_hivpop", state.hc2_hivpop);
     write_data<real_type, typename Config::OutputState::shape_hc1_artpop>(output_file, "hc1_artpop", state.hc1_artpop);
@@ -171,7 +173,6 @@ struct HcAdapter<Language::Cpp, real_type, ModelVariant> {
     write_data<real_type, typename Config::OutputState::shape_hc2_art_aids_deaths>(output_file, "hc2_art_aids_deaths", state.hc2_art_aids_deaths);
     write_data<real_type, typename Config::OutputState::shape_hc_art_init>(output_file, "hc_art_init", state.hc_art_init);
     write_data<real_type, typename Config::OutputState::shape_hc_art_need_init>(output_file, "hc_art_need_init", state.hc_art_need_init);
-    write_data<real_type, typename Config::OutputState::shape_hiv_births>(output_file, "hiv_births", state.hiv_births);
     write_data<real_type, typename Config::OutputState::shape_ctx_need>(output_file, "ctx_need", state.ctx_need);
     write_data<real_type, typename Config::OutputState::shape_infection_by_type>(output_file, "infection_by_type", state.infection_by_type);
     write_data<real_type, typename Config::OutputState::shape_mtct_by_source_tr>(output_file, "mtct_by_source_tr", state.mtct_by_source_tr);

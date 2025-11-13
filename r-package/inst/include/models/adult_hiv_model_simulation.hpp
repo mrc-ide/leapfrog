@@ -39,6 +39,8 @@ struct AdultHivModelSimulation<Config> {
   static constexpr int ART0MOS = SS::ART0MOS;
   static constexpr int p_idx_hiv_first_adult = SS::p_idx_hiv_first_adult;
   static constexpr int hIDX_15PLUS = SS::hIDX_15PLUS;
+  static constexpr int h_fertility_age_groups = SS::h_fertility_age_groups;
+  static constexpr int p_idx_fertility_first = SS::p_idx_fertility_first;
 
   // function args
   int t;
@@ -90,6 +92,7 @@ struct AdultHivModelSimulation<Config> {
 
       run_update_hiv_adult(hiv_step);
       run_remove_p_hiv_deaths(hiv_step);
+      run_wlhiv_births();
     }
   };
 
@@ -176,6 +179,7 @@ struct AdultHivModelSimulation<Config> {
         i_ha.Xhivn_incagerr += p_ha.incidence_rate_ratio_age(a - adult_incid_first_age_group, s, t) *
                                i_ha.hiv_negative_pop(a);
       }
+
 
       for (int a = adult_incid_first_age_group; a < pAG; ++a) {
         i_ha.p_infections_ts(a, s) = i_ha.hiv_negative_pop(a) *
@@ -466,7 +470,85 @@ struct AdultHivModelSimulation<Config> {
         }
       }
     }
+
   };
+
+  void run_wlhiv_births() {
+    const auto& p_dp = pars.dp;
+    const auto& p_ha = pars.ha;
+    const auto& c_ha = state_curr.ha;
+    auto& n_ha = state_next.ha;
+    auto& n_dp = state_next.dp;
+    auto& i_ha = intermediate.ha;
+
+    i_ha.asfr_sum = 0.0;
+    for (int a = 0; a < h_fertility_age_groups; ++a) {
+      i_ha.asfr_sum += p_dp.age_specific_fertility_rate(a, t);
+    } // end a
+
+    int a_idx_in = p_idx_fertility_first;
+    n_ha.hiv_births = 0.0;
+    for (int a = 0; a < h_fertility_age_groups; ++a) {
+      i_ha.nHIVcurr = 0.0;
+      i_ha.nHIVlast = 0.0;
+      i_ha.df = 0.0;
+
+      for (int hd = 0; hd < hDS; ++hd) {
+        i_ha.nHIVcurr += n_ha.h_hivpop(hd, a, FEMALE);
+        i_ha.nHIVlast += c_ha.h_hivpop(hd, a, FEMALE);
+        for (int ht = 0; ht < hTS; ++ht) {
+          i_ha.nHIVcurr += n_ha.h_artpop(ht, hd, a, FEMALE);
+          i_ha.nHIVlast += c_ha.h_artpop(ht, hd, a, FEMALE);
+        } // end hTS
+      } // end hDS
+
+      auto total_pop = 0.0;
+      auto asfr_w = 0.0;
+      for (int a_idx = a_idx_in; a_idx < (a_idx_in + hAG_span[a]); ++a_idx) {
+        total_pop += n_dp.p_totpop(a_idx, FEMALE);
+        asfr_w += p_dp.age_specific_fertility_rate(a_idx - p_idx_fertility_first, t) / i_ha.asfr_sum;
+      }
+      //set up a_idx_in for the next loop
+      a_idx_in = a_idx_in + hAG_span[a];
+      asfr_w /= hAG_span[a];
+
+      i_ha.prev = i_ha.nHIVcurr / total_pop;
+
+      for (int hd = 0; hd < hDS; ++hd) {
+        i_ha.df += p_ha.local_adj_factor *
+          p_ha.fert_mult_by_age(a, t) *
+          p_ha.fert_mult_off_art(hd) *
+          (n_ha.h_hivpop(hd, a, FEMALE) + c_ha.h_hivpop(hd, a, FEMALE)) / 2;
+
+        // women on ART less than 6 months use the off art fertility multiplier
+        i_ha.df += p_ha.local_adj_factor *
+          p_ha.fert_mult_by_age(a, t) *
+          p_ha.fert_mult_off_art(hd) *
+          (n_ha.h_artpop(0, hd, a, FEMALE) + c_ha.h_artpop(0, hd, a, FEMALE)) / 2;
+        for (int ht = 1; ht < hTS; ++ht) {
+          i_ha.df += p_ha.local_adj_factor *
+            p_ha.fert_mult_on_art(a) *
+            (n_ha.h_artpop(ht, hd, a, FEMALE) + c_ha.h_artpop(ht, hd, a, FEMALE)) / 2;
+        } // end hTS
+      } // end hDS
+
+      auto midyear_fertileHIV = (i_ha.nHIVcurr + i_ha.nHIVlast) / 2;
+      if (midyear_fertileHIV > 0) {
+        i_ha.df = i_ha.df / midyear_fertileHIV;
+      } else {
+        i_ha.df = 1;
+      }
+
+      n_ha.hiv_births_by_mat_age(a) = midyear_fertileHIV * p_dp.total_fertility_rate(t) *
+        i_ha.df / (i_ha.df * i_ha.prev + 1 - i_ha.prev) *
+        asfr_w;
+
+
+      n_ha.hiv_births += n_ha.hiv_births_by_mat_age(a);
+    } // end a
+  };
+
+
 };
 
 }

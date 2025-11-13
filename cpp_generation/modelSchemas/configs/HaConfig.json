@@ -8,14 +8,17 @@
       "hAG_span": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
       "hDS": 7,
       "hTS": 3,
-      "hAG": 66
+      "hAG": 66,
+      "p_fertility_age_groups": 35,
+      "h_fertility_age_groups": 35
     },
     "overrides": [
       {
         "applies_if": "use_coarse_stratification",
         "vars": {
           "hAG_span": [2, 3, 5, 5, 5, 5, 5, 5, 31],
-          "hAG": 9
+          "hAG": 9,
+          "h_fertility_age_groups": 8
         }
       }
     ]
@@ -146,6 +149,33 @@
     },
     "pIDX_INCIDPOP": {
       "num_type": "int"
+    },
+    "fert_mult_by_age": {
+      "num_type": "real_type",
+      "dims": ["SS::h_fertility_age_groups", "opts.proj_steps"],
+      "alias": {
+        "r": "fert_rat"
+      }
+    },
+    "fert_mult_off_art": {
+      "num_type": "real_type",
+      "dims": ["SS::hDS"],
+      "alias": {
+        "r": "cd4fert_rat"
+      }
+    },
+    "fert_mult_on_art": {
+      "num_type": "real_type",
+      "dims": ["SS::h_fertility_age_groups"],
+      "alias": {
+         "r": "frr_art6mos"
+      }
+    },
+    "local_adj_factor": {
+      "num_type": "real_type",
+      "alias": {
+        "r": "frr_scalar"
+      }
     }
   },
   "intermediate": {
@@ -266,6 +296,21 @@
     },
     "anyelig_idx": {
       "num_type": "int"
+    },
+    "asfr_sum": {
+      "num_type": "real_type"
+    },
+    "nHIVcurr": {
+      "num_type": "real_type"
+    },
+    "nHIVlast": {
+      "num_type": "real_type"
+    },
+    "df": {
+      "num_type": "real_type"
+    },
+    "prev": {
+      "num_type": "real_type"
     }
   },
   "state": {
@@ -320,6 +365,13 @@
     "p_net_migration_hivpop": {
       "num_type": "real_type",
       "dims": ["SS::pAG", "SS::NS"]
+    },
+    "hiv_births_by_mat_age": {
+      "num_type": "real_type",
+      "dims": ["SS::h_fertility_age_groups"]
+    },
+    "hiv_births": {
+      "num_type": "real_type"
     }
   }
 }
