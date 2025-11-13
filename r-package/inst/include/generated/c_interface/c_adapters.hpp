@@ -115,9 +115,9 @@ struct HaAdapter<Language::C, real_type, ModelVariant> {
     const Options<real_type> &opts
   ) {
     return {
-      .total_rate = read_data<real_type, 1>(params.ha->total_rate, params.ha->total_rate_length, "total_rate", { nda::dim<>(0, opts.proj_steps, 1) }),
-      .relative_risk_age = read_data<real_type, 3>(params.ha->relative_risk_age, params.ha->relative_risk_age_length, "relative_risk_age", { nda::dim<>(0, SS::pAG - SS::p_idx_hiv_first_adult, 1), nda::dim<>(0, SS::NS, (SS::pAG - SS::p_idx_hiv_first_adult)), nda::dim<>(0, opts.proj_steps, (SS::pAG - SS::p_idx_hiv_first_adult) * (SS::NS)) }),
-      .relative_risk_sex = read_data<real_type, 1>(params.ha->relative_risk_sex, params.ha->relative_risk_sex_length, "relative_risk_sex", { nda::dim<>(0, opts.proj_steps, 1) }),
+      .input_adult_incidence_rate = read_data<real_type, 1>(params.ha->input_adult_incidence_rate, params.ha->input_adult_incidence_rate_length, "input_adult_incidence_rate", { nda::dim<>(0, opts.proj_steps, 1) }),
+      .incidence_rate_ratio_age = read_data<real_type, 3>(params.ha->incidence_rate_ratio_age, params.ha->incidence_rate_ratio_age_length, "incidence_rate_ratio_age", { nda::dim<>(0, SS::pAG - SS::p_idx_hiv_first_adult, 1), nda::dim<>(0, SS::NS, (SS::pAG - SS::p_idx_hiv_first_adult)), nda::dim<>(0, opts.proj_steps, (SS::pAG - SS::p_idx_hiv_first_adult) * (SS::NS)) }),
+      .incidence_rate_ratio_sex = read_data<real_type, 1>(params.ha->incidence_rate_ratio_sex, params.ha->incidence_rate_ratio_sex_length, "incidence_rate_ratio_sex", { nda::dim<>(0, opts.proj_steps, 1) }),
       .cd4_mortality = read_data<real_type, 3>(params.ha->cd4_mortality, params.ha->cd4_mortality_length, "cd4_mortality", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),
       .cd4_progression = read_data<real_type, 3>(params.ha->cd4_progression, params.ha->cd4_progression_length, "cd4_progression", { nda::dim<>(0, SS::hDS - 1, 1), nda::dim<>(0, SS::hAG, (SS::hDS - 1)), nda::dim<>(0, SS::NS, (SS::hDS - 1) * (SS::hAG)) }),
       .cd4_initial_distribution = read_data<real_type, 3>(params.ha->cd4_initial_distribution, params.ha->cd4_initial_distribution_length, "cd4_initial_distribution", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),

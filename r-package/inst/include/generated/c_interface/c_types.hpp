@@ -43,12 +43,12 @@ struct DpOut {
 
 template<typename real_type>
 struct HaParams {
-  real_type* total_rate;
-  int total_rate_length;
-  real_type* relative_risk_age;
-  int relative_risk_age_length;
-  real_type* relative_risk_sex;
-  int relative_risk_sex_length;
+  real_type* input_adult_incidence_rate;
+  int input_adult_incidence_rate_length;
+  real_type* incidence_rate_ratio_age;
+  int incidence_rate_ratio_age_length;
+  real_type* incidence_rate_ratio_sex;
+  int incidence_rate_ratio_sex_length;
   real_type* cd4_mortality;
   int cd4_mortality_length;
   real_type* cd4_progression;

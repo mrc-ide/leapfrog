@@ -51,9 +51,9 @@ struct HaAdapter<Language::Cpp, real_type, ModelVariant> {
     OwnedParsMixed<real_type, ModelVariant>::Pars& owned_pars
   ) {
     return {
-      .total_rate = { owned_pars.ha.total_rate.data(), owned_pars.ha.total_rate.shape() },
-      .relative_risk_age = { owned_pars.ha.relative_risk_age.data(), owned_pars.ha.relative_risk_age.shape() },
-      .relative_risk_sex = { owned_pars.ha.relative_risk_sex.data(), owned_pars.ha.relative_risk_sex.shape() },
+      .input_adult_incidence_rate = { owned_pars.ha.input_adult_incidence_rate.data(), owned_pars.ha.input_adult_incidence_rate.shape() },
+      .incidence_rate_ratio_age = { owned_pars.ha.incidence_rate_ratio_age.data(), owned_pars.ha.incidence_rate_ratio_age.shape() },
+      .incidence_rate_ratio_sex = { owned_pars.ha.incidence_rate_ratio_sex.data(), owned_pars.ha.incidence_rate_ratio_sex.shape() },
       .cd4_mortality = { owned_pars.ha.cd4_mortality.data(), owned_pars.ha.cd4_mortality.shape() },
       .cd4_progression = { owned_pars.ha.cd4_progression.data(), owned_pars.ha.cd4_progression.shape() },
       .cd4_initial_distribution = { owned_pars.ha.cd4_initial_distribution.data(), owned_pars.ha.cd4_initial_distribution.shape() },
