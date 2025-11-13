@@ -138,21 +138,6 @@ struct ChildModelSimulation<Config> {
     }
 
     adjust_hiv_births();
-    if(t == 14){
-      auto temp = 0.0;
-      for (int s = 0; s < NS; ++s) {
-        for (int a = 1; a < hc2_agestart; ++a) {
-          for (int hd = 0; hd < hc1DS; ++hd) {
-            if (a == age_1) {
-              temp += n_hc.hc1_hivpop(hd, 0, a, s) * 0.5;
-            } else {
-              temp += n_hc.hc1_hivpop(hd, 0, a, s);
-            }
-          }
-        }
-      }
-      std::cout << temp;
-    }
     add_infections();
     need_for_cotrim();
     cd4_mortality();

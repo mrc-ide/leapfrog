@@ -246,7 +246,6 @@ test_that("Children in need of cotrim aligns", {
                    lfrog = out$ctx_need)
   dt <- dt %>%
     dplyr::mutate(diff = spec - lfrog)
-  ctx_need <- data.table(dt)
 
   expect_true(all(abs(dt$diff) < 5e-1))
 })
@@ -334,7 +333,6 @@ test_that("CLHIV align", {
     dplyr::mutate(diff = pop - fr) %>%
     dplyr::filter(year < 2030) %>%
     dplyr::filter(age < 15)
-clhiv = data.table(dt)
 
   expect_true(all(abs(dt$diff) < 5e-2))
 })
@@ -434,12 +432,11 @@ test_that("HIV related deaths among CLHIV on ART align", {
   hc <- array(0, dim = c(15, 2, 61))
   hc[1:5, , ] <- hc1
   hc[6:15, , ] <- hc2
-  dt <- dplyr::right_join(reshape2::melt(hc), reshape2::melt(aids_deathsart), by = c("Var1", "Var2", "Var3"))
+  dimnames(hc) <- dimnames(aids_deathsart)
+  dt <- dplyr::right_join(reshape2::melt(hc), reshape2::melt(aids_deathsart), by = c("age", "sex", "years"))
   dt <- dt %>%
     dplyr::mutate(
-      age = Var1 - 1,
-      sex = dplyr::if_else(Var2 == 1, "Male", "Female"),
-      year = Var3 + 1969,
+      year = years,
       fr = value.x,
       spec = value.y
     ) %>%

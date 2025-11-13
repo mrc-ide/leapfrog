@@ -113,8 +113,8 @@ process_parameters_to_cpp <- function(parameters) {
   if ("artcd4elig_idx" %in% names(parameters)) {
     parameters[["artcd4elig_idx"]] <- parameters[["artcd4elig_idx"]] - 1L
   }
-  if ("paed_art_elig_cd4" %in% names(parameters)) {
-    parameters[["paed_art_elig_cd4"]] <- parameters[["paed_art_elig_cd4"]] - 1L
+  if ("hc_art_elig_cd4" %in% names(parameters)) {
+    parameters[["hc_art_elig_cd4"]] <- parameters[["hc_art_elig_cd4"]] - 1L
   }
   if ("t_ART_start" %in% names(parameters)) {
     parameters[["t_ART_start"]] <- parameters[["t_ART_start"]] - 1L
@@ -143,8 +143,8 @@ process_parameters_to_r <- function(parameters) {
   if ("artcd4elig_idx" %in% names(parameters)) {
     parameters[["artcd4elig_idx"]] <- parameters[["artcd4elig_idx"]] + 1L
   }
-  if ("paed_art_elig_cd4" %in% names(parameters)) {
-    parameters[["paed_art_elig_cd4"]] <- parameters[["paed_art_elig_cd4"]] + 1L
+  if ("hc_art_elig_cd4" %in% names(parameters)) {
+    parameters[["hc_art_elig_cd4"]] <- parameters[["hc_art_elig_cd4"]] + 1L
   }
   if ("t_ART_start" %in% names(parameters)) {
     parameters[["t_ART_start"]] <- parameters[["t_ART_start"]] + 1L
