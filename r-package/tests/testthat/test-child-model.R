@@ -217,6 +217,7 @@ test_that("Female 15-49y pop aligns", {
 
 test_that("Mothers that need ptmct align", {
   parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
+  parameters$mat_prev_input[] <- as.integer(1)
   utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
   dp <- utils$dp
@@ -236,6 +237,7 @@ test_that("Mothers that need ptmct align", {
 
 test_that("Children in need of cotrim aligns", {
   parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
+  parameters$mat_prev_input[] <- as.integer(1)
   utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
   out <- run_model(parameters, "ChildModel", 1970:2030)
@@ -252,6 +254,7 @@ test_that("Children in need of cotrim aligns", {
 
 test_that("Infections among children align", {
   parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
+  parameters$mat_prev_input[] <- as.integer(1)
   utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
   dp <- utils$dp
@@ -288,6 +291,7 @@ test_that("Infections among children align", {
 
 test_that("CLHIV align", {
   parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
+  parameters$mat_prev_input[] <- as.integer(1)
   utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
   dp <- utils$dp
@@ -339,6 +343,7 @@ test_that("CLHIV align", {
 
 test_that("CLHIV on ART align", {
   parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
+  parameters$mat_prev_input[] <- as.integer(1)
   utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
   dp <- utils$dp
@@ -389,6 +394,7 @@ test_that("CLHIV on ART align", {
 
 test_that("HIV related deaths among CLHIV not on ART align", {
   parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
+  parameters$mat_prev_input[] <- as.integer(1)
   utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
   dp <- utils$dp
@@ -420,6 +426,7 @@ test_that("HIV related deaths among CLHIV not on ART align", {
 
 test_that("HIV related deaths among CLHIV on ART align", {
   parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
+  parameters$mat_prev_input[] <- as.integer(1)
   utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
   dp <- utils$dp
