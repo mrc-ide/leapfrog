@@ -48,7 +48,7 @@
         "r": "rvec"
       }
     },
-    "initial_prevalence": {
+    "initial_incidence": {
       "num_type": "real_type",
       "alias": {
         "r": "iota"
@@ -59,6 +59,9 @@
       "alias": {
         "r": "relinfectART"
       }
+    },
+    "epidemic_start_hts": {
+      "num_type": "int"
     },
     "incidence_rate_ratio_age": {
       "num_type": "real_type",
@@ -355,11 +358,11 @@
     },
     "prev15to49_hts": {
        "num_type": "real_type",
-       "dims": ["opts.hts_per_year"]
+       "dims": ["10"]
     },
     "incid15to49_hts": {
        "num_type": "real_type",
-       "dims": ["opts.hts_per_year"]
+       "dims": ["10"]
     }
   }
 }

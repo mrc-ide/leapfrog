@@ -240,8 +240,13 @@ struct AdultHivModelSimulation<Config> {
   real_type prevcurr = (Xhivp_noart + Xart) / Xtot;
 
   int hts = t * opts.hts_per_year + hiv_step;
-  
-  real_type incrate15to49_ts = p_ha.transmission_rate_hts[hts] * (Xhivp_noart + p_ha.relative_infectiousness_art * Xart) / Xtot + p_ha.initial_prevalence;
+
+  real_type incrate15to49_hts = p_ha.transmission_rate_hts[hts] * (Xhivp_noart + p_ha.relative_infectiousness_art * Xart) / Xtot;
+
+  // Seed incidence
+  if (p_ha.epidemic_start_hts == hts) {
+    incrate15to49_hts += p_ha.initial_incidence;
+  }
 
   // save HIV time step outputs
   n_ha.prev15to49_hts(hiv_step) = prevcurr;
@@ -249,8 +254,8 @@ struct AdultHivModelSimulation<Config> {
 
   // incidence by sex
   real_type incrate15to49_s[NS];
-  incrate15to49_s[MALE] = incrate15to49_ts * (Xhivn_s[MALE]+Xhivn_s[FEMALE]) / (Xhivn_s[MALE] + p_ha.incidence_rate_ratio_sex(t)*Xhivn_s[FEMALE]);
-  incrate15to49_s[FEMALE] = incrate15to49_ts * p_ha.incidence_rate_ratio_sex(t) * incrate15to49_s[MALE];
+  incrate15to49_s[MALE] = incrate15to49_hts * (Xhivn_s[MALE]+Xhivn_s[FEMALE]) / (Xhivn_s[MALE] + p_ha.incidence_rate_ratio_sex(t)*Xhivn_s[FEMALE]);
+  incrate15to49_s[FEMALE] = p_ha.incidence_rate_ratio_sex(t) * incrate15to49_s[MALE];
 
   // annualized infections by age and sex
   for(int s = 0; s < NS; ++s)

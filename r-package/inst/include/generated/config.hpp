@@ -142,8 +142,9 @@ struct HaConfig {
       nda::dim<0, nda::dynamic, 1>
     >;
     nda::array_ref<real_type, shape_transmission_rate_hts> transmission_rate_hts;
-    real_type initial_prevalence;
+    real_type initial_incidence;
     real_type relative_infectiousness_art;
+    int epidemic_start_hts;
     using shape_incidence_rate_ratio_age = nda::shape<
       nda::dim<0, SS::pAG - SS::p_idx_hiv_first_adult, 1>,
       nda::dim<0, SS::NS, (SS::pAG - SS::p_idx_hiv_first_adult)>,
@@ -435,11 +436,11 @@ struct HaConfig {
     >;
     nda::array<real_type, shape_p_net_migration_hivpop> p_net_migration_hivpop;
     using shape_prev15to49_hts = nda::shape<
-      nda::dim<0, nda::dynamic, 1>
+      nda::dim<0, 10, 1>
     >;
     nda::array<real_type, shape_prev15to49_hts> prev15to49_hts;
     using shape_incid15to49_hts = nda::shape<
-      nda::dim<0, nda::dynamic, 1>
+      nda::dim<0, 10, 1>
     >;
     nda::array<real_type, shape_incid15to49_hts> incid15to49_hts;
 
@@ -552,13 +553,13 @@ struct HaConfig {
     >;
     nda::array<real_type, shape_p_net_migration_hivpop> p_net_migration_hivpop;
     using shape_prev15to49_hts = nda::shape<
-      nda::dim<0, nda::dynamic, 1>,
-      nda::dim<0, nda::dynamic, nda::dynamic>
+      nda::dim<0, 10, 1>,
+      nda::dim<0, nda::dynamic, (10)>
     >;
     nda::array<real_type, shape_prev15to49_hts> prev15to49_hts;
     using shape_incid15to49_hts = nda::shape<
-      nda::dim<0, nda::dynamic, 1>,
-      nda::dim<0, nda::dynamic, nda::dynamic>
+      nda::dim<0, 10, 1>,
+      nda::dim<0, nda::dynamic, (10)>
     >;
     nda::array<real_type, shape_incid15to49_hts> incid15to49_hts;
 
@@ -576,8 +577,8 @@ struct HaConfig {
       p_hiv_deaths(shape_p_hiv_deaths(SS::pAG, SS::NS, output_years)),
       p_deaths_excess_nonaids(shape_p_deaths_excess_nonaids(SS::pAG, SS::NS, output_years)),
       p_net_migration_hivpop(shape_p_net_migration_hivpop(SS::pAG, SS::NS, output_years)),
-      prev15to49_hts(shape_prev15to49_hts(opts.hts_per_year, output_years)),
-      incid15to49_hts(shape_incid15to49_hts(opts.hts_per_year, output_years))
+      prev15to49_hts(shape_prev15to49_hts(10, output_years)),
+      incid15to49_hts(shape_incid15to49_hts(10, output_years))
     {
       p_hivpop.for_each_value([](real_type& x) { x = 0; });
       p_deaths_background_hivpop.for_each_value([](real_type& x) { x = 0; });

@@ -49,10 +49,12 @@ struct HaParams {
   int input_adult_incidence_rate_length;
   real_type* transmission_rate_hts;
   int transmission_rate_hts_length;
-  real_type initial_prevalence;
-  int initial_prevalence_length;
+  real_type initial_incidence;
+  int initial_incidence_length;
   real_type relative_infectiousness_art;
   int relative_infectiousness_art_length;
+  int epidemic_start_hts;
+  int epidemic_start_hts_length;
   real_type* incidence_rate_ratio_age;
   int incidence_rate_ratio_age_length;
   real_type* incidence_rate_ratio_sex;
