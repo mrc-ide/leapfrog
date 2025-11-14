@@ -10,7 +10,7 @@
       "hTS": 3,
       "hAG": 66,
       "p_fertility_age_groups": 35,
-      "h_fertility_age_groups": 35
+      "h_fertility_age_groups": 35,
       "pIDX_15to49": 15,
       "pAG_15to49": 35,
       "pIDX_15to49": 15,
@@ -24,7 +24,7 @@
         "vars": {
           "hAG_span": [2, 3, 5, 5, 5, 5, 5, 5, 31],
           "hAG": 9,
-          "h_fertility_age_groups": 8
+          "h_fertility_age_groups": 8,
           "hAG_15to49": 8
         }
       }
@@ -32,10 +32,7 @@
   },
   "pars": {
     "incidence_model_choice": {
-      "num_type": "int",
-	"alias": {
-          "r": "eppmod"
-        }
+      "num_type": "int"
      },	  
     "input_adult_incidence_rate": {
       "num_type": "real_type",
@@ -46,26 +43,17 @@
     },
     "transmission_rate_hts": {
       "num_type": "real_type",
-      "dims": ["opts.proj_steps * opts.hts_per_year"],
-      "alias": {
-        "r": "rvec"
-      }
+      "dims": ["opts.proj_steps * opts.hts_per_year"]
     },
     "initial_incidence": {
-      "num_type": "real_type",
-      "alias": {
-        "r": "iota"
-      }
-    },
-    "relative_infectiousness_art": {
-      "num_type": "real_type",
-      "alias": {
-        "r": "relinfectART"
-      }
+      "num_type": "real_type"
     },
     "epidemic_start_hts": {
       "num_type": "int"
     },
+    "relative_infectiousness_art": {
+      "num_type": "real_type"
+    },      
     "incidence_rate_ratio_age": {
       "num_type": "real_type",
       "dims": ["SS::pAG - SS::p_idx_hiv_first_adult", "SS::NS", "opts.proj_steps"],
@@ -407,6 +395,7 @@
     },
     "hiv_births": {
       "num_type": "real_type"
+    },
     "prev15to49_hts": {
        "num_type": "real_type",
        "dims": ["10"]

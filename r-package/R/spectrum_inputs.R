@@ -226,6 +226,13 @@ prepare_leapfrog_projp <- function(pjnz, use_coarse_age_groups = FALSE, hiv_step
   v$pAG_INCIDPOP <- ifelse(v$incidpopage == 0L, pAG_15_to_49, pAG_15_plus)
   v$pIDX_INCIDPOP <- 15L
 
+  ## Incidence model inputs
+  v$incidence_model_choice <- 0L  ## 0: INCIDMOD_DIRECTINCID_HTS; 1: INCIDMOD_TRANSMRATE_HTS
+  v$transmission_rate_hts <- numeric(length(v$incidinput) * hiv_steps_per_year)
+  v$initial_incidence <- 0.0
+  v$relative_infectiousness_art <- 0.1
+  v$epidemic_start_hts <- length(v$transmission_rate_hts)
+
   v$artmx_timerr <- projp$artmx_timerr[c(1, 2, rep(3, hTS - 2)), ]
 
   ## ## ART eligibility and numbers on treatment

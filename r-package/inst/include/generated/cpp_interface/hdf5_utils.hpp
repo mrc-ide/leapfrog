@@ -200,9 +200,9 @@ struct HaOwnedPars {
 
     real_type initial_incidence;
 
-    real_type relative_infectiousness_art;
-
     int epidemic_start_hts;
+
+    real_type relative_infectiousness_art;
 
     using shape_incidence_rate_ratio_age = nda::shape<
     nda::dim<0, SS::pAG - SS::p_idx_hiv_first_adult, 1>,
@@ -328,12 +328,12 @@ struct HaOwnedPars {
     const Options<real_type> &opts
   ) {
     return {
-      .incidence_model_choice = read_data_scalar<int>(params_file, "eppmod"),
+      .incidence_model_choice = read_data_scalar<int>(params_file, "incidence_model_choice"),
       .input_adult_incidence_rate = read_data<real_type, typename Pars::shape_input_adult_incidence_rate>(params_file, "incidinput", { nda::dim<>(0, opts.proj_steps, 1) }),
-      .transmission_rate_hts = read_data<real_type, typename Pars::shape_transmission_rate_hts>(params_file, "rvec", { nda::dim<>(0, opts.proj_steps * opts.hts_per_year, 1) }),
-      .initial_incidence = read_data_scalar<real_type>(params_file, "iota"),
-      .relative_infectiousness_art = read_data_scalar<real_type>(params_file, "relinfectART"),
+      .transmission_rate_hts = read_data<real_type, typename Pars::shape_transmission_rate_hts>(params_file, "transmission_rate_hts", { nda::dim<>(0, opts.proj_steps * opts.hts_per_year, 1) }),
+      .initial_incidence = read_data_scalar<real_type>(params_file, "initial_incidence"),
       .epidemic_start_hts = read_data_scalar<int>(params_file, "epidemic_start_hts"),
+      .relative_infectiousness_art = read_data_scalar<real_type>(params_file, "relative_infectiousness_art"),
       .incidence_rate_ratio_age = read_data<real_type, typename Pars::shape_incidence_rate_ratio_age>(params_file, "incrr_age", { nda::dim<>(0, SS::pAG - SS::p_idx_hiv_first_adult, 1), nda::dim<>(0, SS::NS, (SS::pAG - SS::p_idx_hiv_first_adult)), nda::dim<>(0, opts.proj_steps, (SS::pAG - SS::p_idx_hiv_first_adult) * (SS::NS)) }),
       .incidence_rate_ratio_sex = read_data<real_type, typename Pars::shape_incidence_rate_ratio_sex>(params_file, "incrr_sex", { nda::dim<>(0, opts.proj_steps, 1) }),
       .cd4_mortality = read_data<real_type, typename Pars::shape_cd4_mortality>(params_file, "cd4_mort", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),
