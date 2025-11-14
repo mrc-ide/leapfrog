@@ -584,7 +584,6 @@ get_pars_metadata <- function(dim_vars, dp) {
       )
     ),
     #########CHILD TAGS HEREAFTER
-    ##TODO: change names to reflect the tag
     trans_eff_assump = list(
       type = "real",
       read = list(
@@ -781,7 +780,6 @@ get_pars_metadata <- function(dim_vars, dp) {
         )
       )
     ),
-    ##Note: should align with adult naming convention
     child_dist_new_infections_cd4 = list(
       type = "real",
       read = list(
@@ -802,18 +800,15 @@ get_pars_metadata <- function(dim_vars, dp) {
             columns = (dim_vars$cd4_perc_0to4$length - 1) * 2 + 1
           ),
           start_offset = list(row = 1)
+        ),
+        list(
+          tag = "ChildAnnRateProgressLowerCD4 MV",
+          dims = list("g", "cd4_prog_0to14_old"),
+          skip = list(
+            column = (dim_vars$cd4_perc_0to4$length) * 2 + 1
+          ),
+          start_offset = list(row = 1)
         )
-        ##TODO: Confirm with Jeff/ Rob G. how this is structured, looks like there is a value for the last CD4 cat?
-        ##dp[816:821,1:25]
-        # ,
-        # list(
-        #   tag = "ChildAnnRateProgressLowerCD4 MV",
-        #   dims = list("g", "cd4_prog_0to14"),
-        #   skip = list(
-        #     column = (dim_vars$cd4_perc_0to4$length) * 2 + 1
-        #   ),
-        #   start_offset = list(row = 1)
-        # )
       )
     ),
     child_mort_by_cd4_no_art = list(
@@ -823,10 +818,16 @@ get_pars_metadata <- function(dim_vars, dp) {
         list(
           tag = "ChildMortByCD4NoART MV2",
           dims = list("vt_time", "a_0to14_coarse_2", "paed_ordinal_cd4_cat")
+        ),
+        ##Note: NOT DONE
+        list(
+          tag = "ChildMortByCD4NoART MV",
+          dims = list("vt_time_old", "a_0to14_coarse_2", "paed_ordinal_cd4_cat", "vt_time_old"),
+          column_dims = list("paed_ordinal_cd4_cat", "vt_time_old"),
+          skip = list(
+            rows = c(1,5:6,10:11,15:16)
+          )
         )
-        ##TODO: Show mantra, this one is AWFUL
-        # ,
-        # list(tag = "ChildMortByCD4NoART MV")
       )
     ),
   child_mort_by_cd4_with_art_0to6 = list(
@@ -929,6 +930,8 @@ get_pars_metadata <- function(dim_vars, dp) {
        )
        ##"CD4Distribution MV" exists, but the interpretation is difficult,
        ##seems like the first year is the year before HIV is introduced?
+       ##could also be that HIV starts earlier in this file? but I cannot open this file in spectrum
+       ##"C:/Users/mwalters/Imperial College London/HIV Inference Group - WP - Documents/Data/Spectrum files/2016 final/subnational/Malawi 2016eBlantyre.PJNZ"
      )
    )
  ),
@@ -964,6 +967,8 @@ cd4_distribution_15_49 = list(
   )
 ),
  aids_deaths_no_art_single_age = list(
+   ##Note: not available before 2022
+   allow_null = TRUE,
    type = "real",
    read = list(
      list(
@@ -977,6 +982,8 @@ cd4_distribution_15_49 = list(
    )
  ),
 aids_deaths_art_single_age = list(
+  ##Note: not available before 2022
+  allow_null = TRUE,
   type = "real",
   read = list(
     list(
@@ -995,6 +1002,14 @@ child_art_calc = list(
     list(
       tag = "ChildARTCalc MV2",
       dims = list("g_both_first", "child_art_cats", "years"),
+      start_offset = list(row = 1)
+    ),
+    list(
+      tag = "ChildARTCalc MV",
+      dims = list("g_both_first", "child_art_cats", "years"),
+      skip = list(
+        rows = 1 + c(dim_vars$g_both_first$length + 1) * 0:3
+      ),
       start_offset = list(row = 1)
     )
   )
@@ -1056,13 +1071,17 @@ get_static_dim_vars <- function() {
                                                        rep("Age: 5-14, CD4 prog", 5)),
                                                       c(rep(c(">30 -> 26-30", "26-30 -> 21-25", "21-25 -> 16-20", "16-20 -> 11-15", "11-15 -> 5-10", "5-10 -> <5"), 2),
                                                            c("1000+ -> 750-999", "750-999 -> 500-749", "500-749 -> 350-499", "350-499 -> 200-349", "200-349 -> <200")))),
-
+    cd4_prog_0to14_old = list(length = 20, labels = paste(c(rep("Age: 0-2, CD4 prog", 7), rep("Age: 3-4, CD4 prog", 7),
+                                                        rep("Age: 5-14, CD4 prog", 6)),
+                                                      c(rep(c(">30 -> 26-30", "26-30 -> 21-25", "21-25 -> 16-20", "16-20 -> 11-15", "11-15 -> 5-10", "5-10 -> <5", "final"), 2),
+                                                        c("1000+ -> 750-999", "750-999 -> 500-749", "500-749 -> 350-499", "350-499 -> 200-349", "200-349 -> <200", "final")))),
     art_dur_2 = list(length = 2, labels = c("0-12mos", "12mos+")),
     pops_for_treat = list(length = 7, labels = c("Pregnant women", "TB/HIV co-infected", "Discordant couples", "Sex workers", "Men who have sex with men", "Injecting drug users", "Other population")),
     elig_perc_year = list(length = 3, labels = c("eligibility", "percent", "year")),
     vt_trt = list(length = 11, labels = c("CD4 <200", "CD4 200-350", "CD4 >350", "Incident infections", "Single dose nevirapine", "WHO 2006 dual ARV regimen", "Option A", "Option B", "ART: Started before pregnancy", "ART: Started during pregnancy >4 weeks", "ART: Started during pregnancy <4 weeks")),
     vt_trt_cat = list(length = 3, labels = c("Perinatal", "Breastfeeding (per month) <350", "Breastfeeding (per month) >=350")),
     vt_time = list(length = 4, labels = c("Perinatal", "Breastfeeding, <6MOS", "Breastfeeding, 7-12MOS", "Breastfeeding, >12MOS")),
+    vt_time_old = list(length = 3, labels = c("Perinatal", "Breastfeeding, <12MOS", "Breastfeeding, >12MOS")), ##Note: this is a guess on what this stands for, unable to open that file
     pmtct_editor_order = list(length = 26, labels = c("No prophylaxis- Percent",
                                              paste0(rep(pmtct_options, each = 2), rep(c("- Number", "- Percent"), 7)), "Total prophlyaxis- Number",
                                                       "Postnatal: No prophylaxis- Percent", paste0(rep("Postnatal ", 2), rep(c("Option A", "Option B"), each = 2), rep(c("- Number", "- Percent"), 2)), "Total postnatal prophlyaxis- Number",
@@ -1092,6 +1111,7 @@ get_static_dim_vars <- function() {
                                                 "Age >=5, <12 months on ART",
                                                 "Age >=5, 12+ months on ART")),
    paed_ordinal_cd4_cat = list(length = 7, labels = 1:7),
+   paed_ordinal_cd4_cat_old = list(length = 21, labels = rep(1:7,3)),
    paed_age_time_art_cd4 = list(length = 33, labels = paste0(
                                         c(rep(c("0: ", "1-2: ", "3-4: "), each = 7), rep(c("5-9: ", "10-14: "), each = 6)),
                                         c(rep(c(">30", "26-30", "21-25", "16-20", "11-15", "5-10", "<5"),3),
