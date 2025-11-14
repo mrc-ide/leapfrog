@@ -180,10 +180,21 @@ struct HaOwnedPars {
   using SS = SSMixed<ModelVariant>;
   
   struct Pars {
+    int incidence_model_choice;
+
     using shape_input_adult_incidence_rate = nda::shape<
     nda::dim<0, nda::dynamic, 1>
   >;
   nda::array<real_type, shape_input_adult_incidence_rate> input_adult_incidence_rate;
+
+    using shape_transmission_rate_hts = nda::shape<
+    nda::dim<0, nda::dynamic, 1>
+  >;
+  nda::array<real_type, shape_transmission_rate_hts> transmission_rate_hts;
+
+    real_type initial_prevalence;
+
+    real_type relative_infectiousness_art;
 
     using shape_incidence_rate_ratio_age = nda::shape<
     nda::dim<0, SS::pAG - SS::p_idx_hiv_first_adult, 1>,
@@ -291,7 +302,11 @@ struct HaOwnedPars {
     const Options<real_type> &opts
   ) {
     return {
+      .incidence_model_choice = read_data_scalar<int>(params_file, "eppmod"),
       .input_adult_incidence_rate = read_data<real_type, typename Pars::shape_input_adult_incidence_rate>(params_file, "incidinput", { nda::dim<>(0, opts.proj_steps, 1) }),
+      .transmission_rate_hts = read_data<real_type, typename Pars::shape_transmission_rate_hts>(params_file, "rvec", { nda::dim<>(0, opts.proj_steps * opts.hts_per_year, 1) }),
+      .initial_prevalence = read_data_scalar<real_type>(params_file, "iota"),
+      .relative_infectiousness_art = read_data_scalar<real_type>(params_file, "relinfectART"),
       .incidence_rate_ratio_age = read_data<real_type, typename Pars::shape_incidence_rate_ratio_age>(params_file, "incrr_age", { nda::dim<>(0, SS::pAG - SS::p_idx_hiv_first_adult, 1), nda::dim<>(0, SS::NS, (SS::pAG - SS::p_idx_hiv_first_adult)), nda::dim<>(0, opts.proj_steps, (SS::pAG - SS::p_idx_hiv_first_adult) * (SS::NS)) }),
       .incidence_rate_ratio_sex = read_data<real_type, typename Pars::shape_incidence_rate_ratio_sex>(params_file, "incrr_sex", { nda::dim<>(0, opts.proj_steps, 1) }),
       .cd4_mortality = read_data<real_type, typename Pars::shape_cd4_mortality>(params_file, "cd4_mort", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),

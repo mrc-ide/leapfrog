@@ -141,7 +141,11 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
     const Options<real_type> &opts
   ) {
     return {
+      .incidence_model_choice = Rcpp::as<int>(data["eppmod"]),
       .input_adult_incidence_rate = parse_data<real_type, 1>(data, "incidinput", { nda::dim<>(0, opts.proj_steps, 1) }),
+      .transmission_rate_hts = parse_data<real_type, 1>(data, "rvec", { nda::dim<>(0, opts.proj_steps * opts.hts_per_year, 1) }),
+      .initial_prevalence = Rcpp::as<real_type>(data["iota"]),
+      .relative_infectiousness_art = Rcpp::as<real_type>(data["relinfectART"]),
       .incidence_rate_ratio_age = parse_data<real_type, 3>(data, "incrr_age", { nda::dim<>(0, SS::pAG - SS::p_idx_hiv_first_adult, 1), nda::dim<>(0, SS::NS, (SS::pAG - SS::p_idx_hiv_first_adult)), nda::dim<>(0, opts.proj_steps, (SS::pAG - SS::p_idx_hiv_first_adult) * (SS::NS)) }),
       .incidence_rate_ratio_sex = parse_data<real_type, 1>(data, "incrr_sex", { nda::dim<>(0, opts.proj_steps, 1) }),
       .cd4_mortality = parse_data<real_type, 3>(data, "cd4_mort", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),
@@ -181,10 +185,12 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
     fill_initial_state<real_type, typename Config::State::shape_p_hiv_deaths>(data, "p_hiv_deaths", state.p_hiv_deaths);
     fill_initial_state<real_type, typename Config::State::shape_p_deaths_excess_nonaids>(data, "p_deaths_excess_nonaids", state.p_deaths_excess_nonaids);
     fill_initial_state<real_type, typename Config::State::shape_p_net_migration_hivpop>(data, "p_net_migration_hivpop", state.p_net_migration_hivpop);
+    fill_initial_state<real_type, typename Config::State::shape_prev15to49_hts>(data, "prev15to49_hts", state.prev15to49_hts);
+    fill_initial_state<real_type, typename Config::State::shape_incid15to49_hts>(data, "incid15to49_hts", state.incid15to49_hts);
     return state;
   };
 
-  static constexpr int output_count = 13;
+  static constexpr int output_count = 15;
 
   static int build_output(
     int index,
@@ -258,6 +264,16 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
     std::copy_n(state.p_net_migration_hivpop.data(), state.p_net_migration_hivpop.size(), REAL(r_p_net_migration_hivpop));
     names[index + 12] = "p_net_migration_hivpop";
     ret[index + 12] = r_p_net_migration_hivpop;
+    Rcpp::NumericVector r_prev15to49_hts(opts.hts_per_year * output_years);
+    r_prev15to49_hts.attr("dim") = Rcpp::IntegerVector::create(opts.hts_per_year, output_years);
+    std::copy_n(state.prev15to49_hts.data(), state.prev15to49_hts.size(), REAL(r_prev15to49_hts));
+    names[index + 13] = "prev15to49_hts";
+    ret[index + 13] = r_prev15to49_hts;
+    Rcpp::NumericVector r_incid15to49_hts(opts.hts_per_year * output_years);
+    r_incid15to49_hts.attr("dim") = Rcpp::IntegerVector::create(opts.hts_per_year, output_years);
+    std::copy_n(state.incid15to49_hts.data(), state.incid15to49_hts.size(), REAL(r_incid15to49_hts));
+    names[index + 14] = "incid15to49_hts";
+    ret[index + 14] = r_incid15to49_hts;
     return index + output_count;
   };
 
@@ -332,6 +348,16 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
     std::copy_n(state.p_net_migration_hivpop.data(), state.p_net_migration_hivpop.size(), REAL(r_p_net_migration_hivpop));
     names[index + 12] = "p_net_migration_hivpop";
     ret[index + 12] = r_p_net_migration_hivpop;
+    Rcpp::NumericVector r_prev15to49_hts(opts.hts_per_year);
+    r_prev15to49_hts.attr("dim") = Rcpp::IntegerVector::create(opts.hts_per_year);
+    std::copy_n(state.prev15to49_hts.data(), state.prev15to49_hts.size(), REAL(r_prev15to49_hts));
+    names[index + 13] = "prev15to49_hts";
+    ret[index + 13] = r_prev15to49_hts;
+    Rcpp::NumericVector r_incid15to49_hts(opts.hts_per_year);
+    r_incid15to49_hts.attr("dim") = Rcpp::IntegerVector::create(opts.hts_per_year);
+    std::copy_n(state.incid15to49_hts.data(), state.incid15to49_hts.size(), REAL(r_incid15to49_hts));
+    names[index + 14] = "incid15to49_hts";
+    ret[index + 14] = r_incid15to49_hts;
     return index + output_count;
   };
 };

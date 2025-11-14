@@ -43,8 +43,16 @@ struct DpOut {
 
 template<typename real_type>
 struct HaParams {
+  int incidence_model_choice;
+  int incidence_model_choice_length;
   real_type* input_adult_incidence_rate;
   int input_adult_incidence_rate_length;
+  real_type* transmission_rate_hts;
+  int transmission_rate_hts_length;
+  real_type initial_prevalence;
+  int initial_prevalence_length;
+  real_type relative_infectiousness_art;
+  int relative_infectiousness_art_length;
   real_type* incidence_rate_ratio_age;
   int incidence_rate_ratio_age_length;
   real_type* incidence_rate_ratio_sex;
@@ -113,6 +121,10 @@ struct HaOut {
   int p_deaths_excess_nonaids_length;
   real_type* p_net_migration_hivpop;
   int p_net_migration_hivpop_length;
+  real_type* prev15to49_hts;
+  int prev15to49_hts_length;
+  real_type* incid15to49_hts;
+  int incid15to49_hts_length;
 };
 
 template<typename real_type>

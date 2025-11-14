@@ -66,12 +66,15 @@ struct AdultHivModelSimulation<Config> {
     i_ha.everARTelig_idx = p_ha.idx_hm_elig(t) < hDS ? p_ha.idx_hm_elig(t) : hDS;
     i_ha.anyelig_idx = p_ha.idx_hm_elig(t);
 
-    // Note: In Spectrum, incidence rate by sex is calculated once per year, using
-    // the previous year HIV negative population.
-    // Incidence rate by age is calculated per time-step using the **current year** 
-    // HIV negative population, rathern than the previous year HIV population.
-    // Rob Glaubius, 5 August 2022: https://github.com/mrc-ide/leaptfrog/issues/18
-    run_calculate_annual_incidence_rate_by_sex();
+    if (p_ha.incidence_model_choice == SS::INCIDMOD_DIRECTINCID_HTS) {
+
+      // Note: In Spectrum, incidence rate by sex is calculated once per year, using
+      // the previous year HIV negative population.
+      // Incidence rate by age is calculated per time-step using the **current year** 
+      // HIV negative population, rathern than the previous year HIV population.
+      // Rob Glaubius, 5 August 2022: https://github.com/mrc-ide/leaptfrog/issues/18
+      run_calculate_annual_incidence_rate_by_sex();
+    }
 
     for (int hiv_step = 0; hiv_step < opts.hts_per_year; ++hiv_step) {
       nda::fill(i_ha.grad, 0.0);
@@ -79,8 +82,15 @@ struct AdultHivModelSimulation<Config> {
       nda::fill(i_ha.h_hiv_deaths_age_sex, 0.0);
       nda::fill(i_ha.h_deaths_excess_nonaids_agesex, 0.0);
       run_disease_progression_and_mortality(hiv_step);
-      run_new_p_infections(hiv_step);
-      run_new_hiv_p_infections(hiv_step);
+
+      if (p_ha.incidence_model_choice == SS::INCIDMOD_DIRECTINCID_HTS) {
+	run_calc_new_infections_agesex(hiv_step);
+      } else if (p_ha.incidence_model_choice == SS::INCIDMOD_TRANSMRATE_HTS){
+	calc_new_infections_incidmod_transmrate(hiv_step);
+      } else {
+	throw std::invalid_argument("Incidence model choice not vaild\n");
+      }
+      run_add_new_hiv_infections(hiv_step);
 
       if (t >= opts.ts_art_start) {
         run_art_progression_and_mortality(hiv_step);
@@ -155,7 +165,102 @@ struct AdultHivModelSimulation<Config> {
     }
   };
 
-  void run_new_p_infections(int hiv_step) {
+  void calc_new_infections_incidmod_transmrate(int hiv_step) {
+    
+    const auto& p_ha = pars.ha;
+    auto& n_ha = state_next.ha;
+    auto& n_dp = state_next.dp;
+    auto& i_ha = intermediate.ha;
+    
+    // sum population sizes
+    real_type Xhivn_s[NS];
+    real_type Xhivn_incagerr[NS];
+    real_type Xhivp_noart = 0.0;
+    real_type Xart = 0.0;
+
+
+    for(int s = 0; s < NS; ++s){
+      Xhivn_s[s] = 0.0;
+      Xhivn_incagerr[s] = 0.0;
+      for(int a = SS::pIDX_15to49; a < SS::pIDX_15to49 + SS::pAG_15to49; ++a) {
+	auto Xhivn_sa = n_dp.p_totpop(a, s) - n_ha.p_hivpop(a, s);
+	Xhivn_s[s] += Xhivn_sa; 
+	Xhivn_incagerr[s] += p_ha.incidence_rate_ratio_age(a - p_ha.pIDX_INCIDPOP, s, t) * Xhivn_sa;
+      }
+
+      for(int ha = SS::hIDX_15to49; ha < SS::hIDX_15to49 + SS::hAG_15to49 + 1; ++ha){
+
+	// adjustment to first and last age group for partial year time step
+	// calculation proportion of HIV population to include / exclude based
+	// on hivpop in single-year ages.
+	real_type prop_include;
+	if(ha == SS::hIDX_15to49){
+	  real_type hivp_ha = 0.0;
+	  int a = SS::pIDX_15to49;
+	  for(int i = 0; i < hAG_span[ha]; ++i, ++a) {
+	    hivp_ha += n_ha.p_hivpop(a, s);
+	  }
+	  prop_include = (hivp_ha > 0) ? 1.0 - n_ha.p_hivpop(SS::pIDX_15to49, s) / hivp_ha * (1.0 - opts.dt * hiv_step) : 1.0;
+	} else if(ha == SS::hIDX_15to49 + SS::hAG_15to49) {
+	  real_type hivp_ha = 0.0;
+	  const int hAG_start_a = SS::pIDX_15to49 + SS::pAG_15to49;
+	  int a = hAG_start_a;
+	  for(int i = 0; i < hAG_span[ha]; ++i, ++a) {
+	    hivp_ha += n_ha.p_hivpop(a, s);
+	  }
+	  prop_include = (hivp_ha > 0) ? n_ha.p_hivpop(hAG_start_a, s) / hivp_ha * (1.0 - opts.dt * hiv_step) : 1.0;
+	} else {
+	  prop_include = 1.0;
+	}
+
+	for(int hm = 0; hm < hDS; ++hm) {
+	  Xhivp_noart += n_ha.h_hivpop(hm, ha, s) * prop_include;
+	  if (t >= opts.ts_art_start) {
+	    for(int hu = 0; hu < hTS; ++hu) {
+	      Xart += n_ha.h_artpop(hu, hm, ha, s) * prop_include;
+	    }
+	  }
+	}
+	
+      } // end loop over ha
+    } // end loop over s
+
+  real_type Xhivn = Xhivn_s[MALE] + Xhivn_s[FEMALE];
+
+  // adjust HIV negative population for partial year time step
+  for(int s = 0; s < NS; s++){
+    Xhivn -= (n_dp.p_totpop(SS::pIDX_15to49, s) - n_ha.p_hivpop(SS::pIDX_15to49, s)) *
+      (1.0 - opts.dt * hiv_step);
+    Xhivn += (n_dp.p_totpop(SS::pIDX_15to49+SS::pAG_15to49, s) -
+	      n_ha.p_hivpop(SS::pIDX_15to49+SS::pAG_15to49, s)) *
+      (1.0 - opts.dt * hiv_step);
+  }
+
+  real_type Xtot = Xhivn + Xhivp_noart + Xart;
+  real_type prevcurr = (Xhivp_noart + Xart) / Xtot;
+
+  int hts = t * opts.hts_per_year + hiv_step;
+  
+  real_type incrate15to49_ts = p_ha.transmission_rate_hts[hts] * (Xhivp_noart + p_ha.relative_infectiousness_art * Xart) / Xtot + p_ha.initial_prevalence;
+
+  // save HIV time step outputs
+  n_ha.prev15to49_hts(hiv_step) = prevcurr;
+  n_ha.incid15to49_hts(hiv_step) = incrate15to49_hts;
+
+  // incidence by sex
+  real_type incrate15to49_s[NS];
+  incrate15to49_s[MALE] = incrate15to49_ts * (Xhivn_s[MALE]+Xhivn_s[FEMALE]) / (Xhivn_s[MALE] + p_ha.incidence_rate_ratio_sex(t)*Xhivn_s[FEMALE]);
+  incrate15to49_s[FEMALE] = incrate15to49_ts * p_ha.incidence_rate_ratio_sex(t) * incrate15to49_s[MALE];
+
+  // annualized infections by age and sex
+  for(int s = 0; s < NS; ++s)
+    for(int a = SS::p_idx_hiv_first_adult; a < pAG; a++){
+      real_type hivn_a = n_dp.p_totpop(a, s) - n_ha.p_hivpop(a, s);
+      i_ha.p_infections_ts(a, s) = hivn_a * incrate15to49_s[s] * p_ha.incidence_rate_ratio_age(a - SS::p_idx_hiv_first_adult, s, t) * Xhivn_s[s] / Xhivn_incagerr[s];
+    }
+  }
+  
+  void run_calc_new_infections_agesex(int hiv_step) {
     const auto& p_ha = pars.ha;
     auto& n_ha = state_next.ha;
     auto& n_dp = state_next.dp;
@@ -163,6 +268,10 @@ struct AdultHivModelSimulation<Config> {
 
     const auto adult_incid_first_age_group = p_ha.pIDX_INCIDPOP;
     const auto adult_incid_last_age_group = adult_incid_first_age_group + p_ha.pAG_INCIDPOP;
+
+    // Calculate HIV infections by age. This uses the updated
+    // 'current year' population [state_next] (vs. previous year 
+    // population used for overall incidence rate and incidence by sex)
 
     for (int s = 0; s < NS; ++s) {
       nda::fill(i_ha.hiv_negative_pop, 0.0);
@@ -177,7 +286,7 @@ struct AdultHivModelSimulation<Config> {
                                i_ha.hiv_negative_pop(a);
       }
 
-      for (int a = adult_incid_first_age_group; a < pAG; ++a) {
+      for (int a = SS::p_idx_hiv_first_adult; a < pAG; ++a) {
         i_ha.p_infections_ts(a, s) = i_ha.hiv_negative_pop(a) *
                                      i_ha.incidence_rate_sex(s) *
                                      p_ha.incidence_rate_ratio_age(a - adult_incid_first_age_group, s, t) *
@@ -187,7 +296,7 @@ struct AdultHivModelSimulation<Config> {
     }
   };
 
-  void run_new_hiv_p_infections(int hiv_step) {
+  void run_add_new_hiv_infections(int hiv_step) {
     const auto& p_ha = pars.ha;
     auto& n_ha = state_next.ha;
     auto& i_ha = intermediate.ha;

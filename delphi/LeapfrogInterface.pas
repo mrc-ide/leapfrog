@@ -79,8 +79,16 @@ end;
 type
   LeapfrogHivAdultParamsView = record
   private
+    incidenceModelChoice: Integer;
+    incidenceModelChoiceLength: Integer;
     inputAdultIncidenceRate: PDouble;
     inputAdultIncidenceRateLength: Integer;
+    transmissionRateHts: PDouble;
+    transmissionRateHtsLength: Integer;
+    initialPrevalence: Double;
+    initialPrevalenceLength: Integer;
+    relativeInfectiousnessArt: Double;
+    relativeInfectiousnessArtLength: Integer;
     incidenceRateRatioAge: PDouble;
     incidenceRateRatioAgeLength: Integer;
     incidenceRateRatioSex: PDouble;
@@ -124,7 +132,11 @@ end;
 type
   LeapfrogHivAdultParams = class
   public
+    incidenceModelChoice: Integer;
     inputAdultIncidenceRate: TGBFixedArray<Double>;
+    transmissionRateHts: TGBFixedArray<Double>;
+    initialPrevalence: Double;
+    relativeInfectiousnessArt: Double;
     incidenceRateRatioAge: TGBFixedArray<Double>;
     incidenceRateRatioSex: TGBFixedArray<Double>;
     cd4Mortality: TGBFixedArray<Double>;
@@ -179,6 +191,10 @@ type
     pDeathsExcessNonaidsLength: Integer;
     pNetMigrationHivpop: PDouble;
     pNetMigrationHivpopLength: Integer;
+    prev15to49Hts: PDouble;
+    prev15to49HtsLength: Integer;
+    incid15to49Hts: PDouble;
+    incid15to49HtsLength: Integer;
 end;
 
 type
@@ -197,6 +213,8 @@ type
     pHivDeaths: TGBFixedArray<Double>;
     pDeathsExcessNonaids: TGBFixedArray<Double>;
     pNetMigrationHivpop: TGBFixedArray<Double>;
+    prev15to49Hts: TGBFixedArray<Double>;
+    incid15to49Hts: TGBFixedArray<Double>;
     function getView(): LeapfrogHivAdultStateView;
     procedure writeToDisk(dir: string);
     Destructor Destroy; override;
@@ -537,6 +555,7 @@ end;
 destructor LeapfrogHivAdultParams.Destroy;
 begin;
   inputAdultIncidenceRate.Free;
+  transmissionRateHts.Free;
   incidenceRateRatioAge.Free;
   incidenceRateRatioSex.Free;
   cd4Mortality.Free;
@@ -569,13 +588,23 @@ begin;
   pHivDeaths.Free;
   pDeathsExcessNonaids.Free;
   pNetMigrationHivpop.Free;
+  prev15to49Hts.Free;
+  incid15to49Hts.Free;
   inherited;
 end;
 
 function LeapfrogHivAdultParams.getView(): LeapfrogHivAdultParamsView;
 begin;
+  Result.incidenceModelChoice := incidenceModelChoice;
+  Result.incidenceModelChoiceLength := 1;
   Result.inputAdultIncidenceRate := PDouble(inputAdultIncidenceRate.data);
   Result.inputAdultIncidenceRateLength := inputAdultIncidenceRate.GetLength();
+  Result.transmissionRateHts := PDouble(transmissionRateHts.data);
+  Result.transmissionRateHtsLength := transmissionRateHts.GetLength();
+  Result.initialPrevalence := initialPrevalence;
+  Result.initialPrevalenceLength := 1;
+  Result.relativeInfectiousnessArt := relativeInfectiousnessArt;
+  Result.relativeInfectiousnessArtLength := 1;
   Result.incidenceRateRatioAge := PDouble(incidenceRateRatioAge.data);
   Result.incidenceRateRatioAgeLength := incidenceRateRatioAge.GetLength();
   Result.incidenceRateRatioSex := PDouble(incidenceRateRatioSex.data);
@@ -644,6 +673,10 @@ begin;
   Result.pDeathsExcessNonaidsLength := pDeathsExcessNonaids.GetLength();
   Result.pNetMigrationHivpop := PDouble(pNetMigrationHivpop.data);
   Result.pNetMigrationHivpopLength := pNetMigrationHivpop.GetLength();
+  Result.prev15to49Hts := PDouble(prev15to49Hts.data);
+  Result.prev15to49HtsLength := prev15to49Hts.GetLength();
+  Result.incid15to49Hts := PDouble(incid15to49Hts.data);
+  Result.incid15to49HtsLength := incid15to49Hts.GetLength();
 end;
 
 destructor LeapfrogHivChildParams.Destroy;
@@ -899,6 +932,7 @@ begin;
   if not DirectoryExists(dir) then
     ForceDirectories(dir);
   inputAdultIncidenceRate.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'inputAdultIncidenceRate');
+  transmissionRateHts.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'transmissionRateHts');
   incidenceRateRatioAge.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'incidenceRateRatioAge');
   incidenceRateRatioSex.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'incidenceRateRatioSex');
   cd4Mortality.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'cd4Mortality');
@@ -932,6 +966,8 @@ begin;
   pHivDeaths.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pHivDeaths');
   pDeathsExcessNonaids.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pDeathsExcessNonaids');
   pNetMigrationHivpop.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'pNetMigrationHivpop');
+  prev15to49Hts.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'prev15to49Hts');
+  incid15to49Hts.WriteToDisk(IncludeTrailingPathDelimiter(dir) +  'incid15to49Hts');
 end;
 
 procedure LeapfrogHivChildParams.writeToDisk(dir: string);

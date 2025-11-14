@@ -8,24 +8,56 @@
       "hAG_span": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
       "hDS": 7,
       "hTS": 3,
-      "hAG": 66
+      "hAG": 66,
+      "pIDX_15to49": 15,
+      "pAG_15to49": 35,
+      "pIDX_15to49": 15,
+      "pAG_15to49": 35,
+      "hIDX_15to49": 0,
+      "hAG_15to49": 35
     },
     "overrides": [
       {
         "applies_if": "use_coarse_stratification",
         "vars": {
           "hAG_span": [2, 3, 5, 5, 5, 5, 5, 5, 31],
-          "hAG": 9
+          "hAG": 9,
+          "hAG_15to49": 8
         }
       }
     ]
   },
   "pars": {
+    "incidence_model_choice": {
+      "num_type": "int",
+	"alias": {
+          "r": "eppmod"
+        }
+     },	  
     "input_adult_incidence_rate": {
       "num_type": "real_type",
       "dims": ["opts.proj_steps"],
       "alias": {
         "r": "incidinput"
+      }
+    },
+    "transmission_rate_hts": {
+      "num_type": "real_type",
+      "dims": ["opts.proj_steps * opts.hts_per_year"],
+      "alias": {
+        "r": "rvec"
+      }
+    },
+    "initial_prevalence": {
+      "num_type": "real_type",
+      "alias": {
+        "r": "iota"
+      }
+    },
+    "relative_infectiousness_art": {
+      "num_type": "real_type",
+      "alias": {
+        "r": "relinfectART"
       }
     },
     "incidence_rate_ratio_age": {
@@ -320,6 +352,14 @@
     "p_net_migration_hivpop": {
       "num_type": "real_type",
       "dims": ["SS::pAG", "SS::NS"]
+    },
+    "prev15to49_hts": {
+       "num_type": "real_type",
+       "dims": ["opts.hts_per_year"]
+    },
+    "incid15to49_hts": {
+       "num_type": "real_type",
+       "dims": ["opts.hts_per_year"]
     }
   }
 }

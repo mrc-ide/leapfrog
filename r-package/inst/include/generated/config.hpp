@@ -133,10 +133,17 @@ struct HaConfig {
   using SS = SSMixed<ModelVariant>;
 
   struct Pars {
+    int incidence_model_choice;
     using shape_input_adult_incidence_rate = nda::shape<
       nda::dim<0, nda::dynamic, 1>
     >;
     nda::array_ref<real_type, shape_input_adult_incidence_rate> input_adult_incidence_rate;
+    using shape_transmission_rate_hts = nda::shape<
+      nda::dim<0, nda::dynamic, 1>
+    >;
+    nda::array_ref<real_type, shape_transmission_rate_hts> transmission_rate_hts;
+    real_type initial_prevalence;
+    real_type relative_infectiousness_art;
     using shape_incidence_rate_ratio_age = nda::shape<
       nda::dim<0, SS::pAG - SS::p_idx_hiv_first_adult, 1>,
       nda::dim<0, SS::NS, (SS::pAG - SS::p_idx_hiv_first_adult)>,
@@ -427,6 +434,14 @@ struct HaConfig {
       nda::dim<0, SS::NS, (SS::pAG)>
     >;
     nda::array<real_type, shape_p_net_migration_hivpop> p_net_migration_hivpop;
+    using shape_prev15to49_hts = nda::shape<
+      nda::dim<0, nda::dynamic, 1>
+    >;
+    nda::array<real_type, shape_prev15to49_hts> prev15to49_hts;
+    using shape_incid15to49_hts = nda::shape<
+      nda::dim<0, nda::dynamic, 1>
+    >;
+    nda::array<real_type, shape_incid15to49_hts> incid15to49_hts;
 
     void reset() {
       p_hivpop.for_each_value([](real_type& x) { x = 0; });
@@ -442,6 +457,8 @@ struct HaConfig {
       p_hiv_deaths.for_each_value([](real_type& x) { x = 0; });
       p_deaths_excess_nonaids.for_each_value([](real_type& x) { x = 0; });
       p_net_migration_hivpop.for_each_value([](real_type& x) { x = 0; });
+      prev15to49_hts.for_each_value([](real_type& x) { x = 0; });
+      incid15to49_hts.for_each_value([](real_type& x) { x = 0; });
     };
   };
 
@@ -534,6 +551,16 @@ struct HaConfig {
       nda::dim<0, nda::dynamic, (SS::pAG) * (SS::NS)>
     >;
     nda::array<real_type, shape_p_net_migration_hivpop> p_net_migration_hivpop;
+    using shape_prev15to49_hts = nda::shape<
+      nda::dim<0, nda::dynamic, 1>,
+      nda::dim<0, nda::dynamic, nda::dynamic>
+    >;
+    nda::array<real_type, shape_prev15to49_hts> prev15to49_hts;
+    using shape_incid15to49_hts = nda::shape<
+      nda::dim<0, nda::dynamic, 1>,
+      nda::dim<0, nda::dynamic, nda::dynamic>
+    >;
+    nda::array<real_type, shape_incid15to49_hts> incid15to49_hts;
 
     OutputState(int output_years):
       p_hivpop(shape_p_hivpop(SS::pAG, SS::NS, output_years)),
@@ -548,7 +575,9 @@ struct HaConfig {
       h_art_initiation(shape_h_art_initiation(SS::hDS, SS::hAG, SS::NS, output_years)),
       p_hiv_deaths(shape_p_hiv_deaths(SS::pAG, SS::NS, output_years)),
       p_deaths_excess_nonaids(shape_p_deaths_excess_nonaids(SS::pAG, SS::NS, output_years)),
-      p_net_migration_hivpop(shape_p_net_migration_hivpop(SS::pAG, SS::NS, output_years))
+      p_net_migration_hivpop(shape_p_net_migration_hivpop(SS::pAG, SS::NS, output_years)),
+      prev15to49_hts(shape_prev15to49_hts(opts.hts_per_year, output_years)),
+      incid15to49_hts(shape_incid15to49_hts(opts.hts_per_year, output_years))
     {
       p_hivpop.for_each_value([](real_type& x) { x = 0; });
       p_deaths_background_hivpop.for_each_value([](real_type& x) { x = 0; });
@@ -563,6 +592,8 @@ struct HaConfig {
       p_hiv_deaths.for_each_value([](real_type& x) { x = 0; });
       p_deaths_excess_nonaids.for_each_value([](real_type& x) { x = 0; });
       p_net_migration_hivpop.for_each_value([](real_type& x) { x = 0; });
+      prev15to49_hts.for_each_value([](real_type& x) { x = 0; });
+      incid15to49_hts.for_each_value([](real_type& x) { x = 0; });
     };
 
     void save_state(const size_t i, const State &state) {
@@ -618,10 +649,18 @@ struct HaConfig {
       nda::for_each_index(chip_p_net_migration_hivpop.shape(), [&](auto idx) -> void {
         chip_p_net_migration_hivpop[idx] = state.p_net_migration_hivpop[idx];
       });
+      auto chip_prev15to49_hts = prev15to49_hts(nda::_, i);
+      nda::for_each_index(chip_prev15to49_hts.shape(), [&](auto idx) -> void {
+        chip_prev15to49_hts[idx] = state.prev15to49_hts[idx];
+      });
+      auto chip_incid15to49_hts = incid15to49_hts(nda::_, i);
+      nda::for_each_index(chip_incid15to49_hts.shape(), [&](auto idx) -> void {
+        chip_incid15to49_hts[idx] = state.incid15to49_hts[idx];
+      });
     };
   };
 
-  static constexpr int output_count = 13;
+  static constexpr int output_count = 15;
   static int get_build_output_size(int prev_size) {
     return prev_size + output_count;
   };

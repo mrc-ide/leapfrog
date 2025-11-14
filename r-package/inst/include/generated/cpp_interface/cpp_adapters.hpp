@@ -51,7 +51,11 @@ struct HaAdapter<Language::Cpp, real_type, ModelVariant> {
     OwnedParsMixed<real_type, ModelVariant>::Pars& owned_pars
   ) {
     return {
+      .incidence_model_choice = owned_pars.ha.incidence_model_choice,
       .input_adult_incidence_rate = { owned_pars.ha.input_adult_incidence_rate.data(), owned_pars.ha.input_adult_incidence_rate.shape() },
+      .transmission_rate_hts = { owned_pars.ha.transmission_rate_hts.data(), owned_pars.ha.transmission_rate_hts.shape() },
+      .initial_prevalence = owned_pars.ha.initial_prevalence,
+      .relative_infectiousness_art = owned_pars.ha.relative_infectiousness_art,
       .incidence_rate_ratio_age = { owned_pars.ha.incidence_rate_ratio_age.data(), owned_pars.ha.incidence_rate_ratio_age.shape() },
       .incidence_rate_ratio_sex = { owned_pars.ha.incidence_rate_ratio_sex.data(), owned_pars.ha.incidence_rate_ratio_sex.shape() },
       .cd4_mortality = { owned_pars.ha.cd4_mortality.data(), owned_pars.ha.cd4_mortality.shape() },
@@ -74,7 +78,7 @@ struct HaAdapter<Language::Cpp, real_type, ModelVariant> {
     };
   };
 
-  static constexpr int output_count = 13;
+  static constexpr int output_count = 15;
 
   static int build_output(
     int index,
@@ -94,6 +98,8 @@ struct HaAdapter<Language::Cpp, real_type, ModelVariant> {
     write_data<real_type, typename Config::OutputState::shape_p_hiv_deaths>(output_file, "p_hiv_deaths", state.p_hiv_deaths);
     write_data<real_type, typename Config::OutputState::shape_p_deaths_excess_nonaids>(output_file, "p_deaths_excess_nonaids", state.p_deaths_excess_nonaids);
     write_data<real_type, typename Config::OutputState::shape_p_net_migration_hivpop>(output_file, "p_net_migration_hivpop", state.p_net_migration_hivpop);
+    write_data<real_type, typename Config::OutputState::shape_prev15to49_hts>(output_file, "prev15to49_hts", state.prev15to49_hts);
+    write_data<real_type, typename Config::OutputState::shape_incid15to49_hts>(output_file, "incid15to49_hts", state.incid15to49_hts);
     return index + output_count;
   };
 };
