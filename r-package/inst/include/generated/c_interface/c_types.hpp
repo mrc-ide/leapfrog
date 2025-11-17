@@ -137,10 +137,12 @@ struct HaOut {
   int hiv_births_by_mat_age_length;
   real_type* hiv_births;
   int hiv_births_length;
-  real_type* prev15to49_hts;
-  int prev15to49_hts_length;
-  real_type* incid15to49_hts;
-  int incid15to49_hts_length;
+  real_type* prevalence_15to49_hts;
+  int prevalence_15to49_hts_length;
+  real_type* incidence_15to49_hts;
+  int incidence_15to49_hts_length;
+  real_type* artcoverage_15to49_hts;
+  int artcoverage_15to49_hts_length;
 };
 
 template<typename real_type>

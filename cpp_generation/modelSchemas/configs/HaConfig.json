@@ -396,11 +396,15 @@
     "hiv_births": {
       "num_type": "real_type"
     },
-    "prev15to49_hts": {
+    "prevalence_15to49_hts": {
        "num_type": "real_type",
        "dims": ["10"]
     },
-    "incid15to49_hts": {
+    "incidence_15to49_hts": {
+       "num_type": "real_type",
+       "dims": ["10"]
+    },
+    "artcoverage_15to49_hts": {
        "num_type": "real_type",
        "dims": ["10"]
     }

@@ -193,12 +193,13 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
     fill_initial_state<real_type, typename Config::State::shape_p_net_migration_hivpop>(data, "p_net_migration_hivpop", state.p_net_migration_hivpop);
     fill_initial_state<real_type, typename Config::State::shape_hiv_births_by_mat_age>(data, "hiv_births_by_mat_age", state.hiv_births_by_mat_age);
     state.hiv_births = Rcpp::as<real_type>(data["hiv_births"]);
-    fill_initial_state<real_type, typename Config::State::shape_prev15to49_hts>(data, "prev15to49_hts", state.prev15to49_hts);
-    fill_initial_state<real_type, typename Config::State::shape_incid15to49_hts>(data, "incid15to49_hts", state.incid15to49_hts);
+    fill_initial_state<real_type, typename Config::State::shape_prevalence_15to49_hts>(data, "prevalence_15to49_hts", state.prevalence_15to49_hts);
+    fill_initial_state<real_type, typename Config::State::shape_incidence_15to49_hts>(data, "incidence_15to49_hts", state.incidence_15to49_hts);
+    fill_initial_state<real_type, typename Config::State::shape_artcoverage_15to49_hts>(data, "artcoverage_15to49_hts", state.artcoverage_15to49_hts);
     return state;
   };
 
-  static constexpr int output_count = 17;
+  static constexpr int output_count = 18;
 
   static int build_output(
     int index,
@@ -282,16 +283,21 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
     std::copy_n(state.hiv_births.data(), state.hiv_births.size(), REAL(r_hiv_births));
     names[index + 14] = "hiv_births";
     ret[index + 14] = r_hiv_births;
-    Rcpp::NumericVector r_prev15to49_hts(10 * output_years);
-    r_prev15to49_hts.attr("dim") = Rcpp::IntegerVector::create(10, output_years);
-    std::copy_n(state.prev15to49_hts.data(), state.prev15to49_hts.size(), REAL(r_prev15to49_hts));
-    names[index + 15] = "prev15to49_hts";
-    ret[index + 15] = r_prev15to49_hts;
-    Rcpp::NumericVector r_incid15to49_hts(10 * output_years);
-    r_incid15to49_hts.attr("dim") = Rcpp::IntegerVector::create(10, output_years);
-    std::copy_n(state.incid15to49_hts.data(), state.incid15to49_hts.size(), REAL(r_incid15to49_hts));
-    names[index + 16] = "incid15to49_hts";
-    ret[index + 16] = r_incid15to49_hts;
+    Rcpp::NumericVector r_prevalence_15to49_hts(10 * output_years);
+    r_prevalence_15to49_hts.attr("dim") = Rcpp::IntegerVector::create(10, output_years);
+    std::copy_n(state.prevalence_15to49_hts.data(), state.prevalence_15to49_hts.size(), REAL(r_prevalence_15to49_hts));
+    names[index + 15] = "prevalence_15to49_hts";
+    ret[index + 15] = r_prevalence_15to49_hts;
+    Rcpp::NumericVector r_incidence_15to49_hts(10 * output_years);
+    r_incidence_15to49_hts.attr("dim") = Rcpp::IntegerVector::create(10, output_years);
+    std::copy_n(state.incidence_15to49_hts.data(), state.incidence_15to49_hts.size(), REAL(r_incidence_15to49_hts));
+    names[index + 16] = "incidence_15to49_hts";
+    ret[index + 16] = r_incidence_15to49_hts;
+    Rcpp::NumericVector r_artcoverage_15to49_hts(10 * output_years);
+    r_artcoverage_15to49_hts.attr("dim") = Rcpp::IntegerVector::create(10, output_years);
+    std::copy_n(state.artcoverage_15to49_hts.data(), state.artcoverage_15to49_hts.size(), REAL(r_artcoverage_15to49_hts));
+    names[index + 17] = "artcoverage_15to49_hts";
+    ret[index + 17] = r_artcoverage_15to49_hts;
     return index + output_count;
   };
 
@@ -373,16 +379,21 @@ struct HaAdapter<Language::R, real_type, ModelVariant> {
     ret[index + 13] = r_hiv_births_by_mat_age;
     names[index + 14] = "hiv_births";
     ret[index + 14] = state.hiv_births;
-    Rcpp::NumericVector r_prev15to49_hts(10);
-    r_prev15to49_hts.attr("dim") = Rcpp::IntegerVector::create(10);
-    std::copy_n(state.prev15to49_hts.data(), state.prev15to49_hts.size(), REAL(r_prev15to49_hts));
-    names[index + 15] = "prev15to49_hts";
-    ret[index + 15] = r_prev15to49_hts;
-    Rcpp::NumericVector r_incid15to49_hts(10);
-    r_incid15to49_hts.attr("dim") = Rcpp::IntegerVector::create(10);
-    std::copy_n(state.incid15to49_hts.data(), state.incid15to49_hts.size(), REAL(r_incid15to49_hts));
-    names[index + 16] = "incid15to49_hts";
-    ret[index + 16] = r_incid15to49_hts;
+    Rcpp::NumericVector r_prevalence_15to49_hts(10);
+    r_prevalence_15to49_hts.attr("dim") = Rcpp::IntegerVector::create(10);
+    std::copy_n(state.prevalence_15to49_hts.data(), state.prevalence_15to49_hts.size(), REAL(r_prevalence_15to49_hts));
+    names[index + 15] = "prevalence_15to49_hts";
+    ret[index + 15] = r_prevalence_15to49_hts;
+    Rcpp::NumericVector r_incidence_15to49_hts(10);
+    r_incidence_15to49_hts.attr("dim") = Rcpp::IntegerVector::create(10);
+    std::copy_n(state.incidence_15to49_hts.data(), state.incidence_15to49_hts.size(), REAL(r_incidence_15to49_hts));
+    names[index + 16] = "incidence_15to49_hts";
+    ret[index + 16] = r_incidence_15to49_hts;
+    Rcpp::NumericVector r_artcoverage_15to49_hts(10);
+    r_artcoverage_15to49_hts.attr("dim") = Rcpp::IntegerVector::create(10);
+    std::copy_n(state.artcoverage_15to49_hts.data(), state.artcoverage_15to49_hts.size(), REAL(r_artcoverage_15to49_hts));
+    names[index + 17] = "artcoverage_15to49_hts";
+    ret[index + 17] = r_artcoverage_15to49_hts;
     return index + output_count;
   };
 };

@@ -84,7 +84,7 @@ struct HaAdapter<Language::Cpp, real_type, ModelVariant> {
     };
   };
 
-  static constexpr int output_count = 17;
+  static constexpr int output_count = 18;
 
   static int build_output(
     int index,
@@ -106,8 +106,9 @@ struct HaAdapter<Language::Cpp, real_type, ModelVariant> {
     write_data<real_type, typename Config::OutputState::shape_p_net_migration_hivpop>(output_file, "p_net_migration_hivpop", state.p_net_migration_hivpop);
     write_data<real_type, typename Config::OutputState::shape_hiv_births_by_mat_age>(output_file, "hiv_births_by_mat_age", state.hiv_births_by_mat_age);
     write_data<real_type, typename Config::OutputState::shape_hiv_births>(output_file, "hiv_births", state.hiv_births);
-    write_data<real_type, typename Config::OutputState::shape_prev15to49_hts>(output_file, "prev15to49_hts", state.prev15to49_hts);
-    write_data<real_type, typename Config::OutputState::shape_incid15to49_hts>(output_file, "incid15to49_hts", state.incid15to49_hts);
+    write_data<real_type, typename Config::OutputState::shape_prevalence_15to49_hts>(output_file, "prevalence_15to49_hts", state.prevalence_15to49_hts);
+    write_data<real_type, typename Config::OutputState::shape_incidence_15to49_hts>(output_file, "incidence_15to49_hts", state.incidence_15to49_hts);
+    write_data<real_type, typename Config::OutputState::shape_artcoverage_15to49_hts>(output_file, "artcoverage_15to49_hts", state.artcoverage_15to49_hts);
     return index + output_count;
   };
 };
