@@ -239,14 +239,14 @@ test_that("Transmission rate models produces expected epidemics", {
     all(abs(mod_child$prevalence_15to49_hts[10,] - prev15to49_child) < 1e-2)
   )
 
-  prev15to49_full <- colSums(colSums(mod_full$h_artpop[,,1:35,,],,4) / mod_full$p_hivpop[16:50,,],,2)
+  artcov15to49_full <- ifelse(colSums(mod_full$p_hivpop[16:50,,],,2) == 0, 0.0, colSums(colSums(mod_full$h_artpop[,,1:35,,],,4) / mod_full$p_hivpop[16:50,,],,2))
   expect_true(
-    all(abs(mod_full$prevalence_15to49_hts[10,] - prev15to49_full) < 1e-2)
+    all(abs(mod_full$artcoverage_15to49_hts[10,] - artcov15to49_full) < 1e-2)
   )
   
-  prev15to49_coarse <- colSums(colSums(mod_coarse$h_artpop[,,1:8,,],,4) / mod_coarse$p_hivpop[16:50,,],,2)
+  artcov15to49_coarse <- ifelse(colSums(mod_full$p_hivpop[16:50,,],,2) == 0, 0.0, colSums(colSums(mod_coarse$h_artpop[,,1:8,,],,4) / mod_coarse$p_hivpop[16:50,,],,2))
   expect_true(
-    all(abs(mod_coarse$prevalence_15to49_hts[10,] - prev15to49_coarse) < 1e-2)
+    all(abs(mod_coarse$artcoverage_15to49_hts[10,] - artcov15to49_coarse) < 1e-2)
   )
 
   
