@@ -252,7 +252,7 @@ struct AdultHivModelSimulation<Config> {
   }
 
   // save HIV time step outputs
-  n_ha.artcoverage_15to49_hts(hiv_step) = Xart / (Xart + Xhivp_noart);
+  n_ha.artcoverage_15to49_hts(hiv_step) = Xart + Xhivp_noart > 0.0 ? Xart / (Xart + Xhivp_noart) : 0.0;
   n_ha.prevalence_15to49_hts(hiv_step) = prevcurr;
   n_ha.incidence_15to49_hts(hiv_step) = incrate15to49_hts;
 
