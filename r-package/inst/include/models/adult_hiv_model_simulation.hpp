@@ -75,7 +75,7 @@ struct AdultHivModelSimulation<Config> {
       // Incidence rate by age is calculated per time-step using the **current year** 
       // HIV negative population, rathern than the previous year HIV population.
       // Rob Glaubius, 5 August 2022: https://github.com/mrc-ide/leaptfrog/issues/18
-      run_calculate_annual_incidence_rate_by_sex();
+      calculate_annual_incidence_rate_by_sex();
     }
 
     for (int hiv_step = 0; hiv_step < opts.hts_per_year; ++hiv_step) {
@@ -86,13 +86,13 @@ struct AdultHivModelSimulation<Config> {
       run_disease_progression_and_mortality(hiv_step);
 
       if (p_ha.incidence_model_choice == SS::INCIDMOD_DIRECTINCID_HTS) {
-	run_calc_new_infections_agesex(hiv_step);
+	calc_new_infections_agesex(hiv_step);
       } else if (p_ha.incidence_model_choice == SS::INCIDMOD_TRANSMRATE_HTS){
 	calc_new_infections_incidmod_transmrate(hiv_step);
       } else {
 	throw std::invalid_argument("Incidence model choice not vaild\n");
       }
-      run_add_new_hiv_infections(hiv_step);
+      add_new_hiv_infections(hiv_step);
 
       if (t >= opts.ts_art_start) {
         run_art_progression_and_mortality(hiv_step);
@@ -108,7 +108,7 @@ struct AdultHivModelSimulation<Config> {
 
   // private methods that we don't want people to call
   private:
-  void run_calculate_annual_incidence_rate_by_sex() {
+  void calculate_annual_incidence_rate_by_sex() {
 
     const auto& p_ha = pars.ha;
     const auto& c_dp = state_curr.dp;
@@ -269,7 +269,7 @@ struct AdultHivModelSimulation<Config> {
     }
   }
   
-  void run_calc_new_infections_agesex(int hiv_step) {
+  void calc_new_infections_agesex(int hiv_step) {
     const auto& p_ha = pars.ha;
     auto& n_ha = state_next.ha;
     auto& n_dp = state_next.dp;
@@ -305,7 +305,7 @@ struct AdultHivModelSimulation<Config> {
     }
   };
 
-  void run_add_new_hiv_infections(int hiv_step) {
+  void add_new_hiv_infections(int hiv_step) {
     const auto& p_ha = pars.ha;
     auto& n_ha = state_next.ha;
     auto& i_ha = intermediate.ha;
