@@ -33,7 +33,7 @@ You can install the development version of leapfrog from
 
 ``` r
 # install.packages("remotes")
-remotes::install_github("mrc-ide/leapfrog", subdir = "leapfrog")
+remotes::install_github("mrc-ide/leapfrog", subdir = "leapfrogr")
 ```
 
 ### Python
@@ -49,21 +49,21 @@ pip install leapfrog-py
 ## Simulation model
 
 The simulation model is implemented in a header-only C++ library located
-in [`leapfrog/inst/include/leapfrog.hpp`](leapfrog/inst/include/leapfrog.hpp). This location
+in [`leapfrogr/inst/include/leapfrog.hpp`](leapfrogr/inst/include/leapfrog.hpp). This location
 allows the C++ code to be imported in other R packages via specifying
 `LinkingTo: leapfrog` in the `DESCRIPTION` file.
 
 > [!IMPORTANT]
 > We use C++20 for this package. Please make sure you have a compiler that is compatible.
 
-See the [R README](leapfrog/README.md) for details of running the model from R.
+See the [R README](leapfrogr/README.md) for details of running the model from R.
 
 ## Code design
 
 ### Simulation model
 
 The simulation model is implemented as templated C++ code in
-`leapfrog/inst/include/leapfrog.hpp`. This is so the simulation model may be
+`leapfrogr/inst/include/leapfrog.hpp`. This is so the simulation model may be
 developed as a standalone C++ library that can be called by other
 software without requiring R-specific code features. The code uses
 header-only open source libraries to maximize portability.

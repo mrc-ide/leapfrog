@@ -1,4 +1,4 @@
-## Standalone use of leapfrogs model fit
+## Standalone use of leapfrog's model fit
 
 ### Important
 
@@ -41,7 +41,7 @@ See usage with
 Run as
 
 ```
-./build/simulate_model 61 ../leapfrog/tests/testthat/testdata/adult_parms_full.h5 output
+./build/simulate_model 61 ../leapfrogr/tests/testthat/testdata/adult_parms_full.h5 output
 ```
 
 Where

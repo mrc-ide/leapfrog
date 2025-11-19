@@ -7,8 +7,8 @@ docker
 ^.vscode$
 ^.idea$
 ^scripts$
-^leapfrog/int/standalone_model/simulate_model$
-^leapfrog/int/standalone_model/model_gprofile$
+^leapfrogr/int/standalone_model/simulate_model$
+^leapfrogr/int/standalone_model/model_gprofile$
 ^tmp$
 ^README\.Rmd$
 ^CPPLINT\.cfg$

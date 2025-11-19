@@ -32,7 +32,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: leapfrog
+        working-directory: leapfrogr
 
     steps:
       - uses: actions/checkout@v4
@@ -50,10 +50,10 @@ jobs:
         with:
           extra-packages: any::rcmdcheck, any::here
           needs: check
-          working-directory: leapfrog
+          working-directory: leapfrogr
 
       - name: Create test data
-        working-directory: leapfrog
+        working-directory: leapfrogr
         shell: bash
         run: ./scripts/create_test_data.R
 
@@ -61,4 +61,4 @@ jobs:
         with:
           error-on: '"error"'
           upload-snapshots: true
-          working-directory: leapfrog
+          working-directory: leapfrogr

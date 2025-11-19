@@ -19,16 +19,20 @@ You can install the development version of leapfrog from
 
 ``` r
 # install.packages("remotes")
-remotes::install_github("mrc-ide/leapfrog", subdir = "leapfrog")
+remotes::install_github("mrc-ide/leapfrog", subdir = "leapfrogr")
 ```
 
 ## Simulation model
 
+The “leapfrog” R package is an R interface around the “leapfrog”
+simulation model. The model is written in C++ and has interfaces in R,
+Python and C. Note the R package is in a subdirectory `leapfrogr` but
+the installed package is called `leapfrog`.
+
 The simulation model is implemented in a header-only C++ library located
-in
-[`leapfrog/inst/include/leapfrog.hpp`](leapfrog/inst/include/leapfrog.hpp).
-This location allows the C++ code to be imported in other R packages via
-specifying `LinkingTo: leapfrog` in the `DESCRIPTION` file.
+in [`leapfrogr/inst/include/`](leapfrogr/inst/include/). This location
+allows the C++ code to be imported in other R packages via specifying
+`LinkingTo: leapfrog` in the `DESCRIPTION` file.
 
 > [!IMPORTANT]
 > We use C++20 for this package. Please make sure you have a compiler that is compatible.
@@ -125,7 +129,7 @@ lintr::lint_package()
 Lint C++ code with [cpplint](https://github.com/cpplint/cpplint)
 
 ``` console
-cpplint leapfrog/inst/include/*
+cpplint leapfrogr/inst/include/*
 ```
 
 ## Code design

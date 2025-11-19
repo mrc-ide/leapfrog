@@ -1,6 +1,6 @@
-#include "../leapfrog/inst/include/leapfrog.hpp"
-#include "../leapfrog/inst/include/generated/c_interface/c_types.hpp"
-#include "../leapfrog/inst/include/generated/c_interface/c_adapters.hpp"
+#include "../leapfrogr/inst/include/leapfrog.hpp"
+#include "../leapfrogr/inst/include/generated/c_interface/c_types.hpp"
+#include "../leapfrogr/inst/include/generated/c_interface/c_adapters.hpp"
 
 #include <windows.h>
 #include <numeric>

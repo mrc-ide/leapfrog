@@ -3,8 +3,8 @@
 #include <vector>
 #include <sstream>
 
-#include "../../leapfrog/inst/include/leapfrog.hpp"
-#include "../../leapfrog/inst/include/generated/py_interface/py_adapters.hpp"
+#include "../../leapfrogr/inst/include/leapfrog.hpp"
+#include "../../leapfrogr/inst/include/generated/py_interface/py_adapters.hpp"
 
 template<typename ModelVariant>
 using LeapfrogPy = leapfrog::Leapfrog<leapfrog::Py, double, ModelVariant>;

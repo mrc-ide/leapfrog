@@ -16,8 +16,8 @@ In the following example you will need parameters - inputs to the model. We have
 ```python
 from leapfrog_py import read_h5_file
 
-parameters_adult = read_h5_file("../leapfrog/tests/testthat/testdata/adult_parms_full.h5")
-parameters_child = read_h5_file("../leapfrog/tests/testthat/testdata/child_parms_full.h5")
+parameters_adult = read_h5_file("../leapfrogr/tests/testthat/testdata/adult_parms_full.h5")
+parameters_child = read_h5_file("../leapfrogr/tests/testthat/testdata/child_parms_full.h5")
 ```
 
 
