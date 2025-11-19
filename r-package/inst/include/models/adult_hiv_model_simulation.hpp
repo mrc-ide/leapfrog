@@ -86,11 +86,11 @@ struct AdultHivModelSimulation<Config> {
       run_disease_progression_and_mortality(hiv_step);
 
       if (p_ha.incidence_model_choice == SS::INCIDMOD_DIRECTINCID_HTS) {
-	calc_new_infections_agesex(hiv_step);
+        calc_new_infections_agesex(hiv_step);
       } else if (p_ha.incidence_model_choice == SS::INCIDMOD_TRANSMRATE_HTS){
-	calc_new_infections_incidmod_transmrate(hiv_step);
+        calc_new_infections_incidmod_transmrate(hiv_step);
       } else {
-	throw std::invalid_argument("Incidence model choice not vaild\n");
+        throw std::invalid_argument("Incidence model choice not vaild\n");
       }
       add_new_hiv_infections(hiv_step);
 
@@ -186,45 +186,45 @@ struct AdultHivModelSimulation<Config> {
       Xhivn_s[s] = 0.0;
       Xhivn_incagerr[s] = 0.0;
       for(int a = SS::pIDX_15to49; a < SS::pIDX_15to49 + SS::pAG_15to49; ++a) {
-	auto Xhivn_sa = n_dp.p_totpop(a, s) - n_ha.p_hivpop(a, s);
-	Xhivn_s[s] += Xhivn_sa; 
-	Xhivn_incagerr[s] += p_ha.incidence_rate_ratio_age(a - p_ha.pIDX_INCIDPOP, s, t) * Xhivn_sa;
+        auto Xhivn_sa = n_dp.p_totpop(a, s) - n_ha.p_hivpop(a, s);
+        Xhivn_s[s] += Xhivn_sa; 
+        Xhivn_incagerr[s] += p_ha.incidence_rate_ratio_age(a - p_ha.pIDX_INCIDPOP, s, t) * Xhivn_sa;
       }
 
       for(int ha = SS::hIDX_15to49; ha < SS::hIDX_15to49 + SS::hAG_15to49 + 1; ++ha){
 
-	// adjustment to first and last age group for partial year time step
-	// calculation proportion of HIV population to include / exclude based
-	// on hivpop in single-year ages.
-	real_type prop_include;
-	if(ha == SS::hIDX_15to49){
-	  real_type hivp_ha = 0.0;
-	  int a = SS::pIDX_15to49;
-	  for(int i = 0; i < hAG_span[ha]; ++i, ++a) {
-	    hivp_ha += n_ha.p_hivpop(a, s);
-	  }
-	  prop_include = (hivp_ha > 0) ? 1.0 - n_ha.p_hivpop(SS::pIDX_15to49, s) / hivp_ha * (1.0 - opts.dt * hiv_step) : 1.0;
-	} else if(ha == SS::hIDX_15to49 + SS::hAG_15to49) {
-	  real_type hivp_ha = 0.0;
-	  const int hAG_start_a = SS::pIDX_15to49 + SS::pAG_15to49;
-	  int a = hAG_start_a;
-	  for(int i = 0; i < hAG_span[ha]; ++i, ++a) {
-	    hivp_ha += n_ha.p_hivpop(a, s);
-	  }
-	  prop_include = (hivp_ha > 0) ? n_ha.p_hivpop(hAG_start_a, s) / hivp_ha * (1.0 - opts.dt * hiv_step) : 1.0;
-	} else {
-	  prop_include = 1.0;
-	}
+        // adjustment to first and last age group for partial year time step
+        // calculation proportion of HIV population to include / exclude based
+        // on hivpop in single-year ages.
+        real_type prop_include;
+        if(ha == SS::hIDX_15to49){
+          real_type hivp_ha = 0.0;
+          int a = SS::pIDX_15to49;
+          for(int i = 0; i < hAG_span[ha]; ++i, ++a) {
+            hivp_ha += n_ha.p_hivpop(a, s);
+          }
+          prop_include = (hivp_ha > 0) ? 1.0 - n_ha.p_hivpop(SS::pIDX_15to49, s) / hivp_ha * (1.0 - opts.dt * hiv_step) : 1.0;
+        } else if(ha == SS::hIDX_15to49 + SS::hAG_15to49) {
+          real_type hivp_ha = 0.0;
+          const int hAG_start_a = SS::pIDX_15to49 + SS::pAG_15to49;
+          int a = hAG_start_a;
+          for(int i = 0; i < hAG_span[ha]; ++i, ++a) {
+            hivp_ha += n_ha.p_hivpop(a, s);
+          }
+          prop_include = (hivp_ha > 0) ? n_ha.p_hivpop(hAG_start_a, s) / hivp_ha * (1.0 - opts.dt * hiv_step) : 1.0;
+        } else {
+          prop_include = 1.0;
+        }
 
-	for(int hm = 0; hm < hDS; ++hm) {
-	  Xhivp_noart += n_ha.h_hivpop(hm, ha, s) * prop_include;
-	  if (t >= opts.ts_art_start) {
-	    for(int hu = 0; hu < hTS; ++hu) {
-	      Xart += n_ha.h_artpop(hu, hm, ha, s) * prop_include;
-	    }
-	  }
-	}
-	
+        for(int hm = 0; hm < hDS; ++hm) {
+          Xhivp_noart += n_ha.h_hivpop(hm, ha, s) * prop_include;
+          if (t >= opts.ts_art_start) {
+            for(int hu = 0; hu < hTS; ++hu) {
+              Xart += n_ha.h_artpop(hu, hm, ha, s) * prop_include;
+            }
+          }
+        }
+        
       } // end loop over ha
     } // end loop over s
 
@@ -235,7 +235,7 @@ struct AdultHivModelSimulation<Config> {
     Xhivn -= (n_dp.p_totpop(SS::pIDX_15to49, s) - n_ha.p_hivpop(SS::pIDX_15to49, s)) *
       (1.0 - opts.dt * hiv_step);
     Xhivn += (n_dp.p_totpop(SS::pIDX_15to49+SS::pAG_15to49, s) -
-	      n_ha.p_hivpop(SS::pIDX_15to49+SS::pAG_15to49, s)) *
+              n_ha.p_hivpop(SS::pIDX_15to49+SS::pAG_15to49, s)) *
       (1.0 - opts.dt * hiv_step);
   }
 
