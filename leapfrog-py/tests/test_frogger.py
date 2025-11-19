@@ -17,7 +17,8 @@ def test_adult_model_full_strat():
         "h_art_initiation", "h_deaths_excess_nonaids_no_art",
         "h_deaths_excess_nonaids_on_art", "p_deaths_excess_nonaids",
         "p_hiv_deaths", "p_net_migration_hivpop", "hiv_births",
-        "hiv_births_by_mat_age",
+        "hiv_births_by_mat_age", "prevalence_15to49_hts",
+        "incidence_15to49_hts", "artcoverage_15to49_hts"
     ]
     returned_vars.sort()
     expected_vars.sort()
@@ -36,7 +37,8 @@ def test_child_model():
         "h_deaths_excess_nonaids_on_art", "p_deaths_excess_nonaids",
         "p_hiv_deaths", "p_net_migration_hivpop",
         "hiv_births", "hiv_births_by_mat_age",
-        "hc1_hivpop", "hc2_hivpop",
+        "prevalence_15to49_hts", "incidence_15to49_hts",
+        "artcoverage_15to49_hts", "hc1_hivpop", "hc2_hivpop",
         "hc1_artpop", "hc2_artpop",
         "hc1_noart_aids_deaths", "hc2_noart_aids_deaths",
         "hc1_art_aids_deaths", "hc2_art_aids_deaths",
