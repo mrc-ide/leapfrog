@@ -18,7 +18,8 @@ test_that("Child model can be run for all years", {
       "hc1_art_aids_deaths", "hc2_art_aids_deaths",
       "hc_art_init", "hc_art_need_init", "ctx_need", "infection_by_type",
       "mtct_by_source_tr", "mtct_by_source_women",
-      "mtct_by_source_hc_infections", "pmtct_coverage_at_delivery")
+      "mtct_by_source_hc_infections", "pmtct_coverage_at_delivery",
+      "prevalence_15to49_hts", "incidence_15to49_hts", "artcoverage_15to49_hts")
   )
 
   ## Nothing should ever be negative
@@ -63,7 +64,8 @@ test_that("Coarse child model can be run for all years", {
       "hc1_art_aids_deaths", "hc2_art_aids_deaths",
       "hc_art_init", "hc_art_need_init", "ctx_need", "infection_by_type",
       "mtct_by_source_tr", "mtct_by_source_women",
-      "mtct_by_source_hc_infections", "pmtct_coverage_at_delivery")
+      "mtct_by_source_hc_infections", "pmtct_coverage_at_delivery",
+      "prevalence_15to49_hts", "incidence_15to49_hts", "artcoverage_15to49_hts")
   )
 
   ## Nothing should ever be negative

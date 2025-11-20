@@ -18,6 +18,8 @@ struct BaseSS {
   static constexpr int ART0MOS = 0;
   static constexpr int PROJPERIOD_CALENDAR = 0;
   static constexpr int PROJPERIOD_MIDYEAR = 1;
+  static constexpr int INCIDMOD_DIRECTINCID_HTS = 0;
+  static constexpr int INCIDMOD_TRANSMRATE_HTS = 1;
 };
 
 enum ConfigsAndOverrides {
@@ -81,7 +83,8 @@ template<MV ModelVariant, typename ...Ts>
 struct SSMixer<ModelVariant, SSPair<true, HaOverride0>, Ts...>: public SSMixer<ModelVariant, Ts...> {
   static constexpr std::array<int, 9> hAG_span = { 2, 3, 5, 5, 5, 5, 5, 5, 31 };
   static constexpr int hAG = 9;
-  static constexpr int h_fertility_age_groups = 8;
+  static constexpr int hAG_fertility = 8;
+  static constexpr int hAG_15to49 = 8;
 };
 
 template<MV ModelVariant, typename ...Ts>
@@ -90,8 +93,13 @@ struct SSMixer<ModelVariant, SSPair<true, Ha>, Ts...>: public SSMixer<ModelVaria
   static constexpr int hDS = 7;
   static constexpr int hTS = 3;
   static constexpr int hAG = 66;
-  static constexpr int p_fertility_age_groups = 35;
-  static constexpr int h_fertility_age_groups = 35;
+  static constexpr int pAG_fertility = 35;
+  static constexpr int hAG_fertility = 35;
+  static constexpr int pIDX_15to49 = 15;
+  static constexpr int pAG_15to49 = 35;
+  static constexpr int hIDX_15to49 = 0;
+  static constexpr int hAG_15to49 = 35;
+  static constexpr int HIV_STEPS_PER_YEAR = 10;
 };
 
 template<MV ModelVariant, typename ...Ts>

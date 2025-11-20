@@ -13,7 +13,7 @@ test_that("initial state set up works as expected", {
       "hiv_births_by_mat_age", "hiv_births",
       "p_deaths_background_totpop", "p_deaths_background_hivpop",
       "h_deaths_excess_nonaids_no_art", "h_deaths_excess_nonaids_on_art",
-      "p_deaths_excess_nonaids"
+      "p_deaths_excess_nonaids", "prevalence_15to49_hts", "incidence_15to49_hts", "artcoverage_15to49_hts"
     )
   )
   expect_equal(dim(out$p_totpop), c(81, 2, 1))
@@ -69,7 +69,7 @@ test_that("initial state set up with coarse stratified HIV works as expected", {
       "hiv_births_by_mat_age", "hiv_births",
       "p_deaths_background_totpop", "p_deaths_background_hivpop",
       "h_deaths_excess_nonaids_no_art", "h_deaths_excess_nonaids_on_art",
-      "p_deaths_excess_nonaids"
+      "p_deaths_excess_nonaids", "prevalence_15to49_hts", "incidence_15to49_hts", "artcoverage_15to49_hts"
     )
   )
   expect_equal(dim(out$p_totpop), c(81, 2, 1))
@@ -124,7 +124,7 @@ test_that("model for 1 time step has looped", {
       "hiv_births_by_mat_age", "hiv_births",
       "p_deaths_background_totpop", "p_deaths_background_hivpop",
       "h_deaths_excess_nonaids_no_art", "h_deaths_excess_nonaids_on_art",
-      "p_deaths_excess_nonaids"
+      "p_deaths_excess_nonaids", "prevalence_15to49_hts", "incidence_15to49_hts", "artcoverage_15to49_hts"
     )
   )
   expect_equal(dim(out$p_totpop), c(81, 2, 1))

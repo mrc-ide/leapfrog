@@ -137,10 +137,18 @@ struct HaConfig {
   using SS = SSMixed<ModelVariant>;
 
   struct Pars {
+    int incidence_model_choice;
     using shape_input_adult_incidence_rate = nda::shape<
       nda::dim<0, nda::dynamic, 1>
     >;
     nda::array_ref<real_type, shape_input_adult_incidence_rate> input_adult_incidence_rate;
+    using shape_transmission_rate_hts = nda::shape<
+      nda::dim<0, nda::dynamic, 1>
+    >;
+    nda::array_ref<real_type, shape_transmission_rate_hts> transmission_rate_hts;
+    real_type initial_incidence;
+    int epidemic_start_hts;
+    real_type relative_infectiousness_art;
     using shape_incidence_rate_ratio_age = nda::shape<
       nda::dim<0, SS::pAG - SS::p_idx_hiv_first_adult, 1>,
       nda::dim<0, SS::NS, (SS::pAG - SS::p_idx_hiv_first_adult)>,
@@ -222,8 +230,8 @@ struct HaConfig {
     int pAG_INCIDPOP;
     int pIDX_INCIDPOP;
     using shape_fert_mult_by_age = nda::shape<
-      nda::dim<0, SS::h_fertility_age_groups, 1>,
-      nda::dim<0, nda::dynamic, (SS::h_fertility_age_groups)>
+      nda::dim<0, SS::hAG_fertility, 1>,
+      nda::dim<0, nda::dynamic, (SS::hAG_fertility)>
     >;
     nda::array_ref<real_type, shape_fert_mult_by_age> fert_mult_by_age;
     using shape_fert_mult_off_art = nda::shape<
@@ -231,7 +239,7 @@ struct HaConfig {
     >;
     nda::array_ref<real_type, shape_fert_mult_off_art> fert_mult_off_art;
     using shape_fert_mult_on_art = nda::shape<
-      nda::dim<0, SS::h_fertility_age_groups, 1>
+      nda::dim<0, SS::hAG_fertility, 1>
     >;
     nda::array_ref<real_type, shape_fert_mult_on_art> fert_mult_on_art;
     real_type local_adj_factor;
@@ -456,10 +464,22 @@ struct HaConfig {
     >;
     nda::array<real_type, shape_p_net_migration_hivpop> p_net_migration_hivpop;
     using shape_hiv_births_by_mat_age = nda::shape<
-      nda::dim<0, SS::h_fertility_age_groups, 1>
+      nda::dim<0, SS::hAG_fertility, 1>
     >;
     nda::array<real_type, shape_hiv_births_by_mat_age> hiv_births_by_mat_age;
     real_type hiv_births;
+    using shape_prevalence_15to49_hts = nda::shape<
+      nda::dim<0, SS::HIV_STEPS_PER_YEAR, 1>
+    >;
+    nda::array<real_type, shape_prevalence_15to49_hts> prevalence_15to49_hts;
+    using shape_incidence_15to49_hts = nda::shape<
+      nda::dim<0, SS::HIV_STEPS_PER_YEAR, 1>
+    >;
+    nda::array<real_type, shape_incidence_15to49_hts> incidence_15to49_hts;
+    using shape_artcoverage_15to49_hts = nda::shape<
+      nda::dim<0, SS::HIV_STEPS_PER_YEAR, 1>
+    >;
+    nda::array<real_type, shape_artcoverage_15to49_hts> artcoverage_15to49_hts;
 
     void reset() {
       p_hivpop.for_each_value([](real_type& x) { x = 0; });
@@ -477,6 +497,9 @@ struct HaConfig {
       p_net_migration_hivpop.for_each_value([](real_type& x) { x = 0; });
       hiv_births_by_mat_age.for_each_value([](real_type& x) { x = 0; });
       hiv_births = 0;
+      prevalence_15to49_hts.for_each_value([](real_type& x) { x = 0; });
+      incidence_15to49_hts.for_each_value([](real_type& x) { x = 0; });
+      artcoverage_15to49_hts.for_each_value([](real_type& x) { x = 0; });
     };
   };
 
@@ -570,14 +593,29 @@ struct HaConfig {
     >;
     nda::array<real_type, shape_p_net_migration_hivpop> p_net_migration_hivpop;
     using shape_hiv_births_by_mat_age = nda::shape<
-      nda::dim<0, SS::h_fertility_age_groups, 1>,
-      nda::dim<0, nda::dynamic, (SS::h_fertility_age_groups)>
+      nda::dim<0, SS::hAG_fertility, 1>,
+      nda::dim<0, nda::dynamic, (SS::hAG_fertility)>
     >;
     nda::array<real_type, shape_hiv_births_by_mat_age> hiv_births_by_mat_age;
     using shape_hiv_births = nda::shape<
       nda::dim<0, nda::dynamic, 1>
     >;
     nda::array<real_type, shape_hiv_births> hiv_births;
+    using shape_prevalence_15to49_hts = nda::shape<
+      nda::dim<0, SS::HIV_STEPS_PER_YEAR, 1>,
+      nda::dim<0, nda::dynamic, (SS::HIV_STEPS_PER_YEAR)>
+    >;
+    nda::array<real_type, shape_prevalence_15to49_hts> prevalence_15to49_hts;
+    using shape_incidence_15to49_hts = nda::shape<
+      nda::dim<0, SS::HIV_STEPS_PER_YEAR, 1>,
+      nda::dim<0, nda::dynamic, (SS::HIV_STEPS_PER_YEAR)>
+    >;
+    nda::array<real_type, shape_incidence_15to49_hts> incidence_15to49_hts;
+    using shape_artcoverage_15to49_hts = nda::shape<
+      nda::dim<0, SS::HIV_STEPS_PER_YEAR, 1>,
+      nda::dim<0, nda::dynamic, (SS::HIV_STEPS_PER_YEAR)>
+    >;
+    nda::array<real_type, shape_artcoverage_15to49_hts> artcoverage_15to49_hts;
 
     OutputState(int output_years):
       p_hivpop(shape_p_hivpop(SS::pAG, SS::NS, output_years)),
@@ -593,8 +631,11 @@ struct HaConfig {
       p_hiv_deaths(shape_p_hiv_deaths(SS::pAG, SS::NS, output_years)),
       p_deaths_excess_nonaids(shape_p_deaths_excess_nonaids(SS::pAG, SS::NS, output_years)),
       p_net_migration_hivpop(shape_p_net_migration_hivpop(SS::pAG, SS::NS, output_years)),
-      hiv_births_by_mat_age(shape_hiv_births_by_mat_age(SS::h_fertility_age_groups, output_years)),
-      hiv_births(shape_hiv_births(output_years))
+      hiv_births_by_mat_age(shape_hiv_births_by_mat_age(SS::hAG_fertility, output_years)),
+      hiv_births(shape_hiv_births(output_years)),
+      prevalence_15to49_hts(shape_prevalence_15to49_hts(SS::HIV_STEPS_PER_YEAR, output_years)),
+      incidence_15to49_hts(shape_incidence_15to49_hts(SS::HIV_STEPS_PER_YEAR, output_years)),
+      artcoverage_15to49_hts(shape_artcoverage_15to49_hts(SS::HIV_STEPS_PER_YEAR, output_years))
     {
       p_hivpop.for_each_value([](real_type& x) { x = 0; });
       p_deaths_background_hivpop.for_each_value([](real_type& x) { x = 0; });
@@ -611,6 +652,9 @@ struct HaConfig {
       p_net_migration_hivpop.for_each_value([](real_type& x) { x = 0; });
       hiv_births_by_mat_age.for_each_value([](real_type& x) { x = 0; });
       hiv_births.for_each_value([](real_type& x) { x = 0; });
+      prevalence_15to49_hts.for_each_value([](real_type& x) { x = 0; });
+      incidence_15to49_hts.for_each_value([](real_type& x) { x = 0; });
+      artcoverage_15to49_hts.for_each_value([](real_type& x) { x = 0; });
     };
 
     void save_state(const size_t i, const State &state) {
@@ -671,10 +715,22 @@ struct HaConfig {
         chip_hiv_births_by_mat_age[idx] = state.hiv_births_by_mat_age[idx];
       });
       hiv_births(i) = state.hiv_births;
+      auto chip_prevalence_15to49_hts = prevalence_15to49_hts(nda::_, i);
+      nda::for_each_index(chip_prevalence_15to49_hts.shape(), [&](auto idx) -> void {
+        chip_prevalence_15to49_hts[idx] = state.prevalence_15to49_hts[idx];
+      });
+      auto chip_incidence_15to49_hts = incidence_15to49_hts(nda::_, i);
+      nda::for_each_index(chip_incidence_15to49_hts.shape(), [&](auto idx) -> void {
+        chip_incidence_15to49_hts[idx] = state.incidence_15to49_hts[idx];
+      });
+      auto chip_artcoverage_15to49_hts = artcoverage_15to49_hts(nda::_, i);
+      nda::for_each_index(chip_artcoverage_15to49_hts.shape(), [&](auto idx) -> void {
+        chip_artcoverage_15to49_hts[idx] = state.artcoverage_15to49_hts[idx];
+      });
     };
   };
 
-  static constexpr int output_count = 15;
+  static constexpr int output_count = 18;
   static int get_build_output_size(int prev_size) {
     return prev_size + output_count;
   };
@@ -842,13 +898,13 @@ struct HcConfig {
     >;
     nda::array_ref<real_type, shape_hc_art_ltfu> hc_art_ltfu;
     using shape_adult_female_infections = nda::shape<
-      nda::dim<0, SS::h_fertility_age_groups, 1>,
-      nda::dim<0, nda::dynamic, (SS::h_fertility_age_groups)>
+      nda::dim<0, SS::hAG_fertility, 1>,
+      nda::dim<0, nda::dynamic, (SS::hAG_fertility)>
     >;
     nda::array_ref<real_type, shape_adult_female_infections> adult_female_infections;
     using shape_adult_female_hivnpop = nda::shape<
-      nda::dim<0, SS::h_fertility_age_groups, 1>,
-      nda::dim<0, nda::dynamic, (SS::h_fertility_age_groups)>
+      nda::dim<0, SS::hAG_fertility, 1>,
+      nda::dim<0, nda::dynamic, (SS::hAG_fertility)>
     >;
     nda::array_ref<real_type, shape_adult_female_hivnpop> adult_female_hivnpop;
     using shape_total_births = nda::shape<
@@ -862,8 +918,8 @@ struct HcConfig {
     int hc_art_start;
     real_type local_adj_factor;
     using shape_hc_age_specific_fertility_rate = nda::shape<
-      nda::dim<0, SS::h_fertility_age_groups, 1>,
-      nda::dim<0, nda::dynamic, (SS::h_fertility_age_groups)>
+      nda::dim<0, SS::hAG_fertility, 1>,
+      nda::dim<0, nda::dynamic, (SS::hAG_fertility)>
     >;
     nda::array_ref<real_type, shape_hc_age_specific_fertility_rate> hc_age_specific_fertility_rate;
   };

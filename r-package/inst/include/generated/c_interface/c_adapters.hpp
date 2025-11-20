@@ -116,7 +116,12 @@ struct HaAdapter<Language::C, real_type, ModelVariant> {
     const Options<real_type> &opts
   ) {
     return {
+      .incidence_model_choice = params.ha->incidence_model_choice,
       .input_adult_incidence_rate = read_data<real_type, 1>(params.ha->input_adult_incidence_rate, params.ha->input_adult_incidence_rate_length, "input_adult_incidence_rate", { nda::dim<>(0, opts.proj_steps, 1) }),
+      .transmission_rate_hts = read_data<real_type, 1>(params.ha->transmission_rate_hts, params.ha->transmission_rate_hts_length, "transmission_rate_hts", { nda::dim<>(0, opts.proj_steps * opts.hts_per_year, 1) }),
+      .initial_incidence = params.ha->initial_incidence,
+      .epidemic_start_hts = params.ha->epidemic_start_hts,
+      .relative_infectiousness_art = params.ha->relative_infectiousness_art,
       .incidence_rate_ratio_age = read_data<real_type, 3>(params.ha->incidence_rate_ratio_age, params.ha->incidence_rate_ratio_age_length, "incidence_rate_ratio_age", { nda::dim<>(0, SS::pAG - SS::p_idx_hiv_first_adult, 1), nda::dim<>(0, SS::NS, (SS::pAG - SS::p_idx_hiv_first_adult)), nda::dim<>(0, opts.proj_steps, (SS::pAG - SS::p_idx_hiv_first_adult) * (SS::NS)) }),
       .incidence_rate_ratio_sex = read_data<real_type, 1>(params.ha->incidence_rate_ratio_sex, params.ha->incidence_rate_ratio_sex_length, "incidence_rate_ratio_sex", { nda::dim<>(0, opts.proj_steps, 1) }),
       .cd4_mortality = read_data<real_type, 3>(params.ha->cd4_mortality, params.ha->cd4_mortality_length, "cd4_mortality", { nda::dim<>(0, SS::hDS, 1), nda::dim<>(0, SS::hAG, (SS::hDS)), nda::dim<>(0, SS::NS, (SS::hDS) * (SS::hAG)) }),
@@ -136,9 +141,9 @@ struct HaAdapter<Language::C, real_type, ModelVariant> {
       .h_art_stage_dur = read_data<real_type, 1>(params.ha->h_art_stage_dur, params.ha->h_art_stage_dur_length, "h_art_stage_dur", { nda::dim<>(0, SS::hTS - 1, 1) }),
       .pAG_INCIDPOP = params.ha->pAG_INCIDPOP,
       .pIDX_INCIDPOP = params.ha->pIDX_INCIDPOP,
-      .fert_mult_by_age = read_data<real_type, 2>(params.ha->fert_mult_by_age, params.ha->fert_mult_by_age_length, "fert_mult_by_age", { nda::dim<>(0, SS::h_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::h_fertility_age_groups)) }),
+      .fert_mult_by_age = read_data<real_type, 2>(params.ha->fert_mult_by_age, params.ha->fert_mult_by_age_length, "fert_mult_by_age", { nda::dim<>(0, SS::hAG_fertility, 1), nda::dim<>(0, opts.proj_steps, (SS::hAG_fertility)) }),
       .fert_mult_off_art = read_data<real_type, 1>(params.ha->fert_mult_off_art, params.ha->fert_mult_off_art_length, "fert_mult_off_art", { nda::dim<>(0, SS::hDS, 1) }),
-      .fert_mult_on_art = read_data<real_type, 1>(params.ha->fert_mult_on_art, params.ha->fert_mult_on_art_length, "fert_mult_on_art", { nda::dim<>(0, SS::h_fertility_age_groups, 1) }),
+      .fert_mult_on_art = read_data<real_type, 1>(params.ha->fert_mult_on_art, params.ha->fert_mult_on_art_length, "fert_mult_on_art", { nda::dim<>(0, SS::hAG_fertility, 1) }),
       .local_adj_factor = params.ha->local_adj_factor
     };
   };
@@ -162,10 +167,13 @@ struct HaAdapter<Language::C, real_type, ModelVariant> {
     fill_initial_state<real_type, typename Config::State::shape_p_net_migration_hivpop>(state.ha->p_net_migration_hivpop, state.ha->p_net_migration_hivpop_length, "p_net_migration_hivpop", initial_state.p_net_migration_hivpop);
     fill_initial_state<real_type, typename Config::State::shape_hiv_births_by_mat_age>(state.ha->hiv_births_by_mat_age, state.ha->hiv_births_by_mat_age_length, "hiv_births_by_mat_age", initial_state.hiv_births_by_mat_age);
     initial_state.hiv_births = *(state.ha->hiv_births);
+    fill_initial_state<real_type, typename Config::State::shape_prevalence_15to49_hts>(state.ha->prevalence_15to49_hts, state.ha->prevalence_15to49_hts_length, "prevalence_15to49_hts", initial_state.prevalence_15to49_hts);
+    fill_initial_state<real_type, typename Config::State::shape_incidence_15to49_hts>(state.ha->incidence_15to49_hts, state.ha->incidence_15to49_hts_length, "incidence_15to49_hts", initial_state.incidence_15to49_hts);
+    fill_initial_state<real_type, typename Config::State::shape_artcoverage_15to49_hts>(state.ha->artcoverage_15to49_hts, state.ha->artcoverage_15to49_hts_length, "artcoverage_15to49_hts", initial_state.artcoverage_15to49_hts);
     return initial_state;
   };
 
-  static constexpr int output_count = 15;
+  static constexpr int output_count = 18;
 
   static int build_output(
     int index,
@@ -187,6 +195,9 @@ struct HaAdapter<Language::C, real_type, ModelVariant> {
     write_data<real_type, typename Config::OutputState::shape_p_net_migration_hivpop>(state.p_net_migration_hivpop, out.ha->p_net_migration_hivpop, out.ha->p_net_migration_hivpop_length, "p_net_migration_hivpop");
     write_data<real_type, typename Config::OutputState::shape_hiv_births_by_mat_age>(state.hiv_births_by_mat_age, out.ha->hiv_births_by_mat_age, out.ha->hiv_births_by_mat_age_length, "hiv_births_by_mat_age");
     write_data<real_type, typename Config::OutputState::shape_hiv_births>(state.hiv_births, out.ha->hiv_births, out.ha->hiv_births_length, "hiv_births");
+    write_data<real_type, typename Config::OutputState::shape_prevalence_15to49_hts>(state.prevalence_15to49_hts, out.ha->prevalence_15to49_hts, out.ha->prevalence_15to49_hts_length, "prevalence_15to49_hts");
+    write_data<real_type, typename Config::OutputState::shape_incidence_15to49_hts>(state.incidence_15to49_hts, out.ha->incidence_15to49_hts, out.ha->incidence_15to49_hts_length, "incidence_15to49_hts");
+    write_data<real_type, typename Config::OutputState::shape_artcoverage_15to49_hts>(state.artcoverage_15to49_hts, out.ha->artcoverage_15to49_hts, out.ha->artcoverage_15to49_hts_length, "artcoverage_15to49_hts");
     return index + output_count;
   };
 
@@ -210,6 +221,9 @@ struct HaAdapter<Language::C, real_type, ModelVariant> {
     write_data<real_type, typename Config::State::shape_p_net_migration_hivpop>(state.p_net_migration_hivpop, out.ha->p_net_migration_hivpop, out.ha->p_net_migration_hivpop_length, "p_net_migration_hivpop");
     write_data<real_type, typename Config::State::shape_hiv_births_by_mat_age>(state.hiv_births_by_mat_age, out.ha->hiv_births_by_mat_age, out.ha->hiv_births_by_mat_age_length, "hiv_births_by_mat_age");
     *(out.ha->hiv_births) = state.hiv_births;
+    write_data<real_type, typename Config::State::shape_prevalence_15to49_hts>(state.prevalence_15to49_hts, out.ha->prevalence_15to49_hts, out.ha->prevalence_15to49_hts_length, "prevalence_15to49_hts");
+    write_data<real_type, typename Config::State::shape_incidence_15to49_hts>(state.incidence_15to49_hts, out.ha->incidence_15to49_hts, out.ha->incidence_15to49_hts_length, "incidence_15to49_hts");
+    write_data<real_type, typename Config::State::shape_artcoverage_15to49_hts>(state.artcoverage_15to49_hts, out.ha->artcoverage_15to49_hts, out.ha->artcoverage_15to49_hts_length, "artcoverage_15to49_hts");
     return index + output_count;
   };
 };
@@ -256,13 +270,13 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
       .abortion = read_data<real_type, 2>(params.hc->abortion, params.hc->abortion_length, "abortion", { nda::dim<>(0, SS::hAB_ind, 1), nda::dim<>(0, opts.proj_steps, (SS::hAB_ind)) }),
       .patients_reallocated = read_data<real_type, 1>(params.hc->patients_reallocated, params.hc->patients_reallocated_length, "patients_reallocated", { nda::dim<>(0, opts.proj_steps, 1) }),
       .hc_art_ltfu = read_data<real_type, 1>(params.hc->hc_art_ltfu, params.hc->hc_art_ltfu_length, "hc_art_ltfu", { nda::dim<>(0, opts.proj_steps, 1) }),
-      .adult_female_infections = read_data<real_type, 2>(params.hc->adult_female_infections, params.hc->adult_female_infections_length, "adult_female_infections", { nda::dim<>(0, SS::h_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::h_fertility_age_groups)) }),
-      .adult_female_hivnpop = read_data<real_type, 2>(params.hc->adult_female_hivnpop, params.hc->adult_female_hivnpop_length, "adult_female_hivnpop", { nda::dim<>(0, SS::h_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::h_fertility_age_groups)) }),
+      .adult_female_infections = read_data<real_type, 2>(params.hc->adult_female_infections, params.hc->adult_female_infections_length, "adult_female_infections", { nda::dim<>(0, SS::hAG_fertility, 1), nda::dim<>(0, opts.proj_steps, (SS::hAG_fertility)) }),
+      .adult_female_hivnpop = read_data<real_type, 2>(params.hc->adult_female_hivnpop, params.hc->adult_female_hivnpop_length, "adult_female_hivnpop", { nda::dim<>(0, SS::hAG_fertility, 1), nda::dim<>(0, opts.proj_steps, (SS::hAG_fertility)) }),
       .total_births = read_data<real_type, 1>(params.hc->total_births, params.hc->total_births_length, "total_births", { nda::dim<>(0, opts.proj_steps, 1) }),
       .ctx_effect = read_data<real_type, 1>(params.hc->ctx_effect, params.hc->ctx_effect_length, "ctx_effect", { nda::dim<>(0, 3, 1) }),
       .hc_art_start = params.hc->hc_art_start,
       .local_adj_factor = params.hc->local_adj_factor,
-      .hc_age_specific_fertility_rate = read_data<real_type, 2>(params.hc->hc_age_specific_fertility_rate, params.hc->hc_age_specific_fertility_rate_length, "hc_age_specific_fertility_rate", { nda::dim<>(0, SS::h_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::h_fertility_age_groups)) })
+      .hc_age_specific_fertility_rate = read_data<real_type, 2>(params.hc->hc_age_specific_fertility_rate, params.hc->hc_age_specific_fertility_rate_length, "hc_age_specific_fertility_rate", { nda::dim<>(0, SS::hAG_fertility, 1), nda::dim<>(0, opts.proj_steps, (SS::hAG_fertility)) })
     };
   };
 

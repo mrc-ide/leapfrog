@@ -48,7 +48,7 @@ struct ChildModelSimulation<Config> {
   static constexpr int hBF = SS::hBF;
   static constexpr int hcAG_coarse = SS::hcAG_coarse;
   static constexpr int p_idx_fertility_first = SS::p_idx_fertility_first;
-  static constexpr int h_fertility_age_groups = SS::h_fertility_age_groups;
+  static constexpr int hAG_fertility = SS::hAG_fertility;
   static constexpr int p_idx_hiv_first_adult = SS::p_idx_hiv_first_adult;
   static constexpr auto hc_age_coarse = SS::hc_age_coarse;
   static constexpr auto hc_age_coarse_cd4 = SS::hc_age_coarse_cd4;
@@ -349,7 +349,7 @@ struct ChildModelSimulation<Config> {
       i_hc.prop_wlhiv_lt350 = 0.0;
 
       //MAGGIE CHECK HERE
-      for (int a = 0; a < h_fertility_age_groups; ++a) {
+      for (int a = 0; a < hAG_fertility; ++a) {
         i_hc.num_wlhiv_lt200 += n_ha.h_hivpop(4, a, FEMALE) + n_ha.h_hivpop(5, a, FEMALE) + n_ha.h_hivpop(6, a, FEMALE);
         i_hc.num_wlhiv_200to350 += n_ha.h_hivpop(3, a, FEMALE) + n_ha.h_hivpop(2, a, FEMALE);
         i_hc.num_wlhiv_gte350 += n_ha.h_hivpop(0, a, FEMALE) + n_ha.h_hivpop(1, a, FEMALE);
@@ -432,12 +432,12 @@ struct ChildModelSimulation<Config> {
 
     // Transmission due to incident infections
     i_hc.asfr_sum = 0.0;
-    for (int a = 0; a < h_fertility_age_groups; ++a) {
+    for (int a = 0; a < hAG_fertility; ++a) {
       i_hc.asfr_sum += p_hc.hc_age_specific_fertility_rate(a, t);
     } // end a
 
     if (p_hc.mat_prev_input(t)) {
-      for (int a = 0; a < h_fertility_age_groups; ++a) {
+      for (int a = 0; a < hAG_fertility; ++a) {
         auto asfr_weight = p_hc.hc_age_specific_fertility_rate(a, t) / i_hc.asfr_sum;
         i_hc.age_weighted_hivneg += asfr_weight * p_hc.adult_female_hivnpop(a, t); // HIV negative 15-49 women weighted for ASFR
         i_hc.age_weighted_infections += asfr_weight * p_hc.adult_female_infections(a, t); // newly infected 15-49 women, weighted for ASFR
@@ -455,7 +455,7 @@ struct ChildModelSimulation<Config> {
         i_hc.perinatal_transmission_from_incidence = 0.0;
       }
     } else {
-      for (int a = 0; a < h_fertility_age_groups; ++a) {
+      for (int a = 0; a < hAG_fertility; ++a) {
         auto asfr_weight = p_dp.age_specific_fertility_rate(a, t) / i_hc.asfr_sum;
         i_hc.age_weighted_hivneg += asfr_weight * i_hc.p_hiv_neg_pop(a + 15, FEMALE); // HIV negative 15-49 women weighted for ASFR
         i_hc.age_weighted_infections += asfr_weight * n_ha.p_infections(a + 15, FEMALE); // newly infected 15-49 women, weighted for ASFR
