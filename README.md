@@ -1,11 +1,11 @@
-# frogger
+# leapfrog
 
 <!-- badges: start -->
 
 [![Project Status: WIP – Initial development is in progress, but there
 has not yet been a stable, usable release suitable for the
 public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
-[![R-CMD-check](https://github.com/mrc-ide/frogger/actions/workflows/R-CMD-check.yaml/badge.svg?branch=main)](https://github.com/mrc-ide/frogger/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/mrc-ide/leapfrog/actions/workflows/R-CMD-check.yaml/badge.svg?branch=main)](https://github.com/mrc-ide/leapfrog/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 Leapfrog is a multistate population projection model for demographic and
@@ -24,16 +24,16 @@ Please install from our
 
 ``` r
 install.packages(
-  "frogger",
+  "leapfrog",
   repos = c("https://mrc-ide.r-universe.dev", "https://cloud.r-project.org"))
 ```
 
-You can install the development version of frogger from
+You can install the development version of leapfrog from
 [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("remotes")
-remotes::install_github("mrc-ide/frogger", subdir = "r-package")
+remotes::install_github("mrc-ide/leapfrog", subdir = "leapfrogr")
 ```
 
 ### Python
@@ -49,21 +49,21 @@ pip install leapfrog-py
 ## Simulation model
 
 The simulation model is implemented in a header-only C++ library located
-in [`r-package/inst/include/frogger.hpp`](r-package/inst/include/frogger.hpp). This location
+in [`leapfrogr/inst/include/leapfrog.hpp`](leapfrogr/inst/include/leapfrog.hpp). This location
 allows the C++ code to be imported in other R packages via specifying
 `LinkingTo: leapfrog` in the `DESCRIPTION` file.
 
 > [!IMPORTANT]
 > We use C++20 for this package. Please make sure you have a compiler that is compatible.
 
-See the [R README](r-package/README.md) for details of running the model from R.
+See the [R README](leapfrogr/README.md) for details of running the model from R.
 
 ## Code design
 
 ### Simulation model
 
 The simulation model is implemented as templated C++ code in
-`r-package/inst/include/frogger.hpp`. This is so the simulation model may be
+`leapfrogr/inst/include/leapfrog.hpp`. This is so the simulation model may be
 developed as a standalone C++ library that can be called by other
 software without requiring R-specific code features. The code uses
 header-only open source libraries to maximize portability.
@@ -98,7 +98,7 @@ Then to run code generation follow
 
 ### Testing
 
-To run any of the tests you will need to generate test data. To do this you must have `R` installed, you'll have to change directories to `r-package` and run
+To run any of the tests you will need to generate test data. To do this you must have `R` installed, you'll have to change directories to `leapfrog` and run
 
 ```bash
 ./scripts/create_test_data.R

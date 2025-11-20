@@ -16,8 +16,8 @@ In the following example you will need parameters - inputs to the model. We have
 ```python
 from leapfrog_py import read_h5_file
 
-parameters_adult = read_h5_file("../r-package/tests/testthat/testdata/adult_parms_full.h5")
-parameters_child = read_h5_file("../r-package/tests/testthat/testdata/child_parms_full.h5")
+parameters_adult = read_h5_file("../leapfrogr/tests/testthat/testdata/adult_parms_full.h5")
+parameters_child = read_h5_file("../leapfrogr/tests/testthat/testdata/child_parms_full.h5")
 ```
 
 
@@ -55,7 +55,7 @@ run_model_from_state(
 
     # configuration
     "HivFullAgeStratification",
-    
+
     # get the last time slice of the state returned by run model so we
     # can continue from where the model left off
     get_time_slice(ret, 30),
