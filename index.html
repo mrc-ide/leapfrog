@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Multistate Population Projection Model for Demographic and HIV Estimation • frogger</title>
+<title>Multistate Population Projection Model for Demographic and HIV Estimation • leapfrog</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="bootstrap-toc.css">
 <script src="bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
@@ -32,7 +32,7 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="index.html">frogger</a>
+        <a class="navbar-link" href="index.html">leapfrog</a>
         <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.5</span>
       </span>
     </div>
@@ -60,7 +60,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/mrc-ide/frogger/" class="external-link">
+  <a href="https://github.com/mrc-ide/leapfrog/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
 
   </a>
@@ -78,7 +78,7 @@
       </header><div class="row">
   <div class="contents col-md-9">
 <div class="section level1">
-<div class="page-header"><h1 id="frogger-r-package">frogger R package<a class="anchor" aria-label="anchor" href="#frogger-r-package"></a>
+<div class="page-header"><h1 id="leapfrog-r-package">leapfrog R package<a class="anchor" aria-label="anchor" href="#leapfrog-r-package"></a>
 </h1></div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -86,24 +86,25 @@
 <p>Please install from our <a href="https://mrc-ide.r-universe.dev/builds" class="external-link">r-universe</a>:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span></span>
-<span>  <span class="st">"frogger"</span>,</span>
+<span>  <span class="st">"leapfrog"</span>,</span>
 <span>  repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"https://mrc-ide.r-universe.dev"</span>, <span class="st">"https://cloud.r-project.org"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>You can install the development version of frogger from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
+<p>You can install the development version of leapfrog from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"mrc-ide/frogger"</span>, subdir <span class="op">=</span> <span class="st">"r-package"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"mrc-ide/leapfrog"</span>, subdir <span class="op">=</span> <span class="st">"leapfrogr"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="simulation-model">Simulation model<a class="anchor" aria-label="anchor" href="#simulation-model"></a>
 </h2>
-<p>The simulation model is implemented in a header-only C++ library located in <a href="r-package/inst/include/frogger.hpp"><code>r-package/inst/include/frogger.hpp</code></a>. This location allows the C++ code to be imported in other R packages via specifying <code>LinkingTo: leapfrog</code> in the <code>DESCRIPTION</code> file.</p>
+<p>The “leapfrog” R package is an R interface around the “leapfrog” simulation model. The model is written in C++ and has interfaces in R, Python and C. Note the R package is in a subdirectory <code>leapfrogr</code> but the installed package is called <code>leapfrog</code>.</p>
+<p>The simulation model is implemented in a header-only C++ library located in <a href="leapfrogr/inst/include/"><code>leapfrogr/inst/include/</code></a>. This location allows the C++ code to be imported in other R packages via specifying <code>LinkingTo: leapfrog</code> in the <code>DESCRIPTION</code> file.</p>
 <blockquote>
 <p>[!IMPORTANT] We use C++20 for this package. Please make sure you have a compiler that is compatible.</p>
 </blockquote>
 <p>The simulation model is callable in R via a wrapper function <code><a href="reference/run_model.html">run_model()</a></code> created with <a href="https://www.rcpp.org" class="external-link">Rcpp</a>.</p>
 <p>You can control how the simulation model is run by setting the <code>configuration</code> argument, see</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">frogger</span><span class="fu">::</span><span class="fu"><a href="reference/list_model_configurations.html">list_model_configurations</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">leapfrog</span><span class="fu">::</span><span class="fu"><a href="reference/list_model_configurations.html">list_model_configurations</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>for the list of available models. At the time of writing these are - <code>DemographicProjection</code> - runs on the demographic projections - <code>HivFullAgeStratification</code> - runs the demographic projection and HIV adult projection with single-year age groups - <code>HivCoarseAgeStratification</code> - runs the demographic projection and HIV adult projection with 5-year age groups - <code>ChildModel</code> - runs the demographic projection, single-year age stratified HIV adult projection and HIV child projection</p>
 </div>
 <div class="section level2">
@@ -112,10 +113,10 @@
 <p>The file <code>pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ</code> contains an example Spectrum file constructed from default country data for Botswana with Spectrum (April 2022).</p>
 <p>Prepare model inputs.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mrc-ide/frogger" class="external-link">frogger</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mrc-ide/leapfrog" class="external-link">leapfrog</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">pjnz</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ"</span>,</span>
-<span>                    package <span class="op">=</span> <span class="st">"frogger"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>                    package <span class="op">=</span> <span class="st">"leapfrog"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/prepare_leapfrog_parameters.html">prepare_leapfrog_parameters</a></span><span class="op">(</span><span class="va">pjnz</span><span class="op">)</span></span></code></pre></div>
 <p>Simulate adult ‘full’ age group (single-year age) model from 1970 to 2030 with 10 HIV time steps per year.</p>
@@ -154,7 +155,7 @@
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">lintr</span><span class="fu">::</span><span class="fu">lint_package</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Lint C++ code with <a href="https://github.com/cpplint/cpplint" class="external-link">cpplint</a></p>
-<pre class="console"><code>cpplint r-package/inst/include/*</code></pre>
+<pre class="console"><code>cpplint leapfrogr/inst/include/*</code></pre>
 </div>
 <div class="section level2">
 <h2 id="code-design">Code design<a class="anchor" aria-label="anchor" href="#code-design"></a>
@@ -162,7 +163,7 @@
 <div class="section level3">
 <h3 id="r-functions">R functions<a class="anchor" aria-label="anchor" href="#r-functions"></a>
 </h3>
-<p>The file <code>src/frogger.cpp</code> contains R wrapper functions for the model simulation via <a href="http://dirk.eddelbuettel.com/code/rcpp.html" class="external-link">Rcpp</a> and <a href="http://dirk.eddelbuettel.com/code/rcpp.eigen.html" class="external-link">RcppEigen</a>.</p>
+<p>The file <code>src/leapfrog.cpp</code> contains R wrapper functions for the model simulation via <a href="http://dirk.eddelbuettel.com/code/rcpp.html" class="external-link">Rcpp</a> and <a href="http://dirk.eddelbuettel.com/code/rcpp.eigen.html" class="external-link">RcppEigen</a>.</p>
 </div>
 </div>
 <div class="section level2">
@@ -171,11 +172,11 @@
 <div class="section level3">
 <h3 id="testing">Testing<a class="anchor" aria-label="anchor" href="#testing"></a>
 </h3>
-<p>There is some pre-prepared test data available to make tests run faster. This is generated and saved <code>./scripts/create_test_data.R</code>.</p>
+<p>There is some pre-prepared test data available to make tests run faster. This is generated and saved <code>../scripts/create_test_data.R</code>.</p>
 <p>We also have some separate data written out in a generic format which can be read to test the model directly from C++. This is in <code>inst/standalone_model/data</code> in zipped files.</p>
 <p>If this is your first time running you will need to unzip the standalone test data</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>.<span class="sc">/</span>inst<span class="sc">/</span>standalone_model<span class="sc">/</span>extract_data</span></code></pre></div>
-<p>If you want to update the test data, it should be updated in the <code>./scripts/create_test_data.R</code> script so that we know how it was created and we can do it again fairly easily. Steps are 1. Update the script and generate the test data 1. Update the standalone data which is built from this <code>./scripts/update_standalone_data</code>. You might need to add a new mapping from R to serialized name if you are adding new input data 1. Unzip this for automated tests <code>./inst/standalone_model/extract_data</code></p>
+<p>If you want to update the test data, it should be updated in the <code>../scripts/create_test_data.R</code> script so that we know how it was created and we can do it again fairly easily. Steps are 1. Update the script and generate the test data 1. Update the standalone data which is built from this <code>./scripts/update_standalone_data</code>. You might need to add a new mapping from R to serialized name if you are adding new input data 1. Unzip this for automated tests <code>./inst/standalone_model/extract_data</code></p>
 </div>
 </div>
 <div class="section level2">
@@ -190,8 +191,8 @@
     <div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/mrc-ide/frogger/" class="external-link">Browse source code</a></li>
-<li><a href="https://github.com/mrc-ide/frogger/issues" class="external-link">Report a bug</a></li>
+<li><a href="https://github.com/mrc-ide/leapfrog/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/mrc-ide/leapfrog/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
 
@@ -208,7 +209,7 @@
 <div class="citation">
 <h2 data-toc-skip>Citation</h2>
 <ul class="list-unstyled">
-<li><a href="authors.html#citation">Citing frogger</a></li>
+<li><a href="authors.html#citation">Citing leapfrog</a></li>
 </ul>
 </div>
 
