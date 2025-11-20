@@ -141,9 +141,9 @@ struct HaAdapter<Language::C, real_type, ModelVariant> {
       .h_art_stage_dur = read_data<real_type, 1>(params.ha->h_art_stage_dur, params.ha->h_art_stage_dur_length, "h_art_stage_dur", { nda::dim<>(0, SS::hTS - 1, 1) }),
       .pAG_INCIDPOP = params.ha->pAG_INCIDPOP,
       .pIDX_INCIDPOP = params.ha->pIDX_INCIDPOP,
-      .fert_mult_by_age = read_data<real_type, 2>(params.ha->fert_mult_by_age, params.ha->fert_mult_by_age_length, "fert_mult_by_age", { nda::dim<>(0, SS::h_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::h_fertility_age_groups)) }),
+      .fert_mult_by_age = read_data<real_type, 2>(params.ha->fert_mult_by_age, params.ha->fert_mult_by_age_length, "fert_mult_by_age", { nda::dim<>(0, SS::hAG_fertility, 1), nda::dim<>(0, opts.proj_steps, (SS::hAG_fertility)) }),
       .fert_mult_off_art = read_data<real_type, 1>(params.ha->fert_mult_off_art, params.ha->fert_mult_off_art_length, "fert_mult_off_art", { nda::dim<>(0, SS::hDS, 1) }),
-      .fert_mult_on_art = read_data<real_type, 1>(params.ha->fert_mult_on_art, params.ha->fert_mult_on_art_length, "fert_mult_on_art", { nda::dim<>(0, SS::h_fertility_age_groups, 1) }),
+      .fert_mult_on_art = read_data<real_type, 1>(params.ha->fert_mult_on_art, params.ha->fert_mult_on_art_length, "fert_mult_on_art", { nda::dim<>(0, SS::hAG_fertility, 1) }),
       .local_adj_factor = params.ha->local_adj_factor
     };
   };
@@ -270,13 +270,13 @@ struct HcAdapter<Language::C, real_type, ModelVariant> {
       .abortion = read_data<real_type, 2>(params.hc->abortion, params.hc->abortion_length, "abortion", { nda::dim<>(0, SS::hAB_ind, 1), nda::dim<>(0, opts.proj_steps, (SS::hAB_ind)) }),
       .patients_reallocated = read_data<real_type, 1>(params.hc->patients_reallocated, params.hc->patients_reallocated_length, "patients_reallocated", { nda::dim<>(0, opts.proj_steps, 1) }),
       .hc_art_ltfu = read_data<real_type, 1>(params.hc->hc_art_ltfu, params.hc->hc_art_ltfu_length, "hc_art_ltfu", { nda::dim<>(0, opts.proj_steps, 1) }),
-      .adult_female_infections = read_data<real_type, 2>(params.hc->adult_female_infections, params.hc->adult_female_infections_length, "adult_female_infections", { nda::dim<>(0, SS::h_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::h_fertility_age_groups)) }),
-      .adult_female_hivnpop = read_data<real_type, 2>(params.hc->adult_female_hivnpop, params.hc->adult_female_hivnpop_length, "adult_female_hivnpop", { nda::dim<>(0, SS::h_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::h_fertility_age_groups)) }),
+      .adult_female_infections = read_data<real_type, 2>(params.hc->adult_female_infections, params.hc->adult_female_infections_length, "adult_female_infections", { nda::dim<>(0, SS::hAG_fertility, 1), nda::dim<>(0, opts.proj_steps, (SS::hAG_fertility)) }),
+      .adult_female_hivnpop = read_data<real_type, 2>(params.hc->adult_female_hivnpop, params.hc->adult_female_hivnpop_length, "adult_female_hivnpop", { nda::dim<>(0, SS::hAG_fertility, 1), nda::dim<>(0, opts.proj_steps, (SS::hAG_fertility)) }),
       .total_births = read_data<real_type, 1>(params.hc->total_births, params.hc->total_births_length, "total_births", { nda::dim<>(0, opts.proj_steps, 1) }),
       .ctx_effect = read_data<real_type, 1>(params.hc->ctx_effect, params.hc->ctx_effect_length, "ctx_effect", { nda::dim<>(0, 3, 1) }),
       .hc_art_start = params.hc->hc_art_start,
       .local_adj_factor = params.hc->local_adj_factor,
-      .hc_age_specific_fertility_rate = read_data<real_type, 2>(params.hc->hc_age_specific_fertility_rate, params.hc->hc_age_specific_fertility_rate_length, "hc_age_specific_fertility_rate", { nda::dim<>(0, SS::h_fertility_age_groups, 1), nda::dim<>(0, opts.proj_steps, (SS::h_fertility_age_groups)) })
+      .hc_age_specific_fertility_rate = read_data<real_type, 2>(params.hc->hc_age_specific_fertility_rate, params.hc->hc_age_specific_fertility_rate_length, "hc_age_specific_fertility_rate", { nda::dim<>(0, SS::hAG_fertility, 1), nda::dim<>(0, opts.proj_steps, (SS::hAG_fertility)) })
     };
   };
 

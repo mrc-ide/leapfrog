@@ -39,7 +39,7 @@ struct AdultHivModelSimulation<Config> {
   static constexpr int ART0MOS = SS::ART0MOS;
   static constexpr int p_idx_hiv_first_adult = SS::p_idx_hiv_first_adult;
   static constexpr int hIDX_15PLUS = SS::hIDX_15PLUS;
-  static constexpr int h_fertility_age_groups = SS::h_fertility_age_groups;
+  static constexpr int hAG_fertility = SS::hAG_fertility;
   static constexpr int p_idx_fertility_first = SS::p_idx_fertility_first;
 
   // function args
@@ -242,12 +242,13 @@ struct AdultHivModelSimulation<Config> {
   real_type Xtot = Xhivn + Xhivp_noart + Xart;
   real_type prevcurr = (Xhivp_noart + Xart) / Xtot;
 
-  int hts = t * opts.hts_per_year + hiv_step;
+  int current_hiv_time_step = t * opts.hts_per_year + hiv_step;
 
-  real_type incrate15to49_hts = p_ha.transmission_rate_hts[hts] * (Xhivp_noart + p_ha.relative_infectiousness_art * Xart) / Xtot;
+  real_type incrate15to49_hts = p_ha.transmission_rate_hts[current_hiv_time_step] *
+    (Xhivp_noart + p_ha.relative_infectiousness_art * Xart) / Xtot;
 
   // Seed incidence
-  if (p_ha.epidemic_start_hts == hts) {
+  if (p_ha.epidemic_start_hts == current_hiv_time_step) {
     incrate15to49_hts += p_ha.initial_incidence;
   }
 
@@ -596,13 +597,13 @@ struct AdultHivModelSimulation<Config> {
     auto& i_ha = intermediate.ha;
 
     i_ha.asfr_sum = 0.0;
-    for (int a = 0; a < h_fertility_age_groups; ++a) {
+    for (int a = 0; a < hAG_fertility; ++a) {
       i_ha.asfr_sum += p_dp.age_specific_fertility_rate(a, t);
     } // end a
 
     int a_idx_in = p_idx_fertility_first;
     n_ha.hiv_births = 0.0;
-    for (int a = 0; a < h_fertility_age_groups; ++a) {
+    for (int a = 0; a < hAG_fertility; ++a) {
       i_ha.nHIVcurr = 0.0;
       i_ha.nHIVlast = 0.0;
       i_ha.df = 0.0;

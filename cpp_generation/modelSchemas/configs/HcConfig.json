@@ -249,14 +249,14 @@
       },
       "adult_female_infections": {
         "num_type": "real_type",
-        "dims": ["SS::h_fertility_age_groups", "opts.proj_steps"],
+        "dims": ["SS::hAG_fertility", "opts.proj_steps"],
         "alias": {
           "r": "adult_female_infections"
         }
       },
       "adult_female_hivnpop": {
         "num_type": "real_type",
-        "dims": ["SS::h_fertility_age_groups", "opts.proj_steps"],
+        "dims": ["SS::hAG_fertility", "opts.proj_steps"],
         "alias": {
           "r": "hivnpop"
         }
@@ -280,7 +280,7 @@
       },
       "hc_age_specific_fertility_rate": {
         "num_type": "real_type",
-        "dims": ["SS::h_fertility_age_groups", "opts.proj_steps"],
+        "dims": ["SS::hAG_fertility", "opts.proj_steps"],
         "alias": {
           "r": "hc_asfr"
         }
