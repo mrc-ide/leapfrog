@@ -53,9 +53,9 @@ jobs:
           working-directory: leapfrogr
 
       - name: Create test data
-        working-directory: leapfrogr
         shell: bash
         run: ./scripts/create_test_data.R
+        working-directory: .
 
       - uses: r-lib/actions/check-r-package@v2
         with:

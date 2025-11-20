@@ -35,6 +35,7 @@ jobs:
       - name: Create test data
         shell: bash
         run: ./scripts/create_test_data.R
+        working-directory: .
 
       - name: Test coverage
         run: |

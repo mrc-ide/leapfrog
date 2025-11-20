@@ -145,7 +145,7 @@ simulation via [Rcpp](http://dirk.eddelbuettel.com/code/rcpp.html) and
 ### Testing
 
 There is some pre-prepared test data available to make tests run faster.
-This is generated and saved `./scripts/create_test_data.R`.
+This is generated and saved `../scripts/create_test_data.R`.
 
 We also have some separate data written out in a generic format which
 can be read to test the model directly from C++. This is in
@@ -157,7 +157,7 @@ test data
     ./inst/standalone_model/extract_data
 
 If you want to update the test data, it should be updated in the
-`./scripts/create_test_data.R` script so that we know how it was created
+`../scripts/create_test_data.R` script so that we know how it was created
 and we can do it again fairly easily. Steps are 1. Update the script and
 generate the test data 1. Update the standalone data which is built from
 this `./scripts/update_standalone_data`. You might need to add a new

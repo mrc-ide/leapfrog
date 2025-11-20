@@ -1,5 +1,7 @@
 ## Script to compare delphi outputs to leapfrog ones
 
+setwd("leapfrogr")
+
 pjnz <- "C:/Users/Test/Downloads/demo_mwi2024_v6.43.PJNZ"
 param_dirs <- c("C:/Users/Test/Downloads/demProjParams",
                 "C:/Users/Test/Downloads/hivAdultParams",

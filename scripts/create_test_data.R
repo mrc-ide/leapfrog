@@ -5,6 +5,7 @@
 ## and HIV parameters for both the adult and the child model.
 ## We also run leapfrog and save out the result for use in reference tests
 
+setwd("leapfrogr")
 devtools::load_all()
 
 # nolint start
