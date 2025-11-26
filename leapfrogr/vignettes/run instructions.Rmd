@@ -1,0 +1,56 @@
+---
+title: "Leapfrog run instructions"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{run instructions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Generating Leapfrog inputs
+
+Leapfrog inputs can be extracted from .PJNZ files generated using the Spectrum-AIM software. Parameters are extracted from the .PJNZ file separately for the demographic, adult, and paediatric model components. This approach allows for different model variants to be run without extracting unnecessary parameters. 
+
+```{r pjnz_output}
+pjnz <- file.path(here::here(), "inst", "pjnz", "bwa_aim-no-special-elig-numpmtct.PJNZ")
+
+##Demographic inputs
+demp <- prepare_leapfrog_demp(pjnz)
+
+##Adult model inputs
+proj <- prepare_leapfrog_projp(pjnz, use_coarse_age_groups = FALSE)
+
+##Paediatric model inputs
+parameters <- c(proj, demp)
+parameters <- prepare_hc_leapfrog_projp(pjnz, params = parameters, use_coarse_age_groups = FALSE)
+```
+
+The parameters object is then used to run the Leapfrog simulation. Note that during the input generation stage you must declare whether coarse or single-year age groups are used. This dictates the dimensions of several parameters. 
+
+## Running Leapfrog
+The parameters are then used in the `r run_model()` function, which conducts the demographic, adult, and paediatric simulations. The `r run_model()` function also requires specifying which model variant (or component) is being utilised. The `r list_model_configurations()` function can be used to identify acceptable inputs for this argument. The `r `output_years` argument dictates which years are returned by the model. 
+ 
+```{r leapfrog}
+lfrog <- run_model(parameters, configuration = "ChildModel", output_years =  1970:2030)
+
+```
+
+## Extracting outputs
+Model outputs are stored in a named list, with the interpretation described in the [variables](variables.Rmd) vignette. 
+
+```{r example_output}
+
+lfrog$p_hivpop %>% dim()
+dimnames(lfrog$p_hivpop) <- list(age = c(0:79, "80+"), sex = c("male", "female"), year = 1970:2030)
+p_hivpop <- reshape2::melt(lfrog$p_hivpop)
+
+ggplot2::ggplot(data = p_hivpop, ggplot2::aes(year, value, group = age)) + ggplot2::geom_line() +
+  ggplot2::facet_wrap(~sex) + ggplot2::labs(x = NULL, y = "Number of people living with HIV by age") + 
+  ggplot2::theme_bw()
+```
+
+
