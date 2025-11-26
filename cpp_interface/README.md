@@ -1,13 +1,13 @@
-## Standalone use of froggers model fit
+## Standalone use of leapfrog's model fit
 
 ### Important
 
 This standalone version of the model exists only as a proof of concept and
 should not actually be run this way. We
-anticipate that non-R users will want to build frogger as a library (e.g.
+anticipate that non-R users will want to build leapfrog as a library (e.g.
 using `nanobind`) and call directly from a
 program not from this CLI application. This standalone code just demonstrates
-one way that we can build frogger without
+one way that we can build leapfrog without
 any dependency on R.
 
 ## Building with cmake
@@ -41,7 +41,7 @@ See usage with
 Run as
 
 ```
-./build/simulate_model 61 ../r-package/tests/testthat/testdata/adult_parms_full.h5 output
+./build/simulate_model 61 ../leapfrogr/tests/testthat/testdata/adult_parms_full.h5 output
 ```
 
 Where

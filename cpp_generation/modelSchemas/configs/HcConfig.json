@@ -23,7 +23,6 @@
       "hBF_coarse": 4,
       "hcAG_coarse": 4,
       "hAB_ind": 2,
-      "hc_p_fertility_age_groups": 35,
       "hAG_fert": 7,
       "mtct_source": 11,
       "hc_age_coarse": [1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3],
@@ -45,15 +44,7 @@
         [0,   0,   0,   0,   0,         0.21],
         [0,   0,   0,   0,   0,         0.44]
       ]
-    },
-    "overrides": [
-      {
-        "applies_if": "use_coarse_stratification",
-        "vars": {
-          "hc_p_fertility_age_groups": 8
-        }
-      }
-    ]
+    }
   },
   "pars": {
       "hc_nosocomial": {
@@ -118,7 +109,7 @@
       },
       "fert_mult_by_age": {
         "num_type": "real_type",
-        "dims": ["SS::hc_p_fertility_age_groups", "opts.proj_steps"]
+        "dims": ["SS::hAG_fertility", "opts.proj_steps"]
       },
       "fert_mult_off_art": {
         "num_type": "real_type",
@@ -129,7 +120,7 @@
       },
       "fert_mult_on_art": {
         "num_type": "real_type",
-        "dims": ["SS::hc_p_fertility_age_groups"]
+        "dims": ["SS::hAG_fertility"]
       },
       "total_fertility_rate": {
         "num_type": "real_type",
@@ -208,11 +199,11 @@
       },
       "adult_female_infections": {
         "num_type": "real_type",
-        "dims": ["SS::hc_p_fertility_age_groups", "opts.proj_steps"]
+        "dims": ["SS::hAG_fertility", "opts.proj_steps"]
       },
       "adult_female_hivnpop": {
         "num_type": "real_type",
-        "dims": ["SS::hc_p_fertility_age_groups", "opts.proj_steps"]
+        "dims": ["SS::hAG_fertility", "opts.proj_steps"]
       },
       "total_births": {
         "num_type": "real_type",
@@ -233,7 +224,7 @@
       },
       "hc_age_specific_fertility_rate": {
         "num_type": "real_type",
-        "dims": ["SS::hc_p_fertility_age_groups", "opts.proj_steps"]
+        "dims": ["SS::hAG_fertility", "opts.proj_steps"]
       }
   },
   "intermediate": {
@@ -335,21 +326,6 @@
       "num_type": "real_type"
     },
     "births_sum": {
-      "num_type": "real_type"
-    },
-    "nHIVcurr": {
-      "num_type": "real_type"
-    },
-    "nHIVlast": {
-      "num_type": "real_type"
-    },
-    "df": {
-      "num_type": "real_type"
-    },
-    "prev": {
-      "num_type": "real_type"
-    },
-    "birthsHE": {
       "num_type": "real_type"
     },
     "sumARV": {
@@ -460,10 +436,6 @@
     }
   },
   "state": {
-    "hiv_births_by_mat_age": {
-      "num_type": "real_type",
-      "dims": ["SS::hc_p_fertility_age_groups"]
-    },
     "hc1_hivpop": {
       "num_type": "real_type",
       "dims": ["SS::hc1DS", "SS::hcTT", "SS::hc1AG", "SS::NS"]
@@ -503,9 +475,6 @@
     "hc_art_need_init": {
       "num_type": "real_type",
       "dims": ["SS::hc1DS", "SS::hcTT", "SS::hcAG_end", "SS::NS"]
-    },
-    "hiv_births": {
-      "num_type": "real_type"
     },
     "ctx_need": {
       "num_type": "real_type"
