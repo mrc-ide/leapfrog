@@ -37,7 +37,6 @@ get_data_from_cfg <- function(name, cfg, dim_vars, dp) {
       dimnames = unname(dim_names)
     )
   }
-  print(name)
   list(data = shaped_data, tag = matching_tag_cfg$tag)
 }
 
@@ -1013,6 +1012,15 @@ child_art_calc = list(
       start_offset = list(row = 1)
     )
   )
+),
+frr_fit_input = list(
+  type = "real",
+  read = list(
+    list(
+      tag = "FRRFitInput MV",
+      dims = list("frr_fit", "years")
+    )
+  )
 )
 )
 }
@@ -1128,7 +1136,8 @@ get_static_dim_vars <- function() {
    child_art_cats = list(length = 4, labels = c("Children needing cotrim (0-14): ",
                                                             "Children receiving cotrim (0-14): ",
                                                             "Children needing ART (0-14): ",
-                                                            "Children receiving ART (0-14): "))
+                                                            "Children receiving ART (0-14): ")),
+   frr_fit = list(length = 2, labels = c("Number ascertained", "Percent positive"))
   )
 }
 
