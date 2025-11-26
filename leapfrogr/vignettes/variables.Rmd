@@ -116,6 +116,7 @@ In 5 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 | sx                 | demography.survival_probability          | Probability of surviving from age x to x+1 i.e. from 0 to 1, 1 to 2, ..., 79 to 80+ and 80+ to 80+                                                                    |
 | netmigr            | demography.net_migration                 | Net migration by age group, sex and year                                                                                                                              |
 | asfr               | demography.age_specific_fertility_rate   | Rate of live births in a year and the total female population of childbearing age                                                                                     |
+|                    | children.age_specific_fertility_rate     | Rate of live births in a year and the total female population of childbearing age (needs to be a separate input from the demography parameters as this always need to be fully stratified)                                                                                                                                               |
 | births_sex_prop    | demography.births_sex_prop               | Proportion of male and female births each year                                                                                                                        |
 | incidinput         | incidence.total_rate                     | Incidence rate per year                                                                                                                                               |
 | incrr_sex          | incidence.sex_rate_ratio                 | HIV incidence rate ratio for female : male age 15-49 years                                                                                                            |
@@ -138,30 +139,39 @@ In 5 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 | adol_cd4_prog      | children.hc2_cd4_prog                    | Probability of progressing to the subsequent CD4 stage for 5-14 year olds                                                                                             |
 | ctx_effect         | children.ctx_effect                      | Effectiveness of cotrimoxazole at averting mortality                                                                                                                  |
 | ctx_val            | children.ctx_val                         | Number of children receiving cotrimoxazole                                                                                                                            |
+|                    | children.ctx_val_is_percent              | Number of children receiving cotrimoxazole                                                                                                                            |
 | paed_art_elig_age  | children.hc_art_elig_age                 | Age at which children are eligible for ART by year                                                                                                                    |
 | paed_art_elig_cd4  | children.hc_art_elig_cd4                 | CD4 at which children are eligible for ART by year                                                                                                                    |
 | mort_art_rr        | children.hc_art_mort_rr                  | Mortality rate ratios by age and treatment duration                                                                                                                   |
 | paed_art_mort      | children.hc1_art_mort                    | Mortality rate for children 0-4y by CD4 and treatment duration                                                                                                        |
 | adol_art_mort      | children.hc2_art_mort                    | Mortality rate for children 5-14y by CD4 and treatment duration                                                                                                       |
 | artpaeds_isperc    | children.hc_art_isperc                   | Boolean vector indicating whether input is a percent                                                                                                                  |
+|                    | children.hc_art_is_age_specific          | Boolean vector indicating whether ART is input as age-specific values or for all children 0-14y                                                                       |
 | paed_art_val       | children.hc_art_val                      | Percent or number of children on ART each year                                                                                                                        |
 | init_art_dist      | children.hc_art_init_dist                | ART initiation by age                                                                                                                                                 |
+|                    | children.hc_art_ltfu                     | Treatment interruption among children on treatment 0-14y                                                                                                              |
 | fert_mult_by_age   | children.fert_mult_by_age                | Fertility ratio for WLHIV by age                                                                                                                                      |
-| fert_mult_offart   | children.fert_mult_offart                | Fertility ratio for WLHIV not on treatment by CD4                                                                                                                     |
-| fert_mult_onart    | children.fert_mult_onart                 | Fertility ratio for WLHIV on treatment by age                                                                                                                         |
+| fert_mult_offart   | children.fert_mult_off_art               | Fertility ratio for WLHIV not on treatment by CD4                                                                                                                     |
+| fert_mult_onart    | children.fert_mult_on_art                | Fertility ratio for WLHIV on treatment by age                                                                                                                         |
 | tfr                | children.total_fertility_rate            | Total fertility rate                                                                                                                                                  |
-| laf                | children.local_adj_factor                | Local fertility adjustment to match progromattic data                                                                                                                 |
+| laf                | children.local_adj_factor                | Local fertility adjustment to match programmatic data                                                                                                                 |
 | pmtct              | children.PMTCT                           | Number or percent of women receiving ARVs for PMTCT  (order: option A, Option B, SDNVP, Dual ARV, Option B+: before pregnancy, Option B+: >4 weeks, Option B+:<4 weeks)                                                                                                                 |
-| mtct               | children.vertical_transmission_rate      | Vertical transmsision rate for pregnant and breastfeeding women not receiving ARV by CD4 category                                                                     |
+| mtct               | children.vertical_transmission_rate      | Vertical transmission rate for pregnant and breastfeeding women not receiving ARV by CD4 category                                                                     |
 | pmtct_mtct         | children.PMTCT_transmission_rate         | Vertical transmission rate for pregnant and breastfeeding women by PMTCT regimen                                                                                      |
 | pmtct_dropout      | children.PMTCT_dropout                   | Dropout rates for women receiving ARV for PMTCT during pregnancy and breastfeeding                                                                                    |
 | pmtct_input_is_perc| children.PMTCT_input_is_percent          | Boolean vector indicating whether PMTCT values were input as percent or number                                                                                        |
 | bf_duration_art    | children.breastfeeding_duration_art      | Percent of women on ART still breastfeeding at two month invervals                                                                                                    |
 | bf_duration_no_art | children.breastfeeding_duration_no_art   | Percent of women not on ART still breastfeeding at two month intervals                                                                                                |
-| mat_hiv_births     | children.mat_hiv_births                  | Number of births to WLHIV                                                                                                                                             |
-| mat_prev_input     | children.mat_prev_input                  | Boolean vector indicating if input mat_hiv_births should be used for vertical transmission rather than results from adult model                                       |
-| prop_lt200         | children.prop_lt200                      | Proportion of WLHIV with CD4 less than 200 by year                                                                                                                    |
-| prop_gte350        | children.prop_gte350                     | Proportion of WLHIV with CD4 greater than 350 by year                                                                                                                 |
+| mat_hiv_births     | children.mat_hiv_births                  | Number of births to WLHIV (needed to bypass the adult model).                                                                                                         |
+| mat_prev_input     | children.mat_prev_input                  | Boolean vector indicating if input mat_hiv_births should be used for vertical transmission rather than results from adult model (needed to bypass the adult model).    |
+| prop_lt200         | children.prop_lt200                      | Proportion of WLHIV with CD4 less than 200 by year (needed to bypass the adult model).                                                                                |
+| prop_gte350        | children.prop_gte350                     | Proportion of WLHIV with CD4 greater than 350 by year  (needed to bypass the adult model).                                                                            |
+|                    | children.adult_female_infections         | Age-specific number of infections among women 15-49 by 5 year age group (needed to bypass the adult model).                                                         |
+|                    | children.adult_female_hivnpop            | Age-specific number of HIV negative women 15-49 by 5 year age group  (needed to bypass the adult model).                                                         |
+|                    | children.infant_pop                      | Sex and age specific infant population  (needed to bypass the adult model).                                                                                           |
+|                    | children.total_births                    | Number of total births  (needed to bypass the adult model).                                                                                                           |
+|                    | children.total_births                    | Number of total births  (needed to bypass the adult model).                                           |                    | children.abortion                        | Number of pregnancy terminations among women living with HIV.                                                                                                         |
+|                    | children.patients_reallocated            | Number of pregnant women reallocated to receive ART from inside or outside of the geographical area represented in the Spectrum file.                               |
 
 ## Outputs
 
@@ -189,14 +199,15 @@ In 5 structs as part of the `Parameters`, named `Demography`, `Incidence`, `Natu
 |                  | hc1_art_aids_deaths        | Projected deaths among PLHIV 0-4y on ART by time on treatment, CD4, age, sex, and year     |
 |                  | hc2_art_aids_deaths        | Projected deaths among PLHIV 5-14y on ART by time on treatment, CD4, age, sex, and year    |
 |                  | hiv_births                 | Number of births to WLHIV by year                                                          |
-|                  | hc_art_need_init           | Children who are eligible for ART by CD4, transmsission, age, sex, and year                |
+|                  | hc_art_need_init           | Children who are eligible for ART by CD4, transmission, age, sex, and year                 |
 |                  | hc_art_init                | Number of new ART initiates by five year age group.                                        |
 |                  | ctx_need                   | Number of children in need of cotrim                                                       |
 |                  | infecton_by_type           | Number of paediatric HIV infections by type of infection (peri vs bf) and age at infection.|
 |                  | ctx_need                   | Number of children in need of cotrim                                                       |
-|                  | mtct_by_source_tr          | Transmission rate by maternal treatement history (stacked bar output)                      |
-|                  | mtct_by_source_women       | Number of pregnant WLHIV by maternal treatement history (stacked bar output)               |
-|                  | mtct_by_source_hc_infections | Number of paediatric infections by maternal treatement history (stacked bar output)      |
+|                  | mtct_by_source_tr          | Transmission rate by maternal treatment history (stacked bar output)                       |
+|                  | mtct_by_source_women       | Number of pregnant WLHIV by maternal treatment history (stacked bar output)                |
+|                  | mtct_by_source_hc_infections | Number of paediatric infections by maternal treatment history (stacked bar output)       |
+|                  | hiv_births_by_mat_age      | Number of births to HIV positive women by maternal age                                     |
 
 
 ## Intermediate data
