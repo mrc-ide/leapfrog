@@ -1,0 +1,97 @@
+---
+title: "Developing leapfrog"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{development}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This vignette details how to make changes and add extensions to leapfrog. There are some organisation and structural things about leapfrog which were added to enable different researchers to make extensions to the model in a way that we can turn these on or off at run time to run different variants of the model.
+
+The overall aim of this is to allow researchers to write these model extensions with as little overhead as possible. If you find something annoying or difficult, let me know and we can probably try and simplify it-- or at least document it better.
+
+## Structure
+
+### Model variants
+
+Leapfrog has a set of `ModelVariant`s which can be run. See [`leapfrogr/inst/include/model_variants.hpp`](https://github.com/mrc-ide/leapfrog/blob/main/leapfrogr/inst/include/model_variants.hpp) for details of these. Each model variant is a collection of boolean switches or enums. These are used to turn on or off different parts of the code when it is run, so that leapfrog can have different extensions and we can compose these together in any way we want. These model variants are evaluated at compile time. When you compile the code, there will be an instance in the compiled binary for each variant your code will call. This will cause the binary to be larger but we chose to do it this way because we wanted the speed from the compile-time plymorphism. We still need to benchmark this to see how much of a gain it actually gives.
+
+All model functions are templated on the model variant, and any conditional behaviour based upon the model variant should be written as an [`if constexpr`](https://en.cppreference.com/w/cpp/language/if).
+
+### Model functions
+
+All model functions should have the same signature e.g.
+
+```
+void my_model_function() 
+```
+Within each model component, functions can be made either public or private. Public functions can be called and accessed outside of a given namespace or class while private functions cannot. Declaring things as private or public helps with scoping; for example the child model does not need to know aobut the internal calculations of the adult or demogrpahic models; declaring things as private in those classes then prevents a given model from inadvertently accessing or modifying them. 
+
+Note that after each time step the code will do the following
+
+* Optionally save out the state see [State saving] section.
+* Replace `state_curr` with `state_next`.
+* Set new `state_next` to all 0s.
+* Set `intermediate` to all 0s.
+
+### State saving
+##TODO: Rob this isn't true any more is it? 
+
+Leapfrog runs a top-level loop over the time step. At the end of each time step, the state is optionally saved out and eventually returned. We do it this way because it decouples the reporting of the model and each time step iteration. When you run the model with `run_model` you can specify which years you want to output data for. By default it will output for all time steps, but if say you are only interested in the last time step. You can return this by running e.g.
+
+```
+run_model(data, parameters, 1970:2030, 10, 2030)
+```
+
+This time output is managed by the state saver see [`leapfrogr/inst/include/state_saver.hpp`](https://github.com/mrc-ide/leapfrog/blob/main/leapfrogr/inst/include/state_saver.hpp)
+
+## Adding new input, output or intermediate data
+
+Leapfrog uses code generation to write the code for wiring up the input and output data. This is to reduce the number of locations you need to make changes when you add new input data or return new data from the model. In short it amounts to modifying the model config .json file located in [`frogger/cpp_generation/modelSchemas/configs`](https://github.com/mrc-ide/leapfrog/tree/main/cpp_generation/modelSchemas/configs). Within each .json file there is a space to declare state space variables, parameters, intermediates, and state space objects. State space variables dictate relevant dimensions or constant parameters. Parameters are typically extracted from the .PJNZ file and require declaring the type of the parameter as well as the dimensions. Intermediates are objects which are used within the simulation but are not output by the model. If intermediates are not repeatedly used within the model they should be declared within the code itself rather than stored as an intermediate. State space objects have the same requirements as intermediates: a declaration of type and dimensions. Dimensions for all of the above can be called from the state space variables declared at the top of each config file.
+
+Within the model code, state space variables can be accessed using a ```SS:``` prefix, these can either be unpacked at the top of the model code or called throughout. 
+
+Generally, all items in the config files should follow the naming conventions outlined in [`frogger/docs/variables.Rmd`](https://github.com/mrc-ide/leapfrog/tree/main/docs/variables.Rmd). 
+
+After the config files have been modified, you must run scripts/generate in terminal to generate the needed code for compiling. 
+
+## Adding a new model variant 
+##TODO: Rob/Mantra/Jeff could you update this? I'm not familiar with the process of instituting a new variant. 
+
+To add a new variant, requires work over a few areas. There are two types of model variants at the moment:
+1. A flag which turns a section of code on or off, this will come with additional model inputs and outputs
+1. A flag which changes the dimensions of some model input or outputs
+
+The required changes will be different depending on if your new variant is one of the first types, which brings additional input/output or the second type which does not bring additional data.
+
+To add a new variant. Firstly, in the code generation:
+
+1. Add any new input or output data in [`leapfrogr/inst/include/model_input.csv`](https://github.com/mrc-ide/leapfrog/blob/main/inst/cpp_generation/model_input.csv) or [`leapfrogr/inst/include/model_output.csv`](https://github.com/mrc-ide/leapfrogr/blob/main/inst/cpp_generation/model_output.csv)
+1. If you have new input data, add a specialism for the new variant into the state_types template in [`inst/cpp_generation/state_types.hpp.in`](https://github.com/mrc-ide/leapfrog/blob/main/inst/cpp_generation/state_types.hpp.in)
+1. Run the generate script
+
+In the C++ code:
+
+1. Add your new variant in [`leapfrogr/inst/include/model_variants.hpp`](https://github.com/mrc-ide/leapfrog/blob/main/leapfrogr/inst/include/model_variants.hpp)
+1. Add a struct for the new state space in [`leapfrogr/inst/include/state_space.hpp`](https://github.com/mrc-ide/leapfrog/blob/main/leapfrogr/inst/include/state_space.hpp)
+1. If your model has new input data, add parameters for this variant in [`leapfrogr/inst/include/parameters.hpp`](https://github.com/mrc-ide/leapfrog/blob/main/leapfrogr/inst/include/parameters.hpp). Parameter types will be generated, you need to add those types to the appropriate template specialisation
+1. If your model has new output data, add a new specialisation in [`leapfrogr/inst/include/state_saver.hpp`](https://github.com/mrc-ide/leapfrog/blob/main/leapfrogr/inst/include/state_saver.hpp)
+
+You now need to update the R wrapper to be able to call this new variant:
+
+1. In [`R/run_model.R`](https://github.com/mrc-ide/leapfrog/blob/main/leapfrogr/R/run_model.R) add a new flag to the `run_model` interface for using your new variant
+1. Update the conditionals to build the `model_variant` string based upon your new flag
+1. Add mapping from the string to the model variant struct in Rcpp wrapper code in [`src/leapfrog.cpp`](https://github.com/mrc-ide/leapfrog/blob/leapfrogr/main/src/leapfrog.cpp). Note use a `constexpr` for the state space to ensure it is evaluated at compile time.
+
+##Testing model results
+After implementing a change in the Leapfrog package, you should introduce a new test to ensure that the change is acting as it should. Currently, the package ensures that all outputs are really numbers and above zero. The paediatric model is currently tested against the Spectrum software implementation. All tests can be run using ```r devtools::test()```.
+
+
