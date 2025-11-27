@@ -14,9 +14,9 @@ knitr::opts_chunk$set(
 )
 ```
 
-This vignette details how to make changes and add extensions to leapfrog. There are some organisation and structural things about leapfrog which were added to enable different researchers to make extensions to the model. In a way that we can turn these on or off at run time to run different variants of the model.
+This vignette details how to make changes and add extensions to leapfrog. There are some organisation and structural things about leapfrog which were added to enable different researchers to make extensions to the model in a way that we can turn these on or off at run time to run different variants of the model.
 
-The overall aim of this is to allow researchers to write these model extensions with as little overhead as possible. If you find something annoying or difficult, let me know and we can probably try and simplify it. Or at least document it better.
+The overall aim of this is to allow researchers to write these model extensions with as little overhead as possible. If you find something annoying or difficult, let me know and we can probably try and simplify it-- or at least document it better.
 
 ## Structure
 
@@ -31,23 +31,9 @@ All model functions are templated on the model variant, and any conditional beha
 All model functions should have the same signature e.g.
 
 ```
-template<typename ModelVariant, typename real_type>
-void my_model_function(int proj_step,
-                       const Parameters<ModelVariant, real_type> &pars,
-                       const State<ModelVariant, real_type> &state_curr,
-                       State<ModelVariant, real_type> &state_next,
-                       IntermediateData<ModelVariant, real_type> &intermediate) {
+void my_model_function() 
 ```
-
-To explain what is going on here
-
-* Templated on `ModelVariant` - this is used for any conditional behaviour based upon the variant being run see [Model variants] for details.
-* Templated on `real_type` - this is used by TMB during fitting. Under a normal fit this will be a `double`.
-* `proj_step` - the current time step of the model as an index, e.g. if running for 1970:2030, this will start at `1` and loop to `61`. Any input data you read based on time step index should have `1970` at the first index. Index `1` in R and `0` in C++.
-* `pars` - the parameters for this model, these are read-only values
-* `state_curr` - the state at the current point in time i.e. at `t = proj_step - 1`. This is read-only.
-* `state_next` - the state at the next time point, i.e. at `t = proj_step`. This is what we are currently populating from the previous time step and the parameters.
-* `intermediate` - a palce for storing any data used within a single time step. Use this as a place to store intermediate values for use later in your code. This is reset to all 0s at the end of every time step.
+Within each model component, functions can be made either public or private. Public functions can be called and accessed outside of a given namespace or class while private functions cannot. Declaring things as private or public helps with scoping; for example the child model does not need to know aobut the internal calculations of the adult or demogrpahic models; declaring things as private in those classes then prevents a given model from inadvertently accessing or modifying them. 
 
 Note that after each time step the code will do the following
 
@@ -57,6 +43,7 @@ Note that after each time step the code will do the following
 * Set `intermediate` to all 0s.
 
 ### State saving
+##TODO: Rob this isn't true any more is it? 
 
 Leapfrog runs a top-level loop over the time step. At the end of each time step, the state is optionally saved out and eventually returned. We do it this way because it decouples the reporting of the model and each time step iteration. When you run the model with `run_model` you can specify which years you want to output data for. By default it will output for all time steps, but if say you are only interested in the last time step. You can return this by running e.g.
 
@@ -68,56 +55,16 @@ This time output is managed by the state saver see [`leapfrogr/inst/include/stat
 
 ## Adding new input, output or intermediate data
 
-Leapfrog uses code generation to write the code for wiring up the input and output data. This is to reduce the number of locations you need to make changes when you add new input data or return new data from the model. In short it amounts to:
+Leapfrog uses code generation to write the code for wiring up the input and output data. This is to reduce the number of locations you need to make changes when you add new input data or return new data from the model. In short it amounts to modifying the model config .json file located in [`frogger/cpp_generation/modelSchemas/configs`](https://github.com/mrc-ide/leapfrog/tree/main/cpp_generation/modelSchemas/configs). Within each .json file there is a space to declare state space variables, parameters, intermediates, and state space objects. State space variables dictate relevant dimensions or constant parameters. Parameters are typically extracted from the .PJNZ file and require declaring the type of the parameter as well as the dimensions. Intermediates are objects which are used within the simulation but are not output by the model. If intermediates are not repeatedly used within the model they should be declared within the code itself rather than stored as an intermediate. State space objects have the same requirements as intermediates: a declaration of type and dimensions. Dimensions for all of the above can be called from the state space variables declared at the top of each config file.
 
-* Add new input data - modify [`leapfrogr/inst/cpp_generation/model_input.csv`](https://github.com/mrc-ide/leapfrog/blob/main/leapfrogr/inst/cpp_generation/model_input.csv) and run [`scripts/generate`](https://github.com/mrc-ide/leapfrog/blob/main/scripts/generate)
-* Add new model output - modify [`leapfrogr/inst/cpp_generation/model_output.csv`](https://github.com/mrc-ide/leapfrog/blob/main/leapfrogr/inst/cpp_generation/model_output.csv) and run [`scripts/generate`](https://github.com/mrc-ide/leapfrog/blob/main/scripts/generate)
+Within the model code, state space variables can be accessed using a ```SS:``` prefix, these can either be unpacked at the top of the model code or called throughout. 
 
-### Input data
+Generally, all items in the config files should follow the naming conventions outlined in [`frogger/docs/variables.Rmd`](https://github.com/mrc-ide/leapfrog/tree/main/docs/variables.Rmd). 
 
-Input data is generated from csv file in [`leapfrogr/inst/include/model_input.hpp`](https://github.com/mrc-ide/leapfrog/blob/main/leapfrogr/inst/include/model_input.hpp), the columns in this file are
+After the config files have been modified, you must run scripts/generate in terminal to generate the needed code for compiling. 
 
-1. `r_name` - The name of the data in R, from either `data` or `parameters` struct passed to `run_model`
-1. `cpp_name` - The name of the data in C++, the label you will use to refer to the data within the leapfrog model. Use a name which adheres to the naming convention rules in the README.
-1. `type` - The type of data, `real_type` or `int`. `real_type` is a templated type. Under normal usage it will be a `double` but is used by TMB for model fitting.
-1. `input_when` - An expression which evaluates to a boolean to control when this input data is used. For example `ModelVariant::run_child_model` to include only in the child model. If blank, this is always input.
-1. `value` - If you want to initialise this data as a constant value array, enter the value here. Note that if using this column then no value should be in the `r_name` column.
-1. `convert_base` - Set to `TRUE` for any array of indexes, these will be converted from 1-based numbering (for R) to 0-based numbering (for C++).
-1. `dims` - The number of dimensions for this input (max 4)
-1. `dim1` - The size of the first dimension
-1. `dim2` - The size of the second dimension, can by blank
-1. `dim3` - The size of the third dimension, can be blank
-1. `dim4` - The size of the fourth dimension, can be blank
-
-Note that the dims can be any of the state space sizes or `proj_years` for the number of years in the projection. See the [README](https://mrc-ide.github.io/leapfrog/#state-space) for valid state space sizes.
-
-After making changes to the [`model_input.csv`](https://github.com/mrc-ide/leapfrog/blob/main/leapfrogr/inst/cpp_generation/model_input.csv), run the generate script [`scripts/generate`](https://github.com/mrc-ide/leapfrog/blob/main/scripts/generate). This update file [`leapfrogr/inst/include/model_input.hpp`](https://github.com/mrc-ide/leapfrog/blob/main/leapfrogr/inst/include/model_input.hpp). Note that this file should never be changed manually as the generate script will completely rewrite it.
-
-After regenerating the code, rebuild the project and you are ready to use the new input data in C++.
-
-### Model outputs
-
-Model outputs are generated in a similar way to inputs. To modify an existing or add new output update the file [`leapfrogr/inst/cpp_generation/model_output.csv`](https://github.com/mrc-ide/leapfrog/blob/main/leapfrogr/inst/cpp_generation/model_. The columns in this file are:
-
-1. `r_name` - The name of the output in the list output from `run_model`
-1. `cpp_name` - The name of the output as it is referred to in C++
-1. `r_type` - The `R` type mapping function to use to convert this to an R-type number e.g. `REAL` to create a real typed number
-1. `output_when` - Conditional expression for when to output this from the model. For example `ModelVariant::run_child_model` to return only from the child model. If blank, this is always returned.
-1. `dims` - The number of dimensions of this output (max 5)
-1. `dim1` - The size of the first dimension
-1. `dim2` - The size of the second dimension
-1. `dim3` - The size of the third dimension
-1. `dim4` - The size of the fourth dimension
-1. `dim5` - The size of the fifth dimension
-
-Note that the dims can be any of the state space sizes or `proj_years` for the number of years in the projection. See the [README](https://mrc-ide.github.io/leapfrog/#state-space) for valid state space sizes.
-
-### Intermediate data
-
-Intermediate data is used as a place to store
-The intermediate data is not handled by code generation as it only requires changes in one place. You can make modifications by adding new data into the struct in [`leapfrogr/inst/include/types.hpp`](https://github.com/mrc-ide/leapfrog/blob/main/leapfrogr/inst/include/types.hpp), making sure to set its default value in the `reset` function on the struct.
-
-## Adding a new model variant
+## Adding a new model variant 
+##TODO: Rob/Mantra/Jeff could you update this? I'm not familiar with the process of instituting a new variant. 
 
 To add a new variant, requires work over a few areas. There are two types of model variants at the moment:
 1. A flag which turns a section of code on or off, this will come with additional model inputs and outputs
@@ -143,3 +90,8 @@ You now need to update the R wrapper to be able to call this new variant:
 1. In [`R/run_model.R`](https://github.com/mrc-ide/leapfrog/blob/main/leapfrogr/R/run_model.R) add a new flag to the `run_model` interface for using your new variant
 1. Update the conditionals to build the `model_variant` string based upon your new flag
 1. Add mapping from the string to the model variant struct in Rcpp wrapper code in [`src/leapfrog.cpp`](https://github.com/mrc-ide/leapfrog/blob/leapfrogr/main/src/leapfrog.cpp). Note use a `constexpr` for the state space to ensure it is evaluated at compile time.
+
+##Testing model results
+After implementing a change in the Leapfrog package, you should introduce a new test to ensure that the change is acting as it should. Currently, the package ensures that all outputs are really numbers and above zero. The paediatric model is currently tested against the Spectrum software implementation. All tests can be run using ```r devtools::test()```.
+
+
