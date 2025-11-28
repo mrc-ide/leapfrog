@@ -1261,6 +1261,8 @@ process_pjnz <- function(pjnz, use_coarse_age_groups = FALSE) {
       year = dim_vars$years$labels
     )
   )
+  netmigr[1:80, , ] <- apply(netmigr_5year[1:16, , ], 2:3, beers::beers_sub_ordinary)
+  netmigr[81, , ] <- netmigr_5year[17, , ]
 
   u5prop <- array(dim = c(5, 2))
   u5prop[1, ] <- pars$Sx[1, , 1] * 2
