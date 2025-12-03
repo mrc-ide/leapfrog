@@ -14,42 +14,24 @@ library(dplyr)
 ## Create demographic and projection parameters for adults
 pjnz_adult <- file.path(here::here(), "inst", "pjnz", "bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ")
 
-demp <- prepare_leapfrog_demp(pjnz_adult)
-
-proj <- prepare_leapfrog_projp(pjnz_adult, use_coarse_age_groups = FALSE)
-parameters <- c(demp, proj)
+parameters <- process_pjnz(pjnz_adult)
 save_parameters(parameters, testthat::test_path("testdata/adult_parms_full.h5"))
 
-proj_coarse <- prepare_leapfrog_projp(pjnz_adult, use_coarse_age_groups = TRUE)
-parameters_coarse <- c(demp, proj_coarse)
+parameters_coarse <- process_pjnz(pjnz_adult, use_coarse_age_groups = TRUE)
 save_parameters(parameters_coarse, testthat::test_path("testdata/adult_parms_coarse.h5"))
 
 # We use France for testing Spectrum model variant as it has non-zero Non-AIDS excess mortality
 # inputs. Which we need for testing modelled non-AIDS excess mortality.
 # This was created by creating a new default projection in Spectrum
 pjnz_france <- file.path(here::here(), "inst", "pjnz", "france_default.PJNZ")
-france_params <- prepare_leapfrog_parameters(pjnz_france)
-france_params <- prepare_hc_leapfrog_projp(pjnz_france, params = france_params, use_coarse_age_groups = FALSE)
-save_parameters(france_params, testthat::test_path("testdata/spectrum_params.h5"))
+france_parameters <- process_pjnz(pjnz_france)
+save_parameters(france_parameters, testthat::test_path("testdata/spectrum_params.h5"))
 
 #Create paeds parameters
 pjnz_child <- file.path(here::here(), "inst", "pjnz", "bwa_aim-no-special-elig-numpmtct.PJNZ")
 
-demp <- prepare_leapfrog_demp(pjnz_child)
-demp$netmigr <- read_netmigr(pjnz_child, adjust_u5mig = FALSE)
-demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
-
-proj_coarse <- prepare_leapfrog_projp(pjnz_child, use_coarse_age_groups = TRUE)
-parameters_coarse <- c(demp, proj_coarse)
-parameters_coarse <- prepare_hc_leapfrog_projp(pjnz_child, params = parameters_coarse,
-                                               bypass_adult = TRUE,
-                                               use_coarse_age_groups = TRUE)
-
-proj <- prepare_leapfrog_projp(pjnz_child, use_coarse_age_groups = FALSE)
-parameters <- c(proj, demp)
-parameters <- prepare_hc_leapfrog_projp(pjnz_child, params = parameters,
-                                        bypass_adult = TRUE,
-                                        use_coarse_age_groups = FALSE)
+parameters <- process_pjnz(pjnz_child)
+parameters_coarse <- process_pjnz(pjnz_child, use_coarse_age_groups = TRUE)
 
 pop1 <- gsub(pattern = '.PJNZ', replacement = '_pop1.xlsx', x = pjnz_child)
 
