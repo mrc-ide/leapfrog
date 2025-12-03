@@ -91,18 +91,8 @@ process_pjnz_ha <- function(dat, pars, dim_vars, use_coarse_age_groups = FALSE, 
   pars$cd4_nonaids_excess_mort <- array(0, dim(pars$cd4_mort), dimnames(pars$cd4_mort))
   pars$art_nonaids_excess_mort <- array(0, dim(pars$cd4_mort), dimnames(pars$cd4_mort))
   if (!is.null(pars$adult_non_aids_excess_mort)) {
-    pars$cd4_nonaids_excess_mort[, , "male"] <- aperm(
-      pars$adult_non_aids_excess_mort[1, , , ], c(2, 3, 1)
-    )
-    pars$cd4_nonaids_excess_mort[, , "female"] <- aperm(
-      pars$adult_non_aids_excess_mort[3, , , ], c(2, 3, 1)
-    )
-    pars$art_nonaids_excess_mort[, , "male"] <- aperm(
-      pars$adult_non_aids_excess_mort[2, , , ], c(2, 3, 1)
-    )
-    pars$art_nonaids_excess_mort[, , "female"] <- aperm(
-      pars$adult_non_aids_excess_mort[4, , , ], c(2, 3, 1)
-    )
+    pars$cd4_nonaids_excess_mort <- aperm(pars$adult_non_aids_excess_mort[1, , , ], c(2, 3, 1))
+    pars$art_nonaids_excess_mort <- aperm(pars$adult_non_aids_excess_mort[2, , , ], c(2, 3, 1))
   }
 
   pars$art_dropout_rate <- -log(1.0 - pars$perc_lost_followup / 100)

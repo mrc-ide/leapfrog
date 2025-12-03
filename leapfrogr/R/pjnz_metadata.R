@@ -540,13 +540,6 @@ get_pars_metadata <- function(dim_vars, dp) {
         )
       )
     ),
-    valid_vers = list(
-      read = list(
-        list(
-          tag = "ValidVers MV"
-        )
-      )
-    ),
     med_cd4_count_init = list(
       type = "real",
       read = list(
@@ -649,7 +642,7 @@ get_pars_metadata <- function(dim_vars, dp) {
       read = list(
         list(
           tag = "AdultARTAdjFactor",
-          dims = list("years"),
+          dims = list("g", "years"),
           start_offset = list(row = 1)
         )
       )
@@ -669,7 +662,7 @@ get_pars_metadata <- function(dim_vars, dp) {
       read = list(
         list(
           tag = "AdultPatsAllocToFromOtherRegion",
-          dims = list("years"),
+          dims = list("g", "years"),
           start_offset = list(row = 1)
         )
       )

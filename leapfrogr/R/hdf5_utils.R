@@ -24,6 +24,7 @@ save_hdf5_file <- function(df, file_path) {
 save_datasets <- function(h5f, df, group = "") {
   lapply(names(df), function(name) {
     dat <- df[[name]]
+    if (is.null(dat)) return()
     new_path <- sprintf("%s/%s", group, name)
     if (is.list(dat)) {
       h5f$create_group(new_path)
