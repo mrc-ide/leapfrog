@@ -54,7 +54,7 @@ process_pjnz <- function(pjnz, use_coarse_age_groups = FALSE, bypass_adult = FAL
   names(pars) <- names(dat$data)
 
   pars <- process_pjnz_dp(dat, pars, dim_vars)
-  pars <- process_pjnz_ha(dat, pars, dim_vars, use_coarse_age_groups, pjnz = pjnz)
+  pars <- process_pjnz_ha(dat, pars, dim_vars, dp, use_coarse_age_groups)
   pars <- process_pjnz_hc(dat, pars, dim_vars, use_coarse_age_groups, bypass_adult)
   pars
 }
