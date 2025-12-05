@@ -80,7 +80,7 @@ prepare_abortion_input <- function(dat, pars, dim_vars, proj_years) {
   abortion
 }
 
-prepare_pmtct <- function(dat, pars, dim_vars) {
+prepare_pmtct <- function(dat, pars, dim_vars, proj_years) {
   pmtct <- pars$arv_regimen
   pmtct[is.na(pmtct)] <- 0
   pmtct_number <- pmtct[grepl("- Number", rownames(pmtct)) & !grepl("postnatal", rownames(pmtct))
@@ -101,7 +101,7 @@ prepare_pmtct <- function(dat, pars, dim_vars) {
   pmtct_number <- pmtct_number[match(pmtct_options, rownames(pmtct_number)), ]
   pmtct_pct <- pmtct_pct[match(pmtct_options, rownames(pmtct_pct)), ]
 
-  pmtct_new <- array(0, dim = c(pmtct_options_length, 61), dimnames = list(
+  pmtct_new <- array(0, dim = c(pmtct_options_length, length(proj_years)), dimnames = list(
     pmtct = pmtct_options
   ))
   ## pick out which ones were inserted as numbers
@@ -294,7 +294,7 @@ prepare_art_mort <- function(dat, pars, dim_vars) {
   ages_3to4 = as.character(3:4)
   ages_less5 = as.character(0:4)
   ages_5to9 = as.character(5:9)
-  ages_10to14 = as.character(5:9)
+  ages_10to14 = as.character(10:14)
   ages_5to14 = as.character(5:14)
 
 
@@ -399,7 +399,7 @@ process_pjnz_hc <- function(dat, pars, dim_vars, use_coarse_age_groups = FALSE, 
   # Paediatric incidence
   #############################################################
   ##PMTCT
-  pmtct <- prepare_pmtct(dat, pars, dim_vars)
+  pmtct <- prepare_pmtct(dat, pars, dim_vars, proj_years)
   pars$PMTCT <- pmtct$pmtct_new
   pars$PMTCT_input_is_percent <- as.integer(pmtct$pmtct_input_isperc)
   pars$PMTCT_dropout <- prepare_pmtct_dropout(dat, pars, dim_vars, proj_years)
