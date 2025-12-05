@@ -4,7 +4,6 @@
 ## We read some input data and prepare a set of demographic projection
 ## and HIV parameters for both the adult and the child model.
 ## We also run leapfrog and save out the result for use in reference tests
-rm(list = ls())
 setwd("leapfrogr")
 devtools::load_all()
 
