@@ -1,0 +1,33 @@
+#!/usr/bin/env Rscript
+
+parameters <- leapfrog::read_parameters(testthat::test_path("testdata/adult_parms_full.h5"))
+parameters_coarse <- leapfrog::read_parameters(testthat::test_path("testdata/adult_parms_coarse.h5"))
+
+message("Benchmarking demographic projection")
+bench::mark(
+  leapfrog = leapfrog::run_model(parameters, "DemographicProjection", 1970:2030),
+  iterations = 10,
+  check = FALSE
+)
+
+message("Benchmarking coarse-stratified adult HIV model")
+bench::mark(
+  leapfrog = leapfrog::run_model(parameters_coarse, "HivCoarseAgeStratification", 1970:2030),
+  iterations = 10,
+  check = FALSE
+)
+
+message("Benchmarking single-year stratified adult HIV model")
+bench::mark(
+  leapfrog = leapfrog::run_model(parameters, "HivFullAgeStratification", 1970:2030),
+  iterations = 10,
+  check = FALSE
+)
+
+parameters <- leapfrog::read_parameters(testthat::test_path("testdata/child_parms_full.h5"))
+message("Benchmarking child model")
+bench::mark(
+  leapfrog = leapfrog::run_model(parameters, "ChildModel", 1970:2030),
+  iterations = 10,
+  check = FALSE
+)

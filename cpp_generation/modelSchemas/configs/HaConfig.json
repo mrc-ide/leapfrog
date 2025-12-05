@@ -8,19 +8,31 @@
       "hAG_span": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
       "hDS": 7,
       "hTS": 3,
-      "hAG": 66
+      "hAG": 66,
+      "pAG_fertility": 35,
+      "hAG_fertility": 35,
+      "pIDX_15to49": 15,
+      "pAG_15to49": 35,
+      "hIDX_15to49": 0,
+      "hAG_15to49": 35,
+      "HIV_STEPS_PER_YEAR": 10
     },
     "overrides": [
       {
         "applies_if": "use_coarse_stratification",
         "vars": {
           "hAG_span": [2, 3, 5, 5, 5, 5, 5, 5, 31],
-          "hAG": 9
+          "hAG": 9,
+          "hAG_fertility": 8,
+          "hAG_15to49": 8
         }
       }
     ]
   },
   "pars": {
+    "incidence_model_choice": {
+      "num_type": "int"
+     },	  
     "input_adult_incidence_rate": {
       "num_type": "real_type",
       "dims": ["opts.proj_steps"],
@@ -28,6 +40,19 @@
         "r": "incidinput"
       }
     },
+    "transmission_rate_hts": {
+      "num_type": "real_type",
+      "dims": ["opts.proj_steps * opts.hts_per_year"]
+    },
+    "initial_incidence": {
+      "num_type": "real_type"
+    },
+    "epidemic_start_hts": {
+      "num_type": "int"
+    },
+    "relative_infectiousness_art": {
+      "num_type": "real_type"
+    },      
     "incidence_rate_ratio_age": {
       "num_type": "real_type",
       "dims": ["SS::pAG - SS::p_idx_hiv_first_adult", "SS::NS", "opts.proj_steps"],
@@ -146,6 +171,33 @@
     },
     "pIDX_INCIDPOP": {
       "num_type": "int"
+    },
+    "fert_mult_by_age": {
+      "num_type": "real_type",
+      "dims": ["SS::hAG_fertility", "opts.proj_steps"],
+      "alias": {
+        "r": "fert_rat"
+      }
+    },
+    "fert_mult_off_art": {
+      "num_type": "real_type",
+      "dims": ["SS::hDS"],
+      "alias": {
+        "r": "cd4fert_rat"
+      }
+    },
+    "fert_mult_on_art": {
+      "num_type": "real_type",
+      "dims": ["SS::hAG_fertility"],
+      "alias": {
+         "r": "frr_art6mos"
+      }
+    },
+    "local_adj_factor": {
+      "num_type": "real_type",
+      "alias": {
+        "r": "frr_scalar"
+      }
     }
   },
   "intermediate": {
@@ -266,6 +318,21 @@
     },
     "anyelig_idx": {
       "num_type": "int"
+    },
+    "asfr_sum": {
+      "num_type": "real_type"
+    },
+    "nHIVcurr": {
+      "num_type": "real_type"
+    },
+    "nHIVlast": {
+      "num_type": "real_type"
+    },
+    "df": {
+      "num_type": "real_type"
+    },
+    "prev": {
+      "num_type": "real_type"
     }
   },
   "state": {
@@ -320,6 +387,25 @@
     "p_net_migration_hivpop": {
       "num_type": "real_type",
       "dims": ["SS::pAG", "SS::NS"]
+    },
+    "hiv_births_by_mat_age": {
+      "num_type": "real_type",
+      "dims": ["SS::hAG_fertility"]
+    },
+    "hiv_births": {
+      "num_type": "real_type"
+    },
+    "prevalence_15to49_hts": {
+       "num_type": "real_type",
+       "dims": ["SS::HIV_STEPS_PER_YEAR"]
+    },
+    "incidence_15to49_hts": {
+       "num_type": "real_type",
+       "dims": ["SS::HIV_STEPS_PER_YEAR"]
+    },
+    "artcoverage_15to49_hts": {
+       "num_type": "real_type",
+       "dims": ["SS::HIV_STEPS_PER_YEAR"]
     }
   }
 }
