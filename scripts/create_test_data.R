@@ -34,13 +34,36 @@ parameters_coarse <- process_pjnz(pjnz_child, use_coarse_age_groups = TRUE, bypa
 
 pop1 <- gsub(pattern = '.PJNZ', replacement = '_pop1.xlsx', x = pjnz_child)
 
+# Copied from EPPASM to remove cyclic dependency between leapfrog and eppasm
+read_pop1 <- function(pop1file, country, years = 2000:2021){
+
+  ## Read population out of Spectrum file
+  pop_list <- list()
+  for(yr in years){
+    pop1 <- as.data.frame(readxl::read_excel(pop1file, sheet=as.character(yr)))
+    pop1 <- pop1[-1,]
+    names(pop1)[1:3] <- c("sex", "cd4", "artdur")
+    pop1 <- stats::reshape(pop1, idvar=c("sex", "cd4", "artdur"), varying=c(0:79, "80+"), times=c(0:79, "80+"), timevar="age", v.names="pop", direction="long")
+    pop1$year <- as.integer(yr)
+    pop1$age <- as.integer(gsub("\\+", "", pop1$age))
+    pop1$cd4 <- as.integer(gsub("CD4 Count: ", "", pop1$cd4))
+    pop1$artdur <- as.integer(gsub("Duration: ", "", pop1$artdur))
+    pop_list[[as.character(yr)]] <- pop1
+  }
+  pop <- plyr::rbind.fill(pop_list)
+  pop$sex <- gsub("ales", "ale", pop$sex)
+  pop <- subset(pop, cd4 != 0 & artdur != 0 & pop > 0)
+
+  pop$country <- country
+
+  return(pop)
+}
+
 spectrum_output <- function(file, ages = 0:14, country = 'Botswana', years_in = 1970:2030){
   ##pull out stratified population from the .xlsx file, This function doesn't take out the paediatric output, so going to just compare to the Spectrum software itself
   df <- file
-  # if(grepl(pattern = 'testdata', file)){
-  #   df <- test_path(df)
-  # }
-  df <- eppasm::read_pop1(df, country, years = years_in)
+
+  df <- read_pop1(df, country, years = years_in)
     df_paed <- df %>% dplyr::filter(age < 5) %>%
       dplyr::right_join(y = data.frame(cd4 = 1:8, cd4_cat = c('neg', 'gte30', '26-30', '21-25', '16-20', '11-15', '5-10', 'lte5'))) %>%
       dplyr::right_join(y = data.frame(artdur = 2:8, transmission = c('perinatal', 'bf0-6', 'bf7-12', 'bf12+', 'ARTlte5mo', 'ART6to12mo', 'ARTgte12mo'))) %>%
