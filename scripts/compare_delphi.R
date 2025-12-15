@@ -44,10 +44,7 @@ build_name_mapping <- function() {
 name_mapping <- build_name_mapping()
 
 pkgload::load_all()
-demp <- prepare_leapfrog_demp(pjnz)
-proj <- prepare_leapfrog_projp(pjnz)
-params <- c(demp, proj)
-params <- prepare_hc_leapfrog_projp(pjnz, params)
+params <- process_pjnz(pjnz)
 params$mat_prev_input <- rep(FALSE, 61)
 params$basepop <- params$basepop[, , 1]
 # scale_cd4_mort is always true from Delphi so force true here

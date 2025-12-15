@@ -219,7 +219,6 @@ test_that("Female 15-49y pop aligns", {
 
 test_that("Mothers that need ptmct align", {
   parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
-  parameters$mat_prev_input[] <- as.integer(1)
   utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
   dp <- utils$dp
@@ -239,7 +238,6 @@ test_that("Mothers that need ptmct align", {
 
 test_that("Children in need of cotrim aligns", {
   parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
-  parameters$mat_prev_input[] <- as.integer(1)
   utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
   out <- run_model(parameters, "ChildModel", 1970:2030)
@@ -256,7 +254,6 @@ test_that("Children in need of cotrim aligns", {
 
 test_that("Infections among children align", {
   parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
-  parameters$mat_prev_input[] <- as.integer(1)
   utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
   dp <- utils$dp
@@ -293,7 +290,6 @@ test_that("Infections among children align", {
 
 test_that("CLHIV align", {
   parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
-  parameters$mat_prev_input[] <- as.integer(1)
   utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
   dp <- utils$dp
@@ -345,7 +341,6 @@ test_that("CLHIV align", {
 
 test_that("CLHIV on ART align", {
   parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
-  parameters$mat_prev_input[] <- as.integer(1)
   utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
   dp <- utils$dp
@@ -396,7 +391,6 @@ test_that("CLHIV on ART align", {
 
 test_that("HIV related deaths among CLHIV not on ART align", {
   parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
-  parameters$mat_prev_input[] <- as.integer(1)
   utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
   dp <- utils$dp
@@ -410,12 +404,11 @@ test_that("HIV related deaths among CLHIV not on ART align", {
   hc <- array(0, dim = c(15, 2, 61))
   hc[1:5, , ] <- hc1
   hc[6:15, , ] <- hc2
-  dt <- dplyr::right_join(reshape2::melt(hc), reshape2::melt(aids_deathsnoart), by = c("Var1", "Var2", "Var3"))
+  dimnames(hc) <- dimnames(aids_deathsnoart)
+  dt <- dplyr::right_join(reshape2::melt(hc), reshape2::melt(aids_deathsnoart), by = c("age", "sex", "years"))
   dt <- dt %>%
     dplyr::mutate(
-      age = Var1 - 1,
-      sex = dplyr::if_else(Var2 == 1, "Male", "Female"),
-      year = Var3 + 1969,
+      year = years,
       fr = value.x,
       spec = value.y
     ) %>%
@@ -428,7 +421,6 @@ test_that("HIV related deaths among CLHIV not on ART align", {
 
 test_that("HIV related deaths among CLHIV on ART align", {
   parameters <- read_parameters(test_path("testdata/child_parms_full.h5"))
-  parameters$mat_prev_input[] <- as.integer(1)
   utils <- readRDS(test_path("testdata/child_test_utils.rds"))
 
   dp <- utils$dp
@@ -442,12 +434,11 @@ test_that("HIV related deaths among CLHIV on ART align", {
   hc <- array(0, dim = c(15, 2, 61))
   hc[1:5, , ] <- hc1
   hc[6:15, , ] <- hc2
-  dt <- dplyr::right_join(reshape2::melt(hc), reshape2::melt(aids_deathsart), by = c("Var1", "Var2", "Var3"))
+  dimnames(hc) <- dimnames(aids_deathsart)
+  dt <- dplyr::right_join(reshape2::melt(hc), reshape2::melt(aids_deathsart), by = c("age", "sex", "years"))
   dt <- dt %>%
     dplyr::mutate(
-      age = Var1 - 1,
-      sex = dplyr::if_else(Var2 == 1, "Male", "Female"),
-      year = Var3 + 1969,
+      year = years,
       fr = value.x,
       spec = value.y
     ) %>%

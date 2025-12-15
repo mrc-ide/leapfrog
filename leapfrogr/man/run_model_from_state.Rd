@@ -40,7 +40,7 @@ Run leapfrog model fit from initial state
 pjnz <- system.file(
   "pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ",
   package = "leapfrog", mustWork = TRUE)
-parameters <- prepare_leapfrog_parameters(pjnz, use_coarse_age_groups = TRUE)
+parameters <- process_pjnz(pjnz, use_coarse_age_groups = TRUE)
 out_first_half_years <- run_model(parameters, "HivCoarseAgeStratification", 1970:2000)
 out_second_half_years <- run_model_from_state(
   parameters,

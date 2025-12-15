@@ -818,6 +818,23 @@ struct HcConfig {
       nda::dim<0, nda::dynamic, (SS::p_idx_hiv_first_adult)>
     >;
     nda::array_ref<real_type, shape_hc_art_init_dist> hc_art_init_dist;
+    using shape_fert_mult_by_age = nda::shape<
+      nda::dim<0, SS::hAG_fertility, 1>,
+      nda::dim<0, nda::dynamic, (SS::hAG_fertility)>
+    >;
+    nda::array_ref<real_type, shape_fert_mult_by_age> fert_mult_by_age;
+    using shape_fert_mult_off_art = nda::shape<
+      nda::dim<0, SS::hDS, 1>
+    >;
+    nda::array_ref<real_type, shape_fert_mult_off_art> fert_mult_off_art;
+    using shape_fert_mult_on_art = nda::shape<
+      nda::dim<0, SS::hAG_fertility, 1>
+    >;
+    nda::array_ref<real_type, shape_fert_mult_on_art> fert_mult_on_art;
+    using shape_total_fertility_rate = nda::shape<
+      nda::dim<0, nda::dynamic, 1>
+    >;
+    nda::array_ref<real_type, shape_total_fertility_rate> total_fertility_rate;
     using shape_PMTCT = nda::shape<
       nda::dim<0, SS::hPS, 1>,
       nda::dim<0, nda::dynamic, (SS::hPS)>

@@ -4,7 +4,6 @@
 ## We read some input data and prepare a set of demographic projection
 ## and HIV parameters for both the adult and the child model.
 ## We also run leapfrog and save out the result for use in reference tests
-
 setwd("leapfrogr")
 devtools::load_all()
 
@@ -14,48 +13,24 @@ library(dplyr)
 ## Create demographic and projection parameters for adults
 pjnz_adult <- file.path(here::here(), "inst", "pjnz", "bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ")
 
-demp <- prepare_leapfrog_demp(pjnz_adult)
-
-proj <- prepare_leapfrog_projp(pjnz_adult, use_coarse_age_groups = FALSE)
-parameters <- c(demp, proj)
+parameters <- process_pjnz(pjnz_adult)
 save_parameters(parameters, testthat::test_path("testdata/adult_parms_full.h5"))
 
-proj_coarse <- prepare_leapfrog_projp(pjnz_adult, use_coarse_age_groups = TRUE)
-parameters_coarse <- c(demp, proj_coarse)
+parameters_coarse <- process_pjnz(pjnz_adult, use_coarse_age_groups = TRUE)
 save_parameters(parameters_coarse, testthat::test_path("testdata/adult_parms_coarse.h5"))
 
 # We use France for testing Spectrum model variant as it has non-zero Non-AIDS excess mortality
 # inputs. Which we need for testing modelled non-AIDS excess mortality.
 # This was created by creating a new default projection in Spectrum
 pjnz_france <- file.path(here::here(), "inst", "pjnz", "france_default.PJNZ")
-france_params <- prepare_leapfrog_parameters(pjnz_france)
-france_params <- prepare_hc_leapfrog_projp(pjnz_france, params = france_params, use_coarse_age_groups = FALSE)
-save_parameters(france_params, testthat::test_path("testdata/spectrum_params.h5"))
+france_parameters <- process_pjnz(pjnz_france)
+save_parameters(france_parameters, testthat::test_path("testdata/spectrum_params.h5"))
 
 #Create paeds parameters
 pjnz_child <- file.path(here::here(), "inst", "pjnz", "bwa_aim-no-special-elig-numpmtct.PJNZ")
 
-demp <- prepare_leapfrog_demp(pjnz_child)
-demp$netmigr <- read_netmigr(pjnz_child, adjust_u5mig = FALSE)
-demp$netmigr_adj <- adjust_spectrum_netmigr(demp$netmigr)
-
-proj_coarse <- prepare_leapfrog_projp(pjnz_child, use_coarse_age_groups = TRUE)
-parameters_coarse <- c(demp, proj_coarse)
-parameters_coarse <- prepare_hc_leapfrog_projp(pjnz_child,  params = parameters_coarse, use_coarse_age_groups = TRUE)
-
-proj <- prepare_leapfrog_projp(pjnz_child, use_coarse_age_groups = FALSE)
-parameters <- c(proj, demp)
-parameters <- prepare_hc_leapfrog_projp(pjnz_child, params = parameters, use_coarse_age_groups = FALSE)
-
-dpfile <- grep(".DP$", utils::unzip(pjnz_child, list=TRUE)$Name, value=TRUE)
-dp <- utils::read.csv(unz(pjnz_child, dpfile), as.is=TRUE)
-dpsub <- function(dp, tag, rows, cols, tagcol=1){
-  dp[which(dp[,tagcol]==tag)+rows, cols]
-}
-yr_start <- as.integer(dpsub(dp,"<FirstYear MV2>",2,4))
-yr_end <- as.integer(dpsub(dp, "<FinalYear MV2>",2,4))
-proj.years <- yr_start:yr_end
-timedat.idx <- 4+1:length(proj.years)-1
+parameters <- process_pjnz(pjnz_child, bypass_adult = T)
+parameters_coarse <- process_pjnz(pjnz_child, use_coarse_age_groups = TRUE, bypass_adult = T)
 
 pop1 <- gsub(pattern = '.PJNZ', replacement = '_pop1.xlsx', x = pjnz_child)
 
@@ -96,32 +71,21 @@ spectrum_output <- function(file, ages = 0:14, country = 'Botswana', years_in = 
 }
 df <- spectrum_output(pop1, ages = 0:80, 'country', years_in = 1970:2030)
 x <- df$total
-x[x$age <10 & x$year == 2001, ]
 
-tag.x ="<AIDSDeathsNoARTSingleAge MV>"
-start.id = 20898
-end.id = 21148
-aids_deathsnoart <- array(as.numeric(unlist(dpsub(dp, tag.x, 3:(end.id - start.id - 2), timedat.idx))), dim = c(length(3:(end.id - start.id - 2)),length(timedat.idx)))
-m = aids_deathsnoart[84:98,]
-f = aids_deathsnoart[166:180,]
-aids_deathsnoart <- array(0, dim = c(15,2,61))
-aids_deathsnoart[,1,] <- m
-aids_deathsnoart[,2,] <- f
+dp <- read_dp(pjnz_child)
+dat <- parse_dp(dp)
 
-tag.x ="<AIDSDeathsARTSingleAge MV>"
-start.id = 20608
-end.id = 20858
-aids_deathsart <- array(as.numeric(unlist(dpsub(dp, tag.x, 3:(end.id - start.id - 2), timedat.idx))), dim = c(length(3:(end.id - start.id - 2)),length(timedat.idx)))
-m = aids_deathsart[84:98,]
-f = aids_deathsart[166:180,]
-aids_deathsart <- array(0, dim = c(15,2,61))
-aids_deathsart[,1,] <- m
-aids_deathsart[,2,] <- f
+aids_deathsnoart <- array(0, dim = c(15,2,61), dimnames = list(age = 0:14, sex = c('male', 'female'), years = 1970:2030))
+aids_deathsnoart[,'male',] <- dat$data$aids_deaths_no_art_single_age$data[as.character(0:14),"male",]
+aids_deathsnoart[,'female',] <- dat$data$aids_deaths_no_art_single_age$data[as.character(0:14),"female",]
 
-spec_ctx_need <- dpsub(dp, tag = '<ChildARTCalc MV2>', rows = 3, cols = timedat.idx)
+aids_deathsart <- array(0, dim = c(15,2,61), dimnames = list(age = 0:14, sex = c('male', 'female'), years = 1970:2030))
+aids_deathsart[,'male',] <- dat$data$aids_deaths_art_single_age$data[as.character(0:14),"male",]
+aids_deathsart[,'female',] <- dat$data$aids_deaths_art_single_age$data[as.character(0:14),"female",]
+
+spec_ctx_need <- dat$data$child_art_calc$data["both", "Children needing cotrim (0-14): ",]
 
 out <- list(dp = dp,
-            timedat.idx = timedat.idx,
             pjnz = pjnz_child,
             pop1 = x,
             ontrt = df$on_treatment,

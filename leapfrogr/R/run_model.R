@@ -16,7 +16,7 @@
 #' pjnz <- system.file(
 #'   "pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ",
 #'   package = "leapfrog", mustWork = TRUE)
-#' parameters <- prepare_leapfrog_parameters(pjnz, use_coarse_age_groups = TRUE)
+#' parameters <- process_pjnz(pjnz, use_coarse_age_groups = TRUE)
 #' out <- run_model(parameters, "HivCoarseAgeStratification", 1970:2030)
 #' @export
 run_model <- function(parameters,
@@ -46,7 +46,7 @@ run_model <- function(parameters,
 #' pjnz <- system.file(
 #'   "pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ",
 #'   package = "leapfrog", mustWork = TRUE)
-#' parameters <- prepare_leapfrog_parameters(pjnz, use_coarse_age_groups = TRUE)
+#' parameters <- process_pjnz(pjnz, use_coarse_age_groups = TRUE)
 #' out_first_half_years <- run_model(parameters, "HivCoarseAgeStratification", 1970:2000)
 #' out_second_half_years <- run_model_from_state(
 #'   parameters,
@@ -83,7 +83,7 @@ run_model_from_state <- function(parameters,
 #' pjnz <- system.file(
 #'   "pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ",
 #'   package = "leapfrog", mustWork = TRUE)
-#' parameters <- prepare_leapfrog_parameters(pjnz, use_coarse_age_groups = TRUE)
+#' parameters <- process_pjnz(pjnz, use_coarse_age_groups = TRUE)
 #' out_first_half_years <- run_model(parameters, "HivCoarseAgeStratification", 1970:2000)
 #' prev_state <- get_time_slice(out_first_half_years, 31)
 #' for (i in 2001:2029) {
@@ -113,8 +113,8 @@ process_parameters_to_cpp <- function(parameters) {
   if ("artcd4elig_idx" %in% names(parameters)) {
     parameters[["artcd4elig_idx"]] <- parameters[["artcd4elig_idx"]] - 1L
   }
-  if ("paed_art_elig_cd4" %in% names(parameters)) {
-    parameters[["paed_art_elig_cd4"]] <- parameters[["paed_art_elig_cd4"]] - 1L
+  if ("hc_art_elig_cd4" %in% names(parameters)) {
+    parameters[["hc_art_elig_cd4"]] <- parameters[["hc_art_elig_cd4"]] - 1L
   }
   if ("t_ART_start" %in% names(parameters)) {
     parameters[["t_ART_start"]] <- parameters[["t_ART_start"]] - 1L
@@ -143,8 +143,8 @@ process_parameters_to_r <- function(parameters) {
   if ("artcd4elig_idx" %in% names(parameters)) {
     parameters[["artcd4elig_idx"]] <- parameters[["artcd4elig_idx"]] + 1L
   }
-  if ("paed_art_elig_cd4" %in% names(parameters)) {
-    parameters[["paed_art_elig_cd4"]] <- parameters[["paed_art_elig_cd4"]] + 1L
+  if ("hc_art_elig_cd4" %in% names(parameters)) {
+    parameters[["hc_art_elig_cd4"]] <- parameters[["hc_art_elig_cd4"]] + 1L
   }
   if ("t_ART_start" %in% names(parameters)) {
     parameters[["t_ART_start"]] <- parameters[["t_ART_start"]] + 1L

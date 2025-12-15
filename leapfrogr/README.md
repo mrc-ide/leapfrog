@@ -70,7 +70,7 @@ library(leapfrog)
 pjnz <- system.file("pjnz/bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ",
                     package = "leapfrog", mustWork = TRUE)
 
-parameters <- prepare_leapfrog_parameters(pjnz)
+parameters <- process_pjnz(pjnz)
 ```
 
 Simulate adult ‘full’ age group (single-year age) model from 1970 to
@@ -84,7 +84,7 @@ You can also simulate a model with ‘coarse’ age group (5-year age
 groups). You need to first prepare the coarse age group parameters
 
 ``` r
-params_coarse <- prepare_leapfrog_parameters(pjnz, use_coarse_age_groups = TRUE)
+params_coarse <- process_pjnz(pjnz, use_coarse_age_groups = TRUE)
 lsimC <- run_model(params_coarse, "HivCoarseAgeStratification", 1970:2030)
 ```
 
