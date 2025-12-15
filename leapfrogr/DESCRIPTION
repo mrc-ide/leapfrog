@@ -43,7 +43,6 @@ Suggests:
     docopt,
     devtools,
     knitr,
-    leapfrog,
     RcppEigen,
     reshape2,
     rmarkdown,
@@ -53,5 +52,4 @@ Suggests:
     xml2
 Remotes:
     rlglaubius/SpectrumUtils,
-    mrc-ide/leapfrog
 VignetteBuilder: knitr
