@@ -17,11 +17,15 @@
 #' class(dp)
 #' @noRd
 read_dp <- function(pjnz) {
-
-  stopifnot(grepl("\\.(pjnz|zip)$", pjnz, ignore.case = TRUE))
+  if (!grepl("\\.(pjnz|zip)$", pjnz, ignore.case = TRUE)) {
+    stop("Invalid file format. This function can only read .pjnz or .zip files")
+  }
 
   dpfile <- grep("\\.DP$", utils::unzip(pjnz, list = TRUE)$Name, value = TRUE)
-  stopifnot(length(dpfile) == 1)
+  if (length(dpfile) != 1) {
+    msg <- sprintf("%d .DP files found. Expected 1.", length(dpfile))
+    stop(msg)
+  }
 
   dp <- utils::read.csv(unz(pjnz, dpfile), as.is = TRUE)
   class(dp) <- c(class(dp), "spectrum_dp")
@@ -50,8 +54,7 @@ process_pjnz <- function(pjnz, use_coarse_age_groups = FALSE, bypass_adult = FAL
   dat <- parse_dp(dp)
   dim_vars <- dat$dim_vars
 
-  pars <- lapply(dat$data, function(x) if (is.null(x)) NULL else x$data)
-  names(pars) <- names(dat$data)
+  pars <- lapply(dat$data, `[[`, "data")
 
   pars <- process_pjnz_dp(dat, pars, dim_vars)
   pars <- process_pjnz_ha(dat, pars, dim_vars, dp, use_coarse_age_groups)

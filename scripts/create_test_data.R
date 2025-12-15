@@ -4,7 +4,6 @@
 ## We read some input data and prepare a set of demographic projection
 ## and HIV parameters for both the adult and the child model.
 ## We also run leapfrog and save out the result for use in reference tests
-rm(list = ls())
 setwd("leapfrogr")
 devtools::load_all()
 
@@ -30,8 +29,8 @@ save_parameters(france_parameters, testthat::test_path("testdata/spectrum_params
 #Create paeds parameters
 pjnz_child <- file.path(here::here(), "inst", "pjnz", "bwa_aim-no-special-elig-numpmtct.PJNZ")
 
-parameters <- process_pjnz(pjnz_child)
-parameters_coarse <- process_pjnz(pjnz_child, use_coarse_age_groups = TRUE)
+parameters <- process_pjnz(pjnz_child, bypass_adult = T)
+parameters_coarse <- process_pjnz(pjnz_child, use_coarse_age_groups = TRUE, bypass_adult = T)
 
 pop1 <- gsub(pattern = '.PJNZ', replacement = '_pop1.xlsx', x = pjnz_child)
 
