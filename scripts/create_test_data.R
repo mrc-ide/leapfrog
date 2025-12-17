@@ -13,24 +13,26 @@ library(dplyr)
 ## Create demographic and projection parameters for adults
 pjnz_adult <- file.path(here::here(), "inst", "pjnz", "bwa_aim-adult-art-no-special-elig_v6.13_2022-04-18.PJNZ")
 
-parameters <- process_pjnz(pjnz_adult)
+parameters <- process_pjnz(pjnz_adult, extract_child_params = FALSE)
 save_parameters(parameters, testthat::test_path("testdata/adult_parms_full.h5"))
 
-parameters_coarse <- process_pjnz(pjnz_adult, use_coarse_age_groups = TRUE)
+parameters_coarse <- process_pjnz(pjnz_adult, extract_child_params = FALSE, use_coarse_age_groups = TRUE)
 save_parameters(parameters_coarse, testthat::test_path("testdata/adult_parms_coarse.h5"))
 
 # We use France for testing Spectrum model variant as it has non-zero Non-AIDS excess mortality
 # inputs. Which we need for testing modelled non-AIDS excess mortality.
 # This was created by creating a new default projection in Spectrum
 pjnz_france <- file.path(here::here(), "inst", "pjnz", "france_default.PJNZ")
-france_parameters <- process_pjnz(pjnz_france)
+france_parameters <- process_pjnz(pjnz_france, extract_child_params = TRUE)
 save_parameters(france_parameters, testthat::test_path("testdata/spectrum_params.h5"))
 
 #Create paeds parameters
 pjnz_child <- file.path(here::here(), "inst", "pjnz", "bwa_aim-no-special-elig-numpmtct.PJNZ")
 
-parameters <- process_pjnz(pjnz_child, bypass_adult = T)
-parameters_coarse <- process_pjnz(pjnz_child, use_coarse_age_groups = TRUE, bypass_adult = T)
+parameters <- process_pjnz(pjnz_child, extract_child_params = TRUE,
+                           bypass_adult = TRUE)
+parameters_coarse <- process_pjnz(pjnz_child, extract_child_params = TRUE,
+                                  use_coarse_age_groups = TRUE, bypass_adult = TRUE)
 
 pop1 <- gsub(pattern = '.PJNZ', replacement = '_pop1.xlsx', x = pjnz_child)
 

@@ -37,6 +37,9 @@ read_dp <- function(pjnz) {
 #'
 #' @param pjnz path to PJNZ file
 #' @param use_coarse_age_groups use the coarse age stratification
+#' @param extract_child_params If TRUE, then child parameters required
+#'  to run the child model will be extracted. If FALSE, only adult parameters
+#'  will be extracted from the PJNZ.
 #' @param bypass_adult produce parameters that will bypass the adult
 #'  model when running the child model variant
 #'
@@ -49,7 +52,12 @@ read_dp <- function(pjnz) {
 #' parameters <- process_pjnz(pjnz)
 #'
 #' @export
-process_pjnz <- function(pjnz, use_coarse_age_groups = FALSE, bypass_adult = FALSE) {
+process_pjnz <- function(
+    pjnz,
+    use_coarse_age_groups = FALSE,
+    extract_child_params = FALSE,
+    bypass_adult = FALSE
+) {
   dp <- read_dp(pjnz)
   dat <- parse_dp(dp)
   dim_vars <- dat$dim_vars
@@ -58,6 +66,8 @@ process_pjnz <- function(pjnz, use_coarse_age_groups = FALSE, bypass_adult = FAL
 
   pars <- process_pjnz_dp(dat, pars, dim_vars)
   pars <- process_pjnz_ha(dat, pars, dim_vars, dp, use_coarse_age_groups)
-  pars <- process_pjnz_hc(dat, pars, dim_vars, use_coarse_age_groups, bypass_adult)
+  if (extract_child_params || bypass_adult) {
+    pars <- process_pjnz_hc(dat, pars, dim_vars, use_coarse_age_groups, bypass_adult)
+  }
   pars
 }
